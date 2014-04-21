@@ -1,0 +1,103 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Check #{service.displayName} on Host #{service.host.displayName}">
+	<div class="row hostgroup">
+		<div class="col3 host">
+			<h3>Overview</h3>
+			<p>
+				<span>Check: </span>
+				<span>#{service.name}</span>
+			</p>
+			<p>
+				<span>Status: </span>
+				<span class="state #{service.state.status.toString().toLowerCase()}" title="#{service.state.status}"></span>
+			</p>
+			<p>
+				<span>Host: </span>
+				<span>#{service.host.displayName}</span>
+			</p>
+			<p>
+				<span>Last checked on: </span>
+				<span>#{dateformat('EEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
+			</p>
+			<p>
+				<span>Last checked at: </span>
+				<span>#{dateformat('HH:mm:ss', service.state.lastCheckTime)}</span>
+			</p>
+			<p>
+				<span class="output">Output: </span>
+				<span class="output">#{coalesce(service.state.output, '')}</span>
+			</p>
+		</div>
+		<div class="col3 host">
+			<h3>Check runtime</h3>
+			<p>
+				<span>Last runtime: </span>
+				<span>#{service.state.lastRuntime} ms</span>
+			</p>
+			<p>
+				<span>Average runtime: </span>
+				<span>#{service.state.averageRuntime} ms</span>
+			</p>
+		</div>
+		<div class="col3 host">
+			<h3>Check latency</h3>
+			<p>
+				<span>Last processing latency: </span>
+				<span>#{service.state.lastCheckProcessingLatency} ms</span>
+			</p>
+			<p>
+				<span>Average processing latency: </span>
+				<span>#{service.state.averageCheckProcessingLatency} ms</span>
+			</p>
+			<p>
+				<span>Last execution latency: </span>
+				<span>#{service.state.lastCheckExecutionLatency} ms</span>
+			</p>
+			<p>
+				<span>Average execution latency: </span>
+				<span>#{service.state.averageCheckExecutionLatency} ms</span>
+			</p>
+		</div>
+		<div class="col3">
+			<h3>Actions</h3>
+			<p>
+				<a href="/service/execute/#{service.id}">Check now</a>
+			</p>
+		</div>
+	</div>
+	<div class="row">
+		<h3>Configuration</h3>
+		<div class="col6">
+			<p class="row6">
+				<span class="col2">Name: </span>
+				<span class="col4">#{service.name}</span>
+			</p>
+			<p class="row6">
+				<span class="col2">Id: </span>
+				<span class="col4">#{service.id}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Host: </span>
+				<span class="col4 output">#{service.host.name}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Check Period: </span>
+				<span class="col4 output">#{service.checkPeriod.displayName}</span>
+			</p>
+		</div>
+		<div class="col6">
+			<p class="row6">
+				<span class="col2">Command: </span>
+				<span class="col4">#{service.commandExecution.command.engine}::#{service.commandExecution.command.name}</span>
+			</p>
+			<data-set var="parameter" value="#{service.commandExecution.parameters}">
+				<p class="row6">
+					<span class="col2 output">#{parameter.name}: </span>
+					<span class="col4 output">#{parameter.value}</span>
+				</p>
+			</data-set>
+		</div>
+	</div>
+</fragment>

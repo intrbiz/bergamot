@@ -1,0 +1,171 @@
+package com.intrbiz.bergamot.worker.runner.nagios;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import com.intrbiz.Util;
+import com.intrbiz.bergamot.compat.macro.MacroFrame;
+import com.intrbiz.bergamot.compat.macro.MacroProcessor;
+import com.intrbiz.bergamot.model.result.Result;
+import com.intrbiz.bergamot.model.result.ResultStatus;
+import com.intrbiz.bergamot.model.task.Check;
+import com.intrbiz.bergamot.model.task.Task;
+import com.intrbiz.bergamot.model.util.Parameter;
+import com.intrbiz.bergamot.util.CommandTokeniser;
+import com.intrbiz.bergamot.worker.runner.AbstractCheckRunner;
+
+public class NagiosRunner extends AbstractCheckRunner
+{
+    public static final int NAGIOS_OK = 0;
+
+    public static final int NAGIOS_WARNING = 1;
+
+    public static final int NAGIOS_CRITICAL = 2;
+
+    public static final int NAGIOS_UNKNOWN = 3;
+
+    private Logger logger = Logger.getLogger(NagiosRunner.class);
+
+    protected File workingDirectory;
+
+    protected Map<String, String> environmentVariables = new HashMap<String, String>();
+
+    public NagiosRunner()
+    {
+        super();
+        // set the working directory
+        this.workingDirectory = new File(System.getProperty("bergamot.worker.dir", System.getProperty("user.dir", ".")));
+        // setup the environment variables
+    }
+
+    @Override
+    public boolean accept(Task task)
+    {
+        return super.accept(task) && (task instanceof Check) && "nagios".equals(((Check) task).getEngine());
+    }
+
+    @Override
+    public Result run(Check check)
+    {
+        logger.info("Executing check : " + check.getEngine() + "::" + check.getName() + " for " + check.getCheckableType() + " " + check.getCheckableId());
+        Result result = check.createResult();
+        try
+        {
+            // apply macros to build the command line
+            String commandLine = this.buildCommandLine(check);
+            // build the process
+            List<String> command = CommandTokeniser.tokeniseCommandLine(commandLine);
+            logger.trace("Tokenised command line: '" + commandLine + "' => " + command);
+            ProcessBuilder builder = new ProcessBuilder(command);
+            builder.directory(this.workingDirectory);
+            builder.environment().putAll(this.environmentVariables);
+            builder.redirectErrorStream(true);
+            // launch the process
+            // TODO watchdog
+            long start = System.nanoTime();
+            Process process = null;
+            try
+            {
+                process  = builder.start();
+                InputStream stdOut = process.getInputStream();
+                int exitCode = process.waitFor();
+                long end = System.nanoTime();
+                // process the result
+                this.parseNagiosExitCode(exitCode, result);
+                this.parseNagiosOutput(stdOut, result);
+                result.setRuntime((((double) (end - start)) / 1_000_000D));
+                // log
+                logger.info("Check output: " + result.isOk() + " " + result.getStatus());
+                logger.debug("Check took: " + (((double) (end - start)) / 1_000_000D) + " ms");
+            }
+            finally
+            {
+                if (process != null) process.destroy();
+            }
+        }
+        catch (IOException | InterruptedException e)
+        {
+            logger.error("Failed to execute nagios check command", e);
+            result.setOk(false);
+            result.setStatus(ResultStatus.INTERNAL);
+            result.setOutput(e.getMessage());
+            result.setRuntime(0);
+        }
+        return result;
+    }
+    
+    protected String buildCommandLine(Check check)
+    {
+        // at minimum we must have the command line and check command
+        String commandLine = check.getParameter("command_line");
+        if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
+        // construct the macro frame from the check parameters
+        MacroFrame checkFrame = new MacroFrame();
+        for (Parameter parameter : check.getParameters())
+        {
+            checkFrame.put(parameter.getName(), parameter.getValue());
+        }
+        // apply the macros to the command line to form the final command line
+        logger.trace("Applying macros to " + commandLine);
+        return MacroProcessor.applyMacros(commandLine, checkFrame);
+    }
+
+    protected void parseNagiosExitCode(int code, Result result)
+    {
+        switch (code)
+        {
+            case NAGIOS_OK:
+                result.setOk(true);
+                result.setStatus(ResultStatus.OK);
+                break;
+            case NAGIOS_WARNING:
+                result.setOk(false);
+                result.setStatus(ResultStatus.WARNING);
+                break;
+            case NAGIOS_CRITICAL:
+                result.setOk(false);
+                result.setStatus(ResultStatus.CRITICAL);
+                break;
+            case NAGIOS_UNKNOWN:
+            default:
+                result.setOk(false);
+                result.setStatus(ResultStatus.UNKNOWN);
+                break;
+        }
+    }
+
+    protected void parseNagiosOutput(InputStream stream, Result result) throws IOException
+    {
+        // currently only look at the first line
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream)))
+        {
+            String outputLine = br.readLine();
+            if (outputLine != null)
+            {
+                logger.trace("Got output line: " + outputLine);
+                int pipe = outputLine.indexOf("|");
+                if (pipe > 0 && pipe < outputLine.length())
+                {
+                    result.setOutput(outputLine.substring(0, pipe).trim());
+                    result.addParameter("nagios_perf_data", outputLine.substring(pipe + 1).trim());
+                }
+                else
+                {
+                    result.setOutput(outputLine.trim());
+                }
+            }
+            else
+            {
+                logger.trace("No output returned from plugin");
+            }
+        }
+    }
+}

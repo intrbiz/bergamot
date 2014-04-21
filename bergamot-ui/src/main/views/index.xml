@@ -1,0 +1,53 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Dashboard">
+
+		<div class="row hostgroup">
+			<h2>Recent alerts</h2>
+			<data-set var="check" value="#{recent}">
+				<a href="/#{check.type}/#{check.id}">
+					<div class="col3 host">
+						<span class="dash_img" style="background: url(#{if(check.type == 'service', '/applications-system.png', '/linux-icon.png')}) no-repeat"></span>
+						<p>
+							<span>Check: </span>
+							<span>#{check.displayName}</span>
+						</p>
+						<p rendered="#{check.type == 'service'}">
+							<span>Host: </span>
+							<span>#{check.host.displayName}</span>
+						</p>
+						<p>
+							<span>Status: </span>
+							<span class="state #{check.state.status.toString().toLowerCase()}" title="#{check.state.status}"></span>
+						</p>
+						<p>
+							<span>Last checked on: </span>
+							<span>#{dateformat('EEE dd/MM/yyyy', check.state.lastCheckTime)}</span>
+						</p>
+						<p>
+							<span>Last checked at: </span>
+							<span>#{dateformat('HH:mm:ss', check.state.lastCheckTime)}</span>
+						</p>
+						<p>
+							<span class="output">Output: </span>
+							<span class="output">#{coalesce(check.state.output, '')}</span>
+						</p>
+						<p rendered="#{check.type == 'host'}">
+							<span>&nbsp;</span>
+							<span>&nbsp;</span>
+						</p>
+					</div>
+				</a>
+			</data-set>
+		</div>
+		
+		<script type="text/javascript">
+			$(document).ready(function(){
+				setTimeout(function(){
+					window.location = window.location;
+				}, 30000);
+			});
+		</script>
+	
+</fragment>

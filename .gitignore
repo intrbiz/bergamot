@@ -1,0 +1,9 @@
+.project
+.classpath
+.settings/
+.directory
+target/
+*~
+cfg/
+bergamot-core/bergamot.xml
+bergamot-ui/bergamot.xml

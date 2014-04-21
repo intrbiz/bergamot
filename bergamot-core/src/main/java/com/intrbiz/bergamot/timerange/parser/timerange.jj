@@ -1,0 +1,254 @@
+options {
+  STATIC = false;
+  UNICODE_INPUT = true;
+}
+
+PARSER_BEGIN(TimeRangeParserInternal)
+
+package com.intrbiz.bergamot.timerange.parser;
+
+import java.util.List;
+import java.util.LinkedList;
+
+import com.intrbiz.bergamot.model.timeperiod.TimeRange;
+import com.intrbiz.bergamot.model.timeperiod.HourRange;
+import com.intrbiz.bergamot.model.timeperiod.ComposedTimeRange;
+import com.intrbiz.bergamot.model.timeperiod.DayOfWeekQualifier;
+import com.intrbiz.bergamot.model.timeperiod.DayOfMonthQualifier;
+import com.intrbiz.bergamot.model.timeperiod.MonthQualifier;
+import com.intrbiz.bergamot.model.timeperiod.DayQualifier;
+import com.intrbiz.bergamot.model.timeperiod.DateQualifier;
+import com.intrbiz.bergamot.model.timeperiod.DayOfWeekInMonthQualifier;
+import com.intrbiz.bergamot.model.timeperiod.util.DayOfWeek;
+import com.intrbiz.bergamot.model.timeperiod.util.Month;
+
+@SuppressWarnings("all")
+public final class TimeRangeParserInternal
+{
+
+}
+
+PARSER_END(TimeRangeParserInternal)
+
+SKIP  : { " " | "\t" | "\n" | "\r" | "\r\n" }
+TOKEN : { 
+    <DIGITS           : (["0"-"9"])+ >
+  | <COLON            : ":" >
+  | <MINUS            : "-" >
+  | <COMMA            : "," >
+  | <DAY              : "day">
+  | <DAYOFWEEK        : "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday" >
+  | <MONTH            : "january" | "february" | "march" | "april" | "may" | "june" | "july" | "august" | "september" | "october" | "november" | "december" >
+}
+
+public DayOfWeek readDayOfWeek() : 
+{
+	Token dayOfWeek;
+}
+{
+	(
+		dayOfWeek = <DAYOFWEEK>
+	)
+    { return DayOfWeek.valueOf(dayOfWeek.image.toUpperCase()); }
+}
+
+public Month readMonth() : 
+{
+	Token month;
+}
+{
+	(
+		month = <MONTH>
+	)
+    { return Month.valueOf(month.image.toUpperCase()); }
+}
+
+public HourRange readHourRange() : 
+{
+	Token startHour;
+	Token startMinute;
+	Token stopHour;
+	Token stopMinute;
+}
+{
+	(
+		startHour = <DIGITS>
+		<COLON>
+		startMinute = <DIGITS>
+		<MINUS>
+		stopHour = <DIGITS>
+		<COLON>
+		stopMinute = <DIGITS>
+	)
+    { return new HourRange(Integer.parseInt(startHour.image), Integer.parseInt(startMinute.image), Integer.parseInt(stopHour.image), Integer.parseInt(stopMinute.image)); }
+}
+
+public ComposedTimeRange readHourRanges() :
+{
+	ComposedTimeRange ranges = new ComposedTimeRange();
+	HourRange range;
+}
+{
+	(
+		(
+			(
+				range = readHourRange()
+				{ ranges.addRange(range); } 
+			)
+		)
+		(
+			<COMMA>
+			(
+				range = readHourRange()
+				{ ranges.addRange(range); } 
+			)
+		)*
+	)
+    { return ranges; }
+}
+
+public ComposedTimeRange readDayOfWeekTimeRange() :
+{
+	DayOfWeekQualifier range = new DayOfWeekQualifier();
+	DayOfWeek dayOfWeek;
+	ComposedTimeRange hours;
+}
+{
+	(
+		dayOfWeek = readDayOfWeek()
+		hours = readHourRanges()
+	)
+    {
+    	range.setDayOfWeek(dayOfWeek);
+    	range.setRanges(hours.getRanges());
+    	return range; 
+    }
+}
+
+public ComposedTimeRange readDayOfMonthTimeRange() :
+{
+	DayOfMonthQualifier range = new DayOfMonthQualifier();
+	Month month = null;
+	Token minus = null;
+	Token dayOfMonth;
+	ComposedTimeRange hours;
+}
+{
+	(
+		(
+			(
+				<DAY>
+			) |
+			(
+				month = readMonth()
+			)
+		)
+		(
+			minus = <MINUS>
+		)?
+		dayOfMonth = <DIGITS>
+		hours = readHourRanges()
+	)
+    {
+    	range.setDayOfMonth(Integer.parseInt(dayOfMonth.image));
+    	if (minus != null) range.setDayOfMonth( range.getDayOfMonth() * -1 );
+    	range.setRanges(hours.getRanges());
+    	return month == null ? new DayQualifier(range) : new MonthQualifier(month, range);
+    }
+}
+
+public ComposedTimeRange readDateTimeRange() :
+{
+	DateQualifier range = new DateQualifier();
+	Token year;
+	Token month;
+	Token day;
+	ComposedTimeRange hours;
+}
+{
+	(
+		year = <DIGITS>
+		<MINUS>
+		month = <DIGITS>
+		<MINUS>
+		day = <DIGITS>
+		hours = readHourRanges()
+	)
+    {
+    	int mn = Integer.parseInt(month.image);
+    	if (mn < 1 && mn > 12) throw new ParseException("The month '" + month.image + "' must be between 1 and 12");
+    	range.setYear(Integer.parseInt(year.image));
+    	range.setMonth(Month.valueOf(mn - 1));
+    	range.setDay(Integer.parseInt(day.image));
+    	range.setRanges(hours.getRanges());
+    	return range; 
+    }
+}
+
+public ComposedTimeRange readDayOfWeekInMonthTimeRange() :
+{
+	DayOfWeekInMonthQualifier range = new DayOfWeekInMonthQualifier();
+	DayOfWeek dayOfWeek;
+	Token minus = null;
+	Token dayOfWeekInMonth;
+	Month month = null;
+	ComposedTimeRange hours;
+}
+{
+	(
+		dayOfWeek = readDayOfWeek()
+		(
+			minus = <MINUS>
+		)?
+		dayOfWeekInMonth = <DIGITS>
+		(
+			month = readMonth()
+		)?
+		hours = readHourRanges()
+	)
+    {
+    	range.setDayOfWeekInMonth(Integer.parseInt(dayOfWeekInMonth.image));
+    	if (minus != null) range.setDayOfWeekInMonth( range.getDayOfWeekInMonth() * -1 );
+    	if (month == null)
+    	{
+    		range.setRanges(hours.getRanges());
+    	}
+    	else
+    	{
+    		range.addRange(new MonthQualifier(month, hours.getRanges().toArray(new TimeRange[0])));
+    	}
+    	return new DayOfWeekQualifier(dayOfWeek, range);
+    }
+}
+
+public TimeRange readTimeRange() :
+{
+	TimeRange range;
+}
+{
+	(
+		LOOKAHEAD( readDayOfWeekTimeRange() )
+		(
+			range = readDayOfWeekTimeRange()
+		) |
+		LOOKAHEAD( readDayOfMonthTimeRange() )
+		(
+			range = readDayOfMonthTimeRange()
+		) |
+		LOOKAHEAD( readDayOfWeekInMonthTimeRange() )
+		(
+			range = readDayOfWeekInMonthTimeRange()
+		) |
+		LOOKAHEAD( readDateTimeRange() )
+		(
+			range = readDateTimeRange()
+		) |
+		LOOKAHEAD( readHourRanges() )
+		(
+			range = readHourRanges()
+		) 
+		
+	)
+    { return range; }
+}
+

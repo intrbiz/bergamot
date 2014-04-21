@@ -1,0 +1,47 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- A template view, applied to all views -->
+<html xmlns="com.intrbiz.balsa">
+	<head>
+		<title>Bergamot Monitoring #{title()}</title>
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
+		<!-- Scripts -->
+		<script src="/js/bower_components/requirejs/require.js"></script>
+    	<script src="/js/bower_components/jquery/dist/jquery.js"></script>
+    	<script type="text/javascript">
+			/* Configure require js */
+			require.config({
+			    baseUrl: "/js/bower_components",
+			    waitSeconds: 15
+			});
+		</script>
+	</head>
+	<body>
+		<div id="header">
+			<div class="container">
+				<div id="logo">
+					<a href="/">
+						<h1>Bergamot Monitoring</h1>
+					</a>
+				</div>
+				<div id="menu">
+					<ul>
+						<li>
+							<a href="/hosts">Hosts</a>
+						</li>
+						<li>
+							<a href="/services">Services</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="content">
+			<div class="container">			
+				<h2>#{title()}</h2>
+				<content/>
+			</div>
+		</div>
+	</body>
+</html>

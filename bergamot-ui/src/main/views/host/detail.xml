@@ -1,0 +1,95 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Host #{host.displayName}">
+
+	<div class="row hostgroup">
+		<div class="col3 host">
+			<p>
+				<span>Status: </span>
+				<span class="state #{host.state.status.toString().toLowerCase()}" title="#{host.state.status}"></span>
+			</p>
+			<p>
+				<span>Host name: </span>
+				<span>#{host.name}</span>
+			</p>
+			<p>
+				<span>Address: </span>
+				<span>#{host.address}</span>
+			</p>
+			<p>
+				<span>Last checked on: </span>
+				<span>#{dateformat('EEE dd/MM/yyyy', host.state.lastCheckTime)}</span>
+			</p>
+			<p>
+				<span>Last checked at: </span>
+				<span>#{dateformat('HH:mm:ss', host.state.lastCheckTime)}</span>
+			</p>
+			<p>
+				<span class="output">Output: </span>
+				<span class="output">#{coalesce(host.state.output, '')}</span>
+			</p>
+		</div>
+	</div>
+
+	<div class="row hostgroup services" rendered="#{! host.services.isEmpty()}">
+		<data-set var="service" value="#{host.services}">
+			<a href="/service/#{service.id}">
+				<div class="col3 host">
+					<span class="dash_img" style="background: url(/applications-system.png) no-repeat"></span>
+					<p>
+						<span>Check: </span>
+						<span>#{service.name}</span>
+					</p>
+					<p>
+						<span>Status: </span>
+						<span class="state #{service.state.status.toString().toLowerCase()}" title="#{service.state.status}"></span>
+					</p>
+					<p>
+						<span>Last checked on: </span>
+						<span>#{dateformat('EEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
+					</p>
+					<p>
+						<span>Last checked at: </span>
+						<span>#{dateformat('HH:mm:ss', service.state.lastCheckTime)}</span>
+					</p>
+					<p>
+						<span class="output">Output: </span>
+						<span class="output">#{coalesce(service.state.output, '')}</span>
+					</p>
+				</div>
+			</a>
+		</data-set>
+	</div>
+	
+	<div class="row">
+		<h3>Configuration</h3>
+		<div class="col6">
+			<p class="row6">
+				<span class="col2">Name: </span>
+				<span class="col4">#{host.name}</span>
+			</p>
+			<p class="row6">
+				<span class="col2">Id: </span>
+				<span class="col4">#{host.id}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Address: </span>
+				<span class="col4 output">#{host.address}</span>
+			</p>
+		</div>
+		<div class="col6">
+			<p class="row6">
+				<span class="col2">Command: </span>
+				<span class="col4">#{host.commandExecution.command.engine}::#{host.commandExecution.command.name}</span>
+			</p>
+			<data-set var="parameter" value="#{host.commandExecution.parameters}">
+				<p class="row6">
+					<span class="col2 output">#{parameter.name}: </span>
+					<span class="col4 output">#{parameter.value}</span>
+				</p>
+			</data-set>
+		</div>
+	</div>
+
+</fragment>
