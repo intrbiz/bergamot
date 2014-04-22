@@ -45,7 +45,7 @@ public class Host extends Checkable
     public void configure(HostCfg config)
     {
         this.name = config.resolveHostName();
-        this.address = config.resolveAddress();
+        this.address = Util.coalesceEmpty(config.resolveAddress(), this.name);
         this.displayName = Util.coalesceEmpty(config.resolveDisplayName(), config.resolveAlias(), this.name);
         this.alertAttemptThreshold = config.resolveMaxCheckAttempts();
         this.recoveryAttemptThreshold = config.resolveMaxCheckAttempts();
