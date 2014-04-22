@@ -228,7 +228,7 @@ public class Bergamot implements Configurable<BergamotCfg>
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         // read the config file
-        BergamotCfg config = BergamotCfg.read(new File(System.getProperty("bergamot.cfg", "bergamot.xml")));
+        BergamotCfg config = BergamotCfg.read(new File(System.getProperty("bergamot.cfg", "/etc/bergamot.xml")));
         // start up
         Bergamot bergamot = new Bergamot();
         bergamot.configure(config);

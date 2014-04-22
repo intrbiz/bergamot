@@ -19,7 +19,7 @@ public class BergamotApp extends BalsaApplication
     {
         // setup our internal daemon
         this.bergamot = new Bergamot();
-        this.bergamot.configure(BergamotCfg.read(new File("bergamot.xml")));
+        this.bergamot.configure(BergamotCfg.read(new File(System.getProperty("bergamot.cfg","/etc/bergamot.xml"))));
         // Setup the application routers
         router(new AppRouter());
     }
