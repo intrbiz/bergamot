@@ -1,6 +1,5 @@
 package com.intrbiz.bergamot.model.state;
 
-import java.security.SecureRandom;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.result.ResultStatus;
