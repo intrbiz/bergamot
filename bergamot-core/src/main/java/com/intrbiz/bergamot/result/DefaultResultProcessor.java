@@ -137,6 +137,7 @@ public class DefaultResultProcessor extends AbstractEngine<ResultProcessorCfg> i
         state.setLastCheckId(result.getId());
         state.setLastCheckTime(result.getExecuted());
         state.setOk(result.isOk());
+        state.pushOkHistory(result.isOk());
         state.setStatus(result.getStatus());
         state.setOutput(result.getOutput());
         return isStateChange;

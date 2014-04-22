@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model.state;
 
+import java.security.SecureRandom;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.result.ResultStatus;
@@ -26,6 +27,10 @@ public class CheckState
     private boolean hard = false;
     
     private long lastStateChange;
+    
+    // history
+    
+    private long okHistory = 0x1L;
     
     // stats
     
@@ -194,5 +199,20 @@ public class CheckState
     public void setLastStateChange(long lastStateChange)
     {
         this.lastStateChange = lastStateChange;
+    }
+
+    public long getOkHistory()
+    {
+        return okHistory;
+    }
+
+    public void setOkHistory(long okHistory)
+    {
+        this.okHistory = okHistory;
+    }
+    
+    public void pushOkHistory(boolean ok)
+    {
+        this.okHistory = ((this.okHistory << 1) & 0x7FFFFFFFFFFFFFFFL) | (ok ? 1L : 0L);
     }
 }
