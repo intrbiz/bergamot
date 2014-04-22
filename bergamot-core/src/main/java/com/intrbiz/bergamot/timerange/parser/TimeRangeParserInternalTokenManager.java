@@ -2,6 +2,7 @@
 package com.intrbiz.bergamot.timerange.parser;
 
 /** Token Manager. */
+@SuppressWarnings("all")
 public class TimeRangeParserInternalTokenManager implements TimeRangeParserInternalConstants
 {
 
