@@ -22,6 +22,26 @@ import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.CommandTokeniser;
 import com.intrbiz.bergamot.worker.runner.AbstractCheckRunner;
 
+/**
+ * Execute Nagios Plugins (CHecks)
+ * 
+ * This CheckRunner executes Nagios plugins (checks) by 
+ * forking the check, just like Nagios would.
+ * 
+ * The exit code is read to determine the result status, 
+ * and stdOut/stdErr are read to determine the check output.
+ * 
+ * Performance data is captured and stored as a parameter of 
+ * the result.
+ * 
+ * Currently only the first line of the check output is read.
+ * 
+ * To avoid polluting the core of Bergamot with Nagios specific 
+ * functionality, macro processing is pushed out to the edge.
+ * As such the only component which needs to known about Nagios 
+ * macros is this Nagios specific CheckRunner implementation.
+ * 
+ */
 public class NagiosRunner extends AbstractCheckRunner
 {
     public static final int NAGIOS_OK = 0;
@@ -46,6 +66,9 @@ public class NagiosRunner extends AbstractCheckRunner
         // setup the environment variables
     }
 
+    /**
+     * Only execute Checks where the engine == "nagios"
+     */
     @Override
     public boolean accept(Task task)
     {
@@ -102,6 +125,14 @@ public class NagiosRunner extends AbstractCheckRunner
         return result;
     }
     
+    /**
+     * The check parameters contain the command line to 
+     * execute and the variable required to build the command line.
+     * 
+     * As such we need to process the Nagios macros contained in 
+     * the command line.
+     * 
+     */
     protected String buildCommandLine(Check check)
     {
         // at minimum we must have the command line and check command
@@ -118,6 +149,9 @@ public class NagiosRunner extends AbstractCheckRunner
         return MacroProcessor.applyMacros(commandLine, checkFrame);
     }
 
+    /**
+     * Convert a Nagios exit code to a Bergamot result
+     */
     protected void parseNagiosExitCode(int code, Result result)
     {
         switch (code)
@@ -142,6 +176,9 @@ public class NagiosRunner extends AbstractCheckRunner
         }
     }
 
+    /**
+     * Extract the check output
+     */
     protected void parseNagiosOutput(InputStream stream, Result result) throws IOException
     {
         // currently only look at the first line
