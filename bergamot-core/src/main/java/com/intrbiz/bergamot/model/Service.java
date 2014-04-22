@@ -41,7 +41,8 @@ public class Service extends Checkable
     {
         this.name = config.resolveServiceDescription();
         this.displayName = Util.coalesceEmpty(config.resolveDisplayName(), this.name);
-        this.maxCheckAttempts = config.resolveMaxCheckAttempts();
+        this.alertAttemptThreshold = config.resolveMaxCheckAttempts();
+        this.recoveryAttemptThreshold = config.resolveMaxCheckAttempts();
         this.checkInterval = TimeUnit.MINUTES.toMillis(config.resolveCheckInterval());
         this.retryInterval = TimeUnit.MINUTES.toMillis(config.resolveRetryInterval());
     }

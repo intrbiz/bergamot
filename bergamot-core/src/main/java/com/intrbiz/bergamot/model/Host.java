@@ -47,7 +47,8 @@ public class Host extends Checkable
         this.name = config.resolveHostName();
         this.address = config.resolveAddress();
         this.displayName = Util.coalesceEmpty(config.resolveDisplayName(), config.resolveAlias(), this.name);
-        this.maxCheckAttempts = config.resolveMaxCheckAttempts();
+        this.alertAttemptThreshold = config.resolveMaxCheckAttempts();
+        this.recoveryAttemptThreshold = config.resolveMaxCheckAttempts();
         this.checkInterval = TimeUnit.MINUTES.toMillis(config.resolveCheckInterval());
         this.retryInterval = TimeUnit.MINUTES.toMillis(config.resolveRetryInterval());
     }

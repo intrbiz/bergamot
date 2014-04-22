@@ -129,9 +129,9 @@ public class DefaultResultProcessor extends AbstractEngine<ResultProcessorCfg> i
         else if (!state.isHard())
         {
             int attempt = state.getAttempt() + 1;
-            if (attempt > checkable.getMaxCheckAttempts()) attempt = checkable.getMaxCheckAttempts();
+            if (attempt > checkable.getCurrentAttemptThreshold()) attempt = checkable.getCurrentAttemptThreshold();
             state.setAttempt(attempt);
-            state.setHard(attempt >= checkable.getMaxCheckAttempts());
+            state.setHard(attempt >= checkable.getCurrentAttemptThreshold());
         }
         // update the state
         state.setLastCheckId(result.getId());

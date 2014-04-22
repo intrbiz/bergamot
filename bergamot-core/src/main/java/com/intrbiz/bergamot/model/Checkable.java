@@ -13,7 +13,9 @@ import com.intrbiz.bergamot.util.RandStatus;
  */
 public abstract class Checkable extends NamedObject
 {
-    protected int maxCheckAttempts = 3;
+    protected int alertAttemptThreshold = 3;
+
+    protected int recoveryAttemptThreshold = 3;
 
     protected long checkInterval = TimeUnit.MINUTES.toMillis(5);
 
@@ -32,14 +34,29 @@ public abstract class Checkable extends NamedObject
 
     public abstract String getType();
 
-    public int getMaxCheckAttempts()
+    public int getAlertAttemptThreshold()
     {
-        return maxCheckAttempts;
+        return alertAttemptThreshold;
     }
 
-    public void setMaxCheckAttempts(int maxCheckAttempts)
+    public void setAlertAttemptThreshold(int alertAttemptThreshold)
     {
-        this.maxCheckAttempts = maxCheckAttempts;
+        this.alertAttemptThreshold = alertAttemptThreshold;
+    }
+
+    public int getRecoveryAttemptThreshold()
+    {
+        return recoveryAttemptThreshold;
+    }
+
+    public void setRecoveryAttemptThreshold(int recoveryAttemptThreshold)
+    {
+        this.recoveryAttemptThreshold = recoveryAttemptThreshold;
+    }
+    
+    public int getCurrentAttemptThreshold()
+    {
+        return this.getState().isOk() ? this.getAlertAttemptThreshold() : this.getRecoveryAttemptThreshold();
     }
 
     public long getCheckInterval()
