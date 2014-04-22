@@ -116,7 +116,7 @@ public abstract class Checkable extends NamedObject
         check.setId(UUID.randomUUID());
         check.setCheckableType(this.getType());
         check.setCheckableId(this.getId());
-        check.setEngine("nagios");
+        check.setEngine(this.commandExecution.getCommand().getEngine());
         check.setName(this.commandExecution.getCommand().getName());
         // intrinsic check parameters
         this.setCheckParameters(check);
