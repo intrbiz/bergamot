@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model.message;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -26,6 +28,9 @@ public abstract class Message
     @JsonIgnore()
     private final String typeName = getMessageType(this.getClass());
 
+    @JsonProperty("id")
+    private UUID id;
+
     @JsonProperty("sender")
     private String sender;
 
@@ -34,12 +39,22 @@ public abstract class Message
         super();
     }
 
-    public String getSender()
+    public final UUID getId()
+    {
+        return id;
+    }
+
+    public final void setId(UUID id)
+    {
+        this.id = id;
+    }
+
+    public final String getSender()
     {
         return sender;
     }
 
-    public void setSender(String sender)
+    public final void setSender(String sender)
     {
         this.sender = sender;
     }

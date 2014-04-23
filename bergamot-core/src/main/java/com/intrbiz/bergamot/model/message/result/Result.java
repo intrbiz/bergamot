@@ -18,9 +18,6 @@ import com.intrbiz.bergamot.model.util.Parameter;
 @JsonTypeName("bergamot.result")
 public class Result extends Message
 {
-    @JsonProperty("id")
-    private UUID id;
-
     @JsonProperty("checkable_type")
     private String checkableType;
 
@@ -54,16 +51,6 @@ public class Result extends Message
     public Result()
     {
         super();
-    }
-
-    public UUID getId()
-    {
-        return id;
-    }
-
-    public void setId(UUID id)
-    {
-        this.id = id;
     }
 
     public String getCheckableType()
