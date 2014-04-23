@@ -51,7 +51,7 @@ public abstract class Checkable extends NamedObject
     /**
      * Is the result of this check suppressed
      */
-    protected boolean supressed = false;
+    protected boolean suppressed = false;
 
     /**
      * Is this check currently scheduled
@@ -135,14 +135,14 @@ public abstract class Checkable extends NamedObject
         this.commandExecution = commandExecution;
     }
 
-    public boolean isSupressed()
+    public boolean isSuppressed()
     {
-        return supressed;
+        return suppressed;
     }
 
-    public void setSupressed(boolean supressed)
+    public void setSuppressed(boolean suppressed)
     {
-        this.supressed = supressed;
+        this.suppressed = suppressed;
     }
 
     public boolean isEnabled()
