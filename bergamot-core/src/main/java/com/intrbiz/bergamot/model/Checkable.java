@@ -27,6 +27,16 @@ public abstract class Checkable extends NamedObject
 
     protected TimePeriod checkPeriod;
 
+    /**
+     * Is the result of this check supressed
+     */
+    protected boolean supressed = false;
+
+    /**
+     * Is this check currently scheduled
+     */
+    protected boolean enabled = true;
+
     public Checkable()
     {
         super();
@@ -53,7 +63,7 @@ public abstract class Checkable extends NamedObject
     {
         this.recoveryAttemptThreshold = recoveryAttemptThreshold;
     }
-    
+
     public int getCurrentAttemptThreshold()
     {
         return this.getState().isOk() ? this.getAlertAttemptThreshold() : this.getRecoveryAttemptThreshold();
@@ -102,6 +112,26 @@ public abstract class Checkable extends NamedObject
     public void setCommandExecution(CommandExecution commandExecution)
     {
         this.commandExecution = commandExecution;
+    }
+
+    public boolean isSupressed()
+    {
+        return supressed;
+    }
+
+    public void setSupressed(boolean supressed)
+    {
+        this.supressed = supressed;
+    }
+
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 
     public CheckState getState()
