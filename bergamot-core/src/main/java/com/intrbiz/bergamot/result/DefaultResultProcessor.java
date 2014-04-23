@@ -100,18 +100,24 @@ public class DefaultResultProcessor extends AbstractEngine<ResultProcessorCfg> i
     
     protected void handleAlert(Checkable checkable, CheckState state, Result result)
     {
-        // alert
-        this.getBergamot().getObjectStore().addRecentCheck(checkable);
+        // reschedule due to state change
         this.getBergamot().getScheduler().reschedule(checkable);
-        logger.warn("Alert for " + checkable);
+        // alert
+        if (! checkable.isSupressed())
+        {
+            this.getBergamot().getObjectStore().addRecentCheck(checkable);
+        }
+        logger.warn("Alert" + (checkable.isSupressed() ? " (supressed)" : "") + " for " + checkable);
     }
     
     protected void handleRecovery(Checkable checkable, CheckState state, Result result)
     {
-        // recovery
-        this.getBergamot().getObjectStore().removeRecentCheck(checkable);
+        // reschedule due to state change
         this.getBergamot().getScheduler().reschedule(checkable);
-        logger.warn("Recovery for " + checkable);
+        // recovery
+        // always ensure we clear alerts down from the display
+        this.getBergamot().getObjectStore().removeRecentCheck(checkable);
+        logger.warn("Recovery" + (checkable.isSupressed() ? " (supressed)" : "") + " for " + checkable);
     }
 
     protected boolean transitionState(Checkable checkable, CheckState state, Result result)
