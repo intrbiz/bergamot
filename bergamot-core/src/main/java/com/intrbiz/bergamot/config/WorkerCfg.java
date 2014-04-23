@@ -18,11 +18,11 @@ public class WorkerCfg extends Configuration
 {
     private int threads = -1;
 
-    private List<RunnerCfg> runners = new LinkedList<RunnerCfg>();
-
     private ExchangeCfg exchange;
 
     private QueueCfg queue;
+
+    private List<EngineCfg> engines = new LinkedList<EngineCfg>();
 
     private List<String> bindings = new LinkedList<String>();
 
@@ -30,13 +30,13 @@ public class WorkerCfg extends Configuration
     {
         super();
     }
-    
-    public WorkerCfg(ExchangeCfg exchange, QueueCfg queue, String[] bindings, RunnerCfg... runners)
+
+    public WorkerCfg(ExchangeCfg exchange, QueueCfg queue, String[] bindings, EngineCfg... engines)
     {
         super();
-        for (RunnerCfg runner : runners)
+        for (EngineCfg engine : engines)
         {
-            this.runners.add(runner);
+            this.engines.add(engine);
         }
         this.exchange = exchange;
         this.queue = queue;
@@ -45,28 +45,39 @@ public class WorkerCfg extends Configuration
             this.bindings.add(binding);
         }
     }
-    
-    public WorkerCfg(ExchangeCfg exchange, QueueCfg queue, String binding, RunnerCfg... runners)
+
+    public WorkerCfg(ExchangeCfg exchange, QueueCfg queue, String binding, EngineCfg... engines)
     {
         super();
-        for (RunnerCfg runner : runners)
+        for (EngineCfg engine : engines)
         {
-            this.runners.add(runner);
+            this.engines.add(engine);
         }
         this.exchange = exchange;
         this.queue = queue;
-            this.bindings.add(binding);
+        this.bindings.add(binding);
     }
-    
-    public WorkerCfg(ExchangeCfg exchange, QueueCfg queue, RunnerCfg... runners)
+
+    public WorkerCfg(ExchangeCfg exchange, QueueCfg queue, EngineCfg... engines)
     {
         super();
-        for (RunnerCfg runner : runners)
+        for (EngineCfg engine : engines)
         {
-            this.runners.add(runner);
+            this.engines.add(engine);
         }
         this.exchange = exchange;
         this.queue = queue;
+    }
+
+    @XmlElementRef(type=EngineCfg.class)
+    public List<EngineCfg> getEngines()
+    {
+        return engines;
+    }
+
+    public void setEngines(List<EngineCfg> engines)
+    {
+        this.engines = engines;
     }
 
     @XmlAttribute(name = "threads")
@@ -78,17 +89,6 @@ public class WorkerCfg extends Configuration
     public void setThreads(int threads)
     {
         this.threads = threads;
-    }
-
-    @XmlElementRef(type = RunnerCfg.class)
-    public List<RunnerCfg> getRunners()
-    {
-        return runners;
-    }
-
-    public void setRunners(List<RunnerCfg> runners)
-    {
-        this.runners = runners;
     }
 
     @XmlElementRef(type = ExchangeCfg.class)
@@ -123,10 +123,14 @@ public class WorkerCfg extends Configuration
     {
         this.bindings = bindings;
     }
-    
+
     public GenericKey[] asBindings()
     {
-        return this.getBindings().stream().map((e) -> { return new GenericKey(e); }).toArray((size) -> { return new GenericKey[size]; });
+        return this.getBindings().stream().map((e) -> {
+            return new GenericKey(e);
+        }).toArray((size) -> {
+            return new GenericKey[size];
+        });
     }
 
     @Override
@@ -144,9 +148,9 @@ public class WorkerCfg extends Configuration
             this.bindings.add("#");
         }
         // cascade
-        for (RunnerCfg runner : this.runners)
+        for (EngineCfg engine : this.engines)
         {
-            runner.applyDefaults();
+            engine.applyDefaults();
         }
     }
 }

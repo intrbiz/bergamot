@@ -19,20 +19,14 @@ import com.intrbiz.bergamot.model.util.Parameterised;
  * Execute this check please
  */
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
-@JsonTypeName("bergamot.check")
-public class Check extends Task implements Parameterised
+@JsonTypeName("bergamot.execute_check")
+public class ExecuteCheck extends Task implements Parameterised
 {
     @JsonProperty("checkable_type")
     private String checkableType;
 
     @JsonProperty("checkable_id")
     private UUID checkableId;
-
-    @JsonProperty("engine")
-    private String engine = "nagios";
-
-    @JsonProperty("name")
-    private String name;
 
     @JsonProperty("parameters")
     private List<Parameter> parameters = new LinkedList<Parameter>();
@@ -43,14 +37,15 @@ public class Check extends Task implements Parameterised
     @JsonProperty("scheduled")
     private long scheduled;
 
-    public Check()
+    public ExecuteCheck()
     {
         super();
     }
-
-    public String getDefaultRoute()
+    
+    @Override
+    public String getDefaultExchange()
     {
-        return this.getType() + "." + this.getEngine();
+        return "bergamot.check." + this.getEngine();
     }
 
     public String getCheckableType()
@@ -71,26 +66,6 @@ public class Check extends Task implements Parameterised
     public void setCheckableId(UUID checkableId)
     {
         this.checkableId = checkableId;
-    }
-
-    public String getEngine()
-    {
-        return engine;
-    }
-
-    public void setEngine(String engine)
-    {
-        this.engine = engine;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     public List<Parameter> getParameters()

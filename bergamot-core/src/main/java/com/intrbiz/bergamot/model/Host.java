@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 
 /**
  * A host - some form of network connected device that is to be checked
@@ -94,12 +94,12 @@ public class Host extends Checkable
         this.hostGroups.add(hostGroup);
     }
 
-    protected void setCheckParameters(Check check)
+    protected void setCheckParameters(ExecuteCheck executeCheck)
     {
-        super.setCheckParameters(check);
+        super.setCheckParameters(executeCheck);
         // intrinsic parameters
-        check.addParameter("HOSTADDRESS", this.getAddress());
-        check.addParameter("HOSTNAME", this.getName());
+        executeCheck.addParameter("HOSTADDRESS", this.getAddress());
+        executeCheck.addParameter("HOSTNAME", this.getName());
     }
 
     @Override

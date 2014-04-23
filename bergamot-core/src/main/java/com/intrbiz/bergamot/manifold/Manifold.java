@@ -3,8 +3,8 @@ package com.intrbiz.bergamot.manifold;
 import java.util.Collection;
 import java.util.List;
 
+import com.intrbiz.bergamot.component.BergamotComponent;
 import com.intrbiz.bergamot.config.ManifoldCfg;
-import com.intrbiz.bergamot.engine.BergamotEngine;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
@@ -16,7 +16,7 @@ import com.intrbiz.queue.name.Queue;
 /**
  * The Manifold routes messages onto various queues
  */
-public interface Manifold extends BergamotEngine<ManifoldCfg>
+public interface Manifold extends BergamotComponent<ManifoldCfg>
 {
     // routing
     

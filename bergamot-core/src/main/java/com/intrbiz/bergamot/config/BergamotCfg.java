@@ -16,7 +16,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.worker.runner.nagios.NagiosRunner;
+import com.intrbiz.bergamot.worker.engine.nagios.NagiosEngine;
+import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "bergamot")
@@ -160,8 +161,17 @@ public class BergamotCfg extends Configuration
             if (this.workers.isEmpty())
             {
                 // default workers
-                // nagios check worker
-                this.workers.add(new WorkerCfg(new ExchangeCfg("bergamot.check.nagios", "topic", true), new QueueCfg("bergamot.queue.check.nagios", true), new RunnerCfg(NagiosRunner.class)));
+                // nagios engine
+                this.workers.add(
+                        new WorkerCfg(
+                                new ExchangeCfg("bergamot.check.nagios", "topic", true), 
+                                new QueueCfg("bergamot.queue.check.nagios", true), 
+                                new EngineCfg(
+                                        NagiosEngine.class, 
+                                        new ExecutorCfg(NagiosExecutor.class
+                                )
+                        )
+                ));
             }
         }
         // cascade defaults down

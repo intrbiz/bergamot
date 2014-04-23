@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.intrbiz.queue.name.GenericKey;
 
 /**
  * A message which will be published to a queue
@@ -71,11 +72,17 @@ public abstract class Message
     }
 
     /**
-     * Get the default queue name for this message
+     * Get the default exchange name for this message
      */
     @JsonIgnore
-    public String getDefaultRoute()
+    public abstract String getDefaultExchange();
+    
+    /**
+     * Get the default route (queue) for this message
+     */
+    @JsonIgnore
+    public GenericKey getDefaultRoutingKey()
     {
-        return this.getType();
+        return null;
     }
 }

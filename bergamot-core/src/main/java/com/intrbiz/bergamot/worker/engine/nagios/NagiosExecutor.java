@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.worker.runner.nagios;
+package com.intrbiz.bergamot.worker.engine.nagios;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,16 +16,16 @@ import com.intrbiz.bergamot.compat.macro.MacroFrame;
 import com.intrbiz.bergamot.compat.macro.MacroProcessor;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.CommandTokeniser;
-import com.intrbiz.bergamot.worker.runner.AbstractCheckRunner;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 
 /**
  * Execute Nagios Plugins (CHecks)
  * 
- * This CheckRunner executes Nagios plugins (checks) by 
+ * This CheckExecutor executes Nagios plugins (checks) by 
  * forking the check, just like Nagios would.
  * 
  * The exit code is read to determine the result status, 
@@ -39,10 +39,10 @@ import com.intrbiz.bergamot.worker.runner.AbstractCheckRunner;
  * To avoid polluting the core of Bergamot with Nagios specific 
  * functionality, macro processing is pushed out to the edge.
  * As such the only component which needs to known about Nagios 
- * macros is this Nagios specific CheckRunner implementation.
+ * macros is this Nagios specific CheckExecutor implementation.
  * 
  */
-public class NagiosRunner extends AbstractCheckRunner
+public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
 {
     public static final int NAGIOS_OK = 0;
 
@@ -52,13 +52,13 @@ public class NagiosRunner extends AbstractCheckRunner
 
     public static final int NAGIOS_UNKNOWN = 3;
 
-    private Logger logger = Logger.getLogger(NagiosRunner.class);
+    private Logger logger = Logger.getLogger(NagiosExecutor.class);
 
     protected File workingDirectory;
 
     protected Map<String, String> environmentVariables = new HashMap<String, String>();
 
-    public NagiosRunner()
+    public NagiosExecutor()
     {
         super();
         // set the working directory
@@ -72,18 +72,18 @@ public class NagiosRunner extends AbstractCheckRunner
     @Override
     public boolean accept(Task task)
     {
-        return super.accept(task) && (task instanceof Check) && "nagios".equals(((Check) task).getEngine());
+        return super.accept(task) && (task instanceof ExecuteCheck) && "nagios".equals(((ExecuteCheck) task).getEngine());
     }
 
     @Override
-    public Result run(Check check)
+    public Result run(ExecuteCheck executeCheck)
     {
-        logger.info("Executing check : " + check.getEngine() + "::" + check.getName() + " for " + check.getCheckableType() + " " + check.getCheckableId());
-        Result result = check.createResult();
+        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckableType() + " " + executeCheck.getCheckableId());
+        Result result = executeCheck.createResult();
         try
         {
             // apply macros to build the command line
-            String commandLine = this.buildCommandLine(check);
+            String commandLine = this.buildCommandLine(executeCheck);
             // build the process
             List<String> command = CommandTokeniser.tokeniseCommandLine(commandLine);
             logger.trace("Tokenised command line: '" + commandLine + "' => " + command);
@@ -133,14 +133,14 @@ public class NagiosRunner extends AbstractCheckRunner
      * the command line.
      * 
      */
-    protected String buildCommandLine(Check check)
+    protected String buildCommandLine(ExecuteCheck executeCheck)
     {
         // at minimum we must have the command line and check command
-        String commandLine = check.getParameter("command_line");
+        String commandLine = executeCheck.getParameter("command_line");
         if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
         // construct the macro frame from the check parameters
         MacroFrame checkFrame = new MacroFrame();
-        for (Parameter parameter : check.getParameters())
+        for (Parameter parameter : executeCheck.getParameters())
         {
             checkFrame.put(parameter.getName(), parameter.getValue());
         }

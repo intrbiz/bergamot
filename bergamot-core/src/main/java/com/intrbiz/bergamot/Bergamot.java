@@ -36,7 +36,7 @@ import com.intrbiz.queue.rabbit.RabbitPool;
  * Bergamot, a simple monitoring system.
  */
 public class Bergamot implements Configurable<BergamotCfg>
-{
+{   
     private Logger logger = Logger.getLogger(Bergamot.class);
 
     private String name = UUID.randomUUID().toString();

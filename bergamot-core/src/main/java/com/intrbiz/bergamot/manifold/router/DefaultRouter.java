@@ -16,8 +16,10 @@ public class DefaultRouter extends AbstractRouter
     @Override
     public boolean route(MessageContext ctx)
     {
+        // default route for 
         // use the default route of the message
-        ctx.getRouting().setExchange(ctx.getMessage().getDefaultRoute());
+        ctx.getRouting().setExchange(ctx.getMessage().getDefaultExchange());
+        ctx.getRouting().setRoutingKey(ctx.getMessage().getDefaultRoutingKey());
         return true;
     }
 }

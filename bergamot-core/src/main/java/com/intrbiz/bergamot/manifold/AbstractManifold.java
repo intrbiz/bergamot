@@ -8,10 +8,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.component.AbstractComponent;
 import com.intrbiz.bergamot.config.ExchangeCfg;
 import com.intrbiz.bergamot.config.ManifoldCfg;
 import com.intrbiz.bergamot.config.RouterCfg;
-import com.intrbiz.bergamot.engine.AbstractEngine;
 import com.intrbiz.bergamot.manifold.model.MessageContext;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.queue.Consumer;
@@ -21,7 +21,7 @@ import com.intrbiz.queue.name.Exchange;
 import com.intrbiz.queue.name.GenericKey;
 import com.intrbiz.queue.name.Queue;
 
-public abstract class AbstractManifold extends AbstractEngine<ManifoldCfg> implements Manifold
+public abstract class AbstractManifold extends AbstractComponent<ManifoldCfg> implements Manifold
 {
     private Logger logger = Logger.getLogger(AbstractManifold.class);
 

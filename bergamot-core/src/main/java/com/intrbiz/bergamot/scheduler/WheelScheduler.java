@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.Checkable;
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 
 /**
@@ -426,10 +426,10 @@ public class WheelScheduler extends AbstractScheduler
         public void run()
         {
             // fire off the check
-            Check check = this.checkable.createCheck();
-            if (check != null)
+            ExecuteCheck executeCheck = this.checkable.createCheck();
+            if (executeCheck != null)
             {
-                getBergamot().getManifold().publish(check);
+                getBergamot().getManifold().publish(executeCheck);
             }
         }
     }

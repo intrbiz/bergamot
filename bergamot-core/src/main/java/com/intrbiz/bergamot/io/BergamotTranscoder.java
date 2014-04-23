@@ -18,7 +18,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.queue.QueueEventTranscoder;
 import com.intrbiz.queue.QueueException;
@@ -32,7 +32,7 @@ public class BergamotTranscoder
         // model
         Parameter.class,
         // messages
-        Check.class,
+        ExecuteCheck.class,
         Result.class
     };
     

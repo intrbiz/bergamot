@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.bergamot.Bergamot;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
@@ -71,8 +71,8 @@ public class AppRouter extends Router
         if (service != null)
         {
             // build the check and dispatch it
-            Check check = service.createCheck();
-            if (check != null) bergamot.getManifold().publish(check);
+            ExecuteCheck executeCheck = service.createCheck();
+            if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
         }
         redirect("/service/" + id);
     }

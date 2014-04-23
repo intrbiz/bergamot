@@ -1,13 +1,13 @@
 package com.intrbiz.bergamot.scheduler;
 
+import com.intrbiz.bergamot.component.BergamotComponent;
 import com.intrbiz.bergamot.config.SchedulerCfg;
-import com.intrbiz.bergamot.engine.BergamotEngine;
 import com.intrbiz.bergamot.model.Checkable;
 
 /**
  * Schedule the execution of stuff, mainly host and service checks
  */
-public interface Scheduler extends BergamotEngine<SchedulerCfg>
+public interface Scheduler extends BergamotComponent<SchedulerCfg>
 {
     /**
      * Pause scheduling all checks

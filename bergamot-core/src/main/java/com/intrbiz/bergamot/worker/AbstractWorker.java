@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.config.RunnerCfg;
+import com.intrbiz.bergamot.component.AbstractComponent;
+import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
-import com.intrbiz.bergamot.engine.AbstractEngine;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.queue.Consumer;
@@ -18,11 +20,11 @@ import com.intrbiz.queue.name.Exchange;
 import com.intrbiz.queue.name.GenericKey;
 import com.intrbiz.queue.name.Queue;
 
-public abstract class AbstractWorker extends AbstractEngine<WorkerCfg> implements Worker, DeliveryHandler<Message>
+public abstract class AbstractWorker extends AbstractComponent<WorkerCfg> implements Worker, DeliveryHandler<Message>
 {
     private Logger logger = Logger.getLogger(AbstractWorker.class);
     
-    private List<Runner> runners = new LinkedList<Runner>();
+    private Map<String, Engine> engines = new TreeMap<String, Engine>();
     
     private List<Consumer<Message, GenericKey>> consumers = new LinkedList<Consumer<Message, GenericKey>>();
     
@@ -35,18 +37,18 @@ public abstract class AbstractWorker extends AbstractEngine<WorkerCfg> implement
     protected void configure() throws Exception
     {
         // load our runners
-        for (RunnerCfg runnerCfg : this.config.getRunners())
+        for (EngineCfg engineCfg : this.config.getEngines())
         {
-            Runner runner = (Runner) runnerCfg.create();
-            runner.setWorker(this);
-            logger.info("Adding runner: " + runner);
-            this.runners.add(runner);
+            Engine engine = (Engine) engineCfg.create();
+            engine.setWorker(this);
+            logger.info("Adding engine: " + engine);
+            this.engines.put(engine.getName(), engine);
         }
     }
     
-    public Collection<Runner> getRunners()
+    public Collection<Engine> getEngines()
     {
-        return this.runners;
+        return this.engines.values();
     }
     
     public void start()
@@ -65,15 +67,15 @@ public abstract class AbstractWorker extends AbstractEngine<WorkerCfg> implement
     
     protected void executeTask(Task task)
     {
-        for (Runner runner : this.runners)
+        Engine engine = this.engines.get(task.getEngine());
+        if (engine != null)
         {
-            if (runner.accept(task))
-            {
-                runner.execute(task);
-                return;
-            }
+            engine.execute(task);
         }
-        logger.error("No runner for task: " + task.getClass() + ", cannot run task!");
+        else
+        {
+            logger.warn("No engine " + task.getEngine() + " could be found, dropping task.");
+        }
     }
 
     @Override

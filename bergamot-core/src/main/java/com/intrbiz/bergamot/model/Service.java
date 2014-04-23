@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 
 /**
  * Some software service running on a host which needs to be checked
@@ -62,13 +62,13 @@ public class Service extends Checkable
         this.serviceGroups = serviceGroups;
     }
 
-    protected void setCheckParameters(Check check)
+    protected void setCheckParameters(ExecuteCheck executeCheck)
     {
-        super.setCheckParameters(check);
+        super.setCheckParameters(executeCheck);
         // intrinsic parameters
-        check.addParameter("HOSTADDRESS", this.getHost().getAddress());
-        check.addParameter("HOSTNAME", this.getHost().getName());
-        check.addParameter("SERVICEDESCRIPTION", this.getName());
+        executeCheck.addParameter("HOSTADDRESS", this.getHost().getAddress());
+        executeCheck.addParameter("HOSTNAME", this.getHost().getName());
+        executeCheck.addParameter("SERVICEDESCRIPTION", this.getName());
     }
 
     public String toString()

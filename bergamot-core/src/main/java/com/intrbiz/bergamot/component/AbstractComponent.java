@@ -1,15 +1,15 @@
-package com.intrbiz.bergamot.engine;
+package com.intrbiz.bergamot.component;
 
 import com.intrbiz.bergamot.Bergamot;
 import com.intrbiz.configuration.Configuration;
 
-public abstract class AbstractEngine<T extends Configuration> implements BergamotEngine<T>
+public abstract class AbstractComponent<T extends Configuration> implements BergamotComponent<T>
 {
     protected Bergamot bergamot;
     
     protected T config;
     
-    public AbstractEngine()
+    public AbstractComponent()
     {
         super();
     }

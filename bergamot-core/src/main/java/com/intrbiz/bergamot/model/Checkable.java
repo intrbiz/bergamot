@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.model;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.RandStatus;
@@ -160,34 +160,34 @@ public abstract class Checkable extends NamedObject
         return this.state;
     }
 
-    public final Check createCheck()
+    public final ExecuteCheck createCheck()
     {
         if (this.commandExecution == null) return null;
-        Check check = new Check();
-        check.setId(UUID.randomUUID());
-        check.setCheckableType(this.getType());
-        check.setCheckableId(this.getId());
-        check.setEngine(this.commandExecution.getCommand().getEngine());
-        check.setName(this.commandExecution.getCommand().getName());
+        ExecuteCheck executeCheck = new ExecuteCheck();
+        executeCheck.setId(UUID.randomUUID());
+        executeCheck.setCheckableType(this.getType());
+        executeCheck.setCheckableId(this.getId());
+        executeCheck.setEngine(this.commandExecution.getCommand().getEngine());
+        executeCheck.setName(this.commandExecution.getCommand().getName());
         // intrinsic check parameters
-        this.setCheckParameters(check);
+        this.setCheckParameters(executeCheck);
         // parameters defined by the command
         for (Parameter parameter : this.commandExecution.getCommand().getParameters())
         {
-            check.addParameter(parameter.getName(), parameter.getValue());
+            executeCheck.addParameter(parameter.getName(), parameter.getValue());
         }
         // configured parameters
         for (Parameter parameter : this.commandExecution.getParameters())
         {
-            check.setParameter(parameter.getName(), parameter.getValue());
+            executeCheck.setParameter(parameter.getName(), parameter.getValue());
         }
-        check.setTimeout(30_000L);
-        check.setScheduled(System.currentTimeMillis());
-        return check;
+        executeCheck.setTimeout(30_000L);
+        executeCheck.setScheduled(System.currentTimeMillis());
+        return executeCheck;
     }
 
-    protected void setCheckParameters(Check check)
+    protected void setCheckParameters(ExecuteCheck executeCheck)
     {
-        check.addParameter("RANDSTATUS", String.valueOf(RandStatus.getInstance().randomNagiosStatus()));
+        executeCheck.addParameter("RANDSTATUS", String.valueOf(RandStatus.getInstance().randomNagiosStatus()));
     }
 }

@@ -10,11 +10,12 @@ import org.junit.Test;
 
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 
 public class TestNagiosRunner
 {
-    private NagiosRunner runner;
+    private NagiosExecutor runner;
 
     /**
      * Setup the runner
@@ -22,40 +23,40 @@ public class TestNagiosRunner
     @Before
     public void setup()
     {
-        this.runner = new NagiosRunner();
+        this.runner = new NagiosExecutor();
     }
 
     /**
      * Helper to create check
      */
-    protected Check nagiosCheck(String commandName, String commandLine, String... args)
+    protected ExecuteCheck nagiosCheck(String commandName, String commandLine, String... args)
     {
-        Check check = new Check();
-        check.setId(UUID.randomUUID());
-        check.setCheckableType("service");
-        check.setCheckableId(UUID.randomUUID());
-        check.setEngine("nagios");
-        check.setName(commandName);
+        ExecuteCheck executeCheck = new ExecuteCheck();
+        executeCheck.setId(UUID.randomUUID());
+        executeCheck.setCheckableType("service");
+        executeCheck.setCheckableId(UUID.randomUUID());
+        executeCheck.setEngine("nagios");
+        executeCheck.setName(commandName);
         // intrinsic parameters
-        check.addParameter("HOSTADDRESS", "127.0.0.1");
-        check.addParameter("HOSTNAME", "localhost");
-        check.addParameter("SERVICEDESCRIPTION", "Dummy Service");
-        check.addParameter("command_line", commandLine);
+        executeCheck.addParameter("HOSTADDRESS", "127.0.0.1");
+        executeCheck.addParameter("HOSTNAME", "localhost");
+        executeCheck.addParameter("SERVICEDESCRIPTION", "Dummy Service");
+        executeCheck.addParameter("command_line", commandLine);
         int argIdx = 1;
         for (String arg : args)
         {
-            check.addParameter("ARG" + (argIdx++), arg);
+            executeCheck.addParameter("ARG" + (argIdx++), arg);
         }
-        check.setScheduled(System.currentTimeMillis());
-        check.setTimeout(30_000L);
-        return check;
+        executeCheck.setScheduled(System.currentTimeMillis());
+        executeCheck.setTimeout(30_000L);
+        return executeCheck;
     }
     
     @Test
     public void testAcceptNagiosCheck()
     {
-        Check check = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy $ARG1$ $ARG2$", "0", "Test");
-        assertThat(this.runner.accept(check), is(equalTo(true)));
+        ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy $ARG1$ $ARG2$", "0", "Test");
+        assertThat(this.runner.accept(executeCheck), is(equalTo(true)));
     }
     
     @Test
@@ -67,13 +68,13 @@ public class TestNagiosRunner
     @Test
     public void testDummyOkCheck()
     {
-        Check check = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
-        Result result = this.runner.run(check);
+        ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
+        Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
-        assertThat(result.getId(), is(equalTo(check.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(check.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
-        assertThat(result.getCheck(), is(equalTo(check)));
+        assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
+        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(true)));
         assertThat(result.getStatus(), is(equalTo(Status.OK)));
         assertThat(result.getOutput(), is(equalTo("OK: Test")));
@@ -85,13 +86,13 @@ public class TestNagiosRunner
     @Test
     public void testDummyWarningCheck()
     {
-        Check check = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 1 Test");
-        Result result = this.runner.run(check);
+        ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 1 Test");
+        Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
-        assertThat(result.getId(), is(equalTo(check.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(check.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
-        assertThat(result.getCheck(), is(equalTo(check)));
+        assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
+        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.WARNING)));
         assertThat(result.getOutput(), is(equalTo("WARNING: Test")));
@@ -103,13 +104,13 @@ public class TestNagiosRunner
     @Test
     public void testDummyCriticalCheck()
     {
-        Check check = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 2 Test");
-        Result result = this.runner.run(check);
+        ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 2 Test");
+        Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
-        assertThat(result.getId(), is(equalTo(check.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(check.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
-        assertThat(result.getCheck(), is(equalTo(check)));
+        assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
+        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.CRITICAL)));
         assertThat(result.getOutput(), is(equalTo("CRITICAL: Test")));
@@ -121,13 +122,13 @@ public class TestNagiosRunner
     @Test
     public void testDummyUnknownCheck()
     {
-        Check check = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 3 Test");
-        Result result = this.runner.run(check);
+        ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 3 Test");
+        Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
-        assertThat(result.getId(), is(equalTo(check.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(check.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
-        assertThat(result.getCheck(), is(equalTo(check)));
+        assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
+        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.UNKNOWN)));
         assertThat(result.getOutput(), is(equalTo("UNKNOWN: Test")));
@@ -139,13 +140,13 @@ public class TestNagiosRunner
     @Test
     public void testMissing()
     {
-        Check check = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_missing");
-        Result result = this.runner.run(check);
+        ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_missing");
+        Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
-        assertThat(result.getId(), is(equalTo(check.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(check.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
-        assertThat(result.getCheck(), is(equalTo(check)));
+        assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
+        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.INTERNAL)));
         assertThat(result.getOutput(), is(not(nullValue())));
@@ -159,13 +160,13 @@ public class TestNagiosRunner
     public void testFailingNRPE()
     {
         // deliberately wrong port number
-        Check check = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -p 35666 -t 15 -c check_load");
-        Result result = this.runner.run(check);
+        ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -p 35666 -t 15 -c check_load");
+        Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
-        assertThat(result.getId(), is(equalTo(check.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(check.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
-        assertThat(result.getCheck(), is(equalTo(check)));
+        assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
+        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), anyOf(equalTo(Status.CRITICAL), equalTo(Status.UNKNOWN)));
         assertThat(result.getOutput(), is(not(nullValue())));
@@ -177,13 +178,13 @@ public class TestNagiosRunner
     @Test
     public void testNRPE()
     {
-        Check check = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -t 15 -c check_load");
-        Result result = this.runner.run(check);
+        ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -t 15 -c check_load");
+        Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
-        assertThat(result.getId(), is(equalTo(check.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(check.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
-        assertThat(result.getCheck(), is(equalTo(check)));
+        assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
+        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(true)));
         assertThat(result.getStatus(), is(equalTo(Status.OK)));
         assertThat(result.getOutput(), is(not(nullValue())));

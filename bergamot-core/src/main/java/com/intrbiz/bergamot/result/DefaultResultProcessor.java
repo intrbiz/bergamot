@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.component.AbstractComponent;
 import com.intrbiz.bergamot.config.ResultProcessorCfg;
-import com.intrbiz.bergamot.engine.AbstractEngine;
 import com.intrbiz.bergamot.model.Checkable;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.result.Result;
@@ -18,7 +18,7 @@ import com.intrbiz.queue.name.Exchange;
 import com.intrbiz.queue.name.GenericKey;
 import com.intrbiz.queue.name.Queue;
 
-public class DefaultResultProcessor extends AbstractEngine<ResultProcessorCfg> implements ResultProcessor, DeliveryHandler<Message>
+public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg> implements ResultProcessor, DeliveryHandler<Message>
 {
     private Logger logger = Logger.getLogger(DefaultResultProcessor.class);
 

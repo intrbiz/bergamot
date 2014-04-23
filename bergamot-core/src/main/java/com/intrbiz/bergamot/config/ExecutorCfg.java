@@ -3,19 +3,19 @@ package com.intrbiz.bergamot.config;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.bergamot.worker.Runner;
+import com.intrbiz.bergamot.worker.Executor;
 import com.intrbiz.configuration.Configuration;
 
-@XmlType(name = "runner")
-@XmlRootElement(name = "runner")
-public class RunnerCfg extends Configuration
+@XmlType(name = "executor")
+@XmlRootElement(name = "executor")
+public class ExecutorCfg extends Configuration
 {
-    public RunnerCfg()
+    public ExecutorCfg()
     {
         super();
     }
     
-    public RunnerCfg(Class<? extends Runner> runnerClass)
+    public ExecutorCfg(Class<? extends Executor<?>> runnerClass)
     {
         super();
         this.setClassname(runnerClass.getName());

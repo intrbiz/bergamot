@@ -1,8 +1,18 @@
 package com.intrbiz.bergamot.worker;
 
-import com.intrbiz.bergamot.config.WorkerCfg;
-import com.intrbiz.bergamot.engine.BergamotEngine;
+import java.util.Collection;
 
-public interface Worker extends BergamotEngine<WorkerCfg>
+import com.intrbiz.bergamot.component.BergamotComponent;
+import com.intrbiz.bergamot.config.WorkerCfg;
+
+/**
+ * A worker is responsible for performing tasks.
+ * 
+ * Workers have a number of engines registered, 
+ * engines are specialised, eg: nagios, snmp, etc.
+ * 
+ */
+public interface Worker extends BergamotComponent<WorkerCfg>
 {
+    Collection<Engine> getEngines();
 }
