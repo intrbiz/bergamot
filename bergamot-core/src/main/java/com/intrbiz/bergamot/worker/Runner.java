@@ -1,7 +1,7 @@
 package com.intrbiz.bergamot.worker;
 
 import com.intrbiz.bergamot.config.RunnerCfg;
-import com.intrbiz.bergamot.model.task.Task;
+import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.configuration.Configurable;
 
 /**

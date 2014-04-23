@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.model.task;
+package com.intrbiz.bergamot.model.message.task;
 
 import java.util.UUID;
 

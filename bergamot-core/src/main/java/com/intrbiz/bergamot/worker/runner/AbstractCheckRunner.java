@@ -2,9 +2,9 @@ package com.intrbiz.bergamot.worker.runner;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.model.result.Result;
-import com.intrbiz.bergamot.model.task.Check;
-import com.intrbiz.bergamot.model.task.Task;
+import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.bergamot.worker.CheckRunner;
 
 public abstract class AbstractCheckRunner extends AbstractRunner implements CheckRunner

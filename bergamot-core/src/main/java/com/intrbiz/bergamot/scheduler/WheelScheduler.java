@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.Checkable;
-import com.intrbiz.bergamot.model.task.Check;
+import com.intrbiz.bergamot.model.message.task.Check;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 
 /**

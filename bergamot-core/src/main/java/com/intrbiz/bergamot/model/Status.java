@@ -1,9 +1,9 @@
-package com.intrbiz.bergamot.model.result;
+package com.intrbiz.bergamot.model;
 
 /**
  * Detailed status of a check
  */
-public enum ResultStatus
+public enum Status
 { 
     /**
      * The check is currently pending
@@ -34,7 +34,7 @@ public enum ResultStatus
      */
     INTERNAL;
     
-    private ResultStatus()
+    private Status()
     {
     }
     
@@ -43,9 +43,9 @@ public enum ResultStatus
         return this.ordinal();
     }
     
-    public static ResultStatus valueOf(int code)
+    public static Status valueOf(int code)
     {
-        for (ResultStatus status : ResultStatus.values())
+        for (Status status : Status.values())
         {
             if (status.getCode() == code) return status;
         }

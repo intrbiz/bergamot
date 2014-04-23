@@ -14,10 +14,10 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.macro.MacroFrame;
 import com.intrbiz.bergamot.compat.macro.MacroProcessor;
-import com.intrbiz.bergamot.model.result.Result;
-import com.intrbiz.bergamot.model.result.ResultStatus;
-import com.intrbiz.bergamot.model.task.Check;
-import com.intrbiz.bergamot.model.task.Task;
+import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.task.Check;
+import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.CommandTokeniser;
 import com.intrbiz.bergamot.worker.runner.AbstractCheckRunner;
@@ -118,7 +118,7 @@ public class NagiosRunner extends AbstractCheckRunner
         {
             logger.error("Failed to execute nagios check command", e);
             result.setOk(false);
-            result.setStatus(ResultStatus.INTERNAL);
+            result.setStatus(Status.INTERNAL);
             result.setOutput(e.getMessage());
             result.setRuntime(0);
         }
@@ -158,20 +158,20 @@ public class NagiosRunner extends AbstractCheckRunner
         {
             case NAGIOS_OK:
                 result.setOk(true);
-                result.setStatus(ResultStatus.OK);
+                result.setStatus(Status.OK);
                 break;
             case NAGIOS_WARNING:
                 result.setOk(false);
-                result.setStatus(ResultStatus.WARNING);
+                result.setStatus(Status.WARNING);
                 break;
             case NAGIOS_CRITICAL:
                 result.setOk(false);
-                result.setStatus(ResultStatus.CRITICAL);
+                result.setStatus(Status.CRITICAL);
                 break;
             case NAGIOS_UNKNOWN:
             default:
                 result.setOk(false);
-                result.setStatus(ResultStatus.UNKNOWN);
+                result.setStatus(Status.UNKNOWN);
                 break;
         }
     }

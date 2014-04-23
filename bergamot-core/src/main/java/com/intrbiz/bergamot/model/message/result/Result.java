@@ -1,56 +1,69 @@
-package com.intrbiz.bergamot.model.task;
+package com.intrbiz.bergamot.model.message.result;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.result.Result;
+import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.model.message.Message;
+import com.intrbiz.bergamot.model.message.task.Check;
 import com.intrbiz.bergamot.model.util.Parameter;
-import com.intrbiz.bergamot.model.util.Parameterised;
 
 /**
- * Execute this check please
+ * The result of a check
  */
-@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
-@JsonTypeName("bergamot.check")
-public class Check extends Task implements Parameterised
+@JsonTypeName("bergamot.result")
+public class Result extends Message
 {
+    @JsonProperty("id")
+    private UUID id;
+
     @JsonProperty("checkable_type")
     private String checkableType;
 
     @JsonProperty("checkable_id")
     private UUID checkableId;
 
-    @JsonProperty("engine")
-    private String engine = "nagios";
+    @JsonProperty("check")
+    private Check check;
 
-    @JsonProperty("name")
-    private String name;
+    @JsonProperty("ok")
+    private boolean ok;
+
+    @JsonProperty("status")
+    private Status status;
+
+    @JsonProperty("executed")
+    private long executed;
+
+    @JsonProperty("processed")
+    private long processed;
+
+    @JsonProperty("runtime")
+    private double runtime;
+
+    @JsonProperty("output")
+    private String output;
 
     @JsonProperty("parameters")
     private List<Parameter> parameters = new LinkedList<Parameter>();
 
-    @JsonProperty("timeout")
-    private long timeout = 30_000L;
-
-    @JsonProperty("scheduled")
-    private long scheduled;
-
-    public Check()
+    public Result()
     {
         super();
     }
 
-    public String getDefaultRoute()
+    public UUID getId()
     {
-        return this.getType() + "." + this.getEngine();
+        return id;
+    }
+
+    public void setId(UUID id)
+    {
+        this.id = id;
     }
 
     public String getCheckableType()
@@ -73,24 +86,74 @@ public class Check extends Task implements Parameterised
         this.checkableId = checkableId;
     }
 
-    public String getEngine()
+    public Check getCheck()
     {
-        return engine;
+        return check;
     }
 
-    public void setEngine(String engine)
+    public void setCheck(Check check)
     {
-        this.engine = engine;
+        this.check = check;
     }
 
-    public String getName()
+    public boolean isOk()
     {
-        return name;
+        return ok;
     }
 
-    public void setName(String name)
+    public void setOk(boolean ok)
     {
-        this.name = name;
+        this.ok = ok;
+    }
+
+    public Status getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(Status status)
+    {
+        this.status = status;
+    }
+
+    public long getExecuted()
+    {
+        return executed;
+    }
+
+    public void setExecuted(long executed)
+    {
+        this.executed = executed;
+    }
+
+    public long getProcessed()
+    {
+        return processed;
+    }
+
+    public void setProcessed(long processed)
+    {
+        this.processed = processed;
+    }
+
+    public double getRuntime()
+    {
+        return runtime;
+    }
+
+    public void setRuntime(double runtime)
+    {
+        this.runtime = runtime;
+    }
+
+    public String getOutput()
+    {
+        return output;
+    }
+
+    public void setOutput(String output)
+    {
+        this.output = output;
     }
 
     public List<Parameter> getParameters()
@@ -143,42 +206,5 @@ public class Check extends Task implements Parameterised
             if (name.equals(parameter.getName())) return parameter.getValue();
         }
         return defaultValue;
-    }
-
-    public long getTimeout()
-    {
-        return timeout;
-    }
-
-    public void setTimeout(long timeout)
-    {
-        this.timeout = timeout;
-    }
-
-    public long getScheduled()
-    {
-        return scheduled;
-    }
-
-    public void setScheduled(long scheduled)
-    {
-        this.scheduled = scheduled;
-    }
-
-    /**
-     * Create a Result with the details of this check
-     * 
-     * @return
-     */
-    @JsonIgnore
-    public Result createResult()
-    {
-        Result result = new Result();
-        result.setId(this.getId());
-        result.setCheckableType(this.getCheckableType());
-        result.setCheckableId(this.getCheckableId());
-        result.setCheck(this);
-        result.setExecuted(System.currentTimeMillis());
-        return result;
     }
 }

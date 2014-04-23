@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.model.state;
 
 import java.util.UUID;
 
-import com.intrbiz.bergamot.model.result.ResultStatus;
+import com.intrbiz.bergamot.model.Status;
 
 /**
  * The state of a check
@@ -13,7 +13,7 @@ public class CheckState
     
     private boolean ok = true;
     
-    private ResultStatus status = ResultStatus.PENDING;
+    private Status status = Status.PENDING;
     
     private String output = "Pending";
     
@@ -70,12 +70,12 @@ public class CheckState
         this.ok = ok;
     }
 
-    public ResultStatus getStatus()
+    public Status getStatus()
     {
         return status;
     }
 
-    public void setStatus(ResultStatus status)
+    public void setStatus(Status status)
     {
         this.status = status;
     }

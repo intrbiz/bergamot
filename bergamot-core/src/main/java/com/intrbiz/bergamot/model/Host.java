@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
-import com.intrbiz.bergamot.model.task.Check;
+import com.intrbiz.bergamot.model.message.task.Check;
 
 /**
  * A host - some form of network connected device that is to be checked

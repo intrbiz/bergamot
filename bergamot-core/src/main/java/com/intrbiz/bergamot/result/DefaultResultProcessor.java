@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.config.ResultProcessorCfg;
 import com.intrbiz.bergamot.engine.AbstractEngine;
 import com.intrbiz.bergamot.model.Checkable;
 import com.intrbiz.bergamot.model.message.Message;
-import com.intrbiz.bergamot.model.result.Result;
+import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;

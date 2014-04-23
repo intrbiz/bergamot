@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
-import com.intrbiz.bergamot.model.task.Check;
+import com.intrbiz.bergamot.model.message.task.Check;
 
 /**
  * Some software service running on a host which needs to be checked

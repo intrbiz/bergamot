@@ -8,9 +8,9 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.result.Result;
-import com.intrbiz.bergamot.model.result.ResultStatus;
-import com.intrbiz.bergamot.model.task.Check;
+import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.task.Check;
 
 public class TestNagiosRunner
 {
@@ -75,7 +75,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
         assertThat(result.getCheck(), is(equalTo(check)));
         assertThat(result.isOk(), is(equalTo(true)));
-        assertThat(result.getStatus(), is(equalTo(ResultStatus.OK)));
+        assertThat(result.getStatus(), is(equalTo(Status.OK)));
         assertThat(result.getOutput(), is(equalTo("OK: Test")));
         assertThat(result.getRuntime(), is(greaterThan(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));
@@ -93,7 +93,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
         assertThat(result.getCheck(), is(equalTo(check)));
         assertThat(result.isOk(), is(equalTo(false)));
-        assertThat(result.getStatus(), is(equalTo(ResultStatus.WARNING)));
+        assertThat(result.getStatus(), is(equalTo(Status.WARNING)));
         assertThat(result.getOutput(), is(equalTo("WARNING: Test")));
         assertThat(result.getRuntime(), is(greaterThan(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));
@@ -111,7 +111,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
         assertThat(result.getCheck(), is(equalTo(check)));
         assertThat(result.isOk(), is(equalTo(false)));
-        assertThat(result.getStatus(), is(equalTo(ResultStatus.CRITICAL)));
+        assertThat(result.getStatus(), is(equalTo(Status.CRITICAL)));
         assertThat(result.getOutput(), is(equalTo("CRITICAL: Test")));
         assertThat(result.getRuntime(), is(greaterThan(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));
@@ -129,7 +129,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
         assertThat(result.getCheck(), is(equalTo(check)));
         assertThat(result.isOk(), is(equalTo(false)));
-        assertThat(result.getStatus(), is(equalTo(ResultStatus.UNKNOWN)));
+        assertThat(result.getStatus(), is(equalTo(Status.UNKNOWN)));
         assertThat(result.getOutput(), is(equalTo("UNKNOWN: Test")));
         assertThat(result.getRuntime(), is(greaterThan(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));
@@ -147,7 +147,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
         assertThat(result.getCheck(), is(equalTo(check)));
         assertThat(result.isOk(), is(equalTo(false)));
-        assertThat(result.getStatus(), is(equalTo(ResultStatus.INTERNAL)));
+        assertThat(result.getStatus(), is(equalTo(Status.INTERNAL)));
         assertThat(result.getOutput(), is(not(nullValue())));
         assertThat(result.getRuntime(), is(equalTo(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));
@@ -167,7 +167,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
         assertThat(result.getCheck(), is(equalTo(check)));
         assertThat(result.isOk(), is(equalTo(false)));
-        assertThat(result.getStatus(), anyOf(equalTo(ResultStatus.CRITICAL), equalTo(ResultStatus.UNKNOWN)));
+        assertThat(result.getStatus(), anyOf(equalTo(Status.CRITICAL), equalTo(Status.UNKNOWN)));
         assertThat(result.getOutput(), is(not(nullValue())));
         assertThat(result.getRuntime(), is(greaterThan(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));
@@ -185,7 +185,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckableId(), is(equalTo(check.getCheckableId())));
         assertThat(result.getCheck(), is(equalTo(check)));
         assertThat(result.isOk(), is(equalTo(true)));
-        assertThat(result.getStatus(), is(equalTo(ResultStatus.OK)));
+        assertThat(result.getStatus(), is(equalTo(Status.OK)));
         assertThat(result.getOutput(), is(not(nullValue())));
         assertThat(result.getRuntime(), is(greaterThan(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));

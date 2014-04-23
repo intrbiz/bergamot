@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.config.RunnerCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.engine.AbstractEngine;
 import com.intrbiz.bergamot.model.message.Message;
-import com.intrbiz.bergamot.model.task.Task;
+import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.name.Exchange;

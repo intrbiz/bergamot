@@ -1,7 +1,7 @@
 package com.intrbiz.bergamot.worker;
 
-import com.intrbiz.bergamot.model.result.Result;
-import com.intrbiz.bergamot.model.task.Check;
+import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.task.Check;
 
 public interface CheckRunner extends Runner
 {

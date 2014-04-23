@@ -3,8 +3,8 @@ package com.intrbiz.bergamot.model;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.intrbiz.bergamot.model.message.task.Check;
 import com.intrbiz.bergamot.model.state.CheckState;
-import com.intrbiz.bergamot.model.task.Check;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.RandStatus;
 
