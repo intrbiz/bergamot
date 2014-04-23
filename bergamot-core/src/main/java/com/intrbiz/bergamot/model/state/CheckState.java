@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.model.Status;
  */
 public class CheckState
 {
-    private UUID serviceId;
+    private UUID checkId;
     
     private boolean ok = true;
     
@@ -56,14 +56,14 @@ public class CheckState
         super();
     }
 
-    public UUID getServiceId()
+    public UUID getCheckId()
     {
-        return serviceId;
+        return checkId;
     }
 
-    public void setServiceId(UUID serviceId)
+    public void setCheckId(UUID checkId)
     {
-        this.serviceId = serviceId;
+        this.checkId = checkId;
     }
 
     public boolean isOk()

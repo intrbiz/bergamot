@@ -26,6 +26,11 @@ public abstract class NamedObject
     public final void setId(UUID id)
     {
         this.id = id;
+        this.onSetId();
+    }
+    
+    protected void onSetId()
+    {
     }
 
     public final String getName()

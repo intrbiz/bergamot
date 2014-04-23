@@ -64,6 +64,11 @@ public abstract class Check extends NamedObject
     }
 
     public abstract String getType();
+    
+    protected void onSetId()
+    {
+        this.state.setCheckId(this.id);
+    }
 
     public int getAlertAttemptThreshold()
     {
