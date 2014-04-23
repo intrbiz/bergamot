@@ -18,11 +18,11 @@ import com.intrbiz.bergamot.model.util.Parameter;
 @JsonTypeName("bergamot.result")
 public class Result extends Message
 {
-    @JsonProperty("checkable_type")
-    private String checkableType;
+    @JsonProperty("check_type")
+    private String checkType;
 
-    @JsonProperty("checkable_id")
-    private UUID checkableId;
+    @JsonProperty("check_id")
+    private UUID checkId;
 
     @JsonProperty("check")
     private ExecuteCheck executeCheck;
@@ -59,24 +59,24 @@ public class Result extends Message
         return "bergamot.result";
     }
 
-    public String getCheckableType()
+    public String getCheckType()
     {
-        return checkableType;
+        return checkType;
     }
 
-    public void setCheckableType(String checkableType)
+    public void setCheckType(String checkType)
     {
-        this.checkableType = checkableType;
+        this.checkType = checkType;
     }
 
-    public UUID getCheckableId()
+    public UUID getCheckId()
     {
-        return checkableId;
+        return checkId;
     }
 
-    public void setCheckableId(UUID checkableId)
+    public void setCheckId(UUID checkId)
     {
-        this.checkableId = checkableId;
+        this.checkId = checkId;
     }
 
     public ExecuteCheck getCheck()

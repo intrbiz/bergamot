@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.compat.command.CheckCommand;
+import com.intrbiz.bergamot.compat.command.NagiosCommandString;
 import com.intrbiz.bergamot.compat.config.builder.NagiosConfigBuilder;
 import com.intrbiz.bergamot.compat.config.model.CommandCfg;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
@@ -13,9 +13,9 @@ import com.intrbiz.bergamot.compat.config.model.HostgroupCfg;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
 import com.intrbiz.bergamot.compat.config.model.ServicegroupCfg;
 import com.intrbiz.bergamot.compat.config.model.TimeperiodCfg;
-import com.intrbiz.bergamot.model.Checkable;
+import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Command;
-import com.intrbiz.bergamot.model.CommandExecution;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.HostGroup;
 import com.intrbiz.bergamot.model.Service;
@@ -224,7 +224,7 @@ public class NagiosConfigImporter
         }
     }
 
-    private void loadCheckPeriod(String checkPeriod, Checkable on, ObjectStore store)
+    private void loadCheckPeriod(String checkPeriod, Check on, ObjectStore store)
     {
         if (checkPeriod != null)
         {
@@ -240,26 +240,26 @@ public class NagiosConfigImporter
         }
     }
 
-    private void loadCheckCommand(String checkCommand, Checkable on, ObjectStore store)
+    private void loadCheckCommand(String checkCommand, Check on, ObjectStore store)
     {
         // the command
-        CheckCommand parsedCommand = CheckCommand.parse(checkCommand);
+        NagiosCommandString parsedCommand = NagiosCommandString.parse(checkCommand);
         if (parsedCommand != null)
         {
             logger.trace("Parsed command: " + parsedCommand.toString());
             Command command = store.lookupCommand("nagios", parsedCommand.getCommandName());
             if (command != null)
             {
-                CommandExecution exec = new CommandExecution();
-                exec.setCommand(command);
+                CheckCommand theCheck = new CheckCommand();
+                theCheck.setCommand(command);
                 // add the ARG* parameters
                 int argIdx = 1;
                 for (String argument : parsedCommand.getArguments())
                 {
-                    exec.addParameter("ARG" + (argIdx++), argument);
+                    theCheck.addParameter("ARG" + (argIdx++), argument);
                 }
-                on.setCommandExecution(exec);
-                logger.trace("Added command " + command.getName() + " for (" + on + ") with " + exec);
+                on.setCheckCommand(theCheck);
+                logger.trace("Added command " + command.getName() + " for (" + on + ") with " + theCheck);
             }
             else
             {

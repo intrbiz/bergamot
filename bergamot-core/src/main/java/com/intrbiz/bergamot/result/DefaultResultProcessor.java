@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.component.AbstractComponent;
 import com.intrbiz.bergamot.config.ResultProcessorCfg;
-import com.intrbiz.bergamot.model.Checkable;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.state.CheckState;
@@ -56,71 +56,71 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
 
     protected void processResult(Result result)
     {
-        logger.info("Got result " + result.getId() + " for '" + result.getCheckableType() + "' " + result.getCheckableId() + " [" + (result.getCheck() == null ? "" : result.getCheck().getName()) + "] => " + result.isOk() + " " + result.getStatus() + " " + result.getOutput() + " took " + result.getRuntime() + " ms.");
+        logger.info("Got result " + result.getId() + " for '" + result.getCheckType() + "' " + result.getCheckId() + " [" + (result.getCheck() == null ? "" : result.getCheck().getName()) + "] => " + result.isOk() + " " + result.getStatus() + " " + result.getOutput() + " took " + result.getRuntime() + " ms.");
         // stamp in processed time
         result.setProcessed(System.currentTimeMillis());
         // update the state
-        Checkable checkable = this.getBergamot().getObjectStore().lookupCheckable(result.getCheckableType(), result.getCheckableId());
-        if (checkable != null)
+        Check check = this.getBergamot().getObjectStore().lookupCheckable(result.getCheckType(), result.getCheckId());
+        if (check != null)
         {
-            CheckState state = checkable.getState();
+            CheckState state = check.getState();
             // transition the state
-            boolean isStateChange = this.transitionState(checkable, state, result);
+            boolean isStateChange = this.transitionState(check, state, result);
             // stats
             this.computeStats(state, result);
             // is this an alert
             if (isStateChange)
             {
-                logger.info("Got state change for " + checkable + " " + state.isOk() + " " + state.getStatus() + " " + state.isHard() + " " + state.getOutput());
+                logger.info("Got state change for " + check + " " + state.isOk() + " " + state.getStatus() + " " + state.isHard() + " " + state.getOutput());
                 if (state.isOk())
                 {
-                    this.handleRecovery(checkable, state, result);
+                    this.handleRecovery(check, state, result);
                 }
                 else
                 {
-                    this.handleAlert(checkable, state, result);
+                    this.handleAlert(check, state, result);
                 }
             }
             else
             {
-                logger.info("Got steady state for " + checkable + " " + state.isOk() + " " + state.getStatus() + " " + state.isHard() + " " + state.getOutput());
-                this.handleSteadyState(checkable, state, result);
+                logger.info("Got steady state for " + check + " " + state.isOk() + " " + state.getStatus() + " " + state.isHard() + " " + state.getOutput());
+                this.handleSteadyState(check, state, result);
             }
         }
         else
         {
-            logger.warn("Could not find " + result.getCheckableType() + " " + result.getCheckableId() + " for result " + result.getId());
+            logger.warn("Could not find " + result.getCheckType() + " " + result.getCheckId() + " for result " + result.getId());
         }
     }
     
-    protected void handleSteadyState(Checkable checkable, CheckState state, Result result)
+    protected void handleSteadyState(Check check, CheckState state, Result result)
     {
         // steady state, NB: this could be good or bad!
     }
     
-    protected void handleAlert(Checkable checkable, CheckState state, Result result)
+    protected void handleAlert(Check check, CheckState state, Result result)
     {
         // reschedule due to state change
-        this.getBergamot().getScheduler().reschedule(checkable);
+        this.getBergamot().getScheduler().reschedule(check);
         // alert
-        if (! checkable.isSuppressed())
+        if (! check.isSuppressed())
         {
-            this.getBergamot().getObjectStore().addRecentCheck(checkable);
+            this.getBergamot().getObjectStore().addRecentCheck(check);
         }
-        logger.warn("Alert" + (checkable.isSuppressed() ? " (suppressed)" : "") + " for " + checkable);
+        logger.warn("Alert" + (check.isSuppressed() ? " (suppressed)" : "") + " for " + check);
     }
     
-    protected void handleRecovery(Checkable checkable, CheckState state, Result result)
+    protected void handleRecovery(Check check, CheckState state, Result result)
     {
         // reschedule due to state change
-        this.getBergamot().getScheduler().reschedule(checkable);
+        this.getBergamot().getScheduler().reschedule(check);
         // recovery
         // always ensure we clear alerts down from the display
-        this.getBergamot().getObjectStore().removeRecentCheck(checkable);
-        logger.warn("Recovery" + (checkable.isSuppressed() ? " (suppressed)" : "") + " for " + checkable);
+        this.getBergamot().getObjectStore().removeRecentCheck(check);
+        logger.warn("Recovery" + (check.isSuppressed() ? " (suppressed)" : "") + " for " + check);
     }
 
-    protected boolean transitionState(Checkable checkable, CheckState state, Result result)
+    protected boolean transitionState(Check check, CheckState state, Result result)
     {
         // is state change
         boolean isStateChange = state.isOk() ^ result.isOk();
@@ -135,9 +135,9 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         else if (!state.isHard())
         {
             int attempt = state.getAttempt() + 1;
-            if (attempt > checkable.getCurrentAttemptThreshold()) attempt = checkable.getCurrentAttemptThreshold();
+            if (attempt > check.getCurrentAttemptThreshold()) attempt = check.getCurrentAttemptThreshold();
             state.setAttempt(attempt);
-            state.setHard(attempt >= checkable.getCurrentAttemptThreshold());
+            state.setHard(attempt >= check.getCurrentAttemptThreshold());
         }
         // update the state
         state.setLastCheckId(result.getId());

@@ -7,13 +7,16 @@ import java.util.List;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.model.util.Parameterised;
 
-public class CommandExecution implements Parameterised
+/**
+ * An execution of a command used to check something
+ */
+public class CheckCommand implements Parameterised
 {
     private Command command;
 
     private List<Parameter> parameters = new LinkedList<Parameter>();
 
-    public CommandExecution()
+    public CheckCommand()
     {
         super();
     }

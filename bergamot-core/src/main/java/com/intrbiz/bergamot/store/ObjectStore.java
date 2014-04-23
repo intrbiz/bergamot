@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import com.intrbiz.bergamot.model.Checkable;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.HostGroup;
@@ -34,7 +34,7 @@ public class ObjectStore
     
     private Map<String, TimePeriod> timePeriods = new TreeMap<String, TimePeriod>();
     
-    private RingBuffer<Checkable> recentChecks = new RingBuffer<Checkable>(12); 
+    private RingBuffer<Check> recentChecks = new RingBuffer<Check>(12); 
 
     public ObjectStore()
     {
@@ -159,7 +159,7 @@ public class ObjectStore
     
     // checkable
     
-    public Checkable lookupCheckable(String type, UUID id)
+    public Check lookupCheckable(String type, UUID id)
     {
         if ("service".equals(type))
             return this.lookupService(id);
@@ -202,17 +202,17 @@ public class ObjectStore
     
     // recent
     
-    public List<Checkable> getRecentChecks()
+    public List<Check> getRecentChecks()
     {
         return this.recentChecks.toList();
     }
     
-    public void addRecentCheck(Checkable check)
+    public void addRecentCheck(Check check)
     {
         this.recentChecks.add(check);
     }
     
-    public void removeRecentCheck(Checkable check)
+    public void removeRecentCheck(Check check)
     {
         this.recentChecks.remove(check);
     }

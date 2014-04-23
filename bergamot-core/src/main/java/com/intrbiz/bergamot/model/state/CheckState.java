@@ -1,6 +1,8 @@
 package com.intrbiz.bergamot.model.state;
 
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.intrbiz.bergamot.model.Status;
 
@@ -44,6 +46,10 @@ public class CheckState
     private double lastCheckProcessingLatency;
     
     private double averageCheckProcessingLatency;
+    
+    // locking
+    
+    private final Lock lock = new ReentrantLock();
     
     public CheckState()
     {
@@ -213,5 +219,12 @@ public class CheckState
     public void pushOkHistory(boolean ok)
     {
         this.okHistory = ((this.okHistory << 1) & 0x7FFFFFFFFFFFFFFFL) | (ok ? 1L : 0L);
+    }
+    
+    // locking
+    
+    public Lock getLock()
+    {
+        return this.lock;
     }
 }

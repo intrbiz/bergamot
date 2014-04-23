@@ -14,7 +14,7 @@ import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 /**
  * A host - some form of network connected device that is to be checked
  */
-public class Host extends Checkable
+public class Host extends Check
 {
     private String address;
 
@@ -128,6 +128,6 @@ public class Host extends Checkable
 
     public String toString()
     {
-        return "Host (" + this.id + ") " + this.name + " check " + this.commandExecution;
+        return "Host (" + this.id + ") " + this.name + " check " + this.checkCommand;
     }
 }

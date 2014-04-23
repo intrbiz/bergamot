@@ -71,7 +71,7 @@ public class AppRouter extends Router
         if (service != null)
         {
             // build the check and dispatch it
-            ExecuteCheck executeCheck = service.createCheck();
+            ExecuteCheck executeCheck = service.createExecuteCheck();
             if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
         }
         redirect("/service/" + id);

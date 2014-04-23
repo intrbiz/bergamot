@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.model.Checkable;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 
@@ -264,29 +264,29 @@ public class WheelScheduler extends AbstractScheduler
     }
 
     @Override
-    public void enable(Checkable checkable)
+    public void enable(Check check)
     {
-        this.enableJob(checkable.getId());
+        this.enableJob(check.getId());
     }
 
     @Override
-    public void disable(Checkable checkable)
+    public void disable(Check check)
     {
-        this.disableJob(checkable.getId());
+        this.disableJob(check.getId());
     }
 
     @Override
-    public void schedule(Checkable checkable)
+    public void schedule(Check check)
     {
-        logger.info("Scheduling " + checkable + " with interval " + checkable.getCurrentInterval());
-        this.scheduleJob(checkable.getId(), checkable.getCurrentInterval(), checkable.getCheckPeriod(), new CheckRunner(checkable));
+        logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval());
+        this.scheduleJob(check.getId(), check.getCurrentInterval(), check.getCheckPeriod(), new CheckRunner(check));
     }
 
     @Override
-    public void reschedule(Checkable checkable)
+    public void reschedule(Check check)
     {
-        logger.info("Rescheduling " + checkable + " with interval " + checkable.getCurrentInterval());
-        this.rescheduleJob(checkable.getId(), checkable.getCurrentInterval(), checkable.getCheckPeriod());
+        logger.info("Rescheduling " + check + " with interval " + check.getCurrentInterval());
+        this.rescheduleJob(check.getId(), check.getCurrentInterval(), check.getCheckPeriod());
     }
 
     @Override
@@ -416,17 +416,17 @@ public class WheelScheduler extends AbstractScheduler
 
     private class CheckRunner implements Runnable
     {
-        public final Checkable checkable;
+        public final Check check;
 
-        public CheckRunner(Checkable checkable)
+        public CheckRunner(Check check)
         {
-            this.checkable = checkable;
+            this.check = check;
         }
 
         public void run()
         {
             // fire off the check
-            ExecuteCheck executeCheck = this.checkable.createCheck();
+            ExecuteCheck executeCheck = this.check.createExecuteCheck();
             if (executeCheck != null)
             {
                 getBergamot().getManifold().publish(executeCheck);

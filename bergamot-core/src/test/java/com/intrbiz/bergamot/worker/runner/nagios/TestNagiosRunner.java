@@ -33,8 +33,8 @@ public class TestNagiosRunner
     {
         ExecuteCheck executeCheck = new ExecuteCheck();
         executeCheck.setId(UUID.randomUUID());
-        executeCheck.setCheckableType("service");
-        executeCheck.setCheckableId(UUID.randomUUID());
+        executeCheck.setCheckType("service");
+        executeCheck.setCheckId(UUID.randomUUID());
         executeCheck.setEngine("nagios");
         executeCheck.setName(commandName);
         // intrinsic parameters
@@ -72,8 +72,8 @@ public class TestNagiosRunner
         Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
         assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+        assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(true)));
         assertThat(result.getStatus(), is(equalTo(Status.OK)));
@@ -90,8 +90,8 @@ public class TestNagiosRunner
         Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
         assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+        assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.WARNING)));
@@ -108,8 +108,8 @@ public class TestNagiosRunner
         Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
         assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+        assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.CRITICAL)));
@@ -126,8 +126,8 @@ public class TestNagiosRunner
         Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
         assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+        assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.UNKNOWN)));
@@ -144,8 +144,8 @@ public class TestNagiosRunner
         Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
         assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+        assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), is(equalTo(Status.INTERNAL)));
@@ -164,8 +164,8 @@ public class TestNagiosRunner
         Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
         assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+        assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
         assertThat(result.getStatus(), anyOf(equalTo(Status.CRITICAL), equalTo(Status.UNKNOWN)));
@@ -182,8 +182,8 @@ public class TestNagiosRunner
         Result result = this.runner.run(executeCheck);
         assertThat(result, is(not(nullValue())));
         assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-        assertThat(result.getCheckableType(), is(equalTo(executeCheck.getCheckableType())));
-        assertThat(result.getCheckableId(), is(equalTo(executeCheck.getCheckableId())));
+        assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+        assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(true)));
         assertThat(result.getStatus(), is(equalTo(Status.OK)));

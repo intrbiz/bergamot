@@ -78,7 +78,7 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
     @Override
     public Result run(ExecuteCheck executeCheck)
     {
-        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckableType() + " " + executeCheck.getCheckableId());
+        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Result result = executeCheck.createResult();
         try
         {

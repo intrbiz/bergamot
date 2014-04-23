@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 /**
  * Some software service running on a host which needs to be checked
  */
-public class Service extends Checkable
+public class Service extends Check
 {
     private Host host;
 
@@ -73,7 +73,7 @@ public class Service extends Checkable
 
     public String toString()
     {
-        return "Service (" + this.id + ") " + this.name + " on host " + this.getHost().getName() + " check " + this.commandExecution;
+        return "Service (" + this.id + ") " + this.name + " on host " + this.getHost().getName() + " check " + this.checkCommand;
     }
 
     @Override

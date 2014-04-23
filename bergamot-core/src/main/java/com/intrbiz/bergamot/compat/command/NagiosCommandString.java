@@ -9,13 +9,13 @@ import com.intrbiz.bergamot.compat.macro.MacroFrame;
 /**
  * Parse Nagios check_command definitions
  */
-public class CheckCommand
+public class NagiosCommandString
 {
     private final String commandName;
 
     private final List<String> arguments;
 
-    public CheckCommand(String commandName, List<String> arguments)
+    public NagiosCommandString(String commandName, List<String> arguments)
     {
         this.commandName = commandName;
         this.arguments = arguments;
@@ -57,7 +57,7 @@ public class CheckCommand
         return frame;
     }
 
-    public static CheckCommand parse(String command)
+    public static NagiosCommandString parse(String command)
     {
         if (Util.isEmpty(command)) return null;
         // parse
@@ -68,6 +68,6 @@ public class CheckCommand
         {
             arguments.add(parts[i]);
         }
-        return new CheckCommand(commandName, arguments);
+        return new NagiosCommandString(commandName, arguments);
     }
 }

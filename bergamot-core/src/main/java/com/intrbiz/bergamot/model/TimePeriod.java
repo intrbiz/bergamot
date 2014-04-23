@@ -21,7 +21,7 @@ public class TimePeriod extends NamedObject implements TimeRange
 {
     private Logger logger = Logger.getLogger(TimePeriod.class);
 
-    private Map<UUID, Checkable> checks = new TreeMap<UUID, Checkable>();
+    private Map<UUID, Check> checks = new TreeMap<UUID, Check>();
 
     private List<TimePeriod> excludes = new LinkedList<TimePeriod>();
 
@@ -38,12 +38,12 @@ public class TimePeriod extends NamedObject implements TimeRange
         this.displayName = Util.coalesce(cfg.resolveAlias(), this.name);
     }
 
-    public Collection<Checkable> getChecks()
+    public Collection<Check> getChecks()
     {
         return this.checks.values();
     }
 
-    public Checkable getCheck(UUID id)
+    public Check getCheck(UUID id)
     {
         return this.checks.get(id);
     }
@@ -58,7 +58,7 @@ public class TimePeriod extends NamedObject implements TimeRange
         return this.checks.size();
     }
 
-    public void addCheck(Checkable check)
+    public void addCheck(Check check)
     {
         this.checks.put(check.getId(), check);
         // TODO differentiate between check and notification periods

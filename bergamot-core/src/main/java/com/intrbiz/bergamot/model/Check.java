@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.util.RandStatus;
 /**
  * An something which should be checked
  */
-public abstract class Checkable extends NamedObject
+public abstract class Check extends NamedObject
 {
     /**
      * How many check attempts to trigger a hard alert
@@ -36,7 +36,7 @@ public abstract class Checkable extends NamedObject
     /**
      * The check command to execute
      */
-    protected CommandExecution commandExecution;
+    protected CheckCommand checkCommand;
 
     /**
      * The state of this check
@@ -58,7 +58,7 @@ public abstract class Checkable extends NamedObject
      */
     protected boolean enabled = true;
 
-    public Checkable()
+    public Check()
     {
         super();
     }
@@ -125,14 +125,14 @@ public abstract class Checkable extends NamedObject
         this.checkPeriod = timePeriod;
     }
 
-    public CommandExecution getCommandExecution()
+    public CheckCommand getCheckCommand()
     {
-        return commandExecution;
+        return checkCommand;
     }
 
-    public void setCommandExecution(CommandExecution commandExecution)
+    public void setCheckCommand(CheckCommand checkCommand)
     {
-        this.commandExecution = commandExecution;
+        this.checkCommand = checkCommand;
     }
 
     public boolean isSuppressed()
@@ -160,24 +160,24 @@ public abstract class Checkable extends NamedObject
         return this.state;
     }
 
-    public final ExecuteCheck createCheck()
+    public final ExecuteCheck createExecuteCheck()
     {
-        if (this.commandExecution == null) return null;
+        if (this.checkCommand == null) return null;
         ExecuteCheck executeCheck = new ExecuteCheck();
         executeCheck.setId(UUID.randomUUID());
-        executeCheck.setCheckableType(this.getType());
-        executeCheck.setCheckableId(this.getId());
-        executeCheck.setEngine(this.commandExecution.getCommand().getEngine());
-        executeCheck.setName(this.commandExecution.getCommand().getName());
+        executeCheck.setCheckType(this.getType());
+        executeCheck.setCheckId(this.getId());
+        executeCheck.setEngine(this.checkCommand.getCommand().getEngine());
+        executeCheck.setName(this.checkCommand.getCommand().getName());
         // intrinsic check parameters
         this.setCheckParameters(executeCheck);
         // parameters defined by the command
-        for (Parameter parameter : this.commandExecution.getCommand().getParameters())
+        for (Parameter parameter : this.checkCommand.getCommand().getParameters())
         {
             executeCheck.addParameter(parameter.getName(), parameter.getValue());
         }
         // configured parameters
-        for (Parameter parameter : this.commandExecution.getParameters())
+        for (Parameter parameter : this.checkCommand.getParameters())
         {
             executeCheck.setParameter(parameter.getName(), parameter.getValue());
         }

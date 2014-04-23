@@ -21,12 +21,12 @@ import com.intrbiz.bergamot.model.util.Parameterised;
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
 @JsonTypeName("bergamot.execute_check")
 public class ExecuteCheck extends Task implements Parameterised
-{
-    @JsonProperty("checkable_type")
-    private String checkableType;
+{    
+    @JsonProperty("check_type")
+    private String checkType;
 
-    @JsonProperty("checkable_id")
-    private UUID checkableId;
+    @JsonProperty("check_id")
+    private UUID checkId;
 
     @JsonProperty("parameters")
     private List<Parameter> parameters = new LinkedList<Parameter>();
@@ -48,24 +48,24 @@ public class ExecuteCheck extends Task implements Parameterised
         return "bergamot.check." + this.getEngine();
     }
 
-    public String getCheckableType()
+    public String getCheckType()
     {
-        return checkableType;
+        return checkType;
     }
 
-    public void setCheckableType(String checkableType)
+    public void setCheckType(String checkType)
     {
-        this.checkableType = checkableType;
+        this.checkType = checkType;
     }
 
-    public UUID getCheckableId()
+    public UUID getCheckId()
     {
-        return checkableId;
+        return checkId;
     }
 
-    public void setCheckableId(UUID checkableId)
+    public void setCheckId(UUID checkId)
     {
-        this.checkableId = checkableId;
+        this.checkId = checkId;
     }
 
     public List<Parameter> getParameters()
@@ -150,8 +150,8 @@ public class ExecuteCheck extends Task implements Parameterised
     {
         Result result = new Result();
         result.setId(this.getId());
-        result.setCheckableType(this.getCheckableType());
-        result.setCheckableId(this.getCheckableId());
+        result.setCheckType(this.getCheckType());
+        result.setCheckId(this.getCheckId());
         result.setCheck(this);
         result.setExecuted(System.currentTimeMillis());
         return result;
