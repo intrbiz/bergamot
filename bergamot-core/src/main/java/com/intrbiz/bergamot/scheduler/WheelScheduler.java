@@ -16,32 +16,17 @@ import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 /**
  * A tick-wheel based scheduler for scheduling checks.
  * 
- * This is designed to be an efficient way to scheduled 
- * thousands of jobs repeatedly.  Conceptually it is a 
- * clock wheel which rotates at a specific frequency, 
- * as defined by 1/tickPeriod.  The wheel is split into 
- * a number of segments, each segment containing a set of 
- * jobs.  The rotationPeriod, the time to complete a full 
- * cycle of the wheel is tickPeriod * segmentCount.
+ * This is designed to be an efficient way to scheduled thousands of jobs repeatedly. Conceptually it is a clock wheel which rotates at a specific frequency, as defined by 1/tickPeriod. The wheel is split into a number of segments, each segment containing a set of jobs. The rotationPeriod, the time to complete a full cycle of the wheel is tickPeriod * segmentCount.
  * 
- * By default the wheel has 60 segments ticking at 1Hz.  
- * As such the wheel rotates once every minute.
+ * By default the wheel has 60 segments ticking at 1Hz. As such the wheel rotates once every minute.
  * 
- * Jobs are balanced over the segments within the wheel 
- * when they are first scheduled.  As such, the first 
- * execution of a job is at most rotationPeriod.
+ * Jobs are balanced over the segments within the wheel when they are first scheduled. As such, the first execution of a job is at most rotationPeriod.
  * 
- * Note: this scheduler is an approximating scheduler.  
- * It can never be more accurate than the tickPeriod.
- * Currently this implementation can never be more accurate 
- * than the rotation period. 
+ * Note: this scheduler is an approximating scheduler. It can never be more accurate than the tickPeriod. Currently this implementation can never be more accurate than the rotation period.
  * 
- * TODO list:
- *  1. Add time-period support rather than check blindly 24x7
- *  2. Look at check latencies and pause scheduling if needed?
- *  3. Support intervals < rotationPeriod
- *  
- *  @author Chris Ellis
+ * TODO list: 1. Add time-period support rather than check blindly 24x7 2. Look at check latencies and pause scheduling if needed? 3. Support intervals < rotationPeriod
+ * 
+ * @author Chris Ellis
  * 
  */
 public class WheelScheduler extends AbstractScheduler
@@ -72,7 +57,7 @@ public class WheelScheduler extends AbstractScheduler
     private volatile int tick = -1;
 
     private volatile long tickTime = System.currentTimeMillis();
-    
+
     private volatile Calendar tickCalendar = Calendar.getInstance();
 
     public WheelScheduler()
@@ -141,7 +126,7 @@ public class WheelScheduler extends AbstractScheduler
             }
         }
     }
-    
+
     protected boolean isInTimeRange(TimeRange range, Calendar calendar)
     {
         long s = System.nanoTime();
@@ -163,7 +148,7 @@ public class WheelScheduler extends AbstractScheduler
             logger.error("Error executing scheduled job " + job.id);
         }
     }
-    
+
     protected int pickSegmentToInsertInto()
     {
         // find the segment with the least jobs
@@ -185,7 +170,7 @@ public class WheelScheduler extends AbstractScheduler
     {
         synchronized (this.jobs)
         {
-            if (! this.jobs.containsKey(id))
+            if (!this.jobs.containsKey(id))
             {
                 interval = this.validateInterval(interval);
                 // the job
@@ -221,6 +206,30 @@ public class WheelScheduler extends AbstractScheduler
             }
         }
     }
+    
+    protected void enableJob(UUID id)
+    {
+        synchronized (this.jobs)
+        {
+            Job job = this.jobs.get(id);
+            if (job != null)
+            {
+                job.enabled = true;
+            }
+        }
+    }
+    
+    protected void disableJob(UUID id)
+    {
+        synchronized (this.jobs)
+        {
+            Job job = this.jobs.get(id);
+            if (job != null)
+            {
+                job.enabled = false;
+            }
+        }
+    }
 
     protected long validateInterval(long interval)
     {
@@ -240,6 +249,30 @@ public class WheelScheduler extends AbstractScheduler
     protected void resumeScheduler()
     {
         this.schedulerEnabled = true;
+    }
+
+    @Override
+    public void pause()
+    {
+        this.pauseScheduler();
+    }
+
+    @Override
+    public void resume()
+    {
+        this.resumeScheduler();
+    }
+
+    @Override
+    public void enable(Checkable checkable)
+    {
+        this.enableJob(checkable.getId());
+    }
+
+    @Override
+    public void disable(Checkable checkable)
+    {
+        this.disableJob(checkable.getId());
     }
 
     @Override
@@ -331,7 +364,7 @@ public class WheelScheduler extends AbstractScheduler
         public volatile long interval;
 
         public final UUID id;
-        
+
         public volatile TimeRange timeRange;
 
         public final Runnable command;
