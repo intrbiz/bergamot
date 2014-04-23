@@ -9,26 +9,47 @@ import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.RandStatus;
 
 /**
- * An object which is checked
+ * An something which should be checked
  */
 public abstract class Checkable extends NamedObject
 {
+    /**
+     * How many check attempts to trigger a hard alert
+     */
     protected int alertAttemptThreshold = 3;
 
+    /**
+     * How many check attempts to trigger a hard recovery
+     */
     protected int recoveryAttemptThreshold = 3;
 
+    /**
+     * How often should checks be executed (in milliseconds)
+     */
     protected long checkInterval = TimeUnit.MINUTES.toMillis(5);
 
+    /**
+     * How often should checks be executed when not in an ok state (in milliseconds)
+     */
     protected long retryInterval = TimeUnit.MINUTES.toMillis(1);
 
+    /**
+     * The check command to execute
+     */
     protected CommandExecution commandExecution;
 
+    /**
+     * The state of this check
+     */
     protected CheckState state = new CheckState();
 
+    /**
+     * When should we check, a calendar
+     */
     protected TimePeriod checkPeriod;
 
     /**
-     * Is the result of this check supressed
+     * Is the result of this check suppressed
      */
     protected boolean supressed = false;
 
