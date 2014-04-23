@@ -65,6 +65,18 @@
 			<p>
 				<a href="/service/execute/#{service.id}">Check now</a>
 			</p>
+			<p>
+				<a href="/service/enable/#{service.id}">Enable</a>
+			</p>
+			<p>
+				<a href="/service/disable/#{service.id}">Disable</a>
+			</p>
+			<p>
+				<a href="/service/suppress/#{service.id}">Supress</a>
+			</p>
+			<p>
+				<a href="/service/unsuppress/#{service.id}">Unsupress</a>
+			</p>
 		</div>
 	</div>
 	<div class="row">
@@ -85,6 +97,14 @@
 			<p class="row6">
 				<span class="col2 output">Check Period: </span>
 				<span class="col4 output">#{service.checkPeriod.displayName}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Enabled: </span>
+				<span class="col4 output">#{if(service.enabled, 'yes', 'no')}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Suppressed: </span>
+				<span class="col4 output">#{if(service.suppressed, 'yes', 'no')}</span>
 			</p>
 		</div>
 		<div class="col6">

@@ -62,14 +62,76 @@ public class AppRouter extends Router
         encode("service/detail");
     }
     
-    @Any("/service/execute/:name")
-    public void execService(@AsUUID UUID id) throws IOException
+    @Any("/service/execute/:id")
+    public void executeService(@AsUUID UUID id) throws IOException
     {
         Bergamot bergamot = this.getBergamot();
         // get the service and force it's execution
         Service service = bergamot.getObjectStore().lookupService(id);
-        Check check = service.createCheck();
-        if (check != null) bergamot.getManifold().publish(check);
+        if (service != null)
+        {
+            // build the check and dispatch it
+            Check check = service.createCheck();
+            if (check != null) bergamot.getManifold().publish(check);
+        }
+        redirect("/service/" + id);
+    }
+    
+    @Any("/service/enable/:id")
+    public void enableService(@AsUUID UUID id) throws IOException
+    {
+        Bergamot bergamot = this.getBergamot();
+        // get the service and enable it
+        Service service = bergamot.getObjectStore().lookupService(id);
+        if (service != null)
+        {
+            // enable the service with the scheduler
+            service.setEnabled(true);
+            bergamot.getScheduler().enable(service);
+        }
+        redirect("/service/" + id);
+    }
+    
+    @Any("/service/disable/:id")
+    public void disableService(@AsUUID UUID id) throws IOException
+    {
+        Bergamot bergamot = this.getBergamot();
+        // get the service and disable it
+        Service service = bergamot.getObjectStore().lookupService(id);
+        if (service != null)
+        {
+            // disable the service with the scheduler
+            service.setEnabled(false);
+            bergamot.getScheduler().disable(service);
+        }
+        redirect("/service/" + id);
+    }
+    
+    @Any("/service/suppress/:id")
+    public void suppressService(@AsUUID UUID id) throws IOException
+    {
+        Bergamot bergamot = this.getBergamot();
+        // get the service and supress it
+        Service service = bergamot.getObjectStore().lookupService(id);
+        if (service != null)
+        {
+            // suppress the service
+            service.setSuppressed(true);
+        }
+        redirect("/service/" + id);
+    }
+    
+    @Any("/service/unsuppress/:id")
+    public void unsuppressService(@AsUUID UUID id) throws IOException
+    {
+        Bergamot bergamot = this.getBergamot();
+        // get the service and unsupress it
+        Service service = bergamot.getObjectStore().lookupService(id);
+        if (service != null)
+        {
+            // unsuppress the service
+            service.setSuppressed(false);
+        }
         redirect("/service/" + id);
     }
 }
