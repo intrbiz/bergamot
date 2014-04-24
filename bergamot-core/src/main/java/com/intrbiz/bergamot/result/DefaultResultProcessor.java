@@ -43,7 +43,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         Queue queue = this.config.getQueue() == null ? null : this.config.getQueue().asQueue();
         GenericKey[] bindings = this.config.asBindings();
         // create the consumer
-        for (int i = 0; i < (Runtime.getRuntime().availableProcessors() * 2); i++)
+        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++)
         {
             this.consumers.add(this.getBergamot().getManifold().setupConsumer(this, exchange, queue, bindings));
         }
@@ -64,27 +64,43 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         if (check != null)
         {
             CheckState state = check.getState();
-            // transition the state
-            boolean isStateChange = this.transitionState(check, state, result);
-            // stats
-            this.computeStats(state, result);
-            // is this an alert
-            if (isStateChange)
+            // lock the state
+            try
             {
-                logger.info("Got state change for " + check + " " + state.isOk() + " " + state.getStatus() + " " + state.isHard() + " " + state.getOutput());
-                if (state.isOk())
+                state.getLock().lock();
+                // apply the result
+                boolean isHardStateChange = this.applyResult(check, state, result);
+                logger.info("State change: hard: " + isHardStateChange + ", transitioning: " + state.isTransitioning() + ", attempt: " + state.getAttempt());
+                // reschedule
+                if (state.isTransitioning())
                 {
-                    this.handleRecovery(check, state, result);
+                    logger.info("Rescheduling " + check + " due to state change");
+                    this.getBergamot().getScheduler().reschedule(check);
                 }
-                else
+                // update any dependencies
+                this.updateDependencies(check, state, result);
+                // stats
+                this.computeStats(state, result);
+                // send notifications
+                if (isHardStateChange)
                 {
-                    this.handleAlert(check, state, result);
+                    if (state.isOk())
+                    {
+                        // send recovery
+                        this.sendRecovery(check, state, result);
+                    }
+                    else
+                    {
+                        // send alert
+                        this.sendAlert(check, state, result);
+                    }
                 }
+                // send the general state update notifications
+                this.sendStateUpdate(check, state, result);
             }
-            else
+            finally
             {
-                logger.info("Got steady state for " + check + " " + state.isOk() + " " + state.getStatus() + " " + state.isHard() + " " + state.getOutput());
-                this.handleSteadyState(check, state, result);
+                state.getLock().unlock();
             }
         }
         else
@@ -93,52 +109,35 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         }
     }
     
-    protected void handleSteadyState(Check check, CheckState state, Result result)
+    protected void sendStateUpdate(Check check, CheckState state, Result result)
     {
-        // steady state, NB: this could be good or bad!
+        logger.info("State update " + check + " is " + state.isOk() + " " + state.isHard() + " " + state.getStatus() + " " + state.getOutput());
     }
     
-    protected void handleAlert(Check check, CheckState state, Result result)
+    protected void sendRecovery(Check check, CheckState state, Result result)
     {
-        // reschedule due to state change
-        this.getBergamot().getScheduler().reschedule(check);
-        // alert
+        logger.warn("Recovery for " + check);
+        this.getBergamot().getObjectStore().removeRecentCheck(check);
+    }
+    
+    protected void sendAlert(Check check, CheckState state, Result result)
+    {
+        logger.warn("Alert for " + check);
         if (! check.isSuppressed())
         {
-            this.getBergamot().getObjectStore().addRecentCheck(check);
+            this.getBergamot().getObjectStore().addRecentCheck(check);    
         }
-        logger.warn("Alert" + (check.isSuppressed() ? " (suppressed)" : "") + " for " + check);
-    }
-    
-    protected void handleRecovery(Check check, CheckState state, Result result)
-    {
-        // reschedule due to state change
-        this.getBergamot().getScheduler().reschedule(check);
-        // recovery
-        // always ensure we clear alerts down from the display
-        this.getBergamot().getObjectStore().removeRecentCheck(check);
-        logger.warn("Recovery" + (check.isSuppressed() ? " (suppressed)" : "") + " for " + check);
     }
 
-    protected boolean transitionState(Check check, CheckState state, Result result)
+    /**
+     * Apply the result to the current state of the check
+     * @return true if a hard state change happened
+     */
+    protected boolean applyResult(Check check, CheckState state, Result result)
     {
-        // is state change
-        boolean isStateChange = state.isOk() ^ result.isOk();
-        logger.debug("IsStateChange: " + state.isOk() + " ^ " + result.isOk() + " = " + isStateChange);
-        // attempts
-        if (isStateChange)
-        {
-            state.setAttempt(0);
-            state.setHard(false);
-            state.setLastStateChange(System.currentTimeMillis());
-        }
-        else if (!state.isHard())
-        {
-            int attempt = state.getAttempt() + 1;
-            if (attempt > check.getCurrentAttemptThreshold()) attempt = check.getCurrentAttemptThreshold();
-            state.setAttempt(attempt);
-            state.setHard(attempt >= check.getCurrentAttemptThreshold());
-        }
+        // is the state changing
+        boolean isTransition  = state.isOk() ^ result.isOk();
+        boolean isFlapping    = isTransition & state.isTransitioning();
         // update the state
         state.setLastCheckId(result.getId());
         state.setLastCheckTime(result.getExecuted());
@@ -146,7 +145,33 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         state.pushOkHistory(result.isOk());
         state.setStatus(result.getStatus());
         state.setOutput(result.getOutput());
-        return isStateChange;
+        state.setFlapping(isFlapping);
+        // apply thresholds
+        if (isTransition)
+        {
+            state.setAttempt(1);
+            state.setHard(false);
+            state.setLastStateChange(System.currentTimeMillis());
+            state.setTransitioning(true);
+        }
+        else if (!state.isHard())
+        {
+            int attempt = state.getAttempt() + 1;
+            if (attempt > check.getCurrentAttemptThreshold()) attempt = check.getCurrentAttemptThreshold();
+            state.setAttempt(attempt);
+            state.setHard(attempt >= check.getCurrentAttemptThreshold());
+            state.setTransitioning(false);
+            return state.isHard();
+        }
+        return false;
+    }
+    
+    protected void updateDependencies(Check check, CheckState state, Result result)
+    {
+        for (Check referencedBy : check.getReferences())
+        {
+            logger.info("Propagating result to check " + referencedBy);
+        }
     }
 
     protected void computeStats(CheckState state, Result result)

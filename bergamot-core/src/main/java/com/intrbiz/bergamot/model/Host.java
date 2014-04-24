@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
 import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.model.state.GroupState;
 
 /**
  * A host - some form of network connected device that is to be checked
@@ -102,28 +103,9 @@ public class Host extends Check
         executeCheck.addParameter("HOSTNAME", this.getName());
     }
 
-    @Override
-    public int hashCode()
+    public GroupState getServicesState()
     {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        Host other = (Host) obj;
-        if (id == null)
-        {
-            if (other.id != null) return false;
-        }
-        else if (!id.equals(other.id)) return false;
-        return true;
+        return GroupState.compute(this.getServices());
     }
 
     public String toString()

@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.HostgroupCfg;
+import com.intrbiz.bergamot.model.state.GroupState;
 
 public class HostGroup extends NamedObject
 {
@@ -54,5 +55,10 @@ public class HostGroup extends NamedObject
     {
         this.hosts.put(host.getName(), host);
         host.addHostgroup(this);
+    }
+    
+    public GroupState getState()
+    {
+        return GroupState.compute(this.getHosts());
     }
 }

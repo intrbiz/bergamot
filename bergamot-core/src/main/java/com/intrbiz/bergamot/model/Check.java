@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -58,13 +60,23 @@ public abstract class Check extends NamedObject
      */
     protected boolean enabled = true;
 
+    /**
+     * Checks which reference this check
+     */
+    private Set<Check> referencedBy = new HashSet<Check>();
+
+    /**
+     * Checks which this check references
+     */
+    private Set<Check> references = new HashSet<Check>();
+
     public Check()
     {
         super();
     }
 
     public abstract String getType();
-    
+
     protected void onSetId()
     {
         this.state.setCheckId(this.id);
@@ -158,6 +170,26 @@ public abstract class Check extends NamedObject
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public Set<Check> getReferencedBy()
+    {
+        return referencedBy;
+    }
+
+    public void setReferencedBy(Set<Check> referencedBy)
+    {
+        this.referencedBy = referencedBy;
+    }
+
+    public Set<Check> getReferences()
+    {
+        return references;
+    }
+
+    public void setReferences(Set<Check> references)
+    {
+        this.references = references;
     }
 
     public CheckState getState()

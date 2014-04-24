@@ -12,45 +12,49 @@ import com.intrbiz.bergamot.model.Status;
 public class CheckState
 {
     private UUID checkId;
-    
+
     private boolean ok = true;
-    
+
     private Status status = Status.PENDING;
-    
+
     private String output = "Pending";
-    
+
     private long lastCheckTime;
-    
+
     private UUID lastCheckId;
-    
+
     private int attempt = 0;
-    
+
     private boolean hard = false;
-    
+
+    private boolean transitioning = false;
+
+    private boolean flapping = false;
+
     private long lastStateChange;
-    
+
     // history
-    
+
     private long okHistory = 0x1L;
-    
+
     // stats
-    
+
     private double lastRuntime;
-    
+
     private double averageRuntime;
-    
+
     private double lastCheckExecutionLatency;
-    
+
     private double averageCheckExecutionLatency;
-    
+
     private double lastCheckProcessingLatency;
-    
+
     private double averageCheckProcessingLatency;
-    
+
     // locking
-    
+
     private final Lock lock = new ReentrantLock();
-    
+
     public CheckState()
     {
         super();
@@ -215,14 +219,32 @@ public class CheckState
     {
         this.okHistory = okHistory;
     }
-    
+
     public void pushOkHistory(boolean ok)
     {
         this.okHistory = ((this.okHistory << 1) & 0x7FFFFFFFFFFFFFFFL) | (ok ? 1L : 0L);
     }
-    
-    // locking
-    
+
+    public boolean isTransitioning()
+    {
+        return transitioning;
+    }
+
+    public void setTransitioning(boolean transitioning)
+    {
+        this.transitioning = transitioning;
+    }
+
+    public boolean isFlapping()
+    {
+        return flapping;
+    }
+
+    public void setFlapping(boolean flapping)
+    {
+        this.flapping = flapping;
+    }
+
     public Lock getLock()
     {
         return this.lock;

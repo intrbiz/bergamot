@@ -8,39 +8,57 @@ public enum Status
     /**
      * The check is currently pending
      */
-    PENDING,
+    PENDING(true),
     /**
      * The check is all ok, yay!
      */
-    OK, 
+    OK(true), 
     /**
      * The check has raised a warning, you may look into it
      */
-    WARNING, 
+    WARNING(false), 
     /**
      * The check has raised a critical error, you should look into it
      */
-    CRITICAL, 
+    CRITICAL(false), 
     /**
      * Something went wrong with the check
      */
-    UNKNOWN,
+    UNKNOWN(false),
     /**
      * The check did not execute quick enough and was cancelled
      */
-    TIMEOUT,
+    TIMEOUT(false),
     /**
      * Some Bergamot internal error happened, go look at the logs
      */
-    INTERNAL;
+    INTERNAL(false);
     
-    private Status()
+    private final boolean ok;
+    
+    private Status(boolean ok)
     {
+        this.ok = ok;
+    }
+    
+    public boolean isOk()
+    {
+        return this.ok;
     }
     
     public int getCode()
     {
         return this.ordinal();
+    }
+    
+    public boolean isBetterThan(Status other)
+    {
+        return this.compareTo(other) < 0;
+    }
+    
+    public boolean isWorseThan(Status other)
+    {
+        return this.compareTo(other) > 0;
     }
     
     public static Status valueOf(int code)
@@ -50,5 +68,15 @@ public enum Status
             if (status.getCode() == code) return status;
         }
         return null;
+    }
+    
+    public static Status best(Status a, Status b)
+    {
+        return a.compareTo(b) < 0 ? a : b;
+    }
+    
+    public static Status worst(Status a, Status b)
+    {
+        return a.compareTo(b) > 0 ? a : b;
     }
 }

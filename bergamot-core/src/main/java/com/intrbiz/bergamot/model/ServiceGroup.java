@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.ServicegroupCfg;
+import com.intrbiz.bergamot.model.state.GroupState;
 
 public class ServiceGroup extends NamedObject
 {
@@ -55,5 +56,10 @@ public class ServiceGroup extends NamedObject
     {
         this.services.put(service.getId(), service);
         service.addServicegroup(this);
+    }
+    
+    public GroupState getState()
+    {
+        return GroupState.compute(this.getServices());
     }
 }
