@@ -23,9 +23,9 @@ public class CheckState
 
     private UUID lastCheckId;
 
-    private int attempt = 0;
+    private int attempt = 4;
 
-    private boolean hard = false;
+    private boolean hard = true;
 
     private boolean transitioning = false;
 

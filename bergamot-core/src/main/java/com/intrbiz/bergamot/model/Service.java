@@ -45,6 +45,7 @@ public class Service extends Check
         this.recoveryAttemptThreshold = config.resolveMaxCheckAttempts();
         this.checkInterval = TimeUnit.MINUTES.toMillis(config.resolveCheckInterval());
         this.retryInterval = TimeUnit.MINUTES.toMillis(config.resolveRetryInterval());
+        this.getState().setAttempt(this.recoveryAttemptThreshold);
     }
 
     public Set<ServiceGroup> getServicegroups()

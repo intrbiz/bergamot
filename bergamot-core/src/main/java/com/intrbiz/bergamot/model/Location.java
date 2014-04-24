@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.model.state.GroupState;
 /**
  * The physical (probably) location of a host
  */
-public class Location extends NamedObject
+public class Location extends Group
 {
     private Map<String, Host> hosts = new TreeMap<String, Host>();
 
@@ -92,8 +92,9 @@ public class Location extends NamedObject
         this.location = location;
     }
 
+    @Override
     public GroupState getState()
     {
-        return GroupState.compute(this.getHosts());
+        return GroupState.compute(this.getHosts(), this.getLocations());
     }
 }

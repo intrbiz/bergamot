@@ -9,7 +9,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.ServicegroupCfg;
 import com.intrbiz.bergamot.model.state.GroupState;
 
-public class ServiceGroup extends NamedObject
+public class ServiceGroup extends Group
 {
     private Map<UUID, Service> services = new TreeMap<UUID, Service>();
 
@@ -50,8 +50,9 @@ public class ServiceGroup extends NamedObject
         service.addServicegroup(this);
     }
     
+    @Override
     public GroupState getState()
     {
-        return GroupState.compute(this.getServices());
+        return GroupState.compute(this.getServices(), null);
     }
 }

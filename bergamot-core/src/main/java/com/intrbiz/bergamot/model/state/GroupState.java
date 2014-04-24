@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.state;
 import java.util.Collection;
 
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Status;
 
 public class GroupState
@@ -135,7 +136,7 @@ public class GroupState
         this.internalCount = internalCount;
     }
     
-    public static GroupState compute(Collection<? extends Check> checks)
+    public static GroupState compute(Collection<? extends Check> checks, Collection<? extends Group> groups)
     {
         GroupState state = new GroupState();
         for (Check check : checks)
@@ -165,6 +166,22 @@ public class GroupState
                 case INTERNAL:
                     state.internalCount++;
                     break;
+            }
+        }
+        if (groups != null)
+        {
+            for (Group group : groups)
+            {
+                GroupState gstate = group.getState();
+                //
+                state.ok            = state.ok & gstate.isOk();
+                state.status        = Status.worst(state.status, gstate.getStatus());
+                state.pendingCount  += gstate.pendingCount;
+                state.okCount       += gstate.okCount;
+                state.warningCount  += gstate.warningCount;
+                state.criticalCount += gstate.criticalCount;
+                state.timeoutCount  += gstate.timeoutCount;
+                state.internalCount += gstate.internalCount;
             }
         }
         return state;

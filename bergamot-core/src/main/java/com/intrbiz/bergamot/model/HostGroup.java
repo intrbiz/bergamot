@@ -8,9 +8,13 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.HostgroupCfg;
 import com.intrbiz.bergamot.model.state.GroupState;
 
-public class HostGroup extends NamedObject
+public class HostGroup extends Group
 {
+    private Map<String, HostGroup> hostgroups = new TreeMap<String, HostGroup>();
+    
     private Map<String, Host> hosts = new TreeMap<String, Host>();
+    
+    private Map<String, HostGroup> members = new TreeMap<String, HostGroup>();
 
     public HostGroup()
     {
@@ -45,11 +49,69 @@ public class HostGroup extends NamedObject
     public void addHost(Host host)
     {
         this.hosts.put(host.getName(), host);
-        host.addHostgroup(this);
+        host.addHostGroup(this);
+    }
+
+    //
+    
+    public Collection<HostGroup> getHostGroups()
+    {
+        return this.hostgroups.values();
+    }
+
+    public void addHostGroup(HostGroup hostGroup)
+    {
+        this.hostgroups.put(hostGroup.getName(), hostGroup);
     }
     
+    public HostGroup getHostGroup(String name)
+    {
+        return this.hostgroups.get(name);
+    }
+
+    public boolean containsHostGroup(String name)
+    {
+        return this.hostgroups.containsKey(name);
+    }
+
+    public int getHostGroupCount()
+    {
+        return this.hostgroups.size();
+    }
+    
+    //
+    
+    public Collection<HostGroup> getMembers()
+    {
+        return this.members.values();
+    }
+
+    public void addMember(HostGroup member)
+    {
+        this.members.put(member.getName(), member);
+        member.addHostGroup(this);
+    }
+    
+    public HostGroup getMember(String name)
+    {
+        return this.members.get(name);
+    }
+
+    public boolean containsMember(String name)
+    {
+        return this.members.containsKey(name);
+    }
+
+    public int getMemberCount()
+    {
+        return this.members.size();
+    }
+    
+    //
+    
+    @Override
     public GroupState getState()
     {
-        return GroupState.compute(this.getHosts());
+        return GroupState.compute(this.getHosts(), this.getMembers());
     }
 }

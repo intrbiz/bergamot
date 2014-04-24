@@ -117,7 +117,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
     protected void sendRecovery(Check check, CheckState state, Result result)
     {
         logger.warn("Recovery for " + check);
-        this.getBergamot().getObjectStore().removeRecentCheck(check);
+        this.getBergamot().getObjectStore().removeAlert(check);
     }
     
     protected void sendAlert(Check check, CheckState state, Result result)
@@ -125,7 +125,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         logger.warn("Alert for " + check);
         if (! check.isSuppressed())
         {
-            this.getBergamot().getObjectStore().addRecentCheck(check);    
+            this.getBergamot().getObjectStore().addAlert(check);    
         }
     }
 
@@ -160,7 +160,10 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
             if (attempt > check.getCurrentAttemptThreshold()) attempt = check.getCurrentAttemptThreshold();
             state.setAttempt(attempt);
             state.setHard(attempt >= check.getCurrentAttemptThreshold());
-            state.setTransitioning(false);
+            if (state.isHard())
+            {
+                state.setTransitioning(false);
+            }
             return state.isHard();
         }
         return false;

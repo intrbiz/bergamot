@@ -81,7 +81,7 @@ public class NagiosConfigImporter
         this.linkLocations(store);
         // load all host objects
         this.loadHosts(store);
-        // TODO build host group members
+        this.linkHostgroups(store);
         // load all service objects
         this.loadServices(store);
         // TODO build servicegroup members
@@ -122,7 +122,7 @@ public class NagiosConfigImporter
                 String parent = locationCfg.resolveLocation();
                 if (! Util.isEmpty(parent))
                 {
-                    Location location = store.lookupLocation(locationCfg.getName());
+                    Location location = store.lookupLocation(locationCfg.getLocationName());
                     if (location != null)
                     {
                         Location parentLocation = store.lookupLocation(parent);
@@ -219,6 +219,54 @@ public class NagiosConfigImporter
             else
             {
                 logger.trace("Not registering hostgroup: " + cfg.getName());
+            }
+        }
+    }
+    
+    private void linkHostgroups(ObjectStore store)
+    {
+        for (HostgroupCfg cfg : this.nagiosConfig.getHostgroups())
+        {
+            if (cfg.isRegister())
+            {
+                HostGroup hostGroup = store.lookupHostgroup(cfg.getHostgroupName());
+                if (hostGroup != null)
+                {
+                    // hosts
+                    List<String> members = cfg.resolveMembers();
+                    if (members != null)
+                    {
+                        for (String member : members)
+                        {
+                            Host host = store.lookupHost(member);
+                            if (host != null)
+                            {
+                                hostGroup.addHost(host);
+                            }
+                            else
+                            {
+                                logger.warn("The host " + member + " does not exist, cannot add it to the hostgroup " + hostGroup.getName());
+                            }
+                        }
+                    }
+                    // host groups
+                    List<String> hostgroups = cfg.resolveMembers();
+                    if (hostgroups != null)
+                    {
+                        for (String member : hostgroups)
+                        {
+                            HostGroup memberHostGroup = store.lookupHostgroup(member);
+                            if (member != null)
+                            {
+                                hostGroup.addMember(memberHostGroup);
+                            }
+                            else
+                            {
+                                logger.warn("The hostgroup " + member + " does not exist, cannot add it to the hostgroup " + hostGroup.getName());
+                            }
+                        }
+                    }
+                }
             }
         }
     }

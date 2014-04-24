@@ -1,8 +1,9 @@
 package com.intrbiz.bergamot.store;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -14,7 +15,6 @@ import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.ServiceGroup;
 import com.intrbiz.bergamot.model.TimePeriod;
-import com.intrbiz.bergamot.util.RingBuffer;
 
 /**
  * Default, in-memory store of Bergamot objects: host, services, etc
@@ -35,7 +35,7 @@ public class ObjectStore
     
     private Map<String, TimePeriod> timePeriods = new TreeMap<String, TimePeriod>();
     
-    private RingBuffer<Check> recentChecks = new RingBuffer<Check>(12);
+    private Set<Check> alerts = new HashSet<Check>();
     
     private Map<String, Location> locations = new TreeMap<String, Location>();
 
@@ -210,19 +210,19 @@ public class ObjectStore
     
     // recent
     
-    public List<Check> getRecentChecks()
+    public Collection<Check> getAlerts()
     {
-        return this.recentChecks.toList();
+        return this.alerts;
     }
     
-    public void addRecentCheck(Check check)
+    public void addAlert(Check check)
     {
-        this.recentChecks.add(check);
+        this.alerts.add(check);
     }
     
-    public void removeRecentCheck(Check check)
+    public void removeAlert(Check check)
     {
-        this.recentChecks.remove(check);
+        this.alerts.remove(check);
     }
     
     // time period
@@ -267,5 +267,15 @@ public class ObjectStore
     public Collection<Location> getLocations()
     {
         return this.locations.values();
+    }
+    
+    public Collection<Location> getRootLocations()
+    {
+        Set<Location> locations = new HashSet<Location>();
+        for (Location location : this.getLocations())
+        {
+            if (location.getLocation() == null) locations.add(location);
+        }
+        return locations;
     }
 }

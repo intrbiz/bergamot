@@ -57,6 +57,7 @@ public class Host extends Check
         this.recoveryAttemptThreshold = config.resolveMaxCheckAttempts();
         this.checkInterval = TimeUnit.MINUTES.toMillis(config.resolveCheckInterval());
         this.retryInterval = TimeUnit.MINUTES.toMillis(config.resolveRetryInterval());
+        this.getState().setAttempt(this.recoveryAttemptThreshold);
     }
 
     public Set<String> getServiceNames()
@@ -90,12 +91,12 @@ public class Host extends Check
         return this.services.size();
     }
 
-    public Set<HostGroup> getHostgroups()
+    public Set<HostGroup> getHostGroups()
     {
         return hostGroups;
     }
 
-    public void addHostgroup(HostGroup hostGroup)
+    public void addHostGroup(HostGroup hostGroup)
     {
         this.hostGroups.add(hostGroup);
     }
@@ -110,7 +111,7 @@ public class Host extends Check
 
     public GroupState getServicesState()
     {
-        return GroupState.compute(this.getServices());
+        return GroupState.compute(this.getServices(), null);
     }
 
     public Location getLocation()
