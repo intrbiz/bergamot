@@ -3,113 +3,92 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Host #{host.displayName}">
 
-	<div class="row hostgroup">
-		<div class="col3 host">
-			<p>
-				<span>Status: </span>
-				<span class="state #{host.state.status.toString().toLowerCase()}" title="#{host.state.status}"></span>
-			</p>
-			<p>
-				<span>Host name: </span>
-				<span>#{host.name}</span>
-			</p>
-			<p>
-				<span>Address: </span>
-				<span>#{host.address}</span>
-			</p>
-			<p>
-				<span>Last checked on: </span>
-				<span>#{dateformat('EEE dd/MM/yyyy', host.state.lastCheckTime)}</span>
-			</p>
-			<p>
-				<span>Last checked at: </span>
-				<span>#{dateformat('HH:mm:ss', host.state.lastCheckTime)}</span>
-			</p>
-			<p>
-				<span class="output">Output: </span>
-				<span class="output">#{coalesce(host.state.output, '')}</span>
-			</p>
-			<p>
-				<span>Services Ok:</span>
-				<span>#{host.servicesState.ok}</span>
-			</p>
-			<p>
-				<span>Status:</span>
-				<span>#{host.servicesState.status}</span>
-			</p>
-			<p>
-				<span>Services OK:</span>
-				<span>#{host.servicesState.okCount}</span>
-			</p>
-			<p>
-				<span>Services WARNING:</span>
-				<span>#{host.servicesState.warningCount}</span>
-			</p>
-			<p>
-				<span>Services CRITICAL:</span>
-				<span>#{host.servicesState.criticalCount}</span>
-			</p>
+	<div class="row submenu pull-right">
+		<a href="/host/unsuppress/#{host.id}">Unsupress</a>
+		<a href="/host/suppress/#{host.id}">Supress</a>
+		<a href="/host/disable/#{host.id}">Disable</a>
+		<a href="/host/enable/#{host.id}">Enable</a>
+		<a href="/host/execute/#{host.id}">Check now</a>
+	</div>
+
+	<div class="row">
+		<div class="col3 dash_icon">
+		    <h3>
+				<span class="dash_img #{host.state.status.toString().toLowerCase()}" title="The host is #{host.state.status.toString().toLowerCase()}">
+					<img src="/network-server.png" />
+				</span>
+				<span class="name">#{host.displayName}</span>
+		    </h3>
+		    <p>
+		    	<span class="label">Host name: </span>
+		   		<span class="value">#{host.name}</span>
+	    	</p>
+	    	<p>
+		    	<span class="label">Address: </span>
+		   		<span class="value">#{host.address}</span>
+	    	</p>
+	    	<p>
+			    <span class="label">Attempt: </span>
+			    <span class="value">
+			    	<span>#{host.state.attempt} of #{host.currentAttemptThreshold}</span>
+			    	<span class="info" rendered="#{host.state.transitioning}" title="The host is changing state">Changing</span>
+			    	<span class="info" rendered="#{host.state.hard}" title="The host is in a steady state">Steady</span>
+			    </span>
+		    </p>
+	    	<p>
+		    	<span class="label">Last checked: </span>
+		   		<span class="value">#{dateformat('HH:mm:ss', host.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime)}</span>
+	    	</p>
+	    	<p class="output">
+		    	<span class="label">Output: </span>
+		    	<span class="value">#{coalesce(host.state.output, '')}</span>
+	    	</p>
 		</div>
+	</div>
+	
+	<h2>Services</h2>
+	
+	<div class="row submenu pull-right">
+		<a href="/host/execute-services/#{host.id}">Check all services now</a>
 	</div>
 
 	<div class="row hostgroup services" rendered="#{! host.services.isEmpty()}">
 		<data-set var="service" value="#{host.services}">
-			<a href="/service/#{service.id}">
-				<div class="col3 host">
-					<span class="dash_img" style="background: url(/applications-system.png) no-repeat"></span>
-					<p>
-						<span>Check: </span>
-						<span>#{service.name}</span>
-					</p>
-					<p>
-						<span>Status: </span>
-						<span class="state #{service.state.status.toString().toLowerCase()}" title="#{service.state.status}"></span>
-					</p>
-					<p>
-						<span>Last checked on: </span>
-						<span>#{dateformat('EEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
-					</p>
-					<p>
-						<span>Last checked at: </span>
-						<span>#{dateformat('HH:mm:ss', service.state.lastCheckTime)}</span>
-					</p>
-					<p>
-						<span class="output">Output: </span>
-						<span class="output">#{coalesce(service.state.output, '')}</span>
-					</p>
+			<a href="/service/id/#{service.id}">
+				<div class="col3 dash_icon">
+					<h3>
+						<span class="dash_img #{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
+							<img src="/applications-system.png" />
+						</span>
+						<span class="name">#{service.displayName}</span>
+				    </h3>
+				    <p>
+					    <span class="label">Status: </span>
+					    <span class="value">#{service.state.status.toString().substring(0,1) + service.state.status.toString().substring(1).toLowerCase()}</span>
+				    </p>
+				    <p>
+					    <span class="label">Attempt: </span>
+					    <span class="value">
+					    	<span>#{service.state.attempt} of #{service.currentAttemptThreshold}</span>
+					    	<span class="info" rendered="#{service.state.transitioning}" title="The service is changing state">Changing</span>
+					    	<span class="info" rendered="#{service.state.hard}" title="The service is in a steady state">Steady</span>
+					    </span>
+				    </p>
+				    <p>
+					    <span class="label">Host: </span>
+					    <span class="value">#{service.host.displayName}</span>
+				    </p>
+				    <p>
+					    <span class="label">Last checked: </span>
+					    <span class="value">#{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
+				    </p>
+				    <p class="output">
+					    <span class="label">Output: </span>
+					    <span class="value">#{coalesce(service.state.output, '')}</span>
+				    </p>
 				</div>
 			</a>
 		</data-set>
-	</div>
-	
-	<div class="row">
-		<h3>Configuration</h3>
-		<div class="col6">
-			<p class="row6">
-				<span class="col2">Name: </span>
-				<span class="col4">#{host.name}</span>
-			</p>
-			<p class="row6">
-				<span class="col2">Id: </span>
-				<span class="col4">#{host.id}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Address: </span>
-				<span class="col4 output">#{host.address}</span>
-			</p>
-		</div>
-		<div class="col6">
-			<p class="row6">
-				<span class="col2">Command: </span>
-				<span class="col4">#{host.checkCommand.command.engine}::#{host.checkCommand.command.name}</span>
-			</p>
-			<data-set var="parameter" value="#{host.checkCommand.parameters}">
-				<p class="row6">
-					<span class="col2 output">#{parameter.name}: </span>
-					<span class="col4 output">#{parameter.value}</span>
-				</p>
-			</data-set>
-		</div>
 	</div>
 
 </fragment>

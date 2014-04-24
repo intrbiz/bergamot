@@ -22,16 +22,22 @@
 			<div class="container">
 				<div id="logo">
 					<a href="/">
-						<h1>Bergamot Monitoring</h1>
+						<h1>Bergamot</h1>
 					</a>
 				</div>
 				<div id="menu">
 					<ul>
 						<li>
-							<a href="/hosts">Hosts</a>
+							<a href="/location/">Locations</a>
 						</li>
 						<li>
-							<a href="/services">Services</a>
+							<a href="/hostgroup/">Hosts</a>
+						</li>
+						<li>
+							<a href="/servicegroup/">Services</a>
+						</li>
+						<li>
+							<a href="/">Alerts</a>
 						</li>
 					</ul>
 				</div>

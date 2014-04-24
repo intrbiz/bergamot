@@ -1,41 +1,41 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Dashboard">
+<fragment xmlns="com.intrbiz.balsa" title="Alerts">
 
-		<div class="row hostgroup">
-			<h2>Recent alerts</h2>
-			<data-set var="check" value="#{recent}">
-				<a href="/#{check.type}/#{check.id}">
-					<div class="col3 host">
-						<span class="dash_img" style="background: url(#{if(check.type == 'service', '/applications-system.png', '/linux-icon.png')}) no-repeat"></span>
+		<div class="row">
+			<data-set var="check" value="#{alerts}">
+				<a href="/#{check.type}/id/#{check.id}">
+					<div class="col3 dash_icon">
+						<h3>
+							<span class="dash_img #{check.state.status.toString().toLowerCase()}" title="The service is #{check.state.status.toString().toLowerCase()}">
+								<img src="/applications-system.png" />
+							</span>
+							<span class="name">#{check.displayName}</span>
+					    </h3>
+					    <p>
+						    <span class="label">Attempt: </span>
+						    <span class="value">
+						    	<span>#{check.state.attempt} of #{check.currentAttemptThreshold}</span>
+						    	<span class="info" rendered="#{check.state.transitioning}" title="The #{check.type} is changing state">Changing</span>
+						    	<span class="info" rendered="#{check.state.hard}" title="The #{check.type} is in a steady state">Steady</span>
+						    </span>
+					    </p>
+					    <p rendered="#{check.type == 'service'}">
+						    <span class="label">Host: </span>
+						    <span class="value">#{check.host.displayName}</span>
+					    </p>
 						<p>
-							<span>Check: </span>
-							<span>#{check.displayName}</span>
+						    <span class="label">Last checked: </span>
+					    	<span class="value">#{dateformat('HH:mm:ss', check.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', check.state.lastCheckTime)}</span>
+				    	</p>
+						<p class="output">
+							<span class="label">Output: </span>
+							<span class="value">#{coalesce(check.state.output, '')}</span>
 						</p>
-						<p rendered="#{check.type == 'service'}">
-							<span>Host: </span>
-							<span>#{check.host.displayName}</span>
-						</p>
-						<p>
-							<span>Status: </span>
-							<span class="state #{check.state.status.toString().toLowerCase()}" title="#{check.state.status}"></span>
-						</p>
-						<p>
-							<span>Last checked on: </span>
-							<span>#{dateformat('EEE dd/MM/yyyy', check.state.lastCheckTime)}</span>
-						</p>
-						<p>
-							<span>Last checked at: </span>
-							<span>#{dateformat('HH:mm:ss', check.state.lastCheckTime)}</span>
-						</p>
-						<p>
-							<span class="output">Output: </span>
-							<span class="output">#{coalesce(check.state.output, '')}</span>
-						</p>
-						<p rendered="#{check.type == 'host'}">
-							<span>&nbsp;</span>
-							<span>&nbsp;</span>
+						<p rendered="#{check.type != 'service'}">
+							<span class="label">&nbsp;</span>
+							<span class="value">&nbsp;</span>
 						</p>
 					</div>
 				</a>

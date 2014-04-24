@@ -101,16 +101,47 @@ table tr:hover {
 }
 
 .container {
-	width: 1740px;
+	width: 435px;
 	margin: 0 auto;
 	position: relative;
 }
 
 .row {
 	float: left;
-	width: 1740px;
+	width: 435px;
 	margin-bottom: 20px;
 }
+
+/* Resizing */
+
+@media (min-width: 870px) and (max-width: 1304px) {
+	.row {
+		width: 870px;
+	}
+	.container {
+		width: 870px;
+	}
+}
+
+@media (min-width: 1305px) and (max-width: 1739px) {
+	.row {
+		width: 1305px;
+	}
+	.container {
+		width: 1305px;
+	}
+}
+
+@media (min-width: 1740px) and (max-width: 19200px) {
+	.row {
+		width: 1740px;
+	}
+	.container {
+		width: 1740px;
+	}
+}
+
+/* */
 
 .col1 {
 	float: left;
@@ -226,71 +257,109 @@ table tr:hover {
 	padding: 2px 5px;
 }
 
-.state {
-	width: 20px !important;
-	height: 20px !important;
-	display: inline-block;
-	border-radius: 10px;
-	background-color: #DDDDDD;
+.submenu.pull-right a {
+	float: right;
 }
 
-.state.ok, .state.up {
-	background-color: #00BF00;	
+/* State colours */
+
+.dash_img.ok, .dash_img.up {
+	background-color: #00BF00 !important;	
 }
 
-.state.warning {
-	background-color: #F3C300;
+.dash_img.warning {
+	background-color: #F3C300 !important;
 }
 
-.state.critical, .state.down {
-	background-color: #E85752;	
+.dash_img.critical, .dash_img.down {
+	background-color: #E85752 !important;	
 }
 
-.state.unknown, .state.internal, .state.timeout {
-	background-color: #A3007B;
+.dash_img.unknown, .dash_img.internal, .dash_img.timeout {
+	background-color: #A3007B !important;
 }
 
+/* icons */
 
-/* hosts */
-
-.hostgroup .host {
-	border-radius: 10px;
-	padding-top: 16px;
-	padding-bottom: 16px;
-	line-height: 20px;
+.dash_icon {
+    position: relative;
+    border-radius:  10px;
+    padding-top:    16px;
+    padding-bottom: 16px;
+    line-height:    20px;
 }
 
-.hostgroup .host p {
-	width: 375px;
-	padding: 5px 25px;
-	display: block;
-	float: left;
+a:hover .dash_icon {
+    background: #f4f4f4;
 }
 
-.hostgroup .host p span {
-	width: 187px;
-	height: 20px;
-	overflow: hidden;
-	display: block;
-	float: left;
+.dash_icon h3 {
+    float: left;
+    width: 100%;
+    font-size: 24px;
+    margin: 0 0 10px 0;
 }
 
-.hostgroup .host p span.output {
-	height: 60px;
+.dash_icon h3 .dash_img {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    box-shadow: 0px 3px 6px #747474;
+    float: left;
+    background-color: #DDD;
 }
 
-.hostgroup a:hover .host {
-	background: #f4f4f4;
+.dash_icon h3 > span {
+    display: block;
+    float: left;
+    margin: 5px 0 0 10px;
+    width: 341px;
 }
 
-.hostgroup .host span.dash_img {
-	display: block;
-	width: 64px;
-	height: 64px;
-	margin: 0px auto 16px auto;
-	border-radius: 8px;
-	box-shadow: 0px 3px 6px #747474;
+.dash_icon h3 > span.name {
+	line-height: 32px;
 }
 
+.dash_icon > p {
+    display: block;
+    float: left;
+    margin: 5px 0 0 0;
+    height: 25px;
+}
 
+.dash_icon > p.output {
+    height: 80px;
+    overflow: hidden;
+}
+
+.dash_icon p > span,
+.dash_icon p > a > span {
+    display: block;
+    float: left;
+    margin: 5px 0 0 10px;
+}
+
+.dash_icon p span.label {
+    width: 120px;
+    font-weight: bold;
+}
+
+.dash_icon p span.label.wide {
+    width: 240px;
+}
+
+.dash_icon p span.value {
+    width: 270px;
+}
+
+.dash_icon p a span.value {
+	text-decoration: underline;
+}
+
+span.info {
+	background-color: #EEE;
+	border-radius: 3px;
+	padding: 0px 4px;
+}
 

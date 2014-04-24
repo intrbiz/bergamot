@@ -13,48 +13,16 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Template;
 
-@Prefix("/")
+@Prefix("/service")
 @Template("layout/main")
-public class AppRouter extends Router
+public class ServiceRouter extends Router
 {
     private Bergamot getBergamot()
     {
         return ((BergamotApp) this.app()).getBergamot();
     }
     
-    @Any("/")
-    public void index()
-    {
-        Bergamot bergamot = this.getBergamot();
-        model("recent", bergamot.getObjectStore().getRecentChecks());
-        encode("index");
-    }
-    
-    @Any("/hosts")
-    public void hosts()
-    {
-        Bergamot bergamot = this.getBergamot();
-        model("hostgroups", bergamot.getObjectStore().getHostgroups());
-        encode("host/index");
-    }
-    
-    @Any("/host/:name")
-    public void host(String name)
-    {
-        Bergamot bergamot = this.getBergamot();
-        model("host", bergamot.getObjectStore().lookupHost(name));
-        encode("host/detail");
-    }
-    
-    @Any("/services")
-    public void services()
-    {
-        Bergamot bergamot = this.getBergamot();
-        model("servicegroups", bergamot.getObjectStore().getServicegroups());
-        encode("service/index");
-    }
-    
-    @Any("/service/:name")
+    @Any("/id/:id")
     public void service(@AsUUID UUID id)
     {
         Bergamot bergamot = this.getBergamot();
@@ -62,7 +30,7 @@ public class AppRouter extends Router
         encode("service/detail");
     }
     
-    @Any("/service/execute/:id")
+    @Any("/execute/:id")
     public void executeService(@AsUUID UUID id) throws IOException
     {
         Bergamot bergamot = this.getBergamot();
@@ -74,10 +42,10 @@ public class AppRouter extends Router
             ExecuteCheck executeCheck = service.createExecuteCheck();
             if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
         }
-        redirect("/service/" + id);
+        redirect("/service/id/" + id);
     }
     
-    @Any("/service/enable/:id")
+    @Any("/enable/:id")
     public void enableService(@AsUUID UUID id) throws IOException
     {
         Bergamot bergamot = this.getBergamot();
@@ -89,10 +57,10 @@ public class AppRouter extends Router
             service.setEnabled(true);
             bergamot.getScheduler().enable(service);
         }
-        redirect("/service/" + id);
+        redirect("/service/id/" + id);
     }
     
-    @Any("/service/disable/:id")
+    @Any("/disable/:id")
     public void disableService(@AsUUID UUID id) throws IOException
     {
         Bergamot bergamot = this.getBergamot();
@@ -104,10 +72,10 @@ public class AppRouter extends Router
             service.setEnabled(false);
             bergamot.getScheduler().disable(service);
         }
-        redirect("/service/" + id);
+        redirect("/service/id/" + id);
     }
     
-    @Any("/service/suppress/:id")
+    @Any("/suppress/:id")
     public void suppressService(@AsUUID UUID id) throws IOException
     {
         Bergamot bergamot = this.getBergamot();
@@ -118,10 +86,10 @@ public class AppRouter extends Router
             // suppress the service
             service.setSuppressed(true);
         }
-        redirect("/service/" + id);
+        redirect("/service/id/" + id);
     }
     
-    @Any("/service/unsuppress/:id")
+    @Any("/unsuppress/:id")
     public void unsuppressService(@AsUUID UUID id) throws IOException
     {
         Bergamot bergamot = this.getBergamot();
@@ -132,6 +100,6 @@ public class AppRouter extends Router
             // unsuppress the service
             service.setSuppressed(false);
         }
-        redirect("/service/" + id);
+        redirect("/service/id/" + id);
     }
 }

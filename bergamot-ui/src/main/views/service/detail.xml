@@ -2,154 +2,80 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Check #{service.displayName} on Host #{service.host.displayName}">
-	<div class="row hostgroup">
-		<div class="col3 host">
-			<h3>Overview</h3>
-			<p>
-				<span>Check: </span>
-				<span>#{service.name}</span>
-			</p>
-			<p>
-				<span>Status: </span>
-				<span class="state #{service.state.status.toString().toLowerCase()}" title="#{service.state.status}"></span>
-			</p>
-			<p>
-				<span>Host: </span>
-				<span>#{service.host.displayName}</span>
-			</p>
-			<p>
-				<span>Last checked on: </span>
-				<span>#{dateformat('EEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
-			</p>
-			<p>
-				<span>Last checked at: </span>
-				<span>#{dateformat('HH:mm:ss', service.state.lastCheckTime)}</span>
-			</p>
-			<p>
-				<span class="output">Output: </span>
-				<span class="output">#{coalesce(service.state.output, '')}</span>
-			</p>
-			<p>
-				<span>Hard state: </span>
-				<span>#{service.state.hard}</span>
-			</p>
-			<p>
-				<span>Hard state: </span>
-				<span>#{service.state.attempt} / #{service.currentAttemptThreshold}</span>
-			</p>
-			<p>
-				<span>Transitioning state: </span>
-				<span>#{service.state.transitioning}</span>
-			</p>
-			<p>
-				<span>Flapping state: </span>
-				<span>#{service.state.flapping}</span>
-			</p>
-		</div>
-		<div class="col3 host">
-			<h3>Check runtime</h3>
-			<p>
-				<span>Last runtime: </span>
-				<span>#{service.state.lastRuntime} ms</span>
-			</p>
-			<p>
-				<span>Average runtime: </span>
-				<span>#{service.state.averageRuntime} ms</span>
-			</p>
-		</div>
-		<div class="col3 host">
-			<h3>Check latency</h3>
-			<p>
-				<span>Last processing latency: </span>
-				<span>#{service.state.lastCheckProcessingLatency} ms</span>
-			</p>
-			<p>
-				<span>Average processing latency: </span>
-				<span>#{service.state.averageCheckProcessingLatency} ms</span>
-			</p>
-			<p>
-				<span>Last execution latency: </span>
-				<span>#{service.state.lastCheckExecutionLatency} ms</span>
-			</p>
-			<p>
-				<span>Average execution latency: </span>
-				<span>#{service.state.averageCheckExecutionLatency} ms</span>
-			</p>
-		</div>
-		<div class="col3">
-			<h3>Actions</h3>
-			<p>
-				<a href="/service/execute/#{service.id}">Check now</a>
-			</p>
-			<p>
-				<a href="/service/enable/#{service.id}">Enable</a>
-			</p>
-			<p>
-				<a href="/service/disable/#{service.id}">Disable</a>
-			</p>
-			<p>
-				<a href="/service/suppress/#{service.id}">Supress</a>
-			</p>
-			<p>
-				<a href="/service/unsuppress/#{service.id}">Unsupress</a>
-			</p>
-		</div>
+
+	<div class="row submenu pull-right">
+		<a href="/service/unsuppress/#{service.id}">Unsupress</a>
+		<a href="/service/suppress/#{service.id}">Supress</a>
+		<a href="/service/disable/#{service.id}">Disable</a>
+		<a href="/service/enable/#{service.id}">Enable</a>
+		<a href="/service/execute/#{service.id}">Check now</a>
 	</div>
+
 	<div class="row">
-		<h3>Configuration</h3>
-		<div class="col6">
-			<p class="row6">
-				<span class="col2">Name: </span>
-				<span class="col4">#{service.name}</span>
-			</p>
-			<p class="row6">
-				<span class="col2">Id: </span>
-				<span class="col4">#{service.id}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Host: </span>
-				<span class="col4 output">#{service.host.name}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Check Interval: </span>
-				<span class="col4 output">#{service.checkInterval / 1000L}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Retry Interval: </span>
-				<span class="col4 output">#{service.retryInterval / 1000L}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Check Period: </span>
-				<span class="col4 output">#{service.checkPeriod.displayName}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Alert Threshold: </span>
-				<span class="col4 output">#{service.alertAttemptThreshold}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Recovery Threshold: </span>
-				<span class="col4 output">#{service.recoveryAttemptThreshold}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Enabled: </span>
-				<span class="col4 output">#{if(service.enabled, 'yes', 'no')}</span>
-			</p>
-			<p class="row6">
-				<span class="col2 output">Suppressed: </span>
-				<span class="col4 output">#{if(service.suppressed, 'yes', 'no')}</span>
-			</p>
-		</div>
-		<div class="col6">
-			<p class="row6">
-				<span class="col2">Command: </span>
-				<span class="col4">#{service.checkCommand.command.engine}::#{service.checkCommand.command.name}</span>
-			</p>
-			<data-set var="parameter" value="#{service.checkCommand.parameters}">
-				<p class="row6">
-					<span class="col2 output">#{parameter.name}: </span>
-					<span class="col4 output">#{parameter.value}</span>
-				</p>
-			</data-set>
+		<div class="col3 dash_icon">
+			<h3>
+				<span class="dash_img #{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
+					<img src="/applications-system.png" />
+				</span>
+				<span class="name">#{service.displayName}</span>
+		    </h3>
+		    <p>
+			    <span class="label">Status: </span>
+			    <span class="value">#{service.state.status.toString().substring(0,1) + service.state.status.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		    <p>
+			    <span class="label">Attempt: </span>
+			    <span class="value">
+			    	<span>#{service.state.attempt} of #{service.currentAttemptThreshold}</span>
+			    	<span class="info" rendered="#{service.state.transitioning}" title="The service is changing state">Changing</span>
+			    	<span class="info" rendered="#{service.state.hard}" title="The service is in a steady state">Steady</span>
+			    </span>
+		    </p>
+		    <p>
+			    <span class="label">Host: </span>
+			    <a href="/host/name/#{service.host.name}">
+				    <span class="value">#{service.host.displayName}</span>
+				</a>
+		    </p>
+		    <p>
+			    <span class="label">Last checked: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
+		    </p>
+		    <p class="output">
+			    <span class="label">Output: </span>
+			    <span class="value">#{coalesce(service.state.output, '')}</span>
+		    </p>
 		</div>
 	</div>
+	
+	<div class="row">
+		<div class="col6 dash_icon">
+			<h3>Check statistics</h3>
+			<p>
+				<span class="label wide">Last runtime: </span>
+				<span class="value">#{service.state.lastRuntime} ms</span>
+			</p>
+			<p>
+				<span class="label wide">Average runtime: </span>
+				<span class="value">#{service.state.averageRuntime} ms</span>
+			</p>
+			<p>
+				<span class="label wide">Last processing latency: </span>
+				<span class="value">#{service.state.lastCheckProcessingLatency} ms</span>
+			</p>
+			<p>
+				<span class="label wide">Average processing latency: </span>
+				<span class="value">#{service.state.averageCheckProcessingLatency} ms</span>
+			</p>
+			<p>
+				<span class="label wide">Last execution latency: </span>
+				<span class="value">#{service.state.lastCheckExecutionLatency} ms</span>
+			</p>
+			<p>
+				<span class="label wide">Average execution latency: </span>
+				<span class="value">#{service.state.averageCheckExecutionLatency} ms</span>
+			</p>
+		</div>
+	</div>
+	
 </fragment>
