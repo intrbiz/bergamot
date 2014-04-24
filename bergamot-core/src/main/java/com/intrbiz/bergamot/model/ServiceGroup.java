@@ -11,8 +11,6 @@ import com.intrbiz.bergamot.model.state.GroupState;
 
 public class ServiceGroup extends NamedObject
 {
-    private ServicegroupCfg config;
-
     private Map<UUID, Service> services = new TreeMap<UUID, Service>();
 
     public ServiceGroup()
@@ -20,14 +18,8 @@ public class ServiceGroup extends NamedObject
         super();
     }
 
-    public ServicegroupCfg getConfig()
-    {
-        return config;
-    }
-
     public void configure(ServicegroupCfg config)
     {
-        this.config = config;
         this.name = config.resolveServicegroupName();
         this.displayName = Util.coalesceEmpty(config.resolveAlias(), this.name);
     }

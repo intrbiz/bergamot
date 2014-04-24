@@ -10,23 +10,14 @@ import com.intrbiz.bergamot.model.state.GroupState;
 
 public class HostGroup extends NamedObject
 {
-    private HostgroupCfg config;
-
     private Map<String, Host> hosts = new TreeMap<String, Host>();
 
     public HostGroup()
     {
         super();
     }
-
-    public HostgroupCfg getConfig()
-    {
-        return config;
-    }
-
     public void configure(HostgroupCfg config)
     {
-        this.config = config;
         this.name = config.resolveHostgroupName();
         this.displayName = Util.coalesceEmpty(config.resolveAlias(), this.name); 
     }
