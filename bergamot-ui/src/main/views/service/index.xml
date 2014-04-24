@@ -8,6 +8,29 @@
 		
 			<h2>#{servicegroup.displayName}</h2>
 			
+			<div>
+				<p>
+					<span>Ok:</span>
+					<span>#{servicegroup.state.ok}</span>
+				</p>
+				<p>
+					<span>Status:</span>
+					<span>#{servicegroup.state.status}</span>
+				</p>
+				<p>
+					<span>Services OK:</span>
+					<span>#{servicegroup.state.okCount}</span>
+				</p>
+				<p>
+					<span>Services WARNING:</span>
+					<span>#{servicegroup.state.warningCount}</span>
+				</p>
+				<p>
+					<span>Services CRITICAL:</span>
+					<span>#{servicegroup.state.criticalCount}</span>
+				</p>
+			</div>
+			
 			<data-set var="service" value="#{servicegroup.services}">
 				<a href="/service/#{service.id}">
 					<div class="col3 host">

@@ -29,6 +29,22 @@
 				<span class="output">Output: </span>
 				<span class="output">#{coalesce(service.state.output, '')}</span>
 			</p>
+			<p>
+				<span>Hard state: </span>
+				<span>#{service.state.hard}</span>
+			</p>
+			<p>
+				<span>Hard state: </span>
+				<span>#{service.state.attempt} / #{service.currentAttemptThreshold}</span>
+			</p>
+			<p>
+				<span>Transitioning state: </span>
+				<span>#{service.state.transitioning}</span>
+			</p>
+			<p>
+				<span>Flapping state: </span>
+				<span>#{service.state.flapping}</span>
+			</p>
 		</div>
 		<div class="col3 host">
 			<h3>Check runtime</h3>
@@ -95,8 +111,24 @@
 				<span class="col4 output">#{service.host.name}</span>
 			</p>
 			<p class="row6">
+				<span class="col2 output">Check Interval: </span>
+				<span class="col4 output">#{service.checkInterval / 1000L}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Retry Interval: </span>
+				<span class="col4 output">#{service.retryInterval / 1000L}</span>
+			</p>
+			<p class="row6">
 				<span class="col2 output">Check Period: </span>
 				<span class="col4 output">#{service.checkPeriod.displayName}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Alert Threshold: </span>
+				<span class="col4 output">#{service.alertAttemptThreshold}</span>
+			</p>
+			<p class="row6">
+				<span class="col2 output">Recovery Threshold: </span>
+				<span class="col4 output">#{service.recoveryAttemptThreshold}</span>
 			</p>
 			<p class="row6">
 				<span class="col2 output">Enabled: </span>
@@ -110,9 +142,9 @@
 		<div class="col6">
 			<p class="row6">
 				<span class="col2">Command: </span>
-				<span class="col4">#{service.commandExecution.command.engine}::#{service.commandExecution.command.name}</span>
+				<span class="col4">#{service.checkCommand.command.engine}::#{service.checkCommand.command.name}</span>
 			</p>
-			<data-set var="parameter" value="#{service.commandExecution.parameters}">
+			<data-set var="parameter" value="#{service.checkCommand.parameters}">
 				<p class="row6">
 					<span class="col2 output">#{parameter.name}: </span>
 					<span class="col4 output">#{parameter.value}</span>

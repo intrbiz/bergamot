@@ -29,6 +29,26 @@
 				<span class="output">Output: </span>
 				<span class="output">#{coalesce(host.state.output, '')}</span>
 			</p>
+			<p>
+				<span>Services Ok:</span>
+				<span>#{host.servicesState.ok}</span>
+			</p>
+			<p>
+				<span>Status:</span>
+				<span>#{host.servicesState.status}</span>
+			</p>
+			<p>
+				<span>Services OK:</span>
+				<span>#{host.servicesState.okCount}</span>
+			</p>
+			<p>
+				<span>Services WARNING:</span>
+				<span>#{host.servicesState.warningCount}</span>
+			</p>
+			<p>
+				<span>Services CRITICAL:</span>
+				<span>#{host.servicesState.criticalCount}</span>
+			</p>
 		</div>
 	</div>
 
@@ -81,9 +101,9 @@
 		<div class="col6">
 			<p class="row6">
 				<span class="col2">Command: </span>
-				<span class="col4">#{host.commandExecution.command.engine}::#{host.commandExecution.command.name}</span>
+				<span class="col4">#{host.checkCommand.command.engine}::#{host.checkCommand.command.name}</span>
 			</p>
-			<data-set var="parameter" value="#{host.commandExecution.parameters}">
+			<data-set var="parameter" value="#{host.checkCommand.parameters}">
 				<p class="row6">
 					<span class="col2 output">#{parameter.name}: </span>
 					<span class="col4 output">#{parameter.value}</span>
