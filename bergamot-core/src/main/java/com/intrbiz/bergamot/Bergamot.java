@@ -179,6 +179,7 @@ public class Bergamot implements Configurable<BergamotCfg>
             logger.info("Imported timeperiods: " + store.getTimePeriodCount());
             logger.info("Imported hostgroups: " + store.getHostgroupCount());
             logger.info("Imported servicegroups: " + store.getServicegroupCount());
+            logger.info("Imported locations: " + store.getLocationCount());
             logger.info("Imported hosts: " + store.getHostCount());
             logger.info("Imported services: " + store.getServiceCount());
             // register all the services with the scheduler

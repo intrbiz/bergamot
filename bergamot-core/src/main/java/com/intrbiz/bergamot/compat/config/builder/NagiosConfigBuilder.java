@@ -21,6 +21,7 @@ import com.intrbiz.bergamot.compat.config.model.ContactCfg;
 import com.intrbiz.bergamot.compat.config.model.ContactgroupCfg;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
 import com.intrbiz.bergamot.compat.config.model.HostgroupCfg;
+import com.intrbiz.bergamot.compat.config.model.LocationCfg;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
 import com.intrbiz.bergamot.compat.config.model.ServicegroupCfg;
 import com.intrbiz.bergamot.compat.config.model.TimeperiodCfg;
@@ -55,6 +56,8 @@ public class NagiosConfigBuilder
         registerObjectBuilder(ObjectBuilder.create(ContactgroupCfg.class));
         registerObjectBuilder(ObjectBuilder.create(TimeperiodCfg.class));
         registerObjectBuilder(ObjectBuilder.create(CommandCfg.class));
+        // extended objects
+        registerObjectBuilder(ObjectBuilder.create(LocationCfg.class));
     }
 
     private Logger logger = Logger.getLogger(NagiosConfigBuilder.class);
@@ -82,6 +85,8 @@ public class NagiosConfigBuilder
     private List<ContactgroupCfg> contactgroups = new LinkedList<ContactgroupCfg>();
     
     private Map<TemplateKey, ConfigObject<?>> templates = new LinkedHashMap<TemplateKey, ConfigObject<?>>();
+    
+    private List<LocationCfg> locations = new LinkedList<LocationCfg>();
 
     private Stack<File> toParse = new Stack<File>();
 
@@ -141,6 +146,11 @@ public class NagiosConfigBuilder
     public List<ConfigObject<?>> getConfigObjects()
     {
         return configObjects;
+    }
+    
+    public List<LocationCfg> getLocations()
+    {
+        return locations;
     }
 
     public List<HostCfg> getHosts()
@@ -257,6 +267,10 @@ public class NagiosConfigBuilder
                         else if (co instanceof CommandCfg)
                         {
                             this.commands.add((CommandCfg) co);
+                        }
+                        else if (co instanceof LocationCfg)
+                        {
+                            this.locations.add((LocationCfg) co);
                         }
                     }
                     else

@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.command.NagiosCommandString;
 import com.intrbiz.bergamot.compat.config.builder.NagiosConfigBuilder;
 import com.intrbiz.bergamot.compat.config.model.CommandCfg;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
 import com.intrbiz.bergamot.compat.config.model.HostgroupCfg;
+import com.intrbiz.bergamot.compat.config.model.LocationCfg;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
 import com.intrbiz.bergamot.compat.config.model.ServicegroupCfg;
 import com.intrbiz.bergamot.compat.config.model.TimeperiodCfg;
@@ -18,6 +20,7 @@ import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.HostGroup;
+import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.ServiceGroup;
 import com.intrbiz.bergamot.model.TimePeriod;
@@ -74,12 +77,40 @@ public class NagiosConfigImporter
         this.loadHostgroups(store);
         // load all service groups
         this.loadServicegroups(store);
+        // load locations
+        this.loadLocations(store);
         // load all host objects
         this.loadHosts(store);
         // TODO build host group members
         // load all service objects
         this.loadServices(store);
         // TODO build servicegroup members
+    }
+    
+    private void loadLocations(ObjectStore store)
+    {
+        for (LocationCfg cfg : this.nagiosConfig.getLocations())
+        {
+            if (cfg.isRegister())
+            {
+                if (!store.containsLocation(cfg.getLocationName()))
+                {
+                    // add the host
+                    Location location = new Location();
+                    location.configure(cfg);
+                    store.addLocation(location);
+                    logger.trace("Adding location " + location.getName());
+                }
+                else
+                {
+                    logger.warn("The location " + cfg.getLocationName() + " is already defined!");
+                }
+            }
+            else
+            {
+                logger.trace("Not registering location: " + cfg.getName());
+            }
+        }
     }
 
     private void loadHosts(ObjectStore store)
@@ -94,6 +125,20 @@ public class NagiosConfigImporter
                     Host host = new Host();
                     host.configure(cfg);
                     store.addHost(host);
+                    // location
+                    String locationName = cfg.resolveLocation();
+                    if (!Util.isEmpty(locationName))
+                    {
+                        Location location = store.lookupLocation(locationName);
+                        if (location != null)
+                        {
+                            location.addHost(host);
+                        }
+                        else
+                        {
+                            logger.warn("The location " + locationName + " does not exist!");
+                        }
+                    }
                     // register into host groups
                     for (String hostgroupName : cfg.getHostgroups())
                     {

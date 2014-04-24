@@ -93,6 +93,9 @@ public class HostCfg extends ConfigObject<HostCfg>
     private String coords2D;
 
     private String coords3D;
+    
+    // extended
+    private String location;
 
     public HostCfg()
     {
@@ -786,6 +789,22 @@ public class HostCfg extends ConfigObject<HostCfg>
     public void setCoords3D(String coords3d)
     {
         coords3D = coords3d;
+    }
+    
+    public String getLocation()
+    {
+        return this.location;
+    }
+    
+    public String resolveLocation()
+    {
+        return this.resolveProperty((p) -> { return p.getLocation(); });
+    }
+
+    @ParameterName("location")
+    public void setLocation(String location)
+    {
+        this.location = location;
     }
     
     public String toString()

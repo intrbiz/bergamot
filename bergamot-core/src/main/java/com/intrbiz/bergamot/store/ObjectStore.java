@@ -10,6 +10,7 @@ import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.HostGroup;
+import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.ServiceGroup;
 import com.intrbiz.bergamot.model.TimePeriod;
@@ -34,7 +35,9 @@ public class ObjectStore
     
     private Map<String, TimePeriod> timePeriods = new TreeMap<String, TimePeriod>();
     
-    private RingBuffer<Check> recentChecks = new RingBuffer<Check>(12); 
+    private RingBuffer<Check> recentChecks = new RingBuffer<Check>(12);
+    
+    private Map<String, Location> locations = new TreeMap<String, Location>();
 
     public ObjectStore()
     {
@@ -200,6 +203,11 @@ public class ObjectStore
         return this.timePeriods.size();
     }
     
+    public int getLocationCount()
+    {
+        return this.locations.size();
+    }
+    
     // recent
     
     public List<Check> getRecentChecks()
@@ -237,5 +245,27 @@ public class ObjectStore
     public Collection<TimePeriod> getTimePeriods()
     {
         return this.timePeriods.values();
+    }
+    
+    // location
+    
+    public Location lookupLocation(String location)
+    {
+        return this.locations.get(location);
+    }
+
+    public void addLocation(Location location)
+    {
+        this.locations.put(location.getName(), location);
+    }
+
+    public boolean containsLocation(String location)
+    {
+        return this.locations.containsKey(location);
+    }
+
+    public Collection<Location> getLocations()
+    {
+        return this.locations.values();
     }
 }

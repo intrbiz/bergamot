@@ -23,11 +23,16 @@ public class Host extends Check
 
     private Set<HostGroup> hostGroups = new HashSet<HostGroup>();
 
+    /**
+     * The location of this host
+     */
+    private Location location;
+
     public Host()
     {
         super();
     }
-    
+
     public final String getType()
     {
         return "host";
@@ -106,6 +111,16 @@ public class Host extends Check
     public GroupState getServicesState()
     {
         return GroupState.compute(this.getServices());
+    }
+
+    public Location getLocation()
+    {
+        return location;
+    }
+
+    public void setLocation(Location location)
+    {
+        this.location = location;
     }
 
     public String toString()
