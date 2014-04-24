@@ -104,7 +104,7 @@ public abstract class Check extends NamedObject
 
     public int getCurrentAttemptThreshold()
     {
-        return this.getState().isOk() ? this.getAlertAttemptThreshold() : this.getRecoveryAttemptThreshold();
+        return (this.getState().isOk() && this.getState().isHard()) ? this.getAlertAttemptThreshold() : this.getRecoveryAttemptThreshold();
     }
 
     public long getCheckInterval()
@@ -129,7 +129,7 @@ public abstract class Check extends NamedObject
 
     public long getCurrentInterval()
     {
-        return this.getState().isOk() ? this.getCheckInterval() : this.getRetryInterval();
+        return (this.getState().isOk() && this.getState().isHard()) ? this.getCheckInterval() : this.getRetryInterval();
     }
 
     public TimePeriod getCheckPeriod()
