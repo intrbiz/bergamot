@@ -32,7 +32,7 @@ public class HostGroup extends NamedObject
         return this.hosts.get(name);
     }
 
-    public boolean contains(String name)
+    public boolean containsHost(String name)
     {
         return this.hosts.containsKey(name);
     }
