@@ -31,8 +31,7 @@ import com.intrbiz.bergamot.timerange.TimeRangeParser;
 /**
  * Import a parsed Nagios configuration into an ObjectStore.
  * 
- * This will interpret the Nagios configuration and create Host, 
- * Service, etc object and link them together.
+ * This will interpret the Nagios configuration and create Host, Service, etc object and link them together.
  * 
  */
 public class NagiosConfigImporter
@@ -79,6 +78,7 @@ public class NagiosConfigImporter
         this.loadServicegroups(store);
         // load locations
         this.loadLocations(store);
+        this.linkLocations(store);
         // load all host objects
         this.loadHosts(store);
         // TODO build host group members
@@ -86,7 +86,7 @@ public class NagiosConfigImporter
         this.loadServices(store);
         // TODO build servicegroup members
     }
-    
+
     private void loadLocations(ObjectStore store)
     {
         for (LocationCfg cfg : this.nagiosConfig.getLocations())
@@ -109,6 +109,33 @@ public class NagiosConfigImporter
             else
             {
                 logger.trace("Not registering location: " + cfg.getName());
+            }
+        }
+    }
+
+    private void linkLocations(ObjectStore store)
+    {
+        for (LocationCfg locationCfg : this.nagiosConfig.getLocations())
+        {
+            if (locationCfg.isRegister())
+            {
+                String parent = locationCfg.resolveLocation();
+                if (! Util.isEmpty(parent))
+                {
+                    Location location = store.lookupLocation(locationCfg.getName());
+                    if (location != null)
+                    {
+                        Location parentLocation = store.lookupLocation(parent);
+                        if (parentLocation != null)
+                        {
+                            parentLocation.addLocation(location);
+                        }
+                        else
+                        {
+                            logger.warn("The location " + parent + " does not exist!");
+                        }
+                    }
+                }
             }
         }
     }
@@ -411,11 +438,11 @@ public class NagiosConfigImporter
         {
             if (cfg.isRegister())
             {
-                TimePeriod timePeriod = store.lookupTimePeriod(cfg.getTimeperiodName());
-                if (timePeriod != null)
+                List<String> excludes = cfg.resolveExclude();
+                if (excludes != null)
                 {
-                    List<String> excludes = cfg.resolveExclude();
-                    if (excludes != null)
+                    TimePeriod timePeriod = store.lookupTimePeriod(cfg.getTimeperiodName());
+                    if (timePeriod != null)
                     {
                         for (String exclude : excludes)
                         {
@@ -431,10 +458,6 @@ public class NagiosConfigImporter
                         }
                     }
                 }
-            }
-            else
-            {
-                logger.trace("Not registering timeperiod: " + cfg.getName());
             }
         }
     }
