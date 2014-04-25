@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
 import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.model.util.Parameter;
 
 /**
  * Some software service running on a host which needs to be checked
@@ -46,6 +47,14 @@ public class Service extends Check
         this.checkInterval = TimeUnit.MINUTES.toMillis(config.resolveCheckInterval());
         this.retryInterval = TimeUnit.MINUTES.toMillis(config.resolveRetryInterval());
         this.getState().setAttempt(this.recoveryAttemptThreshold);
+        // params
+        if (config.resolveCheckParameters() != null)
+        {
+            for (Parameter parameter : config.resolveCheckParameters())
+            {
+                this.getCheckCommand().addParameter(parameter.getName(), parameter.getValue());
+            }
+        }
     }
 
     public Set<ServiceGroup> getServicegroups()

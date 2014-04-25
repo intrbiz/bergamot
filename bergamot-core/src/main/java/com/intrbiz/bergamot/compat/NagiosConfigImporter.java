@@ -367,7 +367,7 @@ public class NagiosConfigImporter
         if (parsedCommand != null)
         {
             logger.trace("Parsed command: " + parsedCommand.toString());
-            Command command = store.lookupCommand("nagios", parsedCommand.getCommandName());
+            Command command = store.lookupCommand(parsedCommand.getCommandName());
             if (command != null)
             {
                 CheckCommand theCheck = new CheckCommand();
@@ -423,8 +423,8 @@ public class NagiosConfigImporter
         for (CommandCfg cfg : this.nagiosConfig.getCommands())
         {
             if (cfg.isRegister())
-            {
-                if (!store.containsCommand("nagios", cfg.getCommandName()))
+            { 
+                if (!store.containsCommand(cfg.getCommandName()))
                 {
                     // add the host
                     Command c = new Command();

@@ -791,6 +791,8 @@ public class HostCfg extends ConfigObject<HostCfg>
         coords3D = coords3d;
     }
     
+    // extended
+    
     public String getLocation()
     {
         return this.location;

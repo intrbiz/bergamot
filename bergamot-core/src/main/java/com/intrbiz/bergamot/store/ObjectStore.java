@@ -140,19 +140,19 @@ public class ObjectStore
     
     // command
     
-    public Command lookupCommand(String engine, String name)
+    public Command lookupCommand(String name)
     {
-        return this.commands.get(engine + "::" + name);
+        return this.commands.get(name);
     }
 
     public void addCommand(Command command)
     {
-        this.commands.put(command.getEngine() + "::" + command.getName(), command);
+        this.commands.put(command.getName(), command);
     }
 
-    public boolean containsCommand(String engine, String command)
+    public boolean containsCommand(String command)
     {
-        return this.commands.containsKey(engine + "::" + command);
+        return this.commands.containsKey(command);
     }
 
     public Collection<Command> getCommands()

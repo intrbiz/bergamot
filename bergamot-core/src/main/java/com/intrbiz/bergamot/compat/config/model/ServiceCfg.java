@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.intrbiz.bergamot.compat.config.builder.metadata.ParameterName;
 import com.intrbiz.bergamot.compat.config.builder.metadata.TypeName;
+import com.intrbiz.bergamot.compat.config.parser.model.ObjectParameter;
+import com.intrbiz.bergamot.model.util.Parameter;
 
 @TypeName("service")
 public class ServiceCfg extends ConfigObject<ServiceCfg>
@@ -86,6 +88,10 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
     private String iconImage;
 
     private String iconImageAlt;
+
+    // extended
+
+    private List<Parameter> checkParameters;
 
     public ServiceCfg()
     {
@@ -184,10 +190,12 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
     {
         return maxCheckAttempts;
     }
-    
+
     public Integer resolveMaxCheckAttempts()
     {
-        return this.resolveProperty((p) -> { return p.getMaxCheckAttempts(); });
+        return this.resolveProperty((p) -> {
+            return p.getMaxCheckAttempts();
+        });
     }
 
     @ParameterName("max_check_attempts")
@@ -200,10 +208,12 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
     {
         return checkInterval;
     }
-    
+
     public Long resolveCheckInterval()
     {
-        return this.resolveProperty((p) -> { return p.getCheckInterval(); });
+        return this.resolveProperty((p) -> {
+            return p.getCheckInterval();
+        });
     }
 
     @ParameterName("check_interval")
@@ -211,7 +221,7 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
     {
         this.checkInterval = checkInterval;
     }
-    
+
     @ParameterName("normal_check_interval")
     public void setNormalCheckInterval(Long checkInterval)
     {
@@ -222,10 +232,12 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
     {
         return retryInterval;
     }
-    
+
     public Long resolveRetryInterval()
     {
-        return this.resolveProperty((p) -> { return p.getRetryInterval(); });
+        return this.resolveProperty((p) -> {
+            return p.getRetryInterval();
+        });
     }
 
     @ParameterName("retry_interval")
@@ -233,7 +245,7 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
     {
         this.retryInterval = retryInterval;
     }
-    
+
     @ParameterName("retry_check_interval")
     public void setRetryCheckInterval(Long retryInterval)
     {
@@ -550,137 +562,221 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
 
     public List<String> resolveHostName()
     {
-        return this.resolveProperty((p) -> { return p.getHostName(); });
+        return this.resolveProperty((p) -> {
+            return p.getHostName();
+        });
     }
 
     public String resolveDisplayName()
     {
-        return this.resolveProperty((p) -> { return p.getDisplayName(); });
+        return this.resolveProperty((p) -> {
+            return p.getDisplayName();
+        });
     }
 
     public String resolveServiceDescription()
     {
-        return this.resolveProperty((p) -> { return p.getServiceDescription(); });
+        return this.resolveProperty((p) -> {
+            return p.getServiceDescription();
+        });
     }
 
     public List<String> resolveHostgroupName()
     {
-        return this.resolveProperty((p) -> { return p.getHostgroupName(); });
+        return this.resolveProperty((p) -> {
+            return p.getHostgroupName();
+        });
     }
 
     public List<String> resolveServicegroups()
     {
-        return this.resolveProperty((p) -> { return p.getServicegroups(); });
+        return this.resolveProperty((p) -> {
+            return p.getServicegroups();
+        });
     }
 
     public String resolveCheckCommand()
     {
-        return this.resolveProperty((p) -> { return p.getCheckCommand(); });
+        return this.resolveProperty((p) -> {
+            return p.getCheckCommand();
+        });
     }
 
     public List<String> resolveInitialState()
     {
-        return this.resolveProperty((p) -> { return p.getInitialState(); });
+        return this.resolveProperty((p) -> {
+            return p.getInitialState();
+        });
     }
 
     public String resolveCheckPeriod()
     {
-        return this.resolveProperty((p) -> { return p.getCheckPeriod(); });
+        return this.resolveProperty((p) -> {
+            return p.getCheckPeriod();
+        });
     }
 
     public Integer resolveFreshnessThreshold()
     {
-        return this.resolveProperty((p) -> { return p.getFreshnessThreshold(); });
+        return this.resolveProperty((p) -> {
+            return p.getFreshnessThreshold();
+        });
     }
 
     public String resolveEventHandler()
     {
-        return this.resolveProperty((p) -> { return p.getEventHandler(); });
+        return this.resolveProperty((p) -> {
+            return p.getEventHandler();
+        });
     }
 
     public Float resolveLowFlapThreshold()
     {
-        return this.resolveProperty((p) -> { return p.getLowFlapThreshold(); });
+        return this.resolveProperty((p) -> {
+            return p.getLowFlapThreshold();
+        });
     }
 
     public Float resolveHighFlapThreshold()
     {
-        return this.resolveProperty((p) -> { return p.getHighFlapThreshold(); });
+        return this.resolveProperty((p) -> {
+            return p.getHighFlapThreshold();
+        });
     }
 
     public List<String> resolveFlapDetectionOptions()
     {
-        return this.resolveProperty((p) -> { return p.getFlapDetectionOptions(); });
+        return this.resolveProperty((p) -> {
+            return p.getFlapDetectionOptions();
+        });
     }
 
     public String resolveRetainStatusInformation()
     {
-        return this.resolveProperty((p) -> { return p.getRetainStatusInformation(); });
+        return this.resolveProperty((p) -> {
+            return p.getRetainStatusInformation();
+        });
     }
 
     public String resolveRetainNonstatusInformation()
     {
-        return this.resolveProperty((p) -> { return p.getRetainNonstatusInformation(); });
+        return this.resolveProperty((p) -> {
+            return p.getRetainNonstatusInformation();
+        });
     }
 
     public Long resolveNotificationInterval()
     {
-        return this.resolveProperty((p) -> { return p.getNotificationInterval(); });
+        return this.resolveProperty((p) -> {
+            return p.getNotificationInterval();
+        });
     }
 
     public Long resolveFirstNotificationDelay()
     {
-        return this.resolveProperty((p) -> { return p.getFirstNotificationDelay(); });
+        return this.resolveProperty((p) -> {
+            return p.getFirstNotificationDelay();
+        });
     }
 
     public String resolveNotificationPeriod()
     {
-        return this.resolveProperty((p) -> { return p.getNotificationPeriod(); });
+        return this.resolveProperty((p) -> {
+            return p.getNotificationPeriod();
+        });
     }
 
     public List<String> resolveNotificationOptions()
     {
-        return this.resolveProperty((p) -> { return p.getNotificationOptions(); });
+        return this.resolveProperty((p) -> {
+            return p.getNotificationOptions();
+        });
     }
 
     public List<String> resolveContacts()
     {
-        return this.resolveProperty((p) -> { return p.getContacts(); });
+        return this.resolveProperty((p) -> {
+            return p.getContacts();
+        });
     }
 
     public List<String> resolveContactGroups()
     {
-        return this.resolveProperty((p) -> { return p.getContactGroups(); });
+        return this.resolveProperty((p) -> {
+            return p.getContactGroups();
+        });
     }
 
     public List<String> resolveStalkingOptions()
     {
-        return this.resolveProperty((p) -> { return p.getStalkingOptions(); });
+        return this.resolveProperty((p) -> {
+            return p.getStalkingOptions();
+        });
     }
 
     public String resolveNotes()
     {
-        return this.resolveProperty((p) -> { return p.getNotes(); });
+        return this.resolveProperty((p) -> {
+            return p.getNotes();
+        });
     }
 
     public String resolveNotesUrl()
     {
-        return this.resolveProperty((p) -> { return p.getNotesUrl(); });
+        return this.resolveProperty((p) -> {
+            return p.getNotesUrl();
+        });
     }
 
     public String resolveActionUrl()
     {
-        return this.resolveProperty((p) -> { return p.getActionUrl(); });
+        return this.resolveProperty((p) -> {
+            return p.getActionUrl();
+        });
     }
 
     public String resolveIconImage()
     {
-        return this.resolveProperty((p) -> { return p.getIconImage(); });
+        return this.resolveProperty((p) -> {
+            return p.getIconImage();
+        });
     }
 
     public String resolveIconImageAlt()
     {
-        return this.resolveProperty((p) -> { return p.getIconImageAlt(); });
+        return this.resolveProperty((p) -> {
+            return p.getIconImageAlt();
+        });
+    }
+
+    // extended
+    
+    public List<Parameter> getCheckParameters()
+    {
+        return checkParameters;
+    }
+
+    public void setCheckParameters(List<Parameter> checkParameters)
+    {
+        this.checkParameters = checkParameters;
+    }
+    
+    public List<Parameter> resolveCheckParameters()
+    {
+        return this.resolveProperty((p) -> { return p.getCheckParameters(); });
+    }
+
+    @Override
+    public boolean unhandledObjectParameter(ObjectParameter parameter)
+    {
+        if ("check_parameter".equals(parameter.getName()))
+        {
+            if (this.checkParameters == null) this.checkParameters = new LinkedList<Parameter>();
+            System.out.println("Got check_parameter: " + parameter.getValue());
+            this.checkParameters.add(Parameter.parse(parameter.getValue()));
+            return true;
+        }
+        return super.unhandledObjectParameter(parameter);
     }
 
     public String toString()

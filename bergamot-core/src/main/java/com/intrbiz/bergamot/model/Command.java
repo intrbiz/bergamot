@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.CommandCfg;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.model.util.Parameterised;
@@ -94,10 +95,24 @@ public class Command extends NamedObject implements Parameterised
 
     public void configure(CommandCfg config)
     {
-        this.engine = "nagios";
+        this.engine = Util.coalesce(config.resolveEngine(), "nagios");
         this.name = config.resolveCommandName();
+        System.out.println("Configured command " + engine + "::" + name);
         // the command line is added as a parameter
-        this.addParameter("command_line", config.resolveCommandLine());
+        if ("nagios".equals(this.engine))
+        {
+            this.addParameter("command_line", config.resolveCommandLine());
+        }
+        else
+        {
+            if (config.resolveParameters() != null)
+            {
+                for (Parameter parameter : config.resolveParameters())
+                {
+                    this.addParameter(parameter.getName(), parameter.getValue());
+                }
+            }
+        }
     }
 
     @Override
