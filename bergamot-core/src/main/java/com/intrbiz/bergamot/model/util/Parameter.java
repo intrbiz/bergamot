@@ -47,4 +47,17 @@ public class Parameter
     {
         this.value = value;
     }
+    
+    public static Parameter parse(String parameter)
+    {
+        int idx = parameter.indexOf("=");
+        if (idx > 0)
+        {
+            return new Parameter(parameter.substring(0, idx), parameter.substring(idx + 1));
+        }
+        else
+        {
+            return new Parameter(parameter, null);
+        }
+    }
 }

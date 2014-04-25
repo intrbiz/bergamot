@@ -18,6 +18,8 @@ import javax.xml.bind.annotation.XmlType;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosEngine;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
+import com.intrbiz.bergamot.worker.engine.nagios.nrpe.NRPEEngine;
+import com.intrbiz.bergamot.worker.engine.nagios.nrpe.NRPEExecutor;
 import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "bergamot")
@@ -169,6 +171,17 @@ public class BergamotCfg extends Configuration
                                 new EngineCfg(
                                         NagiosEngine.class, 
                                         new ExecutorCfg(NagiosExecutor.class
+                                )
+                        )
+                ));
+                // nrpe engine
+                this.workers.add(
+                        new WorkerCfg(
+                                new ExchangeCfg("bergamot.check.nrpe", "topic", true), 
+                                new QueueCfg("bergamot.queue.check.nrpe", true), 
+                                new EngineCfg(
+                                        NRPEEngine.class, 
+                                        new ExecutorCfg(NRPEExecutor.class
                                 )
                         )
                 ));

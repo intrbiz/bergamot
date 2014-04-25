@@ -54,8 +54,9 @@ public class ManifoldCfg extends Configuration
         }
         if (this.exchanges.isEmpty())
         {
-            // default queues
+            // default exchanges
             this.exchanges.add(new ExchangeCfg("bergamot.check.nagios", "topic", true, "all"));
+            this.exchanges.add(new ExchangeCfg("bergamot.check.nrpe",   "topic", true, "all"));
             this.exchanges.add(new ExchangeCfg("bergamot.result",       "topic", true, "all"));
         }
     }
