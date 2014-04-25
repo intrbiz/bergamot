@@ -61,6 +61,7 @@
   <modules>
     <module>bergamot-core</module>
     <module>bergamot-ui</module>
+    <module>bergamot-nrpe</module>
   </modules>
   <dependencyManagement>
   	<dependencies>
