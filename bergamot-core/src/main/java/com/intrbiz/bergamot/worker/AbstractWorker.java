@@ -74,7 +74,7 @@ public abstract class AbstractWorker extends AbstractComponent<WorkerCfg> implem
         }
         else
         {
-            logger.warn("No engine " + task.getEngine() + " could be found, dropping task.");
+            logger.warn("No engine '" + task.getEngine() + "' could be found, dropping task.");
         }
     }
 
