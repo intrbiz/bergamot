@@ -1,10 +1,8 @@
 package com.intrbiz.bergamot.worker.engine.nagios;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +19,7 @@ import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.CommandTokeniser;
 import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
+import com.intrbiz.bergamot.worker.engine.nagios.util.NagiosPluginParser;
 
 /**
  * Execute Nagios Plugins (CHecks)
@@ -44,14 +43,6 @@ import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
  */
 public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
 {
-    public static final int NAGIOS_OK = 0;
-
-    public static final int NAGIOS_WARNING = 1;
-
-    public static final int NAGIOS_CRITICAL = 2;
-
-    public static final int NAGIOS_UNKNOWN = 3;
-
     private Logger logger = Logger.getLogger(NagiosExecutor.class);
 
     protected File workingDirectory;
@@ -102,8 +93,8 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
                 int exitCode = process.waitFor();
                 long end = System.nanoTime();
                 // process the result
-                this.parseNagiosExitCode(exitCode, result);
-                this.parseNagiosOutput(stdOut, result);
+                NagiosPluginParser.parseNagiosExitCode(exitCode, result);
+                NagiosPluginParser.parseNagiosOutput(stdOut, result);
                 result.setRuntime((((double) (end - start)) / 1_000_000D));
                 // log
                 logger.info("Check output: " + result.isOk() + " " + result.getStatus());
@@ -149,60 +140,4 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
         return MacroProcessor.applyMacros(commandLine, checkFrame);
     }
 
-    /**
-     * Convert a Nagios exit code to a Bergamot result
-     */
-    protected void parseNagiosExitCode(int code, Result result)
-    {
-        switch (code)
-        {
-            case NAGIOS_OK:
-                result.setOk(true);
-                result.setStatus(Status.OK);
-                break;
-            case NAGIOS_WARNING:
-                result.setOk(false);
-                result.setStatus(Status.WARNING);
-                break;
-            case NAGIOS_CRITICAL:
-                result.setOk(false);
-                result.setStatus(Status.CRITICAL);
-                break;
-            case NAGIOS_UNKNOWN:
-            default:
-                result.setOk(false);
-                result.setStatus(Status.UNKNOWN);
-                break;
-        }
-    }
-
-    /**
-     * Extract the check output
-     */
-    protected void parseNagiosOutput(InputStream stream, Result result) throws IOException
-    {
-        // currently only look at the first line
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream)))
-        {
-            String outputLine = br.readLine();
-            if (outputLine != null)
-            {
-                logger.trace("Got output line: " + outputLine);
-                int pipe = outputLine.indexOf("|");
-                if (pipe > 0 && pipe < outputLine.length())
-                {
-                    result.setOutput(outputLine.substring(0, pipe).trim());
-                    result.addParameter("nagios_perf_data", outputLine.substring(pipe + 1).trim());
-                }
-                else
-                {
-                    result.setOutput(outputLine.trim());
-                }
-            }
-            else
-            {
-                logger.trace("No output returned from plugin");
-            }
-        }
-    }
 }
