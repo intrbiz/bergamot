@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.intrbiz.bergamot.model.util.Parameter;
+
 public final class MacroFrame
 {
     public static final MacroFrame GLOBAL_MACROS = new MacroFrame(new MacroFrame[0]);
@@ -158,5 +160,15 @@ public final class MacroFrame
         }
         sb.append(padding).append("]}");
         return sb.toString();
+    }
+    
+    public static MacroFrame fromParameters(List<Parameter> parameters)
+    {
+        MacroFrame checkFrame = new MacroFrame();
+        for (Parameter parameter : parameters)
+        {
+            checkFrame.put(parameter.getName(), parameter.getValue());
+        }
+        return checkFrame;
     }
 }

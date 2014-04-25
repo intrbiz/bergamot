@@ -3,6 +3,8 @@ package com.intrbiz.bergamot.worker.engine.nagios.nrpe;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.compat.macro.MacroFrame;
+import com.intrbiz.bergamot.compat.macro.MacroProcessor;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
@@ -43,13 +45,16 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
             // the host
             String host = executeCheck.getParameter("host");
             if (Util.isEmpty(host)) throw new RuntimeException("The 'host' parameter must be provided.");
-            int port    = Integer.parseInt(Util.coalesce(executeCheck.getParameter("port"), "5666"));
             // the command
             String command = executeCheck.getParameter("command");
             if (Util.isEmpty(host)) throw new RuntimeException("The 'command' parameter must be provided.");
+            // currently we apply the nagios macros here, this will change
+            MacroFrame checkFrame = MacroFrame.fromParameters(executeCheck.getParameters());
+            host = MacroProcessor.applyMacros(host, checkFrame);
+            command = MacroProcessor.applyMacros(command, checkFrame);
             // TODO arguments support
             // open an NRPE client and execute the command
-            try (NRPEClient client = new NRPEClient(host, port))
+            try (NRPEClient client = new NRPEClient(host))
             {
                 NRPEResponse response = client.command(command);
                 // parse the response

@@ -16,7 +16,6 @@ import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.task.Task;
-import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.CommandTokeniser;
 import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.nagios.util.NagiosPluginParser;
@@ -130,11 +129,7 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
         String commandLine = executeCheck.getParameter("command_line");
         if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
         // construct the macro frame from the check parameters
-        MacroFrame checkFrame = new MacroFrame();
-        for (Parameter parameter : executeCheck.getParameters())
-        {
-            checkFrame.put(parameter.getName(), parameter.getValue());
-        }
+        MacroFrame checkFrame = MacroFrame.fromParameters(executeCheck.getParameters());
         // apply the macros to the command line to form the final command line
         logger.trace("Applying macros to " + commandLine);
         return MacroProcessor.applyMacros(commandLine, checkFrame);
