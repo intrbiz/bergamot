@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.nrpe.model;
 
+/**
+ * The response for a NRPE check
+ */
 public class NRPEResponse
 {
     private final int responseCode;
@@ -16,16 +19,28 @@ public class NRPEResponse
         this.runtime = runtime;
     }
 
+    /**
+     * The response code as returned by NRPE
+     * @return
+     */
     public int getResponseCode()
     {
         return responseCode;
     }
 
+    /**
+     * The output as returned by NRPE
+     * @return
+     */
     public String getOutput()
     {
         return output;
     }
 
+    /**
+     * How long the check took to execute in microseconds
+     * @return
+     */
     public double getRuntime()
     {
         return runtime;
