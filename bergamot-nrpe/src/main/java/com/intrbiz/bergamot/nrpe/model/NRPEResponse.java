@@ -38,7 +38,7 @@ public class NRPEResponse
     }
 
     /**
-     * How long the check took to execute in microseconds
+     * How long the check took to execute in milliseconds
      * @return
      */
     public double getRuntime()

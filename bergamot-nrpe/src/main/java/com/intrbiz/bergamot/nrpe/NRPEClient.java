@@ -99,7 +99,7 @@ public class NRPEClient implements AutoCloseable
             // parse the response
             NRPEPacket responsePacket = NRPEPacket.parse(response, 0, read);
             long end = System.nanoTime();
-            responsePacket.setRuntime(((double) (end - start)) / 1000D);
+            responsePacket.setRuntime(((double) (end - start)) / 1_000_000D);
             return responsePacket;
         }
         catch (SSLHandshakeException e)
