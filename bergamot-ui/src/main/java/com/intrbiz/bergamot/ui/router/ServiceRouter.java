@@ -85,6 +85,7 @@ public class ServiceRouter extends Router
         {
             // suppress the service
             service.setSuppressed(true);
+            bergamot.getObjectStore().removeAlert(service);
         }
         redirect("/service/id/" + id);
     }

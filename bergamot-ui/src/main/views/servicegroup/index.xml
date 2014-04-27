@@ -24,6 +24,10 @@
 					    <span class="label">Critical: </span>
 					    <span class="value">#{servicegroup.state.criticalCount}</span>
 				    </p>
+				    <p>
+					    <span class="label">Suppressed: </span>
+					    <span class="value">#{servicegroup.state.suppressedCount}</span>
+				    </p>
 				</div>
 			</a>
 		</data-set>

@@ -32,6 +32,14 @@
 			    </span>
 		    </p>
 		    <p>
+			    <span class="label">Suppressed: </span>
+			    <span class="value">#{if(service.suppressed, 'yes', 'no')}</span>
+		    </p>
+		    <p>
+			    <span class="label">Enabled: </span>
+			    <span class="value">#{if(service.enabled, 'yes', 'no')}</span>
+		    </p>
+		    <p>
 			    <span class="label">Host: </span>
 			    <a href="/host/name/#{service.host.name}">
 				    <span class="value">#{service.host.displayName}</span>
