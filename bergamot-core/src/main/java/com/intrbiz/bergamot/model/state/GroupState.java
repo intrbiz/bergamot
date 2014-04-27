@@ -28,6 +28,8 @@ public class GroupState
 
     private int internalCount = 0;
 
+    private int suppressedCount = 0;
+
     public GroupState()
     {
         super();
@@ -135,37 +137,57 @@ public class GroupState
     {
         this.internalCount = internalCount;
     }
-    
+
+    public int getSuppressedCount()
+    {
+        return suppressedCount;
+    }
+
+    public void setSuppressedCount(int suppressedCount)
+    {
+        this.suppressedCount = suppressedCount;
+    }
+
     public static GroupState compute(Collection<? extends Check> checks, Collection<? extends Group> groups)
     {
         GroupState state = new GroupState();
         for (Check check : checks)
         {
-            state.ok     = state.ok & check.getState().isOk();
-            state.status = Status.worst(state.status, check.getState().getStatus());
-            switch (check.getState().getStatus())
+            if (!check.isSuppressed())
             {
-                case PENDING:
-                    state.pendingCount++;
-                    break;
-                case OK:
-                    state.okCount++;
-                    break;
-                case WARNING:
-                    state.warningCount++;
-                    break;
-                case CRITICAL:
-                    state.criticalCount++;
-                    break;
-                case UNKNOWN:
-                    state.unknownCount++;
-                    break;
-                case TIMEOUT:
-                    state.timeoutCount++;
-                    break;
-                case INTERNAL:
-                    state.internalCount++;
-                    break;
+                if (check.getState().isHard())
+                {
+                    state.ok = state.ok && check.getState().isOk();
+                    state.status = Status.worst(state.status, check.getState().getStatus());
+                }
+                switch (check.getState().getStatus())
+                {
+                    case PENDING:
+                        state.pendingCount++;
+                        break;
+                    case OK:
+                        state.okCount++;
+                        break;
+                    case WARNING:
+                        state.warningCount++;
+                        break;
+                    case CRITICAL:
+                        state.criticalCount++;
+                        break;
+                    case UNKNOWN:
+                        state.unknownCount++;
+                        break;
+                    case TIMEOUT:
+                        state.timeoutCount++;
+                        break;
+                    case INTERNAL:
+                        state.internalCount++;
+                        break;
+                }
+            }
+            else
+            {
+                state.suppressedCount++;
             }
         }
         if (groups != null)
@@ -174,14 +196,15 @@ public class GroupState
             {
                 GroupState gstate = group.getState();
                 //
-                state.ok            = state.ok & gstate.isOk();
-                state.status        = Status.worst(state.status, gstate.getStatus());
-                state.pendingCount  += gstate.pendingCount;
-                state.okCount       += gstate.okCount;
-                state.warningCount  += gstate.warningCount;
+                state.ok = state.ok & gstate.isOk();
+                state.status = Status.worst(state.status, gstate.getStatus());
+                state.pendingCount += gstate.pendingCount;
+                state.okCount += gstate.okCount;
+                state.warningCount += gstate.warningCount;
                 state.criticalCount += gstate.criticalCount;
-                state.timeoutCount  += gstate.timeoutCount;
+                state.timeoutCount += gstate.timeoutCount;
                 state.internalCount += gstate.internalCount;
+                state.suppressedCount += gstate.suppressedCount;
             }
         }
         return state;
