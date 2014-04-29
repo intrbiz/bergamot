@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.result;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -59,6 +60,12 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
 
     protected void processResult(Result result)
     {
+        // some validation
+        if ((System.currentTimeMillis() - result.getExecuted()) > TimeUnit.MINUTES.toMillis(15))
+        {
+            logger.warn("Not processing result, it is over 15 minutes old.");
+            return;
+        }
         logger.info("Got result " + result.getId() + " for '" + result.getCheckType() + "' " + result.getCheckId() + " [" + (result.getCheck() == null ? "" : result.getCheck().getName()) + "] => " + result.isOk() + " " + result.getStatus() + " " + result.getOutput() + " took " + result.getRuntime() + " ms.");
         // stamp in processed time
         result.setProcessed(System.currentTimeMillis());

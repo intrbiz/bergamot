@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -68,6 +69,13 @@ public abstract class AbstractNotifier extends AbstractComponent<NotifierCfg> im
 
     protected void sendNotification(Notification notification)
     {
+        // some validation
+        if ((System.currentTimeMillis() - notification.getRaised()) > TimeUnit.MINUTES.toMillis(15))
+        {
+            logger.warn("Not sending notification, it is over 15 minutes old.");
+            return;
+        }
+        // send
         for (NotificationEngine notificationEngine : this.engines.values())
         {
             notificationEngine.sendNotification(notification);

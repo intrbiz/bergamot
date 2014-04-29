@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.worker.engine;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.message.result.Result;
@@ -27,6 +29,13 @@ public abstract class AbstractCheckExecutor<T extends Engine> extends AbstractEx
     public void execute(Task task)
     {
         ExecuteCheck executeCheck = (ExecuteCheck) task;
+        // some validation
+        if ((System.currentTimeMillis() - executeCheck.getScheduled()) > TimeUnit.MINUTES.toMillis(15))
+        {
+            logger.warn("Not executing check, it is over 15 minutes old.");
+            return;
+        }
+        // execute
         logger.debug("Executing check: " + executeCheck.getId() + " " + executeCheck.getEngine() + "::" + executeCheck.getName() + " from " + executeCheck.getSender());
         Result result = this.run(executeCheck);
         logger.debug("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
