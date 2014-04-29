@@ -1,11 +1,10 @@
 package com.intrbiz.bergamot.scheduler;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -46,7 +45,7 @@ public class WheelScheduler extends AbstractScheduler
 
     // wheel
 
-    private Map<UUID, Job> jobs;
+    private ConcurrentMap<UUID, Job> jobs;
 
     private Segment[] orange;
 
@@ -59,6 +58,14 @@ public class WheelScheduler extends AbstractScheduler
     private volatile long tickTime = System.currentTimeMillis();
 
     private volatile Calendar tickCalendar = Calendar.getInstance();
+
+    // initial delay allocation
+
+    private long startUpPeriod = TimeUnit.MINUTES.toMillis(15);
+
+    private long startUpStepPeriod = 500;
+
+    private long currentInitialDelay;
 
     public WheelScheduler()
     {
@@ -75,7 +82,7 @@ public class WheelScheduler extends AbstractScheduler
         {
             this.orange[i] = new Segment();
         }
-        this.jobs = new HashMap<UUID, Job>();
+        this.jobs = new ConcurrentHashMap<UUID, Job>();
         logger.debug("Initalised wheel with " + this.orange.length + " segments, rotation period: " + this.orangePeriod);
     }
 
@@ -96,33 +103,31 @@ public class WheelScheduler extends AbstractScheduler
     protected void processSegment(Segment current)
     {
         logger.trace("Processing " + current.jobs.size() + " jobs");
-        synchronized (current)
+        for (Job job : current.jobs.values())
         {
-            for (Job job : current.jobs)
+            if (job.enabled)
             {
-                if (job.enabled)
+                logger.trace("Job " + job.id + " expires at " + job.expires + " <= " + this.tickTime);
+                if (job.expires <= this.tickTime)
                 {
-                    long timeSinceLastRun = this.tickTime - job.lastRunAt;
-                    if ((timeSinceLastRun) > (job.interval - this.tickPeriod))
+                    // compute the next expiry time
+                    job.lastExpires = job.expires;
+                    job.expires = job.lastExpires + job.interval;
+                    // check the time period
+                    if (job.timeRange == null || this.isInTimeRange(job.timeRange, this.tickCalendar))
                     {
-                        // check the time period
-                        if (job.timeRange == null || this.isInTimeRange(job.timeRange, this.tickCalendar))
-                        {
-                            logger.trace("Job " + job.id + " last run " + timeSinceLastRun + "ms ago, executing.");
-                            this.runJob(job);
-                            job.lastRunAt = this.tickTime;
-                            // TODO should we disable a job until we get it's result ?
-                        }
-                        else
-                        {
-                            logger.trace("Job " + job.id + " is not in time period, skiping this check");
-                        }
+                        logger.trace("Job " + job.id + " expired, executing. Next expires at " + job.expires);
+                        this.runJob(job);
+                    }
+                    else
+                    {
+                        logger.trace("Job " + job.id + " is not in time period, skiping this check");
                     }
                 }
-                else
-                {
-                    logger.trace("Skipping disabled job " + job.id);
-                }
+            }
+            else
+            {
+                logger.trace("Skipping disabled job " + job.id);
             }
         }
     }
@@ -149,85 +154,56 @@ public class WheelScheduler extends AbstractScheduler
         }
     }
 
-    protected int pickSegmentToInsertInto()
+    protected void scheduleJob(UUID id, long interval, long initialDelay, TimeRange timeRange, Runnable command)
     {
-        // find the segment with the least jobs
-        int winningSegment = 0;
-        int minJobs = this.orange[0].jobs.size();
-        for (int i = 1; i < this.orange.length; i++)
+        if (!this.jobs.containsKey(id))
         {
-            int jobs = this.orange[i].jobs.size();
-            if (jobs < minJobs)
-            {
-                minJobs = jobs;
-                winningSegment = i;
-            }
+            interval = this.validateInterval(interval);
+            // the job
+            Job job = new Job(id, interval, initialDelay, timeRange, command);
+            this.jobs.put(job.id, job);
+            // pick the segment based on the initial delay
+            int segmentIdx = ((int) ((initialDelay / this.tickPeriod) % this.orange.length)) + 1;
+            logger.trace("Adding job " + job.id + " to segment: " + segmentIdx + " with interval " + interval + "ms and initial delay " + initialDelay + "ms");
+            Segment segment = this.orange[segmentIdx];
+            segment.jobs.put(job.id, job);
         }
-        return winningSegment;
-    }
-
-    protected void scheduleJob(UUID id, long interval, TimeRange timeRange, Runnable command)
-    {
-        synchronized (this.jobs)
+        else
         {
-            if (!this.jobs.containsKey(id))
-            {
-                interval = this.validateInterval(interval);
-                // the job
-                Job job = new Job(id, interval, timeRange, command);
-                this.jobs.put(job.id, job);
-                // pick a randomised segment to insert the job into
-                int segmentIdx = this.pickSegmentToInsertInto();
-                logger.trace("Adding job to segment: " + segmentIdx + " with interval " + interval);
-                Segment segment = this.orange[segmentIdx];
-                synchronized (segment)
-                {
-                    segment.jobs.add(job);
-                }
-            }
-            else
-            {
-                logger.debug("Job " + id + " is already scheduled, not adding it again.");
-            }
+            logger.debug("Job " + id + " is already scheduled, not adding it again.");
         }
     }
 
     protected void rescheduleJob(UUID id, long newInterval, TimeRange timeRange)
     {
-        synchronized (this.jobs)
+        newInterval = this.validateInterval(newInterval);
+        Job job = this.jobs.get(id);
+        if (job != null)
         {
-            newInterval = this.validateInterval(newInterval);
-            Job job = this.jobs.get(id);
-            if (job != null)
-            {
-                job.interval = newInterval;
-                job.timeRange = timeRange;
-                job.enabled = true;
-            }
+            job.interval = newInterval;
+            job.timeRange = timeRange;
+            // compute the new expiry
+            job.expires = job.lastExpires + newInterval;
+            job.enabled = true;
+            logger.trace("Rescheduled job " + job.id + ", new expiry: " + job.expires);
         }
     }
-    
+
     protected void enableJob(UUID id)
     {
-        synchronized (this.jobs)
+        Job job = this.jobs.get(id);
+        if (job != null)
         {
-            Job job = this.jobs.get(id);
-            if (job != null)
-            {
-                job.enabled = true;
-            }
+            job.enabled = true;
         }
     }
-    
+
     protected void disableJob(UUID id)
     {
-        synchronized (this.jobs)
+        Job job = this.jobs.get(id);
+        if (job != null)
         {
-            Job job = this.jobs.get(id);
-            if (job != null)
-            {
-                job.enabled = false;
-            }
+            job.enabled = false;
         }
     }
 
@@ -235,7 +211,7 @@ public class WheelScheduler extends AbstractScheduler
     {
         if (interval < this.orangePeriod)
         {
-            logger.warn("Currently jobs cannot be scheduled more frequently than every " + this.tickPeriod + "ms, rounding up.");
+            logger.warn("Currently jobs cannot be scheduled more frequently than every " + this.orangePeriod + " ms, rounding up.");
             interval = orangePeriod;
         }
         return interval;
@@ -279,7 +255,10 @@ public class WheelScheduler extends AbstractScheduler
     public void schedule(Check check)
     {
         logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval());
-        this.scheduleJob(check.getId(), check.getCurrentInterval(), check.getCheckPeriod(), new CheckRunner(check));
+        // balance the tasks over a start up window
+        this.currentInitialDelay += this.startUpStepPeriod;
+        long initialDelay = this.currentInitialDelay % this.startUpPeriod;
+        this.scheduleJob(check.getId(), check.getCurrentInterval(), initialDelay, check.getCheckPeriod(), new CheckRunner(check));
     }
 
     @Override
@@ -344,7 +323,7 @@ public class WheelScheduler extends AbstractScheduler
      */
     private class Segment
     {
-        public final Set<Job> jobs = new HashSet<Job>();
+        public final ConcurrentMap<UUID, Job> jobs = new ConcurrentHashMap<UUID, Job>();
 
         public Segment()
         {
@@ -359,27 +338,29 @@ public class WheelScheduler extends AbstractScheduler
     {
         // details
 
+        public final UUID id;
+
+        public final Runnable command;
+
         public volatile boolean enabled = true;
 
         public volatile long interval;
 
-        public final UUID id;
-
         public volatile TimeRange timeRange;
 
-        public final Runnable command;
+        public volatile long expires;
 
-        // state
+        public volatile long lastExpires;
 
-        public long lastRunAt = 0L;
-
-        public Job(UUID id, long interval, TimeRange timeRange, Runnable command)
+        public Job(UUID id, long interval, long initialDelay, TimeRange timeRange, Runnable command)
         {
             super();
             this.id = id;
             this.interval = interval;
             this.timeRange = timeRange;
             this.command = command;
+            // compute the expiry time
+            this.lastExpires = this.expires = System.currentTimeMillis() + initialDelay;
         }
 
         @Override
