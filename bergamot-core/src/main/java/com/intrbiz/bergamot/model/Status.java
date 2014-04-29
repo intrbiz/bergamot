@@ -32,7 +32,7 @@ public enum Status
     /**
      * Some Bergamot internal error happened, go look at the logs
      */
-    INTERNAL(false);
+    ERROR(false);
     
     private final boolean ok;
     

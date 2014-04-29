@@ -108,7 +108,7 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
         {
             logger.error("Failed to execute nagios check command", e);
             result.setOk(false);
-            result.setStatus(Status.INTERNAL);
+            result.setStatus(Status.ERROR);
             result.setOutput(e.getMessage());
             result.setRuntime(0);
         }

@@ -148,7 +148,7 @@ public class TestNagiosRunner
         assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
         assertThat(result.getCheck(), is(equalTo(executeCheck)));
         assertThat(result.isOk(), is(equalTo(false)));
-        assertThat(result.getStatus(), is(equalTo(Status.INTERNAL)));
+        assertThat(result.getStatus(), is(equalTo(Status.ERROR)));
         assertThat(result.getOutput(), is(not(nullValue())));
         assertThat(result.getRuntime(), is(equalTo(0D)));
         assertThat(result.getExecuted(), is(not(nullValue())));

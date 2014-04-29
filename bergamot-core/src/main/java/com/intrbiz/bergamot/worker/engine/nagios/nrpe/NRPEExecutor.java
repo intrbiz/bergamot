@@ -70,7 +70,7 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
             // TODO handle NRPE down
             logger.error("Failed to execute NRPE check", e);
             result.setOk(false);
-            result.setStatus(Status.INTERNAL);
+            result.setStatus(Status.ERROR);
             result.setOutput(e.getMessage());
             result.setRuntime(0);
         }

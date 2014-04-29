@@ -14,7 +14,7 @@ public class TestStatus
         assertTrue("WARNING  is better than CRITICAL", Status.WARNING.isBetterThan(Status.CRITICAL));
         assertTrue("CRITICAL is better than UNKNOWN",  Status.CRITICAL.isBetterThan(Status.UNKNOWN));
         assertTrue("UNKNOWN  is better than TIMEOUT",  Status.UNKNOWN.isBetterThan(Status.TIMEOUT));
-        assertTrue("TIMEOUT  is better than INTERNAL", Status.TIMEOUT.isBetterThan(Status.INTERNAL));
+        assertTrue("TIMEOUT  is better than ERROR", Status.TIMEOUT.isBetterThan(Status.ERROR));
     }
     
     @Test
@@ -25,6 +25,6 @@ public class TestStatus
         assertFalse("WARNING  is better than CRITICAL", Status.WARNING.isWorseThan(Status.CRITICAL));
         assertFalse("CRITICAL is better than UNKNOWN",  Status.CRITICAL.isWorseThan(Status.UNKNOWN));
         assertFalse("UNKNOWN  is better than TIMEOUT",  Status.UNKNOWN.isWorseThan(Status.TIMEOUT));
-        assertFalse("TIMEOUT  is better than INTERNAL", Status.TIMEOUT.isWorseThan(Status.INTERNAL));
+        assertFalse("TIMEOUT  is better than ERROR", Status.TIMEOUT.isWorseThan(Status.ERROR));
     }
 }

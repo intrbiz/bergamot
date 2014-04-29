@@ -26,7 +26,7 @@ public class GroupState
 
     private int timeoutCount = 0;
 
-    private int internalCount = 0;
+    private int errorCount = 0;
 
     private int suppressedCount = 0;
 
@@ -35,7 +35,7 @@ public class GroupState
         super();
     }
 
-    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int internalCount)
+    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int errorCount)
     {
         super();
         this.ok = ok;
@@ -45,7 +45,7 @@ public class GroupState
         this.criticalCount = criticalCount;
         this.unknownCount = unknownCount;
         this.timeoutCount = timeoutCount;
-        this.internalCount = internalCount;
+        this.errorCount = errorCount;
     }
 
     public boolean isOk()
@@ -128,14 +128,14 @@ public class GroupState
         this.timeoutCount = timeoutCount;
     }
 
-    public int getInternalCount()
+    public int getErrorCount()
     {
-        return internalCount;
+        return errorCount;
     }
 
-    public void setInternalCount(int internalCount)
+    public void setErrorCount(int errorCount)
     {
-        this.internalCount = internalCount;
+        this.errorCount = errorCount;
     }
 
     public int getSuppressedCount()
@@ -180,8 +180,8 @@ public class GroupState
                     case TIMEOUT:
                         state.timeoutCount++;
                         break;
-                    case INTERNAL:
-                        state.internalCount++;
+                    case ERROR:
+                        state.errorCount++;
                         break;
                 }
             }
@@ -203,7 +203,7 @@ public class GroupState
                 state.warningCount += gstate.warningCount;
                 state.criticalCount += gstate.criticalCount;
                 state.timeoutCount += gstate.timeoutCount;
-                state.internalCount += gstate.internalCount;
+                state.errorCount += gstate.errorCount;
                 state.suppressedCount += gstate.suppressedCount;
             }
         }
