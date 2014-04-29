@@ -75,27 +75,27 @@
 			<h3>Statistics</h3>
 			<p>
 				<span class="label wide">Last runtime: </span>
-				<span class="value">#{service.state.lastRuntime} ms</span>
+				<span class="value">#{service.stats.lastRuntime} ms</span>
 			</p>
 			<p>
 				<span class="label wide">Average runtime: </span>
-				<span class="value">#{service.state.averageRuntime} ms</span>
+				<span class="value">#{service.stats.averageRuntime} ms</span>
 			</p>
 			<p>
 				<span class="label wide">Last processing latency: </span>
-				<span class="value">#{service.state.lastCheckProcessingLatency} ms</span>
+				<span class="value">#{service.stats.lastCheckProcessingLatency} ms</span>
 			</p>
 			<p>
 				<span class="label wide">Average processing latency: </span>
-				<span class="value">#{service.state.averageCheckProcessingLatency} ms</span>
+				<span class="value">#{service.stats.averageCheckProcessingLatency} ms</span>
 			</p>
 			<p>
 				<span class="label wide">Last execution latency: </span>
-				<span class="value">#{service.state.lastCheckExecutionLatency} ms</span>
+				<span class="value">#{service.stats.lastCheckExecutionLatency} ms</span>
 			</p>
 			<p>
 				<span class="label wide">Average execution latency: </span>
-				<span class="value">#{service.state.averageCheckExecutionLatency} ms</span>
+				<span class="value">#{service.stats.averageCheckExecutionLatency} ms</span>
 			</p>
 		</div>
 		<div class="col4 dash_icon">

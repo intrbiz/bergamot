@@ -39,7 +39,16 @@ public class CheckStateMO extends MessageObject
 
     @JsonProperty("last_state_change")
     private long lastStateChange;
-    
+
+    @JsonProperty("last_hard_ok")
+    private boolean lastHardOk;
+
+    @JsonProperty("last_hard_status")
+    private Status lastHardStatus;
+
+    @JsonProperty("last_hard_output")
+    private String lastHardOutput;
+
     public CheckStateMO()
     {
         super();
@@ -143,5 +152,35 @@ public class CheckStateMO extends MessageObject
     public void setLastStateChange(long lastStateChange)
     {
         this.lastStateChange = lastStateChange;
+    }
+
+    public boolean isLastHardOk()
+    {
+        return lastHardOk;
+    }
+
+    public void setLastHardOk(boolean lastHardOk)
+    {
+        this.lastHardOk = lastHardOk;
+    }
+
+    public Status getLastHardStatus()
+    {
+        return lastHardStatus;
+    }
+
+    public void setLastHardStatus(Status lastHardStatus)
+    {
+        this.lastHardStatus = lastHardStatus;
+    }
+
+    public String getLastHardOutput()
+    {
+        return lastHardOutput;
+    }
+
+    public void setLastHardOutput(String lastHardOutput)
+    {
+        this.lastHardOutput = lastHardOutput;
     }
 }

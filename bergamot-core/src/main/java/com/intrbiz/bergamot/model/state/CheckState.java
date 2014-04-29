@@ -14,43 +14,77 @@ public class CheckState
 {
     private UUID checkId;
 
+    /**
+     * Is the check ok?
+     */
     private boolean ok = true;
 
+    /**
+     * Why is the check ok or not ok?
+     */
     private Status status = Status.PENDING;
 
+    /**
+     * What was the output of the last check
+     */
     private String output = "Pending";
 
+    /**
+     * When did the last check happen
+     */
     private long lastCheckTime;
 
+    /**
+     * What was the Id of the last check
+     */
     private UUID lastCheckId;
 
+    /**
+     * The number of attempts since the last hard state change
+     */
     private int attempt = 4;
 
+    /**
+     * Has a hard state transition happened
+     */
     private boolean hard = true;
 
+    /**
+     * Is the state in transition
+     */
     private boolean transitioning = false;
 
+    /**
+     * Is the state flapping between ok and not ok, but never reaching a hard state
+     */
     private boolean flapping = false;
 
-    private long lastStateChange;
+    /**
+     * When was the last hard state change
+     */
+    private long lastStateChange = System.currentTimeMillis();
 
     // history
 
+    /**
+     * A bitmap of the ok history
+     */
     private long okHistory = 0x1L;
 
-    // stats
+    /**
+     * Was the last hard state ok?
+     */
+    private boolean lastHardOk = true;
 
-    private double lastRuntime;
+    /**
+     * What was the last hard status?
+     */
+    private Status lastHardStatus = Status.PENDING;
 
-    private double averageRuntime;
-
-    private double lastCheckExecutionLatency;
-
-    private double averageCheckExecutionLatency;
-
-    private double lastCheckProcessingLatency;
-
-    private double averageCheckProcessingLatency;
+    /**
+     * What was the output of the last hard state
+     */
+    private String lastHardOutput = "Pending";
 
     // locking
 
@@ -101,16 +135,6 @@ public class CheckState
         this.output = output;
     }
 
-    public double getLastRuntime()
-    {
-        return lastRuntime;
-    }
-
-    public void setLastRuntime(double lastRuntime)
-    {
-        this.lastRuntime = lastRuntime;
-    }
-
     public long getLastCheckTime()
     {
         return lastCheckTime;
@@ -129,56 +153,6 @@ public class CheckState
     public void setLastCheckId(UUID lastCheckId)
     {
         this.lastCheckId = lastCheckId;
-    }
-
-    public double getLastCheckExecutionLatency()
-    {
-        return lastCheckExecutionLatency;
-    }
-
-    public void setLastCheckExecutionLatency(double lastCheckExecutionLatency)
-    {
-        this.lastCheckExecutionLatency = lastCheckExecutionLatency;
-    }
-
-    public double getAverageCheckExecutionLatency()
-    {
-        return averageCheckExecutionLatency;
-    }
-
-    public void setAverageCheckExecutionLatency(double averageCheckExecutionLatency)
-    {
-        this.averageCheckExecutionLatency = averageCheckExecutionLatency;
-    }
-
-    public double getLastCheckProcessingLatency()
-    {
-        return lastCheckProcessingLatency;
-    }
-
-    public void setLastCheckProcessingLatency(double lastCheckProcessingLatency)
-    {
-        this.lastCheckProcessingLatency = lastCheckProcessingLatency;
-    }
-
-    public double getAverageCheckProcessingLatency()
-    {
-        return averageCheckProcessingLatency;
-    }
-
-    public void setAverageCheckProcessingLatency(double averageCheckProcessingLatency)
-    {
-        this.averageCheckProcessingLatency = averageCheckProcessingLatency;
-    }
-
-    public double getAverageRuntime()
-    {
-        return averageRuntime;
-    }
-
-    public void setAverageRuntime(double averageRuntime)
-    {
-        this.averageRuntime = averageRuntime;
     }
 
     public int getAttempt()
@@ -246,11 +220,41 @@ public class CheckState
         this.flapping = flapping;
     }
 
+    public boolean isLastHardOk()
+    {
+        return lastHardOk;
+    }
+
+    public void setLastHardOk(boolean lastHardOk)
+    {
+        this.lastHardOk = lastHardOk;
+    }
+
+    public Status getLastHardStatus()
+    {
+        return lastHardStatus;
+    }
+
+    public void setLastHardStatus(Status lastHardStatus)
+    {
+        this.lastHardStatus = lastHardStatus;
+    }
+
+    public String getLastHardOutput()
+    {
+        return lastHardOutput;
+    }
+
+    public void setLastHardOutput(String lastHardOutput)
+    {
+        this.lastHardOutput = lastHardOutput;
+    }
+
     public Lock getLock()
     {
         return this.lock;
     }
-    
+
     public CheckStateMO toMO()
     {
         CheckStateMO mo = new CheckStateMO();
@@ -264,6 +268,9 @@ public class CheckState
         mo.setOutput(this.getOutput());
         mo.setStatus(this.getStatus());
         mo.setTransitioning(this.isTransitioning());
+        mo.setLastHardOk(this.isLastHardOk());
+        mo.setLastHardStatus(this.lastHardStatus);
+        mo.setLastHardOutput(this.lastHardOutput);
         return mo;
     }
 }

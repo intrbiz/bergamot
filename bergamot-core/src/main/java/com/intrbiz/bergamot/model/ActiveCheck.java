@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.stats.ActiveCheckStats;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.RandStatus;
 
@@ -27,6 +28,11 @@ public abstract class ActiveCheck extends Check
      * The check command to execute
      */
     protected CheckCommand checkCommand;
+    
+    /**
+     * The stats for this active check
+     */
+    protected ActiveCheckStats stats = new ActiveCheckStats();
 
     public ActiveCheck()
     {
@@ -104,5 +110,10 @@ public abstract class ActiveCheck extends Check
         super.toMO(mo);
         mo.setCheckInterval(this.getCheckInterval());
         mo.setRetryInterval(this.getRetryInterval());
+    }
+    
+    public ActiveCheckStats getStats()
+    {
+        return this.stats;
     }
 }

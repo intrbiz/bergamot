@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.state.CheckState;
+import com.intrbiz.bergamot.model.stats.ActiveCheckStats;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.name.Exchange;
@@ -94,7 +95,10 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
                 // update any dependencies
                 this.updateDependencies(check, state, result);
                 // stats
-                this.computeStats(state, result);
+                if (check instanceof ActiveCheck)
+                {
+                    this.computeStats(((ActiveCheck) check).getStats(), result);
+                }
                 // send notifications
                 if (isHardStateChange)
                 {
@@ -190,6 +194,13 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         // is the state changing
         boolean isTransition = state.isOk() ^ result.isOk();
         boolean isFlapping = isTransition & state.isTransitioning();
+        // copy the last hard state
+        if (isTransition && state.isHard())
+        {
+            state.setLastHardOk(state.isOk());
+            state.setLastHardStatus(state.getStatus());
+            state.setLastHardOutput(state.getOutput());
+        }
         // update the state
         state.setLastCheckId(result.getId());
         state.setLastCheckTime(result.getExecuted());
@@ -229,21 +240,21 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         }
     }
 
-    protected void computeStats(CheckState state, Result result)
+    protected void computeStats(ActiveCheckStats stats, Result result)
     {
         // stats
-        state.setLastRuntime(result.getRuntime());
-        state.setAverageRuntime(state.getAverageRuntime() == 0 ? state.getLastRuntime() : ((state.getLastRuntime() + state.getAverageRuntime()) / 2D));
+        stats.setLastRuntime(result.getRuntime());
+        stats.setAverageRuntime(stats.getAverageRuntime() == 0 ? stats.getLastRuntime() : ((stats.getLastRuntime() + stats.getAverageRuntime()) / 2D));
         // check latencies
         if (result.getCheck() != null)
         {
-            state.setLastCheckProcessingLatency(result.getProcessed() - result.getCheck().getScheduled());
-            state.setLastCheckExecutionLatency(result.getExecuted() - result.getCheck().getScheduled());
+            stats.setLastCheckProcessingLatency(result.getProcessed() - result.getCheck().getScheduled());
+            stats.setLastCheckExecutionLatency(result.getExecuted() - result.getCheck().getScheduled());
             // moving average
-            state.setAverageCheckExecutionLatency(state.getAverageCheckExecutionLatency() == 0 ? state.getLastCheckExecutionLatency() : ((state.getAverageCheckExecutionLatency() + state.getLastCheckExecutionLatency()) / 2D));
-            state.setAverageCheckProcessingLatency(state.getAverageCheckProcessingLatency() == 0 ? state.getLastCheckProcessingLatency() : ((state.getAverageCheckProcessingLatency() + state.getLastCheckProcessingLatency()) / 2D));
+            stats.setAverageCheckExecutionLatency(stats.getAverageCheckExecutionLatency() == 0 ? stats.getLastCheckExecutionLatency() : ((stats.getAverageCheckExecutionLatency() + stats.getLastCheckExecutionLatency()) / 2D));
+            stats.setAverageCheckProcessingLatency(stats.getAverageCheckProcessingLatency() == 0 ? stats.getLastCheckProcessingLatency() : ((stats.getAverageCheckProcessingLatency() + stats.getLastCheckProcessingLatency()) / 2D));
             // log
-            logger.debug("Last check latency: processing => " + state.getLastCheckProcessingLatency() + "ms, execution => " + state.getLastCheckExecutionLatency() + "ms processes");
+            logger.debug("Last check latency: processing => " + stats.getLastCheckProcessingLatency() + "ms, execution => " + stats.getLastCheckExecutionLatency() + "ms processes");
         }
     }
 
