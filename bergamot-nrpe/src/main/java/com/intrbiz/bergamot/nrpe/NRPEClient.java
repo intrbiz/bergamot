@@ -54,19 +54,19 @@ public class NRPEClient implements AutoCloseable
 
     private SSLSocket socket;
 
-    public NRPEClient(String host, int port) throws IOException
+    public NRPEClient(String host, int port, int connectTimeout) throws IOException
     {
         super();
         this.address = new InetSocketAddress(host, port);
         this.socket = (SSLSocket) FACTORY.createSocket();
         this.socket.setEnabledProtocols(PROTOCOLS);
         this.socket.setEnabledCipherSuites(CIPHERS);
-        this.socket.connect(this.address);
+        this.socket.connect(this.address, connectTimeout);
     }
 
     public NRPEClient(String host) throws IOException
     {
-        this(host, 5666);
+        this(host, 5666, 2_500);
     }
 
     /**
