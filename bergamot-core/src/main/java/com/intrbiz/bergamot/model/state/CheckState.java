@@ -5,6 +5,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 
 /**
  * The state of a check
@@ -248,5 +249,21 @@ public class CheckState
     public Lock getLock()
     {
         return this.lock;
+    }
+    
+    public CheckStateMO toMO()
+    {
+        CheckStateMO mo = new CheckStateMO();
+        mo.setAttempt(this.getAttempt());
+        mo.setFlapping(this.isFlapping());
+        mo.setHard(this.isHard());
+        mo.setLastCheckId(this.getLastCheckId());
+        mo.setLastCheckTime(this.getLastCheckTime());
+        mo.setLastStateChange(this.getLastStateChange());
+        mo.setOk(this.isOk());
+        mo.setOutput(this.getOutput());
+        mo.setStatus(this.getStatus());
+        mo.setTransitioning(this.isTransitioning());
+        return mo;
     }
 }

@@ -17,8 +17,13 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.HostMO;
+import com.intrbiz.bergamot.model.message.ServiceMO;
+import com.intrbiz.bergamot.model.message.notification.SendAlert;
+import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.queue.QueueEventTranscoder;
 import com.intrbiz.queue.QueueException;
@@ -29,11 +34,17 @@ import com.intrbiz.queue.QueueException;
 public class BergamotTranscoder
 {   
     public static final Class<?>[] CLASSES = {
+        // message objects
+        HostMO.class,
+        ServiceMO.class,
+        ContactMO.class,
         // model
         Parameter.class,
         // messages
         ExecuteCheck.class,
-        Result.class
+        Result.class,
+        SendAlert.class,
+        SendRecovery.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();

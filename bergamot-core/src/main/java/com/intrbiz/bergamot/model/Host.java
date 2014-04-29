@@ -7,9 +7,12 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
-import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.HostMO;
+import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.GroupState;
 
 /**
@@ -26,6 +29,7 @@ public class Host extends Check
     /**
      * The location of this host
      */
+    @JsonProperty("location")
     private Location location;
 
     public Host()
@@ -60,11 +64,13 @@ public class Host extends Check
         this.getState().setAttempt(this.recoveryAttemptThreshold);
     }
 
+    @JsonIgnore
     public Set<String> getServiceNames()
     {
         return this.services.keySet();
     }
 
+    @JsonIgnore
     public Collection<Service> getServices()
     {
         return this.services.values();
@@ -76,16 +82,19 @@ public class Host extends Check
         service.setHost(this);
     }
 
+    @JsonIgnore
     public Service getService(String name)
     {
         return this.services.get(name);
     }
 
+    @JsonIgnore
     public boolean containsService(String name)
     {
         return this.services.containsKey(name);
     }
 
+    @JsonIgnore
     public int getServiceCount()
     {
         return this.services.size();
@@ -127,5 +136,14 @@ public class Host extends Check
     public String toString()
     {
         return "Host (" + this.id + ") " + this.name + " check " + this.checkCommand;
+    }
+    
+    @Override
+    public HostMO toMO()
+    {
+        HostMO mo = new HostMO();
+        super.toMO(mo);
+        mo.setAddress(this.getAddress());
+        return mo;
     }
 }

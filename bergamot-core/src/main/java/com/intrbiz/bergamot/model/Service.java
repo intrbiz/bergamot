@@ -6,7 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
-import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.ServiceMO;
+import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.util.Parameter;
 
 /**
@@ -108,5 +109,14 @@ public class Service extends Check
         }
         else if (!id.equals(other.id)) return false;
         return true;
+    }
+    
+    @Override
+    public ServiceMO toMO()
+    {
+        ServiceMO mo = new ServiceMO();
+        super.toMO(mo);
+        mo.setHost(this.getHost().toMO());
+        return mo;
     }
 }

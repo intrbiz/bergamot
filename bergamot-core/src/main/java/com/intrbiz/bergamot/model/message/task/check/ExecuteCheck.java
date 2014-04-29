@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.model.message.task;
+package com.intrbiz.bergamot.model.message.task.check;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -7,18 +7,15 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.model.util.Parameterised;
 
 /**
  * Execute this check please
  */
-@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
 @JsonTypeName("bergamot.execute_check")
 public class ExecuteCheck extends Task implements Parameterised
 {    

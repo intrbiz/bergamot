@@ -60,7 +60,7 @@ public class HostCfg extends ConfigObject<HostCfg>
 
     private Boolean retainNonstatusInformation;
 
-    private String contacts;
+    private List<String> contacts;
 
     private List<String> contactGroups;
 
@@ -519,18 +519,18 @@ public class HostCfg extends ConfigObject<HostCfg>
         this.retainNonstatusInformation = retainNonstatusInformation;
     }
 
-    public String getContacts()
+    public List<String> getContacts()
     {
         return contacts;
     }
     
-    public String resolveContacts()
+    public List<String> resolveContacts()
     {
         return this.resolveProperty((p) -> { return p.getContacts(); });
     }
 
     @ParameterName("contacts")
-    public void setContacts(String contacts)
+    public void setContacts(List<String> contacts)
     {
         this.contacts = contacts;
     }

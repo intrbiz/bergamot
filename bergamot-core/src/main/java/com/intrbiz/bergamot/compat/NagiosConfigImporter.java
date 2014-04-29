@@ -9,6 +9,8 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.command.NagiosCommandString;
 import com.intrbiz.bergamot.compat.config.builder.NagiosConfigBuilder;
 import com.intrbiz.bergamot.compat.config.model.CommandCfg;
+import com.intrbiz.bergamot.compat.config.model.ContactCfg;
+import com.intrbiz.bergamot.compat.config.model.ContactgroupCfg;
 import com.intrbiz.bergamot.compat.config.model.HostCfg;
 import com.intrbiz.bergamot.compat.config.model.HostgroupCfg;
 import com.intrbiz.bergamot.compat.config.model.LocationCfg;
@@ -18,6 +20,8 @@ import com.intrbiz.bergamot.compat.config.model.TimeperiodCfg;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Command;
+import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.ContactGroup;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.HostGroup;
 import com.intrbiz.bergamot.model.Location;
@@ -72,6 +76,10 @@ public class NagiosConfigImporter
         // load the time periods
         this.loadTimePeriods(store);
         this.loadTimePeriodExcludes(store);
+        // load contacts
+        this.loadContacts(store);
+        this.loadContactGroups(store);
+        this.linkContactGroups(store);
         // load all host groups
         this.loadHostgroups(store);
         // load all service groups
@@ -85,6 +93,112 @@ public class NagiosConfigImporter
         // load all service objects
         this.loadServices(store);
         // TODO build servicegroup members
+    }
+
+    private void loadContacts(ObjectStore store)
+    {
+        for (ContactCfg cfg : this.nagiosConfig.getContacts())
+        {
+            if (cfg.isRegister())
+            {
+                if (!store.containsContact(cfg.getContactName()))
+                {
+                    // add the host
+                    Contact contact = new Contact();
+                    contact.configure(cfg);
+                    store.addContact(contact);
+                    logger.trace("Adding contact " + contact.getName());
+                }
+                else
+                {
+                    logger.warn("The contact " + cfg.getContactName() + " is already defined!");
+                }
+            }
+            else
+            {
+                logger.trace("Not registering contact: " + cfg.getName());
+            }
+        }
+    }
+
+    private void loadContactGroups(ObjectStore store)
+    {
+        for (ContactgroupCfg cfg : this.nagiosConfig.getContactgroups())
+        {
+            if (cfg.isRegister())
+            {
+                if (!store.containsContactGroup(cfg.getContactgroupName()))
+                {
+                    // add the host
+                    ContactGroup contactGroup = new ContactGroup();
+                    contactGroup.configure(cfg);
+                    store.addContactGroup(contactGroup);
+                    logger.trace("Adding contact group " + contactGroup.getName());
+                }
+                else
+                {
+                    logger.warn("The contact group " + cfg.getContactgroupName() + " is already defined!");
+                }
+            }
+            else
+            {
+                logger.trace("Not registering contact group: " + cfg.getName());
+            }
+        }
+    }
+
+    private void linkContactGroups(ObjectStore store)
+    {
+        for (ContactgroupCfg cfg : this.nagiosConfig.getContactgroups())
+        {
+            if (cfg.isRegister())
+            {
+                ContactGroup contactGroup = store.lookupContactGroup(cfg.getContactgroupName());
+                if (contactGroup != null)
+                {
+                    if (cfg.resolveMembers() != null)
+                    {
+                        for (String member : cfg.resolveMembers())
+                        {
+                            Contact contact = store.lookupContact(member);
+                            if (contact != null)
+                            {
+                                contactGroup.addContact(contact);
+                            }
+                            else
+                            {
+                                logger.warn("Cannot add contact " + member + " to contact group " + contactGroup.getName() + ", the contact does not exist.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (ContactCfg cfg : this.nagiosConfig.getContacts())
+        {
+            if (cfg.isRegister())
+            {
+                Contact contact = store.lookupContact(cfg.getContactName());
+                if (contact != null)
+                {
+                    if (cfg.resolveContactgroups() != null)
+                    {
+                        for (String group : cfg.resolveContactgroups())
+                        {
+                            ContactGroup contactGroup = store.lookupContactGroup(group);
+                            if (contactGroup != null)
+                            {
+                                contactGroup.addContact(contact);
+                            }
+                            else
+                            {
+                                logger.warn("Cannot add contact " + contact.getName() + " to contact group " + group + ", the contact does not exist.");
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void loadLocations(ObjectStore store)
@@ -120,7 +234,7 @@ public class NagiosConfigImporter
             if (locationCfg.isRegister())
             {
                 String parent = locationCfg.resolveLocation();
-                if (! Util.isEmpty(parent))
+                if (!Util.isEmpty(parent))
                 {
                     Location location = store.lookupLocation(locationCfg.getLocationName());
                     if (location != null)
@@ -183,6 +297,8 @@ public class NagiosConfigImporter
                     this.loadCheckCommand(cfg.resolveCheckCommand(), host, store);
                     // the time period
                     this.loadCheckPeriod(cfg.resolveCheckPeriod(), host, store);
+                    // the contacts
+                    this.loadCheckContacts(cfg.resolveContactGroups(), cfg.resolveContacts(), host, store);
                     logger.trace("Adding host " + host);
                 }
                 else
@@ -222,7 +338,7 @@ public class NagiosConfigImporter
             }
         }
     }
-    
+
     private void linkHostgroups(ObjectStore store)
     {
         for (HostgroupCfg cfg : this.nagiosConfig.getHostgroups())
@@ -333,6 +449,8 @@ public class NagiosConfigImporter
                         this.loadCheckCommand(cfg.resolveCheckCommand(), service, store);
                         // the time period
                         this.loadCheckPeriod(cfg.resolveCheckPeriod(), service, store);
+                        // the contacts
+                        this.loadCheckContacts(cfg.resolveContactGroups(), cfg.resolveContacts(), service, store);
                         logger.trace("Adding service " + service);
                     }
                 }
@@ -340,6 +458,43 @@ public class NagiosConfigImporter
             else
             {
                 logger.trace("Not registering service: " + cfg.getName());
+            }
+        }
+    }
+
+    private void loadCheckContacts(List<String> contactGroups, List<String> contacts, Check on, ObjectStore store)
+    {
+        if (contactGroups != null)
+        {
+            for (String contactGroup : contactGroups)
+            {
+                ContactGroup group = store.lookupContactGroup(contactGroup);
+                if (group != null)
+                {
+                    for (Contact contact : group.getContacts())
+                    {
+                        on.addContact(contact);
+                    }
+                }
+                else
+                {
+                    logger.warn("The contact group " + contactGroup + " is not defined, used by " + on);
+                }
+            }
+        }
+        if (contacts != null)
+        {
+            for (String contactName : contacts)
+            {
+                Contact contact = store.lookupContact(contactName);
+                if (contact != null)
+                {
+                    on.addContact(contact);
+                }
+                else
+                {
+                    logger.warn("The contact " + contact + " is not defined, used by " + on);
+                }
             }
         }
     }
@@ -423,7 +578,7 @@ public class NagiosConfigImporter
         for (CommandCfg cfg : this.nagiosConfig.getCommands())
         {
             if (cfg.isRegister())
-            { 
+            {
                 if (!store.containsCommand(cfg.getCommandName()))
                 {
                     // add the host

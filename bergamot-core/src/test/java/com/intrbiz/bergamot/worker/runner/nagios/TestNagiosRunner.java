@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 
 public class TestNagiosRunner

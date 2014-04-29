@@ -45,6 +45,8 @@ public class BergamotCfg extends Configuration
     private List<WorkerCfg> workers = new LinkedList<WorkerCfg>();
     
     private List<Macro> macros = new LinkedList<Macro>();
+    
+    private NotifierCfg notifier;
 
     public BergamotCfg()
     {
@@ -140,6 +142,17 @@ public class BergamotCfg extends Configuration
     {
         this.macros = macros;
     }
+    
+    @XmlElementRef(type = NotifierCfg.class)
+    public NotifierCfg getNotifier()
+    {
+        return notifier;
+    }
+
+    public void setNotifier(NotifierCfg notifier)
+    {
+        this.notifier = notifier;
+    }
 
     public void applyDefaults()
     {
@@ -157,6 +170,7 @@ public class BergamotCfg extends Configuration
         {
             if (this.scheduler == null) this.scheduler = new SchedulerCfg();
             if (this.resultProcessor == null) this.resultProcessor = new ResultProcessorCfg();
+            if (this.notifier == null) this.notifier = new NotifierCfg();
         }
         if (this.getMode() == DaemonMode.WORKER || this.getMode() == DaemonMode.BOTH)
         {
@@ -191,6 +205,7 @@ public class BergamotCfg extends Configuration
         this.manifold.applyDefaults();
         if (this.scheduler != null) this.scheduler.applyDefaults();
         if (this.resultProcessor != null) this.resultProcessor.applyDefaults();
+        if (this.notifier != null) this.notifier.applyDefaults();
         for (WorkerCfg worker : this.workers)
         {
             worker.applyDefaults();

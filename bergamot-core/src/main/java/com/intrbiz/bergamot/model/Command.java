@@ -97,7 +97,6 @@ public class Command extends NamedObject implements Parameterised
     {
         this.engine = Util.coalesce(config.resolveEngine(), "nagios");
         this.name = config.resolveCommandName();
-        System.out.println("Configured command " + engine + "::" + name);
         // the command line is added as a parameter
         if ("nagios".equals(this.engine))
         {

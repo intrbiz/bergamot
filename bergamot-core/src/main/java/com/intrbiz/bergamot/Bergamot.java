@@ -21,6 +21,8 @@ import com.intrbiz.bergamot.manifold.Manifold;
 import com.intrbiz.bergamot.manifold.RabbitManifold;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
+import com.intrbiz.bergamot.notification.DefaultNotifier;
+import com.intrbiz.bergamot.notification.Notifier;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 import com.intrbiz.bergamot.result.ResultProcessor;
 import com.intrbiz.bergamot.scheduler.Scheduler;
@@ -36,7 +38,7 @@ import com.intrbiz.queue.rabbit.RabbitPool;
  * Bergamot, a simple monitoring system.
  */
 public class Bergamot implements Configurable<BergamotCfg>
-{   
+{
     private Logger logger = Logger.getLogger(Bergamot.class);
 
     private String name = UUID.randomUUID().toString();
@@ -56,6 +58,10 @@ public class Bergamot implements Configurable<BergamotCfg>
     // worker
 
     private List<Worker> workers = new LinkedList<Worker>();
+
+    // notifier
+
+    private Notifier notifier;
 
     public Bergamot()
     {
@@ -90,6 +96,11 @@ public class Bergamot implements Configurable<BergamotCfg>
     public List<Worker> getWorkers()
     {
         return workers;
+    }
+
+    public Notifier getNotifier()
+    {
+        return notifier;
     }
 
     @Override
@@ -156,6 +167,13 @@ public class Bergamot implements Configurable<BergamotCfg>
             this.workers.add(worker);
             worker.configure(workerCfg);
         }
+        // notifier
+        if (this.config.getNotifier() != null)
+        {
+            this.notifier = new DefaultNotifier();
+            this.notifier.setBergamot(this);
+            this.notifier.configure(this.config.getNotifier());
+        }
         // import the configuration ?
         if (this.config.getMode() == DaemonMode.MASTER || this.config.getMode() == DaemonMode.BOTH)
         {
@@ -182,6 +200,8 @@ public class Bergamot implements Configurable<BergamotCfg>
             logger.info("Imported locations: " + store.getLocationCount());
             logger.info("Imported hosts: " + store.getHostCount());
             logger.info("Imported services: " + store.getServiceCount());
+            logger.info("Imported contacts: " + store.getContactsCount());
+            logger.info("Imported contact groups: " + store.getContactGroupsCount());
             // register all the services with the scheduler
             for (Host host : store.getHosts())
             {
@@ -206,6 +226,8 @@ public class Bergamot implements Configurable<BergamotCfg>
             this.manifold.start();
             // result processor
             if (this.resultProcessor != null) this.resultProcessor.start();
+            // notifier
+            if (this.notifier != null) this.notifier.start();
             // workers
             for (Worker worker : this.workers)
             {

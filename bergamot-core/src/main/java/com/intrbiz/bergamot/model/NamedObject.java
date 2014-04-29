@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.model;
 
 import java.util.UUID;
 
+import com.intrbiz.bergamot.model.message.NamedObjectMO;
+
 /**
  * A generic object with an id and a name
  */
@@ -10,7 +12,7 @@ public abstract class NamedObject
     protected UUID id = UUID.randomUUID();
 
     protected String name;
-
+ 
     protected String displayName;
 
     public NamedObject()
@@ -76,5 +78,12 @@ public abstract class NamedObject
         }
         else if (!id.equals(other.id)) return false;
         return true;
+    }
+    
+    protected void toMO(NamedObjectMO mo)
+    {
+        mo.setId(this.getId());
+        mo.setName(this.getName());
+        mo.setDisplayName(this.getDisplayName());
     }
 }

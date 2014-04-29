@@ -9,7 +9,10 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.component.AbstractComponent;
 import com.intrbiz.bergamot.config.ResultProcessorCfg;
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.Message;
+import com.intrbiz.bergamot.model.message.notification.SendAlert;
+import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.queue.Consumer;
@@ -108,36 +111,74 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
             logger.warn("Could not find " + result.getCheckType() + " " + result.getCheckId() + " for result " + result.getId());
         }
     }
-    
+
     protected void sendStateUpdate(Check check, CheckState state, Result result)
     {
         logger.info("State update " + check + " is " + state.isOk() + " " + state.isHard() + " " + state.getStatus() + " " + state.getOutput());
     }
-    
+
     protected void sendRecovery(Check check, CheckState state, Result result)
     {
-        logger.warn("Recovery for " + check);
+        logger.debug("Recovery for " + check);
         this.getBergamot().getObjectStore().removeAlert(check);
+        if (!check.isSuppressed())
+        {
+            // send a recovery
+            SendRecovery recovery = new SendRecovery();
+            recovery.setRaised(System.currentTimeMillis());
+            recovery.setCheck(check.toMO());
+            for (Contact contact : check.getContacts())
+            {
+                recovery.getTo().add(contact.toMO());
+            }
+            if (!recovery.getTo().isEmpty())
+            {
+                logger.warn("Sending recovery for " + check);
+                this.getBergamot().getManifold().publish(recovery);
+            }
+            else
+            {
+                logger.warn("Not sending recovery for " + check + " no contacts configured.");
+            }
+        }
     }
-    
+
     protected void sendAlert(Check check, CheckState state, Result result)
     {
-        logger.warn("Alert for " + check);
-        if (! check.isSuppressed())
+        logger.debug("Alert for " + check);
+        if (!check.isSuppressed())
         {
-            this.getBergamot().getObjectStore().addAlert(check);    
+            this.getBergamot().getObjectStore().addAlert(check);
+            // send an alert
+            SendAlert alert = new SendAlert();
+            alert.setRaised(System.currentTimeMillis());
+            alert.setCheck(check.toMO());
+            for (Contact contact : check.getContacts())
+            {
+                alert.getTo().add(contact.toMO());
+            }
+            if (!alert.getTo().isEmpty())
+            {
+                logger.warn("Sending alert for " + check);
+                this.getBergamot().getManifold().publish(alert);
+            }
+            else
+            {
+                logger.warn("Not sending alert for " + check + " no contacts configured.");
+            }
         }
     }
 
     /**
      * Apply the result to the current state of the check
+     * 
      * @return true if a hard state change happened
      */
     protected boolean applyResult(Check check, CheckState state, Result result)
     {
         // is the state changing
-        boolean isTransition  = state.isOk() ^ result.isOk();
-        boolean isFlapping    = isTransition & state.isTransitioning();
+        boolean isTransition = state.isOk() ^ result.isOk();
+        boolean isFlapping = isTransition & state.isTransitioning();
         // update the state
         state.setLastCheckId(result.getId());
         state.setLastCheckTime(result.getExecuted());
@@ -168,7 +209,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         }
         return false;
     }
-    
+
     protected void updateDependencies(Check check, CheckState state, Result result)
     {
         for (Check referencedBy : check.getReferences())

@@ -4,17 +4,13 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.queue.name.GenericKey;
 
 /**
  * A message which will be published to a queue
  */
-@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
-public abstract class Message
+public abstract class Message extends MessageObject
 {
     /**
      * Use the JsonTypeName annotation to lookup the given message type name
@@ -30,7 +26,7 @@ public abstract class Message
     private final String typeName = getMessageType(this.getClass());
 
     @JsonProperty("id")
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @JsonProperty("sender")
     private String sender;

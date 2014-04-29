@@ -5,7 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.util.RandStatus;
@@ -69,6 +70,11 @@ public abstract class Check extends NamedObject
      * Checks which this check references
      */
     private Set<Check> references = new HashSet<Check>();
+
+    /**
+     * The contacts who should be notified
+     */
+    private Set<Contact> contacts = new HashSet<Contact>();
 
     public Check()
     {
@@ -197,6 +203,21 @@ public abstract class Check extends NamedObject
         return this.state;
     }
 
+    public Set<Contact> getContacts()
+    {
+        return contacts;
+    }
+
+    public void setContacts(Set<Contact> contacts)
+    {
+        this.contacts = contacts;
+    }
+    
+    public void addContact(Contact contact)
+    {
+        this.contacts.add(contact);
+    }
+
     public final ExecuteCheck createExecuteCheck()
     {
         if (this.checkCommand == null) return null;
@@ -227,4 +248,22 @@ public abstract class Check extends NamedObject
     {
         executeCheck.addParameter("RANDSTATUS", String.valueOf(RandStatus.getInstance().randomNagiosStatus()));
     }
-}
+
+    protected void toMO(CheckMO mo)
+    {
+        super.toMO(mo);
+        mo.setAlertAttemptThreshold(this.getAlertAttemptThreshold());
+        mo.setCheckInterval(this.getCheckInterval());
+        mo.setEnabled(this.isEnabled());
+        mo.setRecoveryAttemptThreshold(this.getRecoveryAttemptThreshold());
+        mo.setRetryInterval(this.getRetryInterval());
+        mo.setState(this.getState().toMO());
+        mo.setSuppressed(this.isSuppressed());
+    }
+    
+    /**
+     * Get the MessageObject of this check
+     */
+    public abstract CheckMO toMO();
+    
+ }

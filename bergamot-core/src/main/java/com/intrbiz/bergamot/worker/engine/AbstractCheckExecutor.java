@@ -3,8 +3,8 @@ package com.intrbiz.bergamot.worker.engine;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.model.message.task.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.task.Task;
+import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.CheckExecutor;
 import com.intrbiz.bergamot.worker.Engine;
 

@@ -58,6 +58,7 @@ public class ManifoldCfg extends Configuration
             this.exchanges.add(new ExchangeCfg("bergamot.check.nagios", "topic", true, "all"));
             this.exchanges.add(new ExchangeCfg("bergamot.check.nrpe",   "topic", true, "all"));
             this.exchanges.add(new ExchangeCfg("bergamot.result",       "topic", true, "all"));
+            this.exchanges.add(new ExchangeCfg("bergamot.notification", "topic", true, "all"));
         }
     }
 }

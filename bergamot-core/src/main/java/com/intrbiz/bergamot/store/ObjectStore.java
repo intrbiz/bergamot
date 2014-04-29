@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Command;
+import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.ContactGroup;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.HostGroup;
 import com.intrbiz.bergamot.model.Location;
@@ -38,6 +40,10 @@ public class ObjectStore
     private Set<Check> alerts = new HashSet<Check>();
     
     private Map<String, Location> locations = new TreeMap<String, Location>();
+    
+    private Map<String, ContactGroup> contactGroups = new TreeMap<String, ContactGroup>();
+    
+    private Map<String, Contact> contacts = new TreeMap<String, Contact>();
 
     public ObjectStore()
     {
@@ -208,6 +214,16 @@ public class ObjectStore
         return this.locations.size();
     }
     
+    public int getContactGroupsCount()
+    {
+        return this.contactGroups.size();
+    }
+    
+    public int getContactsCount()
+    {
+        return this.contacts.size();
+    }
+    
     // recent
     
     public Collection<Check> getAlerts()
@@ -267,6 +283,50 @@ public class ObjectStore
     public Collection<Location> getLocations()
     {
         return this.locations.values();
+    }
+    
+    // contact groups
+    
+    public ContactGroup lookupContactGroup(String contactGroup)
+    {
+        return this.contactGroups.get(contactGroup);
+    }
+
+    public void addContactGroup(ContactGroup contactGroup)
+    {
+        this.contactGroups.put(contactGroup.getName(), contactGroup);
+    }
+
+    public boolean containsContactGroup(String contactGroup)
+    {
+        return this.contactGroups.containsKey(contactGroup);
+    }
+
+    public Collection<ContactGroup> getContactGroups()
+    {
+        return this.contactGroups.values();
+    }
+    
+    // contacts
+    
+    public Contact lookupContact(String contact)
+    {
+        return this.contacts.get(contact);
+    }
+
+    public void addContact(Contact contact)
+    {
+        this.contacts.put(contact.getName(), contact);
+    }
+
+    public boolean containsContact(String contact)
+    {
+        return this.contacts.containsKey(contact);
+    }
+
+    public Collection<Contact> getContacts()
+    {
+        return this.contacts.values();
     }
     
     public Collection<Location> getRootLocations()
