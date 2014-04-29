@@ -64,7 +64,7 @@
 			<data-set var="contact" value="#{service.contacts}">
 				<p>
 					<span class="label">#{contact.displayName}</span>
-					<span class="value">#{contact.email}</span>
+					<span class="value">&nbsp;</span>
 				</p>
 			</data-set>
 		</div>
