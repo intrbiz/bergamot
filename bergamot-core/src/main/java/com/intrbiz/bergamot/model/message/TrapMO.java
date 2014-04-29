@@ -3,13 +3,13 @@ package com.intrbiz.bergamot.model.message;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("bergamot.service")
-public class ServiceMO extends ActiveCheckMO
+@JsonTypeName("bergamot.trap")
+public class TrapMO extends ActiveCheckMO
 {
     @JsonProperty("host")
     private HostMO host;
     
-    public ServiceMO()
+    public TrapMO()
     {
         super();
     }
@@ -31,6 +31,6 @@ public class ServiceMO extends ActiveCheckMO
     
     public String toString()
     {
-        return "sevice { id: " + this.id + "}";
+        return "trap { id: " + this.id + "}";
     }
 }

@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.scheduler;
 
 import com.intrbiz.bergamot.component.BergamotComponent;
 import com.intrbiz.bergamot.config.SchedulerCfg;
-import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.ActiveCheck;
 
 /**
  * Schedule the execution of stuff, mainly host and service checks
@@ -22,22 +22,22 @@ public interface Scheduler extends BergamotComponent<SchedulerCfg>
     /**
      * Schedule the given check
      */
-    void schedule(Check check);
+    void schedule(ActiveCheck check);
     
     /**
      * Reschedule the given check due to some form of state change
      */
-    void reschedule(Check check);
+    void reschedule(ActiveCheck check);
     
     /**
      * Ensure that the given check is enabled, so that it will be 
      * executed
      */
-    void enable(Check check);
+    void enable(ActiveCheck check);
     
     /**
      * Ensure that the given check is disable, so that it will not be 
      * executed
      */
-    void disable(Check check);
+    void disable(ActiveCheck check);
 }

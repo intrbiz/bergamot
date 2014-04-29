@@ -18,7 +18,7 @@ import com.intrbiz.bergamot.model.state.GroupState;
 /**
  * A host - some form of network connected device that is to be checked
  */
-public class Host extends Check
+public class Host extends ActiveCheck
 {
     private String address;
 

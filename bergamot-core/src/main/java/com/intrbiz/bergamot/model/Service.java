@@ -13,7 +13,7 @@ import com.intrbiz.bergamot.model.util.Parameter;
 /**
  * Some software service running on a host which needs to be checked
  */
-public class Service extends Check
+public class Service extends ActiveCheck
 {
     private Host host;
 

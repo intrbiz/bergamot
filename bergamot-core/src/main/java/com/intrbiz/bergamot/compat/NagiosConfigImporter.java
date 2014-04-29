@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.compat.config.model.LocationCfg;
 import com.intrbiz.bergamot.compat.config.model.ServiceCfg;
 import com.intrbiz.bergamot.compat.config.model.ServicegroupCfg;
 import com.intrbiz.bergamot.compat.config.model.TimeperiodCfg;
+import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Command;
@@ -515,7 +516,7 @@ public class NagiosConfigImporter
         }
     }
 
-    private void loadCheckCommand(String checkCommand, Check on, ObjectStore store)
+    private void loadCheckCommand(String checkCommand, ActiveCheck on, ObjectStore store)
     {
         // the command
         NagiosCommandString parsedCommand = NagiosCommandString.parse(checkCommand);

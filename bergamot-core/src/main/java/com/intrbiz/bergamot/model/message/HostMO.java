@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @JsonTypeName("bergamot.host")
-public class HostMO extends CheckMO
+public class HostMO extends ActiveCheckMO
 {
     @JsonProperty("address")
     private String address;

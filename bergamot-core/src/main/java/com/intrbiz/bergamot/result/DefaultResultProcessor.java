@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.component.AbstractComponent;
 import com.intrbiz.bergamot.config.ResultProcessorCfg;
+import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.Message;
@@ -84,8 +85,11 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
                 // reschedule
                 if (state.isTransitioning())
                 {
-                    logger.info("Rescheduling " + check + " due to state change");
-                    this.getBergamot().getScheduler().reschedule(check);
+                    if (check instanceof ActiveCheck)
+                    {
+                        logger.info("Rescheduling " + check + " due to state change");
+                        this.getBergamot().getScheduler().reschedule((ActiveCheck) check);
+                    }
                 }
                 // update any dependencies
                 this.updateDependencies(check, state, result);

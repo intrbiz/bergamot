@@ -12,12 +12,6 @@ public abstract class CheckMO extends NamedObjectMO
     @JsonProperty("recovery_attempt_threshold")
     protected int recoveryAttemptThreshold;
 
-    @JsonProperty("check_interval")
-    protected long checkInterval;
-
-    @JsonProperty("retry_interval")
-    protected long retryInterval;
-
     @JsonProperty("state")
     protected CheckStateMO state;
 
@@ -53,26 +47,6 @@ public abstract class CheckMO extends NamedObjectMO
     public void setRecoveryAttemptThreshold(int recoveryAttemptThreshold)
     {
         this.recoveryAttemptThreshold = recoveryAttemptThreshold;
-    }
-
-    public long getCheckInterval()
-    {
-        return checkInterval;
-    }
-
-    public void setCheckInterval(long checkInterval)
-    {
-        this.checkInterval = checkInterval;
-    }
-
-    public long getRetryInterval()
-    {
-        return retryInterval;
-    }
-
-    public void setRetryInterval(long retryInterval)
-    {
-        this.retryInterval = retryInterval;
     }
 
     public CheckStateMO getState()

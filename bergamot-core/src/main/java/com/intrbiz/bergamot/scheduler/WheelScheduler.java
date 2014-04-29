@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 
@@ -240,19 +240,19 @@ public class WheelScheduler extends AbstractScheduler
     }
 
     @Override
-    public void enable(Check check)
+    public void enable(ActiveCheck check)
     {
         this.enableJob(check.getId());
     }
 
     @Override
-    public void disable(Check check)
+    public void disable(ActiveCheck check)
     {
         this.disableJob(check.getId());
     }
 
     @Override
-    public void schedule(Check check)
+    public void schedule(ActiveCheck check)
     {
         logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval());
         // balance the tasks over a start up window
@@ -262,7 +262,7 @@ public class WheelScheduler extends AbstractScheduler
     }
 
     @Override
-    public void reschedule(Check check)
+    public void reschedule(ActiveCheck check)
     {
         logger.info("Rescheduling " + check + " with interval " + check.getCurrentInterval());
         this.rescheduleJob(check.getId(), check.getCurrentInterval(), check.getCheckPeriod());
@@ -397,9 +397,9 @@ public class WheelScheduler extends AbstractScheduler
 
     private class CheckRunner implements Runnable
     {
-        public final Check check;
+        public final ActiveCheck check;
 
-        public CheckRunner(Check check)
+        public CheckRunner(ActiveCheck check)
         {
             this.check = check;
         }
