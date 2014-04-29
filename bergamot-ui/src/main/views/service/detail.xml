@@ -56,6 +56,20 @@
 		</div>
 	</div>
 	
+	<h2>Configuration</h2>
+	
+	<div class="row">
+		<div class="col3 dash_icon">
+			<h3>Contacts</h3>
+			<data-set var="contact" value="#{service.contacts}">
+				<p>
+					<span class="label">#{contact.displayName}</span>
+					<span class="value">#{contact.email}</span>
+				</p>
+			</data-set>
+		</div>
+	</div>
+	
 	<div class="row">
 		<div class="col4 dash_icon">
 			<h3>Statistics</h3>
