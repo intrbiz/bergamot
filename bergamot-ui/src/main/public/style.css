@@ -276,7 +276,7 @@ table tr:hover {
 	background-color: #E85752 !important;	
 }
 
-.dash_img.unknown, .dash_img.internal, .dash_img.timeout {
+.dash_img.unknown, .dash_img.error, .dash_img.timeout {
 	background-color: #A3007B !important;
 }
 
