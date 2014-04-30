@@ -44,17 +44,27 @@ public abstract class Check extends NamedObject
     /**
      * Checks which reference this check
      */
-    private Set<Check> referencedBy = new HashSet<Check>();
+    protected Set<Check> referencedBy = new HashSet<Check>();
 
     /**
      * Checks which this check references
      */
-    private Set<Check> references = new HashSet<Check>();
+    protected Set<Check> references = new HashSet<Check>();
 
     /**
      * The contacts who should be notified
      */
-    private Set<Contact> contacts = new HashSet<Contact>();
+    protected Set<Contact> contacts = new HashSet<Contact>();
+
+    /**
+     * When notifications maybe sent for this check
+     */
+    protected TimePeriod notificationPeriod;
+
+    /**
+     * Are notifications enabled for this check
+     */
+    protected boolean notificationsEnabled;
 
     public Check()
     {
@@ -161,6 +171,26 @@ public abstract class Check extends NamedObject
     public void addContact(Contact contact)
     {
         this.contacts.add(contact);
+    }
+
+    public TimePeriod getNotificationPeriod()
+    {
+        return notificationPeriod;
+    }
+
+    public void setNotificationPeriod(TimePeriod notificationPeriod)
+    {
+        this.notificationPeriod = notificationPeriod;
+    }
+
+    public boolean isNotificationsEnabled()
+    {
+        return notificationsEnabled;
+    }
+
+    public void setNotificationsEnabled(boolean notificationsEnabled)
+    {
+        this.notificationsEnabled = notificationsEnabled;
     }
 
     protected void toMO(CheckMO mo)

@@ -748,6 +748,8 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
             return p.getIconImageAlt();
         });
     }
+    
+    
 
     // extended
     
@@ -764,6 +766,51 @@ public class ServiceCfg extends ConfigObject<ServiceCfg>
     public List<Parameter> resolveCheckParameters()
     {
         return this.resolveProperty((p) -> { return p.getCheckParameters(); });
+    }
+    
+    public Boolean resolveObsessOverService()
+    {
+        return this.resolveProperty((p) -> { return p.isObsessOverService(); });
+    }
+
+    public Boolean resolveActiveChecksEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isActiveChecksEnabled(); });
+    }
+
+    public Boolean resolvePassiveChecksEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isPassiveChecksEnabled(); });
+    }
+
+    public Boolean resolveCheckFreshness()
+    {
+        return this.resolveProperty((p) -> { return p.isCheckFreshness(); });
+    }
+
+    public Boolean resolveEventHandlerEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isEventHandlerEnabled(); });
+    }
+
+    public Boolean resolveFlapDetectionEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isFlapDetectionEnabled(); });
+    }
+
+    public Boolean resolveProcessPerfData()
+    {
+        return this.resolveProperty((p) -> { return p.isProcessPerfData(); });
+    }
+
+    public Boolean resolveNotificationsEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isNotificationsEnabled(); });
+    }
+
+    public Boolean resolveVolatile()
+    {
+        return this.resolveProperty((p) -> { return p.isVolatile(); });
     }
 
     @Override

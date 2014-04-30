@@ -9,16 +9,22 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 public class Contact extends NamedObject
 {
     private List<ContactGroup> contactGroups = new LinkedList<ContactGroup>();
-    
+
     private String password;
-    
+
     private String email;
-    
+
     private String pager;
-    
+
     private String mobile;
-    
+
     private String phone;
+
+    private TimePeriod notificationPeriod;
+
+    private List<String> engines = new LinkedList<String>();
+
+    private boolean notificationsEnabled = true;
 
     public Contact()
     {
@@ -84,7 +90,37 @@ public class Contact extends NamedObject
     {
         this.phone = phone;
     }
-    
+
+    public TimePeriod getNotificationPeriod()
+    {
+        return notificationPeriod;
+    }
+
+    public void setNotificationPeriod(TimePeriod notificationPeriod)
+    {
+        this.notificationPeriod = notificationPeriod;
+    }
+
+    public List<String> getEngines()
+    {
+        return engines;
+    }
+
+    public void setEngines(List<String> engines)
+    {
+        this.engines = engines;
+    }
+
+    public boolean isNotificationsEnabled()
+    {
+        return notificationsEnabled;
+    }
+
+    public void setNotificationsEnabled(boolean notificationsEnabled)
+    {
+        this.notificationsEnabled = notificationsEnabled;
+    }
+
     public ContactMO toMO()
     {
         ContactMO mo = new ContactMO();
@@ -93,9 +129,10 @@ public class Contact extends NamedObject
         mo.setMobile(this.getMobile());
         mo.setPager(this.getPager());
         mo.setPhone(this.getPhone());
+        mo.setEngines(this.getEngines());
         return mo;
     }
-    
+
     public void configure(ContactCfg cfg)
     {
         this.name = cfg.resolveContactName();
@@ -103,5 +140,7 @@ public class Contact extends NamedObject
         this.email = cfg.resolveEmail();
         this.pager = cfg.resolvePager();
         this.mobile = cfg.resolvePager();
+        this.engines.add("email");
+        this.notificationsEnabled = (cfg.resolveNotificationsEnabled() != null || cfg.resolveHostNotificationsEnabled() != null || cfg.resolveServiceNotificationsEnabled() != null) ? (cfg.resolveNotificationsEnabled() || cfg.resolveHostNotificationsEnabled() || cfg.resolveServiceNotificationsEnabled()) : true;
     }
 }

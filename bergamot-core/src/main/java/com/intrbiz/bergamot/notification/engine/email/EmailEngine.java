@@ -158,7 +158,10 @@ public class EmailEngine extends AbstractNotificationEngine
         // to address
         for (ContactMO contact : notification.getTo())
         {
-            message.addRecipient(RecipientType.TO, new InternetAddress(contact.getEmail()));
+            if ((!Util.isEmpty(contact.getEmail())) && contact.hasEngine(this.getName()))
+            {
+                message.addRecipient(RecipientType.TO, new InternetAddress(contact.getEmail()));
+            }
         }
         // headers
         message.setHeader("X-Bergamot-Notification-Id", notification.getId().toString());

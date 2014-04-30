@@ -107,6 +107,9 @@ public class NagiosConfigImporter
                     // add the host
                     Contact contact = new Contact();
                     contact.configure(cfg);
+                    // contact period
+                    this.loadNotificationPeriod(Util.coalesce(cfg.resolveNotificationPeriod(), cfg.resolveServiceNotificationPeriod(), cfg.resolveHostNotificationPeriod()), contact, store);
+                    // add
                     store.addContact(contact);
                     logger.trace("Adding contact " + contact.getName());
                 }
@@ -118,6 +121,22 @@ public class NagiosConfigImporter
             else
             {
                 logger.trace("Not registering contact: " + cfg.getName());
+            }
+        }
+    }
+    
+    private void loadNotificationPeriod(String notificationPeriod, Contact on, ObjectStore store)
+    {
+        if (notificationPeriod != null)
+        {
+            TimePeriod timePeriod = store.lookupTimePeriod(notificationPeriod);
+            if (timePeriod != null)
+            {
+                on.setNotificationPeriod(timePeriod);
+            }
+            else
+            {
+                logger.warn("The timeperiod " + notificationPeriod + " is not defined, used by " + on);
             }
         }
     }
@@ -300,6 +319,8 @@ public class NagiosConfigImporter
                     this.loadCheckPeriod(cfg.resolveCheckPeriod(), host, store);
                     // the contacts
                     this.loadCheckContacts(cfg.resolveContactGroups(), cfg.resolveContacts(), host, store);
+                    // the notificaion period
+                    this.loadNotificationPeriod(cfg.resolveNotificationPeriod(), host, store);
                     logger.trace("Adding host " + host);
                 }
                 else
@@ -452,6 +473,8 @@ public class NagiosConfigImporter
                         this.loadCheckPeriod(cfg.resolveCheckPeriod(), service, store);
                         // the contacts
                         this.loadCheckContacts(cfg.resolveContactGroups(), cfg.resolveContacts(), service, store);
+                        // the notificaion period
+                        this.loadNotificationPeriod(cfg.resolveNotificationPeriod(), service, store);
                         logger.trace("Adding service " + service);
                     }
                 }
@@ -512,6 +535,22 @@ public class NagiosConfigImporter
             else
             {
                 logger.warn("The timeperiod " + checkPeriod + " is not defined, used by " + on);
+            }
+        }
+    }
+
+    private void loadNotificationPeriod(String notificationPeriod, Check on, ObjectStore store)
+    {
+        if (notificationPeriod != null)
+        {
+            TimePeriod timePeriod = store.lookupTimePeriod(notificationPeriod);
+            if (timePeriod != null)
+            {
+                on.setNotificationPeriod(timePeriod);
+            }
+            else
+            {
+                logger.warn("The timeperiod " + notificationPeriod + " is not defined, used by " + on);
             }
         }
     }

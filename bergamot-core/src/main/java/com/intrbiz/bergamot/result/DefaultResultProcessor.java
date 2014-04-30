@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.result;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -136,24 +137,31 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
     {
         logger.debug("Recovery for " + check);
         this.getBergamot().getObjectStore().removeAlert(check);
-        if (!check.isSuppressed())
+        if (check.isNotificationsEnabled() && (!check.isSuppressed()))
         {
             // send a recovery
-            SendRecovery recovery = new SendRecovery();
-            recovery.setRaised(System.currentTimeMillis());
-            recovery.setCheck(check.toMO());
-            for (Contact contact : check.getContacts())
+            // check notification period
+            if (check.getNotificationPeriod() == null || check.getNotificationPeriod().isInTimeRange(Calendar.getInstance()))
             {
-                recovery.getTo().add(contact.toMO());
-            }
-            if (!recovery.getTo().isEmpty())
-            {
-                logger.warn("Sending recovery for " + check);
-                this.getBergamot().getManifold().publish(recovery);
-            }
-            else
-            {
-                logger.warn("Not sending recovery for " + check + " no contacts configured.");
+                SendRecovery recovery = new SendRecovery();
+                recovery.setRaised(System.currentTimeMillis());
+                recovery.setCheck(check.toMO());
+                for (Contact contact : check.getContacts())
+                {
+                    if (contact.isNotificationsEnabled() && contact.getNotificationPeriod() == null || contact.getNotificationPeriod().isInTimeRange(Calendar.getInstance()))
+                    {
+                        recovery.getTo().add(contact.toMO());
+                    }
+                }
+                if (!recovery.getTo().isEmpty())
+                {
+                    logger.warn("Sending recovery for " + check);
+                    this.getBergamot().getManifold().publish(recovery);
+                }
+                else
+                {
+                    logger.warn("Not sending recovery for " + check + " no contacts configured.");
+                }
             }
         }
     }
@@ -161,25 +169,32 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
     protected void sendAlert(Check check, CheckState state, Result result)
     {
         logger.debug("Alert for " + check);
-        if (!check.isSuppressed())
+        if (check.isNotificationsEnabled() && (!check.isSuppressed()))
         {
             this.getBergamot().getObjectStore().addAlert(check);
             // send an alert
-            SendAlert alert = new SendAlert();
-            alert.setRaised(System.currentTimeMillis());
-            alert.setCheck(check.toMO());
-            for (Contact contact : check.getContacts())
+            // check the notification period
+            if (check.getNotificationPeriod() == null || check.getNotificationPeriod().isInTimeRange(Calendar.getInstance()))
             {
-                alert.getTo().add(contact.toMO());
-            }
-            if (!alert.getTo().isEmpty())
-            {
-                logger.warn("Sending alert for " + check);
-                this.getBergamot().getManifold().publish(alert);
-            }
-            else
-            {
-                logger.warn("Not sending alert for " + check + " no contacts configured.");
+                SendAlert alert = new SendAlert();
+                alert.setRaised(System.currentTimeMillis());
+                alert.setCheck(check.toMO());
+                for (Contact contact : check.getContacts())
+                {
+                    if (contact.isNotificationsEnabled() && contact.getNotificationPeriod() == null || contact.getNotificationPeriod().isInTimeRange(Calendar.getInstance()))
+                    {
+                        alert.getTo().add(contact.toMO());
+                    }
+                }
+                if (!alert.getTo().isEmpty())
+                {
+                    logger.warn("Sending alert for " + check);
+                    this.getBergamot().getManifold().publish(alert);
+                }
+                else
+                {
+                    logger.warn("Not sending alert for " + check + " no contacts configured.");
+                }
             }
         }
     }

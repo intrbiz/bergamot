@@ -42,6 +42,12 @@ public class ContactCfg extends ConfigObject<ContactCfg>
     private Boolean retainStatusInformation;
 
     private Boolean retainNonstatusInformation;
+    
+    // extended
+    
+    private Boolean notificationsEnabled;
+    
+    private String notificationPeriod;
 
     public ContactCfg()
     {
@@ -293,6 +299,63 @@ public class ContactCfg extends ConfigObject<ContactCfg>
     public List<String> resolveAddressx()
     {
         return this.resolveProperty((p) -> { return p.getAddressx(); });
+    }
+    
+    public Boolean resolveHostNotificationsEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isHostNotificationsEnabled(); });
+    }
+    
+    public Boolean resolveServiceNotificationsEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isServiceNotificationsEnabled(); });
+    }
+    
+    public Boolean resolveCanSubmitCommands()
+    {
+        return this.resolveProperty((p) -> { return p.isCanSubmitCommands(); });
+    }
+
+    public Boolean resolveRetainStatusInformation()
+    {
+        return this.resolveProperty((p) -> { return p.isRetainStatusInformation(); });
+    }
+
+    public Boolean resolveRetainNonstatusInformation()
+    {
+        return this.resolveProperty((p) -> { return p.isRetainNonstatusInformation(); });
+    }
+
+    public Boolean isNotificationsEnabled()
+    {
+        return notificationsEnabled;
+    }
+
+    @ParameterName("notifications_enabled")
+    public void setNotificationsEnabled(Boolean notificationsEnabled)
+    {
+        this.notificationsEnabled = notificationsEnabled;
+    }
+    
+    public Boolean resolveNotificationsEnabled()
+    {
+        return this.resolveProperty((p) -> { return p.isNotificationsEnabled(); });
+    }
+
+    public String getNotificationPeriod()
+    {
+        return notificationPeriod;
+    }
+
+    public void setNotificationPeriod(String notificationPeriod)
+    {
+        this.notificationPeriod = notificationPeriod;
+    }
+    
+    @ParameterName("notification_period")
+    public String resolveNotificationPeriod()
+    {
+        return this.resolveProperty((p) -> { return p.getNotificationPeriod(); });
     }
 
     public String toString()

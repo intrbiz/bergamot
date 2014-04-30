@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.model.message;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -8,19 +11,22 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName("bergamot.contact")
 public class ContactMO extends NamedObjectMO
-{   
+{
     @JsonProperty("email")
     private String email;
-    
+
     @JsonProperty("pager")
     private String pager;
-    
+
     @JsonProperty("mobile")
     private String mobile;
-    
+
     @JsonProperty("phone")
     private String phone;
-    
+
+    @JsonProperty("engines")
+    private List<String> engines = new LinkedList<String>();
+
     public ContactMO()
     {
         super();
@@ -65,7 +71,22 @@ public class ContactMO extends NamedObjectMO
     {
         this.phone = phone;
     }
+
+    public List<String> getEngines()
+    {
+        return engines;
+    }
+
+    public void setEngines(List<String> engines)
+    {
+        this.engines = engines;
+    }
     
+    public boolean hasEngine(String engine)
+    {
+        return this.engines.contains(engine);
+    }
+
     public String toString()
     {
         return "contact { name: " + this.name + ", email: " + this.email + "}";
