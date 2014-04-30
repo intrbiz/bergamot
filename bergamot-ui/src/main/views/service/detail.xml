@@ -4,10 +4,10 @@
 <fragment xmlns="com.intrbiz.balsa" title="Service #{service.displayName} on Host #{service.host.displayName}">
 
 	<div class="row submenu pull-right">
-		<a href="/service/unsuppress/#{service.id}">Unsupress</a>
-		<a href="/service/suppress/#{service.id}">Supress</a>
-		<a href="/service/disable/#{service.id}">Disable</a>
-		<a href="/service/enable/#{service.id}">Enable</a>
+		<a rendered="#{service.suppressed}"  href="/service/unsuppress/#{service.id}">Unsupress</a>
+		<a rendered="#{!service.suppressed}" href="/service/suppress/#{service.id}">Supress</a>
+		<a rendered="#{service.enabled}"     href="/service/disable/#{service.id}">Disable</a>
+		<a rendered="#{!service.enabled}"    href="/service/enable/#{service.id}">Enable</a>
 		<a href="/service/execute/#{service.id}">Check now</a>
 	</div>
 

@@ -4,10 +4,10 @@
 <fragment xmlns="com.intrbiz.balsa" title="Host #{host.displayName}">
 
 	<div class="row submenu pull-right">
-		<a href="/host/unsuppress/#{host.id}">Unsupress</a>
-		<a href="/host/suppress/#{host.id}">Supress</a>
-		<a href="/host/disable/#{host.id}">Disable</a>
-		<a href="/host/enable/#{host.id}">Enable</a>
+		<a rendered="#{service.suppressed}"  href="/host/unsuppress/#{host.id}">Unsupress</a>
+		<a rendered="#{!service.suppressed}" href="/host/suppress/#{host.id}">Supress</a>
+		<a rendered="#{service.enabled}"     href="/host/disable/#{host.id}">Disable</a>
+		<a rendered="#{!service.enabled}"    href="/host/enable/#{host.id}">Enable</a>
 		<a href="/host/execute/#{host.id}">Check now</a>
 	</div>
 
@@ -46,9 +46,9 @@
 		</div>
 	</div>
 	
-	<h2>Services</h2>
+	<h2 rendered="#{! host.services.isEmpty()}">Services</h2>
 	
-	<div class="row submenu pull-right">
+	<div class="row submenu pull-right" rendered="#{! host.services.isEmpty()}">
 		<a href="/host/execute-services/#{host.id}">Check all services now</a>
 	</div>
 
