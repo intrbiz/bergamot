@@ -14,6 +14,10 @@
 							<span class="name">#{check.displayName}</span>
 					    </h3>
 					    <p>
+						    <span class="label">Status: </span>
+						    <span class="value">#{check.state.status.toString().substring(0,1) + check.state.status.toString().substring(1).toLowerCase()}</span>
+					    </p>
+					    <p>
 						    <span class="label">Attempt: </span>
 						    <span class="value">
 						    	<span>#{check.state.attempt} of #{check.currentAttemptThreshold}</span>

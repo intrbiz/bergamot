@@ -75,10 +75,6 @@
 					    </span>
 				    </p>
 				    <p>
-					    <span class="label">Host: </span>
-					    <span class="value">#{service.host.displayName}</span>
-				    </p>
-				    <p>
 					    <span class="label">Last checked: </span>
 					    <span class="value">#{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
 				    </p>
@@ -94,7 +90,7 @@
 	<h2>Configuration</h2>
 		
 	<div class="row">
-		<div class="col3 dash_icon">
+		<div class="col4 dash_icon">
 			<h3>Contacts</h3>
 			<data-set var="contact" value="#{host.contacts}">
 				<p>
@@ -102,6 +98,32 @@
 					<span class="value">&nbsp;</span>
 				</p>
 			</data-set>
+		</div>
+		<div class="col4 dash_icon">
+			<h3>Scheduling</h3>
+			<p>
+				<span class="label wide">Check period</span>
+				<span class="value">#{host.checkPeriod.displayName}</span>
+			</p>
+			<p>
+				<span class="label wide">Check interval</span>
+				<span class="value">#{host.checkInterval / 1000}s</span>
+			</p>
+			<p>
+				<span class="label wide">Retry interval</span>
+				<span class="value">#{host.retryInterval / 1000}s</span>
+			</p>
+		</div>
+		<div class="col4 dash_icon">
+			<h3>Notifications</h3>
+			<p>
+				<span class="label wide">Notifications enabled</span>
+				<span class="value">#{if(host.notificationsEnabled, 'yes', 'no')}</span>
+			</p>
+			<p>
+				<span class="label wide">Notification period</span>
+				<span class="value">#{coalesce(host.notificationPeriod.displayName, 'Not configured')}</span>
+			</p>
 		</div>
 	</div>
 	
@@ -143,9 +165,13 @@
 				<span class="label wide">Command Name: </span>
 				<span class="value">#{host.checkCommand.command.name}</span>
 			</p>
+			<p>
+				<span class="label wide">Parameters:</span>
+				<span class="value">&nbsp;</span>
+			</p>
 			<data-set var="parameter" value="#{host.createExecuteCheck().parameters}">
 				<p>
-					<span class="label wide">#{parameter.name}: </span>
+					<span class="label wide indent">#{parameter.name}: </span>
 					<span class="value">#{parameter.value}</span>
 				</p>
 			</data-set>

@@ -4,7 +4,8 @@
 }
 
 html {
-    overflow-y: scroll; 
+    overflow-y: scroll;
+    padding-bottom: 50px;
 }
 
 body {
@@ -361,5 +362,9 @@ span.info {
 	background-color: #EEE;
 	border-radius: 3px;
 	padding: 0px 4px;
+}
+
+span.indent {
+	text-indent: 20px;
 }
 
