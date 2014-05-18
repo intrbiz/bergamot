@@ -31,10 +31,13 @@
 							<a href="/location/">Locations</a>
 						</li>
 						<li>
-							<a href="/hostgroup/">Hosts</a>
+							<a href="/group/">Groups</a>
 						</li>
 						<li>
-							<a href="/servicegroup/">Services</a>
+							<a href="/group/name/hosts">Hosts</a>
+						</li>
+						<li>
+							<a href="/group/name/services">Services</a>
 						</li>
 						<li>
 							<a href="/">Alerts</a>

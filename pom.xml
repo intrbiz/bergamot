@@ -62,6 +62,18 @@
     <module>bergamot-core</module>
     <module>bergamot-ui</module>
     <module>bergamot-nrpe</module>
+    <module>bergamot-config</module>
+    <module>bergamot-timerange</module>
+    <module>bergamot-compat-nagios</module>
+    <module>bergamot-config-converter</module>
+    <module>bergamot-util</module>
+    <module>bergamot-model</module>
+    <module>bergamot-daemon</module>
+    <module>bergamot-notification-engine-email</module>
+    <module>bergamot-notification-engine-sms</module>
+    <module>bergamot-worker-nagios</module>
+    <module>bergamot-virtual-check-expression</module>
+    <module>bergamot-message-model</module>
   </modules>
   <dependencyManagement>
   	<dependencies>

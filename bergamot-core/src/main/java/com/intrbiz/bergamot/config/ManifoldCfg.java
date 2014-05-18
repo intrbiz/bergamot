@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.bergamot.manifold.router.DefaultRouter;
 import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "manifold")
@@ -50,7 +49,7 @@ public class ManifoldCfg extends Configuration
         if (this.routers.isEmpty())
         {
             // default router
-            this.routers.add(new RouterCfg(DefaultRouter.class));
+            this.routers.add(new RouterCfg("com.intrbiz.bergamot.manifold.router.DefaultRouter"));
         }
         if (this.exchanges.isEmpty())
         {

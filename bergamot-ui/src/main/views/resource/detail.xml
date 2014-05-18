@@ -1,0 +1,100 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Resource #{resource.displayName} on Cluster #{resource.cluster.displayName}">
+
+	<div class="row submenu pull-right">
+		<a rendered="#{resource.suppressed}"  href="/resource/unsuppress/#{resource.id}">Unsupress</a>
+		<a rendered="#{!resource.suppressed}" href="/resource/suppress/#{resource.id}">Supress</a>
+		<a rendered="#{resource.enabled}"     href="/resource/disable/#{resource.id}">Disable</a>
+		<a rendered="#{!resource.enabled}"    href="/resource/enable/#{resource.id}">Enable</a>
+	</div>
+
+	<div class="row">
+		<div class="col4 dash_icon">
+			<h3>
+				<span class="dash_img #{resource.state.status.toString().toLowerCase()}" title="The resource is #{resource.state.status.toString().toLowerCase()}">
+					<img src="/resource-icon.png" />
+				</span>
+				<span class="name">#{resource.displayName}</span>
+		    </h3>
+		    <p>
+			    <span class="label wide">Status: </span>
+			    <span class="value">#{resource.state.status.toString().substring(0,1) + resource.state.status.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Cluster: </span>
+			    <a href="/cluster/name/#{resource.cluster.name}">
+				    <span class="value">#{resource.cluster.displayName}</span>
+				</a>
+		    </p>
+		    <p>
+			    <span class="label wide">Suppressed: </span>
+			    <span class="value">#{if(resource.suppressed, 'yes', 'no')}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Enabled: </span>
+			    <span class="value">#{if(resource.enabled, 'yes', 'no')}</span>
+		    </p>		    
+		    <p>
+			    <span class="label wide">Last checked: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Last state change: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', resource.state.lastStateChange)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastStateChange)}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Last status: </span>
+			    <span class="value">#{resource.state.lastHardStatus.toString().substring(0,1) + resource.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		    <p class="output">
+			    <span class="label wide">Output: </span>
+			    <span class="value">#{coalesce(resource.state.output, '')}</span>
+		    </p>
+		</div>
+	</div>
+	
+	<!-- References -->
+	
+	<h2 rendered="#{! resource.references.isEmpty()}">Depends Upon</h2>
+
+	<div class="row hostgroup services" rendered="#{! resource.references.isEmpty()}">
+		<data-set var="check" value="#{resource.references}">
+			<include view="include/check"/>
+		</data-set>
+	</div>
+	
+	<h2>Configuration</h2>
+	
+	<div class="row">
+		<div class="col4 dash_icon">
+			<h3>Contacts</h3>
+			<data-set var="contact" value="#{resource.allContacts}">
+				<p>
+					<span class="label wide">#{contact.displayName}</span>
+					<span class="value">&nbsp;</span>
+				</p>
+			</data-set>
+		</div>
+		<div class="col4 dash_icon">
+			<h3>Notifications</h3>
+			<p>
+				<span class="label wide">Notifications enabled</span>
+				<span class="value">#{if(resource.notifications.enabled, 'yes', 'no')}</span>
+			</p>
+			<p>
+				<span class="label wide">Notification period</span>
+				<span class="value">#{coalesce(resource.notifications.timePeriod.displayName, 'Not configured')}</span>
+			</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>XML</h3>
+			<pre>#{resource.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+</fragment>

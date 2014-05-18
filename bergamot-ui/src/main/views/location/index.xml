@@ -4,28 +4,7 @@
 <fragment xmlns="com.intrbiz.balsa" title="Locations">
 	<div class="row">
 		<data-set var="location" value="#{locations}">
-			<a href="/location/name/#{location.name}">
-				<div class="col3 dash_icon">
-				    <h3>
-						<span class="dash_img #{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
-							<img src="/applications-internet.png" />
-						</span>
-						<span class="name">#{location.displayName}</span>
-				    </h3>
-				    <p>
-					    <span class="label">OK: </span>
-					    <span class="value">#{location.state.okCount}</span>
-				    </p>
-				    <p>
-					    <span class="label">Warning: </span>
-					    <span class="value">#{location.state.warningCount}</span>
-				    </p>
-				    <p>
-					    <span class="label">Critical: </span>
-					    <span class="value">#{location.state.criticalCount}</span>
-				    </p>
-				</div>
-			</a>
+			<include view="include/location"/>
 		</data-set>
 	</div>
 	<script type="text/javascript">

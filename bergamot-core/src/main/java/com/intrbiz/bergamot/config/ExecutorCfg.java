@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.config;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.bergamot.worker.Executor;
 import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "executor")
@@ -15,9 +14,9 @@ public class ExecutorCfg extends Configuration
         super();
     }
     
-    public ExecutorCfg(Class<? extends Executor<?>> runnerClass)
+    public ExecutorCfg(String runnerClass)
     {
         super();
-        this.setClassname(runnerClass.getName());
+        this.setClassname(runnerClass);
     }
 }

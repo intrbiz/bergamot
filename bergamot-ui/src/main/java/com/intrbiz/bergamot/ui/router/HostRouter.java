@@ -31,6 +31,14 @@ public class HostRouter extends Router
         encode("host/detail");
     }
     
+    @Any("/id/:id")
+    public void host(@AsUUID UUID id)
+    {
+        Bergamot bergamot = this.getBergamot();
+        model("host", bergamot.getObjectStore().lookupHost(id));
+        encode("host/detail");
+    }
+    
     @Any("/execute/:id")
     public void executeHost(@AsUUID UUID id) throws IOException
     {
@@ -40,7 +48,7 @@ public class HostRouter extends Router
         if (host != null)
         {
             // build the check and dispatch it
-            ExecuteCheck executeCheck = host.createExecuteCheck();
+            ExecuteCheck executeCheck = host.executeCheck();
             if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
         }
         redirect("/host/name/" + host.getName());
@@ -115,7 +123,7 @@ public class HostRouter extends Router
             for (Service service : host.getServices())
             {
                 // build the check and dispatch it
-                ExecuteCheck executeCheck = service.createExecuteCheck();
+                ExecuteCheck executeCheck = service.executeCheck();
                 if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
             }
         }

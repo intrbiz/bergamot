@@ -20,10 +20,10 @@ public class EngineCfg extends Configuration
         super();
     }
     
-    public EngineCfg(Class<?> engine, ExecutorCfg... runners)
+    public EngineCfg(String engine, ExecutorCfg... runners)
     {
         super();
-        this.setClassname(engine.getName());
+        this.setClassname(engine);
         for (ExecutorCfg runner : runners)
         {
             this.executors.add(runner);

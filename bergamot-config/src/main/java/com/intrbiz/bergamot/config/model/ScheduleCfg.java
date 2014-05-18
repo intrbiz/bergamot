@@ -1,0 +1,61 @@
+package com.intrbiz.bergamot.config.model;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+import com.intrbiz.bergamot.config.resolver.ResolveWith;
+import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
+import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
+
+@XmlType(name = "schedule")
+@XmlRootElement(name = "schedule")
+public class ScheduleCfg
+{
+    private Long every;
+
+    private Long retryEvery;
+    
+    private String timePeriod;
+
+    public ScheduleCfg()
+    {
+        super();
+    }
+
+    @XmlAttribute(name = "every")
+    @ResolveWith(Coalesce.class)
+    public Long getEvery()
+    {
+        return every;
+    }
+
+    public void setEvery(Long every)
+    {
+        this.every = every;
+    }
+
+    @XmlAttribute(name = "retry-every")
+    @ResolveWith(Coalesce.class)
+    public Long getRetryEvery()
+    {
+        return retryEvery;
+    }
+
+    public void setRetryEvery(Long retryEvery)
+    {
+        this.retryEvery = retryEvery;
+    }
+
+    @XmlAttribute(name="time-period")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getTimePeriod()
+    {
+        return timePeriod;
+    }
+
+    public void setTimePeriod(String timePeriod)
+    {
+        this.timePeriod = timePeriod;
+    }
+}

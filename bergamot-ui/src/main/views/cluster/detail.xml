@@ -1,0 +1,110 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Cluster #{cluster.displayName}">
+
+	<div class="row submenu pull-right">
+		<a rendered="#{cluster.suppressed}"  href="/host/unsuppress/#{host.id}">Unsupress</a>
+		<a rendered="#{!cluster.suppressed}" href="/host/suppress/#{host.id}">Supress</a>
+		<a rendered="#{cluster.enabled}"     href="/host/disable/#{host.id}">Disable</a>
+		<a rendered="#{!cluster.enabled}"    href="/host/enable/#{host.id}">Enable</a>
+	</div>
+
+	<div class="row">
+		<div class="col4 dash_icon">
+		    <h3>
+				<span class="dash_img #{cluster.state.status.toString().toLowerCase()}" title="The cluster is #{cluster.state.status.toString().toLowerCase()}">
+					<img src="/host-icon.png" />
+				</span>
+				<span class="name">#{cluster.displayName}</span>
+		    </h3>
+		    <p>
+			    <span class="label wide">Status: </span>
+			    <span class="value">#{cluster.state.status.toString().substring(0,1) + cluster.state.status.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Suppressed: </span>
+			    <span class="value">#{if(cluster.suppressed, 'yes', 'no')}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Enabled: </span>
+			    <span class="value">#{if(cluster.enabled, 'yes', 'no')}</span>
+		    </p>
+	    	<p>
+		    	<span class="label wide">Last checked: </span>
+		   		<span class="value">#{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}</span>
+	    	</p>
+	    	<p>
+			    <span class="label wide">Last state change: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', cluster.state.lastStateChange)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastStateChange)}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Last status: </span>
+			    <span class="value">#{cluster.state.lastHardStatus.toString().substring(0,1) + cluster.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		</div>
+	</div>
+	
+	<!-- References -->
+	
+	<h2 rendered="#{! cluster.references.isEmpty()}">Depends Upon</h2>
+
+	<div class="row hostgroup services" rendered="#{! cluster.references.isEmpty()}">
+		<data-set var="check" value="#{cluster.references}">
+			<include view="include/check"/>
+		</data-set>
+	</div>
+	
+	<!-- Resources -->
+	
+	<h2 rendered="#{! cluster.resources.isEmpty()}">Resources</h2>
+
+	<div class="row hostgroup services" rendered="#{! cluster.resources.isEmpty()}">
+		<data-set var="check" value="#{cluster.resources}">
+			<include view="include/check"/>
+		</data-set>
+	</div>
+	
+	<!-- Configuration -->
+	
+	<h2>Configuration</h2>
+		
+	<div class="row">
+		<div class="col4 dash_icon">
+		    <h3>Contact</h3>
+			<data-set var="contact" value="#{cluster.allContacts}">
+				<p>
+					<span class="label">#{contact.displayName}</span>
+					<span class="value">&nbsp;</span>
+				</p>
+			</data-set>
+		</div>
+		<div class="col4 dash_icon">
+			<h3>Notifications</h3>
+			<p>
+				<span class="label wide">Notifications enabled</span>
+				<span class="value">#{if(cluster.notifications.enabled, 'yes', 'no')}</span>
+			</p>
+			<p>
+				<span class="label wide">Notification period</span>
+				<span class="value">#{coalesce(cluster.notifications.timePeriod.displayName, 'Not configured')}</span>
+			</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>XML</h3>
+			<pre>#{cluster.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function(){
+			setTimeout(function(){
+				window.location = window.location;
+			}, 30000);
+		});
+	</script>
+
+</fragment>

@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.bergamot.notification.engine.email.EmailEngine;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.queue.name.GenericKey;
@@ -134,19 +133,11 @@ public class NotifierCfg extends Configuration
         {
             // email engine with default templates
             this.engines.add(new NotificationEngineCfg(
-                    EmailEngine.class,
+                    "com.intrbiz.bergamot.notification.engine.email.EmailEngine",
                     new CfgParameter("mail.host", "127.0.0.1"),
                     new CfgParameter("mail.user", ""),
                     new CfgParameter("mail.password", ""),
-                    new CfgParameter("from", "bergamot@localhost"),
-                    new CfgParameter("service.alert.subject", EmailEngine.Templates.Service.Alert.SUBJECT),
-                    new CfgParameter("service.alert.content", EmailEngine.Templates.Service.Alert.CONTENT),
-                    new CfgParameter("service.recovery.subject", EmailEngine.Templates.Service.Recovery.SUBJECT),
-                    new CfgParameter("service.recovery.content", EmailEngine.Templates.Service.Recovery.CONTENT),
-                    new CfgParameter("host.alert.subject", EmailEngine.Templates.Host.Alert.SUBJECT),
-                    new CfgParameter("host.alert.content", EmailEngine.Templates.Host.Alert.CONTENT),
-                    new CfgParameter("host.recovery.subject", EmailEngine.Templates.Host.Recovery.SUBJECT),
-                    new CfgParameter("host.recovery.content", EmailEngine.Templates.Host.Recovery.CONTENT)
+                    new CfgParameter("from", "bergamot@localhost")
             ));
             
         }

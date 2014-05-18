@@ -1,0 +1,326 @@
+options {
+  STATIC = false;
+  UNICODE_INPUT = true;
+}
+
+PARSER_BEGIN(VirtualCheckExpressionParserInternal)
+
+package com.intrbiz.bergamot.virtual.parser;
+
+import com.intrbiz.bergamot.model.*;
+import com.intrbiz.bergamot.model.virtual.*;
+import com.intrbiz.bergamot.virtual.*;
+import java.util.*;
+
+@SuppressWarnings("all")
+public final class VirtualCheckExpressionParserInternal {
+
+}
+
+PARSER_END(VirtualCheckExpressionParserInternal)
+
+SKIP : { " " | "\t" | "\n" | "\r" | "\r\n" }
+TOKEN : 
+{
+    <LUUID        :  (<HEXCHAR>){8} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){12} >
+  | <XOR          : "^" | "xor" >
+  | <OR           : "||" | "|" | "or" >
+  | <AND          : "&&" | "&" | "and" >
+  | <NOT          : "!" | "not" >
+  | <STCOMP       : "(" >
+  | <EDCOMP       : ")" >
+  | <HOST         : "host" >
+  | <SERVICE      : "service" >
+  | <TRAP         : "trap" >
+  | <RESOURCE     : "resource" >
+  | <CLUSTER      : "cluster" >
+  | <LON          : "on" >
+  | <LBOOLEAN     : "true" | "TRUE" | "false" | "FALSE" > 
+  | <#HEXCHAR     : ["a"-"f","A"-"F","0"-"9"]> 
+  | <#ESCAPECHAR  : "\\" ["n","t","b","r","f","\\","'","\"", "/"] > 
+  | <#UESCAPECHAR : "\\u" <HEXCHAR><HEXCHAR><HEXCHAR><HEXCHAR> > 
+  | <LSTRING      : "\'" ( (~["\'","\\","\n","\r"]) | <ESCAPECHAR> | <UESCAPECHAR>)* "\'" >
+  | <QUOTE        : "\"" > : STRINGSTATE 
+}
+
+<STRINGSTATE> MORE  : { "\\" : ESCSTATE }
+<STRINGSTATE> TOKEN : { <ENDQUOTE : <QUOTE> > : DEFAULT | <CHAR : ~["\"","\\"]> }
+<ESCSTATE> TOKEN : { <CNTRLESC : ["\'","\\","/","b","f","n","r","t"]> : STRINGSTATE }
+<ESCSTATE> MORE  : { "u" : HEXSTATE }
+<HEXSTATE> TOKEN : { <#HEX : ["a"-"f","A"-"F","0"-"9"]> | <HEXESC : <HEX><HEX><HEX><HEX> > : STRINGSTATE }
+
+private UUID readUUID() : 
+{
+    Token t;
+}
+{
+    t = <LUUID>
+    { return UUID.fromString(t.image); }
+}
+
+private String readString() : 
+{
+    Token t;
+}
+{
+    t = <LSTRING>
+    { return t.image.substring(1, t.image.length() -1); }
+}
+
+private ValueOperator readHost(VirtualCheckExpressionParserContext c) :
+{
+    String name = null;
+    UUID id = null;
+    Host host = null;
+}
+{
+    ( 
+	<HOST>
+	(
+	    (
+		id = readUUID()
+		{ host = c.lookupHost(id); }
+	    ) |
+	    (
+		name = readString()
+		{ host = c.lookupHost(name); }
+	    )
+	    
+	)
+    )
+    { return new ValueOperator(host); }
+}
+
+private ValueOperator readService(VirtualCheckExpressionParserContext c) :
+{
+    String name = null;
+    String hostName = null;
+    UUID id = null;
+    Service service = null;
+    Host host = null;
+}
+{
+    ( 
+	<SERVICE>
+	(
+	    (
+		id = readUUID()
+		{ service = c.lookupService(id); }
+	    ) |
+	    (
+		name = readString()
+		(
+		    <LON>
+		    (<HOST>)?
+		    hostName = readString()
+		    { host = c.lookupHost(hostName); 
+		      service = c.lookupService(host, name); }
+		)?
+	    )
+	)
+    )
+    { return new ValueOperator(service); }
+}
+
+private ValueOperator readTrap(VirtualCheckExpressionParserContext c) :
+{
+    String name = null;
+    String hostName = null;
+    UUID id;
+    Trap trap = null;
+    Host host = null;
+}
+{
+    ( 
+	<TRAP>
+	(
+	    (
+		id = readUUID()
+		{ trap = c.lookupTrap(id); }
+	    ) |
+	    (
+		name = readString()
+		(
+		    <LON>
+		    (<HOST>)?
+		    hostName = readString()
+		    { host = c.lookupHost(hostName);
+		      trap = c.lookupTrap(host, name); }
+		)?
+	    )
+	)
+    )
+    { return new ValueOperator(trap); }
+}
+
+private ValueOperator readCluster(VirtualCheckExpressionParserContext c) :
+{
+    String name = null;
+    UUID id = null;
+    Cluster cluster = null;
+}
+{
+    ( 
+	<CLUSTER>
+	(
+	    (
+		id = readUUID()
+		{ cluster = c.lookupCluster(id); }
+	    ) |
+	    (
+		name = readString()
+		{ cluster = c.lookupCluster(name); }
+	    )
+	)
+    )
+    { return new ValueOperator(cluster); }
+}
+
+private ValueOperator readResource(VirtualCheckExpressionParserContext c) :
+{
+    String name = null;
+    String clusterName = null;
+    UUID id = null;
+    Cluster cluster = null;
+    Resource resource = null;
+}
+{
+    ( 
+	<RESOURCE>
+	(
+	    (
+		id = readUUID()
+		{ resource = c.lookupResource(id); }
+	    ) |
+	    (
+		name = readString()
+		(
+		    <LON>
+		    (<CLUSTER>)?
+		    clusterName = readString()
+		    { cluster = c.lookupCluster(clusterName);
+		      resource = c.lookupResource(cluster, name); }
+		)?
+	    )
+	)
+    )
+    { return new ValueOperator(null); }
+}
+
+private ValueOperator readCheck(VirtualCheckExpressionParserContext c) :
+{
+    ValueOperator check;
+}
+{
+    ( 
+    	check = readHost(c)          |
+    	check = readService(c)       |
+    	check = readTrap(c)          | 
+    	check = readCluster(c)       |
+    	check = readResource(c)
+    )
+    { return check; }
+}
+
+private VirtualCheckOperator readValue(VirtualCheckExpressionParserContext c) :
+{
+    VirtualCheckOperator value;
+}
+{
+    (
+	(
+	    <STCOMP> 
+	    value = readExpression(c) 
+	    <EDCOMP> 
+	    { value = new BracketOperator(value); }
+	) |
+	LOOKAHEAD(readCheck(c))   value = readCheck(c)
+    )
+    { return value; }
+}
+
+private VirtualCheckOperator readUnary(VirtualCheckExpressionParserContext c) :
+{
+    VirtualCheckOperator value;
+}
+{
+    (
+        <NOT>
+        value = readValue(c)
+    )
+    { return new NotOperator(value); }
+}
+
+private VirtualCheckOperator readOperator(VirtualCheckExpressionParserContext c) :
+{
+    VirtualCheckOperator operator;
+}
+{
+    (
+        operator = readValue(c) |
+        operator = readUnary(c)
+    )
+    { return operator; }
+}
+
+public VirtualCheckOperator readExpression(VirtualCheckExpressionParserContext c) :
+{
+    VirtualCheckOperator operator;
+}
+{
+    (
+	operator = readXorExpression(c)
+    )
+    { return operator; }
+}
+
+private VirtualCheckOperator readXorExpression(VirtualCheckExpressionParserContext c) :
+{
+    VirtualCheckOperator l;
+    VirtualCheckOperator r;
+}
+{
+    (
+	l = readOrExpression(c)
+	(
+	    <XOR>
+	    r = readOrExpression(c)
+	    { l = new XorOperator(l, r); }
+	)*
+    )
+    { return l; }
+}
+
+private VirtualCheckOperator readOrExpression(VirtualCheckExpressionParserContext c) :
+{
+    VirtualCheckOperator l;
+    VirtualCheckOperator r;
+}
+{
+    (
+	l = readAndExpression(c)
+	(
+	    <OR>
+	    r = readAndExpression(c)
+	    { l = new OrOperator(l, r); }
+	)*
+    )
+    { return l; }
+}
+
+private VirtualCheckOperator readAndExpression(VirtualCheckExpressionParserContext c) :
+{
+    VirtualCheckOperator l;
+    VirtualCheckOperator r;
+}
+{
+    (
+	l = readOperator(c)
+	(
+	    <AND>
+	    r = readOperator(c)
+	    {l = new AndOperator(l,r); }
+	)*
+    )
+    { return l; }
+}

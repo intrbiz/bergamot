@@ -1,0 +1,98 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Trap #{trap.displayName} on Host #{trap.host.displayName}">
+
+	<div class="row submenu pull-right">
+		<a rendered="#{trap.suppressed}"  href="/trap/unsuppress/#{trap.id}">Unsupress</a>
+		<a rendered="#{!trap.suppressed}" href="/trap/suppress/#{trap.id}">Supress</a>
+		<a rendered="#{trap.enabled}"     href="/trap/disable/#{trap.id}">Disable</a>
+		<a rendered="#{!trap.enabled}"    href="/trap/enable/#{trap.id}">Enable</a>
+	</div>
+
+	<div class="row">
+		<div class="col4 dash_icon">
+			<h3>
+				<span class="dash_img #{trap.state.status.toString().toLowerCase()}" title="The trap is #{trap.state.status.toString().toLowerCase()}">
+					<img src="/trap-icon.png" />
+				</span>
+				<span class="name">#{trap.displayName}</span>
+		    </h3>
+		    <p>
+			    <span class="label wide">Status: </span>
+			    <span class="value">#{trap.state.status.toString().substring(0,1) + trap.state.status.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Host: </span>
+			    <a href="/host/name/#{trap.host.name}">
+				    <span class="value">#{trap.host.displayName}</span>
+				</a>
+		    </p>
+		    <p>
+			    <span class="label wide">Attempt: </span>
+			    <span class="value">
+			    	<span>#{trap.state.attempt} of #{trap.currentAttemptThreshold}</span>
+			    	<span class="info" rendered="#{trap.state.transitioning}" title="The trap is changing state">Changing</span>
+			    	<span class="info" rendered="#{trap.state.hard}" title="The trap is in a steady state">Steady</span>
+			    </span>
+		    </p>
+		    <p>
+			    <span class="label wide">Suppressed: </span>
+			    <span class="value">#{if(trap.suppressed, 'yes', 'no')}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Enabled: </span>
+			    <span class="value">#{if(trap.enabled, 'yes', 'no')}</span>
+		    </p>		    
+		    <p>
+			    <span class="label wide">Last checked: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', trap.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime)}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Last state change: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', trap.state.lastStateChange)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastStateChange)}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Last status: </span>
+			    <span class="value">#{trap.state.lastHardStatus.toString().substring(0,1) + trap.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		    <p class="output">
+			    <span class="label wide">Output: </span>
+			    <span class="value">#{coalesce(trap.state.output, '')}</span>
+		    </p>
+		</div>
+	</div>
+	
+	<h2>Configuration</h2>
+	
+	<div class="row">
+		<div class="col4 dash_icon">
+			<h3>Contacts</h3>
+			<data-set var="contact" value="#{trap.allContacts}">
+				<p>
+					<span class="label wide">#{contact.displayName}</span>
+					<span class="value">&nbsp;</span>
+				</p>
+			</data-set>
+		</div>
+		<div class="col4 dash_icon">
+			<h3>Notifications</h3>
+			<p>
+				<span class="label wide">Notifications enabled</span>
+				<span class="value">#{if(trap.notifications.enabled, 'yes', 'no')}</span>
+			</p>
+			<p>
+				<span class="label wide">Notification period</span>
+				<span class="value">#{coalesce(trap.notifications.timePeriod.displayName, 'Not configured')}</span>
+			</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>XML</h3>
+			<pre>#{trap.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+</fragment>

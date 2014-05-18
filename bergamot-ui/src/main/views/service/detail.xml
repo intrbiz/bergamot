@@ -15,7 +15,7 @@
 		<div class="col4 dash_icon">
 			<h3>
 				<span class="dash_img #{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
-					<img src="/applications-system.png" />
+					<img src="/service-icon.png" />
 				</span>
 				<span class="name">#{service.displayName}</span>
 		    </h3>
@@ -28,10 +28,6 @@
 			    <a href="/host/name/#{service.host.name}">
 				    <span class="value">#{service.host.displayName}</span>
 				</a>
-		    </p>
-		    <p class="output">
-			    <span class="label wide">Output: </span>
-			    <span class="value">#{coalesce(service.state.output, '')}</span>
 		    </p>
 		    <p>
 			    <span class="label wide">Attempt: </span>
@@ -48,7 +44,7 @@
 		    <p>
 			    <span class="label wide">Enabled: </span>
 			    <span class="value">#{if(service.enabled, 'yes', 'no')}</span>
-		    </p>		    
+		    </p>
 		    <p>
 			    <span class="label wide">Last checked: </span>
 			    <span class="value">#{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}</span>
@@ -61,6 +57,10 @@
 			    <span class="label wide">Last status: </span>
 			    <span class="value">#{service.state.lastHardStatus.toString().substring(0,1) + service.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
 		    </p>
+		    <p class="output">
+			    <span class="label wide">Output: </span>
+			    <span class="value">#{coalesce(service.state.output, '')}</span>
+		    </p>
 		</div>
 	</div>
 	
@@ -69,7 +69,7 @@
 	<div class="row">
 		<div class="col4 dash_icon">
 			<h3>Contacts</h3>
-			<data-set var="contact" value="#{service.contacts}">
+			<data-set var="contact" value="#{service.allContacts}">
 				<p>
 					<span class="label wide">#{contact.displayName}</span>
 					<span class="value">&nbsp;</span>
@@ -95,11 +95,11 @@
 			<h3>Notifications</h3>
 			<p>
 				<span class="label wide">Notifications enabled</span>
-				<span class="value">#{if(service.notificationsEnabled, 'yes', 'no')}</span>
+				<span class="value">#{if(service.notifications.enabled, 'yes', 'no')}</span>
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(service.notificationPeriod.displayName, 'Not configured')}</span>
+				<span class="value">#{coalesce(service.notifications.timePeriod.displayName, 'Not configured')}</span>
 			</p>
 		</div>
 	</div>
@@ -136,17 +136,17 @@
 			<h3>Command</h3>
 			<p>
 				<span class="label wide">Command Engine: </span>
-				<span class="value">#{service.checkCommand.command.engine}</span>
+				<span class="value">#{service.checkCommand.engine}</span>
 			</p>
 			<p>
 				<span class="label wide">Command Name: </span>
-				<span class="value">#{service.checkCommand.command.name}</span>
+				<span class="value">#{service.checkCommand.name}</span>
 			</p>
 			<p>
 				<span class="label wide">Parameters:</span>
 				<span class="value">&nbsp;</span>
 			</p>
-			<data-set var="parameter" value="#{service.createExecuteCheck().parameters}">
+			<data-set var="parameter" value="#{service.checkCommand.parameters}">
 				<p>
 					<span class="label wide indent">#{parameter.name}: </span>
 					<span class="value">#{parameter.value}</span>
@@ -154,5 +154,20 @@
 			</data-set>
 		</div>
 	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>XML</h3>
+			<pre>#{service.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+		$(document).ready(function(){
+			setTimeout(function(){
+				window.location = window.location;
+			}, 30000);
+		});
+	</script>
 	
 </fragment>

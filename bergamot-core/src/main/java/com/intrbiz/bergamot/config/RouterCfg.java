@@ -14,9 +14,9 @@ public class RouterCfg extends Configuration
         super();
     }
     
-    public RouterCfg(Class<?> routerClass)
+    public RouterCfg(String routerClass)
     {
         super();
-        this.setClassname(routerClass.getName());
+        this.setClassname(routerClass);
     }
 }

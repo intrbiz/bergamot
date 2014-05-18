@@ -6,17 +6,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.model.ContactGroup;
+import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
-import com.intrbiz.bergamot.model.HostGroup;
 import com.intrbiz.bergamot.model.Location;
+import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.ServiceGroup;
+import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
+import com.intrbiz.bergamot.model.Trap;
 
 /**
  * Default, in-memory store of Bergamot objects: host, services, etc
@@ -27,13 +30,13 @@ public class ObjectStore
     
     private Map<UUID, Host> hostsById = new TreeMap<UUID, Host>();
     
-    private Map<String, HostGroup> hostGroups = new TreeMap<String, HostGroup>();
-    
-    private Map<String, ServiceGroup> serviceGroups = new TreeMap<String, ServiceGroup>();
+    private Map<String, Group> groups = new TreeMap<String, Group>();
     
     private Map<String, Command> commands = new TreeMap<String, Command>();
     
     private Map<UUID, Service> services = new TreeMap<UUID, Service>();
+    
+    private Map<UUID, Trap> traps = new TreeMap<UUID, Trap>();
     
     private Map<String, TimePeriod> timePeriods = new TreeMap<String, TimePeriod>();
     
@@ -41,9 +44,15 @@ public class ObjectStore
     
     private Map<String, Location> locations = new TreeMap<String, Location>();
     
-    private Map<String, ContactGroup> contactGroups = new TreeMap<String, ContactGroup>();
+    private Map<String, Team> teams = new TreeMap<String, Team>();
     
     private Map<String, Contact> contacts = new TreeMap<String, Contact>();
+    
+    private Map<UUID, Resource> resources = new TreeMap<UUID, Resource>();
+    
+    private Map<String, Cluster> clusters = new TreeMap<String, Cluster>();
+    
+    private Map<UUID, Cluster> clustersById = new TreeMap<UUID, Cluster>();
 
     public ObjectStore()
     {
@@ -78,48 +87,31 @@ public class ObjectStore
         return this.hosts.values();
     }
     
-    // hostgroups
+    // groups
     
-    public HostGroup lookupHostgroup(String name)
+    public Group lookupGroup(String name)
     {
-        return this.hostGroups.get(name);
+        return this.groups.get(name);
     }
 
-    public void addHostgroup(HostGroup hostGroup)
+    public void addGroup(Group group)
     {
-        this.hostGroups.put(hostGroup.getName(), hostGroup);
+        this.groups.put(group.getName(), group);
     }
 
-    public boolean containsHostgroup(String hostgroup)
+    public boolean containsGroup(String group)
     {
-        return this.hostGroups.containsKey(hostgroup);
+        return this.groups.containsKey(group);
     }
 
-    public Collection<HostGroup> getHostgroups()
+    public Collection<Group> getGroups()
     {
-        return this.hostGroups.values();
+        return this.groups.values();
     }
     
-    // servicegroups
-    
-    public ServiceGroup lookupServicegroup(String name)
+    public Set<Group> getRootGroups()
     {
-        return this.serviceGroups.get(name);
-    }
-
-    public void addServicegroup(ServiceGroup serviceGroup)
-    {
-        this.serviceGroups.put(serviceGroup.getName(), serviceGroup);
-    }
-
-    public boolean containsServicegroup(String servicegroup)
-    {
-        return this.serviceGroups.containsKey(servicegroup);
-    }
-
-    public Collection<ServiceGroup> getServicegroups()
-    {
-        return this.serviceGroups.values();
+        return this.groups.values().stream().filter((e) -> {return e.getParents().isEmpty();}).collect(Collectors.toSet());
     }
     
     // services
@@ -172,6 +164,8 @@ public class ObjectStore
     {
         if ("service".equals(type))
             return this.lookupService(id);
+        if ("trap".equals(type))
+            return this.lookupTrap(id);
         if ("host".equals(type))
             return this.lookupHost(id);
         return null;
@@ -184,9 +178,9 @@ public class ObjectStore
         return this.hosts.size();
     }
     
-    public int getHostgroupCount()
+    public int getGroupCount()
     {
-        return this.hostGroups.size();
+        return this.groups.size();
     }
     
     public int getServiceCount()
@@ -194,9 +188,9 @@ public class ObjectStore
         return this.services.size();
     }
     
-    public int getServicegroupCount()
+    public int getTrapCount()
     {
-        return this.serviceGroups.size();
+        return this.services.size();
     }
     
     public int getCommandCount()
@@ -214,14 +208,24 @@ public class ObjectStore
         return this.locations.size();
     }
     
-    public int getContactGroupsCount()
+    public int getTeamCount()
     {
-        return this.contactGroups.size();
+        return this.teams.size();
     }
     
     public int getContactsCount()
     {
         return this.contacts.size();
+    }
+    
+    public int getResourcesCount()
+    {
+        return this.contacts.size();
+    }
+    
+    public int getClustersCount()
+    {
+        return this.clusters.size();
     }
     
     // recent
@@ -285,26 +289,26 @@ public class ObjectStore
         return this.locations.values();
     }
     
-    // contact groups
+    // teams
     
-    public ContactGroup lookupContactGroup(String contactGroup)
+    public Team lookupTeam(String contactGroup)
     {
-        return this.contactGroups.get(contactGroup);
+        return this.teams.get(contactGroup);
     }
 
-    public void addContactGroup(ContactGroup contactGroup)
+    public void addTeam(Team team)
     {
-        this.contactGroups.put(contactGroup.getName(), contactGroup);
+        this.teams.put(team.getName(), team);
     }
 
-    public boolean containsContactGroup(String contactGroup)
+    public boolean containsTeam(String contactGroup)
     {
-        return this.contactGroups.containsKey(contactGroup);
+        return this.teams.containsKey(contactGroup);
     }
 
-    public Collection<ContactGroup> getContactGroups()
+    public Collection<Team> getTeams()
     {
-        return this.contactGroups.values();
+        return this.teams.values();
     }
     
     // contacts
@@ -329,13 +333,85 @@ public class ObjectStore
         return this.contacts.values();
     }
     
-    public Collection<Location> getRootLocations()
+    // resources
+    
+    public Resource lookupResource(UUID id)
     {
-        Set<Location> locations = new HashSet<Location>();
-        for (Location location : this.getLocations())
-        {
-            if (location.getLocation() == null) locations.add(location);
-        }
-        return locations;
+        return this.resources.get(id);
+    }
+
+    public void addResource(Resource resource)
+    {
+        this.resources.put(resource.getId(), resource);
+    }
+
+    public boolean containsResource(UUID id)
+    {
+        return this.resources.containsKey(id);
+    }
+
+    public Collection<Resource> getResources()
+    {
+        return this.resources.values();
+    }
+    
+    // traps
+    
+    public Trap lookupTrap(UUID id)
+    {
+        return this.traps.get(id);
+    }
+
+    public void addTrap(Trap trap)
+    {
+        this.traps.put(trap.getId(), trap);
+    }
+
+    public boolean containsTrap(UUID id)
+    {
+        return this.traps.containsKey(id);
+    }
+
+    public Collection<Trap> getTraps()
+    {
+        return this.traps.values();
+    }
+    
+    // clusters
+
+    public Cluster lookupCluster(String name)
+    {
+        return this.clusters.get(name);
+    }
+    
+    public Cluster lookupCluster(UUID id)
+    {
+        return this.clustersById.get(id);
+    }
+
+    public void addCluster(Cluster cluster)
+    {
+        this.clusters.put(cluster.getName(), cluster);
+        this.clustersById.put(cluster.getId(), cluster);
+    }
+
+    public boolean containsCluster(String name)
+    {
+        return this.clusters.containsKey(name);
+    }
+    
+    public boolean containsCluster(UUID id)
+    {
+        return this.clustersById.containsKey(id);
+    }
+
+    public Collection<Cluster> getClusters()
+    {
+        return this.clusters.values();
+    }
+    
+    public Set<Location> getRootLocations()
+    {
+        return this.locations.values().stream().filter((e) -> {return e.getLocation() == null;}).collect(Collectors.toSet());
     }
 }

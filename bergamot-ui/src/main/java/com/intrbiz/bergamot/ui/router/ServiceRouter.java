@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.bergamot.Bergamot;
+import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -20,6 +21,15 @@ public class ServiceRouter extends Router
     private Bergamot getBergamot()
     {
         return ((BergamotApp) this.app()).getBergamot();
+    }
+    
+    @Any("/name/:host/:service")
+    public void service(String hostName, String serviceName)
+    {
+        Bergamot bergamot = this.getBergamot();
+        Host host = bergamot.getObjectStore().lookupHost(hostName);
+        model("service", host.getService(serviceName));
+        encode("service/detail");
     }
     
     @Any("/id/:id")
@@ -39,7 +49,7 @@ public class ServiceRouter extends Router
         if (service != null)
         {
             // build the check and dispatch it
-            ExecuteCheck executeCheck = service.createExecuteCheck();
+            ExecuteCheck executeCheck = service.executeCheck();
             if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
         }
         redirect("/service/id/" + id);

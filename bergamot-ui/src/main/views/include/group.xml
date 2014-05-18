@@ -1,0 +1,27 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+	<a href="/group/name/#{group.name}">
+		<div class="col3 dash_icon">
+		    <h3>
+				<span class="dash_img #{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">
+					<img src="/group-icon.png" />
+				</span>
+				<span class="name">#{group.displayName}</span>
+		    </h3>
+		    <p>
+			    <span class="label">OK: </span>
+			    <span class="value">#{group.state.okCount}</span>
+		    </p>
+		    <p>
+			    <span class="label">Warning: </span>
+			    <span class="value">#{group.state.warningCount}</span>
+		    </p>
+		    <p>
+			    <span class="label">Critical: </span>
+			    <span class="value">#{group.state.criticalCount}</span>
+		    </p>
+		</div>
+	</a>
+</fragment>

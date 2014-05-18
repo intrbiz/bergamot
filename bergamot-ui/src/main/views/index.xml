@@ -5,44 +5,7 @@
 
 		<div class="row">
 			<data-set var="check" value="#{alerts}">
-				<a href="/#{check.type}/id/#{check.id}">
-					<div class="col3 dash_icon">
-						<h3>
-							<span class="dash_img #{check.state.status.toString().toLowerCase()}" title="The service is #{check.state.status.toString().toLowerCase()}">
-								<img src="/applications-system.png" />
-							</span>
-							<span class="name">#{check.displayName}</span>
-					    </h3>
-					    <p>
-						    <span class="label">Status: </span>
-						    <span class="value">#{check.state.status.toString().substring(0,1) + check.state.status.toString().substring(1).toLowerCase()}</span>
-					    </p>
-					    <p>
-						    <span class="label">Attempt: </span>
-						    <span class="value">
-						    	<span>#{check.state.attempt} of #{check.currentAttemptThreshold}</span>
-						    	<span class="info" rendered="#{check.state.transitioning}" title="The #{check.type} is changing state">Changing</span>
-						    	<span class="info" rendered="#{check.state.hard}" title="The #{check.type} is in a steady state">Steady</span>
-						    </span>
-					    </p>
-					    <p rendered="#{check.type == 'service'}">
-						    <span class="label">Host: </span>
-						    <span class="value">#{check.host.displayName}</span>
-					    </p>
-						<p>
-						    <span class="label">Last checked: </span>
-					    	<span class="value">#{dateformat('HH:mm:ss', check.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', check.state.lastCheckTime)}</span>
-				    	</p>
-						<p class="output">
-							<span class="label">Output: </span>
-							<span class="value">#{coalesce(check.state.output, '')}</span>
-						</p>
-						<p rendered="#{check.type != 'service'}">
-							<span class="label">&nbsp;</span>
-							<span class="value">&nbsp;</span>
-						</p>
-					</div>
-				</a>
+				<include view="include/check"/>
 			</data-set>
 		</div>
 		
