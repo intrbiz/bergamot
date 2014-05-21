@@ -8,7 +8,7 @@ import com.intrbiz.configuration.Configurable;
 /**
  * The real world manifestation of a passive check
  */
-public class Trap extends PassiveCheck implements Configurable<TrapCfg>
+public class Trap extends PassiveCheck<TrapMO> implements Configurable<TrapCfg>
 {
     private Host host;
     
@@ -25,7 +25,7 @@ public class Trap extends PassiveCheck implements Configurable<TrapCfg>
         this.config = cfg;
         TrapCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
         this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
         this.enabled = rcfg.getEnabledBooleanValue();
@@ -66,11 +66,14 @@ public class Trap extends PassiveCheck implements Configurable<TrapCfg>
     }
 
     @Override
-    public TrapMO toMO()
+    public TrapMO toMO(boolean stub)
     {
         TrapMO mo = new TrapMO();
-        super.toMO(mo);
-        mo.setHost(this.getHost().toMO());
+        super.toMO(mo, stub);
+        if (! stub)
+        {
+            mo.setHost(this.getHost().toStubMO());
+        }
         return mo;
     }
 }

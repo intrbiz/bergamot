@@ -3,9 +3,11 @@ package com.intrbiz.bergamot.model;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CommandCfg;
+import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.model.util.Parameterised;
 import com.intrbiz.configuration.CfgParameter;
@@ -14,7 +16,7 @@ import com.intrbiz.configuration.Configurable;
 /**
  * The definition of a command which is used to check something
  */
-public class Command extends NamedObject implements Parameterised, Configurable<CommandCfg>
+public class Command extends NamedObject<CommandMO> implements Parameterised, Configurable<CommandCfg>
 {
     private String engine;
 
@@ -35,7 +37,7 @@ public class Command extends NamedObject implements Parameterised, Configurable<
         CommandCfg rcfg = cfg.resolve();
         this.engine = rcfg.getEngine();
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         // load the parameters
         for (CfgParameter cp : rcfg.getParameters())
         {
@@ -148,5 +150,15 @@ public class Command extends NamedObject implements Parameterised, Configurable<
         }
         else if (!name.equals(other.name)) return false;
         return true;
+    }
+    
+    @Override
+    public CommandMO toMO(boolean stub)
+    {
+        CommandMO mo = new CommandMO();
+        super.toMO(mo, stub);
+        mo.setEngine(this.getEngine());
+        mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
+        return mo;
     }
 }

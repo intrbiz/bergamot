@@ -5,14 +5,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.model.message.VirtualCheckMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 
 /**
  * An something which should be checked
  */
-public abstract class Check extends NamedObject
+public abstract class Check<T extends CheckMO> extends NamedObject<T>
 {
     /**
      * The state of this check
@@ -32,7 +34,7 @@ public abstract class Check extends NamedObject
     /**
      * Checks which reference (are dependent upon) this check
      */
-    protected Set<VirtualCheck> referencedBy = new HashSet<VirtualCheck>();
+    protected Set<VirtualCheck<? extends VirtualCheckMO>> referencedBy = new HashSet<VirtualCheck<? extends VirtualCheckMO>>();
 
     /**
      * The contacts who should be notified
@@ -86,17 +88,17 @@ public abstract class Check extends NamedObject
         this.enabled = enabled;
     }
 
-    public Set<VirtualCheck> getReferencedBy()
+    public Set<VirtualCheck<? extends VirtualCheckMO>> getReferencedBy()
     {
         return referencedBy;
     }
 
-    public void setReferencedBy(Set<VirtualCheck> referencedBy)
+    public void setReferencedBy(Set<VirtualCheck<? extends VirtualCheckMO>> referencedBy)
     {
         this.referencedBy = referencedBy;
     }
 
-    public void addReferencedBy(VirtualCheck referencedBy)
+    public void addReferencedBy(VirtualCheck<? extends VirtualCheckMO> referencedBy)
     {
         this.referencedBy.add(referencedBy);
     }
@@ -172,17 +174,19 @@ public abstract class Check extends NamedObject
         this.groups.put(group.getName(), group);
     }
 
-    protected void toMO(CheckMO mo)
+    protected void toMO(CheckMO mo, boolean stub)
     {
-        super.toMO(mo);
+        super.toMO(mo, stub);
         mo.setEnabled(this.isEnabled());
         mo.setState(this.getState().toMO());
         mo.setSuppressed(this.isSuppressed());
+        if (! stub)
+        {
+            mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));
+            mo.setContacts(this.getContacts().stream().map(Contact::toStubMO).collect(Collectors.toList()));
+            mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
+            mo.setReferencedBy(this.getReferencedBy().stream().map(VirtualCheck::toStubMO).collect(Collectors.toList()));
+            mo.setNotifications(this.getNotifications().toMO());
+        }
     }
-
-    /**
-     * Get the MessageObject of this check
-     */
-    public abstract CheckMO toMO();
-
 }

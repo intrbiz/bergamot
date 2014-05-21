@@ -12,8 +12,11 @@ public abstract class NamedObjectMO extends MessageObject
     @JsonProperty("name")
     protected String name;
  
-    @JsonProperty("display_name")
-    protected String displayName;
+    @JsonProperty("summary")
+    protected String summary;
+    
+    @JsonProperty("description")
+    protected String description;
     
     public NamedObjectMO()
     {
@@ -40,13 +43,23 @@ public abstract class NamedObjectMO extends MessageObject
         this.name = name;
     }
 
-    public String getDisplayName()
+    public String getSummary()
     {
-        return displayName;
+        return summary;
     }
 
-    public void setDisplayName(String displayName)
+    public void setSummary(String summary)
     {
-        this.displayName = displayName;
+        this.summary = summary;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 }

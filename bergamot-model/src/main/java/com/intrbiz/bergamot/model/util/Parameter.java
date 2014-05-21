@@ -2,13 +2,15 @@ package com.intrbiz.bergamot.model.util;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.intrbiz.bergamot.model.BergamotObject;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
 @JsonTypeName("bergamot.parameter")
-public class Parameter
+public class Parameter extends BergamotObject<ParameterMO>
 {
     @JsonProperty("name")
     private String name;
@@ -59,5 +61,11 @@ public class Parameter
         {
             return new Parameter(parameter, null);
         }
+    }
+    
+    @Override
+    public ParameterMO toMO(boolean stub)
+    {
+        return new ParameterMO(this.getName(), this.getValue());
     }
 }

@@ -1,20 +1,27 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="#{group.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="#{group.summary}">
 
-	<h2 rendered="#{! isempty(checks)}">Checks in #{group.displayName}</h2>
+	<h2 rendered="#{! isempty(checks)}">Checks in #{group.summary}</h2>
 	<div class="row" rendered="#{! isempty(checks)}">
 		<data-set var="check" value="#{checks}">
 			<include view="include/check"/>
 		</data-set>
 	</div>
 	
-	<h2 rendered="#{! isempty(groups)}">Groups in #{group.displayName}</h2>
+	<h2 rendered="#{! isempty(groups)}">Groups in #{group.summary}</h2>
 	<div class="row" rendered="#{! isempty(groups)}">
 		<data-set var="group" value="#{groups}">
 			<include view="include/group"/>
 		</data-set>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>JSON</h3>
+			<pre>#{group.toJSON()}</pre>
+		</div>
 	</div>
 	
 	<script type="text/javascript">

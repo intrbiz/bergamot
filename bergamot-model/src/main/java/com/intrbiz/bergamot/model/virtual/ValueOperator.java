@@ -7,20 +7,20 @@ import com.intrbiz.bergamot.model.Status;
 
 public class ValueOperator extends VirtualCheckOperator
 {
-    private final Check check;
+    private final Check<?> check;
     
-    public ValueOperator(Check check)
+    public ValueOperator(Check<?> check)
     {
         super();
         this.check = check;
     }
     
-    public Check getCheck()
+    public Check<?> getCheck()
     {
         return this.check;
     }
     
-    public void computeDependencies(Set<Check> checks)
+    public void computeDependencies(Set<Check<?>> checks)
     {
         checks.add(this.check);
     }

@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.intrbiz.bergamot.compat.config.builder.metadata.ParameterName;
 import com.intrbiz.bergamot.compat.config.builder.metadata.TypeName;
-import com.intrbiz.bergamot.compat.config.parser.model.ObjectParameter;
-import com.intrbiz.bergamot.model.util.Parameter;
 
 @TypeName("service")
 public class NagiosServiceCfg extends ConfigObject<NagiosServiceCfg>
@@ -88,10 +86,6 @@ public class NagiosServiceCfg extends ConfigObject<NagiosServiceCfg>
     private String iconImage;
 
     private String iconImageAlt;
-
-    // extended
-
-    private List<Parameter> checkParameters;
 
     public NagiosServiceCfg()
     {
@@ -749,25 +743,6 @@ public class NagiosServiceCfg extends ConfigObject<NagiosServiceCfg>
         });
     }
     
-    
-
-    // extended
-    
-    public List<Parameter> getCheckParameters()
-    {
-        return checkParameters;
-    }
-
-    public void setCheckParameters(List<Parameter> checkParameters)
-    {
-        this.checkParameters = checkParameters;
-    }
-    
-    public List<Parameter> resolveCheckParameters()
-    {
-        return this.resolveProperty((p) -> { return p.getCheckParameters(); });
-    }
-    
     public Boolean resolveObsessOverService()
     {
         return this.resolveProperty((p) -> { return p.isObsessOverService(); });
@@ -811,19 +786,6 @@ public class NagiosServiceCfg extends ConfigObject<NagiosServiceCfg>
     public Boolean resolveVolatile()
     {
         return this.resolveProperty((p) -> { return p.isVolatile(); });
-    }
-
-    @Override
-    public boolean unhandledObjectParameter(ObjectParameter parameter)
-    {
-        if ("check_parameter".equals(parameter.getName()))
-        {
-            if (this.checkParameters == null) this.checkParameters = new LinkedList<Parameter>();
-            System.out.println("Got check_parameter: " + parameter.getValue());
-            this.checkParameters.add(Parameter.parse(parameter.getValue()));
-            return true;
-        }
-        return super.unhandledObjectParameter(parameter);
     }
 
     public String toString()

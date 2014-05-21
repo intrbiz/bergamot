@@ -10,7 +10,7 @@ import com.intrbiz.configuration.Configurable;
 /**
  * Some software service running on a host which needs to be checked
  */
-public class Service extends ActiveCheck implements Configurable<ServiceCfg>
+public class Service extends ActiveCheck<ServiceMO> implements Configurable<ServiceCfg>
 {
     private Host host;
 
@@ -28,7 +28,7 @@ public class Service extends ActiveCheck implements Configurable<ServiceCfg>
         ServiceCfg rcfg = cfg.resolve();
         //
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
         this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
         this.checkInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getEvery());
@@ -71,7 +71,7 @@ public class Service extends ActiveCheck implements Configurable<ServiceCfg>
 
     public String toString()
     {
-        return "Service (" + this.id + ") " + this.name + " on host " + this.getHost().getName() + " check " + this.checkCommand;
+        return "Service (" + this.id + ") " + this.name + " on host " + this.getHost().getName() + " check " + this.command;
     }
 
     @Override
@@ -99,11 +99,14 @@ public class Service extends ActiveCheck implements Configurable<ServiceCfg>
     }
 
     @Override
-    public ServiceMO toMO()
+    public ServiceMO toMO(boolean stub)
     {
         ServiceMO mo = new ServiceMO();
-        super.toMO(mo);
-        mo.setHost(this.getHost().toMO());
+        super.toMO(mo, stub);
+        if (! stub)
+        {
+            mo.setHost(this.getHost().toStubMO());
+        }
         return mo;
     }
 }

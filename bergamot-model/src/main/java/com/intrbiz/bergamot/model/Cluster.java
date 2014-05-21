@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
@@ -13,7 +14,7 @@ import com.intrbiz.configuration.Configurable;
 /**
  * A cluster of resources spanning many hosts
  */
-public class Cluster extends VirtualCheck implements Configurable<ClusterCfg>
+public class Cluster extends VirtualCheck<ClusterMO> implements Configurable<ClusterCfg>
 {
     private Map<String, Resource> resources = new TreeMap<String, Resource>();
     
@@ -31,7 +32,7 @@ public class Cluster extends VirtualCheck implements Configurable<ClusterCfg>
         ClusterCfg rcfg = cfg.resolve();
         //
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
         // initial state
@@ -90,10 +91,14 @@ public class Cluster extends VirtualCheck implements Configurable<ClusterCfg>
     }
 
     @Override
-    public ClusterMO toMO()
+    public ClusterMO toMO(boolean stub)
     {
         ClusterMO mo = new ClusterMO();
-        super.toMO(mo);
+        super.toMO(mo, stub);
+        if (! stub)
+        {
+            mo.setResources(this.getResources().stream().map(Resource::toStubMO).collect(Collectors.toList()));
+        }
         return mo;
     }
     

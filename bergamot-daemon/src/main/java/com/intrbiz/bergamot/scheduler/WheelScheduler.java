@@ -258,14 +258,14 @@ public class WheelScheduler extends AbstractScheduler
         // balance the tasks over a start up window
         this.currentInitialDelay += this.startUpStepPeriod;
         long initialDelay = this.currentInitialDelay % this.startUpPeriod;
-        this.scheduleJob(check.getId(), check.getCurrentInterval(), initialDelay, check.getCheckPeriod(), new CheckRunner(check));
+        this.scheduleJob(check.getId(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
     }
 
     @Override
     public void reschedule(ActiveCheck check)
     {
         logger.info("Rescheduling " + check + " with interval " + check.getCurrentInterval());
-        this.rescheduleJob(check.getId(), check.getCurrentInterval(), check.getCheckPeriod());
+        this.rescheduleJob(check.getId(), check.getCurrentInterval(), check.getTimePeriod());
     }
 
     @Override

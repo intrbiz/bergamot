@@ -8,16 +8,15 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.task.Task;
-import com.intrbiz.bergamot.model.util.Parameter;
-import com.intrbiz.bergamot.model.util.Parameterised;
 
 /**
  * Execute this check please
  */
 @JsonTypeName("bergamot.execute_check")
-public class ExecuteCheck extends Task implements Parameterised
+public class ExecuteCheck extends Task
 {    
     @JsonProperty("check_type")
     private String checkType;
@@ -26,7 +25,7 @@ public class ExecuteCheck extends Task implements Parameterised
     private UUID checkId;
 
     @JsonProperty("parameters")
-    private List<Parameter> parameters = new LinkedList<Parameter>();
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
 
     @JsonProperty("timeout")
     private long timeout = 30_000L;
@@ -65,19 +64,19 @@ public class ExecuteCheck extends Task implements Parameterised
         this.checkId = checkId;
     }
 
-    public List<Parameter> getParameters()
+    public List<ParameterMO> getParameters()
     {
         return parameters;
     }
 
-    public void setParameters(List<Parameter> parameters)
+    public void setParameters(List<ParameterMO> parameters)
     {
         this.parameters = parameters;
     }
 
     public void addParameter(String name, String value)
     {
-        this.parameters.add(new Parameter(name, value));
+        this.parameters.add(new ParameterMO(name, value));
     }
 
     public void setParameter(String name, String value)
@@ -88,7 +87,7 @@ public class ExecuteCheck extends Task implements Parameterised
 
     public void removeParameter(String name)
     {
-        for (Iterator<Parameter> i = this.parameters.iterator(); i.hasNext();)
+        for (Iterator<ParameterMO> i = this.parameters.iterator(); i.hasNext();)
         {
             if (name.equals(i.next().getName()))
             {
@@ -110,7 +109,7 @@ public class ExecuteCheck extends Task implements Parameterised
 
     public String getParameter(String name, String defaultValue)
     {
-        for (Parameter parameter : this.parameters)
+        for (ParameterMO parameter : this.parameters)
         {
             if (name.equals(parameter.getName())) return parameter.getValue();
         }

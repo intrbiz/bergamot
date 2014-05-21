@@ -7,20 +7,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Notifications
+import com.intrbiz.Util;
+import com.intrbiz.bergamot.model.message.NotificationsMO;
+
+public class Notifications extends BergamotObject<NotificationsMO>
 {
     private boolean enabled = true;
-    
+
     private TimePeriod timePeriod;
 
     private List<NotificationEngine> engines = new LinkedList<NotificationEngine>();
-    
+
     private boolean alertsEnabled = true;
-    
+
     private boolean recoveryEnabled = true;
-    
+
     private Set<Status> ignore = new HashSet<Status>();
-    
+
     private boolean allEnginesEnabled = true;
 
     public Notifications()
@@ -37,7 +40,7 @@ public class Notifications
     {
         this.engines = engines;
     }
-    
+
     public void addEngine(NotificationEngine engine)
     {
         this.engines.add(engine);
@@ -92,9 +95,7 @@ public class Notifications
     {
         this.ignore = ignore;
     }
-    
-    
-    
+
     public boolean isAllEnginesEnabled()
     {
         return allEnginesEnabled;
@@ -107,31 +108,40 @@ public class Notifications
 
     public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
     {
-        return this.enabled && 
-               this.isNotificationTypeEnabled(type) &&
-               (! this.isStatusIgnored(status)) &&
-               (this.timePeriod == null ? true : this.timePeriod.isInTimeRange(time)) &&
-               (this.allEnginesEnabled || this.engines.stream().anyMatch((e) -> {return e.isEnabledAt(type, status, time);}));
+        return this.enabled && this.isNotificationTypeEnabled(type) && (!this.isStatusIgnored(status)) && (this.timePeriod == null ? true : this.timePeriod.isInTimeRange(time)) && (this.allEnginesEnabled || this.engines.stream().anyMatch((e) -> {return e.isEnabledAt(type, status, time);}));
     }
-    
+
     private boolean isStatusIgnored(Status status)
     {
         return this.ignore.stream().anyMatch((e) -> {return e == status;});
     }
-    
+
     private boolean isNotificationTypeEnabled(NotificationType type)
     {
-        return (type == NotificationType.ALERT && this.alertsEnabled) || 
-               (type == NotificationType.RECOVERY && this.recoveryEnabled);
+        return (type == NotificationType.ALERT && this.alertsEnabled) || (type == NotificationType.RECOVERY && this.recoveryEnabled);
     }
-    
+
     public Set<String> getEnginesEnabledAt(NotificationType type, Status status, Calendar time)
     {
         return this.engines.stream().filter((e) -> {return e.isEnabledAt(type, status, time);}).map(NotificationEngine::getEngine).collect(Collectors.toSet());
     }
-    
+
     public boolean isEngineEnabledAt(NotificationType type, Status status, Calendar time, String engine)
     {
         return this.engines.stream().filter((e) -> {return engine.equals(e.getEngine());}).anyMatch((e) -> {return e.isEnabledAt(type, status, time);});
+    }
+
+    @Override
+    public NotificationsMO toMO(boolean stub)
+    {
+        NotificationsMO mo = new NotificationsMO();
+        mo.setEnabled(this.isEnabled());
+        mo.setAlertsEnabled(this.isAlertsEnabled());
+        mo.setAllEnginesEnabled(this.isAllEnginesEnabled());
+        mo.setIgnore(this.getIgnore().stream().map(Status::toString).collect(Collectors.toSet()));
+        mo.setRecoveryEnabled(this.isRecoveryEnabled());
+        mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
+        mo.setEngines(this.getEngines().stream().map(NotificationEngine::toMO).collect(Collectors.toList()));
+        return mo;
     }
 }

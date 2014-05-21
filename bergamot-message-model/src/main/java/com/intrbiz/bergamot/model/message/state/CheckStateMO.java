@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.state.check")
@@ -14,7 +13,7 @@ public class CheckStateMO extends MessageObject
     private boolean ok;
 
     @JsonProperty("status")
-    private Status status;
+    private String status;
 
     @JsonProperty("output")
     private String output;
@@ -44,7 +43,7 @@ public class CheckStateMO extends MessageObject
     private boolean lastHardOk;
 
     @JsonProperty("last_hard_status")
-    private Status lastHardStatus;
+    private String lastHardStatus;
 
     @JsonProperty("last_hard_output")
     private String lastHardOutput;
@@ -64,12 +63,12 @@ public class CheckStateMO extends MessageObject
         this.ok = ok;
     }
 
-    public Status getStatus()
+    public String getStatus()
     {
         return status;
     }
 
-    public void setStatus(Status status)
+    public void setStatus(String status)
     {
         this.status = status;
     }
@@ -164,12 +163,12 @@ public class CheckStateMO extends MessageObject
         this.lastHardOk = lastHardOk;
     }
 
-    public Status getLastHardStatus()
+    public String getLastHardStatus()
     {
         return lastHardStatus;
     }
 
-    public void setLastHardStatus(Status lastHardStatus)
+    public void setLastHardStatus(String lastHardStatus)
     {
         this.lastHardStatus = lastHardStatus;
     }

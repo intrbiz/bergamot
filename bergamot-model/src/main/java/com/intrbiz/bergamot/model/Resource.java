@@ -8,7 +8,7 @@ import com.intrbiz.configuration.Configurable;
 /**
  * A resource of a cluster, which is provided by multiple services
  */
-public class Resource extends VirtualCheck implements Configurable<ResourceCfg>
+public class Resource extends VirtualCheck<ResourceMO> implements Configurable<ResourceCfg>
 {
     private Cluster cluster;
 
@@ -26,7 +26,7 @@ public class Resource extends VirtualCheck implements Configurable<ResourceCfg>
         ResourceCfg rcfg = cfg.resolve();
         //
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
         // initial state
@@ -53,15 +53,6 @@ public class Resource extends VirtualCheck implements Configurable<ResourceCfg>
         return "resource";
     }
 
-    @Override
-    public ResourceMO toMO()
-    {
-        ResourceMO mo = new ResourceMO();
-        super.toMO(mo);
-        mo.setCluster(this.getCluster().toMO());
-        return mo;
-    }
-
     public Cluster getCluster()
     {
         return cluster;
@@ -75,5 +66,17 @@ public class Resource extends VirtualCheck implements Configurable<ResourceCfg>
     public String toString()
     {
         return "Resource (" + this.id + ") " + this.name + " on cluster " + (this.getCluster() == null ? "null" : this.getCluster().getName());
+    }
+
+    @Override
+    public ResourceMO toMO(boolean stub)
+    {
+        ResourceMO mo = new ResourceMO();
+        super.toMO(mo, stub);
+        if (! stub)
+        {
+            mo.setCluster(this.getCluster().toStubMO());
+        }
+        return mo;
     }
 }

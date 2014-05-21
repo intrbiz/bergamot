@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Host #{host.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="Host #{host.summary}">
 
 	<div class="row submenu pull-right">
 		<a rendered="#{host.suppressed}"  href="/host/unsuppress/#{host.id}">Unsupress</a>
@@ -17,7 +17,7 @@
 				<span class="dash_img #{host.state.status.toString().toLowerCase()}" title="The host is #{host.state.status.toString().toLowerCase()}">
 					<img src="/host-icon.png" />
 				</span>
-				<span class="name">#{host.displayName}</span>
+				<span class="name">#{host.summary}</span>
 		    </h3>
 		    <p>
 		    	<span class="label wide">Host name: </span>
@@ -99,7 +99,7 @@
 		    <h3>Contact</h3>
 			<data-set var="contact" value="#{host.allContacts}">
 				<p>
-					<span class="label">#{contact.displayName}</span>
+					<span class="label">#{contact.summary}</span>
 					<span class="value">&nbsp;</span>
 				</p>
 			</data-set>
@@ -108,7 +108,7 @@
 			<h3>Scheduling</h3>
 			<p>
 				<span class="label wide">Check period</span>
-				<span class="value">#{host.checkPeriod.displayName}</span>
+				<span class="value">#{host.timePeriod.summary}</span>
 			</p>
 			<p>
 				<span class="label wide">Check interval</span>
@@ -127,7 +127,7 @@
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(host.notifications.timePeriod.displayName, 'Not configured')}</span>
+				<span class="value">#{coalesce(host.notifications.timePeriod.summary, 'Not configured')}</span>
 			</p>
 		</div>
 	</div>
@@ -164,17 +164,17 @@
 			<h3>Command</h3>
 			<p>
 				<span class="label wide">Command Engine: </span>
-				<span class="value">#{host.checkCommand.engine}</span>
+				<span class="value">#{host.command.engine}</span>
 			</p>
 			<p>
 				<span class="label wide">Command Name: </span>
-				<span class="value">#{host.checkCommand.name}</span>
+				<span class="value">#{host.command.name}</span>
 			</p>
 			<p>
 				<span class="label wide">Parameters:</span>
 				<span class="value">&nbsp;</span>
 			</p>
-			<data-set var="parameter" value="#{host.checkCommand.parameters}">
+			<data-set var="parameter" value="#{host.command.parameters}">
 				<p>
 					<span class="label wide indent">#{parameter.name}: </span>
 					<span class="value">#{parameter.value}</span>
@@ -187,6 +187,13 @@
 		<div class="col12">
 			<h3>XML</h3>
 			<pre>#{host.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>JSON</h3>
+			<pre>#{host.toJSON()}</pre>
 		</div>
 	</div>
 	

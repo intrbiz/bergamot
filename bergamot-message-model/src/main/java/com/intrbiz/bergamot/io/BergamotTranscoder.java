@@ -18,16 +18,25 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intrbiz.bergamot.model.message.ClusterMO;
+import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.message.HostMO;
+import com.intrbiz.bergamot.model.message.LocationMO;
+import com.intrbiz.bergamot.model.message.NotificationEngineMO;
+import com.intrbiz.bergamot.model.message.NotificationsMO;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.ServiceMO;
+import com.intrbiz.bergamot.model.message.TeamMO;
+import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.state.CheckStateMO;
+import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.queue.QueueEventTranscoder;
 import com.intrbiz.queue.QueueException;
 
@@ -38,14 +47,23 @@ public class BergamotTranscoder
 {   
     public static final Class<?>[] CLASSES = {
         // message objects
+        NotificationEngineMO.class,
+        NotificationsMO.class,
+        CheckStateMO.class,
+        GroupStateMO.class,
+        CommandMO.class,
         HostMO.class,
         ClusterMO.class,
         ServiceMO.class,
         TrapMO.class,
         ResourceMO.class,
         ContactMO.class,
+        GroupMO.class,
+        LocationMO.class,
+        TeamMO.class,
+        TimePeriodMO.class,
         // model
-        Parameter.class,
+        ParameterMO.class,
         // messages
         ExecuteCheck.class,
         Result.class,

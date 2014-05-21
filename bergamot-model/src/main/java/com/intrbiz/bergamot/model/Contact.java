@@ -2,13 +2,14 @@ package com.intrbiz.bergamot.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.configuration.Configurable;
 
-public class Contact extends NamedObject implements Configurable<ContactCfg>
+public class Contact extends NamedObject<ContactMO> implements Configurable<ContactCfg>
 {
     private ContactCfg config;
 
@@ -40,7 +41,7 @@ public class Contact extends NamedObject implements Configurable<ContactCfg>
         this.config = cfg;
         ContactCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         // email
         this.email = rcfg.lookupEmail("work");
         // phones
@@ -55,12 +56,12 @@ public class Contact extends NamedObject implements Configurable<ContactCfg>
         return this.config;
     }
 
-    public List<Team> getContactGroups()
+    public List<Team> getTeams()
     {
         return teams;
     }
 
-    public void setContactGroups(List<Team> teams)
+    public void setTeams(List<Team> teams)
     {
         this.teams = teams;
     }
@@ -125,14 +126,20 @@ public class Contact extends NamedObject implements Configurable<ContactCfg>
         this.notifications = notifications;
     }
 
-    public ContactMO toMO()
+    @Override
+    public ContactMO toMO(boolean stub)
     {
         ContactMO mo = new ContactMO();
-        super.toMO(mo);
+        super.toMO(mo, stub);
         mo.setEmail(this.getEmail());
         mo.setMobile(this.getMobile());
         mo.setPager(this.getPager());
         mo.setPhone(this.getPhone());
+        if (!stub)
+        {
+            mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
+            mo.setNotifications(Util.nullable(this.getNotifications(), Notifications::toStubMO));
+        }
         return mo;
     }
 }

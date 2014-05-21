@@ -3,10 +3,12 @@ package com.intrbiz.bergamot.model.state;
 import java.util.Collection;
 import java.util.function.Function;
 
+import com.intrbiz.bergamot.model.BergamotObject;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 
-public class GroupState
+public class GroupState extends BergamotObject<GroupStateMO>
 {
     private boolean ok = true;
 
@@ -148,10 +150,10 @@ public class GroupState
         this.suppressedCount = suppressedCount;
     }
 
-    public static <T> GroupState compute(Collection<? extends Check> checks, Collection<T> groups, Function<T,GroupState> groupStateAccessor)
+    public static <T> GroupState compute(Collection<? extends Check<?>> checks, Collection<T> groups, Function<T,GroupState> groupStateAccessor)
     {
         GroupState state = new GroupState();
-        for (Check check : checks)
+        for (Check<?> check : checks)
         {
             if (!check.isSuppressed())
             {
@@ -208,5 +210,22 @@ public class GroupState
             }
         }
         return state;
+    }
+    
+    @Override
+    public GroupStateMO toMO(boolean stub)
+    {
+        GroupStateMO mo = new GroupStateMO();
+        mo.setOk(this.ok);
+        mo.setStatus(this.status.toString());
+        mo.setPendingCount(this.pendingCount);
+        mo.setOkCount(this.okCount);
+        mo.setWarningCount(this.warningCount);
+        mo.setCriticalCount(this.criticalCount);
+        mo.setUnknownCount(this.unknownCount);
+        mo.setErrorCount(this.errorCount);
+        mo.setTimeoutCount(this.timeoutCount);
+        mo.setSuppressedCount(this.suppressedCount);
+        return mo;
     }
 }

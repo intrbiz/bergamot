@@ -5,7 +5,7 @@ import com.intrbiz.bergamot.model.message.RealCheckMO;
 /**
  * A 'real' check has to know about hard vs soft states
  */
-public abstract class RealCheck extends Check
+public abstract class RealCheck<T extends RealCheckMO> extends Check<T>
 {
     /**
      * How many check attempts to trigger a hard alert
@@ -47,10 +47,11 @@ public abstract class RealCheck extends Check
         return (this.getState().isOk() && this.getState().isHard()) ? this.getAlertAttemptThreshold() : this.getRecoveryAttemptThreshold();
     }
     
-    protected void toMO(RealCheckMO mo)
+    protected void toMO(RealCheckMO mo, boolean stub)
     {
-        super.toMO(mo);
+        super.toMO(mo, stub);
         mo.setAlertAttemptThreshold(this.getAlertAttemptThreshold());
         mo.setRecoveryAttemptThreshold(this.getRecoveryAttemptThreshold());
+        mo.setCurrentAttemptThreshold(this.getCurrentAttemptThreshold());
     }
 }

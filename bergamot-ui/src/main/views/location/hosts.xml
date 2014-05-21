@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Location #{location.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="Location #{location.summary}">
 	<div class="row">
 		<data-set var="location" value="#{locations}">
 			<include view="include/location"/>
@@ -13,6 +13,14 @@
 			<include view="include/check"/>
 		</data-set>
 	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>JSON</h3>
+			<pre>#{location.toJSON()}</pre>
+		</div>
+	</div>
+	
 	<script type="text/javascript">
 		$(document).ready(function(){
 			setTimeout(function(){

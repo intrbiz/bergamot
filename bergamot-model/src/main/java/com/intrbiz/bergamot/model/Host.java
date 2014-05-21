@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.Util;
@@ -16,7 +17,7 @@ import com.intrbiz.configuration.Configurable;
 /**
  * A host - some form of network connected device that is to be checked
  */
-public class Host extends ActiveCheck implements Configurable<HostCfg>
+public class Host extends ActiveCheck<HostMO> implements Configurable<HostCfg>
 {
     private String address;
 
@@ -45,7 +46,7 @@ public class Host extends ActiveCheck implements Configurable<HostCfg>
         //
         this.name = rcfg.getName();
         this.address = Util.coalesceEmpty(rcfg.getAddress(), this.name);
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
         this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
         this.checkInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getEvery());
@@ -176,15 +177,21 @@ public class Host extends ActiveCheck implements Configurable<HostCfg>
 
     public String toString()
     {
-        return "Host (" + this.id + ") " + this.name + " check " + this.checkCommand;
+        return "Host (" + this.id + ") " + this.name + " check " + this.command;
     }
-
+    
     @Override
-    public HostMO toMO()
+    public HostMO toMO(boolean stub)
     {
         HostMO mo = new HostMO();
-        super.toMO(mo);
+        super.toMO(mo, stub);
         mo.setAddress(this.getAddress());
+        if (! stub)
+        {
+            mo.setServices(this.getServices().stream().map(Service::toStubMO).collect(Collectors.toList()));
+            mo.setTraps(this.getTraps().stream().map(Trap::toStubMO).collect(Collectors.toList()));
+            mo.setLocation(Util.nullable(this.getLocation(), Location::toStubMO));
+        }
         return mo;
     }
 }

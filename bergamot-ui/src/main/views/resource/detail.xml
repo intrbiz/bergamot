@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Resource #{resource.displayName} on Cluster #{resource.cluster.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="Resource #{resource.summary} on Cluster #{resource.cluster.displayName}">
 
 	<div class="row submenu pull-right">
 		<a rendered="#{resource.suppressed}"  href="/resource/unsuppress/#{resource.id}">Unsupress</a>
@@ -16,7 +16,7 @@
 				<span class="dash_img #{resource.state.status.toString().toLowerCase()}" title="The resource is #{resource.state.status.toString().toLowerCase()}">
 					<img src="/resource-icon.png" />
 				</span>
-				<span class="name">#{resource.displayName}</span>
+				<span class="name">#{resource.summary}</span>
 		    </h3>
 		    <p>
 			    <span class="label wide">Status: </span>
@@ -25,7 +25,7 @@
 		    <p>
 			    <span class="label wide">Cluster: </span>
 			    <a href="/cluster/name/#{resource.cluster.name}">
-				    <span class="value">#{resource.cluster.displayName}</span>
+				    <span class="value">#{resource.cluster.summary}</span>
 				</a>
 		    </p>
 		    <p>
@@ -72,7 +72,7 @@
 			<h3>Contacts</h3>
 			<data-set var="contact" value="#{resource.allContacts}">
 				<p>
-					<span class="label wide">#{contact.displayName}</span>
+					<span class="label wide">#{contact.summary}</span>
 					<span class="value">&nbsp;</span>
 				</p>
 			</data-set>
@@ -85,7 +85,7 @@
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(resource.notifications.timePeriod.displayName, 'Not configured')}</span>
+				<span class="value">#{coalesce(resource.notifications.timePeriod.summary, 'Not configured')}</span>
 			</p>
 		</div>
 	</div>
@@ -94,6 +94,13 @@
 		<div class="col12">
 			<h3>XML</h3>
 			<pre>#{resource.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>JSON</h3>
+			<pre>#{resource.toJSON()}</pre>
 		</div>
 	</div>
 	

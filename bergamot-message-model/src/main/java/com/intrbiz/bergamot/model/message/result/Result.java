@@ -7,10 +7,9 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.Message;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.util.Parameter;
 
 /**
  * The result of a check
@@ -31,7 +30,7 @@ public class Result extends Message
     private boolean ok;
 
     @JsonProperty("status")
-    private Status status;
+    private String status;
 
     @JsonProperty("executed")
     private long executed;
@@ -46,7 +45,7 @@ public class Result extends Message
     private String output;
 
     @JsonProperty("parameters")
-    private List<Parameter> parameters = new LinkedList<Parameter>();
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
 
     public Result()
     {
@@ -99,12 +98,12 @@ public class Result extends Message
         this.ok = ok;
     }
 
-    public Status getStatus()
+    public String getStatus()
     {
         return status;
     }
 
-    public void setStatus(Status status)
+    public void setStatus(String status)
     {
         this.status = status;
     }
@@ -149,19 +148,19 @@ public class Result extends Message
         this.output = output;
     }
 
-    public List<Parameter> getParameters()
+    public List<ParameterMO> getParameters()
     {
         return parameters;
     }
 
-    public void setParameters(List<Parameter> parameters)
+    public void setParameters(List<ParameterMO> parameters)
     {
         this.parameters = parameters;
     }
 
     public void addParameter(String name, String value)
     {
-        this.parameters.add(new Parameter(name, value));
+        this.parameters.add(new ParameterMO(name, value));
     }
 
     public void setParameter(String name, String value)
@@ -172,7 +171,7 @@ public class Result extends Message
 
     public void removeParameter(String name)
     {
-        for (Iterator<Parameter> i = this.parameters.iterator(); i.hasNext();)
+        for (Iterator<ParameterMO> i = this.parameters.iterator(); i.hasNext();)
         {
             if (name.equals(i.next().getName()))
             {
@@ -194,7 +193,7 @@ public class Result extends Message
 
     public String getParameter(String name, String defaultValue)
     {
-        for (Parameter parameter : this.parameters)
+        for (ParameterMO parameter : this.parameters)
         {
             if (name.equals(parameter.getName())) return parameter.getValue();
         }

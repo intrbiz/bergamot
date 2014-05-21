@@ -3,18 +3,19 @@ package com.intrbiz.bergamot.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.intrbiz.bergamot.model.message.VirtualCheckMO;
 import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
 
 /**
  * A virtual check is conditional upon the state of 
  * other checks
  */
-public abstract class VirtualCheck extends Check
+public abstract class VirtualCheck<T extends VirtualCheckMO> extends Check<T>
 {
     /**
      * Checks which this check references
      */
-    protected Set<Check> references = new HashSet<Check>();
+    protected Set<Check<?>> references = new HashSet<Check<?>>();
     
     private VirtualCheckOperator condition;
     
@@ -23,17 +24,17 @@ public abstract class VirtualCheck extends Check
         super();
     }
     
-    public Set<Check> getReferences()
+    public Set<Check<?>> getReferences()
     {
         return references;
     }
 
-    public void setReferences(Set<Check> references)
+    public void setReferences(Set<Check<?>> references)
     {
         this.references = references;
     }
     
-    public void addReference(Check check)
+    public void addReference(Check<?> check)
     {
         this.references.add(check);
     }

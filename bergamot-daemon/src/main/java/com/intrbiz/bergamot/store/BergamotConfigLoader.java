@@ -283,12 +283,12 @@ public class BergamotConfigLoader
         host.addTrap(t);
     }
     
-    private void loadPasiveCheck(PassiveCheck check, PassiveCheckCfg<?> rcfg)
+    private void loadPasiveCheck(PassiveCheck<?> check, PassiveCheckCfg<?> rcfg)
     {
         this.loadCheck(check, rcfg);
     }
 
-    private void loadActiveCheck(ActiveCheck check, ActiveCheckCfg<?> rcfg)
+    private void loadActiveCheck(ActiveCheck<?> check, ActiveCheckCfg<?> rcfg)
     {
         this.loadCheck(check, rcfg);
         // the check period
@@ -298,7 +298,7 @@ public class BergamotConfigLoader
             TimePeriod tp = this.store.lookupTimePeriod(tpn);
             if (tp != null)
             {
-                check.setCheckPeriod(tp);
+                check.setTimePeriod(tp);
             }
         }
         // the check command
@@ -306,12 +306,12 @@ public class BergamotConfigLoader
         {
             Command command = new Command();
             command.configure(rcfg.getCommand());
-            check.setCheckCommand(command);
+            check.setCommand(command);
             logger.info("Added command " + command.getName() + " to check " + check.getName());
         }
     }
 
-    private void loadCheck(Check check, CheckCfg<?> rcfg)
+    private void loadCheck(Check<?> check, CheckCfg<?> rcfg)
     {
         // notifications
         check.setNotifications(this.loadNotifications(rcfg.getNotifications()));
@@ -387,7 +387,7 @@ public class BergamotConfigLoader
         return n;
     }
     
-    private void loadVirtualCheck(VirtualCheck check, VirtualCheckCfg<?> rcfg)
+    private void loadVirtualCheck(VirtualCheck<?> check, VirtualCheckCfg<?> rcfg)
     {
         this.loadCheck(check, rcfg);
         // parse the condition
@@ -400,7 +400,7 @@ public class BergamotConfigLoader
                 logger.info("Using virtual check condition " + cond.toString() + " for " + check);
                 // cross reference the checks
                 check.setReferences(cond.computeDependencies());
-                for (Check dep : check.getReferences())
+                for (Check<?> dep : check.getReferences())
                 {
                     logger.info("The check " + dep + " is referenced by the virtual check " + check);
                     dep.addReferencedBy(check);

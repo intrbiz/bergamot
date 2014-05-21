@@ -1,6 +1,8 @@
 package com.intrbiz.bergamot.model.message;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,6 +28,12 @@ public class ContactMO extends NamedObjectMO
 
     @JsonProperty("engines")
     private Set<String> engines = new HashSet<String>();
+    
+    @JsonProperty("teams")
+    private List<TeamMO> teams = new LinkedList<TeamMO>();
+    
+    @JsonProperty("notifications")
+    private NotificationsMO notifications;
 
     public ContactMO()
     {
@@ -87,8 +95,23 @@ public class ContactMO extends NamedObjectMO
         return this.engines.contains(engine);
     }
 
-    public String toString()
+    public List<TeamMO> getTeams()
     {
-        return "contact { name: " + this.name + ", email: " + this.email + "}";
+        return teams;
+    }
+
+    public void setTeams(List<TeamMO> teams)
+    {
+        this.teams = teams;
+    }
+
+    public NotificationsMO getNotifications()
+    {
+        return notifications;
+    }
+
+    public void setNotifications(NotificationsMO notifications)
+    {
+        this.notifications = notifications;
     }
 }

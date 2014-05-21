@@ -4,13 +4,14 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.intrbiz.bergamot.model.BergamotObject;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 
 /**
  * The state of a check
  */
-public class CheckState
+public class CheckState extends BergamotObject<CheckStateMO>
 {
     private UUID checkId;
 
@@ -260,7 +261,8 @@ public class CheckState
         return this.lock;
     }
 
-    public CheckStateMO toMO()
+    @Override
+    public CheckStateMO toMO(boolean stub)
     {
         CheckStateMO mo = new CheckStateMO();
         mo.setAttempt(this.getAttempt());
@@ -271,11 +273,11 @@ public class CheckState
         mo.setLastStateChange(this.getLastStateChange());
         mo.setOk(this.isOk());
         mo.setOutput(this.getOutput());
-        mo.setStatus(this.getStatus());
+        mo.setStatus(this.getStatus().toString());
         mo.setTransitioning(this.isTransitioning());
         mo.setLastHardOk(this.isLastHardOk());
-        mo.setLastHardStatus(this.lastHardStatus);
-        mo.setLastHardOutput(this.lastHardOutput);
+        mo.setLastHardStatus(this.getLastHardStatus().toString());
+        mo.setLastHardOutput(this.getLastHardOutput());
         return mo;
     }
 }

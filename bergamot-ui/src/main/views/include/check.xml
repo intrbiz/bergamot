@@ -8,7 +8,7 @@
 				<span class="dash_img #{check.state.status.toString().toLowerCase()}" title="The check is #{check.state.status.toString().toLowerCase()}">
 					<img src="/#{check.type}-icon.png" />
 				</span>
-				<span class="name">#{check.displayName}</span>
+				<span class="name">#{check.summary}</span>
 		    </h3>
 		    <p>
 			    <span class="label">Status: </span>
@@ -16,11 +16,11 @@
 		    </p>
 		    <p rendered="#{(check.type == 'service' or check.type == 'trap') and host == null}">
 			    <span class="label">Host: </span>
-			    <span class="value">#{check.host.displayName}</span>
+			    <span class="value">#{check.host.summary}</span>
 		    </p>
 		    <p rendered="#{check.type == 'resource'and cluster == null}">
 			    <span class="label">Cluster: </span>
-			    <span class="value">#{check.cluster.displayName}</span>
+			    <span class="value">#{check.cluster.summary}</span>
 		    </p>
 		    <p rendered="#{check.type == 'host'}">
 		    	<span class="label">Name: </span>

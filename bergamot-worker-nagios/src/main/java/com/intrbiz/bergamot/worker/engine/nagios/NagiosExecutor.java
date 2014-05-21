@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
@@ -106,7 +105,7 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
         {
             logger.error("Failed to execute nagios check command", e);
             result.setOk(false);
-            result.setStatus(Status.ERROR);
+            result.setStatus("ERROR");
             result.setOutput(e.getMessage());
             result.setRuntime(0);
         }

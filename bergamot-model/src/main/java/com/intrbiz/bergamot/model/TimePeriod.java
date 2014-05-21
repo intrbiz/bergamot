@@ -3,18 +3,20 @@ package com.intrbiz.bergamot.model;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
+import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.configuration.Configurable;
 
 /**
  * A calendar of when checks should be executed
  */
-public class TimePeriod extends NamedObject implements TimeRange, Configurable<TimePeriodCfg>
+public class TimePeriod extends NamedObject<TimePeriodMO> implements TimeRange, Configurable<TimePeriodCfg>
 {
     private Logger logger = Logger.getLogger(TimePeriod.class);
 
@@ -41,7 +43,7 @@ public class TimePeriod extends NamedObject implements TimeRange, Configurable<T
         this.config = cfg;
         TimePeriodCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
-        this.displayName = Util.coalesce(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesce(rcfg.getSummary(), this.name);
         // load the time ranges
         this.ranges.clear();
         this.ranges.addAll(rcfg.getTimeRanges());
@@ -101,5 +103,18 @@ public class TimePeriod extends NamedObject implements TimeRange, Configurable<T
     public String toString()
     {
         return "TimePeriod " + this.getName();
+    }
+    
+    @Override
+    public TimePeriodMO toMO(boolean stub)
+    {
+        TimePeriodMO mo = new TimePeriodMO();
+        super.toMO(mo, stub);
+        if (! stub)
+        {
+            mo.setExcludes(this.getExcludes().stream().map(TimePeriod::toStubMO).collect(Collectors.toList()));
+            mo.setRanges(this.getRanges().stream().map(TimeRange::toString).collect(Collectors.toList()));
+        }
+        return mo;
     }
 }

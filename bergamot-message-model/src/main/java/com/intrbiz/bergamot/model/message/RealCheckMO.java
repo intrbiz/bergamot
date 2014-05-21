@@ -9,6 +9,9 @@ public abstract class RealCheckMO extends CheckMO
 
     @JsonProperty("recovery_attempt_threshold")
     protected int recoveryAttemptThreshold;
+    
+    @JsonProperty("current_attempt_threshold")
+    protected int currentAttemptThreshold;
 
     public RealCheckMO()
     {
@@ -33,5 +36,15 @@ public abstract class RealCheckMO extends CheckMO
     public void setRecoveryAttemptThreshold(int recoveryAttemptThreshold)
     {
         this.recoveryAttemptThreshold = recoveryAttemptThreshold;
+    }
+
+    public int getCurrentAttemptThreshold()
+    {
+        return currentAttemptThreshold;
+    }
+
+    public void setCurrentAttemptThreshold(int currentAttemptThreshold)
+    {
+        this.currentAttemptThreshold = currentAttemptThreshold;
     }
 }

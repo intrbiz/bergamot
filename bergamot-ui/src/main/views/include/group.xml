@@ -8,7 +8,7 @@
 				<span class="dash_img #{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">
 					<img src="/group-icon.png" />
 				</span>
-				<span class="name">#{group.displayName}</span>
+				<span class="name">#{group.summary}</span>
 		    </h3>
 		    <p>
 			    <span class="label">OK: </span>

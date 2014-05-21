@@ -146,8 +146,8 @@ public class EmailEngine extends AbstractNotificationEngine
     {        
         Map<String, String> templates = new HashMap<String, String>();
         // host
-        templates.put("host.alert.subject", "Alert for host #{host.displayName} is #{if(host.state.ok, 'UP', 'DOWN')}");
-        templates.put("host.alert.content", "Alert for host #{host.displayName} is #{if(host.state.ok, 'UP', 'DOWN')}\r\n"
+        templates.put("host.alert.subject", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
+        templates.put("host.alert.content", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}\r\n"
                 + "\r\n"
                 + "Check output: #{host.state.output}\r\n"
                 + "\r\n"
@@ -156,8 +156,8 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "For more information: http://bergamot/host/id/#{host.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
-        templates.put("host.recovery.subject", "Recovery for host #{host.displayName} is #{if(host.state.ok, 'UP', 'DOWN')}");
-        templates.put("host.recovery.content", "Recovery for host #{host.displayName} is #{if(host.state.ok, 'UP', 'DOWN')}\r\n"
+        templates.put("host.recovery.subject", "Recovery for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
+        templates.put("host.recovery.content", "Recovery for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}\r\n"
                 + "\r\n"
                 + "Check output: #{host.state.output}\r\n"
                 + "\r\n"
@@ -167,16 +167,16 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // cluster
-        templates.put("cluster.alert.subject", "Alert for cluster #{cluster.displayName} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
-        templates.put("cluster.alert.content", "Alert for cluster #{cluster.displayName} is #{if(cluster.state.ok, 'UP', 'DOWN')}\r\n"
+        templates.put("cluster.alert.subject", "Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
+        templates.put("cluster.alert.content", "Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}\r\n"
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}\r\n"
                 + "\r\n"
                 + "For more information: http://bergamot/cluster/id/#{cluster.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
-        templates.put("cluster.recovery.subject", "Recovery for cluster #{cluster.displayName} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
-        templates.put("cluster.recovery.content", "Recovery for cluster #{cluster.displayName} is #{if(cluster.state.ok, 'UP', 'DOWN')}\r\n"
+        templates.put("cluster.recovery.subject", "Recovery for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
+        templates.put("cluster.recovery.content", "Recovery for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}\r\n"
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}\r\n"
                 + "\r\n"
@@ -184,8 +184,8 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // service
-        templates.put("service.alert.subject", "Alert for service #{service.displayName} on the host #{host.displayName} is #{service.state.status}");
-        templates.put("service.alert.content", "Alert for service #{service.displayName} on the host #{host.displayName} is #{service.state.status}\r\n"
+        templates.put("service.alert.subject", "Alert for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
+        templates.put("service.alert.content", "Alert for service #{service.summary} on the host #{host.summary} is #{service.state.status}\r\n"
                 + "\r\n"
                 + "Check output: #{service.state.output}\r\n"
                 + "\r\n"
@@ -194,8 +194,8 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "For more information: http://bergamot/service/id/#{service.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
-        templates.put("service.recovery.subject", "Recovery for service #{service.displayName} on the host #{host.displayName} is #{service.state.status}");
-        templates.put("service.recovery.content", "Recovery for service #{service.displayName} on the host #{host.displayName} is #{service.state.status}\r\n"
+        templates.put("service.recovery.subject", "Recovery for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
+        templates.put("service.recovery.content", "Recovery for service #{service.summary} on the host #{host.summary} is #{service.state.status}\r\n"
                 + "\r\n"
                 + "Check output: #{service.state.output}\r\n"
                 + "\r\n"
@@ -205,8 +205,8 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // trap
-        templates.put("trap.alert.subject", "Alert for trap #{trap.displayName} on the host #{host.displayName} is #{trap.state.status}");
-        templates.put("trap.alert.content", "Alert for trap #{trap.displayName} on the host #{host.displayName} is #{trap.state.status}\r\n"
+        templates.put("trap.alert.subject", "Alert for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
+        templates.put("trap.alert.content", "Alert for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}\r\n"
                 + "\r\n"
                 + "Check output: #{trap.state.output}\r\n"
                 + "\r\n"
@@ -215,8 +215,8 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "For more information: http://bergamot/trap/id/#{trap.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
-        templates.put("trap.recovery.subject", "Recovery for trap #{trap.displayName} on the host #{host.displayName} is #{trap.state.status}");
-        templates.put("trap.recovery.content", "Recovery for trap #{trap.displayName} on the host #{host.displayName} is #{trap.state.status}\r\n"
+        templates.put("trap.recovery.subject", "Recovery for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
+        templates.put("trap.recovery.content", "Recovery for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}\r\n"
                 + "\r\n"
                 + "Check output: #{trap.state.output}\r\n"
                 + "\r\n"
@@ -226,16 +226,16 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // resource
-        templates.put("resource.alert.subject", "Alert for resource #{resource.displayName} on the cluster #{cluster.displayName} is #{resource.state.status}");
-        templates.put("resource.alert.content", "Alert for resource #{resource.displayName} on the cluster #{cluster.displayName} is #{resource.state.status}\r\n"
+        templates.put("resource.alert.subject", "Alert for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
+        templates.put("resource.alert.content", "Alert for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}\r\n"
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}\r\n"
                 + "\r\n"
                 + "For more information: http://bergamot/resource/id/#{resource.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
-        templates.put("resource.recovery.subject", "Recovery for resource #{resource.displayName} on the cluster #{cluster.displayName} is #{resource.state.status}");
-        templates.put("resource.recovery.content", "Recovery for resource #{resource.displayName} on the cluster #{cluster.displayName} is #{resource.state.status}\r\n"
+        templates.put("resource.recovery.subject", "Recovery for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
+        templates.put("resource.recovery.content", "Recovery for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}\r\n"
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}\r\n"
                 + "\r\n"

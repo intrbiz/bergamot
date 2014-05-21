@@ -3,20 +3,22 @@ package com.intrbiz.bergamot.model;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.LocationCfg;
+import com.intrbiz.bergamot.model.message.LocationMO;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.configuration.Configurable;
 
 /**
  * The physical (probably) location of a host
  */
-public class Location extends NamedObject implements Configurable<LocationCfg>
+public class Location extends NamedObject<LocationMO> implements Configurable<LocationCfg>
 {
-    private Map<String, Host> hosts = new TreeMap<String, Host>();
-
     private Location location;
+    
+    private Map<String, Host> hosts = new TreeMap<String, Host>();
 
     private Map<String, Location> locations = new TreeMap<String, Location>();
     
@@ -39,7 +41,7 @@ public class Location extends NamedObject implements Configurable<LocationCfg>
         this.config = config;
         LocationCfg rcfg = config.resolve();
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
     }
 
     public Collection<Host> getHosts()
@@ -107,5 +109,20 @@ public class Location extends NamedObject implements Configurable<LocationCfg>
     public GroupState getState()
     {
         return GroupState.compute(this.getHosts(), this.getLocations(), (l) -> { return l.getState(); });
+    }
+    
+    @Override    
+    public LocationMO toMO(boolean stub)
+    {
+        LocationMO mo = new LocationMO();
+        super.toMO(mo, stub);        
+        mo.setState(this.getState().toMO());
+        if (! stub)
+        {
+            mo.setLocation(Util.nullable(this.location, Location::toStubMO));
+            mo.setChildren(this.getLocations().stream().map(Location::toStubMO).collect(Collectors.toList()));
+            mo.setHosts(this.getHosts().stream().map(Host::toStubMO).collect(Collectors.toList()));
+        }
+        return  mo;
     }
 }

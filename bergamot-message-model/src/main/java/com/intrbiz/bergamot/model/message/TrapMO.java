@@ -28,9 +28,4 @@ public class TrapMO extends PassiveCheckMO
     {
         this.host = host;
     }
-    
-    public String toString()
-    {
-        return "trap { id: " + this.id + "}";
-    }
 }

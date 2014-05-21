@@ -40,7 +40,7 @@ public class ObjectStore
     
     private Map<String, TimePeriod> timePeriods = new TreeMap<String, TimePeriod>();
     
-    private Set<Check> alerts = new HashSet<Check>();
+    private Set<Check<?>> alerts = new HashSet<Check<?>>();
     
     private Map<String, Location> locations = new TreeMap<String, Location>();
     
@@ -160,7 +160,7 @@ public class ObjectStore
     
     // checkable
     
-    public Check lookupCheckable(String type, UUID id)
+    public Check<?> lookupCheckable(String type, UUID id)
     {
         if ("service".equals(type))
             return this.lookupService(id);
@@ -230,17 +230,17 @@ public class ObjectStore
     
     // recent
     
-    public Collection<Check> getAlerts()
+    public Collection<Check<?>> getAlerts()
     {
         return this.alerts;
     }
     
-    public void addAlert(Check check)
+    public void addAlert(Check<?> check)
     {
         this.alerts.add(check);
     }
     
-    public void removeAlert(Check check)
+    public void removeAlert(Check<?> check)
     {
         this.alerts.remove(check);
     }

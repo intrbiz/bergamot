@@ -28,9 +28,4 @@ public class ServiceMO extends ActiveCheckMO
     {
         this.host = host;
     }
-    
-    public String toString()
-    {
-        return "sevice { id: " + this.id + "}";
-    }
 }

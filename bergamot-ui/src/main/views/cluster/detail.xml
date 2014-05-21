@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Cluster #{cluster.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="Cluster #{cluster.summary}">
 
 	<div class="row submenu pull-right">
 		<a rendered="#{cluster.suppressed}"  href="/host/unsuppress/#{host.id}">Unsupress</a>
@@ -16,7 +16,7 @@
 				<span class="dash_img #{cluster.state.status.toString().toLowerCase()}" title="The cluster is #{cluster.state.status.toString().toLowerCase()}">
 					<img src="/host-icon.png" />
 				</span>
-				<span class="name">#{cluster.displayName}</span>
+				<span class="name">#{cluster.summary}</span>
 		    </h3>
 		    <p>
 			    <span class="label wide">Status: </span>
@@ -74,7 +74,7 @@
 		    <h3>Contact</h3>
 			<data-set var="contact" value="#{cluster.allContacts}">
 				<p>
-					<span class="label">#{contact.displayName}</span>
+					<span class="label">#{contact.summary}</span>
 					<span class="value">&nbsp;</span>
 				</p>
 			</data-set>
@@ -87,7 +87,7 @@
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(cluster.notifications.timePeriod.displayName, 'Not configured')}</span>
+				<span class="value">#{coalesce(cluster.notifications.timePeriod.summary, 'Not configured')}</span>
 			</p>
 		</div>
 	</div>
@@ -96,6 +96,13 @@
 		<div class="col12">
 			<h3>XML</h3>
 			<pre>#{cluster.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>JSON</h3>
+			<pre>#{cluster.toJSON()}</pre>
 		</div>
 	</div>
 	

@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Trap #{trap.displayName} on Host #{trap.host.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="Trap #{trap.summary} on Host #{trap.host.displayName}">
 
 	<div class="row submenu pull-right">
 		<a rendered="#{trap.suppressed}"  href="/trap/unsuppress/#{trap.id}">Unsupress</a>
@@ -16,7 +16,7 @@
 				<span class="dash_img #{trap.state.status.toString().toLowerCase()}" title="The trap is #{trap.state.status.toString().toLowerCase()}">
 					<img src="/trap-icon.png" />
 				</span>
-				<span class="name">#{trap.displayName}</span>
+				<span class="name">#{trap.summary}</span>
 		    </h3>
 		    <p>
 			    <span class="label wide">Status: </span>
@@ -25,7 +25,7 @@
 		    <p>
 			    <span class="label wide">Host: </span>
 			    <a href="/host/name/#{trap.host.name}">
-				    <span class="value">#{trap.host.displayName}</span>
+				    <span class="value">#{trap.host.summary}</span>
 				</a>
 		    </p>
 		    <p>
@@ -70,7 +70,7 @@
 			<h3>Contacts</h3>
 			<data-set var="contact" value="#{trap.allContacts}">
 				<p>
-					<span class="label wide">#{contact.displayName}</span>
+					<span class="label wide">#{contact.summary}</span>
 					<span class="value">&nbsp;</span>
 				</p>
 			</data-set>
@@ -83,7 +83,7 @@
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(trap.notifications.timePeriod.displayName, 'Not configured')}</span>
+				<span class="value">#{coalesce(trap.notifications.timePeriod.summary, 'Not configured')}</span>
 			</p>
 		</div>
 	</div>
@@ -92,6 +92,13 @@
 		<div class="col12">
 			<h3>XML</h3>
 			<pre>#{trap.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>JSON</h3>
+			<pre>#{trap.toJSON()}</pre>
 		</div>
 	</div>
 	

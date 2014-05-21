@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
-import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.Result;
 
 public class NagiosPluginParser
@@ -29,20 +28,20 @@ public class NagiosPluginParser
         {
             case NAGIOS_OK:
                 result.setOk(true);
-                result.setStatus(Status.OK);
+                result.setStatus("OK");
                 break;
             case NAGIOS_WARNING:
                 result.setOk(false);
-                result.setStatus(Status.WARNING);
+                result.setStatus("WARNING");
                 break;
             case NAGIOS_CRITICAL:
                 result.setOk(false);
-                result.setStatus(Status.CRITICAL);
+                result.setStatus("CRITICAL");
                 break;
             case NAGIOS_UNKNOWN:
             default:
                 result.setOk(false);
-                result.setStatus(Status.UNKNOWN);
+                result.setStatus("UNKNOWN");
                 break;
         }
     }

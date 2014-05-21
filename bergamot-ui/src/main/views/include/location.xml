@@ -8,7 +8,7 @@
 				<span class="dash_img #{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
 					<img src="/location-icon.png" />
 				</span>
-				<span class="name">#{location.displayName}</span>
+				<span class="name">#{location.summary}</span>
 		    </h3>
 		    <p>
 			    <span class="label">OK: </span>

@@ -7,13 +7,15 @@ import com.intrbiz.bergamot.model.message.NamedObjectMO;
 /**
  * A generic object with an id and a name
  */
-public abstract class NamedObject
+public abstract class NamedObject<T extends NamedObjectMO> extends BergamotObject<T>
 {
     protected UUID id = UUID.randomUUID();
 
     protected String name;
- 
-    protected String displayName;
+
+    protected String summary;
+
+    protected String description;
 
     public NamedObject()
     {
@@ -30,7 +32,7 @@ public abstract class NamedObject
         this.id = id;
         this.onSetId();
     }
-    
+
     protected void onSetId()
     {
     }
@@ -44,16 +46,25 @@ public abstract class NamedObject
     {
         this.name = name;
     }
-    
 
-    public final String getDisplayName()
+    public final String getSummary()
     {
-        return displayName;
+        return summary;
     }
 
-    public final void setDisplayName(String displayName)
+    public final void setSummary(String summary)
     {
-        this.displayName = displayName;
+        this.summary = summary;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     @Override
@@ -71,7 +82,7 @@ public abstract class NamedObject
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        NamedObject other = (NamedObject) obj;
+        NamedObject<?> other = (NamedObject<?>) obj;
         if (id == null)
         {
             if (other.id != null) return false;
@@ -79,11 +90,12 @@ public abstract class NamedObject
         else if (!id.equals(other.id)) return false;
         return true;
     }
-    
-    protected void toMO(NamedObjectMO mo)
+
+    protected void toMO(NamedObjectMO mo, boolean stub)
     {
         mo.setId(this.getId());
         mo.setName(this.getName());
-        mo.setDisplayName(this.getDisplayName());
+        mo.setSummary(this.getSummary());
+        if (! stub) mo.setDescription(this.getDescription());
     }
 }

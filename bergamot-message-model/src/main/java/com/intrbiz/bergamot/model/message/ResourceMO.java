@@ -28,9 +28,4 @@ public class ResourceMO extends VirtualCheckMO
     {
         this.cluster = cluster;
     }
-    
-    public String toString()
-    {
-        return "resource { id: " + this.id + "}";
-    }
 }

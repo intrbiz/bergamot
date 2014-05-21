@@ -3,8 +3,12 @@ package com.intrbiz.bergamot.model;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public class NotificationEngine
+import com.intrbiz.Util;
+import com.intrbiz.bergamot.model.message.NotificationEngineMO;
+
+public class NotificationEngine extends BergamotObject<NotificationEngineMO>
 {
     private String engine;
 
@@ -82,6 +86,8 @@ public class NotificationEngine
     {
         this.ignore = ignore;
     }
+    
+    
 
     /**
      * Is this notification engine valid for the given time
@@ -103,5 +109,18 @@ public class NotificationEngine
     {
         return (type == NotificationType.ALERT && this.alertsEnabled) || 
                (type == NotificationType.RECOVERY && this.recoveryEnabled);
+    }
+    
+    @Override
+    public NotificationEngineMO toMO(boolean stub)
+    {
+        NotificationEngineMO mo = new NotificationEngineMO();
+        mo.setEnabled(this.isEnabled());
+        mo.setAlertsEnabled(this.isAlertsEnabled());
+        mo.setEngine(this.getEngine());
+        mo.setIgnore(this.getIgnore().stream().map(Status::toString).collect(Collectors.toSet()));
+        mo.setRecoveryEnabled(this.isRecoveryEnabled());
+        mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
+        return mo;
     }
 }

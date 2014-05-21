@@ -4,13 +4,16 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.GroupCfg;
+import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.configuration.Configurable;
 
-public class Group extends NamedObject implements Configurable<GroupCfg>
+public class Group extends NamedObject<GroupMO> implements Configurable<GroupCfg>
 {
     private GroupCfg config;
 
@@ -22,7 +25,7 @@ public class Group extends NamedObject implements Configurable<GroupCfg>
 
     // group members
 
-    private Map<UUID, Check> checks = new TreeMap<UUID, Check>();
+    private Map<UUID, Check<? extends CheckMO>> checks = new TreeMap<UUID, Check<? extends CheckMO>>();
 
     public Group()
     {
@@ -35,7 +38,7 @@ public class Group extends NamedObject implements Configurable<GroupCfg>
         this.config = cfg;
         GroupCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
-        this.displayName = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
     }
 
     @Override
@@ -81,20 +84,36 @@ public class Group extends NamedObject implements Configurable<GroupCfg>
         child.addParent(this);
     }
 
-    public Collection<Check> getChecks()
+    public Collection<Check<? extends CheckMO>> getChecks()
     {
         return checks.values();
     }
 
-    public void addCheck(Check check)
+    public void addCheck(Check<? extends CheckMO> check)
     {
         this.checks.put(check.getId(), check);
         check.addGroup(this);
     }
 
-    public void removeCheck(Check check)
+    public void removeCheck(Check<? extends CheckMO> check)
     {
         this.checks.remove(check.getId());
         check.removeGroup(this);
+    }
+    
+
+    @Override    
+    public GroupMO toMO(boolean stub)
+    {
+        GroupMO mo = new GroupMO();
+        super.toMO(mo, stub);
+        mo.setState(this.getState().toMO());
+        if (! stub)
+        {
+            mo.setChecks(this.getChecks().stream().map(Check::toStubMO).collect(Collectors.toList()));
+            mo.setParents(this.getParents().stream().map(Group::toStubMO).collect(Collectors.toList()));
+            mo.setChildren(this.getChildren().stream().map(Group::toStubMO).collect(Collectors.toList()));
+        }
+        return  mo;
     }
 }

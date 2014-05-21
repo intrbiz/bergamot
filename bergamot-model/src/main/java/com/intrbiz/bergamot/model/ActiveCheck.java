@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.macro.MacroFrame;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
@@ -20,7 +21,7 @@ import com.intrbiz.validator.Validator;
 /**
  * A check which is actively polled
  */
-public abstract class ActiveCheck extends RealCheck
+public abstract class ActiveCheck<T extends ActiveCheckMO> extends RealCheck<T>
 {
     /**
      * How often should checks be executed (in milliseconds)
@@ -35,12 +36,12 @@ public abstract class ActiveCheck extends RealCheck
     /**
      * When should we check, a calendar
      */
-    protected TimePeriod checkPeriod;
+    protected TimePeriod timePeriod;
 
     /**
      * The check command to execute
      */
-    protected Command checkCommand;
+    protected Command command;
 
     /**
      * The stats for this active check
@@ -72,14 +73,14 @@ public abstract class ActiveCheck extends RealCheck
         this.retryInterval = retryInterval;
     }
 
-    public Command getCheckCommand()
+    public Command getCommand()
     {
-        return checkCommand;
+        return command;
     }
 
-    public void setCheckCommand(Command checkCommand)
+    public void setCommand(Command command)
     {
-        this.checkCommand = checkCommand;
+        this.command = command;
     }
 
     public long getCurrentInterval()
@@ -87,29 +88,29 @@ public abstract class ActiveCheck extends RealCheck
         return (this.getState().isOk() && this.getState().isHard()) ? this.getCheckInterval() : this.getRetryInterval();
     }
 
-    public TimePeriod getCheckPeriod()
+    public TimePeriod getTimePeriod()
     {
-        return checkPeriod;
+        return timePeriod;
     }
 
-    public void setCheckPeriod(TimePeriod timePeriod)
+    public void setTimePeriod(TimePeriod timePeriod)
     {
-        this.checkPeriod = timePeriod;
+        this.timePeriod = timePeriod;
     }
 
     public final ExecuteCheck executeCheck()
     {
-        if (this.checkCommand == null) return null;
+        if (this.command == null) return null;
         ExecuteCheck executeCheck = new ExecuteCheck();
         executeCheck.setId(UUID.randomUUID());
         executeCheck.setCheckType(this.getType());
         executeCheck.setCheckId(this.getId());
-        executeCheck.setEngine(this.checkCommand.getEngine());
-        executeCheck.setName(this.checkCommand.getName());
+        executeCheck.setEngine(this.command.getEngine());
+        executeCheck.setName(this.command.getName());
         // TODO: eval the parameters
         ExpressContext context = this.createExpressContext();
         // configured parameters
-        for (Parameter parameter : this.checkCommand.getParameters())
+        for (Parameter parameter : this.command.getParameters())
         {
             ValueExpression vexp = new ValueExpression(context, parameter.getValue());
             String value = (String) vexp.get(context, this);
@@ -180,10 +181,10 @@ public abstract class ActiveCheck extends RealCheck
                 }
                 else if (source instanceof ActiveCheck)
                 {
-                    ActiveCheck check = (ActiveCheck) source;
-                    if (check.getCheckCommand() != null)
+                    ActiveCheck<?> check = (ActiveCheck<?>) source;
+                    if (check.getCommand() != null)
                     {
-                        String param = check.checkCommand.getParameter(name);
+                        String param = check.command.getParameter(name);
                         if (param != null)
                         {
                             return param;
@@ -195,11 +196,17 @@ public abstract class ActiveCheck extends RealCheck
         });
     }
 
-    protected void toMO(ActiveCheckMO mo)
+    protected void toMO(ActiveCheckMO mo, boolean stub)
     {
-        super.toMO(mo);
+        super.toMO(mo, stub);
         mo.setCheckInterval(this.getCheckInterval());
         mo.setRetryInterval(this.getRetryInterval());
+        mo.setCurrentInterval(this.getCurrentInterval());
+        if (! stub)
+        {
+            mo.setCommand(Util.nullable(this.getCommand(), Command::toStubMO));
+            mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
+        }
     }
 
     public ActiveCheckStats getStats()

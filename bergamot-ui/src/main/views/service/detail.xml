@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Service #{service.displayName} on Host #{service.host.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="Service #{service.summary} on Host #{service.host.displayName}">
 
 	<div class="row submenu pull-right">
 		<a rendered="#{service.suppressed}"  href="/service/unsuppress/#{service.id}">Unsupress</a>
@@ -17,7 +17,7 @@
 				<span class="dash_img #{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
 					<img src="/service-icon.png" />
 				</span>
-				<span class="name">#{service.displayName}</span>
+				<span class="name">#{service.summary}</span>
 		    </h3>
 		    <p>
 			    <span class="label wide">Status: </span>
@@ -26,7 +26,7 @@
 		    <p>
 			    <span class="label wide">Host: </span>
 			    <a href="/host/name/#{service.host.name}">
-				    <span class="value">#{service.host.displayName}</span>
+				    <span class="value">#{service.host.summary}</span>
 				</a>
 		    </p>
 		    <p>
@@ -71,7 +71,7 @@
 			<h3>Contacts</h3>
 			<data-set var="contact" value="#{service.allContacts}">
 				<p>
-					<span class="label wide">#{contact.displayName}</span>
+					<span class="label wide">#{contact.summary}</span>
 					<span class="value">&nbsp;</span>
 				</p>
 			</data-set>
@@ -80,7 +80,7 @@
 			<h3>Scheduling</h3>
 			<p>
 				<span class="label wide">Check period</span>
-				<span class="value">#{service.checkPeriod.displayName}</span>
+				<span class="value">#{service.timePeriod.summary}</span>
 			</p>
 			<p>
 				<span class="label wide">Check interval</span>
@@ -99,7 +99,7 @@
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(service.notifications.timePeriod.displayName, 'Not configured')}</span>
+				<span class="value">#{coalesce(service.notifications.timePeriod.summary, 'Not configured')}</span>
 			</p>
 		</div>
 	</div>
@@ -136,17 +136,17 @@
 			<h3>Command</h3>
 			<p>
 				<span class="label wide">Command Engine: </span>
-				<span class="value">#{service.checkCommand.engine}</span>
+				<span class="value">#{service.command.engine}</span>
 			</p>
 			<p>
 				<span class="label wide">Command Name: </span>
-				<span class="value">#{service.checkCommand.name}</span>
+				<span class="value">#{service.command.name}</span>
 			</p>
 			<p>
 				<span class="label wide">Parameters:</span>
 				<span class="value">&nbsp;</span>
 			</p>
-			<data-set var="parameter" value="#{service.checkCommand.parameters}">
+			<data-set var="parameter" value="#{service.command.parameters}">
 				<p>
 					<span class="label wide indent">#{parameter.name}: </span>
 					<span class="value">#{parameter.value}</span>
@@ -159,6 +159,13 @@
 		<div class="col12">
 			<h3>XML</h3>
 			<pre>#{service.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>JSON</h3>
+			<pre>#{service.toJSON()}</pre>
 		</div>
 	</div>
 	

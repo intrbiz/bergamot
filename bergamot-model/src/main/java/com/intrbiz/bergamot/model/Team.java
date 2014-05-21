@@ -5,15 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TeamCfg;
+import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.configuration.Configurable;
 
 /**
  * A team of people, who can be notified
  */
-public class Team extends NamedObject implements Configurable<TeamCfg>
+public class Team extends NamedObject<TeamMO> implements Configurable<TeamCfg>
 {
     private TeamCfg config;
 
@@ -36,7 +38,7 @@ public class Team extends NamedObject implements Configurable<TeamCfg>
         this.config = cfg;
         TeamCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
-        this.displayName = Util.coalesce(rcfg.getSummary(), this.name);
+        this.summary = Util.coalesce(rcfg.getSummary(), this.name);
     }
 
     @Override
@@ -101,6 +103,20 @@ public class Team extends NamedObject implements Configurable<TeamCfg>
     public void addContact(Contact contact)
     {
         this.contacts.add(contact);
-        contact.getContactGroups().add(this);
+        contact.getTeams().add(this);
+    }
+    
+    @Override
+    public TeamMO toMO(boolean stub)
+    {
+        TeamMO mo = new TeamMO();
+        super.toMO(mo, stub);
+        if (! stub)
+        {
+            mo.setParents(this.getParents().stream().map(Team::toStubMO).collect(Collectors.toList()));
+            mo.setChildren(this.getChildren().stream().map(Team::toStubMO).collect(Collectors.toList()));
+            mo.setContacts(this.getContacts().stream().map(Contact::toStubMO).collect(Collectors.toList()));
+        }
+        return mo;
     }
 }

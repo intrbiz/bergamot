@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.macro.MacroFrame;
 import com.intrbiz.bergamot.compat.macro.MacroProcessor;
-import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.task.Task;
 import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
@@ -49,7 +49,7 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
             String command = executeCheck.getParameter("command");
             if (Util.isEmpty(host)) throw new RuntimeException("The 'command' parameter must be provided.");
             // currently we apply the nagios macros here, this will change
-            MacroFrame checkFrame = MacroFrame.fromParameters(executeCheck.getParameters());
+            MacroFrame checkFrame = MacroFrame.fromParameters(executeCheck.getParameters(), ParameterMO::getName, ParameterMO::getValue);
             host = MacroProcessor.applyMacros(host, checkFrame);
             command = MacroProcessor.applyMacros(command, checkFrame);
             // TODO arguments support
@@ -70,7 +70,7 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
             // TODO handle NRPE down
             logger.error("Failed to execute NRPE check", e);
             result.setOk(false);
-            result.setStatus(Status.ERROR);
+            result.setStatus("ERROR");
             result.setOutput(e.getMessage());
             result.setRuntime(0);
         }

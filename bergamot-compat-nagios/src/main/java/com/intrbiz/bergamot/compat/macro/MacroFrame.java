@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-
-import com.intrbiz.bergamot.model.util.Parameter;
+import java.util.function.Function;
 
 public final class MacroFrame
 {
@@ -162,12 +161,12 @@ public final class MacroFrame
         return sb.toString();
     }
     
-    public static MacroFrame fromParameters(List<Parameter> parameters)
+    public static <E> MacroFrame fromParameters(List<E> parameters, Function<E,String> key, Function<E,String> value)
     {
         MacroFrame checkFrame = new MacroFrame();
-        for (Parameter parameter : parameters)
+        for (E parameter : parameters)
         {
-            checkFrame.put(parameter.getName(), parameter.getValue());
+            checkFrame.put(key.apply(parameter), value.apply(parameter));
         }
         return checkFrame;
     }

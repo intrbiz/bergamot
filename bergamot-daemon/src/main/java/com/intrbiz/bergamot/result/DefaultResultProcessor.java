@@ -86,7 +86,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         // stamp in processed time
         result.setProcessed(System.currentTimeMillis());
         // update the state
-        Check check = this.getBergamot().getObjectStore().lookupCheckable(result.getCheckType(), result.getCheckId());
+        Check<?> check = this.getBergamot().getObjectStore().lookupCheckable(result.getCheckType(), result.getCheckId());
         if (check instanceof RealCheck)
         {
             // should be process this result?
@@ -98,7 +98,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
             // apply the result
             CheckState state = check.getState();
             // apply the result
-            boolean isHardStateChange = this.applyResult((RealCheck) check, result);
+            boolean isHardStateChange = this.applyResult((RealCheck<?>) check, result);
             logger.info("State change: hard: " + isHardStateChange + ", transitioning: " + state.isTransitioning() + ", attempt: " + state.getAttempt());
             // reschedule
             if (state.isTransitioning())
@@ -106,13 +106,13 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
                 if (check instanceof ActiveCheck)
                 {
                     logger.info("Rescheduling " + check + " due to state change");
-                    this.getBergamot().getScheduler().reschedule((ActiveCheck) check);
+                    this.getBergamot().getScheduler().reschedule((ActiveCheck<?>) check);
                 }
             }
             // stats
             if (check instanceof ActiveCheck)
             {
-                this.computeStats(((ActiveCheck) check).getStats(), result);
+                this.computeStats(((ActiveCheck<?>) check).getStats(), result);
             }
             // send the general state update notifications
             this.sendStateUpdate(check);
@@ -139,13 +139,13 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         }
     }
 
-    protected void sendStateUpdate(Check check)
+    protected void sendStateUpdate(Check<?> check)
     {
         CheckState state = check.getState();
         logger.info("State update " + check + " is " + state.isOk() + " " + state.isHard() + " " + state.getStatus() + " " + state.getOutput());
     }
 
-    protected <T extends Notification> T createNotification(Check check, Calendar now, NotificationType type, Supplier<T> ctor)
+    protected <T extends Notification> T createNotification(Check<?> check, Calendar now, NotificationType type, Supplier<T> ctor)
     {
         T notification = ctor.get();
         // compute the engines available
@@ -166,7 +166,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         return notification;
     }
 
-    protected void sendRecovery(Check check)
+    protected void sendRecovery(Check<?> check)
     {
         logger.warn("Recovery for " + check);
         this.getBergamot().getObjectStore().removeAlert(check);
@@ -190,7 +190,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         }
     }
 
-    protected void sendAlert(Check check)
+    protected void sendAlert(Check<?> check)
     {
         logger.warn("Alert for " + check);
         if (!check.isSuppressed())
@@ -220,7 +220,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
      * 
      * @return true if a hard state change happened
      */
-    protected boolean applyResult(RealCheck check, Result result)
+    protected boolean applyResult(RealCheck<?> check, Result result)
     {
         CheckState state = check.getState();
         state.getLock().lock();
@@ -241,7 +241,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
             state.setLastCheckTime(result.getExecuted());
             state.setOk(result.isOk());
             state.pushOkHistory(result.isOk());
-            state.setStatus(result.getStatus());
+            state.setStatus(Status.valueOf(result.getStatus().toUpperCase()));
             state.setOutput(result.getOutput());
             state.setFlapping(isFlapping);
             // apply thresholds
@@ -274,11 +274,11 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
     
     // virtual check handling
 
-    protected void updateVirtualChecks(Check check, Result result, boolean isHardStateChange)
+    protected void updateVirtualChecks(Check<?> check, Result result, boolean isHardStateChange)
     {
         if (isHardStateChange)
         {
-            for (VirtualCheck referencedBy : check.getReferencedBy())
+            for (VirtualCheck<?> referencedBy : check.getReferencedBy())
             {
                 logger.info("Propagating result to check " + referencedBy);
                 // update the status of the check
@@ -307,7 +307,7 @@ public class DefaultResultProcessor extends AbstractComponent<ResultProcessorCfg
         }
     }
 
-    protected boolean applyVirtualResult(VirtualCheck check, boolean ok, Status status, Result cause)
+    protected boolean applyVirtualResult(VirtualCheck<?> check, boolean ok, Status status, Result cause)
     {
         CheckState state = check.getState();
         state.getLock().lock();
