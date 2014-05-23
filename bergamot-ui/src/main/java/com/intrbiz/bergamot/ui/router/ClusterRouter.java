@@ -14,17 +14,12 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/cluster")
 @Template("layout/main")
-public class ClusterRouter extends Router
-{
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
+public class ClusterRouter extends Router<BergamotApp>
+{    
     @Any("/name/:name")
     public void cluster(String name)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("cluster", bergamot.getObjectStore().lookupCluster(name));
         encode("cluster/detail");
     }
@@ -32,7 +27,7 @@ public class ClusterRouter extends Router
     @Any("/id/:id")
     public void cluster(@AsUUID UUID id)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("cluster", bergamot.getObjectStore().lookupCluster(id));
         encode("cluster/detail");
     }
@@ -40,7 +35,7 @@ public class ClusterRouter extends Router
     @Any("/enable/:id")
     public void enableCluster(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and enable it
         Cluster cluster = bergamot.getObjectStore().lookupCluster(id);
         if (cluster != null)
@@ -54,7 +49,7 @@ public class ClusterRouter extends Router
     @Any("/disable/:id")
     public void disableCluster(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and disable it
         Cluster cluster = bergamot.getObjectStore().lookupCluster(id);
         if (cluster != null)
@@ -68,7 +63,7 @@ public class ClusterRouter extends Router
     @Any("/suppress/:id")
     public void suppressCluster(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and supress it
         Cluster cluster = bergamot.getObjectStore().lookupCluster(id);
         if (cluster != null)
@@ -82,7 +77,7 @@ public class ClusterRouter extends Router
     @Any("/unsuppress/:id")
     public void unsuppressCluster(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and unsupress it
         Cluster cluster = bergamot.getObjectStore().lookupCluster(id);
         if (cluster != null)

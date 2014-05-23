@@ -15,13 +15,8 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/main")
-public class GroupsRouter extends Router
-{
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
+public class GroupsRouter extends Router<BergamotApp>
+{    
     @Any("/group")
     public void rediectGroups() throws IOException
     {
@@ -31,7 +26,7 @@ public class GroupsRouter extends Router
     @Any("/group/")
     public void showGroups()
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("groups", orderGroupsByStatus(bergamot.getObjectStore().getGroups().stream().filter((e) -> {return e.getParents().isEmpty();}).collect(Collectors.toList())));
         encode("group/index");
     }
@@ -39,7 +34,7 @@ public class GroupsRouter extends Router
     @Any("/group/name/:name")
     public void showHostGroupByName(String name)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         Group group = model("group", bergamot.getObjectStore().lookupGroup(name));
         model("checks", orderCheckByStatus(group.getChecks()));
         model("groups", orderGroupsByStatus(group.getChildren()));

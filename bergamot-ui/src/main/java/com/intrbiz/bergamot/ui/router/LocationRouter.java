@@ -14,13 +14,8 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/main")
-public class LocationRouter extends Router
-{
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
+public class LocationRouter extends Router<BergamotApp>
+{    
     @Any("/location")
     public void rediectLocations() throws IOException
     {
@@ -30,7 +25,7 @@ public class LocationRouter extends Router
     @Any("/location/")
     public void showLocations()
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("locations", orderLocationsByStatus(bergamot.getObjectStore().getRootLocations()));
         encode("location/index");
     }
@@ -38,7 +33,7 @@ public class LocationRouter extends Router
     @Any("/location/name/:name")
     public void showHostGroupByName(String name)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         Location location = model("location", bergamot.getObjectStore().lookupLocation(name));
         model("hosts", orderHostsByStatus(location.getHosts()));
         model("locations", orderLocationsByStatus(location.getLocations()));

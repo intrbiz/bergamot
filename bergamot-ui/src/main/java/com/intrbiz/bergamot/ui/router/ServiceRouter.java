@@ -16,17 +16,12 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/service")
 @Template("layout/main")
-public class ServiceRouter extends Router
+public class ServiceRouter extends Router<BergamotApp>
 {
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
     @Any("/name/:host/:service")
     public void service(String hostName, String serviceName)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         Host host = bergamot.getObjectStore().lookupHost(hostName);
         model("service", host.getService(serviceName));
         encode("service/detail");
@@ -35,7 +30,7 @@ public class ServiceRouter extends Router
     @Any("/id/:id")
     public void service(@AsUUID UUID id)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("service", bergamot.getObjectStore().lookupService(id));
         encode("service/detail");
     }
@@ -43,7 +38,7 @@ public class ServiceRouter extends Router
     @Any("/execute/:id")
     public void executeService(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and force it's execution
         Service service = bergamot.getObjectStore().lookupService(id);
         if (service != null)
@@ -58,7 +53,7 @@ public class ServiceRouter extends Router
     @Any("/enable/:id")
     public void enableService(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and enable it
         Service service = bergamot.getObjectStore().lookupService(id);
         if (service != null)
@@ -73,7 +68,7 @@ public class ServiceRouter extends Router
     @Any("/disable/:id")
     public void disableService(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and disable it
         Service service = bergamot.getObjectStore().lookupService(id);
         if (service != null)
@@ -88,7 +83,7 @@ public class ServiceRouter extends Router
     @Any("/suppress/:id")
     public void suppressService(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and supress it
         Service service = bergamot.getObjectStore().lookupService(id);
         if (service != null)
@@ -103,7 +98,7 @@ public class ServiceRouter extends Router
     @Any("/unsuppress/:id")
     public void unsuppressService(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and unsupress it
         Service service = bergamot.getObjectStore().lookupService(id);
         if (service != null)

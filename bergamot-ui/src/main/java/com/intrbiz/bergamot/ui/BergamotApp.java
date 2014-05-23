@@ -6,6 +6,17 @@ import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.bergamot.Bergamot;
 import com.intrbiz.bergamot.BergamotDaemon;
 import com.intrbiz.bergamot.config.BergamotDaemonCfg;
+import com.intrbiz.bergamot.ui.api.APIRouter;
+import com.intrbiz.bergamot.ui.api.AlertsAPIRouter;
+import com.intrbiz.bergamot.ui.api.ClusterAPIRouter;
+import com.intrbiz.bergamot.ui.api.CommandAPIRouter;
+import com.intrbiz.bergamot.ui.api.GroupAPIRouter;
+import com.intrbiz.bergamot.ui.api.HostAPIRouter;
+import com.intrbiz.bergamot.ui.api.LocationAPIRouter;
+import com.intrbiz.bergamot.ui.api.ResourceAPIRouter;
+import com.intrbiz.bergamot.ui.api.ServiceAPIRouter;
+import com.intrbiz.bergamot.ui.api.TimePeriodAPIRouter;
+import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.router.ClusterRouter;
 import com.intrbiz.bergamot.ui.router.DashboardRouter;
 import com.intrbiz.bergamot.ui.router.GroupsRouter;
@@ -37,6 +48,18 @@ public class BergamotApp extends BalsaApplication
         router(new TrapRouter());
         router(new ClusterRouter());
         router(new ResourceRouter());
+        // API
+        router(new APIRouter());
+        router(new AlertsAPIRouter());
+        router(new LocationAPIRouter());
+        router(new GroupAPIRouter());
+        router(new HostAPIRouter());
+        router(new ClusterAPIRouter());
+        router(new ServiceAPIRouter());
+        router(new TrapAPIRouter());
+        router(new ResourceAPIRouter());
+        router(new TimePeriodAPIRouter());
+        router(new CommandAPIRouter());
     }
     
     public Bergamot getBergamot()

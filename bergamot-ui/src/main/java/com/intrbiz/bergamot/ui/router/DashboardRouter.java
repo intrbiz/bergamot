@@ -9,17 +9,12 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/main")
-public class DashboardRouter extends Router
-{
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
+public class DashboardRouter extends Router<BergamotApp>
+{    
     @Any("/")
     public void index()
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("alerts", bergamot.getObjectStore().getAlerts());
         encode("index");
     }

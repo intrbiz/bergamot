@@ -15,17 +15,12 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/trap")
 @Template("layout/main")
-public class TrapRouter extends Router
-{
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
+public class TrapRouter extends Router<BergamotApp>
+{    
     @Any("/name/:host/:trap")
     public void trap(String hostName, String trapName)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         Host host = bergamot.getObjectStore().lookupHost(hostName);
         model("trap", host.getTrap(trapName));
         encode("trap/detail");
@@ -34,7 +29,7 @@ public class TrapRouter extends Router
     @Any("/id/:id")
     public void trap(@AsUUID UUID id)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("trap", bergamot.getObjectStore().lookupTrap(id));
         encode("trap/detail");
     }
@@ -42,7 +37,7 @@ public class TrapRouter extends Router
     @Any("/enable/:id")
     public void enableTrap(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the trap and enable it
         Trap trap = bergamot.getObjectStore().lookupTrap(id);
         if (trap != null)
@@ -55,7 +50,7 @@ public class TrapRouter extends Router
     @Any("/disable/:id")
     public void disableTrap(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the trap and disable it
         Trap trap = bergamot.getObjectStore().lookupTrap(id);
         if (trap != null)
@@ -68,7 +63,7 @@ public class TrapRouter extends Router
     @Any("/suppress/:id")
     public void suppressTrap(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the trap and supress it
         Trap trap = bergamot.getObjectStore().lookupTrap(id);
         if (trap != null)
@@ -83,7 +78,7 @@ public class TrapRouter extends Router
     @Any("/unsuppress/:id")
     public void unsuppressTrap(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the trap and unsupress it
         Trap trap = bergamot.getObjectStore().lookupTrap(id);
         if (trap != null)

@@ -16,17 +16,12 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/host")
 @Template("layout/main")
-public class HostRouter extends Router
-{
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
+public class HostRouter extends Router<BergamotApp>
+{   
     @Any("/name/:name")
     public void host(String name)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("host", bergamot.getObjectStore().lookupHost(name));
         encode("host/detail");
     }
@@ -34,7 +29,7 @@ public class HostRouter extends Router
     @Any("/id/:id")
     public void host(@AsUUID UUID id)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("host", bergamot.getObjectStore().lookupHost(id));
         encode("host/detail");
     }
@@ -42,7 +37,7 @@ public class HostRouter extends Router
     @Any("/execute/:id")
     public void executeHost(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the host and force it's execution
         Host host = bergamot.getObjectStore().lookupHost(id);
         if (host != null)
@@ -57,7 +52,7 @@ public class HostRouter extends Router
     @Any("/enable/:id")
     public void enableHost(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and enable it
         Host host = bergamot.getObjectStore().lookupHost(id);
         if (host != null)
@@ -72,7 +67,7 @@ public class HostRouter extends Router
     @Any("/disable/:id")
     public void disableHost(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and disable it
         Host host = bergamot.getObjectStore().lookupHost(id);
         if (host != null)
@@ -87,7 +82,7 @@ public class HostRouter extends Router
     @Any("/suppress/:id")
     public void suppressHost(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and supress it
         Host host = bergamot.getObjectStore().lookupHost(id);
         if (host != null)
@@ -101,7 +96,7 @@ public class HostRouter extends Router
     @Any("/unsuppress/:id")
     public void unsuppressHost(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the service and unsupress it
         Host host = bergamot.getObjectStore().lookupHost(id);
         if (host != null)
@@ -115,7 +110,7 @@ public class HostRouter extends Router
     @Any("/execute-services/:id")
     public void executeServicesOnHost(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the host and force it's execution
         Host host = bergamot.getObjectStore().lookupHost(id);
         if (host != null)

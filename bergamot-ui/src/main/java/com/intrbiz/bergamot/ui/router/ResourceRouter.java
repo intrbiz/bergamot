@@ -15,17 +15,12 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/resource")
 @Template("layout/main")
-public class ResourceRouter extends Router
-{
-    private Bergamot getBergamot()
-    {
-        return ((BergamotApp) this.app()).getBergamot();
-    }
-    
+public class ResourceRouter extends Router<BergamotApp>
+{   
     @Any("/name/:host/:resource")
     public void resource(String hostName, String resourceName)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         Cluster cluster = bergamot.getObjectStore().lookupCluster(hostName);
         model("resource", cluster.getResource(resourceName));
         encode("resource/detail");
@@ -34,7 +29,7 @@ public class ResourceRouter extends Router
     @Any("/id/:id")
     public void resource(@AsUUID UUID id)
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         model("resource", bergamot.getObjectStore().lookupResource(id));
         encode("resource/detail");
     }
@@ -42,7 +37,7 @@ public class ResourceRouter extends Router
     @Any("/enable/:id")
     public void enableResource(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the resource and enable it
         Resource resource = bergamot.getObjectStore().lookupResource(id);
         if (resource != null)
@@ -55,7 +50,7 @@ public class ResourceRouter extends Router
     @Any("/disable/:id")
     public void disableResource(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the resource and disable it
         Resource resource = bergamot.getObjectStore().lookupResource(id);
         if (resource != null)
@@ -68,7 +63,7 @@ public class ResourceRouter extends Router
     @Any("/suppress/:id")
     public void suppressResource(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the resource and supress it
         Resource resource = bergamot.getObjectStore().lookupResource(id);
         if (resource != null)
@@ -83,7 +78,7 @@ public class ResourceRouter extends Router
     @Any("/unsuppress/:id")
     public void unsuppressResource(@AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.getBergamot();
+        Bergamot bergamot = this.app().getBergamot();
         // get the resource and unsupress it
         Resource resource = bergamot.getObjectStore().lookupResource(id);
         if (resource != null)
