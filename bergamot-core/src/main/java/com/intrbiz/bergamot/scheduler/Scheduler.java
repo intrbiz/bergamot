@@ -22,22 +22,22 @@ public interface Scheduler extends BergamotComponent<SchedulerCfg>
     /**
      * Schedule the given check
      */
-    void schedule(ActiveCheck check);
+    void schedule(ActiveCheck<?> check);
     
     /**
      * Reschedule the given check due to some form of state change
      */
-    void reschedule(ActiveCheck check);
+    void reschedule(ActiveCheck<?> check);
     
     /**
      * Ensure that the given check is enabled, so that it will be 
      * executed
      */
-    void enable(ActiveCheck check);
+    void enable(ActiveCheck<?> check);
     
     /**
      * Ensure that the given check is disable, so that it will not be 
      * executed
      */
-    void disable(ActiveCheck check);
+    void disable(ActiveCheck<?> check);
 }
