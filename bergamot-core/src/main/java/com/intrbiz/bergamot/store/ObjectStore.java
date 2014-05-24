@@ -93,6 +93,11 @@ public class ObjectStore
     {
         return this.groups.get(name);
     }
+    
+    public Group lookupGroup(UUID id)
+    {
+        return this.groups.values().stream().filter((e)->{return id.equals(e.getId());}).findFirst().get();
+    }
 
     public void addGroup(Group group)
     {
@@ -141,6 +146,11 @@ public class ObjectStore
     public Command lookupCommand(String name)
     {
         return this.commands.get(name);
+    }
+    
+    public Command lookupCommand(UUID id)
+    {
+        return this.commands.values().stream().filter((c)->{return id.equals(c.getId());}).findFirst().get();
     }
 
     public void addCommand(Command command)
@@ -251,6 +261,11 @@ public class ObjectStore
     {
         return this.timePeriods.get(timePeriod);
     }
+    
+    public TimePeriod lookupTimePeriod(UUID id)
+    {
+        return this.timePeriods.values().stream().filter((e)->{return id.equals(e.getId());}).findFirst().get();
+    }
 
     public void addTimePeriod(TimePeriod timePeriod)
     {
@@ -272,6 +287,11 @@ public class ObjectStore
     public Location lookupLocation(String location)
     {
         return this.locations.get(location);
+    }
+    
+    public Location lookupLocation(UUID id)
+    {
+        return this.locations.values().stream().filter((e)->{return id.equals(e.getId());}).findFirst().get();
     }
 
     public void addLocation(Location location)
@@ -295,6 +315,11 @@ public class ObjectStore
     {
         return this.teams.get(contactGroup);
     }
+    
+    public Team lookupTeam(UUID id)
+    {
+        return this.teams.values().stream().filter((e)->{return id.equals(e.getId());}).findFirst().get();
+    }
 
     public void addTeam(Team team)
     {
@@ -316,6 +341,16 @@ public class ObjectStore
     public Contact lookupContact(String contact)
     {
         return this.contacts.get(contact);
+    }
+    
+    public Contact lookupContact(UUID id)
+    {
+        return this.contacts.values().stream().filter((e)->{return id.equals(e.getId());}).findFirst().get();
+    }
+    
+    public Contact lookupContactByEmail(String email)
+    {
+        return this.contacts.values().stream().filter((e)->{return email.equals(e.getEmail());}).findFirst().get();
     }
 
     public void addContact(Contact contact)
