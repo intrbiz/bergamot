@@ -1,35 +1,61 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.UUID;
+
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.ResourceCfgAdapter;
 import com.intrbiz.bergamot.model.message.ResourceMO;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
  * A resource of a cluster, which is provided by multiple services
  */
-public class Resource extends VirtualCheck<ResourceMO> implements Configurable<ResourceCfg>
+@SQLTable(schema = BergamotDB.class, name = "resource", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "host_name_unq", columns = {"cluster_id", "name"})
+public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
 {
-    private Cluster cluster;
-
-    private ResourceCfg config;
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ResourceCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected ResourceCfg configuration;
+    
+    @SQLColumn(index = 2, name = "cluster_id", since = @SQLVersion({ 1, 0, 0 }))
+    private UUID clusterId;
 
     public Resource()
     {
         super();
     }
+    
+    @Override
+    public ResourceCfg getConfiguration()
+    {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(ResourceCfg configuration)
+    {
+        this.configuration = configuration;
+    }
 
     @Override
     public void configure(ResourceCfg cfg)
     {
-        this.config = cfg;
+        super.configure(cfg);
         ResourceCfg rcfg = cfg.resolve();
         //
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
         // initial state
+        // TODO
+        /*
         if (rcfg.getInitialState() != null)
         {
             this.getState().setStatus(Status.valueOf(rcfg.getInitialState().getStatus().toUpperCase()));
@@ -39,12 +65,7 @@ public class Resource extends VirtualCheck<ResourceMO> implements Configurable<R
             this.getState().setLastHardOk(this.getState().isOk());
             this.getState().setLastHardOutput(this.getState().getOutput());
         }
-    }
-
-    @Override
-    public ResourceCfg getConfiguration()
-    {
-        return this.config;
+        */
     }
 
     @Override
@@ -53,14 +74,22 @@ public class Resource extends VirtualCheck<ResourceMO> implements Configurable<R
         return "resource";
     }
 
-    public Cluster getCluster()
+    public UUID getClusterId()
     {
-        return cluster;
+        return this.clusterId;
     }
 
-    public void setCluster(Cluster cluster)
+    public void setClusterId(UUID clusterId)
     {
-        this.cluster = cluster;
+        this.clusterId = clusterId;
+    }
+    
+    public Cluster getCluster()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCluster(this.getClusterId());
+        }
     }
     
     public String toString()

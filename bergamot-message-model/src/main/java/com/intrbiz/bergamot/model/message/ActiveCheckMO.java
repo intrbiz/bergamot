@@ -9,13 +9,13 @@ public abstract class ActiveCheckMO extends RealCheckMO
 
     @JsonProperty("retry_interval")
     protected long retryInterval;
-    
+
     @JsonProperty("current_interval")
     protected long currentInterval;
-    
-    @JsonProperty("command")
-    protected CommandMO command;
-    
+
+    @JsonProperty("check_command")
+    protected CheckCommandMO checkCommand;
+
     @JsonProperty("time_period")
     protected TimePeriodMO timePeriod;
 
@@ -54,14 +54,14 @@ public abstract class ActiveCheckMO extends RealCheckMO
         this.currentInterval = currentInterval;
     }
 
-    public CommandMO getCommand()
+    public CheckCommandMO getCheckCommand()
     {
-        return command;
+        return checkCommand;
     }
 
-    public void setCommand(CommandMO command)
+    public void setCheckCommand(CheckCommandMO checkCommand)
     {
-        this.command = command;
+        this.checkCommand = checkCommand;
     }
 
     public TimePeriodMO getTimePeriod()

@@ -1,29 +1,47 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.StatusesAdapter;
 import com.intrbiz.bergamot.model.message.NotificationsMO;
+import com.intrbiz.data.db.compiler.meta.Action;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
+@SQLTable(schema = BergamotDB.class, name = "notifications", since = @SQLVersion({ 1, 0, 0 }))
 public class Notifications extends BergamotObject<NotificationsMO>
 {
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLPrimaryKey
+    private UUID id;
+
+    @SQLColumn(index = 2, name = "enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean enabled = true;
 
-    private TimePeriod timePeriod;
+    @SQLColumn(index = 3, name = "timeperiod_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT)
+    private UUID timePeriodId;
 
-    private List<NotificationEngine> engines = new LinkedList<NotificationEngine>();
-
+    @SQLColumn(index = 4, name = "alerts_enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean alertsEnabled = true;
 
+    @SQLColumn(index = 5, name = "recovery_enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean recoveryEnabled = true;
 
-    private Set<Status> ignore = new HashSet<Status>();
+    @SQLColumn(index = 6, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    private List<Status> ignore = new LinkedList<Status>();
 
+    @SQLColumn(index = 7, name = "all_engines_enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean allEnginesEnabled = true;
 
     public Notifications()
@@ -31,19 +49,27 @@ public class Notifications extends BergamotObject<NotificationsMO>
         super();
     }
 
-    public List<NotificationEngine> getEngines()
+    public UUID getId()
     {
-        return engines;
+        return id;
     }
 
-    public void setEngines(List<NotificationEngine> engines)
+    public void setId(UUID id)
     {
-        this.engines = engines;
+        this.id = id;
+    }
+
+    public List<NotificationEngine> getEngines()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getNotificationEngines(this.getId());
+        }
     }
 
     public void addEngine(NotificationEngine engine)
     {
-        this.engines.add(engine);
+        // TODO
     }
 
     public boolean isEnabled()
@@ -58,12 +84,21 @@ public class Notifications extends BergamotObject<NotificationsMO>
 
     public TimePeriod getTimePeriod()
     {
-        return timePeriod;
+        if (this.getTimePeriodId() == null) return null;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getTimePeriod(this.getTimePeriodId());
+        }
     }
 
-    public void setTimePeriod(TimePeriod timePeriod)
+    public UUID getTimePeriodId()
     {
-        this.timePeriod = timePeriod;
+        return timePeriodId;
+    }
+
+    public void setTimePeriodId(UUID timePeriodId)
+    {
+        this.timePeriodId = timePeriodId;
     }
 
     public boolean isAlertsEnabled()
@@ -86,12 +121,12 @@ public class Notifications extends BergamotObject<NotificationsMO>
         this.recoveryEnabled = recoveryEnabled;
     }
 
-    public Set<Status> getIgnore()
+    public List<Status> getIgnore()
     {
         return ignore;
     }
 
-    public void setIgnore(Set<Status> ignore)
+    public void setIgnore(List<Status> ignore)
     {
         this.ignore = ignore;
     }
@@ -108,12 +143,17 @@ public class Notifications extends BergamotObject<NotificationsMO>
 
     public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
     {
-        return this.enabled && this.isNotificationTypeEnabled(type) && (!this.isStatusIgnored(status)) && (this.timePeriod == null ? true : this.timePeriod.isInTimeRange(time)) && (this.allEnginesEnabled || this.engines.stream().anyMatch((e) -> {return e.isEnabledAt(type, status, time);}));
+        TimePeriod timePeriod = this.getTimePeriod();
+        return this.enabled && this.isNotificationTypeEnabled(type) && (!this.isStatusIgnored(status)) && (timePeriod == null ? true : timePeriod.isInTimeRange(time)) && (this.allEnginesEnabled || this.getEngines().stream().anyMatch((e) -> {
+            return e.isEnabledAt(type, status, time);
+        }));
     }
 
     private boolean isStatusIgnored(Status status)
     {
-        return this.ignore.stream().anyMatch((e) -> {return e == status;});
+        return this.ignore.stream().anyMatch((e) -> {
+            return e == status;
+        });
     }
 
     private boolean isNotificationTypeEnabled(NotificationType type)
@@ -123,12 +163,18 @@ public class Notifications extends BergamotObject<NotificationsMO>
 
     public Set<String> getEnginesEnabledAt(NotificationType type, Status status, Calendar time)
     {
-        return this.engines.stream().filter((e) -> {return e.isEnabledAt(type, status, time);}).map(NotificationEngine::getEngine).collect(Collectors.toSet());
+        return this.getEngines().stream().filter((e) -> {
+            return e.isEnabledAt(type, status, time);
+        }).map(NotificationEngine::getEngine).collect(Collectors.toSet());
     }
 
     public boolean isEngineEnabledAt(NotificationType type, Status status, Calendar time, String engine)
     {
-        return this.engines.stream().filter((e) -> {return engine.equals(e.getEngine());}).anyMatch((e) -> {return e.isEnabledAt(type, status, time);});
+        return this.getEngines().stream().filter((e) -> {
+            return engine.equals(e.getEngine());
+        }).anyMatch((e) -> {
+            return e.isEnabledAt(type, status, time);
+        });
     }
 
     @Override

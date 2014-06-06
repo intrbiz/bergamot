@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model.message.notification;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,6 +23,9 @@ public abstract class Notification extends Message
 
     @JsonProperty("check")
     private CheckMO check;
+    
+    @JsonProperty("alert_id")
+    private UUID alertId;
 
     public Notification()
     {
@@ -30,12 +34,6 @@ public abstract class Notification extends Message
     
     @JsonIgnore
     public abstract String getNotificationType();
-
-    @Override
-    public String getDefaultExchange()
-    {
-        return "bergamot.notification";
-    }
 
     public long getRaised()
     {
@@ -65,5 +63,15 @@ public abstract class Notification extends Message
     public void setCheck(CheckMO check)
     {
         this.check = check;
+    }
+
+    public UUID getAlertId()
+    {
+        return alertId;
+    }
+
+    public void setAlertId(UUID alertId)
+    {
+        this.alertId = alertId;
     }
 }

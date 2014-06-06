@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
-import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 /**
  * The result of a check
@@ -50,12 +50,6 @@ public class Result extends Message
     public Result()
     {
         super();
-    }
-    
-    @Override
-    public String getDefaultExchange()
-    {
-        return "bergamot.result";
     }
 
     public String getCheckType()

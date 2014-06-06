@@ -4,87 +4,87 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.bergamot.Bergamot;
-import com.intrbiz.bergamot.model.Host;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/trap")
 @Template("layout/main")
+@RequireValidPrincipal()
 public class TrapRouter extends Router<BergamotApp>
 {    
     @Any("/name/:host/:trap")
-    public void trap(String hostName, String trapName)
+    @WithDataAdapter(BergamotDB.class)
+    public void trap(BergamotDB db, String hostName, String trapName, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        Host host = bergamot.getObjectStore().lookupHost(hostName);
-        model("trap", host.getTrap(trapName));
+        model("trap", db.getTrapOnHostByName(site.getId(), hostName, trapName));
         encode("trap/detail");
     }
     
     @Any("/id/:id")
-    public void trap(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public void trap(BergamotDB db, @AsUUID UUID id)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        model("trap", bergamot.getObjectStore().lookupTrap(id));
+        model("trap", db.getTeam(id));
         encode("trap/detail");
     }
     
     @Any("/enable/:id")
-    public void enableTrap(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void enableTrap(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the trap and enable it
-        Trap trap = bergamot.getObjectStore().lookupTrap(id);
+        Trap trap = db.getTrap(id);
         if (trap != null)
         {
             trap.setEnabled(true);
+            db.setTrap(trap);
         }
         redirect("/trap/id/" + id);
     }
     
     @Any("/disable/:id")
-    public void disableTrap(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void disableTrap(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the trap and disable it
-        Trap trap = bergamot.getObjectStore().lookupTrap(id);
+        Trap trap = db.getTrap(id);
         if (trap != null)
         {
             trap.setEnabled(false);
+            db.setTrap(trap);
         }
         redirect("/trap/id/" + id);
     }
     
     @Any("/suppress/:id")
-    public void suppressTrap(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void suppressTrap(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the trap and supress it
-        Trap trap = bergamot.getObjectStore().lookupTrap(id);
+        Trap trap = db.getTrap(id);
         if (trap != null)
         {
-            // suppress the trap
             trap.setSuppressed(true);
-            bergamot.getObjectStore().removeAlert(trap);
+            db.setTrap(trap);
         }
         redirect("/trap/id/" + id);
     }
     
     @Any("/unsuppress/:id")
-    public void unsuppressTrap(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void unsuppressTrap(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the trap and unsupress it
-        Trap trap = bergamot.getObjectStore().lookupTrap(id);
+        Trap trap = db.getTrap(id);
         if (trap != null)
         {
-            // unsuppress the trap
             trap.setSuppressed(false);
+            db.setTrap(trap);
         }
         redirect("/trap/id/" + id);
     }

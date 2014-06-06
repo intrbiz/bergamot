@@ -1,119 +1,154 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.GroupCfg;
-import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.GroupCfgAdapter;
 import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.state.GroupState;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-public class Group extends NamedObject<GroupMO> implements Configurable<GroupCfg>
+@SQLTable(schema = BergamotDB.class, name = "group", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "name_unq", columns = { "site_id", "name" })
+public class Group extends NamedObject<GroupMO, GroupCfg>
 {
-    private GroupCfg config;
-
-    // group hierarchy
-
-    private Map<String, Group> parents = new TreeMap<String, Group>();
-
-    private Map<String, Group> children = new TreeMap<String, Group>();
-
-    // group members
-
-    private Map<UUID, Check<? extends CheckMO>> checks = new TreeMap<UUID, Check<? extends CheckMO>>();
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = GroupCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected GroupCfg configuration;
+    
+    /**
+     * The groups this group is a member of
+     */
+    @SQLColumn(index = 2, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    protected List<UUID> groupIds = new LinkedList<UUID>();
 
     public Group()
     {
         super();
     }
+    
+    @Override
+    public GroupCfg getConfiguration()
+    {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(GroupCfg configuration)
+    {
+        this.configuration = configuration;
+    }
 
     @Override
     public void configure(GroupCfg cfg)
     {
-        this.config = cfg;
+        super.configure(cfg);
         GroupCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-    }
-
-    @Override
-    public GroupCfg getConfiguration()
-    {
-        return this.config;
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
     }
 
     public GroupState getState()
     {
-        return GroupState.compute(this.getChecks(), this.getChildren(), (g) -> { return g.getState(); });
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.computeGroupState(this.getId());
+        }
     }
 
-    public Collection<Group> getParents()
+    public List<UUID> getGroupIds()
     {
-        return parents.values();
+        return groupIds;
+    }
+
+    public void setGroupIds(List<UUID> groupIds)
+    {
+        this.groupIds = groupIds;
+    }
+
+    public List<Group> getGroups()
+    {
+        List<Group> r = new LinkedList<Group>();
+        if (this.getGroupIds() != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                for (UUID id : this.getGroupIds())
+                {
+                    r.add(db.getGroup(id));
+                }
+            }
+        }
+        return r;
     }
 
     public void addParent(Group parent)
     {
-        this.parents.put(parent.getName(), parent);
+        // TODO
     }
 
     public void removeParent(Group parent)
     {
-        this.parents.remove(parent.getName());
+        // TODO
     }
 
-    public Collection<Group> getChildren()
+    public List<Group> getChildren()
     {
-        return children.values();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getGroupsInGroup(this.getId());
+        }
     }
 
     public void removeChild(Group child)
     {
-        this.children.remove(child.getName());
-        child.removeParent(this);
+        // TODO
     }
 
     public void addChild(Group child)
     {
-        this.children.put(child.getName(), child);
-        child.addParent(this);
+        // TODO
     }
 
-    public Collection<Check<? extends CheckMO>> getChecks()
+    public Collection<Check<?,?>> getChecks()
     {
-        return checks.values();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getChecksInGroup(this.getId());
+        }
     }
 
-    public void addCheck(Check<? extends CheckMO> check)
+    public void addCheck(Check<?,?> check)
     {
-        this.checks.put(check.getId(), check);
-        check.addGroup(this);
+        // TODO
     }
 
-    public void removeCheck(Check<? extends CheckMO> check)
+    public void removeCheck(Check<?,?> check)
     {
-        this.checks.remove(check.getId());
-        check.removeGroup(this);
+        // TODO
     }
-    
 
-    @Override    
+    @Override
     public GroupMO toMO(boolean stub)
     {
         GroupMO mo = new GroupMO();
         super.toMO(mo, stub);
         mo.setState(this.getState().toMO());
-        if (! stub)
+        if (!stub)
         {
             mo.setChecks(this.getChecks().stream().map(Check::toStubMO).collect(Collectors.toList()));
-            mo.setParents(this.getParents().stream().map(Group::toStubMO).collect(Collectors.toList()));
+            mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));
             mo.setChildren(this.getChildren().stream().map(Group::toStubMO).collect(Collectors.toList()));
         }
-        return  mo;
+        return mo;
     }
 }

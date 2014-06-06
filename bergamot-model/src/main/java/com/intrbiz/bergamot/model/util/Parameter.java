@@ -9,20 +9,20 @@ import com.intrbiz.bergamot.model.BergamotObject;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
-@JsonTypeName("bergamot.parameter")
+@JsonTypeName("parameter")
 public class Parameter extends BergamotObject<ParameterMO>
 {
     @JsonProperty("name")
     private String name;
-    
+
     @JsonProperty("value")
     private String value;
-    
+
     public Parameter()
     {
         super();
     }
-    
+
     public Parameter(String name, String value)
     {
         super();
@@ -49,23 +49,39 @@ public class Parameter extends BergamotObject<ParameterMO>
     {
         this.value = value;
     }
-    
-    public static Parameter parse(String parameter)
+
+    @Override
+    public int hashCode()
     {
-        int idx = parameter.indexOf("=");
-        if (idx > 0)
-        {
-            return new Parameter(parameter.substring(0, idx), parameter.substring(idx + 1));
-        }
-        else
-        {
-            return new Parameter(parameter, null);
-        }
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
     }
-    
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        Parameter other = (Parameter) obj;
+        if (name == null)
+        {
+            if (other.name != null) return false;
+        }
+        else if (!name.equals(other.name)) return false;
+        return true;
+    }
+
     @Override
     public ParameterMO toMO(boolean stub)
     {
         return new ParameterMO(this.getName(), this.getValue());
+    }
+
+    public String toString()
+    {
+        return this.name + " => " + this.value;
     }
 }

@@ -22,20 +22,20 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @JSON
     public List<TimePeriodMO> getTimePeriods()
     {
-        return this.app().getBergamot().getObjectStore().getTimePeriods().stream().map(TimePeriod::toMO).collect(Collectors.toList());
+        return null; //return this.app().getBergamot().getObjectStore().getTimePeriods().stream().map(TimePeriod::toMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     public TimePeriodMO getTimePeriod(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupTimePeriod(name), TimePeriod::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTimePeriod(name), TimePeriod::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     public TimePeriodMO getTimePeriod(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupTimePeriod(id), TimePeriod::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTimePeriod(id), TimePeriod::toMO);
     }
 }

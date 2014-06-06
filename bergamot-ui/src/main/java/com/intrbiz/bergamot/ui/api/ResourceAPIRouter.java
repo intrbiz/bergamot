@@ -21,27 +21,27 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     public ResourceMO getResource(String clusterName, String name)
     {    
-        return Util.nullable((Resource)Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(clusterName), (h)->{return h.getResource(name);}), Resource::toMO);
+        return null; //return Util.nullable((Resource)Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(clusterName), (h)->{return h.getResource(name);}), Resource::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     public ResourceMO getResource(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupResource(id), Resource::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupResource(id), Resource::toMO);
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getResourceState(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupResource(id), (r)->{return r.getState().toMO();});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupResource(id), (r)->{return r.getState().toMO();});
     }
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getResourceState(String clusterName, String name)
     {    
-        return Util.nullable((Resource)Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(clusterName), (h)->{return h.getResource(name);}), (r)->{return r.getState().toMO();});
+        return null; //return Util.nullable((Resource)Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(clusterName), (h)->{return h.getResource(name);}), (r)->{return r.getState().toMO();});
     }
 }

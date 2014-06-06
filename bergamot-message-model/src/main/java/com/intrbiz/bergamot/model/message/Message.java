@@ -2,34 +2,15 @@ package com.intrbiz.bergamot.model.message;
 
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.queue.name.GenericKey;
 
 /**
  * A message which will be published to a queue
  */
 public abstract class Message extends MessageObject
 {
-    /**
-     * Use the JsonTypeName annotation to lookup the given message type name
-     */
-    public static final String getMessageType(Class<? extends Message> cls)
-    {
-        JsonTypeName typeName = cls.getAnnotation(JsonTypeName.class);
-        if (typeName == null) throw new RuntimeException("The message " + cls + " is not annotated with it's type name!");
-        return typeName.value();
-    }
-
-    @JsonIgnore()
-    private final String typeName = getMessageType(this.getClass());
-
     @JsonProperty("id")
     private UUID id = UUID.randomUUID();
-
-    @JsonProperty("sender")
-    private String sender;
 
     public Message()
     {
@@ -44,41 +25,5 @@ public abstract class Message extends MessageObject
     public final void setId(UUID id)
     {
         this.id = id;
-    }
-
-    public final String getSender()
-    {
-        return sender;
-    }
-
-    public final void setSender(String sender)
-    {
-        this.sender = sender;
-    }
-
-    /**
-     * Get the type name for this message
-     * 
-     * @return
-     */
-    @JsonIgnore
-    public final String getType()
-    {
-        return this.typeName;
-    }
-
-    /**
-     * Get the default exchange name for this message
-     */
-    @JsonIgnore
-    public abstract String getDefaultExchange();
-    
-    /**
-     * Get the default route (queue) for this message
-     */
-    @JsonIgnore
-    public GenericKey getDefaultRoutingKey()
-    {
-        return null;
     }
 }

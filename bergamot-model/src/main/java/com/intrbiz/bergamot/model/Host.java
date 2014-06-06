@@ -1,52 +1,64 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.HostCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.HostCfgAdapter;
 import com.intrbiz.bergamot.model.message.HostMO;
-import com.intrbiz.bergamot.model.state.GroupState;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
  * A host - some form of network connected device that is to be checked
  */
-public class Host extends ActiveCheck<HostMO> implements Configurable<HostCfg>
+@SQLTable(schema = BergamotDB.class, name = "host", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "name_unq", columns = { "site_id", "name" })
+public class Host extends ActiveCheck<HostMO, HostCfg>
 {
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = HostCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected HostCfg configuration;
+    
+    @SQLColumn(index = 2, name = "address", since = @SQLVersion({ 1, 0, 0 }))
     private String address;
 
-    private Map<String, Service> services = new TreeMap<String, Service>();
-    
-    private Map<String, Trap> traps = new TreeMap<String, Trap>();
-
-    /**
-     * The location of this host
-     */
-    @JsonProperty("location")
-    private Location location;
-
-    private HostCfg config;
+    @SQLColumn(index = 3, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
+    private UUID locationId;
 
     public Host()
     {
         super();
     }
+    
+    @Override
+    public HostCfg getConfiguration()
+    {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(HostCfg configuration)
+    {
+        this.configuration = configuration;
+    }
 
     @Override
     public void configure(HostCfg cfg)
     {
-        this.config = cfg;
+        super.configure(cfg);
         HostCfg rcfg = cfg.resolve();
         //
         this.name = rcfg.getName();
         this.address = Util.coalesceEmpty(rcfg.getAddress(), this.name);
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
         this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
         this.checkInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getEvery());
@@ -54,6 +66,8 @@ public class Host extends ActiveCheck<HostMO> implements Configurable<HostCfg>
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
         // initial state
+        // TODO
+        /*
         this.getState().setAttempt(this.recoveryAttemptThreshold);
         if (rcfg.getInitialState() != null)
         {
@@ -64,12 +78,7 @@ public class Host extends ActiveCheck<HostMO> implements Configurable<HostCfg>
             this.getState().setLastHardOk(this.getState().isOk());
             this.getState().setLastHardOutput(this.getState().getOutput());
         }
-    }
-
-    @Override
-    public HostCfg getConfiguration()
-    {
-        return this.config;
+        */
     }
 
     public final String getType()
@@ -86,112 +95,101 @@ public class Host extends ActiveCheck<HostMO> implements Configurable<HostCfg>
     {
         this.address = address;
     }
-    
+
     // services
 
-    public Set<String> getServiceNames()
+    public List<Service> getServices()
     {
-        return this.services.keySet();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getServicesOnHost(this.getId());
+        }
     }
-
-    public Collection<Service> getServices()
+    
+    public Service getService(String name)
     {
-        return this.services.values();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getServiceOnHost(this.getId(), name);
+        }
     }
 
     public void addService(Service service)
     {
-        this.services.put(service.getName(), service);
-        service.setHost(this);
+        // TODO
     }
 
-    public Service getService(String name)
-    {
-        return this.services.get(name);
-    }
-
-    public boolean containsService(String name)
-    {
-        return this.services.containsKey(name);
-    }
-
-    public int getServiceCount()
-    {
-        return this.services.size();
-    }
-
-    public GroupState getServicesState()
-    {
-        return GroupState.compute(this.getServices(), null, null);
-    }
-    
     // traps
-    
-    public Set<String> getTrapNames()
-    {
-        return this.traps.keySet();
-    }
 
     public Collection<Trap> getTraps()
     {
-        return this.traps.values();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getTrapsOnHost(this.getId());
+        }
     }
 
     public void addTrap(Trap trap)
     {
-        this.traps.put(trap.getName(), trap);
-        trap.setHost(this);
+        // TODO
     }
 
     public Trap getTrap(String name)
     {
-        return this.traps.get(name);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getTrapOnHost(this.getId(), name);
+        }
     }
 
-    public boolean containsTrap(String name)
-    {
-        return this.traps.containsKey(name);
-    }
-
-    public int getTrapCount()
-    {
-        return this.traps.size();
-    }
-
-    public GroupState getTrapsState()
-    {
-        return GroupState.compute(this.getTraps(), null, null);
-    }
-    
     // location
 
     public Location getLocation()
     {
-        return location;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getLocation(this.locationId);
+        }
     }
 
-    public void setLocation(Location location)
+    public UUID getLocationId()
     {
-        this.location = location;
+        return this.locationId;
+    }
+
+    public void setLocationId(UUID locationId)
+    {
+        this.locationId = locationId;
     }
 
     public String toString()
     {
-        return "Host (" + this.id + ") " + this.name + " check " + this.command;
+        return "Host (" + this.id + ") " + this.name + " check " + this.getCheckCommand();
     }
-    
+
     @Override
     public HostMO toMO(boolean stub)
     {
         HostMO mo = new HostMO();
         super.toMO(mo, stub);
         mo.setAddress(this.getAddress());
-        if (! stub)
+        if (!stub)
         {
             mo.setServices(this.getServices().stream().map(Service::toStubMO).collect(Collectors.toList()));
             mo.setTraps(this.getTraps().stream().map(Trap::toStubMO).collect(Collectors.toList()));
             mo.setLocation(Util.nullable(this.getLocation(), Location::toStubMO));
         }
         return mo;
+    }
+    
+    @Override
+    public String resolveWorkerPool()
+    {
+        String workerPool = this.getWorkerPool();
+        if (workerPool == null)
+        {
+            workerPool = Util.nullable(this.getLocation(), Location::resolveWorkerPool);
+        }
+        return workerPool;
     }
 }

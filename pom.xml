@@ -40,7 +40,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -51,15 +50,16 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+			                <additionalparam>-Xdoclint:none</additionalparam>
+			            </configuration>
 					</execution>
 				</executions>
 			</plugin>
-			-->
 		</plugins>
 	</build>
 	
   <modules>
-    <module>bergamot-core</module>
     <module>bergamot-ui</module>
     <module>bergamot-nrpe</module>
     <module>bergamot-config</module>
@@ -67,13 +67,17 @@
     <module>bergamot-compat-nagios</module>
     <module>bergamot-config-converter</module>
     <module>bergamot-util</module>
+    <module>bergamot-message-model</module>
     <module>bergamot-model</module>
-    <module>bergamot-daemon</module>
+    <module>bergamot-queue</module>
+    <module>bergamot-notification-api</module>
+    <module>bergamot-worker-api</module>
+    <module>bergamot-result-processor</module>
+    <module>bergamot-scheduler</module>
     <module>bergamot-notification-engine-email</module>
     <module>bergamot-notification-engine-sms</module>
     <module>bergamot-worker-nagios</module>
-    <module>bergamot-virtual-check-expression</module>
-    <module>bergamot-message-model</module>
+    <module>bergamot-updater-websocket</module>
   </modules>
   <dependencyManagement>
   	<dependencies>

@@ -41,7 +41,7 @@ public class Sorter
         return ret;
     }
     
-    public static <T extends Check<?>> List<T> orderCheckByStatus(Collection<T> toSort)
+    public static <T extends Check<?,?>> List<T> orderCheckByStatus(Collection<T> toSort)
     {
         List<T> ret = new LinkedList<T>(toSort);
         Collections.sort(ret, (a, b) -> { return a.getState().getStatus() == b.getState().getStatus() ? a.getSummary().compareTo(b.getSummary()) : b.getState().getStatus().compareTo(a.getState().getStatus()); });

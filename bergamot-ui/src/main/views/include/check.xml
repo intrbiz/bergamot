@@ -3,14 +3,14 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
 	<a href="/#{check.type}/id/#{check.id}">
-		<div class="col3 dash_icon">
+		<div class="col3 dash_icon check" data-check-id="#{check.id}">
 			<h3>
 				<span class="dash_img #{check.state.status.toString().toLowerCase()}" title="The check is #{check.state.status.toString().toLowerCase()}">
 					<img src="/#{check.type}-icon.png" />
 				</span>
 				<span class="name">#{check.summary}</span>
 		    </h3>
-		    <p>
+		    <p class="field-status">
 			    <span class="label">Status: </span>
 			    <span class="value">#{check.state.status.toString().substring(0,1) + check.state.status.toString().substring(1).toLowerCase()}</span>
 		    </p>
@@ -26,7 +26,7 @@
 		    	<span class="label">Name: </span>
 		   		<span class="value">#{check.name} (#{check.address})</span>
 	    	</p>
-		    <p rendered="#{check.type == 'host' || check.type == 'service' || check.type == 'trap'}">
+		    <p rendered="#{check.type == 'host' || check.type == 'service' || check.type == 'trap'}" class="field-attempt">
 			    <span class="label">Attempt: </span>
 			    <span class="value">
 			    	<span>#{check.state.attempt} of #{check.currentAttemptThreshold}</span>
@@ -34,11 +34,11 @@
 			    	<span class="info" rendered="#{check.state.hard}" title="The check is in a steady state">Steady</span>
 			    </span>
 		    </p>				    
-		    <p>
+		    <p class="field-last-checked">
 			    <span class="label">Last checked: </span>
 			    <span class="value">#{dateformat('HH:mm:ss', check.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', check.state.lastCheckTime)}</span>
 		    </p>
-		    <p class="output">
+		    <p class="output field-output">
 			    <span class="label">Output: </span>
 			    <span class="value">#{coalesce(check.state.output, '')}</span>
 		    </p>

@@ -15,10 +15,13 @@ public class CommandMO extends NamedObjectMO
 {
     @JsonProperty("engine")
     private String engine;
-    
+
+    @JsonProperty("executor")
+    private String executor;
+
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
-    
+
     public CommandMO()
     {
         super();
@@ -34,6 +37,16 @@ public class CommandMO extends NamedObjectMO
         this.engine = engine;
     }
 
+    public String getExecutor()
+    {
+        return executor;
+    }
+
+    public void setExecutor(String executor)
+    {
+        this.executor = executor;
+    }
+
     public List<ParameterMO> getParameters()
     {
         return parameters;
@@ -43,7 +56,7 @@ public class CommandMO extends NamedObjectMO
     {
         this.parameters = parameters;
     }
-    
+
     public void addParameter(String name, String value)
     {
         this.parameters.add(new ParameterMO(name, value));

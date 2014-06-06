@@ -20,20 +20,45 @@
 			<artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-		<groupId>com.intrbiz.bergamot</groupId>
-		<artifactId>bergamot-core</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</dependency>
 	<dependency>
 		<groupId>com.intrbiz.bergamot</groupId>
 		<artifactId>bergamot-compat-nagios</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
 	<dependency>
 		<groupId>com.intrbiz.bergamot</groupId>
 		<artifactId>bergamot-nrpe</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</dependency>
-  </dependencies>
+	<dependency>
+		<groupId>com.intrbiz.bergamot</groupId>
+		<artifactId>bergamot-worker-api</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</dependency>
+	<dependency>
+		<groupId>com.intrbiz.util</groupId>
+		<artifactId>bootstrap</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</dependency>
+	</dependencies>
+	<build>
+		<finalName>bergamot-nagios-worker</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.intrbiz.util</groupId>
+				<artifactId>packaging</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<configuration>
+					<appClass>com.intrbiz.bergamot.worker.NagiosWorker</appClass>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>intrbiz-package</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

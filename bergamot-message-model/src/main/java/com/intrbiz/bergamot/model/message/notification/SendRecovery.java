@@ -17,10 +17,4 @@ public class SendRecovery extends Notification
     {
         return "recovery";
     }
-
-    @Override
-    public String getDefaultExchange()
-    {
-        return "bergamot.notification";
-    }
 }

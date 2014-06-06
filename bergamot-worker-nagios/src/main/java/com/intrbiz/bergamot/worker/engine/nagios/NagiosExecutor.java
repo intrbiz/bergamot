@@ -10,12 +10,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.model.message.task.Task;
-import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
+import com.intrbiz.bergamot.nagios.util.NagiosPluginParser;
 import com.intrbiz.bergamot.util.CommandTokeniser;
-import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
-import com.intrbiz.bergamot.worker.engine.nagios.util.NagiosPluginParser;
+import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
 /**
  * Execute Nagios Plugins (CHecks)
@@ -37,7 +36,7 @@ import com.intrbiz.bergamot.worker.engine.nagios.util.NagiosPluginParser;
  * macros is this Nagios specific CheckExecutor implementation.
  * 
  */
-public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
+public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
 {
     private Logger logger = Logger.getLogger(NagiosExecutor.class);
 
@@ -57,13 +56,13 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
      * Only execute Checks where the engine == "nagios"
      */
     @Override
-    public boolean accept(Task task)
+    public boolean accept(ExecuteCheck task)
     {
         return super.accept(task) && (task instanceof ExecuteCheck) && "nagios".equals(((ExecuteCheck) task).getEngine());
     }
 
     @Override
-    public Result run(ExecuteCheck executeCheck)
+    public Result execute(ExecuteCheck executeCheck)
     {
         logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Result result = executeCheck.createResult();
@@ -126,13 +125,6 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
         String commandLine = executeCheck.getParameter("command_line");
         if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
         // the master will have computed the command line for us
-        /*
-        // construct the macro frame from the check parameters
-        MacroFrame checkFrame = MacroFrame.fromParameters(executeCheck.getParameters());
-        // apply the macros to the command line to form the final command line
-        logger.trace("Applying macros to " + commandLine);
-        return MacroProcessor.applyMacros(commandLine, checkFrame);
-        */
         return commandLine;
     }
 

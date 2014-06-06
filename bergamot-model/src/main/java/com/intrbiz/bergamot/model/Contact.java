@@ -1,47 +1,76 @@
 package com.intrbiz.bergamot.model;
 
+import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ContactCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.ContactCfgAdapter;
 import com.intrbiz.bergamot.model.message.ContactMO;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-public class Contact extends NamedObject<ContactMO> implements Configurable<ContactCfg>
+@SQLTable(schema = BergamotDB.class, name = "contact", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "name_unq", columns = {"site_id", "name"})
+public class Contact extends NamedObject<ContactMO, ContactCfg> implements Principal
 {
-    private ContactCfg config;
+    public static final int BCRYPT_WORK_FACTOR = 12;
+    
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ContactCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected ContactCfg configuration;
+    
+    @SQLColumn(index = 2, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    private List<UUID> teamIds = new LinkedList<UUID>();
 
-    private List<Team> teams = new LinkedList<Team>();
+    @SQLColumn(index = 3, name = "password_hash", since = @SQLVersion({ 1, 0, 0 }))
+    private String passwordHash;
 
-    private String password;
-
+    @SQLColumn(index = 4, name = "email", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLUnique(name = "email_unq", columns = {"site_id", "email"})
     private String email;
 
+    @SQLColumn(index = 5, name = "pager", since = @SQLVersion({ 1, 0, 0 }))
     private String pager;
 
+    @SQLColumn(index = 6, name = "mobile", since = @SQLVersion({ 1, 0, 0 }))
     private String mobile;
 
+    @SQLColumn(index = 7, name = "phone", since = @SQLVersion({ 1, 0, 0 }))
     private String phone;
-
-    /**
-     * When and how notifications may be send
-     */
-    protected Notifications notifications;
 
     public Contact()
     {
         super();
     }
+    
+    @Override
+    public ContactCfg getConfiguration()
+    {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(ContactCfg configuration)
+    {
+        this.configuration = configuration;
+    }
 
     @Override
     public void configure(ContactCfg cfg)
     {
-        this.config = cfg;
+        super.configure(cfg);
         ContactCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         // email
         this.email = rcfg.lookupEmail("work");
         // phones
@@ -50,30 +79,47 @@ public class Contact extends NamedObject<ContactMO> implements Configurable<Cont
         this.phone = rcfg.lookupPhone("work");
     }
 
-    @Override
-    public ContactCfg getConfiguration()
+    public List<UUID> getTeamIds()
     {
-        return this.config;
+        return this.teamIds;
     }
-
+    
+    public void setTeamIds(List<UUID> teamIds)
+    {
+        this.teamIds = teamIds;
+    }
+    
     public List<Team> getTeams()
     {
-        return teams;
+        List<Team> r = new LinkedList<Team>();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            for (UUID id : this.getTeamIds())
+            {
+                r.add(db.getTeam(id));
+            }
+        }
+        return r;
     }
 
-    public void setTeams(List<Team> teams)
+    public String getPasswordHash()
     {
-        this.teams = teams;
+        return passwordHash;
     }
 
-    public String getPassword()
+    public void setPasswordHash(String passwordHash)
     {
-        return password;
+        this.passwordHash = passwordHash;
     }
-
-    public void setPassword(String password)
+    
+    public void hashPassword(String plainPassword)
     {
-        this.password = password;
+        this.passwordHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt(BCRYPT_WORK_FACTOR));
+    }
+    
+    public boolean verifyPassword(String plainPassword)
+    {
+        return BCrypt.checkpw(plainPassword, this.passwordHash);
     }
 
     public String getEmail()
@@ -118,12 +164,20 @@ public class Contact extends NamedObject<ContactMO> implements Configurable<Cont
 
     public Notifications getNotifications()
     {
-        return notifications;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getNotifications(this.getId());
+        }
     }
 
     public void setNotifications(Notifications notifications)
     {
-        this.notifications = notifications;
+        // TODO
+    }
+    
+    public String toString()
+    {
+        return "Contact {" + this.getName() + "}";
     }
 
     @Override

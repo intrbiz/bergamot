@@ -3,7 +3,7 @@
 <!-- A template view, applied to all views -->
 <html xmlns="com.intrbiz.balsa">
 	<head>
-		<title>Bergamot Monitoring #{title()}</title>
+		<title>Bergamot Monitoring - #{title()}</title>
 		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
 		<!-- Scripts -->

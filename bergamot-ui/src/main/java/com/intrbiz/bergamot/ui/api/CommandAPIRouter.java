@@ -22,20 +22,20 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @JSON
     public List<CommandMO> getCommand()
     {
-        return this.app().getBergamot().getObjectStore().getCommands().stream().map(Command::toMO).collect(Collectors.toList());
+        return null; //return this.app().getBergamot().getObjectStore().getCommands().stream().map(Command::toMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     public CommandMO getCommand(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupCommand(name), Command::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCommand(name), Command::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     public CommandMO getCommand(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupCommand(id), Command::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCommand(id), Command::toMO);
     }
 }

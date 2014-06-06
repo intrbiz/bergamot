@@ -39,7 +39,7 @@ public abstract class CheckMO extends NamedObjectMO
     }
     
     @JsonIgnore
-    public abstract String getType();
+    public abstract String getCheckType();
 
     public CheckStateMO getState()
     {

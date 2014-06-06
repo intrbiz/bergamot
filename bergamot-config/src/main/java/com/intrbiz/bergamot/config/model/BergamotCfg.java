@@ -411,6 +411,7 @@ public class BergamotCfg extends Configuration
             }
             if (service.getTemplate() == null || service.getTemplate() == false)
             {
+                service.setTemplate(true);
                 System.err.println("Warn: Top level services must be templates: " + service);
             }
             this.validateNotify(service.getNotify(), service);
@@ -427,6 +428,7 @@ public class BergamotCfg extends Configuration
             }
             if (trap.getTemplate() == null || trap.getTemplate() == false)
             {
+                trap.setTemplate(true);
                 System.err.println("Warn: Top level traps must be templates: " + trap);
             }
             this.validateNotify(trap.getNotify(), trap);
@@ -443,6 +445,7 @@ public class BergamotCfg extends Configuration
             }
             if (resource.getTemplate() == null || resource.getTemplate() == false)
             {
+                resource.setTemplate(true);
                 System.err.println("Warn: Top level resources must be templates: " + resource);
             }
             this.validateNotify(resource.getNotify(), resource);

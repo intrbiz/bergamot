@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Service #{service.summary} on Host #{service.host.displayName}">
+<fragment xmlns="com.intrbiz.balsa" title="Service #{service.summary} on Host #{service.host.summary}">
 
 	<div class="row submenu pull-right">
 		<a rendered="#{service.suppressed}"  href="/service/unsuppress/#{service.id}">Unsupress</a>
@@ -12,7 +12,7 @@
 	</div>
 
 	<div class="row">
-		<div class="col4 dash_icon">
+		<div class="col4 dash_icon check" data-check-id="#{service.id}">
 			<h3>
 				<span class="dash_img #{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
 					<img src="/service-icon.png" />
@@ -136,17 +136,17 @@
 			<h3>Command</h3>
 			<p>
 				<span class="label wide">Command Engine: </span>
-				<span class="value">#{service.command.engine}</span>
+				<span class="value">#{service.checkCommand.command.engine}</span>
 			</p>
 			<p>
 				<span class="label wide">Command Name: </span>
-				<span class="value">#{service.command.name}</span>
+				<span class="value">#{service.checkCommand.command.name}</span>
 			</p>
 			<p>
 				<span class="label wide">Parameters:</span>
 				<span class="value">&nbsp;</span>
 			</p>
-			<data-set var="parameter" value="#{service.command.parameters}">
+			<data-set var="parameter" value="#{service.checkCommand.resolveCheckParameters()}">
 				<p>
 					<span class="label wide indent">#{parameter.name}: </span>
 					<span class="value">#{parameter.value}</span>
@@ -162,18 +162,16 @@
 		</div>
 	</div>
 	
-	<div class="row">
-		<div class="col12">
-			<h3>JSON</h3>
-			<pre>#{service.toJSON()}</pre>
-		</div>
-	</div>
-	
 	<script type="text/javascript">
-		$(document).ready(function(){
-			setTimeout(function(){
-				window.location = window.location;
-			}, 30000);
+		require(["bergamot/lib/util/console-log", "bergamot/lib/ui/check-state", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_server_state, bergamot_api_driver)
+		{
+		    bergamot_console_log.attachTo(document);
+
+		    bergamot_ui_server_state.attachTo("div.check");
+
+		    bergamot_api_driver.attachTo(document, {
+				url: "ws://127.0.0.1:8081/websocket",
+		    });
 		});
 	</script>
 	

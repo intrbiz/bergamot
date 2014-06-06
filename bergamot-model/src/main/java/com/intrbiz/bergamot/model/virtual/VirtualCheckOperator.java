@@ -12,12 +12,12 @@ public abstract class VirtualCheckOperator
     
     public abstract Status computeStatus();
     
-    public final Set<Check<?>> computeDependencies()
+    public final Set<Check<?,?>> computeDependencies()
     {
-        Set<Check<?>> checks = new HashSet<Check<?>>();
+        Set<Check<?,?>> checks = new HashSet<Check<?,?>>();
         this.computeDependencies(checks);
         return checks;
     }
     
-    public abstract void computeDependencies(Set<Check<?>> checks);
+    public abstract void computeDependencies(Set<Check<?,?>> checks);
 }

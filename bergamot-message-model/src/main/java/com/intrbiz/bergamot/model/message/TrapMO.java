@@ -14,7 +14,7 @@ public class TrapMO extends PassiveCheckMO
         super();
     }
     
-    public String getType()
+    public String getCheckType()
     {
         return "service";
     }

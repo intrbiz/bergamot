@@ -32,7 +32,7 @@ public class BracketOperator extends VirtualCheckOperator
     }
 
     @Override
-    public void computeDependencies(Set<Check<?>> checks)
+    public void computeDependencies(Set<Check<?,?>> checks)
     {
         this.operand.computeDependencies(checks);
     }

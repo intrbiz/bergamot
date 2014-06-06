@@ -21,27 +21,27 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     public ServiceMO getService(String hostName, String name)
     {    
-        return Util.nullable((Service)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getService(name);}), Service::toMO);
+        return null; //return Util.nullable((Service)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getService(name);}), Service::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     public ServiceMO getService(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupService(id), Service::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupService(id), Service::toMO);
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getServiceState(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupService(id), (s)->{return s.getState().toMO();});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupService(id), (s)->{return s.getState().toMO();});
     }
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getServiceState(String hostName, String name)
     {    
-        return Util.nullable((Service)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getService(name);}), (s)->{return s.getState().toMO();});
+        return null; //return Util.nullable((Service)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getService(name);}), (s)->{return s.getState().toMO();});
     }
 }

@@ -1,7 +1,0 @@
-<bergamot-daemon name="example" mode="WORKER">
-	<!-- The RabbitMQ broker to use -->
-	<broker url="amqp://127.0.0.1"/>
-	<!-- The Bergamot configuration directory -->
-	<config-dir>/home/cellis/Intrbiz/workspace-new/bergamot/cfg/local/</config-dir>
-	<!-- The Database configuration -->
-</bergamot-daemon>

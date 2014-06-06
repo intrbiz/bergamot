@@ -1,0 +1,98 @@
+package com.intrbiz.bergamot.notification;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+
+import org.apache.log4j.Logger;
+
+import com.intrbiz.bergamot.config.NotificationEngineCfg;
+import com.intrbiz.bergamot.config.NotifierCfg;
+import com.intrbiz.bergamot.model.message.notification.Notification;
+import com.intrbiz.bergamot.queue.NotificationQueue;
+import com.intrbiz.queue.Consumer;
+
+public abstract class AbstractNotifier implements Notifier
+{
+    private Logger logger = Logger.getLogger(AbstractNotifier.class);
+
+    protected Map<String, NotificationEngine> engines = new TreeMap<String, NotificationEngine>();
+    
+    protected NotificationQueue queue;
+
+    protected List<Consumer<Notification>> consumers = new LinkedList<Consumer<Notification>>();
+
+    protected NotifierCfg configuration;
+    
+    protected UUID site = null;
+
+    public AbstractNotifier()
+    {
+        super();
+    }
+    
+    protected abstract String getNotifierName();
+
+    @Override
+    public final void configure(NotifierCfg cfg) throws Exception
+    {
+        this.configuration = cfg;
+        this.configure();
+    }
+
+    @Override
+    public final NotifierCfg getConfiguration()
+    {
+        return this.configuration;
+    }
+
+    protected void configure() throws Exception
+    {
+        this.site = this.configuration.getSite();
+        // load the notification engines
+        for (NotificationEngineCfg engineCfg : this.configuration.getEngines())
+        {
+            NotificationEngine engine = (NotificationEngine) engineCfg.create();
+            engine.setNotifier(this);
+            logger.info("Adding notification engine: " + engine);
+            this.engines.put(engine.getName(), engine);
+        }
+    }
+    
+    @Override
+    public UUID getSite()
+    {
+        return this.site;
+    }
+
+    @Override
+    public List<NotificationEngine> getEngines()
+    {
+        return new LinkedList<NotificationEngine>(this.engines.values());
+    }
+
+    @Override
+    public void start() throws Exception
+    {
+        // open the queue
+        this.queue = NotificationQueue.open();
+        // start all the consumers
+        for (int i = 0; i < this.configuration.getThreads(); i++)
+        {
+            logger.info("Creating consumer " + i);
+            this.consumers.add(this.queue.consumeNotifications(this::sendNotification, this.getSite(), this.getNotifierName()));
+        }
+    }
+
+    @Override
+    public void sendNotification(Notification notification)
+    {
+        // send
+        for (NotificationEngine notificationEngine : this.engines.values())
+        {
+            notificationEngine.sendNotification(notification);
+        }
+    }
+}

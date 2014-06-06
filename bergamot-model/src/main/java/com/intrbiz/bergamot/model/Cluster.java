@@ -1,24 +1,27 @@
 package com.intrbiz.bergamot.model;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.ClusterCfgAdapter;
 import com.intrbiz.bergamot.model.message.ClusterMO;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
  * A cluster of resources spanning many hosts
  */
-public class Cluster extends VirtualCheck<ClusterMO> implements Configurable<ClusterCfg>
-{
-    private Map<String, Resource> resources = new TreeMap<String, Resource>();
-    
-    private ClusterCfg config;
+@SQLTable(schema = BergamotDB.class, name = "cluster", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "name_unq", columns = { "site_id", "name" })
+public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
+{   
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ClusterCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected ClusterCfg configuration;
     
     public Cluster()
     {
@@ -26,16 +29,31 @@ public class Cluster extends VirtualCheck<ClusterMO> implements Configurable<Clu
     }
     
     @Override
+    public ClusterCfg getConfiguration()
+    {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(ClusterCfg configuration)
+    {
+        this.configuration = configuration;
+    }
+    
+    @Override
     public void configure(ClusterCfg cfg)
     {
-        this.config = cfg;
+        super.configure(cfg);
         ClusterCfg rcfg = cfg.resolve();
         //
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
         // initial state
+        // TODO
+        /*
         if (rcfg.getInitialState() != null)
         {
             this.getState().setStatus(Status.valueOf(rcfg.getInitialState().getStatus().toUpperCase()));
@@ -45,12 +63,7 @@ public class Cluster extends VirtualCheck<ClusterMO> implements Configurable<Clu
             this.getState().setLastHardOk(this.getState().isOk());
             this.getState().setLastHardOutput(this.getState().getOutput());
         }
-    }
-
-    @Override
-    public ClusterCfg getConfiguration()
-    {
-        return this.config;
+        */
     }
 
     @Override
@@ -58,36 +71,26 @@ public class Cluster extends VirtualCheck<ClusterMO> implements Configurable<Clu
     {
         return "cluster";
     }
-    
-    public Set<String> getResourceNames()
-    {
-        return this.resources.keySet();
-    }
 
-    public Collection<Resource> getResources()
+    public List<Resource> getResources()
     {
-        return this.resources.values();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getResourcesOnCluster(getId());
+        }
     }
 
     public void addResource(Resource resource)
     {
-        this.resources.put(resource.getName(), resource);
-        resource.setCluster(this);
+        // TODO
     }
 
     public Resource getResource(String name)
     {
-        return this.resources.get(name);
-    }
-
-    public boolean containsResource(String name)
-    {
-        return this.resources.containsKey(name);
-    }
-
-    public int getResourceCount()
-    {
-        return this.resources.size();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getResourceOnCluster(this.getId(), name);
+        }
     }
 
     @Override

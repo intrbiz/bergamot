@@ -41,7 +41,7 @@ public class XorOperator extends VirtualCheckOperator
     }
 
     @Override
-    public void computeDependencies(Set<Check<?>> checks)
+    public void computeDependencies(Set<Check<?,?>> checks)
     {
         this.left.computeDependencies(checks);
         this.right.computeDependencies(checks);

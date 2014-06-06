@@ -14,7 +14,7 @@ public class ServiceMO extends ActiveCheckMO
         super();
     }
     
-    public String getType()
+    public String getCheckType()
     {
         return "service";
     }

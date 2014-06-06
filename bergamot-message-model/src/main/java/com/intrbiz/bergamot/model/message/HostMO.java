@@ -26,7 +26,7 @@ public class HostMO extends ActiveCheckMO
         super();
     }
     
-    public String getType()
+    public String getCheckType()
     {
         return "host";
     }

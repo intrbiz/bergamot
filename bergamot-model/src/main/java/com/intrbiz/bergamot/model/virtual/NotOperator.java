@@ -33,7 +33,7 @@ public class NotOperator extends VirtualCheckOperator
     }
 
     @Override
-    public void computeDependencies(Set<Check<?>> checks)
+    public void computeDependencies(Set<Check<?,?>> checks)
     {
         this.operand.computeDependencies(checks);
     }

@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -17,6 +18,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.Notification;
+import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
 
 public class EmailEngine extends AbstractNotificationEngine
@@ -62,35 +64,51 @@ public class EmailEngine extends AbstractNotificationEngine
         this.fromAddress = this.config.getStringParameterValue("from", "bergamot@localhost");
         // setup the JavaMail session
         this.session = Session.getDefaultInstance(properties);
+        this.session.setDebug(true);
     }
 
     @Override
     public void sendNotification(Notification notification)
     {
+        if (logger.isTraceEnabled()) logger.trace(notification.toString());
+        Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
         logger.info("Sending email notification for " + notification.getCheck() + " to " + notification.getTo());
         try
         {
             if (! this.checkAtLeastOneRecipient(notification)) return;
+            // build the message
+            Message message = this.buildMessage(this.session, notification);
+            message.writeTo(System.out);
+            logger.debug("Built message");
+            // send the message
             Transport transport = null;
             try
             {
                 transport = session.getTransport("smtp");
-                // build the message
-                Message message = this.buildMessage(this.session, notification);
                 // connect
                 if (Util.isEmpty(this.user))
+                {
+                    logger.debug("Transport connecting to: " + this.properties.getProperty("mail.smtp.host"));
                     transport.connect();
+                    logger.debug("Transport connected");
+                }
                 else
+                {
+                    logger.debug("Transport connecting to: " + this.properties.getProperty("mail.smtp.host") + " with username: " + this.user);
                     transport.connect(this.user, this.password);
+                    logger.debug("Transport connected");
+                }
                 // send the message
+                logger.info("Sending message...");
                 transport.sendMessage(message, message.getAllRecipients());
+                logger.info("Message sent");
             }
             finally
             {
                 if (transport != null) transport.close();
             }
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             logger.error("Failed to send email notification", e);
         }
@@ -111,7 +129,13 @@ public class EmailEngine extends AbstractNotificationEngine
 
     protected Message buildMessage(Session session, Notification notification) throws Exception
     {
-        Message message = new MimeMessage(session);
+        Message message = new MimeMessage(session) {
+            @Override
+            protected void updateMessageID() throws MessagingException
+            {
+                // do not alter the message id
+            }
+        };
         // from
         message.setFrom(new InternetAddress(this.fromAddress));
         // to address
@@ -123,20 +147,33 @@ public class EmailEngine extends AbstractNotificationEngine
             }
         }
         // headers
+        message.setHeader("X-Bergamot-Alert-Id", notification.getAlertId().toString());
+        message.setHeader("Message-ID", this.messageId(notification));
         message.setHeader("X-Bergamot-Notification-Id", notification.getId().toString());
         message.setHeader("X-Bergamot-Check-Type", notification.getCheck().getType());
         message.setHeader("X-Bergamot-Check-Id", notification.getCheck().getId().toString());
         message.setHeader("X-Bergamot-Check-Status", notification.getCheck().getState().getStatus().toString());
+        // in reply to?
+        if (notification instanceof SendRecovery)
+        {
+            message.setHeader("References", this.messageId(notification));
+            message.setHeader("In-Reply-To", this.messageId(notification));
+        }
         // sent date
         message.setSentDate(new Date(notification.getRaised()));
         // content
         this.buildMessageContent(message, notification);
         return message;
     }
+    
+    protected String messageId(Notification notification)
+    {
+        return "<" + notification.getAlertId().toString() + ".bergamot>";
+    }
 
     protected void buildMessageContent(Message message, Notification notification) throws Exception
     {
-        String templatePrefix = notification.getCheck().getType() + "." + notification.getNotificationType() + "."; 
+        String templatePrefix = notification.getCheck().getCheckType() + "." + notification.getNotificationType() + ".";
         message.setSubject(this.applyTemplate(templatePrefix + "subject", notification));
         message.setContent(this.applyTemplate(templatePrefix + "content", notification), "text/plain");
     }

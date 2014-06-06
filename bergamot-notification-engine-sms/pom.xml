@@ -8,7 +8,7 @@
 		<artifactId>bergamot</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-  <artifactId>bergamot-notification-engine-sms</artifactId>
+	<artifactId>bergamot-notification-engine-sms</artifactId>
 	<name>bergamot-notification-engine-sms</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -28,8 +28,34 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-core</artifactId>
+			<artifactId>bergamot-notification-api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.util</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
+	<build>
+		<finalName>bergamot-notification-engine-sms</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.intrbiz.util</groupId>
+				<artifactId>packaging</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<configuration>
+					<appClass>com.intrbiz.bergamot.notification.SMSNotifier</appClass>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>intrbiz-package</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

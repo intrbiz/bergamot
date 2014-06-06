@@ -31,12 +31,25 @@ import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
+import com.intrbiz.bergamot.model.message.api.error.APIError;
+import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
+import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
+import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
+import com.intrbiz.bergamot.model.message.api.util.APIPing;
+import com.intrbiz.bergamot.model.message.api.util.APIPong;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
+import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
+import com.intrbiz.bergamot.model.message.scheduler.PauseScheduler;
+import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
+import com.intrbiz.bergamot.model.message.scheduler.ResumeScheduler;
+import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
-import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.queue.QueueEventTranscoder;
 import com.intrbiz.queue.QueueException;
 
@@ -65,10 +78,28 @@ public class BergamotTranscoder
         // model
         ParameterMO.class,
         // messages
+        // check
         ExecuteCheck.class,
         Result.class,
+        // notifications
         SendAlert.class,
-        SendRecovery.class
+        SendRecovery.class,
+        // updates
+        Update.class,
+        // scheduler
+        EnableCheck.class,
+        DisableCheck.class,
+        ScheduleCheck.class,
+        RescheduleCheck.class,
+        PauseScheduler.class,
+        ResumeScheduler.class,
+        // API
+        APIError.class,
+        APIPing.class,
+        APIPong.class,
+        UpdateEvent.class,
+        RegisterForUpdates.class,
+        RegisteredForUpdates.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();

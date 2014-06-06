@@ -1,60 +1,53 @@
 package com.intrbiz.bergamot.model;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.intrbiz.bergamot.config.model.CheckCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CheckMO;
-import com.intrbiz.bergamot.model.message.VirtualCheckMO;
 import com.intrbiz.bergamot.model.state.CheckState;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
  * An something which should be checked
  */
-public abstract class Check<T extends CheckMO> extends NamedObject<T>
+public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends NamedObject<T, C>
 {
-    /**
-     * The state of this check
-     */
-    protected CheckState state = new CheckState();
-
     /**
      * Is the result of this check suppressed
      */
+    @SQLColumn(index = 2, name = "suppressed", since = @SQLVersion({ 1, 0, 0 }))
     protected boolean suppressed = false;
 
     /**
      * Is this check currently scheduled
      */
+    @SQLColumn(index = 3, name = "enabled", since = @SQLVersion({ 1, 0, 0 }))
     protected boolean enabled = true;
 
     /**
-     * Checks which reference (are dependent upon) this check
+     * Teams to notify
      */
-    protected Set<VirtualCheck<? extends VirtualCheckMO>> referencedBy = new HashSet<VirtualCheck<? extends VirtualCheckMO>>();
+    @SQLColumn(index = 4, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    protected List<UUID> teamIds = new LinkedList<UUID>();
 
     /**
-     * The contacts who should be notified
+     * Contacts to notify
      */
-    protected Set<Contact> contacts = new HashSet<Contact>();
-
-    /**
-     * The reams who should be notified
-     */
-    protected Set<Team> teams = new HashSet<Team>();
-
-    /**
-     * When and how notifications may be send
-     */
-    protected Notifications notifications;
+    @SQLColumn(index = 5, name = "contact_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    protected List<UUID> contactIds = new LinkedList<UUID>();
 
     /**
      * The groups this check is a member of
      */
-    protected Map<String, Group> groups = new HashMap<String, Group>();
+    @SQLColumn(index = 7, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    protected List<UUID> groupIds = new LinkedList<UUID>();
 
     public Check()
     {
@@ -62,11 +55,6 @@ public abstract class Check<T extends CheckMO> extends NamedObject<T>
     }
 
     public abstract String getType();
-
-    protected void onSetId()
-    {
-        this.state.setCheckId(this.id);
-    }
 
     public boolean isSuppressed()
     {
@@ -88,24 +76,20 @@ public abstract class Check<T extends CheckMO> extends NamedObject<T>
         this.enabled = enabled;
     }
 
-    public Set<VirtualCheck<? extends VirtualCheckMO>> getReferencedBy()
+    public List<VirtualCheck<?,?>> getReferencedBy()
     {
-        return referencedBy;
-    }
-
-    public void setReferencedBy(Set<VirtualCheck<? extends VirtualCheckMO>> referencedBy)
-    {
-        this.referencedBy = referencedBy;
-    }
-
-    public void addReferencedBy(VirtualCheck<? extends VirtualCheckMO> referencedBy)
-    {
-        this.referencedBy.add(referencedBy);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getVirtualChecksReferencingCheck(this.getId());
+        }
     }
 
     public CheckState getState()
     {
-        return this.state;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCheckState(this.getId());
+        }
     }
 
     public Set<Contact> getAllContacts()
@@ -119,59 +103,115 @@ public abstract class Check<T extends CheckMO> extends NamedObject<T>
         return ret;
     }
 
-    public Set<Contact> getContacts()
+    public List<UUID> getContactIds()
     {
-        return contacts;
+        return contactIds;
     }
 
-    public void setContacts(Set<Contact> contacts)
+    public void setContactIds(List<UUID> contactIds)
     {
-        this.contacts = contacts;
+        this.contactIds = contactIds;
+    }
+
+    public List<Contact> getContacts()
+    {
+        List<Contact> r = new LinkedList<Contact>();
+        if (this.getContactIds() != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                for (UUID id : this.getContactIds())
+                {
+                    r.add(db.getContact(id));
+                }
+            }
+        }
+        return r;
     }
 
     public void addContact(Contact contact)
     {
-        this.contacts.add(contact);
+        // TODO
     }
 
-    public Set<Team> getTeams()
+    public List<UUID> getTeamIds()
     {
-        return teams;
+        return teamIds;
     }
 
-    public void setTeams(Set<Team> teams)
+    public void setTeamIds(List<UUID> teamIds)
     {
-        this.teams = teams;
+        this.teamIds = teamIds;
+    }
+
+    public List<Team> getTeams()
+    {
+        List<Team> r = new LinkedList<Team>();
+        if (this.getTeamIds() != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                for (UUID id : this.getTeamIds())
+                {
+                    r.add(db.getTeam(id));
+                }
+            }
+        }
+        return r;
     }
 
     public void addTeam(Team team)
     {
-        this.teams.add(team);
+        // TODO
     }
 
     public Notifications getNotifications()
     {
-        return notifications;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getNotifications(this.getId());
+        }
     }
-
+    
     public void setNotifications(Notifications notifications)
     {
-        this.notifications = notifications;
+        // TODO
     }
 
-    public Collection<Group> getGroups()
+    public List<UUID> getGroupIds()
     {
-        return groups.values();
+        return groupIds;
+    }
+
+    public void setGroupIds(List<UUID> groupIds)
+    {
+        this.groupIds = groupIds;
+    }
+
+    public List<Group> getGroups()
+    {
+        List<Group> r = new LinkedList<Group>();
+        if (this.getGroupIds() != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                for (UUID id : this.getGroupIds())
+                {
+                    r.add(db.getGroup(id));
+                }
+            }
+        }
+        return r;
     }
 
     public void removeGroup(Group group)
     {
-        this.groups.remove(group.getName());
+        // TODO
     }
 
     public void addGroup(Group group)
     {
-        this.groups.put(group.getName(), group);
+        // TODO
     }
 
     protected void toMO(CheckMO mo, boolean stub)
@@ -180,7 +220,7 @@ public abstract class Check<T extends CheckMO> extends NamedObject<T>
         mo.setEnabled(this.isEnabled());
         mo.setState(this.getState().toMO());
         mo.setSuppressed(this.isSuppressed());
-        if (! stub)
+        if (!stub)
         {
             mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));
             mo.setContacts(this.getContacts().stream().map(Contact::toStubMO).collect(Collectors.toList()));

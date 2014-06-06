@@ -16,6 +16,8 @@ public class CommandCfg extends NamedObjectCfg<CommandCfg>
 {
     private String engine;
 
+    private String executor;
+
     public CommandCfg()
     {
         super();
@@ -31,6 +33,18 @@ public class CommandCfg extends NamedObjectCfg<CommandCfg>
     public void setEngine(String engine)
     {
         this.engine = engine;
+    }
+
+    @XmlAttribute(name = "executor")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getExecutor()
+    {
+        return executor;
+    }
+
+    public void setExecutor(String executor)
+    {
+        this.executor = executor;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()

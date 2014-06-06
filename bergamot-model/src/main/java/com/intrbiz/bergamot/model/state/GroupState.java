@@ -1,35 +1,53 @@
 package com.intrbiz.bergamot.model.state;
 
-import java.util.Collection;
-import java.util.function.Function;
+import java.util.UUID;
 
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.BergamotObject;
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
+@SQLTable(schema = BergamotDB.class, name = "group_state", virtual = true, since = @SQLVersion({ 1, 0, 0 }))
 public class GroupState extends BergamotObject<GroupStateMO>
 {
+    @SQLColumn(index = 1, name = "group_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLPrimaryKey
+    private UUID groupId;
+
+    @SQLColumn(index = 2, name = "ok", since = @SQLVersion({ 1, 0, 0 }))
     private boolean ok = true;
 
+    @SQLColumn(index = 3, name = "status", since = @SQLVersion({ 1, 0, 0 }))
     private Status status = Status.PENDING;
 
     // counts;
 
+    @SQLColumn(index = 4, name = "pending_count", since = @SQLVersion({ 1, 0, 0 }))
     private int pendingCount = 0;
 
+    @SQLColumn(index = 5, name = "ok_count", since = @SQLVersion({ 1, 0, 0 }))
     private int okCount = 0;
 
+    @SQLColumn(index = 6, name = "warning_count", since = @SQLVersion({ 1, 0, 0 }))
     private int warningCount = 0;
 
+    @SQLColumn(index = 7, name = "critical_count", since = @SQLVersion({ 1, 0, 0 }))
     private int criticalCount = 0;
 
+    @SQLColumn(index = 8, name = "unknown_count", since = @SQLVersion({ 1, 0, 0 }))
     private int unknownCount = 0;
 
+    @SQLColumn(index = 9, name = "timeout_count", since = @SQLVersion({ 1, 0, 0 }))
     private int timeoutCount = 0;
 
+    @SQLColumn(index = 10, name = "error_count", since = @SQLVersion({ 1, 0, 0 }))
     private int errorCount = 0;
 
+    @SQLColumn(index = 11, name = "suppressed_count", since = @SQLVersion({ 1, 0, 0 }))
     private int suppressedCount = 0;
 
     public GroupState()
@@ -48,6 +66,16 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.unknownCount = unknownCount;
         this.timeoutCount = timeoutCount;
         this.errorCount = errorCount;
+    }
+
+    public UUID getGroupId()
+    {
+        return groupId;
+    }
+
+    public void setGroupId(UUID groupId)
+    {
+        this.groupId = groupId;
     }
 
     public boolean isOk()
@@ -150,68 +178,11 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.suppressedCount = suppressedCount;
     }
 
-    public static <T> GroupState compute(Collection<? extends Check<?>> checks, Collection<T> groups, Function<T,GroupState> groupStateAccessor)
-    {
-        GroupState state = new GroupState();
-        for (Check<?> check : checks)
-        {
-            if (!check.isSuppressed())
-            {
-                if (check.getState().isHard())
-                {
-                    state.ok = state.ok && check.getState().isOk();
-                    state.status = Status.worst(state.status, check.getState().getStatus());
-                }
-                switch (check.getState().getStatus())
-                {
-                    case PENDING:
-                        state.pendingCount++;
-                        break;
-                    case OK:
-                        state.okCount++;
-                        break;
-                    case WARNING:
-                        state.warningCount++;
-                        break;
-                    case CRITICAL:
-                        state.criticalCount++;
-                        break;
-                    case UNKNOWN:
-                        state.unknownCount++;
-                        break;
-                    case TIMEOUT:
-                        state.timeoutCount++;
-                        break;
-                    case ERROR:
-                        state.errorCount++;
-                        break;
-                }
-            }
-            else
-            {
-                state.suppressedCount++;
-            }
-        }
-        if (groups != null)
-        {
-            for (T group : groups)
-            {
-                GroupState gstate = groupStateAccessor.apply(group);
-                //
-                state.ok = state.ok & gstate.isOk();
-                state.status = Status.worst(state.status, gstate.getStatus());
-                state.pendingCount += gstate.pendingCount;
-                state.okCount += gstate.okCount;
-                state.warningCount += gstate.warningCount;
-                state.criticalCount += gstate.criticalCount;
-                state.timeoutCount += gstate.timeoutCount;
-                state.errorCount += gstate.errorCount;
-                state.suppressedCount += gstate.suppressedCount;
-            }
-        }
-        return state;
-    }
-    
+    /*
+     * public static <T> GroupState compute(Collection<? extends Check<?,?>> checks, Collection<T> groups, Function<T,GroupState> groupStateAccessor) { GroupState state = new GroupState(); for (Check<?,?> check : checks) { if (!check.isSuppressed()) { if (check.getState().isHard()) { state.ok = state.ok && check.getState().isOk(); state.status = Status.worst(state.status, check.getState().getStatus()); } switch (check.getState().getStatus()) { case PENDING: state.pendingCount++; break; case OK: state.okCount++; break; case WARNING: state.warningCount++; break; case CRITICAL: state.criticalCount++; break; case UNKNOWN: state.unknownCount++; break; case TIMEOUT: state.timeoutCount++; break; case ERROR: state.errorCount++; break; } } else { state.suppressedCount++; } } if (groups != null) { for (T group : groups) { GroupState gstate = groupStateAccessor.apply(group); // state.ok = state.ok & gstate.isOk(); state.status = Status.worst(state.status, gstate.getStatus()); state.pendingCount
+     * += gstate.pendingCount; state.okCount += gstate.okCount; state.warningCount += gstate.warningCount; state.criticalCount += gstate.criticalCount; state.timeoutCount += gstate.timeoutCount; state.errorCount += gstate.errorCount; state.suppressedCount += gstate.suppressedCount; } } return state; }
+     */
+
     @Override
     public GroupStateMO toMO(boolean stub)
     {

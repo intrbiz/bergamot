@@ -4,107 +4,101 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.bergamot.Bergamot;
-import com.intrbiz.bergamot.model.Host;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/service")
 @Template("layout/main")
+@RequireValidPrincipal()
 public class ServiceRouter extends Router<BergamotApp>
 {
     @Any("/name/:host/:service")
-    public void service(String hostName, String serviceName)
+    @WithDataAdapter(BergamotDB.class)
+    public void service(BergamotDB db, String hostName, String serviceName, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        Host host = bergamot.getObjectStore().lookupHost(hostName);
-        model("service", host.getService(serviceName));
+        model("service", db.getServiceOnHostByName(site.getId(), hostName, serviceName));
         encode("service/detail");
     }
     
     @Any("/id/:id")
-    public void service(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public void service(BergamotDB db, @AsUUID UUID id)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        model("service", bergamot.getObjectStore().lookupService(id));
+        model("service", db.getService(id));
         encode("service/detail");
     }
     
     @Any("/execute/:id")
-    public void executeService(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void executeService(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and force it's execution
-        Service service = bergamot.getObjectStore().lookupService(id);
+        Service service = db.getService(id);
         if (service != null)
         {
-            // build the check and dispatch it
-            ExecuteCheck executeCheck = service.executeCheck();
-            if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
+            action("execute-check", service);
         }
         redirect("/service/id/" + id);
     }
     
     @Any("/enable/:id")
-    public void enableService(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void enableService(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and enable it
-        Service service = bergamot.getObjectStore().lookupService(id);
+        Service service = db.getService(id);
         if (service != null)
         {
-            // enable the service with the scheduler
             service.setEnabled(true);
-            bergamot.getScheduler().enable(service);
+            db.setService(service);
+            action("enable-check", service);
         }
         redirect("/service/id/" + id);
     }
     
     @Any("/disable/:id")
-    public void disableService(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void disableService(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and disable it
-        Service service = bergamot.getObjectStore().lookupService(id);
+        Service service = db.getService(id);
         if (service != null)
         {
-            // disable the service with the scheduler
             service.setEnabled(false);
-            bergamot.getScheduler().disable(service);
+            db.setService(service);
+            action("disable-check", service);
         }
         redirect("/service/id/" + id);
     }
     
     @Any("/suppress/:id")
-    public void suppressService(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void suppressService(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and supress it
-        Service service = bergamot.getObjectStore().lookupService(id);
+        Service service = db.getService(id);
         if (service != null)
         {
-            // suppress the service
             service.setSuppressed(true);
-            bergamot.getObjectStore().removeAlert(service);
+            db.setService(service);
         }
         redirect("/service/id/" + id);
     }
     
     @Any("/unsuppress/:id")
-    public void unsuppressService(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void unsuppressService(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and unsupress it
-        Service service = bergamot.getObjectStore().lookupService(id);
+        Service service = db.getService(id);
         if (service != null)
         {
-            // unsuppress the service
             service.setSuppressed(false);
+            db.setService(service);
         }
         redirect("/service/id/" + id);
     }

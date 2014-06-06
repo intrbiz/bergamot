@@ -3,82 +3,98 @@ package com.intrbiz.bergamot.model;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TeamCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.TeamCfgAdapter;
 import com.intrbiz.bergamot.model.message.TeamMO;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
  * A team of people, who can be notified
  */
-public class Team extends NamedObject<TeamMO> implements Configurable<TeamCfg>
+@SQLTable(schema = BergamotDB.class, name = "team", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "name_unq", columns = {"site_id", "name"})
+public class Team extends NamedObject<TeamMO, TeamCfg>
 {
-    private TeamCfg config;
-
-    private List<Contact> contacts = new LinkedList<Contact>();
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = TeamCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected TeamCfg configuration;
     
-    // team hierarchy
-
-    private Map<String, Team> parents = new TreeMap<String, Team>();
-
-    private Map<String, Team> children = new TreeMap<String, Team>();
+    @SQLColumn(index = 2, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    private List<UUID> teamIds = new LinkedList<UUID>();
 
     public Team()
     {
         super();
     }
+    
+    @Override
+    public TeamCfg getConfiguration()
+    {
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(TeamCfg configuration)
+    {
+        this.configuration = configuration;
+    }
 
     @Override
     public void configure(TeamCfg cfg)
     {
-        this.config = cfg;
+        super.configure(cfg);
         TeamCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
         this.summary = Util.coalesce(rcfg.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
     }
 
-    @Override
-    public TeamCfg getConfiguration()
+    public List<UUID> getTeamIds()
     {
-        return this.config;
+        return this.teamIds;
     }
     
-    public Collection<Team> getParents()
+    public void setTeamIds(List<UUID> teamIds)
     {
-        return parents.values();
+        this.teamIds = teamIds;
     }
-
-    public void addParent(Team parent)
+    
+    public List<Team> getTeams()
     {
-        this.parents.put(parent.getName(), parent);
-    }
-
-    public void removeParent(Team parent)
-    {
-        this.parents.remove(parent.getName());
+        List<Team> r = new LinkedList<Team>();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            for (UUID id : this.getTeamIds())
+            {
+                r.add(db.getTeam(id));
+            }
+        }
+        return r;
     }
 
     public Collection<Team> getChildren()
     {
-        return children.values();
+        // TODO
+        return new LinkedList<Team>();
     }
 
     public void removeChild(Team child)
     {
-        this.children.remove(child.getName());
-        child.removeParent(this);
+        // TODO
     }
 
     public void addChild(Team child)
     {
-        this.children.put(child.getName(), child);
-        child.addParent(this);
+        // TODO
     }
-    
+
     public List<Contact> getAllContacts()
     {
         List<Contact> ret = new LinkedList<Contact>();
@@ -92,28 +108,30 @@ public class Team extends NamedObject<TeamMO> implements Configurable<TeamCfg>
 
     public List<Contact> getContacts()
     {
-        return contacts;
-    }
-
-    public void setContacts(List<Contact> contacts)
-    {
-        this.contacts = contacts;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getContactsInTeam(this.getId());
+        }
     }
 
     public void addContact(Contact contact)
     {
-        this.contacts.add(contact);
-        contact.getTeams().add(this);
+        // TODO
     }
-    
+
+    public void removeContact(Contact contact)
+    {
+        // TODO
+    }
+
     @Override
     public TeamMO toMO(boolean stub)
     {
         TeamMO mo = new TeamMO();
         super.toMO(mo, stub);
-        if (! stub)
+        if (!stub)
         {
-            mo.setParents(this.getParents().stream().map(Team::toStubMO).collect(Collectors.toList()));
+            mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
             mo.setChildren(this.getChildren().stream().map(Team::toStubMO).collect(Collectors.toList()));
             mo.setContacts(this.getContacts().stream().map(Contact::toStubMO).collect(Collectors.toList()));
         }

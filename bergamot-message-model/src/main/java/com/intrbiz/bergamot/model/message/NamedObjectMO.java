@@ -9,15 +9,18 @@ public abstract class NamedObjectMO extends MessageObject
     @JsonProperty("id")
     protected UUID id;
 
+    @JsonProperty("site_id")
+    protected UUID siteId;
+
     @JsonProperty("name")
     protected String name;
- 
+
     @JsonProperty("summary")
     protected String summary;
-    
+
     @JsonProperty("description")
     protected String description;
-    
+
     public NamedObjectMO()
     {
         super();
@@ -31,6 +34,16 @@ public abstract class NamedObjectMO extends MessageObject
     public void setId(UUID id)
     {
         this.id = id;
+    }
+
+    public UUID getSiteId()
+    {
+        return siteId;
+    }
+
+    public void setSiteId(UUID siteId)
+    {
+        this.siteId = siteId;
     }
 
     public String getName()

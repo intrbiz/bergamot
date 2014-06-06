@@ -19,6 +19,7 @@ import com.intrbiz.bergamot.compat.config.model.NagiosTimeperiodCfg;
 import com.intrbiz.bergamot.compat.macro.MacroFrame;
 import com.intrbiz.bergamot.compat.macro.MacroProcessor;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.config.model.CheckCommandCfg;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.config.model.EmailCfg;
@@ -424,13 +425,14 @@ public class NagiosConfigConverter
             {
                 // parse the check command
                 NagiosCommandString command = NagiosCommandString.parse(cfg.getCheckCommand());
-                service.setCommand(new CommandCfg());
-                service.getCommand().getInheritedTemplates().add(command.getCommandName());
+                service.setCheckCommand(new CheckCommandCfg());
+                service.getCheckCommand().setCommand(command.getCommandName());
                 // parameters
                 int i = 1;
                 for (String arg : command.getArguments())
                 {
-                    service.getCommand().addParameter(new CfgParameter("arg" + i++, null, null, arg));
+                    System.out.println("Adding arg: " + arg);
+                    service.getCheckCommand().addParameter(new CfgParameter("arg" + i++, null, null, arg));
                 }
             }
             // add
@@ -501,13 +503,13 @@ public class NagiosConfigConverter
             {
                 // parse the check command
                 NagiosCommandString command = NagiosCommandString.parse(cfg.getCheckCommand());
-                host.setCommand(new CommandCfg());
-                host.getCommand().getInheritedTemplates().add(command.getCommandName());
+                host.setCheckCommand(new CheckCommandCfg());
+                host.getCheckCommand().setCommand(command.getCommandName());
                 // parameters
                 int i = 1;
                 for (String arg : command.getArguments())
                 {
-                    host.getCommand().addParameter(new CfgParameter("arg" + i++, null, null, arg));
+                    host.getCheckCommand().addParameter(new CfgParameter("arg" + i++, null, null, arg));
                 }
             }
             // add

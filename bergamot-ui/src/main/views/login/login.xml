@@ -1,0 +1,56 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- A template view, applied to all views -->
+<html xmlns="com.intrbiz.balsa">
+	<head>
+		<title>Bergamot Monitoring - Login</title>
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
+		<!-- Scripts -->
+		<script src="/js/bower_components/requirejs/require.js"></script>
+    	<script src="/js/bower_components/jquery/dist/jquery.js"></script>
+    	<script type="text/javascript">
+			/* Configure require js */
+			require.config({
+			    baseUrl: "/js/bower_components",
+			    waitSeconds: 15
+			});
+		</script>
+	</head>
+	<body>
+		<div id="header">
+			<div class="container">
+				<div id="logo">
+					<a href="/">
+						<h1>Bergamot</h1>
+					</a>
+				</div>
+				<div id="menu">
+					<ul>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="content">
+			<div class="container">			
+				<div id="login-box">
+					<h2 style="text-align: center;">Welcome to Bergamot Monitoring</h2>
+					<h4 style="text-align: center;">Please login to continue</h4>
+					<form method="post" action="#{path('/login')}">
+						<p>
+							<input type="text" id="username" name="username" placeholder="Enter your username"/>
+						</p>
+						<p>
+							<input type="password" id="password" name="password" placeholder="Enter your password"/>
+						</p>
+						<p>
+							<access-token-for-url path="#{path('/login')}"/>
+							<input type="hidden" id="redirect" name="redirect" value="#{coalesce(redirect,'')}" />
+							<input type="submit" id="login"    name="login"    value="Login"/>
+						</p>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

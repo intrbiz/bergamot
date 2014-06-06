@@ -12,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.team")
 public class TeamMO extends NamedObjectMO
 {
-    @JsonProperty("parents")
-    private List<TeamMO> parents = new LinkedList<TeamMO>();
+    @JsonProperty("teams")
+    private List<TeamMO> teams = new LinkedList<TeamMO>();
 
     @JsonProperty("children")
     private List<TeamMO> children = new LinkedList<TeamMO>();
@@ -26,14 +26,14 @@ public class TeamMO extends NamedObjectMO
         super();
     }
 
-    public List<TeamMO> getParents()
+    public List<TeamMO> getTeams()
     {
-        return parents;
+        return teams;
     }
 
-    public void setParents(List<TeamMO> parents)
+    public void setTeams(List<TeamMO> teams)
     {
-        this.parents = parents;
+        this.teams = teams;
     }
 
     public List<TeamMO> getChildren()

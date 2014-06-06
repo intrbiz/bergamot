@@ -27,62 +27,62 @@ public class HostAPIRouter extends Router<BergamotApp>
     @JSON
     public List<HostMO> getHosts()
     {
-        return this.app().getBergamot().getObjectStore().getHosts().stream().map(Host::toStubMO).collect(Collectors.toList());
+        return null; //return this.app().getBergamot().getObjectStore().getHosts().stream().map(Host::toStubMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     public HostMO getHost(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), Host::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), Host::toMO);
     }
     
     @Get("/name/:name/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getHostState(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), (h)->{return h.getState().toMO();});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), (h)->{return h.getState().toMO();});
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     public HostMO getHost(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), Host::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), Host::toMO);
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getHostState(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), (h)->{return h.getState().toMO();});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), (h)->{return h.getState().toMO();});
     }
     
     @Get("/name/:name/services")
     @JSON(notFoundIfNull = true)
     public List<ServiceMO> getHostServices(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), (e)->{return e.getServices().stream().map(Service::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), (e)->{return e.getServices().stream().map(Service::toMO).collect(Collectors.toList());});
     }
     
     @Get("/id/:id/services")
     @JSON(notFoundIfNull = true)
     public List<ServiceMO> getHostServices(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), (e)->{return e.getServices().stream().map(Service::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), (e)->{return e.getServices().stream().map(Service::toMO).collect(Collectors.toList());});
     }
     
     @Get("/name/:name/traps")
     @JSON(notFoundIfNull = true)
     public List<TrapMO> getHostTraps(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), (e)->{return e.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(name), (e)->{return e.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
     }
     
     @Get("/id/:id/traps")
     @JSON(notFoundIfNull = true)
     public List<TrapMO> getHostTraps(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), (e)->{return e.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(id), (e)->{return e.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
     }
 }

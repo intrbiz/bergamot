@@ -3,47 +3,66 @@ package com.intrbiz.bergamot.model;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.TimePeriodCfgAdapter;
+import com.intrbiz.bergamot.model.adapter.TimeRangesAdapter;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
  * A calendar of when checks should be executed
  */
-public class TimePeriod extends NamedObject<TimePeriodMO> implements TimeRange, Configurable<TimePeriodCfg>
+@SQLTable(schema = BergamotDB.class, name = "timeperiod", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "name_unq", columns = { "site_id", "name" })
+public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> implements TimeRange
 {
     private Logger logger = Logger.getLogger(TimePeriod.class);
+    
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = TimePeriodCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected TimePeriodCfg configuration;
 
-    private TimePeriodCfg config;
+    @SQLColumn(index = 2, name = "excludes_id", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    private List<UUID> excludesId = new LinkedList<UUID>();
 
-    private List<TimePeriod> excludes = new LinkedList<TimePeriod>();
-
+    @SQLColumn(index = 3, name = "ranges", type = "TEXT[]", adapter = TimeRangesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     private List<TimeRange> ranges = new LinkedList<TimeRange>();
 
     public TimePeriod()
     {
         super();
     }
-
+    
     @Override
     public TimePeriodCfg getConfiguration()
     {
-        return this.config;
+        return configuration;
+    }
+
+    @Override
+    public void setConfiguration(TimePeriodCfg configuration)
+    {
+        this.configuration = configuration;
     }
 
     @Override
     public void configure(TimePeriodCfg cfg)
     {
-        this.config = cfg;
+        super.configure(cfg);
         TimePeriodCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
         this.summary = Util.coalesce(rcfg.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         // load the time ranges
         this.ranges.clear();
         this.ranges.addAll(rcfg.getTimeRanges());
@@ -66,17 +85,38 @@ public class TimePeriod extends NamedObject<TimePeriodMO> implements TimeRange, 
 
     public List<TimePeriod> getExcludes()
     {
-        return excludes;
+        List<TimePeriod> r = new LinkedList<TimePeriod>();
+        if (this.excludesId != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                for (UUID id : this.getExcludesId())
+                {
+                    r.add(db.getTimePeriod(id));
+                }
+            }
+        }
+        return r;
     }
 
     public void addExclude(TimePeriod exclude)
     {
-        this.excludes.add(exclude);
+        // TODO
+    }
+    
+    public void removeExclude(TimePeriod exclude)
+    {
+        // TODO
     }
 
-    public void setExcludes(List<TimePeriod> excludes)
+    public List<UUID> getExcludesId()
     {
-        this.excludes = excludes;
+        return excludesId;
+    }
+
+    public void setExcludesId(List<UUID> excludesId)
+    {
+        this.excludesId = excludesId;
     }
 
     /**
@@ -87,13 +127,13 @@ public class TimePeriod extends NamedObject<TimePeriodMO> implements TimeRange, 
     {
         logger.trace("Checking if " + calendar.getTime() + " is valid for this time period");
         // check the possbile excludes
-        for (TimePeriod exclude : this.excludes)
+        for (TimePeriod exclude : this.getExcludes())
         {
             if (exclude.isInTimeRange(calendar)) return false;
         }
         // check the ranges
         if (this.ranges.isEmpty()) return true;
-        for (TimeRange range : this.ranges)
+        for (TimeRange range : this.getRanges())
         {
             if (range.isInTimeRange(calendar)) return true;
         }
@@ -104,13 +144,13 @@ public class TimePeriod extends NamedObject<TimePeriodMO> implements TimeRange, 
     {
         return "TimePeriod " + this.getName();
     }
-    
+
     @Override
     public TimePeriodMO toMO(boolean stub)
     {
         TimePeriodMO mo = new TimePeriodMO();
         super.toMO(mo, stub);
-        if (! stub)
+        if (!stub)
         {
             mo.setExcludes(this.getExcludes().stream().map(TimePeriod::toStubMO).collect(Collectors.toList()));
             mo.setRanges(this.getRanges().stream().map(TimeRange::toString).collect(Collectors.toList()));

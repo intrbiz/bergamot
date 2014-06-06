@@ -3,17 +3,24 @@ package com.intrbiz.bergamot.ui.router;
 import static com.intrbiz.bergamot.ui.util.Sorter.*;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.bergamot.Bergamot;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Location;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/main")
+@RequireValidPrincipal()
 public class LocationRouter extends Router<BergamotApp>
 {    
     @Any("/location")
@@ -23,20 +30,30 @@ public class LocationRouter extends Router<BergamotApp>
     }
     
     @Any("/location/")
-    public void showLocations()
+    @WithDataAdapter(BergamotDB.class)
+    public void showLocations(BergamotDB db, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        model("locations", orderLocationsByStatus(bergamot.getObjectStore().getRootLocations()));
+        model("locations", orderLocationsByStatus(db.getRootLocations(site.getId())));
         encode("location/index");
     }
     
     @Any("/location/name/:name")
-    public void showHostGroupByName(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public void showLocationByName(BergamotDB db, String name, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        Location location = model("location", bergamot.getObjectStore().lookupLocation(name));
+        Location location = model("location", db.getLocationByName(site.getId(), name));
         model("hosts", orderHostsByStatus(location.getHosts()));
-        model("locations", orderLocationsByStatus(location.getLocations()));
+        model("locations", orderLocationsByStatus(location.getChildren()));
+        encode("location/hosts");
+    }
+    
+    @Any("/location/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void showLocationById(BergamotDB db, @AsUUID() UUID id)
+    {
+        Location location = model("location", db.getLocation(id));
+        model("hosts", orderHostsByStatus(location.getHosts()));
+        model("locations", orderLocationsByStatus(location.getChildren()));
         encode("location/hosts");
     }
 }

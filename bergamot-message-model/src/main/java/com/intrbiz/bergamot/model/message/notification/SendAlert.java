@@ -17,10 +17,4 @@ public class SendAlert extends Notification
     {
         return "alert";
     }
-
-    @Override
-    public String getDefaultExchange()
-    {
-        return "bergamot.notification";
-    }
 }

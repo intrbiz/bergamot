@@ -4,124 +4,114 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.bergamot.Bergamot;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.message.task.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/host")
 @Template("layout/main")
+@RequireValidPrincipal()
 public class HostRouter extends Router<BergamotApp>
 {   
     @Any("/name/:name")
-    public void host(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public void host(BergamotDB db, String name, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        model("host", bergamot.getObjectStore().lookupHost(name));
+        model("host", db.getHostByName(site.getId(), name));
         encode("host/detail");
     }
     
     @Any("/id/:id")
-    public void host(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public void host(BergamotDB db, @AsUUID UUID id)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        model("host", bergamot.getObjectStore().lookupHost(id));
+        model("host", db.getHost(id));
         encode("host/detail");
     }
     
     @Any("/execute/:id")
-    public void executeHost(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void executeHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the host and force it's execution
-        Host host = bergamot.getObjectStore().lookupHost(id);
+        Host host = db.getHost(id);
         if (host != null)
         {
-            // build the check and dispatch it
-            ExecuteCheck executeCheck = host.executeCheck();
-            if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
+            action("execute-check", host);
         }
-        redirect("/host/name/" + host.getName());
+        redirect("/host/id/" + id);
     }
     
     @Any("/enable/:id")
-    public void enableHost(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void enableHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and enable it
-        Host host = bergamot.getObjectStore().lookupHost(id);
+        Host host = db.getHost(id);
         if (host != null)
         {
-            // enable the service with the scheduler
             host.setEnabled(true);
-            bergamot.getScheduler().enable(host);
+            db.setHost(host);
+            action("enable-check", host);
         }
-        redirect("/host/name/" + host.getName());
+        redirect("/host/id/" + id);
     }
     
     @Any("/disable/:id")
-    public void disableHost(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void disableHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and disable it
-        Host host = bergamot.getObjectStore().lookupHost(id);
+        Host host = db.getHost(id);
         if (host != null)
         {
-            // disable the service with the scheduler
             host.setEnabled(false);
-            bergamot.getScheduler().disable(host);
+            db.setHost(host);
+            action("disable-check", host);
         }
-        redirect("/host/name/" + host.getName());
+        redirect("/host/id/" + id);
     }
     
     @Any("/suppress/:id")
-    public void suppressHost(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void suppressHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and supress it
-        Host host = bergamot.getObjectStore().lookupHost(id);
+        Host host = db.getHost(id);
         if (host != null)
         {
-            // suppress the service
             host.setSuppressed(true);
+            db.setHost(host);
         }
-        redirect("/host/name/" + host.getName());
+        redirect("/host/id/" + id);
     }
     
     @Any("/unsuppress/:id")
-    public void unsuppressHost(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void unsuppressHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the service and unsupress it
-        Host host = bergamot.getObjectStore().lookupHost(id);
+        Host host = db.getHost(id);
         if (host != null)
         {
-            // unsuppress the service
             host.setSuppressed(false);
+            db.setHost(host);
         }
-        redirect("/host/name/" + host.getName());
+        redirect("/host/id/" + id);
     }
     
     @Any("/execute-services/:id")
-    public void executeServicesOnHost(@AsUUID UUID id) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void executeServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
-        Bergamot bergamot = this.app().getBergamot();
-        // get the host and force it's execution
-        Host host = bergamot.getObjectStore().lookupHost(id);
-        if (host != null)
+        for (Service service : db.getServicesOnHost(id))
         {
-            for (Service service : host.getServices())
-            {
-                // build the check and dispatch it
-                ExecuteCheck executeCheck = service.executeCheck();
-                if (executeCheck != null) bergamot.getManifold().publish(executeCheck);
-            }
+            action("execute-check", service);
         }
-        redirect("/host/name/" + host.getName());
+        redirect("/host/id/" + id);
     }
 }

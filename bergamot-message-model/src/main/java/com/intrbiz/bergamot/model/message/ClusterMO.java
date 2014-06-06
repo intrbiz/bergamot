@@ -17,7 +17,7 @@ public class ClusterMO extends VirtualCheckMO
         super();
     }
     
-    public String getType()
+    public String getCheckType()
     {
         return "cluster";
     }

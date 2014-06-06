@@ -14,7 +14,7 @@ public class ResourceMO extends VirtualCheckMO
         super();
     }
     
-    public String getType()
+    public String getCheckType()
     {
         return "resource";
     }

@@ -107,7 +107,7 @@ public class SMSEngine extends AbstractNotificationEngine
 
     protected String buildMessage(Notification notification) throws Exception
     {
-        return this.applyTemplate(notification.getCheck().getType() + "." + notification.getNotificationType() + ".message", notification);
+        return this.applyTemplate(notification.getCheck().getCheckType() + "." + notification.getNotificationType() + ".message", notification);
     }
 
     @Override

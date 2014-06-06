@@ -22,27 +22,27 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @JSON
     public List<ContactMO> getContacts()
     {
-        return this.app().getBergamot().getObjectStore().getContacts().stream().map(Contact::toMO).collect(Collectors.toList());
+        return null; //return this.app().getBergamot().getObjectStore().getContacts().stream().map(Contact::toMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     public ContactMO getContact(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupContact(name), Contact::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupContact(name), Contact::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     public ContactMO getContact(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupContact(id), Contact::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupContact(id), Contact::toMO);
     }
     
     @Get("/email/:email")
     @JSON(notFoundIfNull = true)
     public ContactMO getContactByEmail(String email)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupContactByEmail(email), Contact::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupContactByEmail(email), Contact::toMO);
     }
 }

@@ -15,6 +15,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 public class LocationCfg extends NamedObjectCfg<LocationCfg>
 {
     private String location;
+    
+    private String workerPool;
 
     public LocationCfg()
     {
@@ -31,6 +33,18 @@ public class LocationCfg extends NamedObjectCfg<LocationCfg>
     public void setLocation(String location)
     {
         this.location = location;
+    }
+    
+    @XmlAttribute(name = "worker-pool")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getWorkerPool()
+    {
+        return workerPool;
+    }
+
+    public void setWorkerPool(String workerPool)
+    {
+        this.workerPool = workerPool;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()

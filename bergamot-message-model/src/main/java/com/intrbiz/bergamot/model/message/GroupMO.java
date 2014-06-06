@@ -16,8 +16,8 @@ public class GroupMO extends NamedObjectMO
     @JsonProperty("state")
     private GroupStateMO state;
     
-    @JsonProperty("parents")
-    private List<GroupMO> parents = new LinkedList<GroupMO>();
+    @JsonProperty("groups")
+    private List<GroupMO> groups = new LinkedList<GroupMO>();
     
     @JsonProperty("children")
     private List<GroupMO> children = new LinkedList<GroupMO>();
@@ -40,14 +40,14 @@ public class GroupMO extends NamedObjectMO
         this.checks = checks;
     }
 
-    public List<GroupMO> getParents()
+    public List<GroupMO> getGroups()
     {
-        return parents;
+        return groups;
     }
 
-    public void setParents(List<GroupMO> parents)
+    public void setGroups(List<GroupMO> groups)
     {
-        this.parents = parents;
+        this.groups = groups;
     }
 
     public List<GroupMO> getChildren()

@@ -21,27 +21,27 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     public TrapMO getTrap(String hostName, String name)
     {    
-        return Util.nullable((Trap)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getTrap(name);}), Trap::toMO);
+        return null; //return Util.nullable((Trap)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getTrap(name);}), Trap::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     public TrapMO getTrap(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupTrap(id), Trap::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTrap(id), Trap::toMO);
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getTrapState(@AsUUID UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupTrap(id), (t)->{return t.getState().toMO();});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTrap(id), (t)->{return t.getState().toMO();});
     }
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
     public CheckStateMO getTrapState(String hostName, String name)
     {    
-        return Util.nullable((Trap)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getTrap(name);}), (t)->{return t.getState().toMO();});
+        return null; //return Util.nullable((Trap)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getTrap(name);}), (t)->{return t.getState().toMO();});
     }
 }

@@ -11,7 +11,7 @@
 	</div>
 
 	<div class="row">
-		<div class="col4 dash_icon">
+		<div class="col4 dash_icon check"  data-check-id="#{cluster.id}">
 		    <h3>
 				<span class="dash_img #{cluster.state.status.toString().toLowerCase()}" title="The cluster is #{cluster.state.status.toString().toLowerCase()}">
 					<img src="/host-icon.png" />
@@ -99,18 +99,16 @@
 		</div>
 	</div>
 	
-	<div class="row">
-		<div class="col12">
-			<h3>JSON</h3>
-			<pre>#{cluster.toJSON()}</pre>
-		</div>
-	</div>
-	
 	<script type="text/javascript">
-		$(document).ready(function(){
-			setTimeout(function(){
-				window.location = window.location;
-			}, 30000);
+		require(["bergamot/lib/util/console-log", "bergamot/lib/ui/check-state", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_server_state, bergamot_api_driver)
+		{
+		    bergamot_console_log.attachTo(document);
+
+		    bergamot_ui_server_state.attachTo("div.check");
+
+		    bergamot_api_driver.attachTo(document, {
+				url: "ws://127.0.0.1:8081/websocket",
+		    });
 		});
 	</script>
 

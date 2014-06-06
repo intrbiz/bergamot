@@ -23,35 +23,35 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @JSON
     public List<LocationMO> getLocations()
     {
-        return this.app().getBergamot().getObjectStore().getLocations().stream().map(Location::toStubMO).collect(Collectors.toList());
+        return null; //return this.app().getBergamot().getObjectStore().getLocations().stream().map(Location::toStubMO).collect(Collectors.toList());
     }
     
     @Get("/roots")
     @JSON
     public List<LocationMO> getRootLocations()
     {
-        return this.app().getBergamot().getObjectStore().getLocations().stream().filter((e)->{return e.getLocation() == null;}).map(Location::toMO).collect(Collectors.toList());
+        return null; //return this.app().getBergamot().getObjectStore().getLocations().stream().filter((e)->{return e.getLocation() == null;}).map(Location::toMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     public LocationMO getLocation(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), Location::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), Location::toMO);
     }
     
     @Get("/name/:name/children")
     @JSON(notFoundIfNull = true)
     public List<LocationMO> getLocationChildren(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), (e)->{return e.getLocations().stream().map(Location::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), (e)->{return e.getChildren().stream().map(Location::toMO).collect(Collectors.toList());});
     }
     
     @Get("/name/:name/hosts")
     @JSON(notFoundIfNull = true)
     public List<HostMO> getLocationHosts(String name)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
     }
     
     //
@@ -60,20 +60,20 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     public LocationMO getLocation(@AsUUID() UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), Location::toMO);
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), Location::toMO);
     }
     
     @Get("/id/:id/children")
     @JSON(notFoundIfNull = true)
     public List<LocationMO> getLocationChildren(@AsUUID() UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), (e)->{return e.getLocations().stream().map(Location::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), (e)->{return e.getChildren().stream().map(Location::toMO).collect(Collectors.toList());});
     }
     
     @Get("/id/:id/hosts")
     @JSON(notFoundIfNull = true)
     public List<HostMO> getLocationHosts(@AsUUID() UUID id)
     {
-        return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
+        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
     }
 }

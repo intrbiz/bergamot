@@ -1,30 +1,63 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.StatusesAdapter;
 import com.intrbiz.bergamot.model.message.NotificationEngineMO;
+import com.intrbiz.data.db.compiler.meta.Action;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
+@SQLTable(schema = BergamotDB.class, name = "notification_engine", since = @SQLVersion({ 1, 0, 0 }))
 public class NotificationEngine extends BergamotObject<NotificationEngineMO>
 {
+    @SQLColumn(index = 1, name = "notifications_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
+    @SQLPrimaryKey
+    private UUID notificationsId;
+
+    @SQLColumn(index = 2, name = "engine", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLPrimaryKey
     private String engine;
 
+    @SQLColumn(index = 3, name = "enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean enabled;
 
-    private TimePeriod timePeriod;
+    @SQLColumn(index = 4, name = "timeperiod_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT)
+    private UUID timePeriodId;
 
+    @SQLColumn(index = 5, name = "alerts_enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean alertsEnabled = true;
 
+    @SQLColumn(index = 6, name = "recovery_enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean recoveryEnabled = true;
 
-    private Set<Status> ignore = new HashSet<Status>();
+    @SQLColumn(index = 7, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    private List<Status> ignore = new LinkedList<Status>();
 
     public NotificationEngine()
     {
         super();
+    }
+
+    public UUID getNotificationsId()
+    {
+        return notificationsId;
+    }
+
+    public void setNotificationsId(UUID notificationsId)
+    {
+        this.notificationsId = notificationsId;
     }
 
     public String getEngine()
@@ -49,12 +82,21 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
 
     public TimePeriod getTimePeriod()
     {
-        return timePeriod;
+        if (this.getTimePeriodId() == null) return null;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getTimePeriod(this.getTimePeriodId());
+        }
     }
 
-    public void setTimePeriod(TimePeriod timePeriod)
+    public UUID getTimePeriodId()
     {
-        this.timePeriod = timePeriod;
+        return timePeriodId;
+    }
+
+    public void setTimePeriodId(UUID timePeriodId)
+    {
+        this.timePeriodId = timePeriodId;
     }
 
     public boolean isAlertsEnabled()
@@ -77,40 +119,37 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
         this.recoveryEnabled = recoveryEnabled;
     }
 
-    public Set<Status> getIgnore()
+    public List<Status> getIgnore()
     {
         return ignore;
     }
 
-    public void setIgnore(Set<Status> ignore)
+    public void setIgnore(List<Status> ignore)
     {
         this.ignore = ignore;
     }
-    
-    
 
     /**
      * Is this notification engine valid for the given time
      */
     public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
     {
-        return this.enabled && 
-               this.isNotificationTypeEnabled(type) &&
-               (! this.isStatusIgnored(status)) &&
-               (this.timePeriod == null ? true : this.timePeriod.isInTimeRange(time));
+        TimePeriod timePeriod = this.getTimePeriod();
+        return this.enabled && this.isNotificationTypeEnabled(type) && (!this.isStatusIgnored(status)) && (timePeriod == null ? true : timePeriod.isInTimeRange(time));
     }
-    
+
     private boolean isStatusIgnored(Status status)
     {
-        return this.ignore.stream().anyMatch((e) -> {return e == status;});
+        return this.ignore.stream().anyMatch((e) -> {
+            return e == status;
+        });
     }
-    
+
     private boolean isNotificationTypeEnabled(NotificationType type)
     {
-        return (type == NotificationType.ALERT && this.alertsEnabled) || 
-               (type == NotificationType.RECOVERY && this.recoveryEnabled);
+        return (type == NotificationType.ALERT && this.alertsEnabled) || (type == NotificationType.RECOVERY && this.recoveryEnabled);
     }
-    
+
     @Override
     public NotificationEngineMO toMO(boolean stub)
     {

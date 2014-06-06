@@ -1,128 +1,173 @@
 package com.intrbiz.bergamot.model;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.LocationCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.LocationCfgAdapter;
 import com.intrbiz.bergamot.model.message.LocationMO;
 import com.intrbiz.bergamot.model.state.GroupState;
-import com.intrbiz.configuration.Configurable;
+import com.intrbiz.data.db.compiler.meta.Action;
+import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLTable;
+import com.intrbiz.data.db.compiler.meta.SQLUnique;
+import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
  * The physical (probably) location of a host
  */
-public class Location extends NamedObject<LocationMO> implements Configurable<LocationCfg>
+@SQLTable(schema = BergamotDB.class, name = "location", since = @SQLVersion({ 1, 0, 0 }))
+@SQLUnique(name = "name_unq", columns = { "site_id", "name" })
+public class Location extends NamedObject<LocationMO, LocationCfg>
 {
-    private Location location;
-    
-    private Map<String, Host> hosts = new TreeMap<String, Host>();
+    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = LocationCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    protected LocationCfg configuration;
 
-    private Map<String, Location> locations = new TreeMap<String, Location>();
-    
-    private LocationCfg config;
+    @SQLColumn(index = 2, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLForeignKey(references = Location.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT)
+    protected UUID locationId;
+
+    @SQLColumn(index = 3, name = "worker_pool", since = @SQLVersion({ 1, 0, 0 }))
+    protected String workerPool;
 
     public Location()
     {
         super();
     }
-    
+
     @Override
     public LocationCfg getConfiguration()
     {
-        return this.config;
+        return configuration;
     }
 
     @Override
-    public void configure(LocationCfg config)
+    public void setConfiguration(LocationCfg configuration)
     {
-        this.config = config;
-        LocationCfg rcfg = config.resolve();
+        this.configuration = configuration;
+    }
+
+    @Override
+    public void configure(LocationCfg cfg)
+    {
+        super.configure(cfg);
+        LocationCfg rcfg = cfg.resolve();
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
+        this.workerPool = rcfg.getWorkerPool();
     }
 
-    public Collection<Host> getHosts()
+    public List<Host> getHosts()
     {
-        return this.hosts.values();
-    }
-
-    public Host getHost(String name)
-    {
-        return this.hosts.get(name);
-    }
-
-    public boolean containsHost(String name)
-    {
-        return this.hosts.containsKey(name);
-    }
-
-    public int getHostCount()
-    {
-        return this.hosts.size();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getHostsInLocation(this.getId());
+        }
     }
 
     public void addHost(Host host)
     {
-        this.hosts.put(host.getName(), host);
-        host.setLocation(this);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addLocationHost(this, host);
+        }
     }
 
-    public Collection<Location> getLocations()
+    public void removeHost(Host host)
     {
-        return this.locations.values();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeLocationHost(this, host);
+        }
     }
 
-    public Location getLocation(String name)
+    public List<Location> getChildren()
     {
-        return this.locations.get(name);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getLocationsInLocation(this.getId());
+        }
     }
 
-    public boolean containsLocation(String name)
+    public void addChild(Location child)
     {
-        return this.locations.containsKey(name);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addLocationChild(this, child);
+        }
     }
 
-    public int getLocationCount()
+    public void removeChild(Location child)
     {
-        return this.locations.size();
-    }
-
-    public void addLocation(Location location)
-    {
-        this.locations.put(location.getName(), location);
-        location.setLocation(this);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeLocationChild(this, child);
+        }
     }
 
     public Location getLocation()
     {
-        return location;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getLocation(this.getLocationId());
+        }
     }
 
-    public void setLocation(Location location)
+    public UUID getLocationId()
     {
-        this.location = location;
+        return locationId;
+    }
+
+    public void setLocationId(UUID locationId)
+    {
+        this.locationId = locationId;
+    }
+
+    public String getWorkerPool()
+    {
+        return workerPool;
+    }
+
+    public void setWorkerPool(String workerPool)
+    {
+        this.workerPool = workerPool;
+    }
+    
+    public String resolveWorkerPool()
+    {
+        String workerPool = this.getWorkerPool();
+        if (workerPool == null)
+        {
+            workerPool = Util.nullable(this.getLocation(), Location::resolveWorkerPool);
+        }
+        return workerPool;
     }
 
     public GroupState getState()
     {
-        return GroupState.compute(this.getHosts(), this.getLocations(), (l) -> { return l.getState(); });
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.computeLocationState(this.getId());
+        }
     }
-    
-    @Override    
+
+    @Override
     public LocationMO toMO(boolean stub)
     {
         LocationMO mo = new LocationMO();
-        super.toMO(mo, stub);        
+        super.toMO(mo, stub);
         mo.setState(this.getState().toMO());
-        if (! stub)
+        if (!stub)
         {
-            mo.setLocation(Util.nullable(this.location, Location::toStubMO));
-            mo.setChildren(this.getLocations().stream().map(Location::toStubMO).collect(Collectors.toList()));
+            mo.setLocation(Util.nullable(this.getLocation(), Location::toStubMO));
+            mo.setChildren(this.getChildren().stream().map(Location::toStubMO).collect(Collectors.toList()));
             mo.setHosts(this.getHosts().stream().map(Host::toStubMO).collect(Collectors.toList()));
         }
-        return  mo;
+        return mo;
     }
 }

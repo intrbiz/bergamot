@@ -1,21 +1,26 @@
 package com.intrbiz.bergamot.ui.router;
 
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.bergamot.Bergamot;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/main")
+@RequireValidPrincipal()
 public class DashboardRouter extends Router<BergamotApp>
 {    
     @Any("/")
-    public void index()
+    @WithDataAdapter(BergamotDB.class)
+    public void index(BergamotDB db, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        model("alerts", bergamot.getObjectStore().getAlerts());
+        model("alerts", db.listChecksThatAreNotOk(site.getId()));
         encode("index");
     }
 }

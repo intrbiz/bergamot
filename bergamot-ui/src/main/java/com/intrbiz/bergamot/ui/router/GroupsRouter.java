@@ -3,18 +3,24 @@ package com.intrbiz.bergamot.ui.router;
 import static com.intrbiz.bergamot.ui.util.Sorter.*;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.bergamot.Bergamot;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Group;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/main")
+@RequireValidPrincipal()
 public class GroupsRouter extends Router<BergamotApp>
 {    
     @Any("/group")
@@ -24,18 +30,28 @@ public class GroupsRouter extends Router<BergamotApp>
     }
     
     @Any("/group/")
-    public void showGroups()
+    @WithDataAdapter(BergamotDB.class)
+    public void showGroups(BergamotDB db, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        model("groups", orderGroupsByStatus(bergamot.getObjectStore().getGroups().stream().filter((e) -> {return e.getParents().isEmpty();}).collect(Collectors.toList())));
+        model("groups", orderGroupsByStatus(db.getRootGroups(site.getId())));
         encode("group/index");
     }
     
     @Any("/group/name/:name")
-    public void showHostGroupByName(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site)
     {
-        Bergamot bergamot = this.app().getBergamot();
-        Group group = model("group", bergamot.getObjectStore().lookupGroup(name));
+        Group group = model("group", db.getGroupByName(site.getId(), name));
+        model("checks", orderCheckByStatus(group.getChecks()));
+        model("groups", orderGroupsByStatus(group.getChildren()));
+        encode("group/group");
+    }
+    
+    @Any("/group/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void showHostGroupByName(BergamotDB db, @AsUUID() UUID id)
+    {
+        Group group = model("group", db.getGroup(id));
         model("checks", orderCheckByStatus(group.getChecks()));
         model("groups", orderGroupsByStatus(group.getChildren()));
         encode("group/group");
