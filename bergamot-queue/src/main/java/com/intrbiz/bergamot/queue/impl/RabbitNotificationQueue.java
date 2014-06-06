@@ -57,7 +57,7 @@ public class RabbitNotificationQueue extends NotificationQueue
         {
             public String setupQueue(Channel on) throws IOException
             {
-                String queueName = "bergamot.notification." + (site == null ? "default" : site.toString() + "." + engineName);
+                String queueName = "bergamot.notification." + (site == null ? "default" : site.toString()) + "." + engineName;
                 on.queueDeclare(queueName, true, false, false, null);
                 on.exchangeDeclare("bergamot.notification", "topic", true);
                 on.queueBind(queueName, "bergamot.notification", site == null ? "#" : site.toString());
