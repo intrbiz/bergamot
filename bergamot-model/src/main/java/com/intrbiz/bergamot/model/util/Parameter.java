@@ -12,6 +12,8 @@ import com.intrbiz.bergamot.model.message.ParameterMO;
 @JsonTypeName("parameter")
 public class Parameter extends BergamotObject<ParameterMO>
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("name")
     private String name;
 

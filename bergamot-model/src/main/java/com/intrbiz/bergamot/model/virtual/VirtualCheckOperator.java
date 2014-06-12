@@ -1,13 +1,16 @@
 package com.intrbiz.bergamot.model.virtual;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
 
-public abstract class VirtualCheckOperator
+public abstract class VirtualCheckOperator implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     public abstract boolean computeOk();
     
     public abstract Status computeStatus();

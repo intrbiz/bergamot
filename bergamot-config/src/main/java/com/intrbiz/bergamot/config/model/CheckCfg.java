@@ -19,6 +19,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 
 public abstract class CheckCfg<P extends CheckCfg<P>> extends NamedObjectCfg<P>
 {
+    private static final long serialVersionUID = 1L;
+    
     private Set<String> groups = new LinkedHashSet<String>();
 
     private NotificationsCfg notifications;

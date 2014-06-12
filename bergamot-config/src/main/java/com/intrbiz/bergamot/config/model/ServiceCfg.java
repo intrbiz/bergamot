@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "service")
 public class ServiceCfg extends ActiveCheckCfg<ServiceCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     public ServiceCfg()
     {
         super();

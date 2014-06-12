@@ -24,6 +24,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Location extends NamedObject<LocationMO, LocationCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = LocationCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected LocationCfg configuration;
 

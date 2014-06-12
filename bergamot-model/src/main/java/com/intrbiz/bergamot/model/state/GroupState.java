@@ -14,6 +14,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLTable(schema = BergamotDB.class, name = "group_state", virtual = true, since = @SQLVersion({ 1, 0, 0 }))
 public class GroupState extends BergamotObject<GroupStateMO>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "group_id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey
     private UUID groupId;

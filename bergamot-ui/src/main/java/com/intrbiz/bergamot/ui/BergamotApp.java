@@ -1,6 +1,9 @@
 package com.intrbiz.bergamot.ui;
 
+import java.util.UUID;
+
 import com.intrbiz.balsa.BalsaApplication;
+import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 import com.intrbiz.bergamot.result.ResultProcessor;
@@ -8,6 +11,19 @@ import com.intrbiz.bergamot.scheduler.Scheduler;
 import com.intrbiz.bergamot.scheduler.WheelScheduler;
 import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
 import com.intrbiz.bergamot.ui.action.SchedulerActions;
+import com.intrbiz.bergamot.ui.api.APIRouter;
+import com.intrbiz.bergamot.ui.api.AlertsAPIRouter;
+import com.intrbiz.bergamot.ui.api.ClusterAPIRouter;
+import com.intrbiz.bergamot.ui.api.CommandAPIRouter;
+import com.intrbiz.bergamot.ui.api.ContactAPIRouter;
+import com.intrbiz.bergamot.ui.api.GroupAPIRouter;
+import com.intrbiz.bergamot.ui.api.HostAPIRouter;
+import com.intrbiz.bergamot.ui.api.LocationAPIRouter;
+import com.intrbiz.bergamot.ui.api.ResourceAPIRouter;
+import com.intrbiz.bergamot.ui.api.ServiceAPIRouter;
+import com.intrbiz.bergamot.ui.api.TeamAPIRouter;
+import com.intrbiz.bergamot.ui.api.TimePeriodAPIRouter;
+import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.login.LoginRouter;
 import com.intrbiz.bergamot.ui.router.ClusterRouter;
 import com.intrbiz.bergamot.ui.router.DashboardRouter;
@@ -35,6 +51,13 @@ public class BergamotApp extends BalsaApplication
     
     private UpdateServer updateServer;
     
+    private final UUID id = UUID.randomUUID();
+    
+    public UUID id()
+    {
+        return id;
+    }
+    
     @Override
     protected void setup() throws Exception
     {
@@ -59,6 +82,8 @@ public class BergamotApp extends BalsaApplication
         this.updateServer = new UpdateServer(Integer.getInteger("bergamot.websocket.port", 8081));
         // security engine
         securityEngine(new BergamotSecurityEngine());
+        // session engine
+        sessionEngine(new HazelcastSessionEngine());
         // some actions
         action(new ExecuteCheckAction());
         action(new SchedulerActions());
@@ -73,12 +98,11 @@ public class BergamotApp extends BalsaApplication
         router(new ClusterRouter());
         router(new ResourceRouter());
         // API
-        /*
         router(new APIRouter());
         router(new AlertsAPIRouter());
+        router(new HostAPIRouter());
         router(new LocationAPIRouter());
         router(new GroupAPIRouter());
-        router(new HostAPIRouter());
         router(new ClusterAPIRouter());
         router(new ServiceAPIRouter());
         router(new TrapAPIRouter());
@@ -87,14 +111,13 @@ public class BergamotApp extends BalsaApplication
         router(new CommandAPIRouter());
         router(new ContactAPIRouter());
         router(new TeamAPIRouter());
-        */
     }
     
     @Override
     protected void startApplication() throws Exception
     {
-        this.resultProcessor.start();
-        this.scheduler.start();
+        // this.resultProcessor.start();
+        // this.scheduler.start();
         this.updateServer.start();
     }
     
@@ -111,11 +134,6 @@ public class BergamotApp extends BalsaApplication
     public UpdateServer getUpdateServer()
     {
         return updateServer;
-    }
-
-    public void setUpdateServer(UpdateServer updateServer)
-    {
-        this.updateServer = updateServer;
     }
 
     public static void main(String[] args) throws Exception

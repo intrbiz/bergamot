@@ -23,6 +23,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLTable(schema = BergamotDB.class, name = "check_state", since = @SQLVersion({ 1, 0, 0 }))
 public class CheckState extends BergamotObject<CheckStateMO>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey
     private UUID checkId;

@@ -14,6 +14,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 @XmlRootElement(name = "location")
 public class LocationCfg extends NamedObjectCfg<LocationCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     private String location;
     
     private String workerPool;

@@ -17,6 +17,8 @@ import com.intrbiz.configuration.Configuration;
 @XmlRootElement(name = "bergamot")
 public class BergamotCfg extends Configuration
 {
+    private static final long serialVersionUID = 1L;
+    
     private String site = "default";
 
     private List<TeamCfg> teams = new LinkedList<TeamCfg>();

@@ -4,6 +4,8 @@ import java.util.Calendar;
 
 public final class HourRange implements TimeRange
 {
+    private static final long serialVersionUID = 1L;
+    
     private final int startHour;
 
     private final int startMinute;

@@ -18,6 +18,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 @XmlRootElement(name = "group")
 public class GroupCfg extends NamedObjectCfg<GroupCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     private Set<String> groups = new LinkedHashSet<String>();
 
     public GroupCfg()

@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,8 +22,10 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 @XmlType(name = "notifications")
 @XmlRootElement(name = "notifications")
-public class NotificationsCfg
+public class NotificationsCfg implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private Boolean enabled;
     
     private String notificationPeriod;

@@ -25,6 +25,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Command extends NamedObject<CommandMO, CommandCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = CommandCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected CommandCfg configuration;
 

@@ -8,6 +8,8 @@ import com.intrbiz.bergamot.model.message.PassiveCheckMO;
  */
 public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCheckCfg<C>> extends RealCheck<T,C>
 {
+    private static final long serialVersionUID = 1L;
+    
     public PassiveCheck()
     {
         super();

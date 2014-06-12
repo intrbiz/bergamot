@@ -19,6 +19,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLUnique(name = "host_name_unq", columns = {"host_id", "name"})
 public class Trap extends PassiveCheck<TrapMO, TrapCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = TrapCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected TrapCfg configuration;
     

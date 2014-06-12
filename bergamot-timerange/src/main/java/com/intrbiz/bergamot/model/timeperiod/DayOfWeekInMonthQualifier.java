@@ -4,6 +4,8 @@ import java.util.Calendar;
 
 public class DayOfWeekInMonthQualifier extends ComposedTimeRange
 {
+    private static final long serialVersionUID = 1L;
+    
     private int dayOfWeekInMonth;
 
     public DayOfWeekInMonthQualifier()

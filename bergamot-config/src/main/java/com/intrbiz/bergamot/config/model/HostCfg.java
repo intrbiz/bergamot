@@ -16,6 +16,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
 @XmlRootElement(name = "host")
 public class HostCfg extends ActiveCheckCfg<HostCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     private List<ServiceCfg> services = new LinkedList<ServiceCfg>();
 
     private List<TrapCfg> traps = new LinkedList<TrapCfg>();

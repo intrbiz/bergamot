@@ -22,12 +22,10 @@ import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.CheckCommandCfg;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.config.model.ContactCfg;
-import com.intrbiz.bergamot.config.model.EmailCfg;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.config.model.NotificationsCfg;
 import com.intrbiz.bergamot.config.model.NotifyCfg;
-import com.intrbiz.bergamot.config.model.PhoneCfg;
 import com.intrbiz.bergamot.config.model.ScheduleCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.StateCfg;
@@ -214,8 +212,8 @@ public class NagiosConfigConverter
             contact.setTemplate(cfg.isRegister() == null || cfg.isRegister() == false ? true : null);
             contact.setName(contact.getTemplateBooleanValue() ? cfg.getName() : cfg.getContactName());
             if (cfg.getInherits() != null) contact.getInheritedTemplates().addAll(cfg.getInherits());
-            if (!Util.isEmpty(cfg.getEmail())) contact.getEmails().add(new EmailCfg("work", cfg.getEmail()));
-            if (!Util.isEmpty(cfg.getPager())) contact.getPhones().add(new PhoneCfg("pager", cfg.getPager()));
+            if (!Util.isEmpty(cfg.getEmail())) contact.setEmail(cfg.getEmail());
+            if (!Util.isEmpty(cfg.getPager())) contact.setPager(cfg.getPager());
             if (!Util.isEmpty(cfg.getAlias())) contact.setSummary(cfg.getAlias());
             // notifications
             if (cfg.isNotificationsEnabled() != null || cfg.getNotificationPeriod() != null)

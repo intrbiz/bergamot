@@ -21,6 +21,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Group extends NamedObject<GroupMO, GroupCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = GroupCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected GroupCfg configuration;
     

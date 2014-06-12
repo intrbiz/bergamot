@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "resource")
 public class ResourceCfg extends VirtualCheckCfg<ResourceCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     public ResourceCfg()
     {
         super();

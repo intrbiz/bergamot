@@ -4,7 +4,10 @@ import java.util.UUID;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Resource;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -12,6 +15,7 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/resource")
@@ -19,29 +23,33 @@ public class ResourceAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:cluster/:name")
     @JSON(notFoundIfNull = true)
-    public ResourceMO getResource(String clusterName, String name)
+    @WithDataAdapter(BergamotDB.class)
+    public ResourceMO getResource(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
-        return null; //return Util.nullable((Resource)Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(clusterName), (h)->{return h.getResource(name);}), Resource::toMO);
+        return Util.nullable(db.getResourceOnClusterByName(site.getId(), clusterName, name), Resource::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    public ResourceMO getResource(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public ResourceMO getResource(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupResource(id), Resource::toMO);
+        return Util.nullable(db.getResource(id), Resource::toMO);
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
-    public CheckStateMO getResourceState(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public CheckStateMO getResourceState(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupResource(id), (r)->{return r.getState().toMO();});
+        return Util.nullable(db.getResource(id), (r)->{return r.getState().toMO();});
     }
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
-    public CheckStateMO getResourceState(String clusterName, String name)
+    @WithDataAdapter(BergamotDB.class)
+    public CheckStateMO getResourceState(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
-        return null; //return Util.nullable((Resource)Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(clusterName), (h)->{return h.getResource(name);}), (r)->{return r.getState().toMO();});
+        return Util.nullable(db.getResourceOnClusterByName(site.getId(), clusterName, name), (r)->{return r.getState().toMO();});
     }
 }

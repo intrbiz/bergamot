@@ -14,6 +14,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
 @XmlRootElement(name = "cluster")
 public class ClusterCfg extends VirtualCheckCfg<ClusterCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     private List<ResourceCfg> resources = new LinkedList<ResourceCfg>();
 
     public ClusterCfg()

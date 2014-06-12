@@ -1,13 +1,17 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "initially")
 @XmlRootElement(name = "initially")
-public class InitiallyCfg
+public class InitiallyCfg implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     private String status;
 
     private String output;

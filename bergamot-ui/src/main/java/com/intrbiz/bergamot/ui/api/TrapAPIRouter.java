@@ -4,6 +4,9 @@ import java.util.UUID;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
@@ -12,6 +15,7 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/trap")
@@ -19,29 +23,33 @@ public class TrapAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:host/:name")
     @JSON(notFoundIfNull = true)
-    public TrapMO getTrap(String hostName, String name)
+    @WithDataAdapter(BergamotDB.class)
+    public TrapMO getTrap(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
-        return null; //return Util.nullable((Trap)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getTrap(name);}), Trap::toMO);
+        return Util.nullable(db.getTrapOnHostByName(site.getId(), hostName, name), Trap::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    public TrapMO getTrap(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public TrapMO getTrap(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTrap(id), Trap::toMO);
+        return Util.nullable(db.getTrap(id), Trap::toMO);
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
-    public CheckStateMO getTrapState(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public CheckStateMO getTrapState(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTrap(id), (t)->{return t.getState().toMO();});
+        return Util.nullable(db.getTrap(id), (t)->{return t.getState().toMO();});
     }
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
-    public CheckStateMO getTrapState(String hostName, String name)
+    @WithDataAdapter(BergamotDB.class)
+    public CheckStateMO getTrapState(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
-        return null; //return Util.nullable((Trap)Util.nullable(this.app().getBergamot().getObjectStore().lookupHost(hostName), (h)->{return h.getTrap(name);}), (t)->{return t.getState().toMO();});
+        return Util.nullable(db.getTrapOnHostByName(site.getId(), hostName, name), (t)->{return t.getState().toMO();});
     }
 }

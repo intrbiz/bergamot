@@ -19,6 +19,8 @@ import com.intrbiz.configuration.Configuration;
 
 public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extends Configuration
 {
+    private static final long serialVersionUID = 1L;
+
     private Set<String> inheritedTemplates = new LinkedHashSet<String>();
 
     private Boolean template;

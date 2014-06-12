@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -16,8 +17,10 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A monitoring 'site'
  */
 @SQLTable(schema = BergamotDB.class, name = "site", since = @SQLVersion({ 1, 0, 0 }))
-public final class Site extends BergamotObject<SiteMO>
+public final class Site extends BergamotObject<SiteMO> implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey()
     protected UUID id;

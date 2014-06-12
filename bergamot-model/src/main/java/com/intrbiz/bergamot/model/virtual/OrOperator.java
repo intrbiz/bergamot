@@ -7,6 +7,8 @@ import com.intrbiz.bergamot.model.Status;
 
 public class OrOperator extends VirtualCheckOperator
 {
+    private static final long serialVersionUID = 1L;
+    
     private final VirtualCheckOperator left;
     
     private final VirtualCheckOperator right;

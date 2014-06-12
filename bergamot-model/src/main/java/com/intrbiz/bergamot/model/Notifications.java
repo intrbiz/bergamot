@@ -21,6 +21,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLTable(schema = BergamotDB.class, name = "notifications", since = @SQLVersion({ 1, 0, 0 }))
 public class Notifications extends BergamotObject<NotificationsMO>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey
     private UUID id;

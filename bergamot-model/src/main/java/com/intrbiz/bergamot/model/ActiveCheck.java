@@ -31,6 +31,8 @@ import com.intrbiz.validator.Validator;
  */
 public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheckCfg<C>> extends RealCheck<T, C>
 {
+    private static final long serialVersionUID = 1L;
+    
     private Logger logger = Logger.getLogger(ActiveCheck.class);
 
     /**

@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.LocationMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -15,65 +18,74 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.Var;
 
 @Prefix("/api/location")
 public class LocationAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    public List<LocationMO> getLocations()
+    @WithDataAdapter(BergamotDB.class)
+    public List<LocationMO> getLocations(BergamotDB db, @Var("site") Site site)
     {
-        return null; //return this.app().getBergamot().getObjectStore().getLocations().stream().map(Location::toStubMO).collect(Collectors.toList());
+        return db.listLocations(site.getId()).stream().map(Location::toStubMO).collect(Collectors.toList());
     }
     
     @Get("/roots")
     @JSON
-    public List<LocationMO> getRootLocations()
+    @WithDataAdapter(BergamotDB.class)
+    public List<LocationMO> getRootLocations(BergamotDB db, @Var("site") Site site)
     {
-        return null; //return this.app().getBergamot().getObjectStore().getLocations().stream().filter((e)->{return e.getLocation() == null;}).map(Location::toMO).collect(Collectors.toList());
+        return db.getRootLocations(site.getId()).stream().filter((e)->{return e.getLocation() == null;}).map(Location::toMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    public LocationMO getLocation(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public LocationMO getLocation(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), Location::toMO);
+        return Util.nullable(db.getLocationByName(site.getId(), name), Location::toMO);
     }
     
     @Get("/name/:name/children")
     @JSON(notFoundIfNull = true)
-    public List<LocationMO> getLocationChildren(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public List<LocationMO> getLocationChildren(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), (e)->{return e.getChildren().stream().map(Location::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getLocationByName(site.getId(), name), (e)->{return e.getChildren().stream().map(Location::toMO).collect(Collectors.toList());});
     }
     
     @Get("/name/:name/hosts")
     @JSON(notFoundIfNull = true)
-    public List<HostMO> getLocationHosts(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public List<HostMO> getLocationHosts(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(name), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getLocationByName(site.getId(), name), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
     }
     
     //
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    public LocationMO getLocation(@AsUUID() UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public LocationMO getLocation(BergamotDB db, @AsUUID() UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), Location::toMO);
+        return Util.nullable(db.getLocation(id), Location::toMO);
     }
     
     @Get("/id/:id/children")
     @JSON(notFoundIfNull = true)
-    public List<LocationMO> getLocationChildren(@AsUUID() UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public List<LocationMO> getLocationChildren(BergamotDB db, @AsUUID() UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), (e)->{return e.getChildren().stream().map(Location::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getLocation(id), (e)->{return e.getChildren().stream().map(Location::toMO).collect(Collectors.toList());});
     }
     
     @Get("/id/:id/hosts")
     @JSON(notFoundIfNull = true)
-    public List<HostMO> getLocationHosts(@AsUUID() UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public List<HostMO> getLocationHosts(BergamotDB db, @AsUUID() UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupLocation(id), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getLocation(id), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
     }
 }

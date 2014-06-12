@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
@@ -18,6 +21,7 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/cluster")
@@ -25,64 +29,73 @@ public class ClusterAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    public List<ClusterMO> getClusters()
+    @WithDataAdapter(BergamotDB.class)
+    public List<ClusterMO> getClusters(BergamotDB db, @Var("site") Site site)
     {
-        return null; //return this.app().getBergamot().getObjectStore().getClusters().stream().map(Cluster::toStubMO).collect(Collectors.toList());
+        return db.listClusters(site.getId()).stream().map(Cluster::toStubMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    public ClusterMO getCluster(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public ClusterMO getCluster(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(name), Cluster::toMO);
+        return Util.nullable(db.getClusterByName(site.getId(), name), Cluster::toMO);
     }
     
     @Get("/name/:name/state")
     @JSON(notFoundIfNull = true)
-    public CheckStateMO getClusterState(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public CheckStateMO getClusterState(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(name), (h)->{return h.getState().toMO();});
+        return Util.nullable(db.getClusterByName(site.getId(), name), (h)->{return h.getState().toMO();});
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    public ClusterMO getCluster(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public ClusterMO getCluster(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(id), Cluster::toMO);
+        return Util.nullable(db.getCluster(id), Cluster::toMO);
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
-    public CheckStateMO getClusterState(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public CheckStateMO getClusterState(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(id), (h)->{return h.getState().toMO();});
+        return Util.nullable(db.getCluster(id), (h)->{return h.getState().toMO();});
     }
     
     @Get("/name/:name/resources")
     @JSON(notFoundIfNull = true)
-    public List<ResourceMO> getClusterResources(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public List<ResourceMO> getClusterResources(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(name), (e)->{return e.getResources().stream().map(Resource::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getClusterByName(site.getId(), name), (e)->{return e.getResources().stream().map(Resource::toMO).collect(Collectors.toList());});
     }
     
     @Get("/id/:id/resources")
     @JSON(notFoundIfNull = true)
-    public List<ResourceMO> getClusterResources(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public List<ResourceMO> getClusterResources(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(id), (e)->{return e.getResources().stream().map(Resource::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getCluster(id), (e)->{return e.getResources().stream().map(Resource::toMO).collect(Collectors.toList());});
     }
     
     @Get("/name/:name/references")
     @JSON(notFoundIfNull = true)
-    public List<CheckMO> getClusterReferences(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public List<CheckMO> getClusterReferences(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(name), (e)->{return e.getReferences().stream().map(Check::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getClusterByName(site.getId(), name), (e)->{return e.getReferences().stream().map(Check::toMO).collect(Collectors.toList());});
     }
     
     @Get("/id/:id/references")
     @JSON(notFoundIfNull = true)
-    public List<CheckMO> getClusterReferences(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public List<CheckMO> getClusterReferences(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupCluster(id), (e)->{return e.getReferences().stream().map(Check::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getCluster(id), (e)->{return e.getReferences().stream().map(Check::toMO).collect(Collectors.toList());});
     }
 }

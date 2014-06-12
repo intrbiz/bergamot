@@ -6,6 +6,8 @@ import com.intrbiz.bergamot.model.timeperiod.util.Month;
 
 public class MonthQualifier extends ComposedTimeRange
 {
+    private static final long serialVersionUID = 1L;
+    
     private Month month;
 
     public MonthQualifier()

@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -13,6 +16,7 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/time-period")
@@ -20,22 +24,25 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    public List<TimePeriodMO> getTimePeriods()
+    @WithDataAdapter(BergamotDB.class)
+    public List<TimePeriodMO> getTimePeriods(BergamotDB db, @Var("site") Site site)
     {
-        return null; //return this.app().getBergamot().getObjectStore().getTimePeriods().stream().map(TimePeriod::toMO).collect(Collectors.toList());
+        return db.listTimePeriods(site.getId()).stream().map(TimePeriod::toMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    public TimePeriodMO getTimePeriod(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public TimePeriodMO getTimePeriod(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTimePeriod(name), TimePeriod::toMO);
+        return Util.nullable(db.getTimePeriodByName(site.getId(), name), TimePeriod::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    public TimePeriodMO getTimePeriod(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public TimePeriodMO getTimePeriod(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupTimePeriod(id), TimePeriod::toMO);
+        return Util.nullable(db.getTimePeriod(id), TimePeriod::toMO);
     }
 }

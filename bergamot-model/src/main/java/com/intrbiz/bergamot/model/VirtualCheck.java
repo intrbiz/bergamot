@@ -18,6 +18,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 public abstract class VirtualCheck<T extends VirtualCheckMO, C extends VirtualCheckCfg<C>> extends Check<T,C>
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Checks which this check references
      */

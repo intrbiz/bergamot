@@ -21,6 +21,8 @@ import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 @XmlRootElement(name = "time-period")
 public class TimePeriodCfg extends NamedObjectCfg<TimePeriodCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     private Set<String> excludes = new LinkedHashSet<String>();
 
     private List<TimeRange> timeRanges = new LinkedList<TimeRange>();

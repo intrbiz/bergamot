@@ -14,6 +14,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 @XmlRootElement(name = "command")
 public class CommandCfg extends NamedObjectCfg<CommandCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     private String engine;
 
     private String executor;

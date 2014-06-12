@@ -19,6 +19,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLUnique(name = "host_name_unq", columns = {"cluster_id", "name"})
 public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ResourceCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected ResourceCfg configuration;
     

@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -16,8 +17,10 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * An alert which was raised against a check
  */
 @SQLTable(schema = BergamotDB.class, name = "alert", since = @SQLVersion({ 1, 0, 0 }))
-public class Alert
+public class Alert implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * The unique ID for this check
      */

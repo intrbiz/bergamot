@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -10,8 +12,10 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 @XmlType(name = "schedule")
 @XmlRootElement(name = "schedule")
-public class ScheduleCfg
+public class ScheduleCfg implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     private Long every;
 
     private Long retryEvery;

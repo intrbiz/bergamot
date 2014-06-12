@@ -19,6 +19,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends NamedObject<T, C>
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Is the result of this check suppressed
      */

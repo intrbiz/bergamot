@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -14,8 +15,10 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 
 @XmlType(name = "notify")
 @XmlRootElement(name = "notify")
-public class NotifyCfg
+public class NotifyCfg implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     private Set<String> teams = new LinkedHashSet<String>();
 
     private Set<String> contacts = new LinkedHashSet<String>();

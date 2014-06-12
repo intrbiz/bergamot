@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -9,8 +11,10 @@ import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 
 @XmlType(name = "state")
 @XmlRootElement(name = "state")
-public class StateCfg
+public class StateCfg implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     private Integer failedAfter;
 
     private Integer recoversAfter;

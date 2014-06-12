@@ -6,13 +6,17 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/contact")
@@ -20,29 +24,41 @@ public class ContactAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    public List<ContactMO> getContacts()
+    @WithDataAdapter(BergamotDB.class)
+    public List<ContactMO> getContacts(BergamotDB db, @Var("site") Site site)
     {
-        return null; //return this.app().getBergamot().getObjectStore().getContacts().stream().map(Contact::toMO).collect(Collectors.toList());
+        return db.listContacts(site.getId()).stream().map(Contact::toMO).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    public ContactMO getContact(String name)
+    @WithDataAdapter(BergamotDB.class)
+    public ContactMO getContact(BergamotDB db, @Var("site") Site site, String name)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupContact(name), Contact::toMO);
+        return Util.nullable(db.getContactByName(site.getId(), name), Contact::toMO);
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    public ContactMO getContact(@AsUUID UUID id)
+    @WithDataAdapter(BergamotDB.class)
+    public ContactMO getContact(BergamotDB db, @AsUUID UUID id)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupContact(id), Contact::toMO);
+        return Util.nullable(db.getContact(id), Contact::toMO);
     }
     
     @Get("/email/:email")
     @JSON(notFoundIfNull = true)
-    public ContactMO getContactByEmail(String email)
+    @WithDataAdapter(BergamotDB.class)
+    public ContactMO getContactByEmail(BergamotDB db, @Var("site") Site site, String email)
     {
-        return null; //return Util.nullable(this.app().getBergamot().getObjectStore().lookupContactByEmail(email), Contact::toMO);
+        return Util.nullable(db.getContactByEmail(site.getId(), email), Contact::toMO);
+    }
+    
+    @Get("/name-or-email/:nameOrEmail")
+    @JSON(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public ContactMO getContactByNameOrEmail(BergamotDB db, @Var("site") Site site, String nameOrEmail)
+    {
+        return Util.nullable(db.getContactByNameOrEmail(site.getId(), nameOrEmail), Contact::toMO);
     }
 }

@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.io.Serializable;
 import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,8 +21,10 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "contact", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = {"site_id", "name"})
-public class Contact extends NamedObject<ContactMO, ContactCfg> implements Principal
+public class Contact extends NamedObject<ContactMO, ContactCfg> implements Principal, Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     public static final int BCRYPT_WORK_FACTOR = 12;
     
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ContactCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
@@ -72,11 +75,11 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         // email
-        this.email = rcfg.lookupEmail("work");
+        this.email = rcfg.getEmail();
         // phones
-        this.mobile = rcfg.lookupPhone("mobile");
-        this.pager = rcfg.lookupPhone("pager");
-        this.phone = rcfg.lookupPhone("work");
+        this.mobile = rcfg.getMobile();
+        this.pager = rcfg.getPager();
+        this.phone = rcfg.getPhone();
     }
 
     public List<UUID> getTeamIds()

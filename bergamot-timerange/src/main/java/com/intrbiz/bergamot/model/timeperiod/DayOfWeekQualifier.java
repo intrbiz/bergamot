@@ -6,6 +6,8 @@ import com.intrbiz.bergamot.model.timeperiod.util.DayOfWeek;
 
 public class DayOfWeekQualifier extends ComposedTimeRange
 {
+    private static final long serialVersionUID = 1L;
+    
     private DayOfWeek dayOfWeek;
 
     public DayOfWeekQualifier()

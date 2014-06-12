@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model;
 
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.model.message.RealCheckMO;
+import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
@@ -10,6 +11,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>> extends Check<T, C>
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * How many check attempts to trigger a hard alert
      */
@@ -49,7 +52,12 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
     
     public int getCurrentAttemptThreshold()
     {
-        return (this.getState().isOk() && this.getState().isHard()) ? this.getRecoveryAttemptThreshold() : this.getAlertAttemptThreshold();
+        return this.getCurrentAttemptThreshold(this.getState());
+    }
+    
+    public int getCurrentAttemptThreshold(CheckState currentState)
+    {
+        return currentState.isOk() ? this.getRecoveryAttemptThreshold() : this.getAlertAttemptThreshold();
     }
     
     protected void toMO(RealCheckMO mo, boolean stub)

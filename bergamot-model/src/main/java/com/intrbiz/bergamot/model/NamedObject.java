@@ -18,6 +18,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObjectCfg<C>> extends BergamotObject<T> implements Configurable<C>
 {
+    private static final long serialVersionUID = 1L;
+
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey()
     protected UUID id = UUID.randomUUID();

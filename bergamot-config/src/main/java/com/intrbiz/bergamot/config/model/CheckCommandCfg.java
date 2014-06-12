@@ -16,6 +16,8 @@ import com.intrbiz.configuration.Configuration;
 @XmlRootElement(name = "check-command")
 public class CheckCommandCfg extends Configuration
 {
+    private static final long serialVersionUID = 1L;
+    
     private String command;
 
     public CheckCommandCfg()

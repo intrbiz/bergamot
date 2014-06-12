@@ -43,7 +43,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     
     private RoutedProducer<Update> updateProducer;
 
-    private int threads = 1;
+    private int threads = 4;
 
     public AbstractResultProcessor()
     {

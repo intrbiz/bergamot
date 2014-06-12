@@ -8,6 +8,8 @@ import com.intrbiz.Util;
 
 public class ComposedTimeRange implements TimeRange
 {
+    private static final long serialVersionUID = 1L;
+    
     private List<TimeRange> ranges = new LinkedList<TimeRange>();
 
     public ComposedTimeRange()

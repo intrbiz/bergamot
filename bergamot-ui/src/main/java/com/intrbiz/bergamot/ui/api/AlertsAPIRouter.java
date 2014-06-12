@@ -7,11 +7,13 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/alert")
@@ -20,8 +22,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
-    public List<CheckMO> getAlerts(BergamotDB db)
+    public List<CheckMO> getAlerts(BergamotDB db, @Var("site") Site site)
     {
-        return db.listChecksThatAreNotOk(null).stream().map(Check::toMO).collect(Collectors.toList());
+        return db.listChecksThatAreNotOk(site.getId()).stream().map(Check::toMO).collect(Collectors.toList());
     }
 }

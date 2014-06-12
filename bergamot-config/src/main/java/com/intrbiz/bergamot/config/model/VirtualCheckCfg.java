@@ -7,6 +7,8 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 public abstract class VirtualCheckCfg<P extends VirtualCheckCfg<P>> extends CheckCfg<P>
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Currently the condition can only be validated at runtime
      */

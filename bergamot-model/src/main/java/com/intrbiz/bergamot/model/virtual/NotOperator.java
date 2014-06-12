@@ -7,6 +7,8 @@ import com.intrbiz.bergamot.model.Status;
 
 public class NotOperator extends VirtualCheckOperator
 {
+    private static final long serialVersionUID = 1L;
+    
     private final VirtualCheckOperator operand;
     
     public NotOperator(VirtualCheckOperator operand)

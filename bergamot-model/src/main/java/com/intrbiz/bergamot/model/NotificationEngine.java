@@ -20,6 +20,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLTable(schema = BergamotDB.class, name = "notification_engine", since = @SQLVersion({ 1, 0, 0 }))
 public class NotificationEngine extends BergamotObject<NotificationEngineMO>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "notifications_id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
     @SQLPrimaryKey

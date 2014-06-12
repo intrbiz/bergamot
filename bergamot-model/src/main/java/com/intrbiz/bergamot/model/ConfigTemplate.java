@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import com.intrbiz.Util;
@@ -18,8 +19,10 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * An alert which was raised against a check
  */
 @SQLTable(schema = BergamotDB.class, name = "config_template", since = @SQLVersion({ 1, 0, 0 }))
-public class ConfigTemplate
+public class ConfigTemplate implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * The site id
      */

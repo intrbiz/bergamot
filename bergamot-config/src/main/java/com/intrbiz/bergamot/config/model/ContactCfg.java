@@ -1,11 +1,13 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -15,17 +17,23 @@ import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
-import com.intrbiz.bergamot.config.resolver.stratergy.MergeListUnique;
+import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 @XmlType(name = "contact")
 @XmlRootElement(name = "contact")
-public class ContactCfg extends NamedObjectCfg<ContactCfg>
+public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private Set<String> teams = new LinkedHashSet<String>();
 
-    private List<EmailCfg> emails = new LinkedList<EmailCfg>();
+    private String email;
 
-    private List<PhoneCfg> phones = new LinkedList<PhoneCfg>();
+    private String pager;
+
+    private String mobile;
+
+    private String phone;
 
     private NotificationsCfg notifications;
 
@@ -46,64 +54,68 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg>
     {
         this.teams = teams;
     }
-    
+
     public void addTeam(String group)
     {
         this.teams.add(group);
     }
-    
+
     public void removeTeam(String group)
     {
         this.teams.remove(group);
     }
-    
+
     public boolean containsTeam(String name)
     {
         return this.teams.contains(name);
     }
 
-    @XmlElementRef(type = EmailCfg.class)
-    @ResolveWith(MergeListUnique.class)
-    public List<EmailCfg> getEmails()
+    @XmlElement(name = "email")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getEmail()
     {
-        return emails;
+        return email;
     }
 
-    public void setEmails(List<EmailCfg> emails)
+    public void setEmail(String email)
     {
-        this.emails = emails;
-    }
-    
-    public String lookupEmail(String type)
-    {
-        for (EmailCfg e : this.emails)
-        {
-            if (type.equals(e.getType()))
-                return e.getAddress();
-        }
-        return null;
+        this.email = email;
     }
 
-    @XmlElementRef(type = PhoneCfg.class)
-    @ResolveWith(MergeListUnique.class)
-    public List<PhoneCfg> getPhones()
+    @XmlElement(name = "pager")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getPager()
     {
-        return phones;
+        return pager;
     }
 
-    public void setPhones(List<PhoneCfg> phones)
+    public void setPager(String pager)
     {
-        this.phones = phones;
+        this.pager = pager;
     }
-    
-    public String lookupPhone(String type)
+
+    @XmlElement(name = "mobile")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getMobile()
     {
-        for (PhoneCfg e : this.phones)
-        {
-            if (type.equals(e.getType()))
-                return e.getNumber();
-        }
-        return null;
+        return mobile;
+    }
+
+    public void setMobile(String mobile)
+    {
+        this.mobile = mobile;
+    }
+
+    @XmlElement(name = "phone")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getPhone()
+    {
+        return phone;
+    }
+
+    public void setPhone(String phone)
+    {
+        this.phone = phone;
     }
 
     @XmlElementRef(type = NotificationsCfg.class)

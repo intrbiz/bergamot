@@ -1,13 +1,17 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(name = "tag")
 @XmlRootElement(name = "tag")
-public class TagCfg
+public class TagCfg implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     private String name;
 
     private String description;

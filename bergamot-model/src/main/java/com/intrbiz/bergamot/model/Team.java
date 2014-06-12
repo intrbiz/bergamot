@@ -23,6 +23,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 @SQLUnique(name = "name_unq", columns = {"site_id", "name"})
 public class Team extends NamedObject<TeamMO, TeamCfg>
 {
+    private static final long serialVersionUID = 1L;
+    
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = TeamCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected TeamCfg configuration;
     

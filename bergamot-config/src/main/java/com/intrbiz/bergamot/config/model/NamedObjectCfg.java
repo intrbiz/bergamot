@@ -16,6 +16,8 @@ import com.intrbiz.configuration.CfgParameter;
 
 public abstract class NamedObjectCfg<P extends NamedObjectCfg<P>> extends TemplatedObjectCfg<P>
 {
+    private static final long serialVersionUID = 1L;
+
     private UUID id = null;
 
     private String summary;
