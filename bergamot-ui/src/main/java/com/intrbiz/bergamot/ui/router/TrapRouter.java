@@ -33,7 +33,7 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void trap(BergamotDB db, @AsUUID UUID id)
     {
-        model("trap", db.getTeam(id));
+        model("trap", db.getTrap(id));
         encode("trap/detail");
     }
     

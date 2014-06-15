@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +35,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
 {
     private static final long serialVersionUID = 1L;
     
-    private Logger logger = Logger.getLogger(ActiveCheck.class);
+    private transient Logger logger = Logger.getLogger(ActiveCheck.class);
 
     /**
      * How often should checks be executed (in milliseconds)
@@ -266,5 +268,14 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
             mo.setCheckCommand(Util.nullable(this.getCheckCommand(), CheckCommand::toStubMO));
             mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
         }
+    }
+    
+    /*
+     * Serialisation shit
+     */    
+    private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException  
+    {  
+        is.defaultReadObject();
+        this.logger = Logger.getLogger(ActiveCheck.class);
     }
 }

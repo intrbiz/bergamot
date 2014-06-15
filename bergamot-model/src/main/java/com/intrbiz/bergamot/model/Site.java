@@ -42,6 +42,14 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
     {
         super();
     }
+    
+    public Site(UUID id, String name, String summary)
+    {
+        super();
+        this.id = id;
+        this.name = name;
+        this.summary = summary;
+    }
 
     public UUID getId()
     {
@@ -128,9 +136,18 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
         return true;
     }
     
+    /**
+     * Generate a random object id for an object contained by this site
+     * @return
+     */
     public UUID randomObjectId()
     {
         return randomId(this.getId());
+    }
+    
+    public String toString()
+    {
+        return "Site { id => " + this.id + ", name => " + this.name + " }";
     }
 
     /**
@@ -175,17 +192,5 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
     public static UUID setSiteId(UUID siteId, UUID objectId)
     {
         return new UUID((siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | (objectId.getMostSignificantBits() & 0x00000000_0000FFFFL), objectId.getLeastSignificantBits());
-    }
-
-    public static void main(String[] args)
-    {
-        UUID randId = UUID.randomUUID();
-        UUID siteId = randomSiteId();
-        UUID objectId = randomId(siteId);
-        //
-        System.out.println("Rand: " + randId + " " + randId.version() + " " + randId.variant());
-        System.out.println("Site: " + siteId + " " + siteId.version() + " " + siteId.variant());
-        System.out.println("Object: " + objectId + " " + siteId.version() + " " + siteId.variant());
-        System.out.println("Site of Object: " + getSiteId(objectId) + " " + siteId.equals(getSiteId(objectId)));
     }
 }

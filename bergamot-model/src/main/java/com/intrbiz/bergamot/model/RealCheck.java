@@ -52,10 +52,10 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
     
     public int getCurrentAttemptThreshold()
     {
-        return this.getCurrentAttemptThreshold(this.getState());
+        return this.computeCurrentAttemptThreshold(this.getState());
     }
     
-    public int getCurrentAttemptThreshold(CheckState currentState)
+    public int computeCurrentAttemptThreshold(CheckState currentState)
     {
         return currentState.isOk() ? this.getRecoveryAttemptThreshold() : this.getAlertAttemptThreshold();
     }

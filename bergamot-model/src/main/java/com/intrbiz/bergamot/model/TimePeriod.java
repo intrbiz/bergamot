@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> impleme
 {
     private static final long serialVersionUID = 1L;
     
-    private Logger logger = Logger.getLogger(TimePeriod.class);
+    private transient Logger logger = Logger.getLogger(TimePeriod.class);
     
     @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = TimePeriodCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected TimePeriodCfg configuration;
@@ -158,5 +160,14 @@ public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> impleme
             mo.setRanges(this.getRanges().stream().map(TimeRange::toString).collect(Collectors.toList()));
         }
         return mo;
+    }
+
+    /*
+     * Serialisation shit
+     */
+    private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException  
+    {  
+        is.defaultReadObject();
+        this.logger = Logger.getLogger(TimePeriod.class);
     }
 }

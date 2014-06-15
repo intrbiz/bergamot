@@ -2,8 +2,6 @@ package com.intrbiz.bergamot.model.state;
 
 import java.sql.Timestamp;
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CheckCfg;
@@ -134,10 +132,6 @@ public class CheckState extends BergamotObject<CheckStateMO>
 
     @SQLColumn(index = 21, name = "average_check_processing_latency", since = @SQLVersion({ 1, 0, 0 }))
     private double averageCheckProcessingLatency;
-
-    // locking
-
-    private final Lock lock = new ReentrantLock();
 
     public CheckState()
     {
@@ -359,11 +353,6 @@ public class CheckState extends BergamotObject<CheckStateMO>
         this.averageRuntime = averageRuntime;
     }
 
-    public Lock getLock()
-    {
-        return this.lock;
-    }
-
     @Override
     public CheckStateMO toMO(boolean stub)
     {
@@ -406,5 +395,10 @@ public class CheckState extends BergamotObject<CheckStateMO>
         {
             this.setAttempt(((RealCheckCfg<?>)cfg).getState().getRecoversAfter());
         }
+    }
+    
+    public String toString()
+    {
+        return "CheckState { check => " + this.checkId + ", ok => " + this.ok + " }";
     }
 }

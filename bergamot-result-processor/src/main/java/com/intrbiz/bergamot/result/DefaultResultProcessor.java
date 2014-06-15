@@ -210,51 +210,43 @@ public class DefaultResultProcessor extends AbstractResultProcessor
      */
     protected boolean applyResult(RealCheck<?, ?> check, CheckState state, Result result)
     {
-        state.getLock().lock();
-        try
+        // is the state changing
+        boolean isTransition = state.isOk() ^ result.isOk();
+        boolean isFlapping = isTransition & state.isTransitioning();
+        // copy the last hard state
+        if (isTransition && state.isHard())
         {
-            // is the state changing
-            boolean isTransition = state.isOk() ^ result.isOk();
-            boolean isFlapping = isTransition & state.isTransitioning();
-            // copy the last hard state
-            if (isTransition && state.isHard())
-            {
-                state.setLastHardOk(state.isOk());
-                state.setLastHardStatus(state.getStatus());
-                state.setLastHardOutput(state.getOutput());
-            }
-            // update the state
-            state.setLastCheckId(result.getId());
-            state.setLastCheckTime(new Timestamp(result.getExecuted()));
-            state.setOk(result.isOk());
-            state.pushOkHistory(result.isOk());
-            state.setStatus(Status.valueOf(result.getStatus().toUpperCase()));
-            state.setOutput(result.getOutput());
-            state.setFlapping(isFlapping);
-            // apply thresholds
-            if (isTransition)
-            {
-                state.setAttempt(1);
-                state.setHard(false);
-                state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
-                state.setTransitioning(true);
-            }
-            else if (! (state.isHard() && state.getAttempt() >= check.getCurrentAttemptThreshold(state)))
-            {
-                int attempt = state.getAttempt() + 1;
-                if (attempt > check.getCurrentAttemptThreshold(state)) attempt = check.getCurrentAttemptThreshold(state);
-                state.setAttempt(attempt);
-                state.setHard(attempt >= check.getCurrentAttemptThreshold(state));
-                if (state.isHard())
-                {
-                    state.setTransitioning(false);
-                }
-                return state.isHard() && (state.isOk() ^ state.isLastHardOk());
-            }
+            state.setLastHardOk(state.isOk());
+            state.setLastHardStatus(state.getStatus());
+            state.setLastHardOutput(state.getOutput());
         }
-        finally
+        // update the state
+        state.setLastCheckId(result.getId());
+        state.setLastCheckTime(new Timestamp(result.getExecuted()));
+        state.setOk(result.isOk());
+        state.pushOkHistory(result.isOk());
+        state.setStatus(Status.valueOf(result.getStatus().toUpperCase()));
+        state.setOutput(result.getOutput());
+        state.setFlapping(isFlapping);
+        // apply thresholds
+        if (isTransition)
         {
-            state.getLock().unlock();
+            state.setAttempt(1);
+            state.setHard(false);
+            state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
+            state.setTransitioning(true);
+        }
+        else if (! (state.isHard() && state.getAttempt() >= check.computeCurrentAttemptThreshold(state)))
+        {
+            int attempt = state.getAttempt() + 1;
+            if (attempt > check.computeCurrentAttemptThreshold(state)) attempt = check.computeCurrentAttemptThreshold(state);
+            state.setAttempt(attempt);
+            state.setHard(attempt >= check.computeCurrentAttemptThreshold(state));
+            if (state.isHard())
+            {
+                state.setTransitioning(false);
+            }
+            return state.isHard() && (state.isOk() ^ state.isLastHardOk());
         }
         return false;
     }
@@ -299,40 +291,32 @@ public class DefaultResultProcessor extends AbstractResultProcessor
 
     protected boolean applyVirtualResult(VirtualCheck<?, ?> check, CheckState state, boolean ok, Status status, Result cause)
     {
-        state.getLock().lock();
-        try
+        boolean isStateChange = state.isOk() ^ ok;
+        // always in a hard state
+        // as the hard / soft state logic has already happened
+        state.setHard(true);
+        state.setAttempt(0);
+        state.setTransitioning(false);
+        state.setFlapping(false);
+        // is it a state change
+        if (isStateChange)
         {
-            boolean isStateChange = state.isOk() ^ ok;
-            // always in a hard state
-            // as the hard / soft state logic has already happened
-            state.setHard(true);
-            state.setAttempt(0);
-            state.setTransitioning(false);
-            state.setFlapping(false);
-            // is it a state change
-            if (isStateChange)
-            {
-                state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
-                // copy the last hard state
-                state.setLastHardOk(state.isOk());
-                state.setLastHardStatus(state.getStatus());
-                state.setLastHardOutput(state.getOutput());
-            }
-            // update the state
-            state.setLastCheckId(cause.getId());
-            state.setLastCheckTime(new Timestamp(cause.getExecuted()));
-            state.setOk(ok);
-            state.pushOkHistory(ok);
-            state.setStatus(status);
-            // no output
-            state.setOutput(null);
-            // is state change
-            return isStateChange;
+            state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
+            // copy the last hard state
+            state.setLastHardOk(state.isOk());
+            state.setLastHardStatus(state.getStatus());
+            state.setLastHardOutput(state.getOutput());
         }
-        finally
-        {
-            state.getLock().unlock();
-        }
+        // update the state
+        state.setLastCheckId(cause.getId());
+        state.setLastCheckTime(new Timestamp(cause.getExecuted()));
+        state.setOk(ok);
+        state.pushOkHistory(ok);
+        state.setStatus(status);
+        // no output
+        state.setOutput(null);
+        // is state change
+        return isStateChange;
     }
     
     protected void computeStats(Check<?,?> check, CheckState state, Result result)

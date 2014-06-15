@@ -36,6 +36,8 @@ import com.intrbiz.bergamot.ui.router.TrapRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
 import com.intrbiz.data.DataManager;
+import com.intrbiz.data.cache.HazelcastCacheProvider;
+import com.intrbiz.data.cache.tiered.TieredCacheProvider;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
@@ -62,9 +64,15 @@ public class BergamotApp extends BalsaApplication
     protected void setup() throws Exception
     {
         // TODO - read a config file
+        // session engine
+        sessionEngine(new HazelcastSessionEngine());
+        // security engine
+        securityEngine(new BergamotSecurityEngine());
+        // setup the cache
+        DataManager.get().registerDefaultCacheProvider(new TieredCacheProvider(new HazelcastCacheProvider(this.getInstanceName())));
         // setup the queues
         QueueManager.getInstance().registerDefaultBroker(new RabbitPool("amqp://127.0.0.1"));
-        // setup the database
+        // setup the database 
         DataManager.getInstance().registerDefaultServer(DatabasePool.Default.create(org.postgresql.Driver.class, "jdbc:postgresql://127.0.0.1/bergamot", "bergamot", "bergamot"));
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -74,16 +82,10 @@ public class BergamotApp extends BalsaApplication
         // these will probably move to external daemons
         // at some point, or at least will be managed 
         // better
-        // the result processor
         this.resultProcessor = new DefaultResultProcessor();
-        // the scheduler
         this.scheduler = new WheelScheduler();
         // websocket update server
         this.updateServer = new UpdateServer(Integer.getInteger("bergamot.websocket.port", 8081));
-        // security engine
-        securityEngine(new BergamotSecurityEngine());
-        // session engine
-        sessionEngine(new HazelcastSessionEngine());
         // some actions
         action(new ExecuteCheckAction());
         action(new SchedulerActions());
@@ -116,8 +118,11 @@ public class BergamotApp extends BalsaApplication
     @Override
     protected void startApplication() throws Exception
     {
-        // this.resultProcessor.start();
-        // this.scheduler.start();
+        if (Boolean.getBoolean("bergamot.master"))
+        {
+            this.resultProcessor.start();
+            this.scheduler.start();
+        }
         this.updateServer.start();
     }
     

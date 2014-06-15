@@ -68,5 +68,10 @@
 			<artifactId>jbcrypt</artifactId>
 			<version>0.3m</version>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.util</groupId>
+			<artifactId>cache-hazelcast</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>
