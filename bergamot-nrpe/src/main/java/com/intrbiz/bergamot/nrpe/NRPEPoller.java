@@ -42,7 +42,7 @@ public class NRPEPoller
 
     private int defaultConnectTimeoutSeconds;
 
-    public NRPEPoller(int threads, int defaultRequestTimeoutSeconds, int defaultConnectTimeoutSeconds)
+    public NRPEPoller(int threads, int defaultConnectTimeoutSeconds, int defaultRequestTimeoutSeconds)
     {
         this.defaultRequestTimeoutSeconds = defaultRequestTimeoutSeconds;
         this.defaultConnectTimeoutSeconds = defaultConnectTimeoutSeconds;
@@ -64,7 +64,7 @@ public class NRPEPoller
 
     public NRPEPoller()
     {
-        this(Runtime.getRuntime().availableProcessors(), 60, 5);
+        this(Runtime.getRuntime().availableProcessors(), 5, 60);
     }
 
     public int getDefaultRequestTimeoutSeconds()
