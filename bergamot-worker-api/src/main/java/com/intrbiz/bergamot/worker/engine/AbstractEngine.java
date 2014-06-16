@@ -16,7 +16,6 @@ import com.intrbiz.bergamot.worker.Worker;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 
 public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
 {
@@ -94,29 +93,18 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     {
         return this.name;
     }
-
+    
     @Override
     public void execute(ExecuteCheck task)
-    {
-        Result result = this.executeCheck(task);
-        if (result != null)
-        {
-            logger.debug("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
-            this.resultProducer.publish(new GenericKey(String.valueOf(task.getSiteId())), result);
-        }
-    }
-    
-    public Result executeCheck(ExecuteCheck task)
     {
         for (Executor<?> executor : this.executors)
         {
             if (executor.accept(task))
             {
-                return executor.execute(task);
+                executor.execute(task, this.resultProducer);
             }
         }
         logger.warn("Failed to execute task " + task + ", no matching executor found, droping");
-        return null;
     }
 
     @Override

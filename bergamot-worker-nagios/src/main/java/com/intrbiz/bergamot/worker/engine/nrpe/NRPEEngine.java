@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.nrpe;
 
+import com.intrbiz.bergamot.nrpe.NRPEPoller;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 
 /**
@@ -8,10 +9,12 @@ import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 public class NRPEEngine extends AbstractEngine
 {
     public static final String NAME = "nrpe";
+    
+    private NRPEPoller poller;
 
     public NRPEEngine()
     {
-        super(NAME);
+        super(NAME); 
     }
 
     @Override
@@ -22,5 +25,12 @@ public class NRPEEngine extends AbstractEngine
         {
             this.addExecutor(new NRPEExecutor());
         }
+        // setup the NRPE poller
+        this.poller = new NRPEPoller();
+    }
+    
+    public NRPEPoller getPoller()
+    {
+        return this.poller;
     }
 }

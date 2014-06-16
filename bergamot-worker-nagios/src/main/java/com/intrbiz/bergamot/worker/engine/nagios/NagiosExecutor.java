@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.nagios.util.NagiosPluginParser;
 import com.intrbiz.bergamot.util.CommandTokeniser;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.queue.Producer;
 
 /**
  * Execute Nagios Plugins (CHecks)
@@ -62,7 +63,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     }
 
     @Override
-    public Result execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, Producer<Result> resultSubmitter)
     {
         logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Result result = executeCheck.createResult();
@@ -108,7 +109,8 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             result.setOutput(e.getMessage());
             result.setRuntime(0);
         }
-        return result;
+        logger.debug("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
+        resultSubmitter.publish(result);
     }
     
     /**

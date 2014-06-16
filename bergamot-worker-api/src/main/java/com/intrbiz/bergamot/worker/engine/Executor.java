@@ -4,6 +4,7 @@ import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.configuration.Configurable;
+import com.intrbiz.queue.Producer;
 
 /**
  * Executors execute a particular task.
@@ -21,7 +22,7 @@ public interface Executor<T extends Engine> extends Configurable<ExecutorCfg>
     /**
      * Execute the check
      */
-    Result execute(ExecuteCheck executeCheck);
+    void execute(ExecuteCheck executeCheck, Producer<Result> resultSubmitter);
     
     void start() throws Exception;
 }
