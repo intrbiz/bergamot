@@ -11,11 +11,11 @@ import com.intrbiz.bergamot.nrpe.util.CRC32;
  */
 public class NRPEPacket
 {
-    private static final int PACKET_LENGTH = 1036;
+    public static final int PACKET_LENGTH = 1036;
 
-    private static final byte NULL = (byte) 0;
+    public static final byte NULL = (byte) 0;
 
-    private static final String NRPE_HELLO = "_NRPE_CHECK";
+    public static final String NRPE_HELLO = "_NRPE_CHECK";
 
     private PacketVersion version = PacketVersion.NRPE_2;
 

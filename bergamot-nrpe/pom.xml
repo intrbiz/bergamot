@@ -7,9 +7,7 @@
     <artifactId>bergamot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.intrbiz.bergamot</groupId>
   <artifactId>bergamot-nrpe</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>bergamot-nrpe</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -24,7 +22,15 @@
     <dependency>
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
-    	<version>1.2.14</version>
+    </dependency>
+    <dependency>
+    	<groupId>io.netty</groupId>
+    	<artifactId>netty-all</artifactId>
+    	<version>4.0.12.Final</version>
+    </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.core</groupId>
+    	<artifactId>core</artifactId>
     </dependency>
   </dependencies>
 </project>

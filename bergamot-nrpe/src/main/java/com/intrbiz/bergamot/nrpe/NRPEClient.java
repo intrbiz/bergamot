@@ -80,7 +80,6 @@ public class NRPEClient implements AutoCloseable
     {
         try
         {
-            // TODO - watchdog
             InputStream in = this.socket.getInputStream();
             OutputStream out = this.socket.getOutputStream();
             // send the query
