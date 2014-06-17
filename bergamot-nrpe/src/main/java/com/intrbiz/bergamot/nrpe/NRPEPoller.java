@@ -36,8 +36,6 @@ public class NRPEPoller
 {
     private EventLoopGroup eventLoop;
 
-    private SSLEngine sslEngine;
-
     private int defaultRequestTimeoutSeconds;
 
     private int defaultConnectTimeoutSeconds;
@@ -48,18 +46,6 @@ public class NRPEPoller
         this.defaultConnectTimeoutSeconds = defaultConnectTimeoutSeconds;
         // setup the Netty event loop
         this.eventLoop = new NioEventLoopGroup(threads, new IBThreadFactory("NRPEPoller", false));
-        // setup the NRPE ssl engine
-        try
-        {
-            this.sslEngine = SSLContext.getDefault().createSSLEngine();
-            this.sslEngine.setEnabledCipherSuites(NRPEClient.CIPHERS);
-            this.sslEngine.setEnabledProtocols(NRPEClient.PROTOCOLS);
-            this.sslEngine.setUseClientMode(true);
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new RuntimeException("Failed to init SSLEngine", e);
-        }
     }
 
     public NRPEPoller()
@@ -75,6 +61,22 @@ public class NRPEPoller
     public int getDefaultConnectTimeoutSeconds()
     {
         return defaultConnectTimeoutSeconds;
+    }
+    
+    private SSLEngine createSSLEngine()
+    {
+        try
+        {
+            SSLEngine sslEngine = SSLContext.getDefault().createSSLEngine();
+            sslEngine.setEnabledCipherSuites(NRPEClient.CIPHERS);
+            sslEngine.setEnabledProtocols(NRPEClient.PROTOCOLS);
+            sslEngine.setUseClientMode(true);
+            return sslEngine;
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException("Failed to init SSLEngine", e);
+        }
     }
 
     /**
@@ -105,9 +107,9 @@ public class NRPEPoller
                 ch.pipeline().addLast(
                         new ReadTimeoutHandler(requestTimeout /* seconds */), 
                         new WriteTimeoutHandler(requestTimeout /* seconds */), 
-                        new SslHandler(sslEngine), 
+                        new SslHandler(createSSLEngine()), 
                         new NRPEDecoder(), 
-                        new NRPEEncoder(), 
+                        new NRPEEncoder(),
                         new NRPEHandler<T>(request, responseHandler, errorHandler, userContext)
                 );
             }

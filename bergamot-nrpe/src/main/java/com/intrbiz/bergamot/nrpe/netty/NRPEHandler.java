@@ -44,7 +44,7 @@ public class NRPEHandler<T> extends ChannelInboundHandlerAdapter
         // invoke the callback
         this.responseHandler.accept(p, this.userContext);
         // close
-        ctx.close();
+        if (ctx.channel().isActive()) ctx.close();
     }
     
     @Override
