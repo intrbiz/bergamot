@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.TimePeriodCfgAdapter;
 import com.intrbiz.bergamot.model.adapter.TimeRangesAdapter;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
@@ -32,31 +31,16 @@ public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> impleme
     private static final long serialVersionUID = 1L;
     
     private transient Logger logger = Logger.getLogger(TimePeriod.class);
-    
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = TimePeriodCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected TimePeriodCfg configuration;
 
-    @SQLColumn(index = 2, name = "excludes_id", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "excludes_id", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<UUID> excludesId = new LinkedList<UUID>();
 
-    @SQLColumn(index = 3, name = "ranges", type = "TEXT[]", adapter = TimeRangesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "ranges", type = "TEXT[]", adapter = TimeRangesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     private List<TimeRange> ranges = new LinkedList<TimeRange>();
 
     public TimePeriod()
     {
         super();
-    }
-    
-    @Override
-    public TimePeriodCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(TimePeriodCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override

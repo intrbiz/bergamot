@@ -1,6 +1,8 @@
 package com.intrbiz.bergamot.model;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 import com.intrbiz.Util;
@@ -18,47 +20,54 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * An alert which was raised against a check
  */
-@SQLTable(schema = BergamotDB.class, name = "config_template", since = @SQLVersion({ 1, 0, 0 }))
-public class ConfigTemplate implements Serializable
+@SQLTable(schema = BergamotDB.class, name = "config", since = @SQLVersion({ 1, 0, 0 }))
+public class Config implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    /**
-     * The site id
-     */
-    @SQLColumn(index = 1, name = "site_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey()
+    protected UUID id;
+    
+    @SQLColumn(index = 2, name = "site_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
     protected UUID siteId;
 
-    @SQLColumn(index = 2, name = "type", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLPrimaryKey()
+    @SQLColumn(index = 3, name = "type", since = @SQLVersion({ 1, 0, 0 }))
     protected String type;
 
-    @SQLColumn(index = 3, name = "name", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLPrimaryKey()
+    @SQLColumn(index = 4, name = "name", since = @SQLVersion({ 1, 0, 0 }))
     protected String name;
+    
+    @SQLColumn(index = 5, name = "template", since = @SQLVersion({ 1, 0, 0 }))
+    protected boolean template;
+    
+    @SQLColumn(index = 6, name = "inherits", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    protected List<String> inherits = new LinkedList<String>();
 
-    @SQLColumn(index = 4, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "summary", since = @SQLVersion({ 1, 0, 0 }))
     protected String summary;
 
-    @SQLColumn(index = 5, name = "description", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "description", since = @SQLVersion({ 1, 0, 0 }))
     protected String description;
 
-    @SQLColumn(index = 6, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected Configuration configuration;
 
-    public ConfigTemplate()
+    public Config()
     {
         super();
     }
 
-    public ConfigTemplate(UUID siteId, NamedObjectCfg<?> configuration)
+    public Config(UUID id, UUID siteId, NamedObjectCfg<?> configuration)
     {
         super();
+        this.id = id;
         this.siteId = siteId;
         this.type = Configuration.getRootElement(configuration.getClass());
         this.name = configuration.getName();
+        this.template = configuration.getTemplateBooleanValue();
+        this.inherits = new LinkedList<String>(configuration.getInheritedTemplates());
         this.summary = Util.coalesceEmpty(configuration.getSummary(), Util.ucFirst(this.name));
         this.description = configuration.getDescription();
         this.configuration = configuration;
@@ -122,5 +131,35 @@ public class ConfigTemplate implements Serializable
     public void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
+    }
+
+    public UUID getId()
+    {
+        return id;
+    }
+
+    public void setId(UUID id)
+    {
+        this.id = id;
+    }
+
+    public boolean isTemplate()
+    {
+        return template;
+    }
+
+    public void setTemplate(boolean template)
+    {
+        this.template = template;
+    }
+
+    public List<String> getInherits()
+    {
+        return inherits;
+    }
+
+    public void setInherits(List<String> inherits)
+    {
+        this.inherits = inherits;
     }
 }

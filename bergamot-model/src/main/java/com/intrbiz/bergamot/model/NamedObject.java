@@ -3,10 +3,10 @@ package com.intrbiz.bergamot.model;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.NamedObjectMO;
-import com.intrbiz.configuration.Configurable;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
@@ -16,7 +16,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A generic object with an id and a name
  */
-public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObjectCfg<C>> extends BergamotObject<T> implements Configurable<C>
+public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObjectCfg<C>> extends BergamotObject<T>
 {
     private static final long serialVersionUID = 1L;
 
@@ -50,13 +50,29 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
 
     public void configure(C configuration)
     {
+        // store the config
         this.setConfiguration(configuration);
         // ids and site
         this.setId(configuration.getId());
         this.setSiteId(Site.getSiteId(this.getId()));
     }
-
-    public abstract void setConfiguration(C configuration);
+    
+    @SuppressWarnings("unchecked")
+    public final C getConfiguration()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return (C) Util.nullable(db.getConfig(this.getId()), Config::getConfiguration);
+        }
+    }
+    
+    public final void setConfiguration(C config)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.setConfig(new Config(this.getId(), this.getSiteId(), config));
+        }
+    }
 
     public final UUID getId()
     {

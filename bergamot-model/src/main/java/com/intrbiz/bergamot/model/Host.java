@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.HostCfgAdapter;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -25,30 +24,15 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = HostCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected HostCfg configuration;
-    
-    @SQLColumn(index = 2, name = "address", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "address", since = @SQLVersion({ 1, 0, 0 }))
     private String address;
 
-    @SQLColumn(index = 3, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID locationId;
 
     public Host()
     {
         super();
-    }
-    
-    @Override
-    public HostCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(HostCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override
@@ -56,7 +40,6 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     {
         super.configure(cfg);
         HostCfg rcfg = cfg.resolve();
-        //
         this.name = rcfg.getName();
         this.address = Util.coalesceEmpty(rcfg.getAddress(), this.name);
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
@@ -67,20 +50,6 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         this.retryInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getRetryEvery());
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
-        // initial state
-        // TODO
-        /*
-        this.getState().setAttempt(this.recoveryAttemptThreshold);
-        if (rcfg.getInitialState() != null)
-        {
-            this.getState().setStatus(Status.valueOf(rcfg.getInitialState().getStatus().toUpperCase()));
-            this.getState().setOk(this.getState().getStatus().isOk());
-            this.getState().setOutput(Util.coalesce(rcfg.getInitialState().getOutput(), ""));
-            this.getState().setLastHardStatus(this.getState().getStatus());
-            this.getState().setLastHardOk(this.getState().isOk());
-            this.getState().setLastHardOutput(this.getState().getOutput());
-        }
-        */
     }
 
     public final String getType()

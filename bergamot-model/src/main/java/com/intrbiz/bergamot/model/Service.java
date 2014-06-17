@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.ServiceCfgAdapter;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -22,27 +21,12 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ServiceCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected ServiceCfg configuration;
-    
-    @SQLColumn(index = 2, name = "host_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "host_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID hostId;
 
     public Service()
     {
         super();
-    }
-    
-    @Override
-    public ServiceCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(ServiceCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override
@@ -60,20 +44,6 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
         this.retryInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getRetryEvery());
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
-        // initial state
-        // TODO
-        /*
-        this.getState().setAttempt(this.recoveryAttemptThreshold);
-        if (rcfg.getInitialState() != null)
-        {
-            this.getState().setStatus(Status.valueOf(rcfg.getInitialState().getStatus().toUpperCase()));
-            this.getState().setOk(this.getState().getStatus().isOk());
-            this.getState().setOutput(Util.coalesce(rcfg.getInitialState().getOutput(), ""));
-            this.getState().setLastHardStatus(this.getState().getStatus());
-            this.getState().setLastHardOk(this.getState().isOk());
-            this.getState().setLastHardOutput(this.getState().getOutput());
-        }
-        */
     }
 
     public final String getType()

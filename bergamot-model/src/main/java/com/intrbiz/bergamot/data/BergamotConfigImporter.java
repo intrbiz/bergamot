@@ -32,7 +32,7 @@ import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Command;
-import com.intrbiz.bergamot.model.ConfigTemplate;
+import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
@@ -111,7 +111,7 @@ public class BergamotConfigImporter
             {
                 if (object.getTemplateBooleanValue() && object instanceof NamedObjectCfg)
                 {
-                    db.setConfigTemplate(new ConfigTemplate(this.site.getId(), (NamedObjectCfg<?>) object));
+                    db.setConfig(new Config(this.site.randomObjectId(), this.site.getId(), (NamedObjectCfg<?>) object));
                 }
             }
         }

@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.GroupCfgAdapter;
 import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.state.GroupState;
@@ -24,30 +23,15 @@ public class Group extends NamedObject<GroupMO, GroupCfg>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = GroupCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected GroupCfg configuration;
-    
     /**
      * The groups this group is a member of
      */
-    @SQLColumn(index = 2, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     protected List<UUID> groupIds = new LinkedList<UUID>();
 
     public Group()
     {
         super();
-    }
-    
-    @Override
-    public GroupCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(GroupCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override

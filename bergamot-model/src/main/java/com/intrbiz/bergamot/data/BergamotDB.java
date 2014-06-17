@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Command;
-import com.intrbiz.bergamot.model.ConfigTemplate;
+import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
@@ -66,7 +66,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
             Resource.class,
             GroupState.class,
             Alert.class,
-            ConfigTemplate.class
+            Config.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -161,20 +161,24 @@ public abstract class BergamotDB extends DatabaseAdapter
     // config template
     
     @Cacheable
-    @SQLSetter(table = ConfigTemplate.class, name = "set_config_template", since = @SQLVersion({1, 0, 0}))
-    public abstract void setConfigTemplate(ConfigTemplate template);
+    @SQLSetter(table = Config.class, name = "set_config", since = @SQLVersion({1, 0, 0}))
+    public abstract void setConfig(Config template);
     
     @Cacheable
-    @SQLGetter(table = ConfigTemplate.class, name = "get_config_template", since = @SQLVersion({1, 0, 0}))
-    public abstract ConfigTemplate getConfigTemplate(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
+    @SQLGetter(table = Config.class, name = "get_config", since = @SQLVersion({1, 0, 0}))
+    public abstract Config getConfig(@SQLParam("id") UUID siteId);
     
     @Cacheable
-    @SQLRemove(table = ConfigTemplate.class, name = "remove_config_template", since = @SQLVersion({1, 0, 0}))
-    public abstract void removeConfigTemplate(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
+    @SQLRemove(table = Config.class, name = "remove_config", since = @SQLVersion({1, 0, 0}))
+    public abstract void removeConfig(@SQLParam("id") UUID id);
     
-    @Cacheable
-    @SQLGetter(table = ConfigTemplate.class, name = "list_config_templates", since = @SQLVersion({1, 0, 0}))
-    public abstract List<ConfigTemplate> listConfigTemplates(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type", optional = true) String type);
+    @SQLGetter(table = Config.class, name = "list_config", since = @SQLVersion({1, 0, 0}))
+    public abstract List<Config> listConfig(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type", optional = true) String type);
+    
+    @SQLGetter(table = Config.class, name = "list_config_templates", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND type = p_type AND template = TRUE")
+    )
+    public abstract List<Config> listConfigTemplates(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type") String type);
     
     // time period
     

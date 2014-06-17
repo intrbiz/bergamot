@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.TeamCfgAdapter;
 import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -25,27 +24,12 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = TeamCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected TeamCfg configuration;
-    
-    @SQLColumn(index = 2, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<UUID> teamIds = new LinkedList<UUID>();
 
     public Team()
     {
         super();
-    }
-    
-    @Override
-    public TeamCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(TeamCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override

@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.ClusterCfgAdapter;
 import com.intrbiz.bergamot.model.message.ClusterMO;
-import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLUnique;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -22,24 +20,9 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
 {   
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ClusterCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected ClusterCfg configuration;
-    
     public Cluster()
     {
         super();
-    }
-    
-    @Override
-    public ClusterCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(ClusterCfg configuration)
-    {
-        this.configuration = configuration;
     }
     
     @Override
@@ -47,25 +30,11 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
     {
         super.configure(cfg);
         ClusterCfg rcfg = cfg.resolve();
-        //
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
-        // initial state
-        // TODO
-        /*
-        if (rcfg.getInitialState() != null)
-        {
-            this.getState().setStatus(Status.valueOf(rcfg.getInitialState().getStatus().toUpperCase()));
-            this.getState().setOk(this.getState().getStatus().isOk());
-            this.getState().setOutput(Util.coalesce(rcfg.getInitialState().getOutput(), ""));
-            this.getState().setLastHardStatus(this.getState().getStatus());
-            this.getState().setLastHardOk(this.getState().isOk());
-            this.getState().setLastHardOutput(this.getState().getOutput());
-        }
-        */
     }
 
     @Override

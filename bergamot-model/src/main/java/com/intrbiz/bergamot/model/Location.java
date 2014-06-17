@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.LocationCfgAdapter;
 import com.intrbiz.bergamot.model.message.LocationMO;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.data.db.compiler.meta.Action;
@@ -25,32 +24,17 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 public class Location extends NamedObject<LocationMO, LocationCfg>
 {
     private static final long serialVersionUID = 1L;
-    
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = LocationCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected LocationCfg configuration;
 
-    @SQLColumn(index = 2, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLForeignKey(references = Location.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT)
     protected UUID locationId;
 
-    @SQLColumn(index = 3, name = "worker_pool", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "worker_pool", since = @SQLVersion({ 1, 0, 0 }))
     protected String workerPool;
 
     public Location()
     {
         super();
-    }
-
-    @Override
-    public LocationCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(LocationCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override

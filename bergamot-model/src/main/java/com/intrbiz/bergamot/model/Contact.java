@@ -12,7 +12,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.ContactCfgAdapter;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -27,43 +26,28 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     
     public static final int BCRYPT_WORK_FACTOR = 12;
     
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ContactCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected ContactCfg configuration;
-    
-    @SQLColumn(index = 2, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<UUID> teamIds = new LinkedList<UUID>();
 
-    @SQLColumn(index = 3, name = "password_hash", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "password_hash", since = @SQLVersion({ 1, 0, 0 }))
     private String passwordHash;
 
-    @SQLColumn(index = 4, name = "email", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "email", since = @SQLVersion({ 1, 0, 0 }))
     @SQLUnique(name = "email_unq", columns = {"site_id", "email"})
     private String email;
 
-    @SQLColumn(index = 5, name = "pager", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "pager", since = @SQLVersion({ 1, 0, 0 }))
     private String pager;
 
-    @SQLColumn(index = 6, name = "mobile", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "mobile", since = @SQLVersion({ 1, 0, 0 }))
     private String mobile;
 
-    @SQLColumn(index = 7, name = "phone", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "phone", since = @SQLVersion({ 1, 0, 0 }))
     private String phone;
 
     public Contact()
     {
         super();
-    }
-    
-    @Override
-    public ContactCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(ContactCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override

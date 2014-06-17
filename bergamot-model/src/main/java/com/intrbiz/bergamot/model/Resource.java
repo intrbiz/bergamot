@@ -5,7 +5,6 @@ import java.util.UUID;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.ResourceCfgAdapter;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -21,27 +20,12 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = ResourceCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected ResourceCfg configuration;
-    
-    @SQLColumn(index = 2, name = "cluster_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "cluster_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID clusterId;
 
     public Resource()
     {
         super();
-    }
-    
-    @Override
-    public ResourceCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(ResourceCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     @Override
@@ -49,25 +33,11 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
     {
         super.configure(cfg);
         ResourceCfg rcfg = cfg.resolve();
-        //
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
-        // initial state
-        // TODO
-        /*
-        if (rcfg.getInitialState() != null)
-        {
-            this.getState().setStatus(Status.valueOf(rcfg.getInitialState().getStatus().toUpperCase()));
-            this.getState().setOk(this.getState().getStatus().isOk());
-            this.getState().setOutput(Util.coalesce(rcfg.getInitialState().getOutput(), ""));
-            this.getState().setLastHardStatus(this.getState().getStatus());
-            this.getState().setLastHardOk(this.getState().isOk());
-            this.getState().setLastHardOutput(this.getState().getOutput());
-        }
-        */
     }
 
     @Override

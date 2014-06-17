@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.CommandCfgAdapter;
 import com.intrbiz.bergamot.model.adapter.ParametersAdapter;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.util.Parameter;
@@ -26,17 +25,14 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 public class Command extends NamedObject<CommandMO, CommandCfg>
 {
     private static final long serialVersionUID = 1L;
-    
-    @SQLColumn(index = 1, name = "configuration", type = "TEXT", adapter = CommandCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected CommandCfg configuration;
 
-    @SQLColumn(index = 2, name = "engine", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "engine", since = @SQLVersion({ 1, 0, 0 }))
     private String engine;
 
-    @SQLColumn(index = 3, name = "executor", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "executor", since = @SQLVersion({ 1, 0, 0 }))
     private String executor;
 
-    @SQLColumn(index = 4, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     private List<Parameter> parameters = new LinkedList<Parameter>();
 
     public Command()
@@ -45,22 +41,9 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
     }
 
     @Override
-    public CommandCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    @Override
-    public void setConfiguration(CommandCfg configuration)
-    {
-        this.configuration = configuration;
-    }
-
-    @Override
     public void configure(CommandCfg cfg)
     {
         super.configure(cfg);
-        // resolve
         CommandCfg rcfg = cfg.resolve();
         this.engine = rcfg.getEngine();
         this.name = rcfg.getName();
