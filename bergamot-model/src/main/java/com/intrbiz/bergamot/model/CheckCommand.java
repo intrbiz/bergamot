@@ -9,12 +9,10 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CheckCommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.CheckCommandCfgAdapter;
 import com.intrbiz.bergamot.model.adapter.ParametersAdapter;
 import com.intrbiz.bergamot.model.message.CheckCommandMO;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.configuration.CfgParameter;
-import com.intrbiz.configuration.Configurable;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -24,7 +22,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * The definition of a command which is used to check something
  */
 @SQLTable(schema = BergamotDB.class, name = "check_command", since = @SQLVersion({ 1, 0, 0 }))
-public class CheckCommand extends BergamotObject<CheckCommandMO> implements Configurable<CheckCommandCfg>
+public class CheckCommand extends BergamotObject<CheckCommandMO>
 {
     private static final long serialVersionUID = 1L;
     
@@ -32,13 +30,10 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Conf
     @SQLPrimaryKey
     private UUID checkId;
 
-    @SQLColumn(index = 2, name = "configuration", type = "TEXT", adapter = CheckCommandCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    protected CheckCommandCfg configuration;
-
-    @SQLColumn(index = 3, name = "command_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "command_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID commandId;
 
-    @SQLColumn(index = 4, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     private List<Parameter> parameters = new LinkedList<Parameter>();
 
     public CheckCommand()
@@ -72,17 +67,6 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Conf
         {
             return db.getCommand(this.getCommandId());
         }
-    }
-
-    @Override
-    public CheckCommandCfg getConfiguration()
-    {
-        return configuration;
-    }
-
-    public void setConfiguration(CheckCommandCfg configuration)
-    {
-        this.configuration = configuration;
     }
 
     public void configure(CheckCommandCfg cfg)
