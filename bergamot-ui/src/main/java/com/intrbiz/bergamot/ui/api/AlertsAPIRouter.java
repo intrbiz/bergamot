@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -24,6 +23,6 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<CheckMO> getAlerts(BergamotDB db, @Var("site") Site site)
     {
-        return db.listChecksThatAreNotOk(site.getId()).stream().map(Check::toMO).collect(Collectors.toList());
+        return db.listChecksThatAreNotOk(site.getId()).stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());
     }
 }

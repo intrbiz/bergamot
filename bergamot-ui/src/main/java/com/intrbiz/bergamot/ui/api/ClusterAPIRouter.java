@@ -8,7 +8,6 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
@@ -88,7 +87,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<CheckMO> getClusterReferences(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getClusterByName(site.getId(), name), (e)->{return e.getReferences().stream().map(Check::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getClusterByName(site.getId(), name), (e)->{return e.getReferences().stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());});
     }
     
     @Get("/id/:id/references")
@@ -96,6 +95,6 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<CheckMO> getClusterReferences(BergamotDB db, @AsUUID UUID id)
     {
-        return Util.nullable(db.getCluster(id), (e)->{return e.getReferences().stream().map(Check::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getCluster(id), (e)->{return e.getReferences().stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());});
     }
 }

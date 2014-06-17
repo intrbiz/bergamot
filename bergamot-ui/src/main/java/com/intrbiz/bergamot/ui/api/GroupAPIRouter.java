@@ -8,7 +8,6 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CheckMO;
@@ -61,7 +60,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<CheckMO> getGroupChecks(BergamotDB db, @AsUUID() UUID id)
     {
-        return Util.nullable(db.getGroup(id), (e)->{return e.getChecks().stream().map(Check::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getGroup(id), (e)->{return e.getChecks().stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());});
     }
     
     @Get("/name/:name")
@@ -85,6 +84,6 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<CheckMO> getGroupChecks(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getGroupByName(site.getId(), name), (e)->{return e.getChecks().stream().map(Check::toMO).collect(Collectors.toList());});
+        return Util.nullable(db.getGroupByName(site.getId(), name), (e)->{return e.getChecks().stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());});
     }
 }
