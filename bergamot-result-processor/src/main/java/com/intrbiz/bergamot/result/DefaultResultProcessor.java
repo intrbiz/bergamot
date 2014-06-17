@@ -41,12 +41,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // we failed to execute the given check in time, oops!
         logger.warn("Failed to execute check, workers aren't working hard enough: " + check.getId() + "\r\n" + check);
         // fake a timeout result and submit it
-        Result result = check.createResult();
-        result.setOk(false);
-        result.setStatus(Status.TIMEOUT.toString());
-        result.setOutput("Worker timeout whilst executing check");
-        result.setRuntime(0);
-        this.processExecuted(result);
+        this.processExecuted(new Result().fromCheck(check).timeout("Worker timeout whilst executing check"));
     }
 
     @Override

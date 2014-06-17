@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.Message;
@@ -192,5 +193,47 @@ public class Result extends Message
             if (name.equals(parameter.getName())) return parameter.getValue();
         }
         return defaultValue;
+    }
+    
+    // constructor helpers
+    
+    /**
+     * Create a Result with the details of this check
+     * 
+     * @return
+     */
+    @JsonIgnore
+    public Result fromCheck(ExecuteCheck check)
+    {
+        this.setId(check.getId());
+        this.setCheckType(check.getCheckType());
+        this.setCheckId(check.getCheckId());
+        this.setCheck(check);
+        this.setExecuted(System.currentTimeMillis());
+        return this;
+    }
+    
+    /**
+     * Update this result with the error information
+     * @param t
+     * @return
+     */
+    @JsonIgnore
+    public Result error(Throwable t)
+    {
+        this.setOk(false);
+        this.setStatus("ERROR");
+        this.setOutput(t.getMessage());
+        this.setRuntime(0);
+        return this;
+    }
+    
+    public Result timeout(String message)
+    {
+        this.setOk(false);
+        this.setStatus("TIMEOUT");
+        this.setOutput(message);
+        this.setRuntime(0);
+        return this;
     }
 }

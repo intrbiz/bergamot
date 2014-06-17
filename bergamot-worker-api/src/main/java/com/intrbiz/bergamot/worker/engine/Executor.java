@@ -1,10 +1,11 @@
 package com.intrbiz.bergamot.worker.engine;
 
+import java.util.function.Consumer;
+
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.configuration.Configurable;
-import com.intrbiz.queue.Producer;
 
 /**
  * Executors execute a particular task.
@@ -22,7 +23,7 @@ public interface Executor<T extends Engine> extends Configurable<ExecutorCfg>
     /**
      * Execute the check
      */
-    void execute(ExecuteCheck executeCheck, Producer<Result> resultSubmitter);
+    void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter);
     
     void start() throws Exception;
 }

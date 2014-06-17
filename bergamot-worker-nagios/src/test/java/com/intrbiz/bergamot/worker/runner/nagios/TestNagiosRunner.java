@@ -9,9 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
-import com.intrbiz.queue.Producer;
 
 public class TestNagiosRunner
 {
@@ -60,10 +58,9 @@ public class TestNagiosRunner
     public void testDummyOkCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
-        this.runner.execute(executeCheck, new Producer<Result>() {
-            @Override
-            public void publish(Result result)
-            {
+        this.runner.execute(
+            executeCheck, 
+            (result) -> {
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -76,28 +73,16 @@ public class TestNagiosRunner
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
-
-            @Override
-            public void publish(Result event, long ttl)
-            {
-                this.publish(event);
-            }
-
-            @Override
-            public void close()
-            {
-            }
-        });
+        );
     }
     
     @Test
     public void testDummyWarningCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 1 Test");
-        this.runner.execute(executeCheck, new Producer<Result>() {
-            @Override
-            public void publish(Result result)
-            {
+        this.runner.execute(
+            executeCheck,
+            (result) -> {
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -110,28 +95,16 @@ public class TestNagiosRunner
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
-
-            @Override
-            public void publish(Result event, long ttl)
-            {
-                this.publish(event);
-            }
-
-            @Override
-            public void close()
-            {
-            }
-        });
+        );
     }
     
     @Test
     public void testDummyCriticalCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 2 Test");
-        this.runner.execute(executeCheck, new Producer<Result>() {
-            @Override
-            public void publish(Result result)
-            {
+        this.runner.execute(
+            executeCheck,
+            (result) -> {
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -144,62 +117,38 @@ public class TestNagiosRunner
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
-
-            @Override
-            public void publish(Result event, long ttl)
-            {
-                this.publish(event);
-            }
-
-            @Override
-            public void close()
-            {
-            }
-        });
+        );
     }
     
     @Test
     public void testDummyUnknownCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 3 Test");
-        this.runner.execute(executeCheck, new Producer<Result>() {
-            @Override
-            public void publish(Result result)
-            {
-            assertThat(result, is(not(nullValue())));
-            assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-            assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
-            assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-            assertThat(result.getCheck(), is(equalTo(executeCheck)));
-            assertThat(result.isOk(), is(equalTo(false)));
-            assertThat(result.getStatus(), is(equalTo("UNKNOWN")));
-            assertThat(result.getOutput(), is(equalTo("UNKNOWN: Test")));
-            assertThat(result.getRuntime(), is(greaterThan(0D)));
-            assertThat(result.getExecuted(), is(not(nullValue())));
-            assertThat(result.getProcessed(), is(equalTo(0L)));
+        this.runner.execute(
+            executeCheck,
+            (result) -> {
+                assertThat(result, is(not(nullValue())));
+                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
+                assertThat(result.getCheck(), is(equalTo(executeCheck)));
+                assertThat(result.isOk(), is(equalTo(false)));
+                assertThat(result.getStatus(), is(equalTo("UNKNOWN")));
+                assertThat(result.getOutput(), is(equalTo("UNKNOWN: Test")));
+                assertThat(result.getRuntime(), is(greaterThan(0D)));
+                assertThat(result.getExecuted(), is(not(nullValue())));
+                assertThat(result.getProcessed(), is(equalTo(0L)));
             }
-
-            @Override
-            public void publish(Result event, long ttl)
-            {
-                this.publish(event);
-            }
-
-            @Override
-            public void close()
-            {
-            }
-        });
+        );
     }
     
     @Test
     public void testMissing()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_missing");
-        this.runner.execute(executeCheck, new Producer<Result>() {
-            @Override
-            public void publish(Result result)
-            {
+        this.runner.execute(
+            executeCheck,
+            (result) -> {
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -212,18 +161,7 @@ public class TestNagiosRunner
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
-
-            @Override
-            public void publish(Result event, long ttl)
-            {
-                this.publish(event);
-            }
-
-            @Override
-            public void close()
-            {
-            }
-        });
+        );
     }
     
     @SuppressWarnings("unchecked")
@@ -232,10 +170,9 @@ public class TestNagiosRunner
     {
         // deliberately wrong port number
         ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H 127.0.0.1 -p 35666 -t 15 -c check_load");
-        this.runner.execute(executeCheck, new Producer<Result>() {
-            @Override
-            public void publish(Result result)
-            {
+        this.runner.execute(
+            executeCheck,
+            (result) -> {
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -248,28 +185,16 @@ public class TestNagiosRunner
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
-
-            @Override
-            public void publish(Result event, long ttl)
-            {
-                this.publish(event);
-            }
-
-            @Override
-            public void close()
-            {
-            }
-        });
+        );
     }
     
     @Test
     public void testNRPE()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H 127.0.0.1 -t 15 -c check_load");
-        this.runner.execute(executeCheck, new Producer<Result>() {
-            @Override
-            public void publish(Result result)
-            {
+        this.runner.execute(
+            executeCheck,
+            (result) -> {
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -282,17 +207,6 @@ public class TestNagiosRunner
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
-
-            @Override
-            public void publish(Result event, long ttl)
-            {
-                this.publish(event);
-            }
-
-            @Override
-            public void close()
-            {
-            }
-        });
+        );
     }
 }

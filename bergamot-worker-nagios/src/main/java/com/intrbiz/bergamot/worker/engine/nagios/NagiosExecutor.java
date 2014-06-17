@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -15,7 +16,6 @@ import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.nagios.util.NagiosPluginParser;
 import com.intrbiz.bergamot.util.CommandTokeniser;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
-import com.intrbiz.queue.Producer;
 
 /**
  * Execute Nagios Plugins (CHecks)
@@ -63,10 +63,9 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Producer<Result> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
     {
-        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
-        Result result = executeCheck.createResult();
+        logger.debug("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         try
         {
             // apply macros to build the command line
@@ -89,12 +88,13 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
                 int exitCode = process.waitFor();
                 long end = System.nanoTime();
                 // process the result
+                Result result = new Result().fromCheck(executeCheck);
                 NagiosPluginParser.parseNagiosExitCode(exitCode, result);
                 NagiosPluginParser.parseNagiosOutput(stdOut, result);
                 result.setRuntime((((double) (end - start)) / 1_000_000D));
-                // log
                 logger.info("Check output: " + result.isOk() + " " + result.getStatus());
                 logger.debug("Check took: " + (((double) (end - start)) / 1_000_000D) + " ms");
+                resultSubmitter.accept(result);
             }
             finally
             {
@@ -104,13 +104,8 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
         catch (IOException | InterruptedException e)
         {
             logger.error("Failed to execute nagios check command", e);
-            result.setOk(false);
-            result.setStatus("ERROR");
-            result.setOutput(e.getMessage());
-            result.setRuntime(0);
+            resultSubmitter.accept(new Result().fromCheck(executeCheck).error(e));
         }
-        logger.debug("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
-        resultSubmitter.publish(result);
     }
     
     /**

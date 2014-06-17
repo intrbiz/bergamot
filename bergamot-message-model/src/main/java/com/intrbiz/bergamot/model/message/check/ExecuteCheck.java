@@ -5,12 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
-import com.intrbiz.bergamot.model.message.result.Result;
 
 /**
  * Execute this check please
@@ -180,22 +178,5 @@ public class ExecuteCheck extends Message
     public void setScheduled(long scheduled)
     {
         this.scheduled = scheduled;
-    }
-
-    /**
-     * Create a Result with the details of this check
-     * 
-     * @return
-     */
-    @JsonIgnore
-    public Result createResult()
-    {
-        Result result = new Result();
-        result.setId(this.getId());
-        result.setCheckType(this.getCheckType());
-        result.setCheckId(this.getCheckId());
-        result.setCheck(this);
-        result.setExecuted(System.currentTimeMillis());
-        return result;
     }
 }

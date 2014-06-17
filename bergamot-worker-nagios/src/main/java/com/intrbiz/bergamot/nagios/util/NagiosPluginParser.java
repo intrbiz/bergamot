@@ -7,10 +7,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.bergamot.model.message.result.Result;
 
 public class NagiosPluginParser
 {
+    private static final Logger logger = Logger.getLogger(NagiosPluginParser.class);
+    
     public static final int NAGIOS_OK = 0;
 
     public static final int NAGIOS_WARNING = 1;
@@ -49,9 +53,16 @@ public class NagiosPluginParser
     /**
      * Extract the check output
      */
-    public static void parseNagiosOutput(String output, Result result) throws IOException
+    public static void parseNagiosOutput(String output, Result result)
     {
-        parseNagiosOutput(new StringReader(output), result);
+        try
+        {
+            parseNagiosOutput(new StringReader(output), result);
+        }
+        catch (IOException e)
+        {
+            logger.fatal("Error parsing nagios output from string", e);
+        }
     }
 
     /**
