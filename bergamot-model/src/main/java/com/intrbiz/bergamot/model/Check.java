@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.model.message.VirtualCheckMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -78,7 +79,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
         this.enabled = enabled;
     }
 
-    public List<VirtualCheck<?,?>> getReferencedBy()
+    public List<VirtualCheck<?, ?>> getReferencedBy()
     {
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -227,7 +228,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
             mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));
             mo.setContacts(this.getContacts().stream().map(Contact::toStubMO).collect(Collectors.toList()));
             mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
-            mo.setReferencedBy(this.getReferencedBy().stream().map(VirtualCheck::toStubMO).collect(Collectors.toList()));
+            mo.setReferencedBy(this.getReferencedBy().stream().map((v) -> {return (VirtualCheckMO) v.toStubMO();}).collect(Collectors.toList()));
             mo.setNotifications(this.getNotifications().toMO());
         }
     }

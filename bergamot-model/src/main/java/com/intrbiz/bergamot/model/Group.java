@@ -10,6 +10,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.GroupCfgAdapter;
+import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -147,7 +148,7 @@ public class Group extends NamedObject<GroupMO, GroupCfg>
         mo.setState(this.getState().toMO());
         if (!stub)
         {
-            mo.setChecks(this.getChecks().stream().map(Check::toStubMO).collect(Collectors.toList()));
+            mo.setChecks(this.getChecks().stream().map((c) -> {return (CheckMO) c.toStubMO();}).collect(Collectors.toList()));
             mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));
             mo.setChildren(this.getChildren().stream().map(Group::toStubMO).collect(Collectors.toList()));
         }
