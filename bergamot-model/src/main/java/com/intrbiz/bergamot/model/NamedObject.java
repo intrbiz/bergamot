@@ -50,11 +50,11 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
 
     public void configure(C configuration)
     {
-        // store the config
-        this.setConfiguration(configuration);
         // ids and site
         this.setId(configuration.getId());
         this.setSiteId(Site.getSiteId(this.getId()));
+        // store the config
+        this.setConfiguration(configuration);
     }
     
     @SuppressWarnings("unchecked")
