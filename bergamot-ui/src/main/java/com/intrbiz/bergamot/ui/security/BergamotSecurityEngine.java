@@ -15,6 +15,7 @@ import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.data.DataException;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -83,6 +84,12 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
                         this.invalidLogins.inc();
                         throw new BalsaSecurityException("Invalid password");
                     }
+                    if (! this.check(contact, "ui.login"))
+                    {
+                        logger.error("Login is denied for principal " + pw.getPrincipalName() + " => " + site + "::" + contact);
+                        this.invalidLogins.inc();
+                        throw new BalsaSecurityException("Login denied");
+                    }
                     this.validLogins.inc();
                     return contact;
                 }
@@ -100,5 +107,80 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
         }
         this.invalidLogins.inc();
         throw new BalsaSecurityException("No such principal");
+    }
+
+    /**
+     * Check that the given principal has the given permission
+     */
+    @Override
+    public boolean check(Principal principal, String permission)
+    {
+        if (principal instanceof Contact) 
+            return this.check((Contact) principal, permission);
+        return false;
+    }
+    
+    protected boolean check(Contact contact, String permission)
+    {
+        for (String granted : contact.getGrantedPermissions())
+        {
+            if (this.matchPermission(granted, permission))
+                return true;
+        }
+        for (String revoked : contact.getRevokedPermissions())
+        {
+            if (this.matchPermission(revoked, permission)) 
+                return false;
+        }
+        // go up the chain
+        for (Team team : contact.getTeams())
+        {
+            Boolean result = check(team, permission);
+            if (result != null) return result;
+        }
+        return false;
+    }
+    
+    /**
+     * Tri-stated recursive checking of inherited permissions
+     */
+    protected Boolean check(Team team, String permission)
+    {
+        for (String granted : team.getGrantedPermissions())
+        {
+            if (this.matchPermission(granted, permission))
+                return true;
+        }
+        for (String revoked : team.getRevokedPermissions())
+        {
+            if (this.matchPermission(revoked, permission)) 
+                return false;
+        }
+        // go up the chain
+        for (Team parent : team.getTeams())
+        {
+            Boolean result = check(parent, permission);
+            if (result != null) return result;
+        }
+        return null;
+    }
+    
+    /**
+     * Match a granted or revoked permission against the requested permission
+     * @param granted the permission pattern which has been granted of revoked
+     * @param permission the permissions that is being checked for
+     * @return true if they match
+     */
+    protected boolean matchPermission(String granted, String permission)
+    {
+        if (granted.equals(permission))
+        {
+            return true;
+        }
+        else if (granted.endsWith("*") && permission.startsWith(granted.substring(0, granted.length() - 1)))
+        {
+            return true;
+        }
+        return false;
     }
 }
