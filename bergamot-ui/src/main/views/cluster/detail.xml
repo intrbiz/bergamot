@@ -67,43 +67,47 @@
 	
 	<!-- Configuration -->
 	
-	<h2>Configuration</h2>
-		
-	<div class="row">
-		<div class="col4 dash_icon">
-		    <h3>Notify</h3>
-			<data-set var="contact" value="#{cluster.contacts}">
-				<p>
-					<span class="label wide">Contact</span>
-					<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
-				</p>
-			</data-set>
-			<data-set var="team" value="#{cluster.teams}">
-				<p>
-					<span class="label wide">Team</span>
-					<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
-				</p>
-			</data-set>
-		</div>
-		<div class="col4 dash_icon">
-			<h3>Notifications</h3>
-			<p>
-				<span class="label wide">Notifications enabled</span>
-				<span class="value">#{if(cluster.notifications.enabled, 'yes', 'no')}</span>
-			</p>
-			<p>
-				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(cluster.notifications.timePeriod.summary, 'Not configured')}</span>
-			</p>
-		</div>
-	</div>
+	<container rendered="#{Balsa().permission('ui.config.view')}">
 	
-	<div class="row">
-		<div class="col12">
-			<h3>XML</h3>
-			<pre>#{cluster.configuration.toString()}</pre>
+		<h2>Configuration</h2>
+			
+		<div class="row">
+			<div class="col4 dash_icon">
+			    <h3>Notify</h3>
+				<data-set var="contact" value="#{cluster.contacts}">
+					<p>
+						<span class="label wide">Contact</span>
+						<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
+					</p>
+				</data-set>
+				<data-set var="team" value="#{cluster.teams}">
+					<p>
+						<span class="label wide">Team</span>
+						<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
+					</p>
+				</data-set>
+			</div>
+			<div class="col4 dash_icon">
+				<h3>Notifications</h3>
+				<p>
+					<span class="label wide">Notifications enabled</span>
+					<span class="value">#{if(cluster.notifications.enabled, 'yes', 'no')}</span>
+				</p>
+				<p>
+					<span class="label wide">Notification period</span>
+					<span class="value">#{coalesce(cluster.notifications.timePeriod.summary, 'Not configured')}</span>
+				</p>
+			</div>
 		</div>
-	</div>
+		
+		<div class="row">
+			<div class="col12">
+				<h3>XML</h3>
+				<pre>#{cluster.configuration.toString()}</pre>
+			</div>
+		</div>
+	
+	</container>
 	
 	<script type="text/javascript">
 		require(["bergamot/lib/util/console-log", "bergamot/lib/ui/check-state", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_server_state, bergamot_api_driver)

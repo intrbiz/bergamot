@@ -64,109 +64,113 @@
 		</div>
 	</div>
 	
-	<h2>Configuration</h2>
+	<container rendered="#{Balsa().permission('ui.config.view')}">
 	
-	<div class="row">
-		<div class="col4 dash_icon">
-			<h3>Notify</h3>
-			<data-set var="contact" value="#{service.contacts}">
+		<h2>Configuration</h2>
+		
+		<div class="row">
+			<div class="col4 dash_icon">
+				<h3>Notify</h3>
+				<data-set var="contact" value="#{service.contacts}">
+					<p>
+						<span class="label wide">Contact</span>
+						<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
+					</p>
+				</data-set>
+				<data-set var="team" value="#{service.teams}">
+					<p>
+						<span class="label wide">Team</span>
+						<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
+					</p>
+				</data-set>
+			</div>
+			<div class="col4 dash_icon">
+				<h3>Scheduling</h3>
 				<p>
-					<span class="label wide">Contact</span>
-					<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
+					<span class="label wide">Check period</span>
+					<span class="value">#{service.timePeriod.summary}</span>
 				</p>
-			</data-set>
-			<data-set var="team" value="#{service.teams}">
 				<p>
-					<span class="label wide">Team</span>
-					<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
+					<span class="label wide">Check interval</span>
+					<span class="value">#{service.checkInterval / 1000}s</span>
 				</p>
-			</data-set>
+				<p>
+					<span class="label wide">Retry interval</span>
+					<span class="value">#{service.retryInterval / 1000}s</span>
+				</p>
+			</div>
+			<div class="col4 dash_icon">
+				<h3>Notifications</h3>
+				<p>
+					<span class="label wide">Notifications enabled</span>
+					<span class="value">#{if(service.notifications.enabled, 'yes', 'no')}</span>
+				</p>
+				<p>
+					<span class="label wide">Notification period</span>
+					<span class="value">#{coalesce(service.notifications.timePeriod.summary, 'Not configured')}</span>
+				</p>
+			</div>
 		</div>
-		<div class="col4 dash_icon">
-			<h3>Scheduling</h3>
-			<p>
-				<span class="label wide">Check period</span>
-				<span class="value">#{service.timePeriod.summary}</span>
-			</p>
-			<p>
-				<span class="label wide">Check interval</span>
-				<span class="value">#{service.checkInterval / 1000}s</span>
-			</p>
-			<p>
-				<span class="label wide">Retry interval</span>
-				<span class="value">#{service.retryInterval / 1000}s</span>
-			</p>
+		
+		<div class="row">
+			<div class="col4 dash_icon">
+				<h3>Statistics</h3>
+				<p>
+					<span class="label wide">Last runtime: </span>
+					<span class="value">#{service.state.lastRuntime} ms</span>
+				</p>
+				<p>
+					<span class="label wide">Average runtime: </span>
+					<span class="value">#{service.state.averageRuntime} ms</span>
+				</p>
+				<p>
+					<span class="label wide">Last processing latency: </span>
+					<span class="value">#{service.state.lastCheckProcessingLatency} ms</span>
+				</p>
+				<p>
+					<span class="label wide">Average processing latency: </span>
+					<span class="value">#{service.state.averageCheckProcessingLatency} ms</span>
+				</p>
+				<p>
+					<span class="label wide">Last execution latency: </span>
+					<span class="value">#{service.state.lastCheckExecutionLatency} ms</span>
+				</p>
+				<p>
+					<span class="label wide">Average execution latency: </span>
+					<span class="value">#{service.state.averageCheckExecutionLatency} ms</span>
+				</p>
+			</div>
+			<div class="col4 dash_icon">
+				<h3>Command</h3>
+				<p>
+					<span class="label wide">Command Engine: </span>
+					<span class="value">#{service.checkCommand.command.engine}</span>
+				</p>
+				<p>
+					<span class="label wide">Command Name: </span>
+					<span class="value">#{service.checkCommand.command.name}</span>
+				</p>
+				<p>
+					<span class="label wide">Parameters:</span>
+					<span class="value">&nbsp;</span>
+				</p>
+				<data-set var="parameter" value="#{service.checkCommand.resolveCheckParameters()}">
+					<p>
+						<span class="label wide indent">#{parameter.name}: </span>
+						<span class="value">#{parameter.value}</span>
+					</p>
+				</data-set>
+			</div>
 		</div>
-		<div class="col4 dash_icon">
-			<h3>Notifications</h3>
-			<p>
-				<span class="label wide">Notifications enabled</span>
-				<span class="value">#{if(service.notifications.enabled, 'yes', 'no')}</span>
-			</p>
-			<p>
-				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(service.notifications.timePeriod.summary, 'Not configured')}</span>
-			</p>
+		
+		<div class="row">
+			<div class="col12">
+				<h3>XML</h3>
+				<pre>#{service.configuration.toString()}</pre>
+			</div>
 		</div>
-	</div>
 	
-	<div class="row">
-		<div class="col4 dash_icon">
-			<h3>Statistics</h3>
-			<p>
-				<span class="label wide">Last runtime: </span>
-				<span class="value">#{service.state.lastRuntime} ms</span>
-			</p>
-			<p>
-				<span class="label wide">Average runtime: </span>
-				<span class="value">#{service.state.averageRuntime} ms</span>
-			</p>
-			<p>
-				<span class="label wide">Last processing latency: </span>
-				<span class="value">#{service.state.lastCheckProcessingLatency} ms</span>
-			</p>
-			<p>
-				<span class="label wide">Average processing latency: </span>
-				<span class="value">#{service.state.averageCheckProcessingLatency} ms</span>
-			</p>
-			<p>
-				<span class="label wide">Last execution latency: </span>
-				<span class="value">#{service.state.lastCheckExecutionLatency} ms</span>
-			</p>
-			<p>
-				<span class="label wide">Average execution latency: </span>
-				<span class="value">#{service.state.averageCheckExecutionLatency} ms</span>
-			</p>
-		</div>
-		<div class="col4 dash_icon">
-			<h3>Command</h3>
-			<p>
-				<span class="label wide">Command Engine: </span>
-				<span class="value">#{service.checkCommand.command.engine}</span>
-			</p>
-			<p>
-				<span class="label wide">Command Name: </span>
-				<span class="value">#{service.checkCommand.command.name}</span>
-			</p>
-			<p>
-				<span class="label wide">Parameters:</span>
-				<span class="value">&nbsp;</span>
-			</p>
-			<data-set var="parameter" value="#{service.checkCommand.resolveCheckParameters()}">
-				<p>
-					<span class="label wide indent">#{parameter.name}: </span>
-					<span class="value">#{parameter.value}</span>
-				</p>
-			</data-set>
-		</div>
-	</div>
-	
-	<div class="row">
-		<div class="col12">
-			<h3>XML</h3>
-			<pre>#{service.configuration.toString()}</pre>
-		</div>
-	</div>
+	</container>
 	
 	<script type="text/javascript">
 		require(["bergamot/lib/util/console-log", "bergamot/lib/ui/check-state", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_server_state, bergamot_api_driver)
