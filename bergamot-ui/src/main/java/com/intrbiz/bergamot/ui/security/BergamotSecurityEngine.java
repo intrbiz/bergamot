@@ -3,10 +3,11 @@ package com.intrbiz.bergamot.ui.security;
 import static com.intrbiz.balsa.BalsaContext.*;
 
 import java.security.Principal;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Timer;
 import com.intrbiz.balsa.engine.impl.security.SecurityEngineImpl;
 import com.intrbiz.balsa.engine.security.Credentials;
 import com.intrbiz.balsa.engine.security.PasswordCredentials;
@@ -15,24 +16,27 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.data.DataException;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Timer;
-import com.yammer.metrics.core.TimerContext;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 public class BergamotSecurityEngine extends SecurityEngineImpl
 {
     private Logger logger = Logger.getLogger(BergamotSecurityEngine.class);
     
-    private final Timer authenticateTimer = Metrics.newTimer(BergamotSecurityEngine.class, "authenticate", TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+    private final Timer authenticateTimer;
     
-    private final Counter validLogins = Metrics.newCounter(BergamotSecurityEngine.class, "valid-logins");
+    private final Counter validLogins;
     
-    private final Counter invalidLogins = Metrics.newCounter(BergamotSecurityEngine.class, "invalid-logins");
+    private final Counter invalidLogins;
 
     public BergamotSecurityEngine()
     {
         super();
+        // setup metrics
+        IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot");
+        this.authenticateTimer = source.getRegistry().timer(Witchcraft.name(BergamotSecurityEngine.class, "authenticate"));
+        this.validLogins       = source.getRegistry().counter(Witchcraft.name(BergamotSecurityEngine.class, "valid-logins"));
+        this.invalidLogins     = source.getRegistry().counter(Witchcraft.name(BergamotSecurityEngine.class, "invalid-logins"));
     }
 
     @Override
@@ -46,7 +50,7 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     {
         if (credentials instanceof PasswordCredentials)
         {
-            TimerContext tCtx = this.authenticateTimer.time();
+            Timer.Context tCtx = this.authenticateTimer.time();
             try
             {
                 PasswordCredentials pw = (PasswordCredentials) credentials;

@@ -3,11 +3,19 @@ package com.intrbiz.bergamot.ui.api;
 import static com.intrbiz.balsa.BalsaContext.*;
 
 import java.io.IOException;
-import java.util.SortedMap;
 import java.util.Map.Entry;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Counting;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metered;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.Sampling;
+import com.codahale.metrics.Snapshot;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.intrbiz.balsa.engine.impl.route.RouteMetricName;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
@@ -15,19 +23,14 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
-import com.yammer.metrics.Metrics;
-import com.yammer.metrics.core.Counter;
-import com.yammer.metrics.core.Meter;
-import com.yammer.metrics.core.Metric;
-import com.yammer.metrics.core.MetricName;
-import com.yammer.metrics.core.MetricsRegistry;
-import com.yammer.metrics.core.Timer;
 
 @Prefix("/api/")
 public class APIRouter extends Router<BergamotApp>
@@ -56,71 +59,23 @@ public class APIRouter extends Router<BergamotApp>
     @Get("/metrics")
     public void metricsJson() throws IOException
     {
-        MetricsRegistry reg = Metrics.defaultRegistry();
-        //
         JsonGenerator j = response().json().getJsonWriter();
         j.writeStartObject();
-        j.writeArrayFieldStart("groups");
-        for (Entry<String, SortedMap<MetricName, Metric>> group : reg.groupedMetrics().entrySet())
+        j.writeArrayFieldStart("sources");
+        for (IntelligenceSource source : Witchcraft.get().getSources())
         {
             j.writeStartObject();
-            j.writeStringField("group", group.getKey());
+            j.writeStringField("name", source.getName());
             j.writeArrayFieldStart("metrics");
-            for (Entry<MetricName, Metric> metric : group.getValue().entrySet())
+            for (Entry<String, Metric> metric : source.getRegistry().getMetrics().entrySet())
             {
                 j.writeStartObject();
                 // name
-                j.writeObjectFieldStart("name");
-                j.writeStringField("group", metric.getKey().getGroup());
-                j.writeStringField("type", metric.getKey().getType());
-                j.writeStringField("name", metric.getKey().getName());
-                j.writeStringField("scope", metric.getKey().getScope());
-                if (metric.getKey() instanceof RouteMetricName)
-                {
-                    RouteMetricName rmn = (RouteMetricName) metric.getKey();
-                    j.writeStringField("method", rmn.getHttpMethod());
-                    j.writeStringField("pattern", rmn.getPattern());
-                }
-                j.writeEndObject();
+                j.writeStringField("name", metric.getKey());
                 // metric
-                j.writeObjectFieldStart("metric");
+                j.writeFieldName("metric");
                 //
-                if (metric.getValue() instanceof Counter)
-                {
-                    Counter c = (Counter) metric.getValue();
-                    j.writeStringField("type", "counter");
-                    j.writeNumberField("count", c.count());
-                }
-                else if (metric.getValue() instanceof Meter)
-                {
-                    Meter m = (Meter) metric.getValue();
-                    j.writeStringField("type", "meter");
-                    j.writeNumberField("count", m.count());
-                    j.writeNumberField("mean-rate", m.meanRate());
-                    j.writeNumberField("one-minute-rate", m.oneMinuteRate());
-                    j.writeNumberField("five-minute-rate", m.fiveMinuteRate());
-                    j.writeNumberField("fifteen-minute-rate", m.fifteenMinuteRate());
-                    j.writeStringField("rate-unit", m.rateUnit().toString());
-                }
-                else if (metric.getValue() instanceof Timer)
-                {
-                    Timer t = (Timer) metric.getValue();
-                    j.writeStringField("type", "timer");
-                    j.writeNumberField("count", t.count());
-                    //
-                    j.writeNumberField("min", t.min());
-                    j.writeNumberField("mean", t.mean());
-                    j.writeNumberField("max", t.max());
-                    j.writeStringField("duration-unit", t.durationUnit().toString());
-                    //
-                    j.writeNumberField("mean-rate", t.meanRate());
-                    j.writeNumberField("one-minute-rate", t.oneMinuteRate());
-                    j.writeNumberField("five-minute-rate", t.fiveMinuteRate());
-                    j.writeNumberField("fifteen-minute-rate", t.fifteenMinuteRate());
-                    j.writeStringField("rate-unit", t.rateUnit().toString());
-                }
-                //
-                j.writeEndObject();
+                MetricWriter.writeMetric(metric.getValue(), j);
                 //
                 j.writeEndObject();
             }
@@ -130,5 +85,197 @@ public class APIRouter extends Router<BergamotApp>
         j.writeEndArray();
         j.writeEndObject();
         j.flush();
+    }
+    
+    public static class MetricWriter
+    {
+        public static void writeMetric(Metric mv, JsonGenerator jg) throws IOException
+        {
+            jg.writeStartObject();
+            //
+            if (mv instanceof Gauge)
+                writeGauge((Gauge<?>) mv, jg);
+            else if (mv instanceof Counter)
+                writeCounter((Counter) mv, jg);
+            else if (mv instanceof Meter)
+                writeMeter((Meter) mv, jg);
+            else if (mv instanceof Timer)
+                writeTimer((Timer) mv, jg);
+            else if (mv instanceof Histogram) 
+                writeHistogram((Histogram) mv, jg);
+            //
+            jg.writeEndObject();
+        }
+
+        public static void writeCounter(Counter c, JsonGenerator jg) throws IOException
+        {
+            jg.writeFieldName("count");
+            jg.writeNumber(c.getCount());
+            //
+            jg.writeFieldName("type");
+            jg.writeString("counter");
+        }
+
+        public static void writeMeter(Meter m, JsonGenerator jg) throws IOException
+        {
+            jg.writeFieldName("count");
+            jg.writeNumber(m.getCount());
+            //
+            jg.writeFieldName("mean-rate");
+            jg.writeNumber(m.getMeanRate());
+            //
+            jg.writeFieldName("one-minute-rate");
+            jg.writeNumber(m.getOneMinuteRate());
+            //
+            jg.writeFieldName("five-minute-rate");
+            jg.writeNumber(m.getFiveMinuteRate());
+            //
+            jg.writeFieldName("fifteen-minute-rate");
+            jg.writeNumber(m.getFifteenMinuteRate());
+            //
+            jg.writeFieldName("type");
+            jg.writeString("meter");
+        }
+
+        public static void writeTimer(Timer t, JsonGenerator jg) throws IOException
+        {
+            writeMetered(t, jg);
+            writeSampling(t, jg);
+            //
+            jg.writeFieldName("type");
+            jg.writeString("timer");
+        }
+        
+        public static void writeCounting(Counting m, JsonGenerator jg) throws IOException
+        {
+            jg.writeFieldName("count");
+            jg.writeNumber(m.getCount());
+        }
+        
+        public static void writeMetered(Metered m, JsonGenerator jg) throws IOException
+        {
+            writeCounting(m, jg);
+            //
+            jg.writeFieldName("mean-rate");
+            jg.writeNumber(m.getMeanRate());
+            //
+            jg.writeFieldName("one-minute-rate");
+            jg.writeNumber(m.getOneMinuteRate());
+            //
+            jg.writeFieldName("five-minute-rate");
+            jg.writeNumber(m.getFiveMinuteRate());
+            //
+            jg.writeFieldName("fifteen-minute-rate");
+            jg.writeNumber(m.getFifteenMinuteRate());
+        }
+        
+        public static void writeSampling(Sampling m, JsonGenerator jg) throws IOException
+        {
+            Snapshot s = m.getSnapshot();
+            jg.writeFieldName("snapshot");
+            jg.writeStartObject();
+            //
+            jg.writeFieldName("percentile-75");
+            jg.writeNumber(s.get75thPercentile());
+            //
+            jg.writeFieldName("percentile-95");
+            jg.writeNumber(s.get95thPercentile());
+            //
+            jg.writeFieldName("percentile-98");
+            jg.writeNumber(s.get98thPercentile());
+            //
+            jg.writeFieldName("percentile-99");
+            jg.writeNumber(s.get99thPercentile());
+            //
+            jg.writeFieldName("percentile-999");
+            jg.writeNumber(s.get999thPercentile());
+            //
+            jg.writeFieldName("size");
+            jg.writeNumber(s.size());
+            //
+            jg.writeFieldName("median");
+            jg.writeNumber(s.getMedian());
+            //
+            jg.writeFieldName("min");
+            jg.writeNumber(s.getMin());
+            //
+            jg.writeFieldName("mean");
+            jg.writeNumber(s.getMean());
+            //
+            jg.writeFieldName("max");
+            jg.writeNumber(s.getMax());
+            //
+            jg.writeFieldName("std-dev");
+            jg.writeNumber(s.getStdDev());
+            //
+            jg.writeEndObject();
+        }
+
+        public static void writeHistogram(Histogram h, JsonGenerator jg) throws IOException
+        {
+            writeCounting(h, jg);
+            writeSampling(h, jg);
+            //
+            jg.writeFieldName("type");
+            jg.writeString("histogram");
+        }
+
+        public static void writeGauge(Gauge<?> g, JsonGenerator jg) throws IOException
+        {
+            Object val = g.getValue();
+            jg.writeFieldName("value");
+            if (val instanceof String)
+            {
+                jg.writeString((String) val);
+                //
+                jg.writeFieldName("value-type");
+                jg.writeString("String");
+            }
+            else if (val instanceof Integer)
+            {
+                jg.writeNumber((int) val);
+                //
+                jg.writeFieldName("value-type");
+                jg.writeString("Integer");
+            }
+            else if (val instanceof Long)
+            {
+                jg.writeNumber((long) val);
+                //
+                jg.writeFieldName("value-type");
+                jg.writeString("Long");
+            }
+            else if (val instanceof Float)
+            {
+                jg.writeNumber((float) val);
+                //
+                jg.writeFieldName("value-type");
+                jg.writeString("Float");
+            }
+            else if (val instanceof Double)
+            {
+                jg.writeNumber((double) val);
+                //
+                jg.writeFieldName("value-type");
+                jg.writeString("Double");
+            }
+            else if (val instanceof Boolean)
+            {
+                jg.writeBoolean((boolean) val);
+                //
+                jg.writeFieldName("value-type");
+                jg.writeString("Boolean");
+            }
+            else
+            {
+                jg.writeNull();
+                //
+                jg.writeFieldName("value-type");
+                jg.writeNull();
+            }
+            //
+            jg.writeFieldName("type");
+            jg.writeString("gauge");
+        }
     }
 }
