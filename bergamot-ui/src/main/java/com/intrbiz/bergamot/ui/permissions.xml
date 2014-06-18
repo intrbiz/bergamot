@@ -1,0 +1,14 @@
+<permissions>
+	<permission name="ui.login">
+		<summary>Allow access to the Web UI</summary>
+		<description>A contact must be granted this permission in order to be able to login and access the web user interface</description>
+	</permission>
+	<permission name="ui.config.view">
+		<summary>Allow access to view check configuration</summary>
+		<description>A contact must be granted this permission in order to be able to view check configuration</description>
+	</permission>
+	<permission name="api.access">
+		<summary>Allow API access</summary>
+		<description>A contact must be granted this permission in order to be able to utilise the API</description>
+	</permission>
+</permissions>
