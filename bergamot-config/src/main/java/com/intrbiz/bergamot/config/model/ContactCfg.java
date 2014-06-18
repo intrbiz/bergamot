@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
+import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 
 @XmlType(name = "contact")
 @XmlRootElement(name = "contact")
@@ -36,6 +37,10 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializab
     private String phone;
 
     private NotificationsCfg notifications;
+    
+    private Set<String> grantedPermissions = new LinkedHashSet<String>();
+
+    private Set<String> revokedPermissions = new LinkedHashSet<String>();
 
     public ContactCfg()
     {
@@ -128,6 +133,32 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializab
     public void setNotifications(NotificationsCfg notifications)
     {
         this.notifications = notifications;
+    }
+    
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "grants")
+    @ResolveWith(MergeSet.class)
+    public Set<String> getGrantedPermissions()
+    {
+        return grantedPermissions;
+    }
+
+    public void setGrantedPermissions(Set<String> grantedPermissions)
+    {
+        this.grantedPermissions = grantedPermissions;
+    }
+
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "revokes")
+    @ResolveWith(MergeSet.class)
+    public Set<String> getRevokedPermissions()
+    {
+        return revokedPermissions;
+    }
+
+    public void setRevokedPermissions(Set<String> revokedPermissions)
+    {
+        this.revokedPermissions = revokedPermissions;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()

@@ -19,13 +19,13 @@ import com.intrbiz.data.db.compiler.meta.SQLUnique;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "contact", since = @SQLVersion({ 1, 0, 0 }))
-@SQLUnique(name = "name_unq", columns = {"site_id", "name"})
+@SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Contact extends NamedObject<ContactMO, ContactCfg> implements Principal, Serializable
 {
     private static final long serialVersionUID = 1L;
-    
+
     public static final int BCRYPT_WORK_FACTOR = 12;
-    
+
     @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<UUID> teamIds = new LinkedList<UUID>();
 
@@ -33,7 +33,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     private String passwordHash;
 
     @SQLColumn(index = 3, name = "email", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLUnique(name = "email_unq", columns = {"site_id", "email"})
+    @SQLUnique(name = "email_unq", columns = { "site_id", "email" })
     private String email;
 
     @SQLColumn(index = 4, name = "pager", since = @SQLVersion({ 1, 0, 0 }))
@@ -44,6 +44,12 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
 
     @SQLColumn(index = 6, name = "phone", since = @SQLVersion({ 1, 0, 0 }))
     private String phone;
+
+    @SQLColumn(index = 7, name = "granted_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    private List<String> grantedPermissions = new LinkedList<String>();
+
+    @SQLColumn(index = 8, name = "revoked_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    private List<String> revokedPermissions = new LinkedList<String>();
 
     public Contact()
     {
@@ -64,18 +70,23 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         this.mobile = rcfg.getMobile();
         this.pager = rcfg.getPager();
         this.phone = rcfg.getPhone();
+        // permissions
+        this.grantedPermissions.clear();
+        this.grantedPermissions.addAll(rcfg.getGrantedPermissions());
+        this.revokedPermissions.clear();
+        this.revokedPermissions.addAll(rcfg.getRevokedPermissions());
     }
 
     public List<UUID> getTeamIds()
     {
         return this.teamIds;
     }
-    
+
     public void setTeamIds(List<UUID> teamIds)
     {
         this.teamIds = teamIds;
     }
-    
+
     public List<Team> getTeams()
     {
         List<Team> r = new LinkedList<Team>();
@@ -98,12 +109,12 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     {
         this.passwordHash = passwordHash;
     }
-    
+
     public void hashPassword(String plainPassword)
     {
         this.passwordHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt(BCRYPT_WORK_FACTOR));
     }
-    
+
     public boolean verifyPassword(String plainPassword)
     {
         return BCrypt.checkpw(plainPassword, this.passwordHash);
@@ -161,7 +172,27 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     {
         // TODO
     }
-    
+
+    public List<String> getGrantedPermissions()
+    {
+        return grantedPermissions;
+    }
+
+    public void setGrantedPermissions(List<String> grantedPermissions)
+    {
+        this.grantedPermissions = grantedPermissions;
+    }
+
+    public List<String> getRevokedPermissions()
+    {
+        return revokedPermissions;
+    }
+
+    public void setRevokedPermissions(List<String> revokedPermissions)
+    {
+        this.revokedPermissions = revokedPermissions;
+    }
+
     public String toString()
     {
         return "Contact {" + this.getName() + "}";

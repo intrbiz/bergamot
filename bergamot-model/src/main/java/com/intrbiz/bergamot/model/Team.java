@@ -19,13 +19,19 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A team of people, who can be notified
  */
 @SQLTable(schema = BergamotDB.class, name = "team", since = @SQLVersion({ 1, 0, 0 }))
-@SQLUnique(name = "name_unq", columns = {"site_id", "name"})
+@SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Team extends NamedObject<TeamMO, TeamCfg>
 {
     private static final long serialVersionUID = 1L;
-    
+
     @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<UUID> teamIds = new LinkedList<UUID>();
+
+    @SQLColumn(index = 2, name = "granted_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    private List<String> grantedPermissions = new LinkedList<String>();
+
+    @SQLColumn(index = 3, name = "revoked_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    private List<String> revokedPermissions = new LinkedList<String>();
 
     public Team()
     {
@@ -40,18 +46,23 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
         this.name = rcfg.getName();
         this.summary = Util.coalesce(rcfg.getSummary(), this.name);
         this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
+        // permissions
+        this.grantedPermissions.clear();
+        this.grantedPermissions.addAll(rcfg.getGrantedPermissions());
+        this.revokedPermissions.clear();
+        this.revokedPermissions.addAll(rcfg.getRevokedPermissions());
     }
 
     public List<UUID> getTeamIds()
     {
         return this.teamIds;
     }
-    
+
     public void setTeamIds(List<UUID> teamIds)
     {
         this.teamIds = teamIds;
     }
-    
+
     public List<Team> getTeams()
     {
         List<Team> r = new LinkedList<Team>();
@@ -108,6 +119,26 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
     public void removeContact(Contact contact)
     {
         // TODO
+    }
+
+    public List<String> getGrantedPermissions()
+    {
+        return grantedPermissions;
+    }
+
+    public void setGrantedPermissions(List<String> grantedPermissions)
+    {
+        this.grantedPermissions = grantedPermissions;
+    }
+
+    public List<String> getRevokedPermissions()
+    {
+        return revokedPermissions;
+    }
+
+    public void setRevokedPermissions(List<String> revokedPermissions)
+    {
+        this.revokedPermissions = revokedPermissions;
     }
 
     @Override

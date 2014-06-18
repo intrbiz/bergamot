@@ -13,14 +13,19 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
+import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 
 @XmlType(name = "team")
 @XmlRootElement(name = "team")
 public class TeamCfg extends NamedObjectCfg<TeamCfg>
 {
     private static final long serialVersionUID = 1L;
-    
+
     private Set<String> teams = new LinkedHashSet<String>();
+
+    private Set<String> grantedPermissions = new LinkedHashSet<String>();
+
+    private Set<String> revokedPermissions = new LinkedHashSet<String>();
 
     public TeamCfg()
     {
@@ -39,20 +44,46 @@ public class TeamCfg extends NamedObjectCfg<TeamCfg>
     {
         this.teams = teams;
     }
-    
+
     public void addTeam(String group)
     {
         this.teams.add(group);
     }
-    
+
     public void removeTeam(String group)
     {
         this.teams.remove(group);
     }
-    
+
     public boolean containsTeam(String name)
     {
         return this.teams.contains(name);
+    }
+
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "grants")
+    @ResolveWith(MergeSet.class)
+    public Set<String> getGrantedPermissions()
+    {
+        return grantedPermissions;
+    }
+
+    public void setGrantedPermissions(Set<String> grantedPermissions)
+    {
+        this.grantedPermissions = grantedPermissions;
+    }
+
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "revokes")
+    @ResolveWith(MergeSet.class)
+    public Set<String> getRevokedPermissions()
+    {
+        return revokedPermissions;
+    }
+
+    public void setRevokedPermissions(Set<String> revokedPermissions)
+    {
+        this.revokedPermissions = revokedPermissions;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
