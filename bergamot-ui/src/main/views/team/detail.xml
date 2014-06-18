@@ -1,0 +1,46 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Team #{team.summary}">
+
+	<div class="row">
+		<div class="col4 dash_icon">
+		    <p>
+			    <span class="label wide">Name: </span>
+			    <span class="value">#{team.name}</span>
+		    </p>
+		    <p class="description">
+			    #{coalesce(team.description, '')}
+		    </p>
+		</div>
+	</div>
+	
+	<h2>Members</h2>
+	
+	<div class="row">
+		<div class="col4">
+			<h3>Contacts</h3>
+			<data-set var="contact" value="#{team.contacts}">
+				<p>
+					<a href="/contact/id/#{contact.id}">#{contact.summary}</a>
+				</p>
+			</data-set>
+		</div>
+		<div class="col4">
+			<h3>Teams</h3>
+			<data-set var="team" value="#{team.teams}">
+				<p>
+					<a href="/team/id/#{team.id}">#{team.summary}</a>
+				</p>
+			</data-set>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>XML</h3>
+			<pre>#{team.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+</fragment>

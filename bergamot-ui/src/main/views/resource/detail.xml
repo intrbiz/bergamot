@@ -69,11 +69,17 @@
 	
 	<div class="row">
 		<div class="col4 dash_icon">
-			<h3>Contacts</h3>
-			<data-set var="contact" value="#{resource.allContacts}">
+			<h3>Notify</h3>
+			<data-set var="contact" value="#{resource.contacts}">
 				<p>
-					<span class="label wide">#{contact.summary}</span>
-					<span class="value">&nbsp;</span>
+					<span class="label wide">Contact</span>
+					<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
+				</p>
+			</data-set>
+			<data-set var="team" value="#{resource.teams}">
+				<p>
+					<span class="label wide">Team</span>
+					<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
 				</p>
 			</data-set>
 		</div>

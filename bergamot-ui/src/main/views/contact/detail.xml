@@ -1,0 +1,63 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Contact #{contact.summary}">
+
+	<div class="row">
+		<div class="col4 dash_icon">
+		    <p>
+			    <span class="label wide">Username: </span>
+			    <span class="value">#{contact.name}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Email: </span>
+			    <span class="value">#{coalesce(contact.email, '')}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Pager: </span>
+			    <span class="value">#{coalesce(contact.pager, '')}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Mobile: </span>
+			    <span class="value">#{coalesce(contact.mobile, '')}</span>
+		    </p>
+		    <p>
+			    <span class="label wide">Phone: </span>
+			    <span class="value">#{coalesce(contact.phone, '')}</span>
+		    </p>
+		    <p class="description">
+			    #{coalesce(contact.description, '')}
+		    </p>
+		</div>
+		<div class="col4">
+			<h3>Member of</h3>
+			<data-set var="team" value="#{contact.teams}">
+				<p>
+					<a href="/team/id/#{team.id}">#{team.summary}</a>
+				</p>
+			</data-set>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col4 dash_icon">
+			<h3>Notifications</h3>
+			<p>
+				<span class="label wide">Notifications enabled</span>
+				<span class="value">#{if(contact.notifications.enabled, 'yes', 'no')}</span>
+			</p>
+			<p>
+				<span class="label wide">Notification period</span>
+				<span class="value">#{coalesce(contact.notifications.timePeriod.summary, 'Not configured')}</span>
+			</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<h3>XML</h3>
+			<pre>#{contact.configuration.toString()}</pre>
+		</div>
+	</div>
+	
+</fragment>

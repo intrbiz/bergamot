@@ -26,12 +26,14 @@ import com.intrbiz.bergamot.ui.api.TimePeriodAPIRouter;
 import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.login.LoginRouter;
 import com.intrbiz.bergamot.ui.router.ClusterRouter;
+import com.intrbiz.bergamot.ui.router.ContactRouter;
 import com.intrbiz.bergamot.ui.router.DashboardRouter;
 import com.intrbiz.bergamot.ui.router.GroupsRouter;
 import com.intrbiz.bergamot.ui.router.HostRouter;
 import com.intrbiz.bergamot.ui.router.LocationRouter;
 import com.intrbiz.bergamot.ui.router.ResourceRouter;
 import com.intrbiz.bergamot.ui.router.ServiceRouter;
+import com.intrbiz.bergamot.ui.router.TeamRouter;
 import com.intrbiz.bergamot.ui.router.TrapRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
@@ -99,6 +101,8 @@ public class BergamotApp extends BalsaApplication
         router(new TrapRouter());
         router(new ClusterRouter());
         router(new ResourceRouter());
+        router(new TeamRouter());
+        router(new ContactRouter());
         // API
         router(new APIRouter());
         router(new AlertsAPIRouter());
