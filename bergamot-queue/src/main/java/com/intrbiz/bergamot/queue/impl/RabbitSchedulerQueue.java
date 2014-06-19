@@ -6,6 +6,8 @@ import java.util.UUID;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueBrokerPool;
@@ -26,6 +28,8 @@ public class RabbitSchedulerQueue extends SchedulerQueue
     private final BergamotTranscoder transcoder = new BergamotTranscoder();
 
     private final QueueBrokerPool<Channel> broker;
+    
+    private final IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.queue");
 
     public RabbitSchedulerQueue(QueueBrokerPool<Channel> broker)
     {
@@ -40,7 +44,7 @@ public class RabbitSchedulerQueue extends SchedulerQueue
     @Override
     public RoutedProducer<SchedulerAction> publishSchedulerActions(GenericKey defaultKey)
     {
-        return new RabbitProducer<SchedulerAction>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), defaultKey)
+        return new RabbitProducer<SchedulerAction>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), defaultKey, this.source.getRegistry().timer("publish-scheduler-action"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -53,7 +57,7 @@ public class RabbitSchedulerQueue extends SchedulerQueue
     @Override
     public Consumer<SchedulerAction> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler, UUID site)
     {
-        return new RabbitConsumer<SchedulerAction>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), handler)
+        return new RabbitConsumer<SchedulerAction>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), handler, this.source.getRegistry().timer("consume-scheduler-action"))
         {
             public String setupQueue(Channel on) throws IOException
             {

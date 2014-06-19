@@ -6,6 +6,8 @@ import java.util.UUID;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.queue.NotificationQueue;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueBrokerPool;
@@ -26,6 +28,8 @@ public class RabbitNotificationQueue extends NotificationQueue
     private final BergamotTranscoder transcoder = new BergamotTranscoder();
 
     private final QueueBrokerPool<Channel> broker;
+    
+    private final IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.queue");
 
     public RabbitNotificationQueue(QueueBrokerPool<Channel> broker)
     {
@@ -40,7 +44,7 @@ public class RabbitNotificationQueue extends NotificationQueue
     @Override
     public RoutedProducer<Notification> publishNotifications(GenericKey defaultKey)
     {
-        return new RabbitProducer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), defaultKey)
+        return new RabbitProducer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), defaultKey, this.source.getRegistry().timer("publish-notifications"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -53,7 +57,7 @@ public class RabbitNotificationQueue extends NotificationQueue
     @Override
     public Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site, String engineName)
     {
-        return new RabbitConsumer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), handler)
+        return new RabbitConsumer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), handler, this.source.getRegistry().timer("consume-notifications"))
         {
             public String setupQueue(Channel on) throws IOException
             {

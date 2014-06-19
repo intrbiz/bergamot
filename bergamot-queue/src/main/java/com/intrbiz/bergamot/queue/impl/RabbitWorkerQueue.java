@@ -8,6 +8,8 @@ import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueBrokerPool;
@@ -28,6 +30,8 @@ public class RabbitWorkerQueue extends WorkerQueue
     private final BergamotTranscoder transcoder = new BergamotTranscoder();
 
     private final QueueBrokerPool<Channel> broker;
+    
+    private final IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.queue");
 
     public RabbitWorkerQueue(QueueBrokerPool<Channel> broker)
     {
@@ -42,7 +46,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public RoutedProducer<ExecuteCheck> publishChecks(GenericKey defaultKey)
     {
-        return new RabbitProducer<ExecuteCheck>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), defaultKey)
+        return new RabbitProducer<ExecuteCheck>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), defaultKey, this.source.getRegistry().timer("publish-check"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -57,7 +61,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     {
         final String workerPool = Util.isEmpty(theWorkerPool) ? null : theWorkerPool;
         if (Util.isEmpty(engine)) throw new IllegalArgumentException("The parameter: engine must be given");
-        return new RabbitConsumer<ExecuteCheck>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler)
+        return new RabbitConsumer<ExecuteCheck>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-check"))
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -102,7 +106,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ExecuteCheck> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler, UUID site)
     {
-        return new RabbitConsumer<ExecuteCheck>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler)
+        return new RabbitConsumer<ExecuteCheck>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-dead-check"))
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -118,7 +122,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public RoutedProducer<Result> publishResults(GenericKey defaultKey)
     {
-        return new RabbitProducer<Result>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), defaultKey)
+        return new RabbitProducer<Result>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), defaultKey, this.source.getRegistry().timer("publish-result"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -131,7 +135,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<Result> consumeResults(DeliveryHandler<Result> handler, UUID site)
     {
-        return new RabbitConsumer<Result>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), handler)
+        return new RabbitConsumer<Result>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), handler, this.source.getRegistry().timer("consume-result"))
         {
             public String setupQueue(Channel on) throws IOException
             {
