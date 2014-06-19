@@ -56,8 +56,8 @@ public class APIRouter extends Router<BergamotApp>
     
     //
     
-    @Get("/metrics")
-    public void metricsJson() throws IOException
+    @Get("/sources")
+    public void getIntelligenceSource() throws IOException
     {
         JsonGenerator j = response().json().getJsonWriter();
         j.writeStartObject();
@@ -83,6 +83,51 @@ public class APIRouter extends Router<BergamotApp>
             j.writeEndObject();
         }
         j.writeEndArray();
+        j.writeEndObject();
+        j.flush();
+    }
+    
+    @Get("/source/:source")
+    public void getIntelligenceSource(String name) throws IOException
+    {
+        IntelligenceSource source = Witchcraft.get().get(name);
+        if (source == null) throw new BalsaNotFound();
+        //
+        JsonGenerator j = response().json().getJsonWriter();
+        j.writeStartObject();
+        j.writeStringField("name", source.getName());
+        j.writeArrayFieldStart("metrics");
+        for (Entry<String, Metric> metric : source.getRegistry().getMetrics().entrySet())
+        {
+            j.writeStartObject();
+            // name
+            j.writeStringField("name", metric.getKey());
+            // metric
+            j.writeFieldName("metric");
+            //
+            MetricWriter.writeMetric(metric.getValue(), j);
+            //
+            j.writeEndObject();
+        }
+        j.writeEndArray();
+        j.writeEndObject();
+        j.flush();
+    }
+    
+    @Get("/metric/:source/:name")
+    public void getMetric(String sourceName, String name) throws IOException
+    {
+        IntelligenceSource source = Witchcraft.get().get(sourceName);
+        if (source == null) throw new BalsaNotFound();
+        // metric
+        Metric metric = source.getRegistry().getMetrics().get(name);
+        if (metric == null) throw new BalsaNotFound();
+        // output
+        JsonGenerator j = response().json().getJsonWriter();
+        j.writeStartObject();
+        j.writeStringField("name", name);
+        j.writeFieldName("metric");
+        MetricWriter.writeMetric(metric, j);
         j.writeEndObject();
         j.flush();
     }
