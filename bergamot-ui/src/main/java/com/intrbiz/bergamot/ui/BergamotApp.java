@@ -34,6 +34,7 @@ import com.intrbiz.bergamot.ui.router.LocationRouter;
 import com.intrbiz.bergamot.ui.router.ResourceRouter;
 import com.intrbiz.bergamot.ui.router.ServiceRouter;
 import com.intrbiz.bergamot.ui.router.TeamRouter;
+import com.intrbiz.bergamot.ui.router.TimePeriodRouter;
 import com.intrbiz.bergamot.ui.router.TrapRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
@@ -117,6 +118,7 @@ public class BergamotApp extends BalsaApplication
         router(new CommandAPIRouter());
         router(new ContactAPIRouter());
         router(new TeamAPIRouter());
+        router(new TimePeriodRouter());
     }
     
     @Override

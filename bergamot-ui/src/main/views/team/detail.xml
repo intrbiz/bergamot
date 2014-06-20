@@ -6,7 +6,7 @@
 	<div class="row">
 		<div class="col4 dash_icon">
 		    <p>
-			    <span class="label wide">Name: </span>
+			    <span class="label">Name: </span>
 			    <span class="value">#{team.name}</span>
 		    </p>
 		    <p class="description">

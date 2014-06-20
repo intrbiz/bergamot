@@ -358,6 +358,10 @@ a:hover .dash_icon {
 	text-decoration: underline;
 }
 
+.dash_icon p span.value.single {
+    width: 560px;
+}
+
 span.info {
 	background-color: #EEE;
 	border-radius: 3px;

@@ -13,17 +13,17 @@ import com.intrbiz.metadata.RequirePermissions;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
 
-@Prefix("/contact")
+@Prefix("/timeperiod")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class ContactRouter extends Router<BergamotApp>
+public class TimePeriodRouter extends Router<BergamotApp>
 {    
     @Any("/id/:id")
     @RequirePermissions("ui.config.view")
     @WithDataAdapter(BergamotDB.class)
-    public void contact(BergamotDB db, @AsUUID UUID id)
+    public void timePeriod(BergamotDB db, @AsUUID UUID id)
     {
-        model("contact", db.getTeam(id));
-        encode("contact/detail");
+        model("timeperiod", db.getTimePeriod(id));
+        encode("timeperiod/detail");
     }
 }

@@ -6,23 +6,23 @@
 	<div class="row">
 		<div class="col4 dash_icon">
 		    <p>
-			    <span class="label wide">Username: </span>
+			    <span class="label">Username: </span>
 			    <span class="value">#{contact.name}</span>
 		    </p>
 		    <p>
-			    <span class="label wide">Email: </span>
+			    <span class="label">Email: </span>
 			    <span class="value">#{coalesce(contact.email, '')}</span>
 		    </p>
 		    <p>
-			    <span class="label wide">Pager: </span>
+			    <span class="label">Pager: </span>
 			    <span class="value">#{coalesce(contact.pager, '')}</span>
 		    </p>
 		    <p>
-			    <span class="label wide">Mobile: </span>
+			    <span class="label">Mobile: </span>
 			    <span class="value">#{coalesce(contact.mobile, '')}</span>
 		    </p>
 		    <p>
-			    <span class="label wide">Phone: </span>
+			    <span class="label">Phone: </span>
 			    <span class="value">#{coalesce(contact.phone, '')}</span>
 		    </p>
 		    <p class="description">
@@ -48,7 +48,7 @@
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value">#{coalesce(contact.notifications.timePeriod.summary, 'Not configured')}</span>
+				<span class="value"><a href="/timeperiod/id/#{contact.notifications.timePeriod.id}">#{contact.notifications.timePeriod.summary}</a></span>
 			</p>
 		</div>
 	</div>

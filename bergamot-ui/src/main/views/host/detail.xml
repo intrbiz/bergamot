@@ -116,7 +116,7 @@
 				<h3>Scheduling</h3>
 				<p>
 					<span class="label wide">Check period</span>
-					<span class="value">#{host.timePeriod.summary}</span>
+					<span class="value"><a href="/timeperiod/id/#{host.timePeriod.id}">#{host.timePeriod.summary}</a></span>
 				</p>
 				<p>
 					<span class="label wide">Check interval</span>
@@ -135,7 +135,7 @@
 				</p>
 				<p>
 					<span class="label wide">Notification period</span>
-					<span class="value">#{coalesce(host.notifications.timePeriod.summary, 'Not configured')}</span>
+					<span class="value"><a href="/timeperiod/id/#{host.notifications.timePeriod.id}">#{host.notifications.timePeriod.summary}</a></span>
 				</p>
 			</div>
 		</div>

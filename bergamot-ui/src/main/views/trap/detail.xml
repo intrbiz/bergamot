@@ -91,7 +91,7 @@
 				</p>
 				<p>
 					<span class="label wide">Notification period</span>
-					<span class="value">#{coalesce(trap.notifications.timePeriod.summary, 'Not configured')}</span>
+					<span class="value"><a href="/timeperiod/id/#{trap.notifications.timePeriod.id}">#{trap.notifications.timePeriod.summary}</a></span>
 				</p>
 			</div>
 		</div>
