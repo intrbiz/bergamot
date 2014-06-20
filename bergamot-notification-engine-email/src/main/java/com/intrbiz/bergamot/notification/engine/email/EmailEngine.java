@@ -15,11 +15,15 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.log4j.Logger;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 public class EmailEngine extends AbstractNotificationEngine
 {
@@ -36,10 +40,18 @@ public class EmailEngine extends AbstractNotificationEngine
     private String password;
 
     private String fromAddress;
+    
+    private final Timer emailSendTimer;
+    
+    private final Counter emailSendErrors;
 
     public EmailEngine()
     {
         super(NAME);
+        // setup metrics
+        IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.email");
+        this.emailSendTimer = source.getRegistry().timer("email-sent");
+        this.emailSendErrors = source.getRegistry().counter("email-errors");
     }
 
     @Override
@@ -73,6 +85,7 @@ public class EmailEngine extends AbstractNotificationEngine
         if (logger.isTraceEnabled()) logger.trace(notification.toString());
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
         logger.info("Sending email notification for " + notification.getCheck() + " to " + notification.getTo());
+        Timer.Context tctx = this.emailSendTimer.time();
         try
         {
             if (! this.checkAtLeastOneRecipient(notification)) return;
@@ -110,7 +123,12 @@ public class EmailEngine extends AbstractNotificationEngine
         }
         catch (Throwable e)
         {
+            this.emailSendErrors.inc();
             logger.error("Failed to send email notification", e);
+        }
+        finally
+        {
+            tctx.stop();
         }
 
     }
