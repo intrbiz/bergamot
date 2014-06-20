@@ -10,12 +10,15 @@ import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
+import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.nagios.util.NagiosPluginParser;
 import com.intrbiz.bergamot.util.CommandTokeniser;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 /**
  * Execute Nagios Plugins (CHecks)
@@ -44,13 +47,17 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     protected File workingDirectory;
 
     protected Map<String, String> environmentVariables = new HashMap<String, String>();
+    
+    protected final Timer nagiosTimer;
 
     public NagiosExecutor()
     {
         super();
         // set the working directory
         this.workingDirectory = new File(System.getProperty("bergamot.worker.dir", System.getProperty("user.dir", ".")));
-        // setup the environment variables
+        // setup metrics
+        IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.nagios");
+        this.nagiosTimer = source.getRegistry().timer("all-nagios-plugin-executions");
     }
 
     /**
@@ -59,7 +66,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && (task instanceof ExecuteCheck) && "nagios".equals(((ExecuteCheck) task).getEngine());
+        return super.accept(task) && "nagios".equals(task.getEngine());
     }
 
     @Override
@@ -69,7 +76,8 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
         try
         {
             // apply macros to build the command line
-            String commandLine = this.buildCommandLine(executeCheck);
+            String commandLine = executeCheck.getParameter("command_line");
+            if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
             // build the process
             List<String> command = CommandTokeniser.tokeniseCommandLine(commandLine);
             logger.trace("Tokenised command line: '" + commandLine + "' => " + command);
@@ -78,27 +86,35 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             builder.environment().putAll(this.environmentVariables);
             builder.redirectErrorStream(true);
             // launch the process
-            // TODO watchdog
-            long start = System.nanoTime();
-            Process process = null;
+            Timer.Context tctx = this.nagiosTimer.time();
             try
             {
-                process  = builder.start();
-                InputStream stdOut = process.getInputStream();
-                int exitCode = process.waitFor();
-                long end = System.nanoTime();
-                // process the result
-                Result result = new Result().fromCheck(executeCheck);
-                NagiosPluginParser.parseNagiosExitCode(exitCode, result);
-                NagiosPluginParser.parseNagiosOutput(stdOut, result);
-                result.setRuntime((((double) (end - start)) / 1_000_000D));
-                logger.info("Check output: " + result.isOk() + " " + result.getStatus());
-                logger.debug("Check took: " + (((double) (end - start)) / 1_000_000D) + " ms");
-                resultSubmitter.accept(result);
+                long start = System.nanoTime();
+                // TODO watchdog the process
+                Process process = null;
+                try
+                {
+                    process  = builder.start();
+                    InputStream stdOut = process.getInputStream();
+                    int exitCode = process.waitFor();
+                    long end = System.nanoTime();
+                    // process the result
+                    Result result = new Result().fromCheck(executeCheck);
+                    NagiosPluginParser.parseNagiosExitCode(exitCode, result);
+                    NagiosPluginParser.parseNagiosOutput(stdOut, result);
+                    result.setRuntime((((double) (end - start)) / 1_000_000D));
+                    logger.info("Check output: " + result.isOk() + " " + result.getStatus());
+                    logger.debug("Check took: " + (((double) (end - start)) / 1_000_000D) + " ms");
+                    resultSubmitter.accept(result);
+                }
+                finally
+                {
+                    if (process != null) process.destroy();
+                }
             }
             finally
             {
-                if (process != null) process.destroy();
+                tctx.stop();
             }
         }
         catch (IOException | InterruptedException e)
@@ -107,22 +123,4 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             resultSubmitter.accept(new Result().fromCheck(executeCheck).error(e));
         }
     }
-    
-    /**
-     * The check parameters contain the command line to 
-     * execute and the variable required to build the command line.
-     * 
-     * As such we need to process the Nagios macros contained in 
-     * the command line.
-     * 
-     */
-    protected String buildCommandLine(ExecuteCheck executeCheck)
-    {
-        // at minimum we must have the command line and check command
-        String commandLine = executeCheck.getParameter("command_line");
-        if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
-        // the master will have computed the command line for us
-        return commandLine;
-    }
-
 }
