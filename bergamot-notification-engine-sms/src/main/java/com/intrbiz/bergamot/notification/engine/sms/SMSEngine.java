@@ -9,10 +9,14 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
+import com.intrbiz.gerald.source.IntelligenceSource;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.resource.factory.MessageFactory;
 import com.twilio.sdk.resource.instance.Message;
@@ -32,10 +36,18 @@ public class SMSEngine extends AbstractNotificationEngine
     private TwilioRestClient client;
 
     private MessageFactory messageFactory;
+    
+    private final Timer smsSendTimer;
+    
+    private final Counter smsSendErrors;
 
     public SMSEngine()
     {
         super(NAME);
+        // setup metrics
+        IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.sms");
+        this.smsSendTimer = source.getRegistry().timer("sms-sent");
+        this.smsSendErrors = source.getRegistry().counter("sms-errors");
     }
 
     @Override
@@ -53,47 +65,53 @@ public class SMSEngine extends AbstractNotificationEngine
         this.messageFactory = client.getAccount().getMessageFactory();
     }
 
-    public static void main(String[] args) throws Exception
-    {
-    }
-
     @Override
     public void sendNotification(Notification notification)
     {
         logger.info("Sending SMS notification for " + notification.getCheck() + " to " + notification.getTo());
+        Timer.Context tctx = this.smsSendTimer.time();
         try
         {
-            if (!this.checkAtLeastOneRecipient(notification)) return;
-            // build the message
-            String message = this.buildMessage(notification);
-            if (Util.isEmpty(message)) throw new RuntimeException("Failed to build message, not sending notifications");
-            // send the SMSes
-            for (ContactMO contact : notification.getTo())
+            try
             {
-                if ((!Util.isEmpty(contact.getPager())) && contact.hasEngine(this.getName()))
+                if (!this.checkAtLeastOneRecipient(notification)) return;
+                // build the message
+                String message = this.buildMessage(notification);
+                if (Util.isEmpty(message)) throw new RuntimeException("Failed to build message, not sending notifications");
+                // send the SMSes
+                for (ContactMO contact : notification.getTo())
                 {
-                    try
+                    if ((!Util.isEmpty(contact.getPager())) && contact.hasEngine(this.getName()))
                     {
-                        // send the SMS
-                        List<NameValuePair> params = new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair("To", contact.getPager()));
-                        params.add(new BasicNameValuePair("From", this.from));
-                        params.add(new BasicNameValuePair("Body", message));
-                        Message sms = this.messageFactory.create(params);
-                        logger.info("Sent SMS, Id: " + sms.getSid());
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("Failed to send SMS notification to " + contact.getPager() + " - " + contact.getName());
+                        try
+                        {
+                            // send the SMS
+                            List<NameValuePair> params = new ArrayList<NameValuePair>();
+                            params.add(new BasicNameValuePair("To", contact.getPager()));
+                            params.add(new BasicNameValuePair("From", this.from));
+                            params.add(new BasicNameValuePair("Body", message));
+                            Message sms = this.messageFactory.create(params);
+                            logger.info("Sent SMS, Id: " + sms.getSid());
+                            
+                        }
+                        catch (Exception e)
+                        {
+                            this.smsSendErrors.inc();
+                            logger.error("Failed to send SMS notification to " + contact.getPager() + " - " + contact.getName());
+                        }
                     }
                 }
             }
+            catch (Exception e)
+            {
+                this.smsSendErrors.inc();
+                logger.error("Failed to send SMS notification", e);
+            }
         }
-        catch (Exception e)
+        finally
         {
-            logger.error("Failed to send SMS notification", e);
+            tctx.stop();
         }
-
     }
 
     protected boolean checkAtLeastOneRecipient(Notification notification)
