@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Service;
@@ -51,5 +52,16 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     public CheckStateMO getServiceState(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
         return Util.nullable(db.getServiceOnHostByName(site.getId(), hostName, name), (s)->{return s.getState().toMO();});
+    }
+    
+    @Get("/id/:id/execute")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String executeService(BergamotDB db, @AsUUID UUID id)
+    { 
+        Service service = db.getService(id);
+        if (service == null) throw new BalsaNotFound("No service with id '" + id + "' exists.");
+        action("execute-check", service);
+        return "Ok";
     }
 }

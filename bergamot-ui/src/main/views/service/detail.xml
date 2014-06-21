@@ -8,7 +8,7 @@
 		<a rendered="#{!service.suppressed}" href="/service/suppress/#{service.id}">Supress</a>
 		<a rendered="#{service.enabled}"     href="/service/disable/#{service.id}">Disable</a>
 		<a rendered="#{!service.enabled}"    href="/service/enable/#{service.id}">Enable</a>
-		<a href="/service/execute/#{service.id}">Check now</a>
+		<a href="/service/execute/#{service.id}" id="check-now" data-check-id="#{service.id}">Check now</a>
 	</div>
 
 	<div class="row">
@@ -182,6 +182,14 @@
 		    bergamot_api_driver.attachTo(document, {
 				url: "ws://127.0.0.1:8081/websocket",
 		    });
+		});
+		// execute check
+		$(document).ready(function() {
+			$('#check-now').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-check-id");
+				$.getJSON('/api/service/id/' + id + '/execute', function(data) { /* all ok */ });
+			});
 		});
 	</script>
 	

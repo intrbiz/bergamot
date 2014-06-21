@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
@@ -97,5 +98,33 @@ public class HostAPIRouter extends Router<BergamotApp>
     public List<TrapMO> getHostTraps(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getHost(id), (e)->{return e.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
+    }
+    
+    @Get("/id/:id/execute")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String executeHost(BergamotDB db, @AsUUID UUID id)
+    { 
+        Host host = db.getHost(id);
+        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        action("execute-check", host);
+        return "Ok";
+    }
+    
+    @Get("/id/:id/execute-services")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String executeServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    { 
+        Host host = db.getHost(id);
+        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        int executed = 0;
+        for (Service service : host.getServices())
+        {
+            action("execute-check", service);
+            executed++;
+        }
+        action("execute-check", host);
+        return "Ok, executed " + executed + " services";
     }
 }

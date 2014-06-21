@@ -8,7 +8,7 @@
 		<a rendered="#{!host.suppressed}" href="/host/suppress/#{host.id}">Supress</a>
 		<a rendered="#{host.enabled}"     href="/host/disable/#{host.id}">Disable</a>
 		<a rendered="#{!host.enabled}"    href="/host/enable/#{host.id}">Enable</a>
-		<a href="/host/execute/#{host.id}">Check now</a>
+		<a href="/host/execute/#{host.id}" id="check-now" data-check-id="#{host.id}">Check now</a>
 	</div>
 
 	<div class="row">
@@ -71,7 +71,7 @@
 	<h2 rendered="#{! host.services.isEmpty()}">Services</h2>
 	
 	<div class="row submenu pull-right" rendered="#{! host.services.isEmpty()}">
-		<a href="/host/execute-services/#{host.id}">Check all services now</a>
+		<a href="/host/execute-services/#{host.id}" id="check-services-now" data-host-id="#{host.id}">Check all services now</a>
 	</div>
 
 	<div class="row hostgroup services" rendered="#{! host.services.isEmpty()}">
@@ -210,6 +210,22 @@
 		    bergamot_api_driver.attachTo(document, {
 				url: "ws://127.0.0.1:8081/websocket",
 		    });
+		});
+		// execute check
+		$(document).ready(function() {
+			$('#check-now').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-check-id");
+				$.getJSON('/api/host/id/' + id + '/execute', function(data) { /* all ok */ });
+			});
+		});
+		// execute services check
+		$(document).ready(function() {
+			$('#check-services-now').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-host-id");
+				$.getJSON('/api/host/id/' + id + '/execute-services', function(data) { /* all ok */ });
+			});
 		});
 	</script>
 
