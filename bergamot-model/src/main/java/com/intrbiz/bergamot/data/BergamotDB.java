@@ -489,29 +489,24 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLRemove(table = Alert.class, name = "remove_alert", since = @SQLVersion({1, 0, 0}))
     public abstract void removeAlert(@SQLParam("id") UUID id);
     
-    @Cacheable
     @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<Alert> getAllAlertsForCheck(@SQLParam("check_id") UUID checkId);
     
-    @Cacheable
     @SQLGetter(table = Alert.class, name = "get_recovered_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = TRUE")
     )
     public abstract List<Alert> getRecoveredAlertsForCheck(@SQLParam("check_id") UUID checkId);
     
-    @Cacheable
     @SQLGetter(table = Alert.class, name = "get_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE")
     )
     public abstract List<Alert> getAlertsForCheck(@SQLParam("check_id") UUID checkId);
     
-    @Cacheable
     @SQLGetter(table = Alert.class, name = "get_current_alert_for_check", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE ORDER BY raised DESC LIMIT 1")
     )
     public abstract Alert getCurrentAlertForCheck(@SQLParam("check_id") UUID checkId);
     
-    @Cacheable
     @SQLGetter(table = Alert.class, name = "get_alerts", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE site_id = p_site_id AND recovered = FALSE ORDER BY raised DESC")
     )
