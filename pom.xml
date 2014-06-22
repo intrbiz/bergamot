@@ -77,7 +77,6 @@
     <module>bergamot-notification-engine-email</module>
     <module>bergamot-notification-engine-sms</module>
     <module>bergamot-worker-nagios</module>
-    <module>bergamot-updater-websocket</module>
   </modules>
   <dependencyManagement>
   	<dependencies>
