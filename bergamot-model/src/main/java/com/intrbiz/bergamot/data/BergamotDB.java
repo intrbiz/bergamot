@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Command;
+import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Group;
@@ -66,7 +67,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
             Resource.class,
             GroupState.class,
             Alert.class,
-            Config.class
+            Config.class,
+            Comment.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -829,6 +831,20 @@ public abstract class BergamotDB extends DatabaseAdapter
             query = @SQLQuery("SELECT c.* FROM bergamot.resource c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")
     )
     public abstract List<Resource> listResourceThatAreNotOk(@SQLParam("site_id") UUID siteId);
+    
+    // comments
+    
+    @Cacheable
+    @SQLSetter(table = Comment.class, name = "set_comment", since = @SQLVersion({1, 0, 0}))
+    public abstract void setComment(Comment comment);
+    
+    @Cacheable
+    @SQLGetter(table = Comment.class, name = "get_comment", since = @SQLVersion({1, 0, 0}))
+    public abstract Comment getComment(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLRemove(table = Comment.class, name = "remove_comment", since = @SQLVersion({1, 0, 0}))
+    public abstract void removeComment(@SQLParam("id") UUID id);
     
     // generic
     
