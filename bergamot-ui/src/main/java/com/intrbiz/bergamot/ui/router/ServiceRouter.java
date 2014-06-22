@@ -25,7 +25,8 @@ public class ServiceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void service(BergamotDB db, String hostName, String serviceName, @SessionVar("site") Site site)
     {
-        model("service", db.getServiceOnHostByName(site.getId(), hostName, serviceName));
+        Service service = model("service", db.getServiceOnHostByName(site.getId(), hostName, serviceName));
+        model("alerts", db.getAllAlertsForCheck(service.getId()));
         encode("service/detail");
     }
     
@@ -34,6 +35,7 @@ public class ServiceRouter extends Router<BergamotApp>
     public void service(BergamotDB db, @AsUUID UUID id)
     {
         model("service", db.getService(id));
+        model("alerts", db.getAllAlertsForCheck(id));
         encode("service/detail");
     }
     

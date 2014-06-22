@@ -25,7 +25,8 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void trap(BergamotDB db, String hostName, String trapName, @SessionVar("site") Site site)
     {
-        model("trap", db.getTrapOnHostByName(site.getId(), hostName, trapName));
+        Trap trap = model("trap", db.getTrapOnHostByName(site.getId(), hostName, trapName));
+        model("alerts", db.getAllAlertsForCheck(trap.getId()));
         encode("trap/detail");
     }
     
@@ -34,6 +35,7 @@ public class TrapRouter extends Router<BergamotApp>
     public void trap(BergamotDB db, @AsUUID UUID id)
     {
         model("trap", db.getTrap(id));
+        model("alerts", db.getAllAlertsForCheck(id));
         encode("trap/detail");
     }
     

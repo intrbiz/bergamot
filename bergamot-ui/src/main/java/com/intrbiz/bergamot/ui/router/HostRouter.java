@@ -26,7 +26,8 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void host(BergamotDB db, String name, @SessionVar("site") Site site)
     {
-        model("host", db.getHostByName(site.getId(), name));
+        Host host = model("host", db.getHostByName(site.getId(), name));
+        model("alerts", db.getAllAlertsForCheck(host.getId()));
         encode("host/detail");
     }
     
@@ -35,6 +36,7 @@ public class HostRouter extends Router<BergamotApp>
     public void host(BergamotDB db, @AsUUID UUID id)
     {
         model("host", db.getHost(id));
+        model("alerts", db.getAllAlertsForCheck(id));
         encode("host/detail");
     }
     
