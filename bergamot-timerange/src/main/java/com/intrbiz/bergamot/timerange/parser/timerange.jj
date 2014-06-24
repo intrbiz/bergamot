@@ -207,17 +207,12 @@ public ComposedTimeRange readDayOfWeekInMonthTimeRange() :
 		hours = readHourRanges()
 	)
     {
+    	range.setMonth(month);
+    	range.setDayOfWeek(dayOfWeek);
     	range.setDayOfWeekInMonth(Integer.parseInt(dayOfWeekInMonth.image));
     	if (minus != null) range.setDayOfWeekInMonth( range.getDayOfWeekInMonth() * -1 );
-    	if (month == null)
-    	{
-    		range.setRanges(hours.getRanges());
-    	}
-    	else
-    	{
-    		range.addRange(new MonthQualifier(month, hours.getRanges().toArray(new TimeRange[0])));
-    	}
-    	return new DayOfWeekQualifier(dayOfWeek, range);
+        range.setRanges(hours.getRanges());
+    	return range;
     }
 }
 

@@ -167,17 +167,12 @@ public final class TimeRangeParserInternal implements TimeRangeParserInternalCon
       ;
     }
     hours = readHourRanges();
+        range.setMonth(month);
+        range.setDayOfWeek(dayOfWeek);
         range.setDayOfWeekInMonth(Integer.parseInt(dayOfWeekInMonth.image));
         if (minus != null) range.setDayOfWeekInMonth( range.getDayOfWeekInMonth() * -1 );
-        if (month == null)
-        {
-                range.setRanges(hours.getRanges());
-        }
-        else
-        {
-                range.addRange(new MonthQualifier(month, hours.getRanges().toArray(new TimeRange[0])));
-        }
-        {if (true) return new DayOfWeekQualifier(dayOfWeek, range);}
+        range.setRanges(hours.getRanges());
+        {if (true) return range;}
     throw new Error("Missing return statement in function");
   }
 
@@ -236,11 +231,6 @@ public final class TimeRangeParserInternal implements TimeRangeParserInternalCon
     finally { jj_save(4, xla); }
   }
 
-  private boolean jj_3_5() {
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
   private boolean jj_3R_5() {
     if (jj_scan_token(DIGITS)) return true;
     if (jj_scan_token(MINUS)) return true;
@@ -251,8 +241,8 @@ public final class TimeRangeParserInternal implements TimeRangeParserInternalCon
     return false;
   }
 
-  private boolean jj_3_4() {
-    if (jj_3R_5()) return true;
+  private boolean jj_3_5() {
+    if (jj_3R_6()) return true;
     return false;
   }
 
@@ -267,13 +257,13 @@ public final class TimeRangeParserInternal implements TimeRangeParserInternalCon
     return false;
   }
 
-  private boolean jj_3_3() {
-    if (jj_3R_4()) return true;
+  private boolean jj_3R_7() {
+    if (jj_scan_token(DAYOFWEEK)) return true;
     return false;
   }
 
-  private boolean jj_3R_7() {
-    if (jj_scan_token(DAYOFWEEK)) return true;
+  private boolean jj_3_4() {
+    if (jj_3R_5()) return true;
     return false;
   }
 
@@ -299,11 +289,6 @@ public final class TimeRangeParserInternal implements TimeRangeParserInternalCon
     return false;
   }
 
-  private boolean jj_3_2() {
-    if (jj_3R_3()) return true;
-    return false;
-  }
-
   private boolean jj_3R_3() {
     Token xsp;
     xsp = jj_scanpos;
@@ -318,13 +303,18 @@ public final class TimeRangeParserInternal implements TimeRangeParserInternalCon
     return false;
   }
 
+  private boolean jj_3_3() {
+    if (jj_3R_4()) return true;
+    return false;
+  }
+
   private boolean jj_3R_8() {
     if (jj_3R_12()) return true;
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_3R_2()) return true;
+  private boolean jj_3_2() {
+    if (jj_3R_3()) return true;
     return false;
   }
 
@@ -335,6 +325,11 @@ public final class TimeRangeParserInternal implements TimeRangeParserInternalCon
 
   private boolean jj_3R_9() {
     if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_2()) return true;
     return false;
   }
 

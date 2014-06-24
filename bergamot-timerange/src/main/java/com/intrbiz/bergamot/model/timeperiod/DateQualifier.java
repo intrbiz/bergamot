@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model.timeperiod;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 
 import com.intrbiz.bergamot.model.timeperiod.util.Month;
@@ -69,6 +71,16 @@ public class DateQualifier extends ComposedTimeRange
     public boolean isInTimeRange(Calendar calendar)
     {
         return this.year == calendar.get(Calendar.YEAR) && calendar.get(Calendar.MONTH) == this.month.getMonth() && this.day == calendar.get(Calendar.DAY_OF_MONTH) && super.isInTimeRange(calendar);
+    }
+
+    @Override
+    public LocalDateTime computeNextStartTime(Clock clock)
+    {
+        LocalDateTime next = super.computeNextStartTime(clock);
+        if (next == null) return null;
+        next = next.withYear(this.year).withMonth(this.month.getMonth() + 1).withDayOfMonth(this.day);
+        // check the date is valid
+        return (next.isAfter(LocalDateTime.now(clock))) ? next : null;
     }
 
     public String toString()

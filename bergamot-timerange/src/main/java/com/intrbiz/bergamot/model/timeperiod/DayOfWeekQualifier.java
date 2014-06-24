@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.model.timeperiod;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 
 import com.intrbiz.bergamot.model.timeperiod.util.DayOfWeek;
@@ -41,6 +44,18 @@ public class DayOfWeekQualifier extends ComposedTimeRange
     public boolean isInTimeRange(Calendar calendar)
     {
         return calendar.get(Calendar.DAY_OF_WEEK) == this.dayOfWeek.getDayOfWeek() && super.isInTimeRange(calendar);
+    }
+    
+    @Override
+    public LocalDateTime computeNextStartTime(Clock clock)
+    {
+        LocalDateTime next = super.computeNextStartTime(clock);
+        if (next == null) return null;
+        next = next.with(ChronoField.DAY_OF_WEEK, this.dayOfWeek.toJavaTime().getValue());
+        // is it next week?
+        if (! next.isAfter(LocalDateTime.now(clock))) next = next.plusDays(7);
+        // check the date is valid
+        return (next.isAfter(LocalDateTime.now(clock))) ? next : null;
     }
 
     public String toString()

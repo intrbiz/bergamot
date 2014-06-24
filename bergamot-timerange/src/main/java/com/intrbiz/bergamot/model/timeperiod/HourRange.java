@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model.timeperiod;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 
 public final class HourRange implements TimeRange
@@ -32,6 +34,11 @@ public final class HourRange implements TimeRange
     public HourRange(int startHour, int startMinute, int stopHour, int stopMinute)
     {
         this(startHour, startMinute, 0, stopHour, stopMinute, 0);
+    }
+    
+    public HourRange(int startHour, int stopHour)
+    {
+        this(startHour, 0, 0, stopHour, 0, 0);
     }
 
     public int getStartHour()
@@ -78,5 +85,13 @@ public final class HourRange implements TimeRange
                (this.startMinute < 10 ? "0" : "") + this.startMinute + "-" + 
                (this.stopHour < 10 ? "0" : "") + this.stopHour + ":" + 
                (this.stopMinute < 10 ? "0" : "") + this.stopMinute;
+    }
+    
+    public LocalDateTime computeNextStartTime(Clock clock)
+    {
+        LocalDateTime now  = LocalDateTime.now(clock);
+        LocalDateTime next = now.withNano(0).withHour(this.startHour).withMinute(this.startMinute).withSecond(this.startSecond);
+        if (! next.isAfter(now)) next = next.plusDays(1);
+        return next;
     }
 }

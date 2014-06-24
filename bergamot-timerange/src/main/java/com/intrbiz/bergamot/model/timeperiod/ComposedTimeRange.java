@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model.timeperiod;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +51,26 @@ public class ComposedTimeRange implements TimeRange
             if (range.isInTimeRange(calendar)) return true;
         }
         return false;
+    }
+    
+    public LocalDateTime computeNextStartTime(Clock clock)
+    {
+        LocalDateTime next = null;
+        for (TimeRange range : this.ranges)
+        {
+            if (next == null)
+            {
+                next = range.computeNextStartTime(clock);
+            }
+            else
+            {
+                LocalDateTime rn = range.computeNextStartTime(clock);
+                if (next.isAfter(rn)) next = rn;
+            }
+        }
+        if (next == null) return null;
+        // check the date is valid
+        return (next.isAfter(LocalDateTime.now(clock))) ? next : null;
     }
 
     public String toString()
