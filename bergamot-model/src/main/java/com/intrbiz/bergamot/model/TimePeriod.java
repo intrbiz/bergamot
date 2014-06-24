@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -126,6 +128,11 @@ public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> impleme
             if (range.isInTimeRange(calendar)) return true;
         }
         return false;
+    }
+    
+    public LocalDateTime computeNextStartTime(Clock clock)
+    {
+        return null;
     }
 
     public String toString()
