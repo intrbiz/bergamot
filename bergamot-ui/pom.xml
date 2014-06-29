@@ -68,6 +68,11 @@
 			<artifactId>balsa-hazelcast</artifactId>
 			<version>4.0.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.gerald</groupId>
+			<artifactId>gerald-the-mole</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>

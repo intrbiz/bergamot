@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.ui;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
@@ -41,6 +42,7 @@ import com.intrbiz.bergamot.updater.UpdateServer;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
 import com.intrbiz.data.cache.tiered.TieredCacheProvider;
+import com.intrbiz.gerald.Gerald;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
@@ -81,6 +83,8 @@ public class BergamotApp extends BalsaApplication
         {
             System.out.println("Database: " + db.getName() + " " + db.getVersion());
         }
+        // Setup Gerald - Service name: Bergamot.UI, send every minute
+        Gerald.theMole().from("Bergamot.UI").period(1, TimeUnit.MINUTES);
         // setup the critical Bergamot components,
         // these will probably move to external daemons
         // at some point, or at least will be managed 
@@ -124,11 +128,16 @@ public class BergamotApp extends BalsaApplication
     @Override
     protected void startApplication() throws Exception
     {
+        // Start Gerald
+        Gerald.theMole().start();
+        // currently statically only start the scheduler and result processor on one node
+        // TODO: need to fix this
         if (Boolean.getBoolean("bergamot.master"))
         {
             this.resultProcessor.start();
             this.scheduler.start();
         }
+        // start the update websocket server
         this.updateServer.start();
     }
     
