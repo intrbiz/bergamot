@@ -181,6 +181,14 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
     {
         return new UUID((objectId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L);
     }
+    
+    /**
+     * Get the processing pool for a given objectId
+     */
+    public static int getProcessingPool(UUID objectId)
+    {
+        return (int) (objectId.getLeastSignificantBits() & 0xFFL);
+    }
 
     /**
      * Set the site id into the given object id

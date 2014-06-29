@@ -216,6 +216,14 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     {
         // TODO
     }
+    
+    /**
+     * Get the processing pool for this check
+     */
+    public int getProcessingPool()
+    {
+        return Site.getProcessingPool(this.getId());
+    }
 
     protected void toMO(CheckMO mo, boolean stub)
     {

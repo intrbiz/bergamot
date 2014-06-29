@@ -165,6 +165,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         executeCheck.setSiteId(this.getSiteId());
         executeCheck.setCheckType(this.getType());
         executeCheck.setCheckId(this.getId());
+        executeCheck.setProcessingPool(this.getProcessingPool());
         executeCheck.setEngine(command.getEngine());
         executeCheck.setName(command.getName());
         // TODO: eval the parameters

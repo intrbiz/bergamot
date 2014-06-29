@@ -24,6 +24,12 @@ public class Result extends Message
     @JsonProperty("check_id")
     private UUID checkId;
 
+    @JsonProperty("site_id")
+    private UUID siteId;
+    
+    @JsonProperty("processing_pool")
+    private int processingPool;
+
     @JsonProperty("check")
     private ExecuteCheck executeCheck;
 
@@ -195,8 +201,28 @@ public class Result extends Message
         return defaultValue;
     }
     
-    // constructor helpers
+    public UUID getSiteId()
+    {
+        return siteId;
+    }
+
+    public void setSiteId(UUID siteId)
+    {
+        this.siteId = siteId;
+    }
+
+    public int getProcessingPool()
+    {
+        return processingPool;
+    }
+
+    public void setProcessingPool(int processingPool)
+    {
+        this.processingPool = processingPool;
+    }
     
+    // constructor helpers
+
     /**
      * Create a Result with the details of this check
      * 
@@ -208,6 +234,8 @@ public class Result extends Message
         this.setId(check.getId());
         this.setCheckType(check.getCheckType());
         this.setCheckId(check.getCheckId());
+        this.setSiteId(check.getSiteId());
+        this.setProcessingPool(check.getProcessingPool());
         this.setCheck(check);
         this.setExecuted(System.currentTimeMillis());
         return this;
@@ -228,6 +256,7 @@ public class Result extends Message
         return this;
     }
     
+    @JsonIgnore
     public Result timeout(String message)
     {
         this.setOk(false);

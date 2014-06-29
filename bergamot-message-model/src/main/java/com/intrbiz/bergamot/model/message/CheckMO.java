@@ -32,6 +32,9 @@ public abstract class CheckMO extends NamedObjectMO
     
     @JsonProperty("notifications")
     protected NotificationsMO notifications;
+    
+    @JsonProperty("processing_pool")
+    protected int processingPool;
 
     public CheckMO()
     {
@@ -119,5 +122,15 @@ public abstract class CheckMO extends NamedObjectMO
     public void setNotifications(NotificationsMO notifications)
     {
         this.notifications = notifications;
+    }
+
+    public int getProcessingPool()
+    {
+        return processingPool;
+    }
+
+    public void setProcessingPool(int processingPool)
+    {
+        this.processingPool = processingPool;
     }
 }

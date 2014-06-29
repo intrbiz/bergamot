@@ -33,6 +33,9 @@ public class ExecuteCheck extends Message
 
     @JsonProperty("site_id")
     private UUID siteId;
+    
+    @JsonProperty("processing_pool")
+    private int processingPool;
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
@@ -178,5 +181,15 @@ public class ExecuteCheck extends Message
     public void setScheduled(long scheduled)
     {
         this.scheduled = scheduled;
+    }
+
+    public int getProcessingPool()
+    {
+        return processingPool;
+    }
+
+    public void setProcessingPool(int processingPool)
+    {
+        this.processingPool = processingPool;
     }
 }
