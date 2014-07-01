@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.scheduler;
 
+import java.util.UUID;
+
 import com.intrbiz.bergamot.model.ActiveCheck;
 
 /**
@@ -38,6 +40,20 @@ public interface Scheduler
      * executed
      */
     void disable(ActiveCheck<?,?> check);
+    
+    /**
+     * Make this scheduler responsible for the given pool
+     * @param site the site id
+     * @param pool the per site pool id
+     */
+    void ownPool(UUID site, int pool);
+    
+    /**
+     * Make this scheduler not responsible for the given pool
+     * @param site the site id
+     * @param pool the per site pool id
+     */
+    void disownPool(UUID site, int pool);
     
     /**
      * Start the scheduler

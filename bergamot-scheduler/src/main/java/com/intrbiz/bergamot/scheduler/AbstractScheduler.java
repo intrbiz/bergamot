@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.scheduler;
 
+import java.util.UUID;
+
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
@@ -51,6 +53,18 @@ public abstract class AbstractScheduler implements Scheduler
         this.workerQueue.close();
     }
     
+    @Override
+    public void ownPool(UUID site, int pool)
+    {
+        // TODO
+    }
+
+    @Override
+    public void disownPool(UUID site, int pool)
+    {
+        // TODO
+    }
+
     protected void publishExecuteCheck(ExecuteCheck check, GenericKey routingKey, long ttl)
     {
         this.executeCheckProducer.publish(routingKey, check, ttl);
