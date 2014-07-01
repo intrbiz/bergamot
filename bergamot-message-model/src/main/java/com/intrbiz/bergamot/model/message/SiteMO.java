@@ -24,6 +24,9 @@ public class SiteMO extends MessageObject
     
     @JsonProperty("aliases")
     protected List<String> aliases = new LinkedList<String>();
+    
+    @JsonProperty("pool_count")
+    protected int poolCount;
 
     public SiteMO()
     {
@@ -78,5 +81,15 @@ public class SiteMO extends MessageObject
     public void setAliases(List<String> aliases)
     {
         this.aliases = aliases;
+    }
+
+    public int getPoolCount()
+    {
+        return poolCount;
+    }
+
+    public void setPoolCount(int poolCount)
+    {
+        this.poolCount = poolCount;
     }
 }

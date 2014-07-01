@@ -38,11 +38,14 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
     @SQLColumn(index = 5, name = "aliases", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
     protected List<String> aliases = new LinkedList<String>();
 
+    @SQLColumn(index = 3, name = "pool_count", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    protected int poolCount = 4;
+
     public Site()
     {
         super();
     }
-    
+
     public Site(UUID id, String name, String summary)
     {
         super();
@@ -101,6 +104,20 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
         this.aliases = aliases;
     }
 
+    /**
+     * Get the number of processing pools for this site
+     * @return
+     */
+    public int getPoolCount()
+    {
+        return poolCount;
+    }
+
+    public void setPoolCount(int poolCount)
+    {
+        this.poolCount = poolCount;
+    }
+
     public SiteMO toMO(boolean stub)
     {
         SiteMO mo = new SiteMO();
@@ -135,16 +152,25 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
         else if (!id.equals(other.id)) return false;
         return true;
     }
-    
+
     /**
      * Generate a random object id for an object contained by this site
+     * 
      * @return
      */
     public UUID randomObjectId()
     {
         return randomId(this.getId());
     }
-    
+
+    /**
+     * Get the processing pool for a given objectId
+     */
+    public int computeProcessingPool(UUID objectId)
+    {
+        return ((int) (objectId.getLeastSignificantBits() & 0xFFL)) % this.getPoolCount();
+    }
+
     public String toString()
     {
         return "Site { id => " + this.id + ", name => " + this.name + " }";
@@ -180,14 +206,6 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
     public static UUID getSiteId(UUID objectId)
     {
         return new UUID((objectId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L);
-    }
-    
-    /**
-     * Get the processing pool for a given objectId
-     */
-    public static int getProcessingPool(UUID objectId)
-    {
-        return (int) (objectId.getLeastSignificantBits() & 0xFFL);
     }
 
     /**

@@ -51,6 +51,9 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
      */
     @SQLColumn(index = 7, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     protected List<UUID> groupIds = new LinkedList<UUID>();
+    
+    @SQLColumn(index = 8, name = "pool", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    protected int pool = 0;
 
     public Check()
     {
@@ -218,11 +221,25 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     }
     
     /**
+     * Get the pool to which this check has been assigned
+     * @return
+     */
+    public int getPool()
+    {
+        return pool;
+    }
+
+    public void setPool(int pool)
+    {
+        this.pool = pool;
+    }
+
+    /**
      * Get the processing pool for this check
      */
-    public int getProcessingPool()
+    public int computePool()
     {
-        return Site.getProcessingPool(this.getId());
+        return this.getSite().computeProcessingPool(this.getId());
     }
 
     protected void toMO(CheckMO mo, boolean stub)
@@ -231,6 +248,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
         mo.setEnabled(this.isEnabled());
         mo.setState(this.getState().toMO());
         mo.setSuppressed(this.isSuppressed());
+        mo.setPool(this.getPool());
         if (!stub)
         {
             mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));

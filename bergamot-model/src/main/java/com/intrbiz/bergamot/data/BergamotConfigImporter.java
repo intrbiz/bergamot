@@ -516,6 +516,8 @@ public class BergamotConfigImporter
 
     private void loadCheck(Check<?,?> check, CheckCfg<?> rcfg, BergamotDB db)
     {
+        // set the processing pool
+        check.setPool(this.site.computeProcessingPool(check.getId()));
         // the state
         this.loadCheckState(check, rcfg, db);
         // notifications

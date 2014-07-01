@@ -652,6 +652,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Host> listHostsThatAreNotOk(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
+    @SQLGetter(table = Host.class, name = "list_hosts_in_pool", since = @SQLVersion({1, 0, 0}))
+    public abstract List<Host> listHostsInPool(@SQLParam("site_id") UUID siteId, @SQLParam("pool") int pool);
+    
+    @Cacheable
     @SQLRemove(table = Host.class, name = "remove_host", since = @SQLVersion({1, 0, 0}))
     public abstract void removeHost(@SQLParam("id") UUID id);
     
@@ -693,6 +697,10 @@ public abstract class BergamotDB extends DatabaseAdapter
             query = @SQLQuery("SELECT c.* FROM bergamot.service c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")
     )
     public abstract List<Service> listServicesThatAreNotOk(@SQLParam("site_id") UUID siteId);
+    
+    @Cacheable
+    @SQLGetter(table = Service.class, name = "list_services_in_pool", since = @SQLVersion({1, 0, 0}))
+    public abstract List<Service> listServicesInPool(@SQLParam("site_id") UUID siteId, @SQLParam("pool") int pool);
     
     @Cacheable
     @SQLRemove(table = Service.class, name = "remove_service", since = @SQLVersion({1, 0, 0}))
