@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.result;
 
+import java.util.UUID;
+
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 
@@ -27,4 +29,18 @@ public interface ResultProcessor
      * @param check
      */
     void processDead(ExecuteCheck check);
+    
+    /**
+     * Make this result processor responsible for the given pool
+     * @param site the site id
+     * @param pool the per site pool id
+     */
+    void ownPool(UUID site, int pool);
+    
+    /**
+     * Make this result processor not responsible for the given pool
+     * @param site the site id
+     * @param pool the per site pool id
+     */
+    void disownPool(UUID site, int pool);
 }
