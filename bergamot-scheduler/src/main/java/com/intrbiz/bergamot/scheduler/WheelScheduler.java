@@ -196,6 +196,33 @@ public class WheelScheduler extends AbstractScheduler
             logger.trace("Rescheduled job " + job.id + ", new expiry: " + job.expires);
         }
     }
+    
+    protected void removeJob(UUID id)
+    {
+        // ensure the given job is removed
+        this.jobs.remove(id);
+        for (Segment segment : this.orange)
+        {
+            segment.jobs.remove(id);
+        }
+    }
+    
+    @Override
+    protected void removeJobsInPool(UUID site, int pool)
+    {
+        // ensure the jobs are removed from the segments
+        for (Segment segment : this.orange)
+        {
+            for (Job job : segment.jobs.values())
+            {
+                if (site.equals(job.site) && pool == job.pool)
+                {
+                    segment.jobs.remove(job.id);
+                    this.jobs.remove(job.id);
+                }
+            }    
+        }
+    }
 
     protected void enableJob(UUID id)
     {
@@ -273,6 +300,12 @@ public class WheelScheduler extends AbstractScheduler
     {
         logger.info("Rescheduling " + check + " with interval " + check.getCurrentInterval());
         this.rescheduleJob(check.getId(), check.getCurrentInterval(), check.getTimePeriod());
+    }
+    
+    @Override
+    public void remove(ActiveCheck<?,?> check)
+    {
+        this.removeJob(check.getId());
     }
 
     @Override

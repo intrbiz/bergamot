@@ -30,6 +30,12 @@ public interface Scheduler
     void reschedule(ActiveCheck<?,?> check);
     
     /**
+     * Remove the given check from the scheduler
+     * @param check the check to remove
+     */
+    void remove(ActiveCheck<?,?> check);
+    
+    /**
      * Ensure that the given check is enabled, so that it will be 
      * executed
      */

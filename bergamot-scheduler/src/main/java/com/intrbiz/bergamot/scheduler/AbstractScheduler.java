@@ -56,14 +56,18 @@ public abstract class AbstractScheduler implements Scheduler
     @Override
     public void ownPool(UUID site, int pool)
     {
-        // TODO
+        // TODO bind any queues for the given pool
     }
 
     @Override
     public void disownPool(UUID site, int pool)
     {
-        // TODO
+        // TODO unbind any queues for the given pool
+        // remove the jobs in the given pool
+        this.removeJobsInPool(site, pool);
     }
+    
+    protected abstract void removeJobsInPool(UUID site, int pool);
 
     protected void publishExecuteCheck(ExecuteCheck check, GenericKey routingKey, long ttl)
     {
