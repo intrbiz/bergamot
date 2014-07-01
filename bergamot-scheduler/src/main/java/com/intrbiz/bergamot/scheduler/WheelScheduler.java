@@ -178,7 +178,7 @@ public class WheelScheduler extends AbstractScheduler
         }
         else
         {
-            logger.debug("Job " + id + " is already scheduled, not adding it again.");
+            logger.trace("Job " + id + " is already scheduled, not adding it again.");
         }
     }
 
@@ -199,6 +199,7 @@ public class WheelScheduler extends AbstractScheduler
     
     protected void removeJob(UUID id)
     {
+        logger.trace("Removing job " + id + " from scheduling");
         // ensure the given job is removed
         this.jobs.remove(id);
         for (Segment segment : this.orange)
@@ -217,6 +218,7 @@ public class WheelScheduler extends AbstractScheduler
             {
                 if (site.equals(job.site) && pool == job.pool)
                 {
+                    logger.trace("Removing job " + job.id + " from scheduling as it is part of pool " + site + "." + pool);
                     segment.jobs.remove(job.id);
                     this.jobs.remove(job.id);
                 }
