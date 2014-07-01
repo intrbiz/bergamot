@@ -38,7 +38,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
     @SQLColumn(index = 5, name = "aliases", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
     protected List<String> aliases = new LinkedList<String>();
 
-    @SQLColumn(index = 3, name = "pool_count", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "pool_count", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected int poolCount = 4;
 
     public Site()
