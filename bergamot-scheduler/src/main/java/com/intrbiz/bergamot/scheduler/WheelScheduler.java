@@ -8,11 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.Host;
-import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 
@@ -285,22 +281,6 @@ public class WheelScheduler extends AbstractScheduler
         super.start();
         // ensure that we are ready to run
         this.resumeScheduler();
-        // TODO: this needs to me managed properly
-        // read all active checks from the DB and schedule them
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            for (Site site : db.listSites())
-            {
-                for (Host host : db.listHosts(site.getId()))
-                {
-                    this.schedule(host);
-                }
-                for (Service service : db.listServices(site.getId()))
-                {
-                    this.schedule(service);
-                }
-            }
-        }
         // setup the ticker thread
         if (this.ticker == null)
         {
