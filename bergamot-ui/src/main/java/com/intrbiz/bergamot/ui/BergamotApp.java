@@ -5,11 +5,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
+import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.result.DefaultResultProcessor;
-import com.intrbiz.bergamot.result.ResultProcessor;
-import com.intrbiz.bergamot.scheduler.Scheduler;
-import com.intrbiz.bergamot.scheduler.WheelScheduler;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
 import com.intrbiz.bergamot.ui.action.SchedulerActions;
 import com.intrbiz.bergamot.ui.api.APIRouter;
@@ -51,10 +49,8 @@ import com.intrbiz.util.pool.database.DatabasePool;
  * A very basic Bergamot web interface
  */
 public class BergamotApp extends BalsaApplication
-{
-    private ResultProcessor resultProcessor;
-    
-    private Scheduler scheduler;
+{    
+    private ClusterManager clusterManager;
     
     private UpdateServer updateServer;
     
@@ -69,6 +65,8 @@ public class BergamotApp extends BalsaApplication
     protected void setup() throws Exception
     {
         // TODO - read a config file
+        // Setup Gerald - Service name: Bergamot.UI, send every minute
+        Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
         // session engine
         sessionEngine(new HazelcastSessionEngine());
         // security engine
@@ -83,14 +81,9 @@ public class BergamotApp extends BalsaApplication
         {
             System.out.println("Database: " + db.getName() + " " + db.getVersion());
         }
-        // Setup Gerald - Service name: Bergamot.UI, send every minute
-        Gerald.theMole().from("Bergamot.UI").period(1, TimeUnit.MINUTES);
-        // setup the critical Bergamot components,
-        // these will probably move to external daemons
-        // at some point, or at least will be managed 
-        // better
-        this.resultProcessor = new DefaultResultProcessor();
-        this.scheduler = new WheelScheduler();
+        // setup ClusterManager to manage our critical
+        // resources across the cluster
+        this.clusterManager = new ClusterManager();
         // websocket update server
         this.updateServer = new UpdateServer(Integer.getInteger("bergamot.websocket.port", 8081));
         // some actions
@@ -130,25 +123,23 @@ public class BergamotApp extends BalsaApplication
     {
         // Start Gerald
         Gerald.theMole().start();
-        // currently statically only start the scheduler and result processor on one node
-        // TODO: need to fix this
-        if (Boolean.getBoolean("bergamot.master"))
+        // start the cluster manager
+        this.clusterManager.start(this.getInstanceName());
+        // register sites with the cluster manager
+        try (BergamotDB db = BergamotDB.connect())
         {
-            this.resultProcessor.start();
-            this.scheduler.start();
+            for (Site site : db.listSites())
+            {
+                this.clusterManager.registerSite(site);
+            }
         }
         // start the update websocket server
         this.updateServer.start();
     }
     
-    public ResultProcessor getResultProcessor()
+    public ClusterManager getClusterManager()
     {
-        return resultProcessor;
-    }
-
-    public Scheduler getScheduler()
-    {
-        return scheduler;
+        return this.clusterManager;
     }
 
     public UpdateServer getUpdateServer()
@@ -158,6 +149,7 @@ public class BergamotApp extends BalsaApplication
 
     public static void main(String[] args) throws Exception
     {
+        // start the app
         BergamotApp bergamotApp = new BergamotApp();
         bergamotApp.start();
     }
