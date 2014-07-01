@@ -162,13 +162,13 @@ public class WheelScheduler extends AbstractScheduler
         }
     }
 
-    protected void scheduleJob(UUID id, long interval, long initialDelay, TimeRange timeRange, Runnable command)
+    protected void scheduleJob(UUID id, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
     {
         if (!this.jobs.containsKey(id))
         {
             interval = this.validateInterval(interval);
             // the job
-            Job job = new Job(id, interval, initialDelay, timeRange, command);
+            Job job = new Job(id, site, pool, interval, initialDelay, timeRange, command);
             this.jobs.put(job.id, job);
             // pick the segment based on the initial delay
             int segmentIdx = ((int) ((initialDelay / this.tickPeriod) % this.orange.length));
@@ -265,7 +265,7 @@ public class WheelScheduler extends AbstractScheduler
         // randomly distribute the initial delay
         long initialDelay = (long) (this.initialDelay.nextDouble() * ((double) check.getCurrentInterval()));
         logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval() + " and initial delay " + initialDelay);
-        this.scheduleJob(check.getId(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
+        this.scheduleJob(check.getId(), check.getSiteId(), check.getPool(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
     }
 
     @Override
@@ -343,6 +343,10 @@ public class WheelScheduler extends AbstractScheduler
         // details
 
         public final UUID id;
+        
+        public final UUID site;
+        
+        public final int pool;
 
         public final Runnable command;
 
@@ -356,10 +360,12 @@ public class WheelScheduler extends AbstractScheduler
 
         public volatile long lastExpires;
 
-        public Job(UUID id, long interval, long initialDelay, TimeRange timeRange, Runnable command)
+        public Job(UUID id, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
         {
             super();
             this.id = id;
+            this.site = site;
+            this.pool = pool;            
             this.interval = interval;
             this.timeRange = timeRange;
             this.command = command;
