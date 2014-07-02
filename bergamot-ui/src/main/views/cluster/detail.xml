@@ -4,10 +4,10 @@
 <fragment xmlns="com.intrbiz.balsa" title="Cluster #{cluster.summary}">
 
 	<div class="row submenu pull-right">
-		<a rendered="#{cluster.suppressed}"  href="/host/unsuppress/#{host.id}">Unsupress</a>
-		<a rendered="#{!cluster.suppressed}" href="/host/suppress/#{host.id}">Supress</a>
-		<a rendered="#{cluster.enabled}"     href="/host/disable/#{host.id}">Disable</a>
-		<a rendered="#{!cluster.enabled}"    href="/host/enable/#{host.id}">Enable</a>
+		<a rendered="#{cluster.suppressed}"  href="/cluster/unsuppress/#{host.id}">Unsupress</a>
+		<a rendered="#{!cluster.suppressed}" href="/cluster/suppress/#{host.id}">Supress</a>
+		<a rendered="#{cluster.enabled}"     href="/cluster/disable/#{host.id}">Disable</a>
+		<a rendered="#{!cluster.enabled}"    href="/cluster/enable/#{host.id}">Enable</a>
 	</div>
 
 	<div class="row">
