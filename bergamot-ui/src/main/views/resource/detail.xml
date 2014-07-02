@@ -76,9 +76,9 @@
 			    <div class="col4 dash_icon alert">
 					<h3>
 						<span class="dash_img #{alert.status.toString().toLowerCase()}" title="The resource is #{alert.status.toString().toLowerCase()}">
-							<img src="/service-icon.png" />
+							<img src="/resource-icon.png" />
 						</span>
-						<span class="name">#{service.summary}</span>
+						<span class="name">#{resource.summary}</span>
 				    </h3>
 				    <p>
 					    <span class="label">Status: </span>
