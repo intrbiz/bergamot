@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -55,5 +56,16 @@ public class LocationRouter extends Router<BergamotApp>
         model("hosts", orderHostsByStatus(location.getHosts()));
         model("locations", orderLocationsByStatus(location.getChildren()));
         encode("location/hosts");
+    }
+    
+    @Any("/location/id/:id/execute-all-hosts")
+    @WithDataAdapter(BergamotDB.class)
+    public void executeHostsInLocation(BergamotDB db, @AsUUID UUID id) throws IOException
+    { 
+        for (Host host : db.getHostsInLocation(id))
+        {
+            action("execute-check", host);
+        }
+        redirect("/group/id/" + id);
     }
 }

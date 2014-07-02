@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
@@ -87,5 +88,21 @@ public class LocationAPIRouter extends Router<BergamotApp>
     public List<HostMO> getLocationHosts(BergamotDB db, @AsUUID() UUID id)
     {
         return Util.nullable(db.getLocation(id), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
+    }
+    
+    @Get("/id/:id/execute-all-hosts")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String executeHostsInLocation(BergamotDB db, @AsUUID UUID id)
+    { 
+        Location location = db.getLocation(id);
+        if (location == null) throw new BalsaNotFound("No location with id '" + id + "' exists.");
+        int executed = 0;
+        for (Host host : location.getHosts())
+        {
+            action("execute-check", host);
+            executed++;
+        }
+        return "Ok, executed " + executed + " hosts";
     }
 }

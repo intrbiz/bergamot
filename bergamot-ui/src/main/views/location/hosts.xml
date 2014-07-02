@@ -8,11 +8,19 @@
 		</data-set>
 	</div>
 	
-	<div class="row">
-		<data-set var="check" value="#{hosts}">
-			<include view="include/check"/>
-		</data-set>
-	</div>
+	<container rendered="#{! isempty(hosts)}">
+	
+		<div class="row submenu pull-right">
+			<a href="/location/execute-all-hosts/#{group.id}" id="check-all-now" data-location-id="#{location.id}">Check all now</a>
+		</div>
+	
+		<div class="row">
+			<data-set var="check" value="#{hosts}">
+				<include view="include/check"/>
+			</data-set>
+		</div>
+	
+	</container>
 	
 	<script type="text/javascript">
 		require(["bergamot/lib/util/console-log", "bergamot/lib/ui/check-state", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_server_state, bergamot_api_driver)
@@ -24,6 +32,15 @@
 		    bergamot_api_driver.attachTo(document, {
 				url: "ws://" + #{'"' + Balsa().request.serverName + '"'} + "/websocket",
 		    });
+		});
+		
+		// execute all hosts
+		$(document).ready(function() {
+			$('#check-all-now').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-location-id");
+				$.getJSON('/api/location/id/' + id + '/execute-all-hosts', function(data) { /* all ok */ });
+			});
 		});
 	</script>
 	
