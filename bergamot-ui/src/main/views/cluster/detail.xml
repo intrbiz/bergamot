@@ -170,7 +170,7 @@
 		    bergamot_ui_server_state.attachTo("div.check");
 
 		    bergamot_api_driver.attachTo(document, {
-				url: "ws://127.0.0.1:8081/websocket",
+				url: "ws://" + #{'"' + Balsa().request.serverName + '"'} + "/websocket",
 		    });
 		});
 	</script>
