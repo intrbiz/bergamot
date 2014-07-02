@@ -149,8 +149,16 @@ public class BergamotApp extends BalsaApplication
 
     public static void main(String[] args) throws Exception
     {
-        // start the app
-        BergamotApp bergamotApp = new BergamotApp();
-        bergamotApp.start();
+        try
+        {
+            // start the app
+            BergamotApp bergamotApp = new BergamotApp();
+            bergamotApp.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 }
