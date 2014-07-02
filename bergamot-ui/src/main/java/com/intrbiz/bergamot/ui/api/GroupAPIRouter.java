@@ -93,7 +93,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute-all-checks")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    public String executeChecksInGroup(BergamotDB db, @AsUUID UUID id)
     { 
         Group group = db.getGroup(id);
         if (group == null) throw new BalsaNotFound("No group with id '" + id + "' exists.");
