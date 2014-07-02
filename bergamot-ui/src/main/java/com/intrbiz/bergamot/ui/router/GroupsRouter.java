@@ -8,6 +8,8 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.ActiveCheck;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -55,5 +57,19 @@ public class GroupsRouter extends Router<BergamotApp>
         model("checks", orderCheckByStatus(group.getChecks()));
         model("groups", orderGroupsByStatus(group.getChildren()));
         encode("group/group");
+    }
+    
+    @Any("/group/execute-all-checks/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void executeChecksInGroup(BergamotDB db, @AsUUID UUID id) throws IOException
+    {
+        for (Check<?,?> check : db.getChecksInGroup(id))
+        {
+            if (check instanceof ActiveCheck)
+            {
+                action("execute-check", check);
+            }
+        }
+        redirect("/group/id/" + id);
     }
 }
