@@ -3,12 +3,21 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="#{group.summary}">
 
-	<h2 rendered="#{! isempty(checks)}">Checks in #{group.summary}</h2>
-	<div class="row" rendered="#{! isempty(checks)}">
-		<data-set var="check" value="#{checks}">
-			<include view="include/check"/>
-		</data-set>
-	</div>
+	<container rendered="#{! isempty(checks)}">
+	
+		<h2>Checks in #{group.summary}</h2>
+		
+		<div class="row submenu pull-right">
+			<a href="/group/execute-all-checks/#{group.id}" id="check-all-now" data-group-id="#{group.id}">Check all now</a>
+		</div>
+		
+		<div class="row">
+			<data-set var="check" value="#{checks}">
+				<include view="include/check"/>
+			</data-set>
+		</div>
+		
+	</container>
 	
 	<h2 rendered="#{! isempty(groups)}">Groups in #{group.summary}</h2>
 	<div class="row" rendered="#{! isempty(groups)}">
@@ -27,6 +36,15 @@
 		    bergamot_api_driver.attachTo(document, {
 				url: "ws://" + #{'"' + Balsa().request.serverName + '"'} + "/websocket",
 		    });
+		});
+		
+		// execute all checks
+		$(document).ready(function() {
+			$('#check-all-now').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-group-id");
+				$.getJSON('/api/group/id/' + id + '/execute-all-checks', function(data) { /* all ok */ });
+			});
 		});
 	</script>
 	

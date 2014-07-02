@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.ActiveCheck;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CheckMO;
@@ -85,5 +88,24 @@ public class GroupAPIRouter extends Router<BergamotApp>
     public List<CheckMO> getGroupChecks(BergamotDB db, @Var("site") Site site, String name)
     {
         return Util.nullable(db.getGroupByName(site.getId(), name), (e)->{return e.getChecks().stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());});
+    }
+    
+    @Get("/id/:id/execute-all-checks")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String executeServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    { 
+        Group group = db.getGroup(id);
+        if (group == null) throw new BalsaNotFound("No group with id '" + id + "' exists.");
+        int executed = 0;
+        for (Check<?,?> check : group.getChecks())
+        {
+            if (check instanceof ActiveCheck)
+            {
+                action("execute-check", check);
+                executed++;
+            }
+        }
+        return "Ok, executed " + executed + " services";
     }
 }
