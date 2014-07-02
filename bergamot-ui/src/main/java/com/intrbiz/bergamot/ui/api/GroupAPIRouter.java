@@ -106,6 +106,6 @@ public class GroupAPIRouter extends Router<BergamotApp>
                 executed++;
             }
         }
-        return "Ok, executed " + executed + " services";
+        return "Ok, executed " + executed + " checks";
     }
 }
