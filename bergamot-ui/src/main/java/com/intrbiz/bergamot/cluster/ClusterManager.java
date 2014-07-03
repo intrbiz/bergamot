@@ -210,20 +210,10 @@ public class ClusterManager
                         {
                             try
                             {
-                                ClusterMigration migration = migrations.poll(10, TimeUnit.SECONDS);
-                                if (migration != null)
-                                {
-                                    logger.info("Executing cluster migration: " + migration);
-                                    boolean result = migration.applyMigration(ClusterManager.this);
-                                    logger.debug("Migration completed: " + result);
-                                }
+                                runMigration(migrations.poll(10, TimeUnit.SECONDS));
                             }
                             catch (InterruptedException e)
                             {
-                            }
-                            catch (Exception e)
-                            {
-                                logger.error("Error applying migration", e);
                             }
                         }
                         logger.info("Terminating cluster migrations thread");
@@ -236,6 +226,23 @@ public class ClusterManager
         catch (Exception e)
         {
             throw new DataException("Failed to start Hazelcast Cluster Manager", e);
+        }
+    }
+    
+    private void runMigration(ClusterMigration migration)
+    {
+        try
+        {
+            if (migration != null)
+            {
+                logger.info("Executing cluster migration: " + migration);
+                boolean result = migration.applyMigration(ClusterManager.this);
+                logger.debug("Migration completed: " + result);
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error("Error applying migration", e);
         }
     }
 
@@ -349,29 +356,10 @@ public class ClusterManager
      */
     private void registerPools(Collection<ProcessingPool> pools, Set<Member> memberSet)
     {
-        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> {
-            return m.getUuid();
-        }, (m) -> {
-            return m;
-        }));
+        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> { return m.getUuid(); }, (m) -> { return m; }));
         for (ProcessingPool pool : pools)
         {
-            Member runOn = members.get(pool.getOwner());
-            if (runOn != null)
-            {
-                try
-                {
-                    this.getMigrationQueue(runOn.getUuid()).put(new RegisterPoolTask(pool.getSite(), pool.getPool()));
-                }
-                catch (InterruptedException e)
-                {
-                    logger.fatal("Failed to queue cluster migration task, cluster could be inconsistent!", e);
-                }
-            }
-            else
-            {
-                logger.debug("Cannot run on member: " + pool.getOwner());
-            }
+            this.sendMigration(members.get(pool.getOwner()), new RegisterPoolTask(pool.getSite(), pool.getPool()));
         }
     }
 
@@ -380,28 +368,33 @@ public class ClusterManager
      */
     private void deregisterPools(Collection<ProcessingPool> pools, Set<Member> memberSet)
     {
-        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> {
-            return m.getUuid();
-        }, (m) -> {
-            return m;
-        }));
+        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> { return m.getUuid(); }, (m) -> { return m; }));
         for (ProcessingPool pool : pools)
         {
-            Member runOn = members.get(pool.getPreviousOwner());
-            if (runOn != null)
+            this.sendMigration(members.get(pool.getPreviousOwner()), new DeregisterPoolTask(pool.getSite(), pool.getPool()));
+        }
+    }
+    
+    private void sendMigration(Member runOn, ClusterMigration migration)
+    {
+        if (runOn != null)
+        {
+            if (runOn.localMember())
             {
-                try
-                {
-                    this.getMigrationQueue(runOn.getUuid()).put(new DeregisterPoolTask(pool.getSite(), pool.getPool()));
-                }
-                catch (InterruptedException e)
-                {
-                    logger.fatal("Failed to queue cluster migration task, cluster could be inconsistent!", e);
-                }
+                // run it directly
+                this.runMigration(migration);
             }
             else
             {
-                logger.debug("Cannot run on member: " + pool.getPreviousOwner());
+                // enqueue it to the target node
+                try
+                {
+                    this.getMigrationQueue(runOn.getUuid()).put(migration);
+                }
+                catch (Exception e)
+                {
+                    logger.fatal("Failed to queue cluster migration task, cluster could be inconsistent!", e);
+                }
             }
         }
     }
