@@ -158,7 +158,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         if (request instanceof APIPing)
         {
             APIPing ping = (APIPing) request;
-            System.out.println("Returning pong");
+            logger.trace("Returning pong");
             return new APIPong(ping);
         }
         else if (request instanceof RegisterForUpdates)

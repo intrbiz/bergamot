@@ -11,12 +11,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
 
 public class UpdateServer implements Runnable
 {
@@ -80,18 +75,5 @@ public class UpdateServer implements Runnable
             this.runner = new Thread(this);
             this.runner.start();
         }
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        // TODO
-        // logging
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.TRACE);
-        // queue manager
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool("amqp://127.0.0.1"));
-        // start updater
-        UpdateServer n = new UpdateServer(8081);
-        n.run();
     }
 }
