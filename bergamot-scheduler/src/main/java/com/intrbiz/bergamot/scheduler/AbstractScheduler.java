@@ -16,7 +16,9 @@ import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.queue.Consumer;
+import com.intrbiz.queue.QueueException;
 import com.intrbiz.queue.RoutedProducer;
 import com.intrbiz.queue.name.GenericKey;
 
@@ -41,7 +43,8 @@ public abstract class AbstractScheduler implements Scheduler
         this.workerQueue = WorkerQueue.open();
         this.executeCheckProducer = this.workerQueue.publishChecks();
         this.schedulerQueue = SchedulerQueue.open();
-        this.schedulerActionConsumer = this.schedulerQueue.consumeSchedulerActions((a) -> { executeAction(a); }, null);
+        // TODO scheduler names
+        this.schedulerActionConsumer = this.schedulerQueue.consumeSchedulerActions((a) -> { executeAction(a); });
         
     }
     
@@ -56,13 +59,21 @@ public abstract class AbstractScheduler implements Scheduler
     @Override
     public void ownPool(UUID site, int pool)
     {
-        // TODO bind any queues for the given pool
+        // bind any queues for the given pool
+        this.schedulerActionConsumer.addBinding(new SchedulerKey(site, pool));
     }
 
     @Override
     public void disownPool(UUID site, int pool)
     {
-        // TODO unbind any queues for the given pool
+        // unbind any queues for the given pool
+        try
+        {
+            this.schedulerActionConsumer.removeBinding(new SchedulerKey(site, pool));
+        }
+        catch (QueueException e)
+        {
+        }
         // remove the jobs in the given pool
         this.removeJobsInPool(site, pool);
     }

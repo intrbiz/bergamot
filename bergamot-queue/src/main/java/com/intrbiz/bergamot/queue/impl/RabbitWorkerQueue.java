@@ -65,12 +65,16 @@ public class RabbitWorkerQueue extends WorkerQueue
         {
             public String setupQueue(Channel on) throws IOException
             {
+                // the dead check queue
+                on.queueDeclare("bergamot.dead_check_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.dead_check", "fanout", true);
+                on.queueBind("bergamot.dead_check_queue", "bergamot.dead_check", "");
+                // the check queue
                 String queueName = "bergamot.check." + (site == null ? "default" : site.toString()) + "." + Util.coalesceEmpty(workerPool, "default") + "." + engine;
                 // setup the queue
                 on.queueDeclare(queueName, true, false, false, args("x-dead-letter-exchange", "bergamot.dead_check"));
                 // common exchanges
                 on.exchangeDeclare("bergamot.check", "topic", true, false, args("alternate-exchange", "bergamot.check.site.default"));
-                on.exchangeDeclare("bergamot.dead_check", "topic", true);
                 // default exchanges
                 on.exchangeDeclare("bergamot.check.site.default", "topic", true, false, args("alternate-exchange", "bergamot.check.worker_pool.default.any"));
                 on.exchangeDeclare("bergamot.check.worker_pool.default.any", "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
@@ -104,17 +108,16 @@ public class RabbitWorkerQueue extends WorkerQueue
     }
 
     @Override
-    public Consumer<ExecuteCheck> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler, UUID site)
+    public Consumer<ExecuteCheck> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler)
     {
         return new RabbitConsumer<ExecuteCheck>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-dead-check"))
         {
             public String setupQueue(Channel on) throws IOException
             {
-                String queueName = "bergamot.dead_check." + (site == null ? "default" : site.toString());
-                on.queueDeclare(queueName, true, false, false, null);
-                on.exchangeDeclare("bergamot.dead_check", "topic", true);
-                on.queueBind(queueName, "bergamot.dead_check", site == null ? "#" : site.toString() + ".*.*");
-                return queueName;
+                on.queueDeclare("bergamot.dead_check_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.dead_check", "fanout", true);
+                on.queueBind("bergamot.dead_check_queue", "bergamot.dead_check", "");
+                return "bergamot.dead_check_queue";
             }
         };
     }
@@ -126,24 +129,64 @@ public class RabbitWorkerQueue extends WorkerQueue
         {
             protected String setupExchange(Channel on) throws IOException
             {
-                on.exchangeDeclare("bergamot.result", "topic", true);
+                // the fallback queue
+                on.queueDeclare("bergamot.result.fallback_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.result.fallback", "fanout", true, false, null);
+                on.queueBind("bergamot.result.fallback_queue", "bergamot.result.fallback", "");
+                // the result exchange
+                on.exchangeDeclare("bergamot.result", "topic", true, false, args("alternate-exchange", "bergamot.result.fallback"));
                 return "bergamot.result";
             }
         };
     }
 
     @Override
-    public Consumer<Result> consumeResults(DeliveryHandler<Result> handler, UUID site)
+    public Consumer<Result> consumeResults(DeliveryHandler<Result> handler, String instance)
     {
         return new RabbitConsumer<Result>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), handler, this.source.getRegistry().timer("consume-result"))
         {
             public String setupQueue(Channel on) throws IOException
             {
-                String queueName = "bergamot.result." + (site == null ? "default" : site.toString());
-                on.queueDeclare(queueName, true, false, false, null);
-                on.exchangeDeclare("bergamot.result", "topic", true);
-                on.queueBind(queueName, "bergamot.result", site == null ? "#" : site.toString());
+                // the fallback queue
+                on.queueDeclare("bergamot.result.fallback_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.result.fallback", "fanout", true, false, null);
+                on.queueBind("bergamot.result.fallback_queue", "bergamot.result.fallback", "");
+                // Use a transient queue since
+                // processing duties could be moved at any time
+                String queueName = "bergamot.result.processor." + instance;
+                on.queueDeclare(queueName, false, true, true, null);
+                // the result exchange
+                on.exchangeDeclare("bergamot.result", "topic", true, false, args("alternate-exchange", "bergamot.result.fallback"));
                 return queueName;
+            }
+
+            @Override
+            protected void addQueueBinding(Channel on, String binding) throws IOException
+            {
+                on.queueBind(this.queue, "bergamot.result", binding);
+            }
+
+            @Override
+            protected void removeQueueBinding(Channel on, String binding) throws IOException
+            {
+                // seems odd, but unbind is non-idempotent, binding then unbinding is a poor workaround
+                on.queueBind(this.queue, "bergamot.result", binding);
+                on.queueUnbind(this.queue, "bergamot.result", binding);
+            }
+        };
+    }
+    
+    @Override
+    public Consumer<Result> consumeFallbackResults(DeliveryHandler<Result> handler)
+    {
+        return new RabbitConsumer<Result>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), handler, this.source.getRegistry().timer("consume-fallback-result"))
+        {
+            public String setupQueue(Channel on) throws IOException
+            {
+                on.queueDeclare("bergamot.result.fallback_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.result.fallback", "fanout", true, false, null);
+                on.queueBind("bergamot.result.fallback_queue", "bergamot.result.fallback", "");
+                return "bergamot.result.fallback_queue";
             }
         };
     }

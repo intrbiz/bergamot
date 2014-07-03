@@ -39,7 +39,7 @@ public abstract class WorkerQueue extends QueueAdapter
     
     public abstract Consumer<ExecuteCheck> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine);
     
-    public abstract Consumer<ExecuteCheck> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler, UUID site);
+    public abstract Consumer<ExecuteCheck> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler);
     
     // result
     
@@ -50,5 +50,14 @@ public abstract class WorkerQueue extends QueueAdapter
         return this.publishResults(null);
     }
     
-    public abstract Consumer<Result> consumeResults(DeliveryHandler<Result> handler, UUID site);
+    /**
+     * Consume results targeted to a specific processor
+     */
+    public abstract Consumer<Result> consumeResults(DeliveryHandler<Result> handler, String instance);
+    
+    /**
+     * Consume results which were not successfully routed to the intended processor
+     * @return
+     */
+    public abstract Consumer<Result> consumeFallbackResults(DeliveryHandler<Result> handler);
 }

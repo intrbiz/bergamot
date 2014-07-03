@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.queue.NotificationQueue;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.RoutedProducer;
 import com.intrbiz.queue.name.GenericKey;
@@ -25,10 +26,14 @@ import com.intrbiz.queue.name.GenericKey;
 public abstract class AbstractResultProcessor implements ResultProcessor
 {
     private Logger logger = Logger.getLogger(AbstractResultProcessor.class);
+    
+    private UUID instanceId = UUID.randomUUID();
 
     private WorkerQueue workerQueue;
 
     private List<Consumer<Result>> resultConsumers = new LinkedList<Consumer<Result>>();
+    
+    private List<Consumer<Result>> fallbackConsumers = new LinkedList<Consumer<Result>>();
 
     private List<Consumer<ExecuteCheck>> deadConsumers = new LinkedList<Consumer<ExecuteCheck>>();
 
@@ -44,7 +49,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
 
     private RoutedProducer<Update> updateProducer;
 
-    private int threads = 4;
+    private int threads = Runtime.getRuntime().availableProcessors();
 
     public AbstractResultProcessor()
     {
@@ -66,11 +71,41 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     @Override
     public void ownPool(UUID site, int pool)
     {
+        for (Consumer<Result> consumer : this.resultConsumers)
+        {
+            consumer.addBinding(new ResultKey(site, pool));
+            break;
+        }
+        for (Consumer<Result> consumer : this.fallbackConsumers)
+        {
+            consumer.addBinding(new ResultKey(site, pool));
+            break;
+        }
+        for (Consumer<ExecuteCheck> consumer : this.deadConsumers)
+        {
+            consumer.addBinding(new ResultKey(site, pool));
+            break;
+        }
     }
 
     @Override
     public void disownPool(UUID site, int pool)
     {
+        for (Consumer<Result> consumer : this.resultConsumers)
+        {
+            consumer.removeBinding(new ResultKey(site, pool));
+            break;
+        }
+        for (Consumer<Result> consumer : this.fallbackConsumers)
+        {
+            consumer.removeBinding(new ResultKey(site, pool));
+            break;
+        }
+        for (Consumer<ExecuteCheck> consumer : this.deadConsumers)
+        {
+            consumer.removeBinding(new ResultKey(site, pool));
+            break;
+        }
     }
 
     @Override
@@ -84,12 +119,18 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         {
             // consume results, currently for all sites
             this.resultConsumers.add(this.workerQueue.consumeResults((r) -> {
+                logger.trace("Processing pooled result");
                 processExecuted(r);
-            }, null));
+            }, this.instanceId.toString()));
+            // consume results, currently for all sites
+            this.fallbackConsumers.add(this.workerQueue.consumeFallbackResults((r) -> {
+                logger.trace("Processing fallback result");
+                processExecuted(r);
+            }));
             // consume dead checks, currently for all sites
             this.deadConsumers.add(this.workerQueue.consumeDeadChecks((e) -> {
                 processDead(e);
-            }, null));
+            }));
         }
         // scheduler queue
         this.schedulerQueue = SchedulerQueue.open();

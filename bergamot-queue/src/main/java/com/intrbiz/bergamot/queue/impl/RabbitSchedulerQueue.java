@@ -55,17 +55,30 @@ public class RabbitSchedulerQueue extends SchedulerQueue
     }
 
     @Override
-    public Consumer<SchedulerAction> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler, UUID site)
+    public Consumer<SchedulerAction> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler)
     {
         return new RabbitConsumer<SchedulerAction>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), handler, this.source.getRegistry().timer("consume-scheduler-action"))
         {
             public String setupQueue(Channel on) throws IOException
             {
-                String queueName = "bergamot.scheduler." + (site == null ? "default" : site.toString());
-                on.queueDeclare(queueName, true, false, false, null);
+                // as scheduling services can move at any time, we need 
+                // to use a transient queue
+                String queueName = "bergamot.scheduler." + UUID.randomUUID(); 
+                on.queueDeclare(queueName, false, true, true, null);
                 on.exchangeDeclare("bergamot.scheduler", "topic", true);
-                on.queueBind(queueName, "bergamot.scheduler", site == null ? "#" : site.toString());
                 return queueName;
+            }
+
+            @Override
+            protected void addQueueBinding(Channel on, String binding) throws IOException
+            {
+                on.queueBind(this.queue, "bergamot.scheduler", binding.toString());
+            }
+            
+            @Override
+            protected void removeQueueBinding(Channel on, String binding) throws IOException
+            {
+                on.queueUnbind(this.queue, "bergamot.scheduler", binding.toString());
             }
         };
     }

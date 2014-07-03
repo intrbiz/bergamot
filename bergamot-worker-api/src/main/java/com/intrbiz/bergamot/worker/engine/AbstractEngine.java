@@ -12,11 +12,11 @@ import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.worker.Worker;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 
 public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
 {
@@ -104,7 +104,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
             {
                 executor.execute(task, (result) -> {
                     logger.debug("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
-                    this.resultProducer.publish(new GenericKey(String.valueOf(task.getSiteId())), result);
+                    this.resultProducer.publish(new ResultKey(task.getSiteId(), task.getProcessingPool()), result);
                 });
             }
         }

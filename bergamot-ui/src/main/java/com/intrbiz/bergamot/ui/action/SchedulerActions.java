@@ -5,9 +5,9 @@ import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
+import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.metadata.Action;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 
 public class SchedulerActions
 {
@@ -26,7 +26,7 @@ public class SchedulerActions
     {
         synchronized (this)
         {
-            this.schedulerActionProducer.publish(new GenericKey(check.getSiteId().toString()), new EnableCheck(check.toStubMO()));
+            this.schedulerActionProducer.publish(new SchedulerKey(check.getSiteId(), check.getPool()), new EnableCheck(check.toStubMO()));
         }
     }
     
@@ -35,7 +35,7 @@ public class SchedulerActions
     {
         synchronized (this)
         {
-            this.schedulerActionProducer.publish(new GenericKey(check.getSiteId().toString()), new DisableCheck(check.toStubMO()));
+            this.schedulerActionProducer.publish(new SchedulerKey(check.getSiteId(), check.getPool()), new DisableCheck(check.toStubMO()));
         }
     }
 }

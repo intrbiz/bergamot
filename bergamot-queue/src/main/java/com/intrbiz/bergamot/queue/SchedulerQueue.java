@@ -1,8 +1,6 @@
 package com.intrbiz.bergamot.queue;
 
 
-import java.util.UUID;
-
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.queue.impl.RabbitSchedulerQueue;
 import com.intrbiz.queue.Consumer;
@@ -34,5 +32,5 @@ public abstract class SchedulerQueue extends QueueAdapter
         return this.publishSchedulerActions(null);
     }
     
-    public abstract Consumer<SchedulerAction> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler, UUID site);
+    public abstract Consumer<SchedulerAction> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler);
 }
