@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.ui.action.DispatchResultAction;
 import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
 import com.intrbiz.bergamot.ui.action.SchedulerActions;
 import com.intrbiz.bergamot.ui.api.APIRouter;
@@ -89,6 +90,7 @@ public class BergamotApp extends BalsaApplication
         // some actions
         action(new ExecuteCheckAction());
         action(new SchedulerActions());
+        action(new DispatchResultAction());
         // Setup the application routers
         router(new LoginRouter());
         router(new DashboardRouter());
