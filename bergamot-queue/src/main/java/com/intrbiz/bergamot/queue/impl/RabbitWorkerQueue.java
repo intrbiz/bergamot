@@ -33,9 +33,10 @@ public class RabbitWorkerQueue extends WorkerQueue
     
     private final IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.queue");
 
-    public RabbitWorkerQueue(QueueBrokerPool<Channel> broker)
+    @SuppressWarnings("unchecked")
+    public RabbitWorkerQueue(QueueBrokerPool<?> broker)
     {
-        this.broker = broker;
+        this.broker = (QueueBrokerPool<Channel>) broker;
     }
 
     public String getName()

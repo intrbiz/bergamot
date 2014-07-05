@@ -31,9 +31,10 @@ public class RabbitSchedulerQueue extends SchedulerQueue
     
     private final IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.queue");
 
-    public RabbitSchedulerQueue(QueueBrokerPool<Channel> broker)
+    @SuppressWarnings("unchecked")
+    public RabbitSchedulerQueue(QueueBrokerPool<?> broker)
     {
-        this.broker = broker;
+        this.broker = (QueueBrokerPool<Channel>) broker;
     }
 
     public String getName()
