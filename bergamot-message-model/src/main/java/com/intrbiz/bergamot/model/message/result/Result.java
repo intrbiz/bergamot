@@ -241,6 +241,36 @@ public class Result extends Message
         return this;
     }
     
+    @JsonIgnore
+    public Result ok(String output)
+    {
+        this.setOk(false);
+        this.setStatus("OK");
+        this.setOutput(output);
+        this.setRuntime(0);
+        return this;
+    }
+    
+    @JsonIgnore
+    public Result warning(String output)
+    {
+        this.setOk(false);
+        this.setStatus("WARNING");
+        this.setOutput(output);
+        this.setRuntime(0);
+        return this;
+    }
+    
+    @JsonIgnore
+    public Result critical(String output)
+    {
+        this.setOk(false);
+        this.setStatus("CRITICAL");
+        this.setOutput(output);
+        this.setRuntime(0);
+        return this;
+    }
+    
     /**
      * Update this result with the error information
      * @param t
