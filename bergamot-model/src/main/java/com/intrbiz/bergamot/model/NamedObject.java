@@ -1,12 +1,19 @@
 package com.intrbiz.bergamot.model;
 
 import java.sql.Timestamp;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.ParametersAdapter;
 import com.intrbiz.bergamot.model.message.NamedObjectMO;
+import com.intrbiz.bergamot.model.util.Parameter;
+import com.intrbiz.bergamot.model.util.Parameterised;
+import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
@@ -16,7 +23,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A generic object with an id and a name
  */
-public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObjectCfg<C>> extends BergamotObject<T>
+public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObjectCfg<C>> extends BergamotObject<T> implements Parameterised
 {
     private static final long serialVersionUID = 1L;
 
@@ -42,6 +49,12 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
 
     @SQLColumn(index = 7, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
+    
+    /**
+     * Arbitrary parameters of an object
+     */
+    @SQLColumn(index = 8, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    private List<Parameter> parameters = new LinkedList<Parameter>();
 
     public NamedObject()
     {
@@ -53,6 +66,12 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         // ids and site
         this.setId(configuration.getId());
         this.setSiteId(Site.getSiteId(this.getId()));
+        // copy the parameters
+        for (CfgParameter param : configuration.getParameters())
+        {
+            this.parameters.clear();
+            this.parameters.add(new Parameter(param.getName(), param.getValueOrText()));
+        }
         // store the config
         this.setConfiguration(configuration);
     }
@@ -151,6 +170,18 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
     {
         this.updated = updated;
     }
+    
+    @Override
+    public List<Parameter> getParameters()
+    {
+        return parameters;
+    }
+
+    @Override
+    public void setParameters(List<Parameter> parameters)
+    {
+        this.parameters = parameters;
+    }
 
     protected void toMO(NamedObjectMO mo, boolean stub)
     {
@@ -159,6 +190,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         mo.setName(this.getName());
         mo.setSummary(this.getSummary());
         if (!stub) mo.setDescription(this.getDescription());
+        mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
     }
 
     @Override

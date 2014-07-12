@@ -1,10 +1,12 @@
 package com.intrbiz.bergamot.model.message;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public abstract class NamedObjectMO extends MessageObject
+public abstract class NamedObjectMO extends MessageObject implements ParameterisedMO
 {
     @JsonProperty("id")
     protected UUID id;
@@ -20,6 +22,9 @@ public abstract class NamedObjectMO extends MessageObject
 
     @JsonProperty("description")
     protected String description;
+    
+    @JsonProperty("parameters")
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
 
     public NamedObjectMO()
     {
@@ -74,5 +79,17 @@ public abstract class NamedObjectMO extends MessageObject
     public void setDescription(String description)
     {
         this.description = description;
+    }
+    
+    @Override
+    public List<ParameterMO> getParameters()
+    {
+        return parameters;
+    }
+
+    @Override
+    public void setParameters(List<ParameterMO> parameters)
+    {
+        this.parameters = parameters;
     }
 }
