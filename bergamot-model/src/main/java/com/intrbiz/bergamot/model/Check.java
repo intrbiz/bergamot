@@ -52,6 +52,9 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     @SQLColumn(index = 7, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     protected List<UUID> groupIds = new LinkedList<UUID>();
     
+    /**
+     * The processing pool to which this check is assigned
+     */
     @SQLColumn(index = 8, name = "pool", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected int pool = 0;
 
