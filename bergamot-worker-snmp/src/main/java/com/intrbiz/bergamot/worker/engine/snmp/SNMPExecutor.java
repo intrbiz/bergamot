@@ -16,8 +16,6 @@ import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.snmp.script.BergamotScriptContext;
 import com.intrbiz.snmp.SNMPContext;
-import com.intrbiz.snmp.SNMPContextId;
-import com.intrbiz.snmp.SNMPV3Context;
 import com.intrbiz.snmp.SNMPVersion;
 import com.intrbiz.snmp.security.SNMPAuthMode;
 import com.intrbiz.snmp.security.SNMPPrivMode;
@@ -93,6 +91,8 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
             if (SNMPPrivMode.parse(executeCheck.getParameter("snmp-priv")) == null) throw new RuntimeException("The snmp-priv must be one of: 'none', 'aes128', 'des'");
             if (Util.isEmpty(executeCheck.getParameter("snmp-user"))) throw new RuntimeException("The snmp-user must be defined!");
             if (Util.isEmpty(executeCheck.getParameter("snmp-password"))) throw new RuntimeException("The snmp-password must be defined!");
+            // for now require the SNMP engine id for V3
+            if (Util.isEmpty(executeCheck.getParameter("snmp-engine-id"))) throw new RuntimeException("The snmp-engine-id must be defined!");
         }
     }
     
@@ -102,30 +102,21 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
         String host = executeCheck.getParameter("host");
         if (SNMPVersion.V1 == version)
         {
-            SNMPContext<?> ctx = this.getEngine().getTransport().getContext(SNMPContextId.byHost(host));
-            if (ctx == null) ctx = this.getEngine().getTransport().openV1Context(host, executeCheck.getParameter("snmp-community"));
-            return ctx;
+            return this.getEngine().getTransport().openV2Context(host, executeCheck.getParameter("snmp-community"));
         }
         else if (SNMPVersion.V2C == version)
         {
-            SNMPContext<?> ctx = this.getEngine().getTransport().getContext(SNMPContextId.byHost(host));
-            if (ctx == null) ctx = this.getEngine().getTransport().openV2Context(host, executeCheck.getParameter("snmp-community"));
-            return ctx;
+            return this.getEngine().getTransport().openV2Context(host, executeCheck.getParameter("snmp-community"));
         }
         else if (SNMPVersion.V3 == version)
         {
             String engineId = executeCheck.getParameter("snmp-engine-id");
             SNMPAuthMode auth = SNMPAuthMode.parse(executeCheck.getParameter("snmp-auth"));
             SNMPPrivMode priv = SNMPPrivMode.parse(executeCheck.getParameter("snmp-priv"));
-            SNMPContext<?> ctx = Util.isEmpty(engineId) ? this.getEngine().getTransport().getContext(host) : this.getEngine().getTransport().getContext(host, engineId);
-            if (ctx == null)
-            {
-                ctx = Util.isEmpty(engineId) ? this.getEngine().getTransport().openV3Context(host) : this.getEngine().getTransport().openV3Context(host, engineId);
-                String user = executeCheck.getParameter("snmp-user");
-                String pass = executeCheck.getParameter("snmp-password");
-                ((SNMPV3Context) ctx).setUser(user, auth, priv, pass, pass);
-            }
-            return ctx;
+            String user = executeCheck.getParameter("snmp-user");
+            String pass = executeCheck.getParameter("snmp-password");
+            // open the context
+            return this.getEngine().getTransport().openV3Context(host, engineId).setUser(user, auth, priv, pass, pass);
         }
         else
         {
