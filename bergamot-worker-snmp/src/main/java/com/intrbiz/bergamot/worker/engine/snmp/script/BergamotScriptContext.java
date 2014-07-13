@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.worker.engine.snmp.script;
 
 import java.util.function.Consumer;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 
@@ -70,5 +71,15 @@ public class BergamotScriptContext
     public Result createResult()
     {
         return new Result().fromCheck(this.getCheck());
+    }
+    
+    public void require(String parameterName)
+    {
+        if (Util.isEmpty(this.getCheck().getParameter(parameterName))) throw new RuntimeException("The " + parameterName + " parameter must be defined!");
+    }
+    
+    public void require(boolean check, String message)
+    {
+        if (check) throw new RuntimeException(message);
     }
 }
