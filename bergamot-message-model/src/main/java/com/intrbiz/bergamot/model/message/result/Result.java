@@ -242,9 +242,19 @@ public class Result extends Message
     }
     
     @JsonIgnore
+    public Result pending(String output)
+    {
+        this.setOk(true);
+        this.setStatus("PENDING");
+        this.setOutput(output);
+        this.setRuntime(0);
+        return this;
+    }
+    
+    @JsonIgnore
     public Result ok(String output)
     {
-        this.setOk(false);
+        this.setOk(true);
         this.setStatus("OK");
         this.setOutput(output);
         this.setRuntime(0);
