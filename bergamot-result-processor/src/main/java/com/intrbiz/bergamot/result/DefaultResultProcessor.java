@@ -236,6 +236,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             state.setHard(false);
             state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
             state.setTransitioning(true);
+            // check for immediate transition
+            state.setHard(state.getAttempt() >= check.computeCurrentAttemptThreshold(state));
+            if (state.isHard())
+            {
+                state.setTransitioning(false);
+                return state.isHard() && (state.isOk() ^ state.isLastHardOk());
+            }
         }
         else if (! (state.isHard() && state.getAttempt() >= check.computeCurrentAttemptThreshold(state)))
         {
