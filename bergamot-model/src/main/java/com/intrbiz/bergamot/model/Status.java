@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model;
 
+import org.apache.log4j.Logger;
+
 /**
  * Detailed status of a check
  */
@@ -78,5 +80,18 @@ public enum Status
     public static Status worst(Status a, Status b)
     {
         return a.compareTo(b) > 0 ? a : b;
+    }
+    
+    public static Status parse(String value)
+    {
+        try
+        {
+            return Status.valueOf(value.toUpperCase());
+        }
+        catch (Exception e)
+        {
+            Logger.getLogger(Status.class).warn("Failed to parse status: " + value, e);
+        }
+        return ERROR;
     }
 }
