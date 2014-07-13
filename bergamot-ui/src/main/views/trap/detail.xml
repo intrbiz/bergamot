@@ -18,17 +18,17 @@
 				</span>
 				<span class="name">#{trap.summary}</span>
 		    </h3>
-		    <p>
+		    <p class="field-status">
 			    <span class="label wide">Status: </span>
 			    <span class="value">#{trap.state.status.toString().substring(0,1) + trap.state.status.toString().substring(1).toLowerCase()}</span>
 		    </p>
-		    <p>
+		    <p class="field-host">
 			    <span class="label wide">Host: </span>
 			    <a href="/host/name/#{trap.host.name}">
 				    <span class="value">#{trap.host.summary}</span>
 				</a>
 		    </p>
-		    <p>
+		    <p class="field-attempt">
 			    <span class="label wide">Attempt: </span>
 			    <span class="value">
 			    	<span>#{trap.state.attempt} of #{trap.currentAttemptThreshold}</span>
@@ -44,19 +44,19 @@
 			    <span class="label wide">Enabled: </span>
 			    <span class="value">#{if(trap.enabled, 'yes', 'no')}</span>
 		    </p>		    
-		    <p>
+		    <p class="field-last-checked">
 			    <span class="label wide">Last checked: </span>
 			    <span class="value">#{dateformat('HH:mm:ss', trap.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime)}</span>
 		    </p>
-		    <p>
+		    <p class="field-last-state-change">
 			    <span class="label wide">Last state change: </span>
 			    <span class="value">#{dateformat('HH:mm:ss', trap.state.lastStateChange)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastStateChange)}</span>
 		    </p>
-		    <p>
+		    <p class="field-last-status">
 			    <span class="label wide">Last status: </span>
 			    <span class="value">#{trap.state.lastHardStatus.toString().substring(0,1) + trap.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
 		    </p>
-		    <p class="output">
+		    <p class="output field-output">
 			    <span class="label wide">Output: </span>
 			    <span class="value">#{coalesce(trap.state.output, '')}</span>
 		    </p>

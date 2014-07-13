@@ -18,7 +18,7 @@
 				</span>
 				<span class="name">#{cluster.summary}</span>
 		    </h3>
-		    <p>
+		    <p class="field-status">
 			    <span class="label wide">Status: </span>
 			    <span class="value">#{cluster.state.status.toString().substring(0,1) + cluster.state.status.toString().substring(1).toLowerCase()}</span>
 		    </p>
@@ -30,15 +30,15 @@
 			    <span class="label wide">Enabled: </span>
 			    <span class="value">#{if(cluster.enabled, 'yes', 'no')}</span>
 		    </p>
-	    	<p>
+	    	<p class="field-last-checked">
 		    	<span class="label wide">Last checked: </span>
 		   		<span class="value">#{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}</span>
 	    	</p>
-	    	<p>
+	    	<p class="field-last-state-change">
 			    <span class="label wide">Last state change: </span>
 			    <span class="value">#{dateformat('HH:mm:ss', cluster.state.lastStateChange)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastStateChange)}</span>
 		    </p>
-		    <p>
+		    <p class="field-last-status">
 			    <span class="label wide">Last status: </span>
 			    <span class="value">#{cluster.state.lastHardStatus.toString().substring(0,1) + cluster.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
 		    </p>

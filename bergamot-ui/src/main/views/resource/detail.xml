@@ -18,11 +18,11 @@
 				</span>
 				<span class="name">#{resource.summary}</span>
 		    </h3>
-		    <p>
+		    <p class="field-status">
 			    <span class="label wide">Status: </span>
 			    <span class="value">#{resource.state.status.toString().substring(0,1) + resource.state.status.toString().substring(1).toLowerCase()}</span>
 		    </p>
-		    <p>
+		    <p class="field-cluster">
 			    <span class="label wide">Cluster: </span>
 			    <a href="/cluster/name/#{resource.cluster.name}">
 				    <span class="value">#{resource.cluster.summary}</span>
@@ -36,19 +36,19 @@
 			    <span class="label wide">Enabled: </span>
 			    <span class="value">#{if(resource.enabled, 'yes', 'no')}</span>
 		    </p>		    
-		    <p>
+		    <p class="field-last-checked">
 			    <span class="label wide">Last checked: </span>
 			    <span class="value">#{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}</span>
 		    </p>
-		    <p>
+		    <p class="field-last-state-change">
 			    <span class="label wide">Last state change: </span>
 			    <span class="value">#{dateformat('HH:mm:ss', resource.state.lastStateChange)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastStateChange)}</span>
 		    </p>
-		    <p>
+		    <p class="field-last-status">
 			    <span class="label wide">Last status: </span>
 			    <span class="value">#{resource.state.lastHardStatus.toString().substring(0,1) + resource.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
 		    </p>
-		    <p class="output">
+		    <p class="output field-output">
 			    <span class="label wide">Output: </span>
 			    <span class="value">#{coalesce(resource.state.output, '')}</span>
 		    </p>
