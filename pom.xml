@@ -77,6 +77,7 @@
     <module>bergamot-notification-engine-email</module>
     <module>bergamot-notification-engine-sms</module>
     <module>bergamot-worker-nagios</module>
+    <module>bergamot-worker-snmp</module>
   </modules>
   <dependencyManagement>
   	<dependencies>
