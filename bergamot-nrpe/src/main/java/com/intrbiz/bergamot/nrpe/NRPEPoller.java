@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -93,7 +93,7 @@ public class NRPEPoller
      * @param errorHandler
      *            the error handler to invoke should an error occur
      */
-    public <T> void submit(String host, int port, int connectTimeout, int requestTimeout, NRPEPacket request, T userContext, BiConsumer<NRPEPacket, T> responseHandler, final BiConsumer<Throwable, T> errorHandler)
+    public void submit(String host, int port, int connectTimeout, int requestTimeout, NRPEPacket request, Consumer<NRPEPacket> responseHandler, Consumer<Throwable> errorHandler)
     {
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
@@ -110,7 +110,7 @@ public class NRPEPoller
                         new SslHandler(createSSLEngine()), 
                         new NRPEDecoder(), 
                         new NRPEEncoder(),
-                        new NRPEHandler<T>(request, responseHandler, errorHandler, userContext)
+                        new NRPEHandler(request, responseHandler, errorHandler)
                 );
             }
         });
@@ -122,52 +122,52 @@ public class NRPEPoller
             {
                 if (future.isDone() && (!future.isSuccess()))
                 {
-                    errorHandler.accept(future.cause(), userContext);
+                    errorHandler.accept(future.cause());
                 }
             }
         });
     }
 
-    public <T> void hello(String host, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler) throws IOException
+    public <T> void hello(String host, T userContext, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler) throws IOException
     {
-        this.hello(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, userContext, responseHandler, errorHandler);
+        this.hello(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, responseHandler, errorHandler);
     }
 
-    public <T> void hello(String host, int port, int connectTimeout, int requestTimeout, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler) throws IOException
+    public <T> void hello(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler) throws IOException
     {
-        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().hello(), userContext, (p, c) -> {
-            responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()), c);
+        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().hello(), (p) -> {
+            responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));
         }, errorHandler);
     }
 
-    public <T> void command(String host, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler, String command) throws IOException
+    public <T> void command(String host, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command) throws IOException
     {
-        this.command(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, userContext, responseHandler, errorHandler, command);
+        this.command(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, responseHandler, errorHandler, command);
     }
 
-    public <T> void command(String host, int port, int connectTimeout, int requestTimeout, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler, String command) throws IOException
+    public <T> void command(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command) throws IOException
     {
-        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command), userContext, (p, c) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()), c);}, errorHandler);
+        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command), (p) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));}, errorHandler);
     }
 
-    public <T> void command(String host, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler, String command, List<String> args) throws IOException
+    public <T> void command(String host, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, List<String> args) throws IOException
     {
-        this.command(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, userContext, responseHandler, errorHandler, command, args);
+        this.command(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, responseHandler, errorHandler, command, args);
     }
 
-    public <T> void command(String host, int port, int connectTimeout, int requestTimeout, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler, String command, List<String> args) throws IOException
+    public <T> void command(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, List<String> args) throws IOException
     {
-        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), userContext, (p, c) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()), c);}, errorHandler);
+        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), (p) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));}, errorHandler);
     }
 
-    public <T> void command(String host, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler, String command, String... args) throws IOException
+    public <T> void command(String host, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, String... args) throws IOException
     {
-        this.command(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, userContext, responseHandler, errorHandler, command, args);
+        this.command(host, 5666, this.defaultConnectTimeoutSeconds, this.defaultRequestTimeoutSeconds, responseHandler, errorHandler, command, args);
     }
 
-    public <T> void command(String host, int port, int connectTimeout, int requestTimeout, T userContext, BiConsumer<NRPEResponse, T> responseHandler, BiConsumer<Throwable, T> errorHandler, String command, String... args) throws IOException
+    public <T> void command(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, String... args) throws IOException
     {
-        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), userContext, (p, c) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()), c);}, errorHandler);
+        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), (p) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));}, errorHandler);
     }
 
     public void shutdown()

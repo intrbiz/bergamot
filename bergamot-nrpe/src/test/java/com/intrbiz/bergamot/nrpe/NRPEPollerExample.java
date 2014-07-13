@@ -8,10 +8,10 @@ public class NRPEPollerExample
     {
         NRPEPoller poller = new NRPEPoller();
         // execute some commands
-        poller.command("127.0.0.1", 5666, 5, 10, null, (r, c) -> {System.out.println("Got " + r);}, (e, c) -> {System.out.println("Error: " + e);}, "check_mem");
-        poller.command("172.30.13.30", 5666, 5, 10, null, (r, c) -> {System.out.println("Got " + r);}, (e, c) -> {System.out.println("Error: " + e);}, "check_disk_root");
-        poller.command("172.30.13.30", 5666, 5, 10, null, (r, c) -> {System.out.println("Got " + r);}, (e, c) -> {System.out.println("Error: " + e);}, "check_mem");
-        poller.command("127.0.0.1", 5666, 5, 10, null, (r, c) -> {System.out.println("Got " + r);}, (e, c) -> {System.out.println("Error: " + e);}, "blah_blah");
+        poller.command("127.0.0.1", 5666, 5, 10, (r) -> {System.out.println("Got " + r);}, (e) -> {System.out.println("Error: " + e);}, "check_mem");
+        poller.command("172.30.13.30", 5666, 5, 10, (r) -> {System.out.println("Got " + r);}, (e) -> {System.out.println("Error: " + e);}, "check_disk_root");
+        poller.command("172.30.13.30", 5666, 5, 10, (r) -> {System.out.println("Got " + r);}, (e) -> {System.out.println("Error: " + e);}, "check_mem");
+        poller.command("127.0.0.1", 5666, 5, 10, (r) -> {System.out.println("Got " + r);}, (e) -> {System.out.println("Error: " + e);}, "blah_blah");
         // poller.command("127.0.0.1",    5666, 5, 60, null, (r, c) -> {System.out.println("Got " + r);}, (e, c) -> {System.out.println("Error: " + e);}, "check_disk_root");
         // randomly connect to loads of hosts
         /*

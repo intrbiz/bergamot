@@ -60,8 +60,8 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             // submit the command to the poller
             // TODO timeouts
             this.getEngine().getPoller().command(
-                host, 5666, 5,  60,  null, 
-                (response, context) -> {
+                host, 5666, 5,  60, 
+                (response) -> {
                     Result result = new Result().fromCheck(executeCheck);
                     NagiosPluginParser.parseNagiosExitCode(response.getResponseCode(), result);
                     NagiosPluginParser.parseNagiosOutput(response.getOutput(), result);
@@ -69,7 +69,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                     tctx.stop();
                     resultSubmitter.accept(result);
                 }, 
-                (exception, context) -> {
+                (exception) -> {
                     tctx.stop();
                     failedRequests.inc();
                     resultSubmitter.accept(new Result().fromCheck(executeCheck).error(exception));

@@ -3,13 +3,13 @@ package com.intrbiz.bergamot.nrpe.netty;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.nrpe.model.NRPEPacket;
 
-public class NRPEHandler<T> extends ChannelInboundHandlerAdapter
+public class NRPEHandler extends ChannelInboundHandlerAdapter
 {
     private Logger logger = Logger.getLogger(NRPEHandler.class);
     
@@ -19,19 +19,16 @@ public class NRPEHandler<T> extends ChannelInboundHandlerAdapter
     
     private NRPEPacket request;
     
-    private BiConsumer<NRPEPacket, T> responseHandler;
+    private Consumer<NRPEPacket> responseHandler;
     
-    private BiConsumer<Throwable, T> errorHandler;
+    private Consumer<Throwable> errorHandler;
     
-    private T userContext;
-    
-    public NRPEHandler(NRPEPacket request, BiConsumer<NRPEPacket, T> responseHandler, BiConsumer<Throwable, T> errorHandler, T userContext)
+    public NRPEHandler(NRPEPacket request, Consumer<NRPEPacket> responseHandler, Consumer<Throwable> errorHandler)
     {
         super();
         this.request = request;
         this.responseHandler = responseHandler;
         this.errorHandler = errorHandler;
-        this.userContext = userContext;
     }
     
     @Override
@@ -42,7 +39,7 @@ public class NRPEHandler<T> extends ChannelInboundHandlerAdapter
         p.setRuntime(this.end - this.start);
         logger.debug("Got NRPE response in: status: " + p.getResponseCode() + ", message: " + p.getMessage() + ", runtime: " + p.getRuntime() + "ms");
         // invoke the callback
-        this.responseHandler.accept(p, this.userContext);
+        this.responseHandler.accept(p);
         // close
         if (ctx.channel().isActive()) ctx.close();
     }
@@ -60,6 +57,6 @@ public class NRPEHandler<T> extends ChannelInboundHandlerAdapter
     {
         logger.debug("Error processing NRPE request: " + cause);
         // invoke the callback
-        this.errorHandler.accept(cause, this.userContext);
+        this.errorHandler.accept(cause);
     }    
 }
