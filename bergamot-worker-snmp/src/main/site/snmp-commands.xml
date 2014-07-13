@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <!--
+        The definition of an SNMP check command, using 
+        the Bergamot SNMP check engine.
+        
+        SNMP V1, V2 and V3 agents are supported.
+        
+        The command defines a small Javascript script 
+        which will be executed.  This script should 
+        perform any require SNMP queries and then publish 
+        a result.
+    -->
+    <command engine="snmp" name="snmp_check" template="yes">
+	<summary>Generic SNMP Check</summary>
+	<description>A generic SNMP check</description>
+	<parameter description="The SNMP agent hostname"                  name="host">#{host.address}</parameter>
+	<parameter description="The SNMP version: 1, 2, 3"                name="snmp-version">#{coalesce(host.getParameter('snmp-version'), host.location.getParameter('snmp-version'), '2')}</parameter>
+	<parameter description="The SNMP community string"                name="snmp-community">#{coalesce(host.getParameter('snmp-community'), host.location.getParameter('snmp-community'), 'public')}</parameter>
+	<parameter description="The SNMP V3 auth mode: none, sha1, md5"   name="snmp-auth">#{coalesce(host.getParameter('snmp-auth'), host.location.getParameter('snmp-auth'), 'sha1')}</parameter>
+	<parameter description="The SNMP V3 auth mode: none, aes128, des" name="snmp-priv">#{coalesce(host.getParameter('snmp-priv'), host.location.getParameter('snmp-priv'), 'aes128')}</parameter>
+	<parameter description="The SNMP V3 username"                     name="snmp-user">#{coalesce(host.getParameter('snmp-user'), host.location.getParameter('snmp-user'))}</parameter>
+	<parameter description="The SNMP V3 password"                     name="snmp-password">#{coalesce(host.getParameter('snmp-password'), host.location.getParameter('snmp-password'))}</parameter>
+	<parameter description="The SNMP V3 engine id"                    name="snmp-engine-id">#{coalesce(host.getParameter('snmp-engine-id'), host.location.getParameter('snmp-engine-id'))}</parameter>
+	<parameter description="The check script"                         name="script"></parameter>
+    </command>
+    
+    <!--
+	A template of a simple get OID check, returning ok on response and 
+	error otherwise.
+    -->
+    <command engine="snmp" name="snmp_get_check" extends="snmp_check" template="yes">
+	<summary>Generic SNMP Get Check</summary>
+	<description>A generic SNMP check which gets the value of an OID.  Raising an alert should the agent not be contactable.</description>
+	<parameter description="The OID to get" name="oid"></parameter>
+	<parameter name="script">
+	    <![CDATA[
+	    /* Validate that we have the OID */
+	    bergamot.require('oid');
+	    /* Get the system oid */
+	    agent.getValue(bergamot.check.getParameter('oid'), function(varbind) { 
+	        bergamot.ok(varbind.valueToString()); 
+	    });
+	    ]]>
+	</parameter>
+    </command>
+    
+    <command engine="snmp" name="check_snmp_description" extends="snmp_get_check">
+	<summary>Check SNMP Description</summary>
+	<description>Query the device system description over SNMP</description>
+	<parameter name="oid">1.3.6.1.2.1.1.1.0</parameter>
+    </command>
+    
+    <command engine="snmp" name="check_snmp_contact" extends="snmp_get_check">
+	<summary>Check SNMP Contact</summary>
+	<description>Query the device system contact over SNMP</description>
+	<parameter name="oid">1.3.6.1.2.1.1.4.0</parameter>
+    </command>
+    
+    <command engine="snmp" name="check_snmp_name" extends="snmp_get_check">
+	<summary>Check SNMP Name</summary>
+	<description>Query the device system name over SNMP</description>
+	<parameter name="oid">1.3.6.1.2.1.1.5.0</parameter>
+    </command>
+    
+    <command engine="snmp" name="check_snmp_location" extends="snmp_get_check">
+	<summary>Check SNMP Location</summary>
+	<description>Query the device system location over SNMP</description>
+	<parameter name="oid">1.3.6.1.2.1.1.6.0</parameter>
+    </command>
+    
+    <command engine="snmp" name="check_snmp_uptime" extends="snmp_check">
+	<summary>Check SNMP Uptime</summary>
+	<description>Query the device uptime over SNMP and raise an alert if the device uptime is less than the given thresholds.</description>
+	<parameter description="Warning if uptime is less than" name="warning">30</parameter>
+	<parameter description="Critical if uptime is less than" name="critical">15</parameter>
+	<parameter name="script">
+	    <![CDATA[
+	    /* Validate parameters */
+	    bergamot.require('warning');
+	    bergamot.require('critical');
+	    /* Get the system uptime */
+	    agent.getValue('1.3.6.1.2.1.1.3.0', function(varbind) { 
+	        if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('critical') * 60 *1000))
+		{
+		    bergamot.critical('Up ' + varbind.getTimeTicksValue().getTicksMillis() + 'ms');
+		}
+		else if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('warning') * 60 *1000))
+		{
+		    bergamot.warning('Up ' + varbind.getTimeTicksValue().getTicksMillis() + 'ms');
+		}
+		else
+		{
+		    bergamot.ok('Up ' + varbind.getTimeTicksValue().getTicksMillis() + 'ms');
+		}
+	    });
+	    ]]>
+	</parameter>
+    </command>
+    
+</bergamot>
