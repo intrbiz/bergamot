@@ -271,6 +271,16 @@ public class Result extends Message
         return this;
     }
     
+    @JsonIgnore
+    public Result unknown(String output)
+    {
+        this.setOk(false);
+        this.setStatus("UNKNOWN");
+        this.setOutput(output);
+        this.setRuntime(0);
+        return this;
+    }
+    
     /**
      * Update this result with the error information
      * @param t
@@ -282,6 +292,16 @@ public class Result extends Message
         this.setOk(false);
         this.setStatus("ERROR");
         this.setOutput(t.getMessage());
+        this.setRuntime(0);
+        return this;
+    }
+    
+    @JsonIgnore
+    public Result error(String message)
+    {
+        this.setOk(false);
+        this.setStatus("ERROR");
+        this.setOutput(message);
         this.setRuntime(0);
         return this;
     }
