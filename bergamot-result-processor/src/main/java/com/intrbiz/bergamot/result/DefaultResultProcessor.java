@@ -205,6 +205,12 @@ public class DefaultResultProcessor extends AbstractResultProcessor
      */
     protected boolean applyResult(RealCheck<?, ?> check, CheckState state, Result result)
     {
+        // validate that status matches ok
+        Status resultStatus = Status.parse(result.getStatus());
+        if (result.isOk() != resultStatus.isOk())
+        {
+            result.setOk(resultStatus.isOk());
+        }
         // is the state changing
         boolean isTransition = state.isOk() ^ result.isOk();
         boolean isFlapping = isTransition & state.isTransitioning();
@@ -220,7 +226,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         state.setLastCheckTime(new Timestamp(result.getExecuted()));
         state.setOk(result.isOk());
         state.pushOkHistory(result.isOk());
-        state.setStatus(Status.valueOf(result.getStatus().toUpperCase()));
+        state.setStatus(resultStatus);
         state.setOutput(result.getOutput());
         state.setFlapping(isFlapping);
         // apply thresholds
