@@ -32,9 +32,6 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
     @SQLColumn(index = 2, name = "executor", since = @SQLVersion({ 1, 0, 0 }))
     private String executor;
 
-    @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    private List<Parameter> parameters = new LinkedList<Parameter>();
-
     public Command()
     {
         super();
@@ -75,58 +72,6 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
     public void setExecutor(String executor)
     {
         this.executor = executor;
-    }
-
-    public List<Parameter> getParameters()
-    {
-        return parameters;
-    }
-
-    public void setParameters(List<Parameter> parameters)
-    {
-        this.parameters = parameters;
-    }
-
-    public void addParameter(String name, String value)
-    {
-        this.parameters.add(new Parameter(name, value));
-    }
-
-    public void setParameter(String name, String value)
-    {
-        this.removeParameter(name);
-        this.addParameter(name, value);
-    }
-
-    public void removeParameter(String name)
-    {
-        for (Iterator<Parameter> i = this.parameters.iterator(); i.hasNext();)
-        {
-            if (name.equals(i.next().getName()))
-            {
-                i.remove();
-                break;
-            }
-        }
-    }
-
-    public void clearParameters()
-    {
-        this.parameters.clear();
-    }
-
-    public String getParameter(String name)
-    {
-        return this.getParameter(name, null);
-    }
-
-    public String getParameter(String name, String defaultValue)
-    {
-        for (Parameter parameter : this.parameters)
-        {
-            if (name.equals(parameter.getName())) return parameter.getValue();
-        }
-        return defaultValue;
     }
 
     @Override
