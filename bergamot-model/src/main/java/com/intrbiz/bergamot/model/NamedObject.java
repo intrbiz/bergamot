@@ -67,9 +67,9 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         this.setId(configuration.getId());
         this.setSiteId(Site.getSiteId(this.getId()));
         // copy the parameters
+        this.parameters.clear();
         for (CfgParameter param : configuration.getParameters())
         {
-            this.parameters.clear();
             this.parameters.add(new Parameter(param.getName(), param.getValueOrText()));
         }
         // store the config
