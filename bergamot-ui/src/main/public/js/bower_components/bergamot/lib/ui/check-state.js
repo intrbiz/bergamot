@@ -20,13 +20,19 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.log_debug("Updating server state, to: " + check.state.ok + " " + check.state.status);
 	    this.$node.find("h3 span.dash_img").attr("class", "dash_img " + check.state.status.toLowerCase());
 	    this.$node.find("h3 span.dash_img").attr("title", "The check is " + check.state.status.toLowerCase());
-	    this.$node.find("p.field-status span.value").html(check.state.status.toUpperCase().substring(0,1) + check.state.status.toLowerCase().substring(1));
-	    this.$node.find("p.field-output span.value").html(check.state.output);
-	    // attempt
-	    this.$node.find("p.field-attempt span.value").html('<span>' + check.state.attempt + " of " + check.current_attempt_threshold + ' </span>' +
-		(check.state.hard ? '<span class="info" title="The host is in a steady state">Steady</span>' : '<span class="info" title="The check is changing state">Changing</span>'));
+	    this.$node.find("p.field-status span.value").text(check.state.status.toUpperCase().substring(0,1) + check.state.status.toLowerCase().substring(1));
+	    this.$node.find("p.field-output span.value").text(check.state.output);
 	    // last check time
-	    this.$node.find("p.field-last-checked span.value").html(this.formatDate(check.state.last_check_time));
+	    this.$node.find("p.field-last-checked span.value").text(this.formatDate(check.state.last_check_time));
+	    // attempt
+	    // build each element to avoid XSS
+	    var attempt_span = document.createElement("span");
+	    $(attempt_span).text(check.state.attempt + " of " + check.current_attempt_threshold + " ");
+	    var attempt_flag_span = document.createElement("span");
+	    $(attempt_flag_span).attr("class", "info")
+	    $(attempt_flag_span).attr("title", check.state.hard ? "The host is in a steady state" : "The check is changing state")
+	    $(attempt_flag_span).text(check.state.hard ? "Steady" : "Changing");
+	    this.$node.find("p.field-attempt span.value").html([attempt_span, attempt_flag_span]);
 	    // animate the update
 	    var $fadeNode = this.$node;/*.find("h3 span.dash_img");*/
 	    $fadeNode.fadeTo(800, 0.2, function() { 
