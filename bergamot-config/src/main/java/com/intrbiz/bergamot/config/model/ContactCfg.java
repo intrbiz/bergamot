@@ -36,8 +36,10 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializab
 
     private String phone;
 
+    private String im;
+
     private NotificationsCfg notifications;
-    
+
     private Set<String> grantedPermissions = new LinkedHashSet<String>();
 
     private Set<String> revokedPermissions = new LinkedHashSet<String>();
@@ -123,6 +125,18 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializab
         this.phone = phone;
     }
 
+    @XmlElement(name = "im")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getIm()
+    {
+        return im;
+    }
+
+    public void setIm(String im)
+    {
+        this.im = im;
+    }
+
     @XmlElementRef(type = NotificationsCfg.class)
     @ResolveWith(BeanResolver.class)
     public NotificationsCfg getNotifications()
@@ -134,7 +148,7 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializab
     {
         this.notifications = notifications;
     }
-    
+
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "grants")
     @ResolveWith(MergeSet.class)
