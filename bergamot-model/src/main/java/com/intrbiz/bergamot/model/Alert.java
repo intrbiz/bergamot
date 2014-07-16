@@ -143,9 +143,10 @@ public class Alert implements Serializable
     private Timestamp acknowledgedAt;
 
     /**
-     * Who acknowledged this alert
+     * Whom acknowledged this alert
      */
     @SQLColumn(index = 21, name = "acknowledged_by", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL)
     private UUID acknowledgedBy;
 
     /**
