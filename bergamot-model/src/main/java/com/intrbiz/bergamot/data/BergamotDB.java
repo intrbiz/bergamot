@@ -71,7 +71,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
             GroupState.class,
             Alert.class,
             Config.class,
-            Comment.class
+            Comment.class,
+            Downtime.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -858,6 +859,38 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = Comment.class, name = "list_comments", since = @SQLVersion({1, 0, 0}))
     public abstract List<Comment> listComments(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);
+    
+    // downtime
+    
+    @Cacheable
+    @SQLSetter(table = Downtime.class, name = "set_downtime", since = @SQLVersion({1, 0, 0}))
+    public abstract void setDowntime(Downtime downtime);
+    
+    @Cacheable
+    @SQLGetter(table = Downtime.class, name = "get_downtime", since = @SQLVersion({1, 0, 0}))
+    public abstract Downtime getDowntime(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLRemove(table = Downtime.class, name = "remove_downtime", since = @SQLVersion({1, 0, 0}))
+    public abstract void removeDowntime(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLGetter(table = Downtime.class, name = "get_downtimes_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "starts", direction = Direction.DESC),
+        query = @SQLQuery("SELECT * FROM bergamot.downtime WHERE check_id = p_check_id AND starts >= (now() - p_interval::INTERVAL) AND ends <= (now() + p_interval::INTERVAL)")
+    )
+    public abstract List<Downtime> getDowntimesForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "interval", virtual = true) String interval);
+    
+    public List<Downtime> getDowntimesForCheck(UUID checkId)
+    {
+        return this.getDowntimesForCheck(checkId, "1 week");
+    }
+    
+    @Cacheable
+    @SQLGetter(table = Downtime.class, name = "get_all_downtimes_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
+    public abstract List<Downtime> getAllDowntimesForCheck(@SQLParam("check_id") UUID checkId);
+    
+    @SQLGetter(table = Downtime.class, name = "list_downtimes", since = @SQLVersion({1, 0, 0}))
+    public abstract List<Downtime> listDowntimes(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);
     
     // generic
     
