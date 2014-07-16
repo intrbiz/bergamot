@@ -22,7 +22,7 @@ public class Alert implements Serializable
     private static final long serialVersionUID = 1L;
     
     /**
-     * The unique ID for this check
+     * The unique ID for this alert
      */
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey()
