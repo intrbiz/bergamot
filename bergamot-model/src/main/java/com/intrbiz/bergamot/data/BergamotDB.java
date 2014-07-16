@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
@@ -852,12 +853,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract void removeComment(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Comment.class, name = "get_comments_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
-    public abstract List<Comment> getCommentsForCheck(@SQLParam("check_id") UUID checkId, @SQLOffset long offset, @SQLLimit long limit);
-    
-    @Cacheable
-    @SQLGetter(table = Comment.class, name = "get_comments_for_alert", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
-    public abstract List<Comment> getCommentsForAlert(@SQLParam("alert_id") UUID alertId, @SQLOffset long offset, @SQLLimit long limit);
+    @SQLGetter(table = Comment.class, name = "get_comments_for_object", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
+    public abstract List<Comment> getCommentsForObject(@SQLParam("object_id") UUID checkId, @SQLOffset long offset, @SQLLimit long limit);
     
     @SQLGetter(table = Comment.class, name = "list_comments", since = @SQLVersion({1, 0, 0}))
     public abstract List<Comment> listComments(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);

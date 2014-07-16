@@ -19,7 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 public class Comment implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * The unique ID for this comment
      */
@@ -32,57 +32,51 @@ public class Comment implements Serializable
     private UUID siteId;
 
     /**
-     * The check to which this alert was issued
+     * The object against which this comment relates, this could be: 1. a check 2. an alert 3. a downtime
      */
-    @SQLColumn(index = 3, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
-    private UUID checkId;
-    
-    /**
-     * The specific alert which this comment is against (optional)
-     */
-    @SQLColumn(index = 4, name = "alert_id", since = @SQLVersion({ 1, 0, 0 }))
-    private UUID alertId;
-    
+    @SQLColumn(index = 3, name = "object_id", since = @SQLVersion({ 1, 0, 0 }))
+    private UUID objectId;
+
     /**
      * The content type of the comment: "plain", "markdown", "html"
      */
-    @SQLColumn(index = 5, name = "format", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "format", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected String format = "plain";
-    
+
     /**
-     * The type of the comment: "general", "acknowledgement"
+     * The type of the comment: "general", "acknowledgement", ...
      */
-    @SQLColumn(index = 6, name = "comment_type", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "comment_type", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected String commentType = "general";
-    
+
     /**
      * The summary (title) of the comment
      */
-    @SQLColumn(index = 7, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected String summary;
 
     /**
      * The comment
      */
-    @SQLColumn(index = 8, name = "comment", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "comment", since = @SQLVersion({ 1, 0, 0 }))
     protected String comment;
 
     /**
      * When was it created
      */
-    @SQLColumn(index = 9, name = "created", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "created", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
 
     /**
      * When was it updated
      */
-    @SQLColumn(index = 10, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
-    
+
     /**
      * Who created this alert
      */
-    @SQLColumn(index = 9, name = "author", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "author", since = @SQLVersion({ 1, 0, 0 }))
     private UUID author;
 
     public Comment()
@@ -110,24 +104,14 @@ public class Comment implements Serializable
         this.siteId = siteId;
     }
 
-    public UUID getCheckId()
+    public UUID getObjectId()
     {
-        return checkId;
+        return objectId;
     }
 
-    public void setCheckId(UUID checkId)
+    public void setObjectId(UUID objectId)
     {
-        this.checkId = checkId;
-    }
-
-    public UUID getAlertId()
-    {
-        return alertId;
-    }
-
-    public void setAlertId(UUID alertId)
-    {
-        this.alertId = alertId;
+        this.objectId = objectId;
     }
 
     public String getFormat()
@@ -199,9 +183,9 @@ public class Comment implements Serializable
     {
         this.author = author;
     }
-    
+
     public String toString()
     {
-        return "Comment { id => " + this.getId() + ", check => " + this.getCheckId() + ", summary => " + this.getSummary() + " }";
+        return "Comment { id => " + this.getId() + ", object => " + this.getObjectId() + ", summary => " + this.getSummary() + " }";
     }
 }
