@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 
-public class TestNagiosRunner
+public class ManualTestNagiosRunner
 {
     private NagiosExecutor runner;
 
