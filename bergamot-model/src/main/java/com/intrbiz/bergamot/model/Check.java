@@ -18,7 +18,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * An something which should be checked
  */
-public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends NamedObject<T, C>
+public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends NamedObject<T, C> implements Commented
 {
     private static final long serialVersionUID = 1L;
     
@@ -286,6 +286,28 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
         {
             return db.getDowntimesForCheck(this.getId());
         }
+    }
+    
+    /**
+     * Get comments against this downtime
+     * @param limit the maximum number of comments to get
+     */
+    @Override
+    public List<Comment> getComments(int limit)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCommentsForObject(this.getId(), 0, limit);
+        }
+    }
+
+    /**
+     * Get comments against this downtime
+     */
+    @Override
+    public List<Comment> getComments()
+    {
+        return this.getComments(5);
     }
 
     protected void toMO(CheckMO mo, boolean stub)

@@ -21,7 +21,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "location", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
-public class Location extends NamedObject<LocationMO, LocationCfg>
+public class Location extends NamedObject<LocationMO, LocationCfg> implements Commented
 {
     private static final long serialVersionUID = 1L;
 
@@ -140,6 +140,28 @@ public class Location extends NamedObject<LocationMO, LocationCfg>
         {
             return db.computeLocationState(this.getId());
         }
+    }
+    
+    /**
+     * Get comments against this downtime
+     * @param limit the maximum number of comments to get
+     */
+    @Override
+    public List<Comment> getComments(int limit)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCommentsForObject(this.getId(), 0, limit);
+        }
+    }
+
+    /**
+     * Get comments against this downtime
+     */
+    @Override
+    public List<Comment> getComments()
+    {
+        return this.getComments(5);
     }
 
     @Override

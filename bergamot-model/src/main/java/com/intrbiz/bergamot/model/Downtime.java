@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -25,7 +26,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * dependencies.
  */
 @SQLTable(schema = BergamotDB.class, name = "downtime", since = @SQLVersion({ 1, 0, 0 }))
-public class Downtime implements Serializable, TimeRange
+public class Downtime implements Serializable, TimeRange, Commented
 {
     private static final long serialVersionUID = 1L;
     
@@ -198,6 +199,28 @@ public class Downtime implements Serializable, TimeRange
     public LocalDateTime computeNextStartTime(Clock clock)
     {
         return null;
+    }
+    
+    /**
+     * Get comments against this downtime
+     * @param limit the maximum number of comments to get
+     */
+    @Override
+    public List<Comment> getComments(int limit)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCommentsForObject(this.getId(), 0, limit);
+        }
+    }
+
+    /**
+     * Get comments against this downtime
+     */
+    @Override
+    public List<Comment> getComments()
+    {
+        return this.getComments(5);
     }
     
     public String toString()

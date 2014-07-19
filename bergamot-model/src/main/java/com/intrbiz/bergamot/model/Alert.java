@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -17,7 +18,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * An alert which was raised against a check
  */
 @SQLTable(schema = BergamotDB.class, name = "alert", since = @SQLVersion({ 1, 0, 0 }))
-public class Alert implements Serializable
+public class Alert implements Serializable, Commented
 {
     private static final long serialVersionUID = 1L;
     
@@ -440,5 +441,27 @@ public class Alert implements Serializable
     public void setRecoveredAt(Timestamp recoveredAt)
     {
         this.recoveredAt = recoveredAt;
+    }
+    
+    /**
+     * Get comments against this downtime
+     * @param limit the maximum number of comments to get
+     */
+    @Override
+    public List<Comment> getComments(int limit)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCommentsForObject(this.getId(), 0, limit);
+        }
+    }
+
+    /**
+     * Get comments against this downtime
+     */
+    @Override
+    public List<Comment> getComments()
+    {
+        return this.getComments(5);
     }
 }

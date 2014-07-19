@@ -19,7 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "group", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
-public class Group extends NamedObject<GroupMO, GroupCfg>
+public class Group extends NamedObject<GroupMO, GroupCfg> implements Commented
 {
     private static final long serialVersionUID = 1L;
     
@@ -140,6 +140,28 @@ public class Group extends NamedObject<GroupMO, GroupCfg>
         {
             db.removeCheckFromGroup(this, check);
         }
+    }
+    
+    /**
+     * Get comments against this downtime
+     * @param limit the maximum number of comments to get
+     */
+    @Override
+    public List<Comment> getComments(int limit)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCommentsForObject(this.getId(), 0, limit);
+        }
+    }
+
+    /**
+     * Get comments against this downtime
+     */
+    @Override
+    public List<Comment> getComments()
+    {
+        return this.getComments(5);
     }
 
     @Override
