@@ -51,8 +51,8 @@
 							<goal>jar</goal>
 						</goals>
 						<configuration>
-			                <additionalparam>-Xdoclint:none</additionalparam>
-			            </configuration>
+						    <additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -79,6 +79,7 @@
     <module>bergamot-worker-nagios</module>
     <module>bergamot-worker-snmp</module>
   </modules>
+  
   <dependencyManagement>
   	<dependencies>
   		<dependency>
@@ -133,4 +134,32 @@
   		</dependency>
   	</dependencies>
   </dependencyManagement>
+  
+	<repositories>
+		<repository>
+			<id>snapshots</id>
+			<url>http://nexus.intrbiz.net/nexus/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>intrbiz</id>
+			<name>Intrbiz</name>
+			<url>http://nexus.intrbiz.net/nexus/content/repositories/releases</url>
+		</repository>
+	</repositories>
+	
+	<distributionManagement>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://nexus.intrbiz.net/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>intrbiz</id>
+			<name>Intrbiz</name>
+			<url>http://nexus.intrbiz.net/nexus/content/repositories/releases</url>
+		</repository>
+	</distributionManagement>
+  
 </project>
