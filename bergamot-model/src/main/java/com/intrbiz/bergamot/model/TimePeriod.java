@@ -91,12 +91,18 @@ public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> impleme
 
     public void addExclude(TimePeriod exclude)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addTimePeriodExclude(this, exclude);
+        }
     }
     
     public void removeExclude(TimePeriod exclude)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeTimePeriodExclude(this, exclude);
+        }
     }
 
     public List<UUID> getExcludesId()

@@ -78,18 +78,26 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
 
     public Collection<Team> getChildren()
     {
-        // TODO
-        return new LinkedList<Team>();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getTeamsInTeam(this.getId());
+        }
     }
 
     public void removeChild(Team child)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeTeamChild(this, child);
+        }
     }
 
     public void addChild(Team child)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addTeamChild(this, child);
+        }
     }
 
     public List<Contact> getAllContacts()
@@ -113,12 +121,18 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
 
     public void addContact(Contact contact)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addContactToTeam(this, contact);
+        }
     }
 
     public void removeContact(Contact contact)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeContactFromTeam(this, contact);
+        }
     }
 
     public List<String> getGrantedPermissions()

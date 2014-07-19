@@ -140,7 +140,18 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
 
     public void addContact(Contact contact)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addContactToCheck(this, contact);
+        }
+    }
+    
+    public void removeContact(Contact contact)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeContactFromCheck(this, contact);
+        }
     }
 
     public List<UUID> getTeamIds()
@@ -171,7 +182,18 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
 
     public void addTeam(Team team)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addTeamToCheck(this, team);
+        }
+    }
+    
+    public void removeTeam(Team team)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeTeamFromCheck(this, team);
+        }
     }
 
     public Notifications getNotifications()
@@ -184,7 +206,11 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     
     public void setNotifications(Notifications notifications)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            notifications.setId(this.getId());
+            db.setNotifications(notifications);
+        }
     }
 
     public List<UUID> getGroupIds()
@@ -215,12 +241,18 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
 
     public void removeGroup(Group group)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeCheckFromGroup(group, this);
+        }
     }
 
     public void addGroup(Group group)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addCheckToGroup(group, this);
+        }
     }
     
     /**

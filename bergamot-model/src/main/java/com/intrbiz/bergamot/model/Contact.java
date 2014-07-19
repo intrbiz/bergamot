@@ -170,7 +170,11 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
 
     public void setNotifications(Notifications notifications)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            notifications.setId(this.getId());
+            db.setNotifications(notifications);
+        }
     }
 
     public List<String> getGrantedPermissions()

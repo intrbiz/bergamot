@@ -368,7 +368,7 @@ public class BergamotConfigImporter
                     if (team != null)
                     {
                         logger.info("Adding contact " + contact.getName() + " to team " + team.getName());
-                        db.addTeamContact(team, contact);
+                        team.addContact(contact);
                     }
                 }
             }

@@ -80,12 +80,18 @@ public class Group extends NamedObject<GroupMO, GroupCfg>
 
     public void addParent(Group parent)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addGroupChild(parent, this);
+        }
     }
 
     public void removeParent(Group parent)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeGroupChild(parent, this);
+        }
     }
 
     public List<Group> getChildren()
@@ -98,12 +104,18 @@ public class Group extends NamedObject<GroupMO, GroupCfg>
 
     public void removeChild(Group child)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeGroupChild(this, child);
+        }
     }
 
     public void addChild(Group child)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addGroupChild(this, child);
+        }
     }
 
     public Collection<Check<?,?>> getChecks()
@@ -116,12 +128,18 @@ public class Group extends NamedObject<GroupMO, GroupCfg>
 
     public void addCheck(Check<?,?> check)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addCheckToGroup(this, check);
+        }
     }
 
     public void removeCheck(Check<?,?> check)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeCheckFromGroup(this, check);
+        }
     }
 
     @Override

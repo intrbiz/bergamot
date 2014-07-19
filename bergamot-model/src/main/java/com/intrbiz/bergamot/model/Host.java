@@ -87,7 +87,18 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
 
     public void addService(Service service)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addServiceToHost(this, service);
+        }
+    }
+    
+    public void removeService(Service service)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeServiceFromHost(this, service);
+        }
     }
 
     // traps
@@ -102,7 +113,18 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
 
     public void addTrap(Trap trap)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addTrapToHost(this, trap);
+        }
+    }
+    
+    public void removeTrap(Trap trap)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeTrapFromHost(this, trap);
+        }
     }
 
     public Trap getTrap(String name)

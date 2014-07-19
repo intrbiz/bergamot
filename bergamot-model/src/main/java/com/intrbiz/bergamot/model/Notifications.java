@@ -71,7 +71,11 @@ public class Notifications extends BergamotObject<NotificationsMO>
 
     public void addEngine(NotificationEngine engine)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            engine.setNotificationsId(this.getId());
+            db.setNotificationEngine(engine);
+        }
     }
 
     public boolean isEnabled()

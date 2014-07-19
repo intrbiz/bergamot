@@ -53,7 +53,18 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
 
     public void addResource(Resource resource)
     {
-        // TODO
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.addResourceToCluster(this, resource);
+        }
+    }
+    
+    public void removeResource(Resource resource)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.removeResourceFromCluster(this, resource);
+        }
     }
 
     public Resource getResource(String name)
