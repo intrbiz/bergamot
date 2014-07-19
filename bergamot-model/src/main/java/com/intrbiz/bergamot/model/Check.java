@@ -276,6 +276,17 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     {
         return this.getSite().computeProcessingPool(this.getId());
     }
+    
+    /**
+     * Get the current downtimes for this check
+     */
+    public List<Downtime> getDowntime()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getDowntimesForCheck(this.getId());
+        }
+    }
 
     protected void toMO(CheckMO mo, boolean stub)
     {
