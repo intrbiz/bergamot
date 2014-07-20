@@ -143,7 +143,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected void sendRecovery(Check<?, ?> check, BergamotDB db)
     {
         logger.warn("Recovery for " + check);
-        if (!check.isSuppressed())
+        if (!check.isSuppressedOrInDowntime())
         {
             // ger the current alert for this check
             Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
@@ -173,7 +173,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected void sendAlert(Check<?, ?> check, BergamotDB db)
     {
         logger.warn("Alert for " + check);
-        if (!check.isSuppressed())
+        if (!check.isSuppressedOrInDowntime())
         {
             // record the alert
             Alert alertRecord = new Alert(check, check.getState());
