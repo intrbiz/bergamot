@@ -353,7 +353,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
         super.toMO(mo, stub);
         mo.setEnabled(this.isEnabled());
         mo.setState(this.getState().toMO());
-        mo.setSuppressed(this.isSuppressed());
+        mo.setSuppressed(this.isSuppressedOrInDowntime());
         mo.setPool(this.getPool());
         if (!stub)
         {
