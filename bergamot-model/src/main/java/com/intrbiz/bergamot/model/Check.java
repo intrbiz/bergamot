@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -286,6 +287,43 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
         {
             return db.getDowntimesForCheck(this.getId());
         }
+    }
+    
+    /**
+     * Check if this check is in downtime at the given time
+     */
+    public boolean isInDowntime(Calendar now)
+    {
+       for (Downtime downtime : this.getDowntime())
+       {
+           if (downtime.isInTimeRange(now))
+               return true;
+       }
+       return false;
+    }
+    
+    /**
+     * Check if this check is currently in downtime
+     */
+    public boolean isInDowntime()
+    {
+        return this.isInDowntime(Calendar.getInstance());
+    }
+    
+    /**
+     * Is this check suppressed or in downtime at the given time
+     */
+    public boolean isSuppressedOrInDowntime(Calendar now)
+    {
+        return this.isSuppressed() || this.isInDowntime(now);
+    }
+    
+    /**
+     * Is this check suppressed or currently in downtime
+     */
+    public boolean isSuppressedOrInDowntime()
+    {
+        return this.isSuppressed() || this.isInDowntime();
     }
     
     /**
