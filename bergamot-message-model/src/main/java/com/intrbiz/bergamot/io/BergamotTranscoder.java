@@ -38,6 +38,9 @@ import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
+import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
+import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
@@ -99,7 +102,12 @@ public class BergamotTranscoder
         APIPong.class,
         UpdateEvent.class,
         RegisterForUpdates.class,
-        RegisteredForUpdates.class
+        RegisteredForUpdates.class,
+        // control
+        RegisterWatcher.class,
+        // watcher
+        RegisterCheck.class,
+        UnregisterCheck.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();

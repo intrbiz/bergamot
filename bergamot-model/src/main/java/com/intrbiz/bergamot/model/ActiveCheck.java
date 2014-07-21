@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.model;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -10,23 +8,19 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.express.BergamotEntityResolver;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.util.Parameter;
-import com.intrbiz.converter.Converter;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
-import com.intrbiz.express.ExpressEntityResolver;
-import com.intrbiz.express.ExpressException;
-import com.intrbiz.express.dynamic.DynamicEntity;
 import com.intrbiz.express.value.ValueExpression;
 import com.intrbiz.queue.name.GenericKey;
-import com.intrbiz.validator.Validator;
 
 /**
  * A check which is actively polled
@@ -34,8 +28,6 @@ import com.intrbiz.validator.Validator;
 public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheckCfg<C>> extends RealCheck<T, C>
 {
     private static final long serialVersionUID = 1L;
-    
-    private transient Logger logger = Logger.getLogger(ActiveCheck.class);
 
     /**
      * How often should checks be executed (in milliseconds)
@@ -87,14 +79,6 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     public long getCurrentInterval()
     {
         return (this.getState().isOk() && this.getState().isHard()) ? this.getCheckInterval() : this.getRetryInterval();
-    }
-
-    public CheckCommand getCheckCommand()
-    {
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            return db.getCheckCommand(this.getId());
-        }
     }
 
     public TimePeriod getTimePeriod()
@@ -151,10 +135,10 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
 
     /**
      * Construct the execute check message for this check
-     * @return
      */
     public final ExecuteCheck executeCheck()
     {
+        Logger logger = Logger.getLogger(ActiveCheck.class);
         CheckCommand checkCommand = this.getCheckCommand();
         if (checkCommand == null) return null;
         Command command = checkCommand.getCommand();
@@ -167,9 +151,9 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         executeCheck.setCheckId(this.getId());
         executeCheck.setProcessingPool(this.getPool());
         executeCheck.setEngine(command.getEngine());
+        executeCheck.setExecutor(command.getExecutor());
         executeCheck.setName(command.getName());
-        // TODO: eval the parameters
-        ExpressContext context = this.createExpressContext();
+        ExpressContext context = new DefaultContext(new BergamotEntityResolver());
         // configured parameters
         for (Parameter parameter : checkCommand.resolveCheckParameters())
         {
@@ -184,80 +168,6 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         return executeCheck;
     }
 
-    // TODO
-
-    protected ExpressContext createExpressContext()
-    {
-        return new DefaultContext(new ExpressEntityResolver()
-        {
-            @Override
-            public Object getEntity(String name, Object source)
-            {
-                if ("this".equals(name))
-                {
-                    return source;
-                }
-                else if ("host".equals(name))
-                {
-                    if (source instanceof Host)
-                    {
-                        return source;
-                    }
-                    else if (source instanceof Service) { return ((Service) source).getHost(); }
-                }
-                else if ("service".equals(name))
-                {
-                    if (source instanceof Service) { return source; }
-                }
-                else if ("nagios".equals(name))
-                {
-                    return new DynamicEntity()
-                    {
-                        @Override
-                        public Object get(String name, ExpressContext context, Object source) throws ExpressException
-                        {
-                            if ("path".equals(name))
-                            {
-                                return "/usr/lib/nagios/plugins";
-                            }
-                            return null;
-                        }
-
-                        @Override
-                        public void set(String name, Object value, ExpressContext context, Object source) throws ExpressException
-                        {
-                        }
-
-                        @Override
-                        public Converter<?> getConverter(String name, ExpressContext context, Object source) throws ExpressException
-                        {
-                            return null;
-                        }
-
-                        @Override
-                        public Validator<?> getValidator(String name, ExpressContext context, Object source) throws ExpressException
-                        {
-                            return null;
-                        }
-                    };
-                }
-                else if (source instanceof ActiveCheck)
-                {
-                    ActiveCheck<?, ?> check = (ActiveCheck<?, ?>) source;
-                    CheckCommand checkCommand = check.getCheckCommand();
-                    if (check.getCheckCommand() != null)
-                    {
-                        for (Parameter param : checkCommand.resolveCheckParameters())
-                        {
-                            if (name.equals(param.getName())) return param.getValue();
-                        }
-                    }
-                }
-                return null;
-            }
-        });
-    }
-
     protected void toMO(ActiveCheckMO mo, boolean stub)
     {
         super.toMO(mo, stub);
@@ -266,17 +176,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         mo.setCurrentInterval(this.getCurrentInterval());
         if (!stub)
         {
-            mo.setCheckCommand(Util.nullable(this.getCheckCommand(), CheckCommand::toStubMO));
             mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
         }
-    }
-    
-    /*
-     * Serialisation shit
-     */    
-    private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException  
-    {  
-        is.defaultReadObject();
-        this.logger = Logger.getLogger(ActiveCheck.class);
     }
 }

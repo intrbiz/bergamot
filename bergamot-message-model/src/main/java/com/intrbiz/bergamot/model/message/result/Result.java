@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 
 /**
  * The result of a check
@@ -31,7 +31,7 @@ public class Result extends Message
     private int processingPool;
 
     @JsonProperty("check")
-    private ExecuteCheck executeCheck;
+    private CheckEvent check;
 
     @JsonProperty("ok")
     private boolean ok;
@@ -79,14 +79,14 @@ public class Result extends Message
         this.checkId = checkId;
     }
 
-    public ExecuteCheck getCheck()
+    public CheckEvent getCheck()
     {
-        return executeCheck;
+        return check;
     }
 
-    public void setCheck(ExecuteCheck executeCheck)
+    public void setCheck(CheckEvent check)
     {
-        this.executeCheck = executeCheck;
+        this.check = check;
     }
 
     public boolean isOk()
@@ -229,7 +229,7 @@ public class Result extends Message
      * @return
      */
     @JsonIgnore
-    public Result fromCheck(ExecuteCheck check)
+    public Result fromCheck(CheckEvent check)
     {
         this.setId(check.getId());
         this.setCheckType(check.getCheckType());

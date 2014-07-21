@@ -10,6 +10,20 @@ public abstract class RealCheckCfg<P extends RealCheckCfg<P>> extends CheckCfg<P
     private static final long serialVersionUID = 1L;
     
     private StateCfg state;
+    
+    private CheckCommandCfg checkCommand;
+    
+    @XmlElementRef(type = CheckCommandCfg.class)
+    @ResolveWith(BeanResolver.class)
+    public CheckCommandCfg getCheckCommand()
+    {
+        return checkCommand;
+    }
+
+    public void setCheckCommand(CheckCommandCfg command)
+    {
+        this.checkCommand = command;
+    }
 
     public RealCheckCfg()
     {

@@ -12,8 +12,6 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 public abstract class ActiveCheckCfg<P extends ActiveCheckCfg<P>> extends RealCheckCfg<P>
 {
     private static final long serialVersionUID = 1L;
-    
-    private CheckCommandCfg checkCommand;
 
     private ScheduleCfg schedule;
 
@@ -22,18 +20,6 @@ public abstract class ActiveCheckCfg<P extends ActiveCheckCfg<P>> extends RealCh
     public ActiveCheckCfg()
     {
         super();
-    }
-
-    @XmlElementRef(type = CheckCommandCfg.class)
-    @ResolveWith(BeanResolver.class)
-    public CheckCommandCfg getCheckCommand()
-    {
-        return checkCommand;
-    }
-
-    public void setCheckCommand(CheckCommandCfg command)
-    {
-        this.checkCommand = command;
     }
 
     @XmlElementRef(type = ScheduleCfg.class)

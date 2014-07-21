@@ -13,9 +13,6 @@ public abstract class ActiveCheckMO extends RealCheckMO
     @JsonProperty("current_interval")
     protected long currentInterval;
 
-    @JsonProperty("check_command")
-    protected CheckCommandMO checkCommand;
-
     @JsonProperty("time_period")
     protected TimePeriodMO timePeriod;
 
@@ -52,16 +49,6 @@ public abstract class ActiveCheckMO extends RealCheckMO
     public void setCurrentInterval(long currentInterval)
     {
         this.currentInterval = currentInterval;
-    }
-
-    public CheckCommandMO getCheckCommand()
-    {
-        return checkCommand;
-    }
-
-    public void setCheckCommand(CheckCommandMO checkCommand)
-    {
-        this.checkCommand = checkCommand;
     }
 
     public TimePeriodMO getTimePeriod()

@@ -79,6 +79,8 @@
     <module>bergamot-worker-nagios</module>
     <module>bergamot-worker-snmp</module>
     <module>bergamot-cli</module>
+    <module>bergamot-watcher-api</module>
+    <module>bergamot-watcher-snmp</module>
   </modules>
   
   <dependencyManagement>

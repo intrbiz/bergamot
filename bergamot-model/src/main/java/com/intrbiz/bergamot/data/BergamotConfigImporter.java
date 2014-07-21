@@ -20,6 +20,7 @@ import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.config.model.NotificationEngineCfg;
 import com.intrbiz.bergamot.config.model.NotificationsCfg;
 import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
+import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
@@ -40,6 +41,7 @@ import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationEngine;
 import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.PassiveCheck;
+import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
@@ -471,7 +473,7 @@ public class BergamotConfigImporter
     
     private void loadActiveCheck(ActiveCheck<?,?> check, ActiveCheckCfg<?> rcfg, BergamotDB db)
     {
-        this.loadCheck(check, rcfg, db);
+        this.loadRealCheck(check, rcfg, db);
         // the check period
         if (! Util.isEmpty(rcfg.getSchedule().getTimePeriod()))
         {
@@ -480,7 +482,24 @@ public class BergamotConfigImporter
             {
                 check.setTimePeriodId(timePeriod.getId());
             }
+        }        
+    }
+    
+    private void loadCheckState(Check<?,?> check, CheckCfg<?> cfg, BergamotDB db)
+    {
+        CheckState state = db.getCheckState(check.getId());
+        if (state == null || this.resetState)
+        {
+            state = new CheckState();
+            state.setCheckId(check.getId());
+            state.configure(cfg);
+            db.setCheckState(state);
         }
+    }
+    
+    private void loadRealCheck(RealCheck<?,?> check, RealCheckCfg<?> rcfg, BergamotDB db)
+    {
+        this.loadCheck(check, rcfg, db);
         // the check command
         if (rcfg.getCheckCommand() != null)
         {
@@ -499,18 +518,6 @@ public class BergamotConfigImporter
             {
                 throw new DataException("The command " + rcfg.getCheckCommand().getCommand() + " could not be found, needed by " + check.getName());
             }
-        }
-    }
-    
-    private void loadCheckState(Check<?,?> check, CheckCfg<?> cfg, BergamotDB db)
-    {
-        CheckState state = db.getCheckState(check.getId());
-        if (state == null || this.resetState)
-        {
-            state = new CheckState();
-            state.setCheckId(check.getId());
-            state.configure(cfg);
-            db.setCheckState(state);
         }
     }
 
@@ -606,7 +613,7 @@ public class BergamotConfigImporter
     
     private void loadPasiveCheck(PassiveCheck<?,?> check, PassiveCheckCfg<?> rcfg, BergamotDB db)
     {
-        this.loadCheck(check, rcfg, db);
+        this.loadRealCheck(check, rcfg, db);
     }
     
     private void loadVirtualCheck(VirtualCheck<?,?> check, VirtualCheckCfg<?> rcfg, BergamotDB db)

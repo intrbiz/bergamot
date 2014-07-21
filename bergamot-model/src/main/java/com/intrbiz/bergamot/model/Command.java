@@ -1,14 +1,10 @@
 package com.intrbiz.bergamot.model;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.adapter.ParametersAdapter;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.configuration.CfgParameter;
@@ -43,6 +39,7 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
         super.configure(cfg);
         CommandCfg rcfg = cfg.resolve();
         this.engine = rcfg.getEngine();
+        this.executor = rcfg.getExecutor();
         this.name = rcfg.getName();
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.description = Util.coalesceEmpty(rcfg.getDescription(), "");

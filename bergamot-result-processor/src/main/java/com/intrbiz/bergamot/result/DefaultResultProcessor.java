@@ -333,10 +333,10 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         state.setLastRuntime(result.getRuntime());
         state.setAverageRuntime(state.getAverageRuntime() == 0 ? state.getLastRuntime() : ((state.getLastRuntime() + state.getAverageRuntime()) / 2D));
         // check latencies
-        if (result.getCheck() != null)
+        if (result.getCheck() != null && result.getCheck() instanceof ExecuteCheck)
         {
-            state.setLastCheckProcessingLatency(result.getProcessed() - result.getCheck().getScheduled());
-            state.setLastCheckExecutionLatency(result.getExecuted() - result.getCheck().getScheduled());
+            state.setLastCheckProcessingLatency(result.getProcessed() - ((ExecuteCheck) result.getCheck()).getScheduled());
+            state.setLastCheckExecutionLatency(result.getExecuted() - ((ExecuteCheck) result.getCheck()).getScheduled());
             // moving average
             state.setAverageCheckExecutionLatency(state.getAverageCheckExecutionLatency() == 0 ? state.getLastCheckExecutionLatency() : ((state.getAverageCheckExecutionLatency() + state.getLastCheckExecutionLatency()) / 2D));
             state.setAverageCheckProcessingLatency(state.getAverageCheckProcessingLatency() == 0 ? state.getLastCheckProcessingLatency() : ((state.getAverageCheckProcessingLatency() + state.getLastCheckProcessingLatency()) / 2D));

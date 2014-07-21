@@ -23,6 +23,7 @@ import com.hazelcast.core.Member;
 import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.query.Predicates;
+import com.intrbiz.bergamot.controller.BergamotController;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 import com.intrbiz.bergamot.result.ResultProcessor;
@@ -90,12 +91,18 @@ public class ClusterManager
      * Our result processor
      */
     private ResultProcessor processor;
+    
+    /**
+     * Our controller
+     */
+    private BergamotController controller;
 
     public ClusterManager()
     {
         super();
         this.scheduler = new WheelScheduler();
         this.processor = new DefaultResultProcessor();
+        this.controller = new BergamotController();
     }
 
     public Scheduler getScheduler()
@@ -198,6 +205,8 @@ public class ClusterManager
                 this.processor.start();
                 logger.info("Starting scheduler");
                 this.scheduler.start();
+                logger.info("Starting controller");
+                this.controller.start();
                 // setup our migration task consumer
                 this.runMigrations = true;
                 this.migrationsConsumer = new Thread(new Runnable()

@@ -1,7 +1,19 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.UUID;
+
+import org.apache.log4j.Logger;
+
 import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
+import com.intrbiz.bergamot.express.BergamotEntityResolver;
+import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.PassiveCheckMO;
+import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
+import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
+import com.intrbiz.bergamot.model.util.Parameter;
+import com.intrbiz.express.DefaultContext;
+import com.intrbiz.express.ExpressContext;
+import com.intrbiz.express.value.ValueExpression;
 
 /**
  * A check which is never polled
@@ -13,5 +25,71 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
     public PassiveCheck()
     {
         super();
+    }
+    
+    /**
+     * Construct the register check message for this check
+     */
+    public final RegisterCheck registerCheck()
+    {
+        Logger logger = Logger.getLogger(PassiveCheck.class);
+        CheckCommand checkCommand = this.getCheckCommand();
+        if (checkCommand == null) return null;
+        Command command = checkCommand.getCommand();
+        if (command == null) return null;
+        if (logger.isTraceEnabled()) logger.trace("Registering check for " + this.getId() + " " + this.getName() + " with command " + command);
+        RegisterCheck registerCheck = new RegisterCheck();
+        registerCheck.setId(UUID.randomUUID());
+        registerCheck.setSiteId(this.getSiteId());
+        registerCheck.setCheckType(this.getType());
+        registerCheck.setCheckId(this.getId());
+        registerCheck.setProcessingPool(this.getPool());
+        registerCheck.setEngine(command.getEngine());
+        registerCheck.setExecutor(command.getExecutor());
+        registerCheck.setName(command.getName());
+        ExpressContext context = new DefaultContext(new BergamotEntityResolver());
+        // configured parameters
+        for (Parameter parameter : checkCommand.resolveCheckParameters())
+        {
+            ValueExpression vexp = new ValueExpression(context, parameter.getValue());
+            String value = (String) vexp.get(context, this);
+            if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
+            registerCheck.setParameter(parameter.getName(), value);
+        }
+        if (logger.isTraceEnabled()) logger.trace("Register check: " + new BergamotTranscoder().encodeAsString(registerCheck));
+        return registerCheck;
+    }
+    
+    /**
+     * Construct the unregister check message for this check
+     */
+    public final UnregisterCheck unregisterCheck()
+    {
+        Logger logger = Logger.getLogger(PassiveCheck.class);
+        CheckCommand checkCommand = this.getCheckCommand();
+        if (checkCommand == null) return null;
+        Command command = checkCommand.getCommand();
+        if (command == null) return null;
+        if (logger.isTraceEnabled()) logger.trace("Unregistering check for " + this.getId() + " " + this.getName() + " with command " + command);
+        UnregisterCheck unregisterCheck = new UnregisterCheck();
+        unregisterCheck.setId(UUID.randomUUID());
+        unregisterCheck.setSiteId(this.getSiteId());
+        unregisterCheck.setCheckType(this.getType());
+        unregisterCheck.setCheckId(this.getId());
+        unregisterCheck.setProcessingPool(this.getPool());
+        unregisterCheck.setEngine(command.getEngine());
+        unregisterCheck.setExecutor(command.getExecutor());
+        unregisterCheck.setName(command.getName());
+        ExpressContext context = new DefaultContext(new BergamotEntityResolver());
+        // configured parameters
+        for (Parameter parameter : checkCommand.resolveCheckParameters())
+        {
+            ValueExpression vexp = new ValueExpression(context, parameter.getValue());
+            String value = (String) vexp.get(context, this);
+            if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
+            unregisterCheck.setParameter(parameter.getName(), value);
+        }
+        if (logger.isTraceEnabled()) logger.trace("Unregister check: " + new BergamotTranscoder().encodeAsString(unregisterCheck));
+        return unregisterCheck;
     }
 }

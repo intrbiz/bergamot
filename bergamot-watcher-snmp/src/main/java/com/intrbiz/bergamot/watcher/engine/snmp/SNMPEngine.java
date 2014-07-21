@@ -1,12 +1,12 @@
-package com.intrbiz.bergamot.worker.engine.snmp;
+package com.intrbiz.bergamot.watcher.engine.snmp;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.watcher.engine.AbstractEngine;
 import com.intrbiz.snmp.SNMPTransport;
 
 /**
- * Execute SNMP checks using SNMP-IB
+ * Watch for SNMP traps using SNMP-IB
  */
 public class SNMPEngine extends AbstractEngine
 {
@@ -25,9 +25,9 @@ public class SNMPEngine extends AbstractEngine
     protected void configure() throws Exception
     {
         super.configure();
-        if (this.executors.isEmpty())
+        if (this.executor.isEmpty())
         {
-            this.addExecutor(new SNMPExecutor());
+            this.addListener(new LinkStateExecutor());
         }
     }
     
@@ -35,7 +35,7 @@ public class SNMPEngine extends AbstractEngine
     public void start() throws Exception
     {
         // setup the transport
-        int port = this.getWorker().getConfiguration().getIntParameterValue("snmp-port", 8162);
+        int port = this.getWatcher().getConfiguration().getIntParameterValue("snmp-port", 8162);
         Logger.getLogger(SNMPEngine.class).info("Listening for SNMP traps on port " + port);
         this.transport = SNMPTransport.open(port);
         this.transportThread = new Thread(this.transport, "SNMP-Transport");

@@ -1,6 +1,8 @@
 package com.intrbiz.bergamot.model;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.RealCheckMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -60,11 +62,23 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         return currentState.isOk() ? this.getRecoveryAttemptThreshold() : this.getAlertAttemptThreshold();
     }
     
+    public CheckCommand getCheckCommand()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCheckCommand(this.getId());
+        }
+    }
+    
     protected void toMO(RealCheckMO mo, boolean stub)
     {
         super.toMO(mo, stub);
         mo.setAlertAttemptThreshold(this.getAlertAttemptThreshold());
         mo.setRecoveryAttemptThreshold(this.getRecoveryAttemptThreshold());
         mo.setCurrentAttemptThreshold(this.getCurrentAttemptThreshold());
+        if (!stub)
+        {
+            mo.setCheckCommand(Util.nullable(this.getCheckCommand(), CheckCommand::toStubMO));
+        }
     }
 }
