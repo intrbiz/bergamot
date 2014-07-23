@@ -29,5 +29,31 @@
     	<artifactId>snmp-ib</artifactId>
     	<version>1.0.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+	<groupId>com.intrbiz.util</groupId>
+	<artifactId>bootstrap</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
+  <build>
+		<finalName>bergamot-nagios-snmp</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.intrbiz.util</groupId>
+				<artifactId>packaging</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<configuration>
+					<appClass>com.intrbiz.bergamot.watcher.SNMPWatcher</appClass>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>intrbiz-package</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
