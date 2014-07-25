@@ -15,6 +15,8 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.Param;
+import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Var;
 
@@ -44,5 +46,13 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     public TimePeriodMO getTimePeriod(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getTimePeriod(id), TimePeriod::toMO);
+    }
+    
+    @Post("/create")
+    @JSON()
+    public String createTimePeriod(@Param("configuration") String configurationXML)
+    {
+        // TODO: create time period
+        return "ok";
     }
 }
