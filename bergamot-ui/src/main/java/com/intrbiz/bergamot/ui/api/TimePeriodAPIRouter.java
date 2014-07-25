@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.TimePeriod;
@@ -50,9 +51,18 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     
     @Post("/create")
     @JSON()
-    public String createTimePeriod(@Param("configuration") String configurationXML)
+    @WithDataAdapter(BergamotDB.class)
+    public TimePeriodMO createTimePeriod(BergamotDB db, @Var("site") Site site, @Param("configuration") String configurationXML)
     {
-        // TODO: create time period
-        return "ok";
+        // parse the config and allocate the id
+        TimePeriodCfg config = TimePeriodCfg.fromString(TimePeriodCfg.class, configurationXML);
+        config.setId(site.randomObjectId());
+        // TODO: store the config
+        // create the time period
+        TimePeriod tp = new TimePeriod();
+        tp.configure(config);
+        // TODO: store
+        // return
+        return tp.toMO();
     }
 }
