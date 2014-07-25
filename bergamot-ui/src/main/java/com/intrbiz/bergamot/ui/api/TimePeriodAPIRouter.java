@@ -57,12 +57,9 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
         // parse the config and allocate the id
         TimePeriodCfg config = TimePeriodCfg.fromString(TimePeriodCfg.class, configurationXML);
         config.setId(site.randomObjectId());
-        // TODO: store the config
+        // TODO: validate the config?
         // create the time period
-        TimePeriod tp = new TimePeriod();
-        tp.configure(config);
-        // TODO: store
-        // return
-        return tp.toMO();
+        TimePeriod timePeriod = action("create-timeperiod", config);
+        return timePeriod.toMO();
     }
 }

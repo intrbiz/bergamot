@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.action.DispatchResultAction;
 import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
 import com.intrbiz.bergamot.ui.action.SchedulerActions;
+import com.intrbiz.bergamot.ui.action.TimePeriodActions;
 import com.intrbiz.bergamot.ui.api.APIRouter;
 import com.intrbiz.bergamot.ui.api.AlertsAPIRouter;
 import com.intrbiz.bergamot.ui.api.ClusterAPIRouter;
@@ -91,6 +92,7 @@ public class BergamotApp extends BalsaApplication
         action(new ExecuteCheckAction());
         action(new SchedulerActions());
         action(new DispatchResultAction());
+        action(new TimePeriodActions());
         // Setup the application routers
         router(new LoginRouter());
         router(new DashboardRouter());
