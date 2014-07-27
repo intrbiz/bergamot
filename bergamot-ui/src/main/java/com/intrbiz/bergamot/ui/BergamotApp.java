@@ -78,7 +78,7 @@ public class BergamotApp extends BalsaApplication
         // setup the queues
         QueueManager.getInstance().registerDefaultBroker(new RabbitPool("amqp://127.0.0.1"));
         // setup the database 
-        DataManager.getInstance().registerDefaultServer(DatabasePool.Default.create(org.postgresql.Driver.class, "jdbc:postgresql://127.0.0.1/bergamot", "bergamot", "bergamot"));
+        DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://127.0.0.1/bergamot").username("bergamot").password("bergamot").build());
         try (BergamotDB db = BergamotDB.connect())
         {
             System.out.println("Database: " + db.getName() + " " + db.getVersion());

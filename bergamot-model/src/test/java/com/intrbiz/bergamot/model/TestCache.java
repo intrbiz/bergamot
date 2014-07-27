@@ -23,7 +23,7 @@ public class TestCache
         // setup cache
         DataManager.get().registerDefaultCacheProvider(new TieredCacheProvider(new HazelcastCacheProvider("hazelcast.cache")));
         // create the schema
-        DataManager.getInstance().registerDefaultServer(DatabasePool.Default.create(org.postgresql.Driver.class, "jdbc:postgresql://127.0.0.1/bergamot", "bergamot", "bergamot"));
+        DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://127.0.0.1/bergamot").username("bergamot").password("bergamot").build());
         //
         try (BergamotDB db = BergamotDB.connect())
         {

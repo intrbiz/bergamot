@@ -24,7 +24,7 @@ public class TestDB
         Logger.getRootLogger().setLevel(Level.TRACE);
         Logger.getLogger(CompilerTool.class).setLevel(Level.TRACE);
         // create the schema
-        DataManager.getInstance().registerDefaultServer(DatabasePool.Default.create(org.postgresql.Driver.class, "jdbc:postgresql://127.0.0.1/bergamot", "bergamot", "bergamot"));
+        DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://127.0.0.1/bergamot").username("bergamot").password("bergamot").build());
         BergamotDB.install();
         //
         Collection<BergamotCfg> configs = new BergamotConfigReader().includeDir(new File("/home/cellis/Intrbiz/workspace-new/bergamot/cfg/local/")).build();
