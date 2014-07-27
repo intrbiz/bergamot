@@ -8,7 +8,7 @@
     </parent>
 	<artifactId>bergamot-ui</artifactId>
 	<packaging>jar</packaging>
-	<name>Balsa Example</name>
+	<name>Bergamot UI</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
