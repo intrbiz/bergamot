@@ -14,7 +14,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.adapter.TimeRangeAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
-import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
+import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
+import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 
 @XmlType(name = "time-period")
@@ -34,7 +35,7 @@ public class TimePeriodCfg extends NamedObjectCfg<TimePeriodCfg>
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "excludes")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(MergeSet.class)
     public Set<String> getExcludes()
     {
         return excludes;
@@ -47,7 +48,7 @@ public class TimePeriodCfg extends NamedObjectCfg<TimePeriodCfg>
 
     @XmlJavaTypeAdapter(TimeRangeAdapter.class)
     @XmlElement(name = "time-range")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(MergeList.class)
     public List<TimeRange> getTimeRanges()
     {
         return timeRanges;
