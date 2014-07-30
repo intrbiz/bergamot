@@ -23,6 +23,7 @@ import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/time-period")
@@ -50,6 +51,22 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     public TimePeriodMO getTimePeriod(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getTimePeriod(id), TimePeriod::toMO);
+    }
+    
+    @Get("/name/:name/config")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @Var("site") Site site, String name)
+    {
+        return Util.nullable(db.getTimePeriodByName(site.getId(), name), TimePeriod::getConfiguration);
+    }
+    
+    @Get("/id/:id/config")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getTimePeriod(id), TimePeriod::getConfiguration);
     }
     
     @Any("/configure")
