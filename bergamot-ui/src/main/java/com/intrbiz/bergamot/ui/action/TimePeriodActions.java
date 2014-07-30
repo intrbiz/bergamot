@@ -1,19 +1,30 @@
 package com.intrbiz.bergamot.ui.action;
 
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
+import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Config;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.metadata.Action;
 
 public class TimePeriodActions
 {
-    @Action("create-timeperiod")
+    @Action("create-time-period")
     public TimePeriod createTimePeriod(TimePeriodCfg config)
     {
-        // TODO: store the config
-        // create the time period
-        TimePeriod timePeriod = new TimePeriod();
-        timePeriod.configure(config);
-        // TODO: store the time period
-        return timePeriod;
+        if (config.getId() == null) throw new IllegalArgumentException("Config must have a valid ID");
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            // resolve the config
+            db.getConfigResolver(Site.getSiteId(config.getId())).resolveInherit(config);
+            // store the config
+            db.setConfig(new Config(config.getId(), Site.getSiteId(config.getId()), config));
+            // create the time period
+            TimePeriod timePeriod = new TimePeriod();
+            timePeriod.configure(config);
+            System.out.println("Storing TimePeriod: " + timePeriod.toJSON());
+            db.setTimePeriod(timePeriod);
+            return timePeriod;
+        }
     }
 }

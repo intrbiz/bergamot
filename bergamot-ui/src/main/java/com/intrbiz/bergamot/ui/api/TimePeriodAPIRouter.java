@@ -12,12 +12,16 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
+import com.intrbiz.bergamot.timerange.TimeRangeParser;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.AsBoolean;
+import com.intrbiz.metadata.AsString;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Param;
-import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Var;
 
@@ -49,17 +53,44 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
         return Util.nullable(db.getTimePeriod(id), TimePeriod::toMO);
     }
     
-    @Post("/create")
+    @Any("/configure")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TimePeriodMO createTimePeriod(BergamotDB db, @Var("site") Site site, @Param("configuration") String configurationXML)
+    public TimePeriodMO configureTimePeriod(BergamotDB db, @Var("site") Site site, @Param("configuration") String configurationXML)
     {
         // parse the config and allocate the id
         TimePeriodCfg config = TimePeriodCfg.fromString(TimePeriodCfg.class, configurationXML);
         config.setId(site.randomObjectId());
-        // TODO: validate the config?
         // create the time period
-        TimePeriod timePeriod = action("create-timeperiod", config);
+        TimePeriod timePeriod = action("create-time-period", config);
+        return timePeriod.toMO();
+    }
+    
+    @Any("/create")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public TimePeriodMO createTimePeriod(BergamotDB db, @Var("site") Site site, @Param("name") String name, @Param("summary") String summary, @Param("template") @AsBoolean Boolean template, @ListParam("extends") List<String> inherits, @ListParam("exclude") List<String> excludes, @ListParam("time-range") List<String> timeRanges)
+    {
+        // parse the config and allocate the id
+        TimePeriodCfg config = new TimePeriodCfg();
+        config.setId(site.randomObjectId());
+        config.setName(name);
+        config.setSummary(summary);
+        config.setTemplate(template);
+        for (String inherit : inherits)
+        {
+            config.getInheritedTemplates().add(inherit);
+        }
+        for (String exclude : excludes)
+        {
+            config.getExcludes().add(exclude);
+        }
+        for (String timeRange : timeRanges)
+        {
+            config.getTimeRanges().add(TimeRangeParser.parseTimeRange(timeRange));
+        }
+        // create the time period
+        TimePeriod timePeriod = action("create-time-period", config);
         return timePeriod.toMO();
     }
 }
