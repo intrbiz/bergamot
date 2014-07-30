@@ -172,7 +172,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract void setConfig(Config template);
     
     @SQLGetter(table = Config.class, name = "get_config", since = @SQLVersion({1, 0, 0}))
-    public abstract Config getConfig(@SQLParam("id") UUID siteId);
+    public abstract Config getConfig(@SQLParam("id") UUID id);
     
     @SQLRemove(table = Config.class, name = "remove_config", since = @SQLVersion({1, 0, 0}))
     public abstract void removeConfig(@SQLParam("id") UUID id);
@@ -184,6 +184,14 @@ public abstract class BergamotDB extends DatabaseAdapter
             query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND type = p_type AND template = TRUE")
     )
     public abstract List<Config> listConfigTemplates(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type") String type);
+    
+    @SQLGetter(table = Config.class, name = "get_config_by_name", since = @SQLVersion({1, 0, 0}))
+    public abstract Config getConfigByName(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
+    
+    public ConfigResolver getConfigResolver(UUID siteId)
+    {
+        return new ConfigResolver(this, siteId);
+    }
     
     // time period
     
