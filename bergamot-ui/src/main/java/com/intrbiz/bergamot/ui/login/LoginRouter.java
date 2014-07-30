@@ -1,6 +1,9 @@
 package com.intrbiz.bergamot.ui.login;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
@@ -19,10 +22,15 @@ import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 @Prefix("/")
 public class LoginRouter extends Router<BergamotApp>
 {
+    public static final String USERNAME_COOKIE = "bergamot.username";
+    
+    private Logger logger = Logger.getLogger(LoginRouter.class);
+    
     @Get("/login")
     public void login(@Param("redirect") String redirect)
     {
         model("redirect", redirect);
+        model("username", cookie(USERNAME_COOKIE));
         encodeOnly("login/login");
     }
 
@@ -30,11 +38,13 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireValidAccessTokenForURL()
     public void doLogin(@Param("username") String username, @Param("password") String password, @Param("redirect") String redirect) throws IOException
     {
-        System.out.println("Login: " + username);
+        logger.info("Login: " + username);
         authenticate(username, password);
         // store the current site and contact
         Contact contact = sessionVar("contact", currentPrincipal());
         sessionVar("site", contact.getSite());
+        // set a cookie of the username, to remember the user
+        cookie().name(USERNAME_COOKIE).value(username).path(path("/login")).expiresAfter(90, TimeUnit.DAYS).httpOnly().set();
         // redirect
         redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
     }
