@@ -85,13 +85,14 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @Any("/create")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TimePeriodMO createTimePeriod(BergamotDB db, @Var("site") Site site, @Param("name") String name, @Param("summary") String summary, @Param("template") @AsBoolean Boolean template, @ListParam("extends") List<String> inherits, @ListParam("exclude") List<String> excludes, @ListParam("time-range") List<String> timeRanges)
+    public TimePeriodMO createTimePeriod(BergamotDB db, @Var("site") Site site, @Param("name") String name, @Param("summary") String summary, @Param("description") String description, @Param("template") @AsBoolean Boolean template, @ListParam("extends") List<String> inherits, @ListParam("exclude") List<String> excludes, @ListParam("time-range") List<String> timeRanges)
     {
         // parse the config and allocate the id
         TimePeriodCfg config = new TimePeriodCfg();
         config.setId(site.randomObjectId());
         config.setName(name);
         config.setSummary(summary);
+        config.setDescription(description);
         config.setTemplate(template);
         for (String inherit : inherits)
         {
