@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.ui.action;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Config;
@@ -9,6 +11,8 @@ import com.intrbiz.metadata.Action;
 
 public class TimePeriodActions
 {
+    private Logger logger = Logger.getLogger(TimePeriodActions.class);
+    
     @Action("create-time-period")
     public TimePeriod createTimePeriod(TimePeriodCfg config)
     {
@@ -22,7 +26,7 @@ public class TimePeriodActions
             // create the time period
             TimePeriod timePeriod = new TimePeriod();
             timePeriod.configure(config);
-            System.out.println("Storing TimePeriod: " + timePeriod.toJSON());
+            logger.info("Creating TimePeriod: " + timePeriod.toJSON());
             db.setTimePeriod(timePeriod);
             return timePeriod;
         }
