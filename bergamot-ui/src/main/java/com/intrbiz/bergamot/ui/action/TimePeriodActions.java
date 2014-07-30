@@ -26,8 +26,12 @@ public class TimePeriodActions
             // create the time period
             TimePeriod timePeriod = new TimePeriod();
             timePeriod.configure(config);
-            logger.info("Creating TimePeriod: " + timePeriod.toJSON());
-            db.setTimePeriod(timePeriod);
+            // store it?
+            if (! config.getTemplateBooleanValue())
+            {
+                logger.info("Storing TimePeriod: " + timePeriod.toJSON());
+                db.setTimePeriod(timePeriod);
+            }
             return timePeriod;
         }
     }
