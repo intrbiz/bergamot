@@ -20,6 +20,7 @@ import com.intrbiz.bergamot.ui.api.ContactAPIRouter;
 import com.intrbiz.bergamot.ui.api.GroupAPIRouter;
 import com.intrbiz.bergamot.ui.api.HostAPIRouter;
 import com.intrbiz.bergamot.ui.api.LocationAPIRouter;
+import com.intrbiz.bergamot.ui.api.MetricsAPIRouter;
 import com.intrbiz.bergamot.ui.api.ResourceAPIRouter;
 import com.intrbiz.bergamot.ui.api.ServiceAPIRouter;
 import com.intrbiz.bergamot.ui.api.TeamAPIRouter;
@@ -107,6 +108,7 @@ public class BergamotApp extends BalsaApplication
         router(new ContactRouter());
         // API
         router(new APIRouter());
+        router(new MetricsAPIRouter());
         router(new AlertsAPIRouter());
         router(new HostAPIRouter());
         router(new LocationAPIRouter());
