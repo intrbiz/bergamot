@@ -1,5 +1,5 @@
 <permissions>
-	<permission name="ui.login">
+	<permission name="ui.access">
 		<summary>Allow access to the Web UI</summary>
 		<description>A contact must be granted this permission in order to be able to login and access the web user interface</description>
 	</permission>

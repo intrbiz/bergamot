@@ -40,6 +40,8 @@ public class LoginRouter extends Router<BergamotApp>
     {
         logger.info("Login: " + username);
         authenticate(username, password);
+        // assert that the contact is permitted UI access
+        require(permission("ui.access"));
         // store the current site and contact
         Contact contact = sessionVar("contact", currentPrincipal());
         sessionVar("site", contact.getSite());
