@@ -17,9 +17,11 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.LocationMO;
@@ -107,7 +109,11 @@ public class BergamotTranscoder
         RegisterWatcher.class,
         // watcher
         RegisterCheck.class,
-        UnregisterCheck.class
+        UnregisterCheck.class,
+        // generic
+        ErrorMO.class,
+        // auth
+        AuthTokenMO.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();

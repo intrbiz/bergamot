@@ -9,6 +9,7 @@ import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
@@ -26,9 +27,9 @@ public class APIRouter extends Router<BergamotApp>
     @Catch(BalsaNotFound.class)
     @Any("**")
     @JSON(status = HTTPStatus.NotFound)
-    public String notFound()
+    public ErrorMO notFound()
     {
-        return "Not found";
+        return new ErrorMO("Not found");
     }
     
     /**
@@ -37,9 +38,9 @@ public class APIRouter extends Router<BergamotApp>
     @Catch(BalsaSecurityException.class)
     @Any("**")
     @JSON(status = HTTPStatus.Forbidden)
-    public String accessDenied()
+    public ErrorMO accessDenied()
     {
-        return "Access denied";
+        return new ErrorMO("Access denied");
     }
     
     /**
