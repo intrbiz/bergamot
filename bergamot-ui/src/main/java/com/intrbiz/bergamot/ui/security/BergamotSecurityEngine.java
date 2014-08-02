@@ -2,42 +2,27 @@ package com.intrbiz.bergamot.ui.security;
 
 import static com.intrbiz.balsa.BalsaContext.*;
 
+import java.nio.ByteBuffer;
 import java.security.Principal;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Timer;
 import com.intrbiz.balsa.engine.impl.security.SecurityEngineImpl;
-import com.intrbiz.balsa.engine.security.Credentials;
-import com.intrbiz.balsa.engine.security.PasswordCredentials;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.data.DataException;
-import com.intrbiz.gerald.source.IntelligenceSource;
-import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 public class BergamotSecurityEngine extends SecurityEngineImpl
 {
     private Logger logger = Logger.getLogger(BergamotSecurityEngine.class);
-    
-    private final Timer authenticateTimer;
-    
-    private final Counter validLogins;
-    
-    private final Counter invalidLogins;
 
     public BergamotSecurityEngine()
     {
         super();
-        // setup metrics
-        IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot");
-        this.authenticateTimer = source.getRegistry().timer(Witchcraft.name(BergamotSecurityEngine.class, "authenticate"));
-        this.validLogins       = source.getRegistry().counter(Witchcraft.name(BergamotSecurityEngine.class, "valid-logins"));
-        this.invalidLogins     = source.getRegistry().counter(Witchcraft.name(BergamotSecurityEngine.class, "invalid-logins"));
     }
 
     @Override
@@ -45,68 +30,69 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     {
         return "Bergamot Security Engine";
     }
+    
+    protected String getMetricsIntelligenceSourceName()
+    {
+        return "com.intrbiz.bergamot";
+    }
 
     @Override
-    public Principal authenticate(Credentials credentials) throws BalsaSecurityException
+    protected byte[] tokenForPrincipal(Principal principal)
     {
-        if (credentials instanceof PasswordCredentials)
+        byte[] token = new byte[16];
+        ByteBuffer bb = ByteBuffer.wrap(token);
+        UUID id = ((Contact) principal).getId();
+        bb.putLong(id.getMostSignificantBits());
+        bb.putLong(id.getLeastSignificantBits());
+        return token;
+    }
+
+    @Override
+    protected Principal principalForToken(byte[] token)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(token);
+        UUID id = new UUID(bb.getLong(), bb.getLong());
+        try (BergamotDB db = BergamotDB.connect())
         {
-            Timer.Context tCtx = this.authenticateTimer.time();
-            try
-            {
-                PasswordCredentials pw = (PasswordCredentials) credentials;
-                try (BergamotDB db = BergamotDB.connect())
-                {
-                    logger.info("Authentication for principal: " + pw.getPrincipalName() + ", server: " + Balsa().request().getServerName());
-                    logger.debug("Looking up site: " + Balsa().request().getServerName());
-                    // lookup the site
-                    Site site = db.getSiteByName(Balsa().request().getServerName());
-                    // validate
-                    if (site == null)
-                    {
-                        logger.error("Failed to determine the site for the server name: " + Balsa().request().getServerName() + ", authentication cannot continue.");
-                        this.invalidLogins.inc();
-                        throw new BalsaSecurityException("No such principal");
-                    }
-                    // lookup the principal
-                    Contact contact = db.getContactByNameOrEmail(site.getId(), pw.getPrincipalName());
-                    // validate
-                    if (contact == null)
-                    {
-                        logger.error("No such principal " + pw.getPrincipalName() + " for site " + site + " could be found.");
-                        this.invalidLogins.inc();
-                        throw new BalsaSecurityException("No such principal");
-                    }
-                    if (! contact.verifyPassword(new String(pw.getPassword())))
-                    {
-                        logger.error("Password mismatch for principal " + pw.getPrincipalName() + " => " + site + "::" + contact);
-                        // TODO record login failure
-                        this.invalidLogins.inc();
-                        throw new BalsaSecurityException("Invalid password");
-                    }
-                    if (! this.check(contact, "ui.login"))
-                    {
-                        logger.error("Login is denied for principal " + pw.getPrincipalName() + " => " + site + "::" + contact);
-                        this.invalidLogins.inc();
-                        throw new BalsaSecurityException("Login denied");
-                    }
-                    this.validLogins.inc();
-                    return contact;
-                }
-                catch (DataException e)
-                {
-                    logger.error("Cannot authenticate principle, database error", e);
-                    this.invalidLogins.inc();
-                    throw new BalsaSecurityException("Error getting principal");
-                }
-            }
-            finally
-            {
-                tCtx.stop();
-            }
+            return db.getContact(id);
         }
-        this.invalidLogins.inc();
-        throw new BalsaSecurityException("No such principal");
+    }
+
+    @Override
+    protected Principal doPasswordLogin(String username, char[] password) throws BalsaSecurityException
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            logger.info("Authentication for principal: " + username + ", server: " + Balsa().request().getServerName());
+            logger.debug("Looking up site: " + Balsa().request().getServerName());
+            // lookup the site
+            Site site = db.getSiteByName(Balsa().request().getServerName());
+            // validate
+            if (site == null)
+            {
+                logger.error("Failed to determine the site for the server name: " + Balsa().request().getServerName() + ", authentication cannot continue.");
+                this.invalidLogins.inc();
+                throw new BalsaSecurityException("No such principal");
+            }
+            // lookup the principal
+            Contact contact = db.getContactByNameOrEmail(site.getId(), username);
+            // does the username exist?
+            if (contact == null) return null;
+            // check the password
+            if (! contact.verifyPassword(new String(password)))
+            {
+                logger.error("Password mismatch for principal " + username + " => " + site.getId() + "::" + contact.getId());
+                this.invalidLogins.inc();
+                throw new BalsaSecurityException("Invalid password");
+            }
+            return contact;
+        }
+        catch (DataException e)
+        {
+            logger.error("Cannot authenticate principal, database error", e);
+            this.validLogins.inc();
+            throw new BalsaSecurityException("Error getting principal");
+        }
     }
 
     /**
