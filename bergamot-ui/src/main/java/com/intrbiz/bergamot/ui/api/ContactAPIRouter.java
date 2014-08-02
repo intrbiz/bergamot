@@ -16,10 +16,12 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/contact")
+@RequireValidPrincipal()
 public class ContactAPIRouter extends Router<BergamotApp>
 {
     @Get("/")

@@ -18,10 +18,12 @@ import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/trap")
+@RequireValidPrincipal()
 public class TrapAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:host/:name")

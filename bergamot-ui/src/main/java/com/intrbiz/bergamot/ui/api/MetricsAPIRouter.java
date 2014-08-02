@@ -13,8 +13,10 @@ import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/api/metrics")
+@RequireValidPrincipal()
 public class MetricsAPIRouter extends Router<BergamotApp>
 {   
     @Get("/sources")

@@ -12,10 +12,12 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 
 
 @Prefix("/api/alert")
+@RequireValidPrincipal()
 public class AlertsAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
