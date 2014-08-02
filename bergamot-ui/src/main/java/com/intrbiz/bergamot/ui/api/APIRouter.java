@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.ui.api;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
+import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
@@ -28,6 +29,17 @@ public class APIRouter extends Router<BergamotApp>
     public String notFound()
     {
         return "Not found";
+    }
+    
+    /**
+     * Default global API 403 error handler
+     */
+    @Catch(BalsaSecurityException.class)
+    @Any("**")
+    @JSON(status = HTTPStatus.Forbidden)
+    public String accessDenied()
+    {
+        return "Access denied";
     }
     
     /**
