@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.ui.api;
 
+import java.util.concurrent.TimeUnit;
+
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
@@ -9,6 +11,7 @@ import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -16,6 +19,7 @@ import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Order;
+import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 
 @Prefix("/api/")
@@ -53,6 +57,9 @@ public class APIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void authenticateRequest(BergamotDB db)
     {
+        // BTF skip auth for auth routes
+        // TODO: we should be able to declare this rule in Balsa
+        if ("/api/auth-token".equals(request().getPathInfo()) || "/api/extend-auth-token".equals(request().getPathInfo())) return;
         // perform a token based request authentication
         // we may already have the auth from the session, if shared with a UI session
         if (! this.validPrincipal())
@@ -64,5 +71,31 @@ public class APIRouter extends Router<BergamotApp>
         // setup the site based on the authenticated principal
         Contact contact = var("contact", currentPrincipal());
         var("site", contact.getSite());
+    }
+    
+    /**
+     * Authenticate a user for API access, 
+     */
+    @Any("/auth-token")
+    @JSON()
+    public AuthTokenMO getAuthToken(@Param("username") String username, @Param("password") String password)
+    {
+        authenticateRequest(username, password);
+        long expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
+        String token = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiresAt);
+        return new AuthTokenMO(token, expiresAt);
+    }
+    
+    /**
+     * Extend an authentication token 
+     */
+    @Any("/extend-auth-token")
+    @JSON()
+    public AuthTokenMO extendAuthToken(@Param("auth-token") String token)
+    {
+        authenticateRequest(new GenericAuthenticationToken(token));
+        long expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
+        String newToken = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiresAt);
+        return new AuthTokenMO(newToken, expiresAt);
     }
 }

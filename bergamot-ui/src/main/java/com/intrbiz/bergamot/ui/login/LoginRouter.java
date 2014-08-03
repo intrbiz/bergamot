@@ -9,12 +9,10 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.Get;
-import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
@@ -27,23 +25,6 @@ public class LoginRouter extends Router<BergamotApp>
     public static final String USERNAME_COOKIE = "bergamot.username";
     
     private Logger logger = Logger.getLogger(LoginRouter.class);
-    
-    /**
-     * Authenticate a user for API access, 
-     */
-    @Any("/auth-token")
-    @JSON()
-    public AuthTokenMO getAuthToken(@Param("username") String username, @Param("password") String password)
-    {
-        // authenticate the user
-        authenticateRequest(username, password);
-        // how long to auth for
-        long expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
-        // generate the token
-        String token = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiresAt);
-        // respond
-        return new AuthTokenMO(token, expiresAt);
-    }
     
     @Get("/login")
     public void login(@Param("redirect") String redirect)
