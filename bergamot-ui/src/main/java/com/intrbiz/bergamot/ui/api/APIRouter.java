@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
+import com.intrbiz.metadata.IgnorePaths;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
@@ -53,13 +54,12 @@ public class APIRouter extends Router<BergamotApp>
      */
     @Before
     @Any("**")
+    /* We don't want to filter the authentication routes */
+    @IgnorePaths({"/auth-token", "/extend-auth-token"})
     @Order(10)
     @WithDataAdapter(BergamotDB.class)
     public void authenticateRequest(BergamotDB db)
     {
-        // BTF skip auth for auth routes
-        // TODO: we should be able to declare this rule in Balsa
-        if ("/api/auth-token".equals(request().getPathInfo()) || "/api/extend-auth-token".equals(request().getPathInfo())) return;
         // perform a token based request authentication
         // we may already have the auth from the session, if shared with a UI session
         if (! this.validPrincipal())
