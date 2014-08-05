@@ -7,8 +7,10 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.message.DowntimeMO;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -26,7 +28,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * dependencies.
  */
 @SQLTable(schema = BergamotDB.class, name = "downtime", since = @SQLVersion({ 1, 0, 0 }))
-public class Downtime implements Serializable, TimeRange, Commented
+public class Downtime extends BergamotObject<DowntimeMO> implements Serializable, TimeRange, Commented
 {
     private static final long serialVersionUID = 1L;
     
@@ -37,6 +39,9 @@ public class Downtime implements Serializable, TimeRange, Commented
     @SQLPrimaryKey()
     private UUID id;
 
+    /**
+     * The site id
+     */
     @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
     private UUID siteId;
@@ -47,9 +52,15 @@ public class Downtime implements Serializable, TimeRange, Commented
     @SQLColumn(index = 3, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID checkId;
     
+    /**
+     * The summary of this downtime
+     */
     @SQLColumn(index = 4, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected String summary;
 
+    /**
+     * The description of this downtime
+     */
     @SQLColumn(index = 5, name = "description", since = @SQLVersion({ 1, 0, 0 }))
     protected String description;
 
@@ -68,9 +79,9 @@ public class Downtime implements Serializable, TimeRange, Commented
     /**
      * Whom created this downtime
      */
-    @SQLColumn(index = 8, name = "created_by", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "created_by_id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL)
-    protected UUID createdBy;
+    protected UUID createdById;
     
     /**
      * When does this downtime start (in UTC)
@@ -159,14 +170,14 @@ public class Downtime implements Serializable, TimeRange, Commented
         this.updated = updated;
     }
 
-    public UUID getCreatedBy()
+    public UUID getCreatedById()
     {
-        return createdBy;
+        return createdById;
     }
 
-    public void setCreatedBy(UUID createdBy)
+    public void setCreatedById(UUID createdById)
     {
-        this.createdBy = createdBy;
+        this.createdById = createdById;
     }
 
     public Timestamp getStarts()
@@ -223,8 +234,40 @@ public class Downtime implements Serializable, TimeRange, Commented
         return this.getComments(5);
     }
     
+    public Check<?,?> getCheck()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCheck(this.getCheckId());
+        }
+    }
+    
+    public Contact getCreatedBy()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getContact(this.getCreatedById());
+        }
+    }
+    
     public String toString()
     {
         return "Downtime { check => " + this.getCheckId() + ", starts => " + this.getStarts() + ", ends => " + this.getEnds() + ", summary => " + this.getSummary()  + " }";
+    }
+    
+    public DowntimeMO toMO(boolean stub)
+    {
+        DowntimeMO mo = new DowntimeMO();
+        mo.setCheck(this.getCheck().toStubMO());
+        mo.setComments(this.getComments().stream().map(Comment::toMO).collect(Collectors.toList()));
+        mo.setCreated(this.getCreated().getTime());
+        mo.setCreatedBy(this.getCreatedBy().toStubMO());
+        mo.setDescription(this.getDescription());
+        mo.setEnds(this.getEnds().getTime());
+        mo.setId(this.getId());
+        mo.setStarts(this.getStarts().getTime());
+        mo.setSummary(this.getSummary());
+        mo.setUpdated(this.getUpdated() == null ? -1 : this.getUpdated().getTime());
+        return mo;
     }
 }

@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -18,7 +21,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * An alert which was raised against a check
  */
 @SQLTable(schema = BergamotDB.class, name = "alert", since = @SQLVersion({ 1, 0, 0 }))
-public class Alert implements Serializable, Commented
+public class Alert extends BergamotObject<AlertMO> implements Serializable, Commented
 {
     private static final long serialVersionUID = 1L;
     
@@ -146,9 +149,9 @@ public class Alert implements Serializable, Commented
     /**
      * Whom acknowledged this alert
      */
-    @SQLColumn(index = 21, name = "acknowledged_by", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 21, name = "acknowledged_by_id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL)
-    private UUID acknowledgedBy;
+    private UUID acknowledgedById;
 
     /**
      * Has this alert recovered by itself
@@ -197,7 +200,7 @@ public class Alert implements Serializable, Commented
         // defaults for other state
         this.acknowledged = false;
         this.acknowledgedAt = null;
-        this.acknowledgedBy = null;
+        this.acknowledgedById = null;
         this.recovered = false;
         this.recoveredAt = null;
         this.recoveredBy = null;
@@ -403,14 +406,14 @@ public class Alert implements Serializable, Commented
         this.acknowledgedAt = acknowledgedAt;
     }
 
-    public UUID getAcknowledgedBy()
+    public UUID getAcknowledgedById()
     {
-        return acknowledgedBy;
+        return acknowledgedById;
     }
 
-    public void setAcknowledgedBy(UUID acknowledgedBy)
+    public void setAcknowledgedById(UUID acknowledgedById)
     {
-        this.acknowledgedBy = acknowledgedBy;
+        this.acknowledgedById = acknowledgedById;
     }
 
     public boolean isRecovered()
@@ -444,7 +447,7 @@ public class Alert implements Serializable, Commented
     }
     
     /**
-     * Get comments against this downtime
+     * Get comments against this alert
      * @param limit the maximum number of comments to get
      */
     @Override
@@ -457,11 +460,63 @@ public class Alert implements Serializable, Commented
     }
 
     /**
-     * Get comments against this downtime
+     * Get comments against this alert
      */
     @Override
     public List<Comment> getComments()
     {
         return this.getComments(5);
+    }
+    
+    /**
+     * The check
+     */
+    public Check<?,?> getCheck()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCheck(this.getCheckId());
+        }
+    }
+    
+    public Contact getAcknowledgedBy()
+    {
+        if (this.getAcknowledgedById() == null) return null;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getContact(this.getAcknowledgedById());
+        }
+    }
+
+    @Override
+    public AlertMO toMO(boolean stub)
+    {
+        AlertMO mo = new AlertMO();
+        mo.setAcknowledged(this.isAcknowledged());
+        mo.setAcknowledgedAt(this.getAcknowledgedAt() == null ? -1 : this.getAcknowledgedAt().getTime());
+        mo.setAcknowledgedBy(Util.nullable(this.getAcknowledgedBy(), Contact::toStubMO));
+        mo.setCheck(this.getCheck().toStubMO());
+        mo.setFlapping(this.isFlapping());
+        mo.setHard(this.isHard());
+        mo.setId(this.getId());
+        mo.setLastCheckId(this.getLastCheckId());
+        mo.setLastCheckTime(this.getLastCheckTime() == null ? -1 : this.getLastCheckTime().getTime());
+        mo.setLastHardOk(this.isLastHardOk());
+        mo.setLastHardOutput(this.getLastHardOutput());
+        mo.setLastHardStatus(this.getLastHardStatus().toString());
+        mo.setLastStateChange(this.getLastStateChange() == null ? -1 : this.getLastStateChange().getTime());
+        mo.setOk(this.isOk());
+        mo.setOutput(this.getOutput());
+        mo.setRaised(this.getRaised().getTime());
+        mo.setRecovered(this.isRecovered());
+        mo.setRecoveredAt(this.getRecoveredAt() == null ? -1 : this.getRecoveredAt().getTime());
+        mo.setRecoveredBy(this.getRecoveredBy());
+        mo.setStatus(this.getStatus().toString());
+        mo.setTransitioning(this.isTransitioning());
+        if (! stub)
+        {
+            mo.setComments(this.getComments().stream().map(Comment::toMO).collect(Collectors.toList()));
+        }
+        return mo;
     }
 }

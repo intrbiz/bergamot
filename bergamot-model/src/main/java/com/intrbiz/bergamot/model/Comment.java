@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
@@ -16,9 +17,20 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A comment against an alert, check, etc
  */
 @SQLTable(schema = BergamotDB.class, name = "comment", since = @SQLVersion({ 1, 0, 0 }))
-public class Comment implements Serializable
+public class Comment extends BergamotObject<CommentMO> implements Serializable
 {
     private static final long serialVersionUID = 1L;
+    
+    public static final class CommentType {
+        public static final String GENERAL = "general";
+        public static final String ACKNOWLEDGEMENT = "acknowledgement";
+    }
+    
+    public static final class Format {
+        public static final String PLAIN = "plain";
+        public static final String MARKDOWN = "markdown";
+        public static final String HTML = "html";
+    }
 
     /**
      * The unique ID for this comment
@@ -47,7 +59,7 @@ public class Comment implements Serializable
      * The type of the comment: "general", "acknowledgement", ...
      */
     @SQLColumn(index = 5, name = "comment_type", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    protected String commentType = "general";
+    protected String commentType = CommentType.GENERAL;
 
     /**
      * The summary (title) of the comment
@@ -76,8 +88,8 @@ public class Comment implements Serializable
     /**
      * Who created this alert
      */
-    @SQLColumn(index = 10, name = "author", since = @SQLVersion({ 1, 0, 0 }))
-    private UUID author;
+    @SQLColumn(index = 10, name = "author_id", since = @SQLVersion({ 1, 0, 0 }))
+    private UUID authorId;
 
     public Comment()
     {
@@ -174,18 +186,96 @@ public class Comment implements Serializable
         this.updated = updated;
     }
 
-    public UUID getAuthor()
+    public UUID getAuthorId()
     {
-        return author;
+        return authorId;
     }
 
-    public void setAuthor(UUID author)
+    public void setAuthorId(UUID authorId)
     {
-        this.author = author;
+        this.authorId = authorId;
+    }
+    
+    public Contact getAuthor()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getContact(this.getAuthorId());
+        }
     }
 
     public String toString()
     {
         return "Comment { id => " + this.getId() + ", object => " + this.getObjectId() + ", summary => " + this.getSummary() + " }";
+    }
+    
+    @Override
+    public CommentMO toMO(boolean stub)
+    {
+        CommentMO mo = new CommentMO();
+        mo.setAuthor(this.getAuthor().toStubMO());
+        mo.setComment(this.getComment());
+        mo.setCommentType(this.getCommentType());
+        mo.setCreated(this.getCreated().getTime());
+        mo.setFormat(this.getFormat());
+        mo.setId(this.getId());
+        mo.setSummary(this.getSummary());
+        mo.setUpdated(this.getUpdated() == null ? -1 : this.getUpdated().getTime());
+        return mo;
+    }
+    
+    // helpers
+    
+    public Comment on(Check<?, ?> check)
+    {
+        this.setSiteId(check.getSiteId());
+        this.setObjectId(check.getId());
+        this.setId(Site.randomId(this.getSiteId()));
+        this.setCreated(new Timestamp(System.currentTimeMillis()));
+        this.setUpdated(new Timestamp(System.currentTimeMillis()));
+        return this;
+    }
+    
+    public Comment on(Alert alert)
+    {
+        this.setSiteId(alert.getSiteId());
+        this.setObjectId(alert.getId());
+        this.setId(Site.randomId(this.getSiteId()));
+        this.setCreated(new Timestamp(System.currentTimeMillis()));
+        this.setUpdated(new Timestamp(System.currentTimeMillis()));
+        return this;
+    }
+    
+    public Comment author(Contact author)
+    {
+        this.setAuthorId(author.getId());
+        return this;
+    }
+    
+    public Comment acknowledges(Alert alert)
+    {
+        this.on(alert);
+        this.setCommentType(CommentType.ACKNOWLEDGEMENT);
+        return this;
+    }
+    
+    public Comment summary(String summary)
+    {
+        this.setSummary(summary);
+        return this;
+    }
+    
+    public Comment message(String fomat, String message)
+    {
+        this.setFormat(fomat);
+        this.setComment(message);
+        return this;
+    }
+    
+    public Comment message(String message)
+    {
+        this.setFormat(Format.PLAIN);
+        this.setComment(message);
+        return this;
     }
 }

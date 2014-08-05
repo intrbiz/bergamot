@@ -17,10 +17,13 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.CommandMO;
+import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.DowntimeMO;
 import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.message.HostMO;
@@ -80,6 +83,9 @@ public class BergamotTranscoder
         LocationMO.class,
         TeamMO.class,
         TimePeriodMO.class,
+        AlertMO.class,
+        CommentMO.class,
+        DowntimeMO.class,
         // model
         ParameterMO.class,
         // messages
