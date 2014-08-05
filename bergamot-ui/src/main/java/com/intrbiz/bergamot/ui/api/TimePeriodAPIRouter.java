@@ -55,7 +55,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
         return Util.nullable(db.getTimePeriod(id), TimePeriod::toMO);
     }
     
-    @Get("/name/:name/config")
+    @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @Var("site") Site site, String name)
@@ -63,7 +63,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
         return Util.nullable(db.getTimePeriodByName(site.getId(), name), TimePeriod::getConfiguration);
     }
     
-    @Get("/id/:id/config")
+    @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @AsUUID UUID id)

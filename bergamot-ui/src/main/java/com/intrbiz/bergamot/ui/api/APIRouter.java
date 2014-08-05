@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.ui.api;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
@@ -22,15 +24,41 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.XML;
 
 @Prefix("/api/")
 public class APIRouter extends Router<BergamotApp>
 {   
     /**
+     * Default global API 404 error handler for XML responses (config)
+     */
+    @Catch(BalsaNotFound.class)
+    @Any("**\\.xml")
+    @Order(10)
+    @XML(status = HTTPStatus.NotFound)
+    public ErrorMO notFoundXML()
+    {
+        return new ErrorMO("Not found");
+    }
+    
+    /**
+     * Default global API 403 error handler for XML responses (config)
+     */
+    @Catch(BalsaSecurityException.class)
+    @Any("**\\.xml")
+    @Order(10)
+    @XML(status = HTTPStatus.Forbidden)
+    public ErrorMO accessDeniedXML()
+    {
+        return new ErrorMO("Access denied");
+    }
+    
+    /**
      * Default global API 404 error handler
      */
     @Catch(BalsaNotFound.class)
     @Any("**")
+    @Order(20)
     @JSON(status = HTTPStatus.NotFound)
     public ErrorMO notFound()
     {
@@ -42,10 +70,28 @@ public class APIRouter extends Router<BergamotApp>
      */
     @Catch(BalsaSecurityException.class)
     @Any("**")
+    @Order(20)
     @JSON(status = HTTPStatus.Forbidden)
     public ErrorMO accessDenied()
     {
         return new ErrorMO("Access denied");
+    }
+    
+    /**
+     * Default global API 500 error handler
+     */
+    @Catch()
+    @Any("**")
+    @Order(Order.LAST)
+    @JSON(status = HTTPStatus.InternalServerError)
+    public ErrorMO internalServerError()
+    {
+        Throwable error = balsa().getException();
+        if (error != null)
+        {
+            Logger.getLogger(APIRouter.class).error("Caught internal server error: " + error.getMessage(), error);
+        }
+        return new ErrorMO(error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage());
     }
     
     /**
