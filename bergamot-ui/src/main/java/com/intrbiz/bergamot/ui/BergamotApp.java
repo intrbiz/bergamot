@@ -24,6 +24,7 @@ import com.intrbiz.bergamot.ui.api.MetricsAPIRouter;
 import com.intrbiz.bergamot.ui.api.ResourceAPIRouter;
 import com.intrbiz.bergamot.ui.api.ServiceAPIRouter;
 import com.intrbiz.bergamot.ui.api.TeamAPIRouter;
+import com.intrbiz.bergamot.ui.api.TestAPIRouter;
 import com.intrbiz.bergamot.ui.api.TimePeriodAPIRouter;
 import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.login.LoginRouter;
@@ -106,6 +107,7 @@ public class BergamotApp extends BalsaApplication
         router(new ResourceRouter());
         router(new TeamRouter());
         router(new ContactRouter());
+        router(new TimePeriodRouter());
         // API
         router(new APIRouter());
         router(new MetricsAPIRouter());
@@ -121,7 +123,7 @@ public class BergamotApp extends BalsaApplication
         router(new CommandAPIRouter());
         router(new ContactAPIRouter());
         router(new TeamAPIRouter());
-        router(new TimePeriodRouter());
+        router(new TestAPIRouter());
     }
     
     @Override
