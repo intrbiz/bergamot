@@ -363,6 +363,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
             mo.setReferencedBy(this.getReferencedBy().stream().map((v) -> {return (VirtualCheckMO) v.toStubMO();}).collect(Collectors.toList()));
             mo.setNotifications(this.getNotifications().toMO());
             mo.setDowntime(this.getDowntime().stream().map(Downtime::toStubMO).collect(Collectors.toList()));
+            mo.setComments(this.getComments().stream().map(Comment::toStubMO).collect(Collectors.toList()));
         }
     }
 }

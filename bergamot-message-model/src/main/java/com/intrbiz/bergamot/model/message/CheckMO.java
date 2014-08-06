@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 
-public abstract class CheckMO extends NamedObjectMO
+public abstract class CheckMO extends NamedObjectMO implements CommentedMO
 {
     @JsonProperty("state")
     protected CheckStateMO state;
@@ -38,6 +38,9 @@ public abstract class CheckMO extends NamedObjectMO
     
     @JsonProperty("downtime")
     protected List<DowntimeMO> downtime = new LinkedList<DowntimeMO>();
+    
+    @JsonProperty("comments")
+    protected List<CommentMO> comments = new LinkedList<CommentMO>();
 
     public CheckMO()
     {
@@ -145,5 +148,17 @@ public abstract class CheckMO extends NamedObjectMO
     public void setDowntime(List<DowntimeMO> downtime)
     {
         this.downtime = downtime;
+    }
+
+    @Override
+    public List<CommentMO> getComments()
+    {
+        return comments;
+    }
+
+    @Override
+    public void setComments(List<CommentMO> comments)
+    {
+        this.comments = comments;
     }
 }
