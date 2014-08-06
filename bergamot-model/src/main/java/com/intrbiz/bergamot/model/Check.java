@@ -362,6 +362,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
             mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
             mo.setReferencedBy(this.getReferencedBy().stream().map((v) -> {return (VirtualCheckMO) v.toStubMO();}).collect(Collectors.toList()));
             mo.setNotifications(this.getNotifications().toMO());
+            mo.setDowntime(this.getDowntime().stream().map(Downtime::toStubMO).collect(Collectors.toList()));
         }
     }
 }

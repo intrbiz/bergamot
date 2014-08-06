@@ -35,6 +35,9 @@ public abstract class CheckMO extends NamedObjectMO
     
     @JsonProperty("pool")
     protected int pool;
+    
+    @JsonProperty("downtime")
+    protected List<DowntimeMO> downtime = new LinkedList<DowntimeMO>();
 
     public CheckMO()
     {
@@ -132,5 +135,15 @@ public abstract class CheckMO extends NamedObjectMO
     public void setPool(int pool)
     {
         this.pool = pool;
+    }
+
+    public List<DowntimeMO> getDowntime()
+    {
+        return downtime;
+    }
+
+    public void setDowntime(List<DowntimeMO> downtime)
+    {
+        this.downtime = downtime;
     }
 }
