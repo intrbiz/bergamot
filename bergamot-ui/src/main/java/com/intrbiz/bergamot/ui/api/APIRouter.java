@@ -7,7 +7,9 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
+import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaSecurityException;
+import com.intrbiz.balsa.error.BalsaValidationError;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
@@ -75,6 +77,19 @@ public class APIRouter extends Router<BergamotApp>
     public ErrorMO accessDenied()
     {
         return new ErrorMO("Access denied");
+    }
+    
+    /**
+     * Validation and Conversion error handler
+     */
+    @Catch({ BalsaValidationError.class, BalsaConversionError.class })
+    @Any("**")
+    @Order(30)
+    @JSON(status = HTTPStatus.BadRequest)
+    public ErrorMO invalideRequest()
+    {
+        // TODO: Detail
+        return new ErrorMO("Bad Request");
     }
     
     /**
