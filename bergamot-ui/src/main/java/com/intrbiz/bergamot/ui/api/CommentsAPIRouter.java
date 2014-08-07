@@ -12,8 +12,8 @@ import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.AsUUID;
+import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
-import com.intrbiz.metadata.IsMandatory;
 import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
@@ -45,7 +45,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @Get("/for-object/id/:id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public List<CommentMO> getCommentsForObject(BergamotDB db, @AsUUID UUID id, @Param("offset") @IsaLong(min = 0, max = 1000) @IsMandatory long offset, @Param("limit") @IsaLong(min = 0, max = 1000) @IsMandatory long limit)
+    public List<CommentMO> getCommentsForObject(BergamotDB db, @AsUUID UUID id, @Param("offset") @IsaLong(min = 0, max = 1000, mandatory = true, defaultValue = 0, coalesce = CoalesceMode.ON_NULL) Long offset, @Param("limit") @IsaLong(min = 0, max = 1000, mandatory = true, defaultValue = 10, coalesce = CoalesceMode.ON_NULL) long limit)
     {
         return db.getCommentsForObject(id, offset, limit).stream().map(Comment::toMO).collect(Collectors.toList());
     }

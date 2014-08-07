@@ -18,7 +18,6 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
-import com.intrbiz.metadata.IsMandatory;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
@@ -66,7 +65,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/acknowledge")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public AlertMO acknowledgeAlert(BergamotDB db, @AsUUID UUID id,@Param("summary") @CheckStringLength(min = 1, max = 80) @IsMandatory String summary, @Param("comment") @CheckStringLength(min = 1, max = 4096) @IsMandatory String comment)
+    public AlertMO acknowledgeAlert(BergamotDB db, @AsUUID UUID id,@Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String comment)
     {
         Alert alert = db.getAlert(id);
         if (alert == null) return null;
