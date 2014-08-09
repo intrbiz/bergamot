@@ -6,12 +6,16 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
+import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaLong;
@@ -53,5 +57,23 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     )
     {
         return db.getCommentsForObject(id, offset, limit).stream().map(Comment::toMO).collect(Collectors.toList());
+    }
+    
+    @Any("/add-comment-to/id/:id")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public CommentMO addCommentToObject(
+            BergamotDB db, 
+            @AsUUID UUID id, 
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
+            @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
+    )
+    {
+        Check<?, ?> check = db.getCheck(id);
+        if (check == null) throw new BalsaNotFound("No check with the id: " + id);
+        // the comment
+        Comment comment = new Comment().author(currentPrincipal()).on(check).summary(summary).message(message);
+        db.setComment(comment);
+        return comment.toMO();
     }
 }
