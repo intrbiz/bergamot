@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
@@ -62,7 +63,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         return Util.nullable(db.getCurrentAlertForCheck(id), Alert::toMO);
     }
     
-    @Get("/id/:id/acknowledge")
+    @Any("/id/:id/acknowledge")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     public AlertMO acknowledgeAlert(BergamotDB db, @AsUUID UUID id,@Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String comment)
