@@ -9,8 +9,11 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Comment;
+import com.intrbiz.bergamot.model.Downtime;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -23,6 +26,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.Var;
 
 @Prefix("/api/comment")
 @RequireValidPrincipal()
@@ -59,10 +63,10 @@ public class CommentsAPIRouter extends Router<BergamotApp>
         return db.getCommentsForObject(id, offset, limit).stream().map(Comment::toMO).collect(Collectors.toList());
     }
     
-    @Any("/add-comment-to/id/:id")
+    @Any("/add-comment-to-check/id/:id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public CommentMO addCommentToObject(
+    public CommentMO addCommentToCheck(
             BergamotDB db, 
             @AsUUID UUID id, 
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
@@ -73,6 +77,59 @@ public class CommentsAPIRouter extends Router<BergamotApp>
         if (check == null) throw new BalsaNotFound("No check with the id: " + id);
         // the comment
         Comment comment = new Comment().author(currentPrincipal()).on(check).summary(summary).message(message);
+        db.setComment(comment);
+        return comment.toMO();
+    }
+    
+    @Any("/add-comment-to-alert/id/:id")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public CommentMO addCommentToAlert(
+            BergamotDB db, 
+            @AsUUID UUID id, 
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
+            @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
+    )
+    {
+        Alert alert = db.getAlert(id);
+        if (alert == null) throw new BalsaNotFound("No alert with the id: " + id);
+        // the comment
+        Comment comment = new Comment().author(currentPrincipal()).on(alert).summary(summary).message(message);
+        db.setComment(comment);
+        return comment.toMO();
+    }
+    
+    @Any("/add-comment-to-downtime/id/:id")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public CommentMO addCommentToDowntime(
+            BergamotDB db, 
+            @AsUUID UUID id, 
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
+            @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
+    )
+    {
+        Downtime downtime = db.getDowntime(id);
+        if (downtime == null) throw new BalsaNotFound("No downtime with the id: " + id);
+        // the comment
+        Comment comment = new Comment().author(currentPrincipal()).on(downtime).summary(summary).message(message);
+        db.setComment(comment);
+        return comment.toMO();
+    }
+    
+    @Any("/add-comment-to-object/id/:id")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public CommentMO addCommentToObject(
+            BergamotDB db, 
+            @Var("site") Site site,
+            @AsUUID UUID id, 
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
+            @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
+    )
+    {
+        // the comment
+        Comment comment = new Comment().author(currentPrincipal()).on(site, id).summary(summary).message(message);
         db.setComment(comment);
         return comment.toMO();
     }
