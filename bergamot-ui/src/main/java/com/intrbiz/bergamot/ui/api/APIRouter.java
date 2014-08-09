@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.converter.ConversionException;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
@@ -27,10 +28,13 @@ import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.XML;
+import com.intrbiz.validator.ValidationException;
 
 @Prefix("/api/")
 public class APIRouter extends Router<BergamotApp>
 {   
+    private Logger logger = Logger.getLogger(APIRouter.class);
+    
     /**
      * Default global API 404 error handler for XML responses (config)
      */
@@ -88,7 +92,14 @@ public class APIRouter extends Router<BergamotApp>
     @JSON(status = HTTPStatus.BadRequest)
     public ErrorMO invalideRequest()
     {
-        // TODO: Detail
+        for (ConversionException cex : balsa().getConversionErrors())
+        {
+            logger.error("Conversion exception on request", cex);
+        }
+        for (ValidationException vex : balsa().getValidationErrors())
+        {
+            logger.error("Validation exception on request", vex);
+        }
         return new ErrorMO("Bad Request");
     }
     
@@ -104,7 +115,7 @@ public class APIRouter extends Router<BergamotApp>
         Throwable error = balsa().getException();
         if (error != null)
         {
-            Logger.getLogger(APIRouter.class).error("Caught internal server error: " + error.getMessage(), error);
+            logger.error("Caught internal server error: " + error.getMessage(), error);
         }
         return new ErrorMO(error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage());
     }
