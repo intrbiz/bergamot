@@ -51,7 +51,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 1, 0}),
+        version = @SQLVersion({1, 1, 1}),
         tables = {
             Site.class,
             Location.class,
@@ -994,14 +994,14 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract void removeDowntime(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Downtime.class, name = "get_downtimes_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "starts", direction = Direction.DESC),
-        query = @SQLQuery("SELECT * FROM bergamot.downtime WHERE check_id = p_check_id AND starts >= (now() - p_interval::INTERVAL) AND ends <= (now() + p_interval::INTERVAL)")
+    @SQLGetter(table = Downtime.class, name = "get_downtimes_for_check", since = @SQLVersion({1, 1, 1}), orderBy = @SQLOrder(value = "starts", direction = Direction.DESC),
+        query = @SQLQuery("SELECT * FROM bergamot.downtime WHERE check_id = p_check_id AND starts >= (now() - p_past_interval::INTERVAL) AND ends <= (now() + p_future_interval::INTERVAL)")
     )
-    public abstract List<Downtime> getDowntimesForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "interval", virtual = true) String interval);
+    public abstract List<Downtime> getDowntimesForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "past_interval", virtual = true) String pastInterval, @SQLParam(value = "future_interval", virtual = true) String futureInterval);
     
     public List<Downtime> getDowntimesForCheck(UUID checkId)
     {
-        return this.getDowntimesForCheck(checkId, "1 week");
+        return this.getDowntimesForCheck(checkId, "1 week", "1 week");
     }
     
     @Cacheable
