@@ -1,17 +1,22 @@
 package com.intrbiz.bergamot.ui.api;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.message.DowntimeMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
+import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaLong;
@@ -53,5 +58,28 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     )
     {
         return db.getDowntimesForCheck(id, pastDays + " days", futureDays + " days").stream().map(Downtime::toMO).collect(Collectors.toList());
+    }
+    
+    @Any("/add-downtime-to-check/id/:id")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public DowntimeMO addDowntimeToCheck(
+            BergamotDB db, 
+            @AsUUID UUID id,
+            @Param("starts") @IsaLong(min = 0, mandatory = true) Long startTime,
+            @Param("ends") @IsaLong(min = 0, mandatory = true) Long endTime,
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary,
+            @Param("description") @CheckStringLength(min = 1, max = 4096, mandatory = true) String description
+    )
+    {
+        Check<?, ?> check = db.getCheck(id);
+        if (check == null) throw new BalsaNotFound("No check with id: " + id);
+        //
+        Timestamp starts = new Timestamp(startTime);
+        Timestamp ends = new Timestamp(endTime);
+        //
+        Downtime downtime = new Downtime().createdBy(this.currentPrincipal()).on(check).between(starts, ends).summary(summary).description(description);
+        db.setDowntime(downtime);
+        return downtime.toMO();
     }
 }
