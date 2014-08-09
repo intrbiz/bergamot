@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.ui.api.ClusterAPIRouter;
 import com.intrbiz.bergamot.ui.api.CommandAPIRouter;
 import com.intrbiz.bergamot.ui.api.CommentsAPIRouter;
 import com.intrbiz.bergamot.ui.api.ContactAPIRouter;
+import com.intrbiz.bergamot.ui.api.DowntimeAPIRouter;
 import com.intrbiz.bergamot.ui.api.GroupAPIRouter;
 import com.intrbiz.bergamot.ui.api.HostAPIRouter;
 import com.intrbiz.bergamot.ui.api.LocationAPIRouter;
@@ -82,6 +83,7 @@ public class BergamotApp extends BalsaApplication
         QueueManager.getInstance().registerDefaultBroker(new RabbitPool("amqp://127.0.0.1"));
         // setup the database 
         DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://127.0.0.1/bergamot").username("bergamot").password("bergamot").build());
+        BergamotDB.install();
         try (BergamotDB db = BergamotDB.connect())
         {
             System.out.println("Database: " + db.getName() + " " + db.getVersion());
@@ -126,6 +128,7 @@ public class BergamotApp extends BalsaApplication
         router(new TeamAPIRouter());
         router(new TestAPIRouter());
         router(new CommentsAPIRouter());
+        router(new DowntimeAPIRouter());
     }
     
     @Override
