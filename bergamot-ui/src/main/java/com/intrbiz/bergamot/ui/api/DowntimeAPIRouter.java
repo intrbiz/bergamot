@@ -19,6 +19,7 @@ import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
@@ -53,8 +54,8 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     public List<DowntimeMO> getDowntimeForObject(
             BergamotDB db, 
             @AsUUID UUID id, 
-            @Param("past") @IsaLong(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer pastDays, 
-            @Param("future") @IsaLong(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer futureDays
+            @Param("past") @IsaInt(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer pastDays, 
+            @Param("future") @IsaInt(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer futureDays
     )
     {
         return db.getDowntimesForCheck(id, pastDays + " days", futureDays + " days").stream().map(Downtime::toMO).collect(Collectors.toList());
