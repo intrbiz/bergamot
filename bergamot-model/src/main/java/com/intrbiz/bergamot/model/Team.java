@@ -160,6 +160,8 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
     {
         TeamMO mo = new TeamMO();
         super.toMO(mo, stub);
+        mo.setGrantedPermissions(this.getGrantedPermissions());
+        mo.setRevokedPermissions(this.getRevokedPermissions());
         if (!stub)
         {
             mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
