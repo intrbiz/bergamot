@@ -270,4 +270,41 @@ public class Downtime extends BergamotObject<DowntimeMO> implements Serializable
         mo.setUpdated(this.getUpdated() == null ? -1 : this.getUpdated().getTime());
         return mo;
     }
+    
+    // helpers
+    
+    public Downtime on(Check<?,?> check)
+    {
+        this.setCheckId(check.getId());
+        this.setSiteId(check.getSiteId());
+        this.setId(Site.randomId(this.getSiteId()));
+        this.setCreated(new Timestamp(System.currentTimeMillis()));
+        this.setUpdated(this.getCreated());
+        return this;
+    }
+    
+    public Downtime createdBy(Contact createdBy)
+    {
+        this.setCreatedById(createdBy.getId());
+        return this;
+    }
+    
+    public Downtime between(Timestamp starts, Timestamp ends)
+    {
+        this.setStarts(starts);
+        this.setEnds(ends);
+        return this;
+    }
+    
+    public Downtime summary(String summary)
+    {
+        this.setSummary(summary);
+        return this;
+    }
+    
+    public Downtime description(String description)
+    {
+        this.setDescription(description);
+        return this;
+    }
 }
