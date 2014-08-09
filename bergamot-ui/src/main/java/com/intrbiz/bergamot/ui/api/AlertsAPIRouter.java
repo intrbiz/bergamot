@@ -66,7 +66,12 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Any("/id/:id/acknowledge")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public AlertMO acknowledgeAlert(BergamotDB db, @AsUUID UUID id,@Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String comment)
+    public AlertMO acknowledgeAlert(
+            BergamotDB db, 
+            @AsUUID UUID id,
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
+            @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String comment
+    )
     {
         Alert alert = db.getAlert(id);
         if (alert == null) return null;
