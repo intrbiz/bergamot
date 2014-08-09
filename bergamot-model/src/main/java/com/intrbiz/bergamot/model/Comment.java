@@ -226,23 +226,36 @@ public class Comment extends BergamotObject<CommentMO> implements Serializable
     
     // helpers
     
+    protected void on(UUID siteId, UUID id)
+    {
+        this.setSiteId(siteId);
+        this.setObjectId(id);
+        this.setId(Site.randomId(siteId));
+        this.setCreated(new Timestamp(System.currentTimeMillis()));
+        this.setUpdated(this.getCreated());
+    }
+    
+    public Comment on(Site site, UUID id)
+    {
+        this.on(site.getId(), id);
+        return this;
+    }
+    
     public Comment on(Check<?, ?> check)
     {
-        this.setSiteId(check.getSiteId());
-        this.setObjectId(check.getId());
-        this.setId(Site.randomId(this.getSiteId()));
-        this.setCreated(new Timestamp(System.currentTimeMillis()));
-        this.setUpdated(new Timestamp(System.currentTimeMillis()));
+        this.on(check.getSiteId(), check.getId());
         return this;
     }
     
     public Comment on(Alert alert)
     {
-        this.setSiteId(alert.getSiteId());
-        this.setObjectId(alert.getId());
-        this.setId(Site.randomId(this.getSiteId()));
-        this.setCreated(new Timestamp(System.currentTimeMillis()));
-        this.setUpdated(new Timestamp(System.currentTimeMillis()));
+        this.on(alert.getSiteId(), alert.getId());
+        return this;
+    }
+    
+    public Comment on(Downtime downtime)
+    {
+        this.on(downtime.getSiteId(), downtime.getId());
         return this;
     }
     
