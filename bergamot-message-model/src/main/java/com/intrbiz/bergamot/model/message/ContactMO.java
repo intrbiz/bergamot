@@ -34,6 +34,12 @@ public class ContactMO extends NamedObjectMO
     
     @JsonProperty("notifications")
     private NotificationsMO notifications;
+    
+    @JsonProperty("granted-permissions")
+    private List<String> grantedPermissions = new LinkedList<String>();
+    
+    @JsonProperty("revoked-permissions")
+    private List<String> revokedPermissions = new LinkedList<String>();
 
     public ContactMO()
     {
@@ -113,5 +119,25 @@ public class ContactMO extends NamedObjectMO
     public void setNotifications(NotificationsMO notifications)
     {
         this.notifications = notifications;
+    }
+    
+    public List<String> getGrantedPermissions()
+    {
+        return grantedPermissions;
+    }
+
+    public void setGrantedPermissions(List<String> grantedPermissions)
+    {
+        this.grantedPermissions = grantedPermissions;
+    }
+
+    public List<String> getRevokedPermissions()
+    {
+        return revokedPermissions;
+    }
+
+    public void setRevokedPermissions(List<String> revokedPermissions)
+    {
+        this.revokedPermissions = revokedPermissions;
     }
 }

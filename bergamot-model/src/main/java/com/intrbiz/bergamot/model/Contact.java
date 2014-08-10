@@ -211,6 +211,8 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         mo.setMobile(this.getMobile());
         mo.setPager(this.getPager());
         mo.setPhone(this.getPhone());
+        mo.setGrantedPermissions(this.getGrantedPermissions());
+        mo.setRevokedPermissions(this.getRevokedPermissions());
         if (!stub)
         {
             mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
