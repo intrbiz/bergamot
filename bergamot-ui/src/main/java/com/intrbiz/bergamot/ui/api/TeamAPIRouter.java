@@ -135,8 +135,8 @@ public class TeamAPIRouter extends Router<BergamotApp>
             @Param("description") @CheckStringLength(min = 1, max = 1000) String description, 
             @Param("template") @AsBoolean(coalesce = CoalesceMode.ON_NULL) Boolean template, 
             @ListParam("extends") @CheckStringLength(min = 1, max = 80, mandatory = true) List<String> inherits, 
-            @ListParam("grants") @CheckStringLength(min = 1, max = 50, mandatory = true) List<String> grants, 
-            @ListParam("revokes") @CheckStringLength(min = 1, max = 50, mandatory = true) List<String> revokes
+            @ListParam("grants") @CheckStringLength(min = 1, max = 255, mandatory = true) List<String> grants, 
+            @ListParam("revokes") @CheckStringLength(min = 1, max = 255, mandatory = true) List<String> revokes
     )
     {
         // create the team config

@@ -124,8 +124,8 @@ public class ContactAPIRouter extends Router<BergamotApp>
             @Param("mobile") @CheckStringLength(min = 1, max = 20, mandatory = true) String mobile,
             @Param("phone") @CheckStringLength(min = 1, max = 20, mandatory = true) String phone, 
             @Param("im") @CheckStringLength(min = 1, max = 255, mandatory = true) String im, 
-            @ListParam("grants") @CheckStringLength(min = 1, max = 50, mandatory = true) List<String> grants, 
-            @ListParam("revokes") @CheckStringLength(min = 1, max = 50, mandatory = true) List<String> revokes
+            @ListParam("grants") @CheckStringLength(min = 1, max = 255, mandatory = true) List<String> grants, 
+            @ListParam("revokes") @CheckStringLength(min = 1, max = 255, mandatory = true) List<String> revokes
     )
     {
         // create the team config
