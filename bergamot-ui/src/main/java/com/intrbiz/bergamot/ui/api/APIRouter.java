@@ -185,7 +185,6 @@ public class APIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public Boolean changePassword(
             BergamotDB db, 
-            @AsUUID UUID id, 
             @Param("current-password") @CheckStringLength(min = 1, max = 80, mandatory = true) String currentPassword,
             @Param("new-password")     @CheckStringLength(min = 1, max = 80, mandatory = true) String newPassword
     )
