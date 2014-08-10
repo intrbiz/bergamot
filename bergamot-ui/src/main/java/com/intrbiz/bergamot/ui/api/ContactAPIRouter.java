@@ -36,6 +36,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
+    @RequirePermissions("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public List<ContactMO> getContacts(BergamotDB db, @Var("site") Site site)
     {
@@ -44,6 +45,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
+    @RequirePermissions("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContact(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -52,6 +54,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermissions("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContact(BergamotDB db, @AsUUID UUID id)
     {
@@ -60,6 +63,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Get("/email/:email")
     @JSON(notFoundIfNull = true)
+    @RequirePermissions("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContactByEmail(BergamotDB db, @Var("site") Site site, String email)
     {
@@ -68,6 +72,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Get("/name-or-email/:nameOrEmail")
     @JSON(notFoundIfNull = true)
+    @RequirePermissions("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContactByNameOrEmail(BergamotDB db, @Var("site") Site site, String nameOrEmail)
     {
@@ -76,6 +81,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermissions("api.read.contact.config")
     @WithDataAdapter(BergamotDB.class)
     public ContactCfg getContactConfig(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -84,6 +90,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermissions("api.read.contact.config")
     @WithDataAdapter(BergamotDB.class)
     public ContactCfg getContactConfig(BergamotDB db, @AsUUID UUID id)
     {
@@ -92,6 +99,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Any("/configure")
     @JSON()
+    @RequirePermissions("api.write.contact.create")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO configureContact(
             BergamotDB db, 
@@ -109,6 +117,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Any("/create")
     @JSON()
+    @RequirePermissions("api.write.contact.create")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO createContact(
             BergamotDB db, 

@@ -7,10 +7,12 @@
 		<summary>Allow access to view check configuration</summary>
 		<description>A contact must be granted this permission in order to be able to view check configuration</description>
 	</permission>
+	<!-- API -->
 	<permission name="api.access">
 		<summary>Allow API access</summary>
 		<description>A contact must be granted this permission in order to be able to utilise the API</description>
 	</permission>
+	<!-- Generic -->
 	<permission name="api.read.*" pseudo="yes">
 		<summary>Allow reading of objects via the API</summary>
 		<description>Root of all API read permissions</description>
@@ -19,8 +21,21 @@
 		<summary>Allow modification of objects via the API</summary>
 		<description>Root of all API write permissions</description>
 	</permission>
+	<!-- Contact -->
 	<permission name="api.write.contact.set-password">
 		<summary>Allow changing of passwords</summary>
 		<description>A contact must be granted this permission in order to be able to set passwords of an contact</description>
+	</permission>
+	<permission name="api.write.contact.create">
+		<summary>Allow creation of contacts</summary>
+		<description>A contact must be granted this permission in order to be able to create contacts</description>
+	</permission>
+	<permission name="api.read.contact">
+		<summary>Allow reading of contacts</summary>
+		<description>A contact must be granted this permission in order to be able to read contacts</description>
+	</permission>
+	<permission name="api.read.contact.config">
+		<summary>Allow reading of contact configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read contact configuration</description>
 	</permission>
 </permissions>
