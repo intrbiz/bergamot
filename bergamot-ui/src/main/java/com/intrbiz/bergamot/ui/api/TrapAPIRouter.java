@@ -5,6 +5,7 @@ import java.util.UUID;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
@@ -20,6 +21,7 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/trap")
@@ -81,5 +83,21 @@ public class TrapAPIRouter extends Router<BergamotApp>
         // dispatch the result for processing
         action("dispatch-result", result);
         return "Accepted";
+    }
+    
+    @Get("/name/:host/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public TrapCfg getTrapConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    {
+        return Util.nullable(db.getTrapOnHostByName(site.getId(), hostName, name), Trap::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public TrapCfg getTrapConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getTrap(id), Trap::getConfiguration);
     }
 }
