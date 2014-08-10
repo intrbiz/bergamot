@@ -8,6 +8,7 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
@@ -22,6 +23,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/group")
@@ -109,5 +111,21 @@ public class GroupAPIRouter extends Router<BergamotApp>
             }
         }
         return "Ok, executed " + executed + " checks";
+    }
+    
+    @Get("/name/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public GroupCfg getGroupConfig(BergamotDB db, @Var("site") Site site, String name)
+    {
+        return Util.nullable(db.getGroupByName(site.getId(), name), Group::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public GroupCfg getGroupConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getGroup(id), Group::getConfiguration);
     }
 }
