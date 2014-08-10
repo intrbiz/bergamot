@@ -27,6 +27,7 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/team")
@@ -87,6 +88,22 @@ public class TeamAPIRouter extends Router<BergamotApp>
     public List<ContactMO> getTeamContacts(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getTeam(id), (e)->{return e.getContacts().stream().map(Contact::toMO).collect(Collectors.toList());});
+    }
+    
+    @Get("/name/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public TeamCfg getTeamConfig(BergamotDB db, @Var("site") Site site, String name)
+    {
+        return Util.nullable(db.getTeamByName(site.getId(), name), Team::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public TeamCfg getTeamConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getTeam(id), Team::getConfiguration);
     }
     
     @Any("/configure")
