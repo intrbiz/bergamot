@@ -32,7 +32,7 @@ import com.intrbiz.metadata.Var;
 @Prefix("/api/team")
 @RequireValidPrincipal()
 public class TeamAPIRouter extends Router<BergamotApp>
-{
+{    
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
@@ -92,7 +92,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Any("/configure")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TeamMO configureTeam(BergamotDB db, @Var("site") Site site, @Param("configuration") String configurationXML)
+    public TeamMO configureTeam(BergamotDB db, @Var("site") Site site, @Param("configuration") @CheckStringLength(min = 1, max = 128 * 1024, mandatory = true) String configurationXML)
     {
         // parse the config and allocate the id
         TeamCfg config = TeamCfg.fromString(TeamCfg.class, configurationXML);
