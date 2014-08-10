@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -66,7 +67,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
         return Util.nullable(db.getTeamByName(site.getId(), name), (e)->{return e.getContacts().stream().map(Contact::toMO).collect(Collectors.toList());});
     }
     
-    @Get("/id/:name")
+    @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     public TeamMO getTeam(BergamotDB db, @AsUUID UUID id)
@@ -159,6 +160,34 @@ public class TeamAPIRouter extends Router<BergamotApp>
         }
         // create the team
         Team team = action("create-team", config);
+        return team.toMO();
+    }
+    
+    @Get("/id/:id/add-contact/id/:contact_id")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public TeamMO addToTeam(BergamotDB db, @AsUUID UUID id, @AsUUID UUID contactId)
+    {
+        Team team = db.getTeam(id);
+        if (team == null) throw new BalsaNotFound("No team with the id: " + id);
+        Contact contact = db.getContact(contactId);
+        if (contact == null) throw new BalsaNotFound("No contact with the id: " + contactId);
+        // add the contact to the team
+        team.addContact(contact);
+        return team.toMO();
+    }
+    
+    @Get("/name/:name/add-contact/name/:name")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public TeamMO addToTeamByName(BergamotDB db, @Var("site") Site site, String name, String contactName)
+    {
+        Team team = db.getTeamByName(site.getId(), name);
+        if (team == null) throw new BalsaNotFound("No team with the name: " + name);
+        Contact contact = db.getContactByName(site.getId(), contactName);
+        if (contact == null) throw new BalsaNotFound("No contact with the name: " + contactName);
+        // add the contact to the team
+        team.addContact(contact);
         return team.toMO();
     }
 }
