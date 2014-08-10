@@ -5,6 +5,7 @@ import java.util.UUID;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
@@ -17,6 +18,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/resource")
@@ -53,5 +55,21 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     public CheckStateMO getResourceState(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
         return Util.nullable(db.getResourceOnClusterByName(site.getId(), clusterName, name), (r)->{return r.getState().toMO();});
+    }
+    
+    @Get("/name/:host/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public ResourceCfg getResourceConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    {
+        return Util.nullable(db.getResourceOnClusterByName(site.getId(), hostName, name), Resource::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public ResourceCfg getResourceConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getResource(id), Resource::getConfiguration);
     }
 }
