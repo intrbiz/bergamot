@@ -14,7 +14,7 @@ public class TeamActions
     private Logger logger = Logger.getLogger(TeamActions.class);
     
     @Action("create-team")
-    public Team createTimePeriod(TeamCfg config)
+    public Team createTeam(TeamCfg config)
     {
         if (config.getId() == null) throw new IllegalArgumentException("Config must have a valid Id");
         try (BergamotDB db = BergamotDB.connect())
