@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.ui.api;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
-import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
@@ -19,7 +18,7 @@ public class TestAPIRouter extends Router<BergamotApp>
 {    
     @Get("/hello/world")
     @JSON()
-    public String helloWorld(BergamotDB db)
+    public String helloWorld()
     {    
         return "Hello World";
     }
