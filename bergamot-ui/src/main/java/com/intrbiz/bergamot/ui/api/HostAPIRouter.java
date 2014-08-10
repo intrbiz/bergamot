@@ -8,6 +8,7 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
@@ -24,6 +25,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/host")
@@ -128,5 +130,21 @@ public class HostAPIRouter extends Router<BergamotApp>
         }
         action("execute-check", host);
         return "Ok, executed " + executed + " services";
+    }
+    
+    @Get("/name/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public HostCfg getGostConfig(BergamotDB db, @Var("site") Site site, String name)
+    {
+        return Util.nullable(db.getHostByName(site.getId(), name), Host::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public HostCfg getHostConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getHost(id), Host::getConfiguration);
     }
 }
