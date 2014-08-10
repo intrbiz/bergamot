@@ -38,4 +38,33 @@
 		<summary>Allow reading of contact configuration</summary>
 		<description>A contact must be granted this permission in order to be able to read contact configuration</description>
 	</permission>
+	<!-- Team -->
+	<permission name="api.write.team.create">
+		<summary>Allow creation of teams</summary>
+		<description>A contact must be granted this permission in order to be able to create teams</description>
+	</permission>
+	<permission name="api.read.team">
+		<summary>Allow reading of teams</summary>
+		<description>A contact must be granted this permission in order to be able to read teams</description>
+	</permission>
+	<permission name="api.read.team.config">
+		<summary>Allow reading of team configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read team configuration</description>
+	</permission>
+	<permission name="api.write.team.add-contact">
+		<summary>Allow adding a contact to a team</summary>
+		<description>A contact must be granted this permission in order to be able to add a contact to a team</description>
+	</permission>
+	<permission name="api.write.team.add-child">
+		<summary>Allow adding a child team to a team</summary>
+		<description>A contact must be granted this permission in order to be able to add a child team to a team</description>
+	</permission>
+	<permission name="api.write.team.remove-contact">
+		<summary>Allow adding a contact to a team</summary>
+		<description>A contact must be granted this permission in order to be able to remove a contact from a team</description>
+	</permission>
+	<permission name="api.write.team.remove-child">
+		<summary>Allow adding a child team to a team</summary>
+		<description>A contact must be granted this permission in order to be able to remove a child team from a team</description>
+	</permission>
 </permissions>
