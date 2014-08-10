@@ -1,6 +1,5 @@
 package com.intrbiz.bergamot.ui.api;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -21,7 +20,6 @@ import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.converter.ConversionException;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.CheckStringLength;
