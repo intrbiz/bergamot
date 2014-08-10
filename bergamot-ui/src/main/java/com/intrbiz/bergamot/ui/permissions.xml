@@ -11,4 +11,8 @@
 		<summary>Allow API access</summary>
 		<description>A contact must be granted this permission in order to be able to utilise the API</description>
 	</permission>
+	<permission name="api.contact.set-password">
+		<summary>Allow changing of passwords</summary>
+		<description>A contact must be granted this permission in order to be able to set passwords of an contact</description>
+	</permission>
 </permissions>
