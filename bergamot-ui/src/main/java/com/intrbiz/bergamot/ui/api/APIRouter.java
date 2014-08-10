@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.ui.api;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -20,13 +21,17 @@ import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.converter.ConversionException;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
+import com.intrbiz.metadata.CheckStringLength;
+import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IgnorePaths;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.XML;
 import com.intrbiz.validator.ValidationException;
 
@@ -169,5 +174,29 @@ public class APIRouter extends Router<BergamotApp>
         long expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
         String newToken = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiresAt);
         return new AuthTokenMO(newToken, expiresAt);
+    }
+    
+    /**
+     * Change the current users password
+     */
+    @Get("/change-password")
+    @JSON()
+    @RequireValidPrincipal()
+    @WithDataAdapter(BergamotDB.class)
+    public Boolean changePassword(
+            BergamotDB db, 
+            @AsUUID UUID id, 
+            @Param("current-password") @CheckStringLength(min = 1, max = 80, mandatory = true) String currentPassword,
+            @Param("new-password")     @CheckStringLength(min = 1, max = 80, mandatory = true) String newPassword
+    )
+    {
+        Contact contact = currentPrincipal();
+        // verify the given current password before changing the password
+        if (! contact.verifyPassword(currentPassword)) throw new BalsaSecurityException("Failed to verify current password");
+        // change the password
+        contact.hashPassword(newPassword);
+        // update the contact
+        db.setContact(contact);
+        return true;
     }
 }
