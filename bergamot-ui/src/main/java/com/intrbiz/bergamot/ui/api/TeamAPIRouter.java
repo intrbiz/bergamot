@@ -218,4 +218,60 @@ public class TeamAPIRouter extends Router<BergamotApp>
         team.addChild(child);
         return team.toMO();
     }
+    
+    @Get("/id/:id/remove-contact/id/:contact_id")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public TeamMO removeContactFromTeam(BergamotDB db, @AsUUID UUID id, @AsUUID UUID contactId)
+    {
+        Team team = db.getTeam(id);
+        if (team == null) throw new BalsaNotFound("No team with the id: " + id);
+        Contact contact = db.getContact(contactId);
+        if (contact == null) throw new BalsaNotFound("No contact with the id: " + contactId);
+        // remove the contact to the team
+        team.removeContact(contact);
+        return team.toMO();
+    }
+    
+    @Get("/name/:name/remove-contact/name/:contact_name")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public TeamMO removeContactFromTeamByName(BergamotDB db, @Var("site") Site site, String name, String contactName)
+    {
+        Team team = db.getTeamByName(site.getId(), name);
+        if (team == null) throw new BalsaNotFound("No team with the name: " + name);
+        Contact contact = db.getContactByName(site.getId(), contactName);
+        if (contact == null) throw new BalsaNotFound("No contact with the name: " + contactName);
+        // remove the contact to the team
+        team.removeContact(contact);
+        return team.toMO();
+    }
+    
+    @Get("/id/:id/remove-child/id/:child")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public TeamMO removeChild(BergamotDB db, @AsUUID UUID id, @AsUUID UUID childId)
+    {
+        Team team = db.getTeam(id);
+        if (team == null) throw new BalsaNotFound("No team with the id: " + id);
+        Team child = db.getTeam(childId);
+        if (child == null) throw new BalsaNotFound("No team with the id: " + childId);
+        // remove the child to the team
+        team.removeChild(child);
+        return team.toMO();
+    }
+    
+    @Get("/name/:name/remove-child/name/:child_name")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public TeamMO removeChildByName(BergamotDB db, @Var("site") Site site, String name, String childName)
+    {
+        Team team = db.getTeamByName(site.getId(), name);
+        if (team == null) throw new BalsaNotFound("No team with the name: " + name);
+        Team child = db.getTeamByName(site.getId(), childName);
+        if (child == null) throw new BalsaNotFound("No team with the name: " + childName);
+        // remove the child to the team
+        team.removeChild(child);
+        return team.toMO();
+    }
 }
