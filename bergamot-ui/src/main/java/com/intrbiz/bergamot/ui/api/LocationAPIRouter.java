@@ -8,6 +8,7 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
@@ -21,6 +22,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 @Prefix("/api/location")
 @RequireValidPrincipal()
@@ -106,5 +108,21 @@ public class LocationAPIRouter extends Router<BergamotApp>
             executed++;
         }
         return "Ok, executed " + executed + " hosts";
+    }
+    
+    @Get("/name/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public LocationCfg getLocationConfig(BergamotDB db, @Var("site") Site site, String name)
+    {
+        return Util.nullable(db.getLocationByName(site.getId(), name), Location::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public LocationCfg getLocationConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getLocation(id), Location::getConfiguration);
     }
 }
