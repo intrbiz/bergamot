@@ -135,7 +135,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public HostCfg getGostConfig(BergamotDB db, @Var("site") Site site, String name)
+    public HostCfg getHostConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         return Util.nullable(db.getHostByName(site.getId(), name), Host::getConfiguration);
     }
