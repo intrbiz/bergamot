@@ -11,7 +11,15 @@
 		<summary>Allow API access</summary>
 		<description>A contact must be granted this permission in order to be able to utilise the API</description>
 	</permission>
-	<permission name="api.contact.set-password">
+	<permission name="api.read.*" pseudo="yes">
+		<summary>Allow reading of objects via the API</summary>
+		<description>Root of all API read permissions</description>
+	</permission>
+	<permission name="api.write.*" pseudo="yes">
+		<summary>Allow modification of objects via the API</summary>
+		<description>Root of all API write permissions</description>
+	</permission>
+	<permission name="api.write.contact.set-password">
 		<summary>Allow changing of passwords</summary>
 		<description>A contact must be granted this permission in order to be able to set passwords of an contact</description>
 	</permission>

@@ -163,7 +163,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/set-password")
     @JSON()
-    @RequirePermissions("api.contact.set-password")
+    @RequirePermissions("api.write.contact.set-password")
     @WithDataAdapter(BergamotDB.class)
     public Boolean setPassword(BergamotDB db, @AsUUID UUID id, @Param("password") @CheckStringLength(min = 1, max = 80, mandatory = true) String password)
     {
