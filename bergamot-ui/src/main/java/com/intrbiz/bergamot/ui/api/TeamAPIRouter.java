@@ -92,7 +92,11 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Any("/configure")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TeamMO configureTeam(BergamotDB db, @Var("site") Site site, @Param("configuration") @CheckStringLength(min = 1, max = 128 * 1024, mandatory = true) String configurationXML)
+    public TeamMO configureTeam(
+            BergamotDB db, 
+            @Var("site") Site site, 
+            @Param("configuration") @CheckStringLength(min = 1, max = 128 * 1024, mandatory = true) String configurationXML
+    )
     {
         // parse the config and allocate the id
         TeamCfg config = TeamCfg.fromString(TeamCfg.class, configurationXML);
