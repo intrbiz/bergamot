@@ -6,6 +6,7 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
@@ -18,6 +19,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/service")
@@ -65,5 +67,21 @@ public class ServiceAPIRouter extends Router<BergamotApp>
         if (service == null) throw new BalsaNotFound("No service with id '" + id + "' exists.");
         action("execute-check", service);
         return "Ok";
+    }
+    
+    @Get("/name/:host/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public ServiceCfg getGostConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    {
+        return Util.nullable(db.getServiceOnHostByName(site.getId(), hostName, name), Service::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public ServiceCfg getServiceConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getService(id), Service::getConfiguration);
     }
 }
