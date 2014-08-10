@@ -67,4 +67,17 @@
 		<summary>Allow adding a child team to a team</summary>
 		<description>A contact must be granted this permission in order to be able to remove a child team from a team</description>
 	</permission>
+	<!-- TimePeriod -->
+	<permission name="api.write.time-period.create">
+		<summary>Allow creation of time periods</summary>
+		<description>A contact must be granted this permission in order to be able to create time periods</description>
+	</permission>
+	<permission name="api.read.time-period">
+		<summary>Allow reading of time periods</summary>
+		<description>A contact must be granted this permission in order to be able to read time periods</description>
+	</permission>
+	<permission name="api.read.time-period.config">
+		<summary>Allow reading of time periods configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read time period configuration</description>
+	</permission>
 </permissions>
