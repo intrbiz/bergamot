@@ -17,6 +17,8 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsBoolean;
 import com.intrbiz.metadata.AsUUID;
+import com.intrbiz.metadata.CheckStringLength;
+import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListParam;
@@ -74,7 +76,11 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @Any("/configure")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TimePeriodMO configureTimePeriod(BergamotDB db, @Var("site") Site site, @Param("configuration") String configurationXML)
+    public TimePeriodMO configureTimePeriod(
+            BergamotDB db, 
+            @Var("site") Site site, 
+            @Param("configuration") @CheckStringLength(min = 1, max = 128 * 1024, mandatory = true) String configurationXML
+    )
     {
         // parse the config and allocate the id
         TimePeriodCfg config = TimePeriodCfg.fromString(TimePeriodCfg.class, configurationXML);
@@ -87,7 +93,17 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @Any("/create")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TimePeriodMO createTimePeriod(BergamotDB db, @Var("site") Site site, @Param("name") String name, @Param("summary") String summary, @Param("description") String description, @Param("template") @AsBoolean Boolean template, @ListParam("extends") List<String> inherits, @ListParam("exclude") List<String> excludes, @ListParam("time-range") List<String> timeRanges)
+    public TimePeriodMO createTimePeriod(
+            BergamotDB db, 
+            @Var("site") Site site, 
+            @Param("name") @CheckStringLength(min = 1, max = 80, mandatory = true) String name, 
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
+            @Param("description") @CheckStringLength(min = 1, max = 1000) String description, 
+            @Param("template") @AsBoolean(coalesce = CoalesceMode.ON_NULL) Boolean template, 
+            @ListParam("extends") @CheckStringLength(min = 1, max = 80, mandatory = true) List<String> inherits, 
+            @ListParam("exclude") @CheckStringLength(min = 1, max = 80, mandatory = true) List<String> excludes, 
+            @ListParam("time-range") @CheckStringLength(min = 1, max = 50, mandatory = true) List<String> timeRanges
+    )
     {
         // parse the config and allocate the id
         TimePeriodCfg config = new TimePeriodCfg();
