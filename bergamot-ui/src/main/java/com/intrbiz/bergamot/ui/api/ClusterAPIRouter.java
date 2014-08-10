@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
@@ -22,6 +23,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.XML;
 
 
 @Prefix("/api/cluster")
@@ -98,5 +100,21 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     public List<CheckMO> getClusterReferences(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getCluster(id), (e)->{return e.getReferences().stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());});
+    }
+    
+    @Get("/name/:name/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public ClusterCfg getClusterConfig(BergamotDB db, @Var("site") Site site, String name)
+    {
+        return Util.nullable(db.getClusterByName(site.getId(), name), Cluster::getConfiguration);
+    }
+    
+    @Get("/id/:id/config.xml")
+    @XML(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public ClusterCfg getClusterConfig(BergamotDB db, @AsUUID UUID id)
+    {
+        return Util.nullable(db.getCluster(id), Cluster::getConfiguration);
     }
 }
