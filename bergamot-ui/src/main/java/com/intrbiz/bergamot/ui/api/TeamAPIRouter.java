@@ -166,7 +166,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/add-contact/id/:contact_id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TeamMO addToTeam(BergamotDB db, @AsUUID UUID id, @AsUUID UUID contactId)
+    public TeamMO addContactToTeam(BergamotDB db, @AsUUID UUID id, @AsUUID UUID contactId)
     {
         Team team = db.getTeam(id);
         if (team == null) throw new BalsaNotFound("No team with the id: " + id);
@@ -177,10 +177,10 @@ public class TeamAPIRouter extends Router<BergamotApp>
         return team.toMO();
     }
     
-    @Get("/name/:name/add-contact/name/:name")
+    @Get("/name/:name/add-contact/name/:contact_name")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public TeamMO addToTeamByName(BergamotDB db, @Var("site") Site site, String name, String contactName)
+    public TeamMO addContactToTeam(BergamotDB db, @Var("site") Site site, String name, String contactName)
     {
         Team team = db.getTeamByName(site.getId(), name);
         if (team == null) throw new BalsaNotFound("No team with the name: " + name);
