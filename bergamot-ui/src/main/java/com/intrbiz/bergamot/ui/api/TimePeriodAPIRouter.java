@@ -24,7 +24,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermissions;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -36,7 +36,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    @RequirePermissions("api.read.time-period")
+    @RequirePermission("api.read.time-period")
     @WithDataAdapter(BergamotDB.class)
     public List<TimePeriodMO> getTimePeriods(BergamotDB db, @Var("site") Site site)
     {
@@ -45,7 +45,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.time-period")
+    @RequirePermission("api.read.time-period")
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodMO getTimePeriod(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -54,7 +54,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.time-period")
+    @RequirePermission("api.read.time-period")
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodMO getTimePeriod(BergamotDB db, @AsUUID UUID id)
     {
@@ -63,7 +63,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermissions("api.read.time-period.config")
+    @RequirePermission("api.read.time-period.config")
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -72,7 +72,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermissions("api.read.time-period.config")
+    @RequirePermission("api.read.time-period.config")
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @AsUUID UUID id)
     {
@@ -81,7 +81,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     
     @Any("/configure")
     @JSON()
-    @RequirePermissions("api.write.time-period.create")
+    @RequirePermission("api.write.time-period.create")
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodMO configureTimePeriod(
             BergamotDB db, 
@@ -99,7 +99,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     
     @Any("/create")
     @JSON()
-    @RequirePermissions("api.write.time-period.create")
+    @RequirePermission("api.write.time-period.create")
     @WithDataAdapter(BergamotDB.class)
     public TimePeriodMO createTimePeriod(
             BergamotDB db, 

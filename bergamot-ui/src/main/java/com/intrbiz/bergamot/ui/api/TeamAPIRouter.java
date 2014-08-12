@@ -26,7 +26,7 @@ import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermissions;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -38,7 +38,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
 {    
     @Get("/")
     @JSON
-    @RequirePermissions("api.read.team")
+    @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
     public List<TeamMO> getTeams(BergamotDB db, @Var("site") Site site)
     {
@@ -47,7 +47,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.team")
+    @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO getTeam(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -56,7 +56,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/children")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.team")
+    @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
     public List<TeamMO> getTeamChildren(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -65,7 +65,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/contacts")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.team")
+    @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
     public List<ContactMO> getTeamContacts(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -74,7 +74,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.team")
+    @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO getTeam(BergamotDB db, @AsUUID UUID id)
     {
@@ -83,7 +83,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/children")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.team")
+    @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
     public List<TeamMO> getTeamChildren(BergamotDB db, @AsUUID UUID id)
     {
@@ -92,7 +92,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/contacts")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.team")
+    @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
     public List<ContactMO> getTeamContacts(BergamotDB db, @AsUUID UUID id)
     {
@@ -101,7 +101,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermissions("api.read.team.config")
+    @RequirePermission("api.read.team.config")
     @WithDataAdapter(BergamotDB.class)
     public TeamCfg getTeamConfig(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -110,7 +110,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermissions("api.read.team.config")
+    @RequirePermission("api.read.team.config")
     @WithDataAdapter(BergamotDB.class)
     public TeamCfg getTeamConfig(BergamotDB db, @AsUUID UUID id)
     {
@@ -119,7 +119,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Any("/configure")
     @JSON()
-    @RequirePermissions("api.write.team.create")
+    @RequirePermission("api.write.team.create")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO configureTeam(
             BergamotDB db, 
@@ -137,7 +137,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Any("/create")
     @JSON()
-    @RequirePermissions("api.write.team.create")
+    @RequirePermission("api.write.team.create")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO createTeam(
             BergamotDB db, 
@@ -177,7 +177,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/add-contact/id/:contact_id")
     @JSON()
-    @RequirePermissions("api.write.team.add-contact")
+    @RequirePermission("api.write.team.add-contact")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO addContactToTeam(BergamotDB db, @AsUUID UUID id, @AsUUID UUID contactId)
     {
@@ -192,7 +192,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/add-contact/name/:contact_name")
     @JSON()
-    @RequirePermissions("api.write.team.add-contact")
+    @RequirePermission("api.write.team.add-contact")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO addContactToTeamByName(BergamotDB db, @Var("site") Site site, String name, String contactName)
     {
@@ -207,7 +207,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/add-child/id/:child")
     @JSON()
-    @RequirePermissions("api.write.team.add-child")
+    @RequirePermission("api.write.team.add-child")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO addChild(BergamotDB db, @AsUUID UUID id, @AsUUID UUID childId)
     {
@@ -222,7 +222,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/add-child/name/:child_name")
     @JSON()
-    @RequirePermissions("api.write.team.add-child")
+    @RequirePermission("api.write.team.add-child")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO addChildByName(BergamotDB db, @Var("site") Site site, String name, String childName)
     {
@@ -237,7 +237,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/remove-contact/id/:contact_id")
     @JSON()
-    @RequirePermissions("api.write.team.remove-contact")
+    @RequirePermission("api.write.team.remove-contact")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO removeContactFromTeam(BergamotDB db, @AsUUID UUID id, @AsUUID UUID contactId)
     {
@@ -252,7 +252,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/remove-contact/name/:contact_name")
     @JSON()
-    @RequirePermissions("api.write.team.remove-contact")
+    @RequirePermission("api.write.team.remove-contact")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO removeContactFromTeamByName(BergamotDB db, @Var("site") Site site, String name, String contactName)
     {
@@ -267,7 +267,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/remove-child/id/:child")
     @JSON()
-    @RequirePermissions("api.write.team.remove-child")
+    @RequirePermission("api.write.team.remove-child")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO removeChild(BergamotDB db, @AsUUID UUID id, @AsUUID UUID childId)
     {
@@ -282,7 +282,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/remove-child/name/:child_name")
     @JSON()
-    @RequirePermissions("api.write.team.remove-child")
+    @RequirePermission("api.write.team.remove-child")
     @WithDataAdapter(BergamotDB.class)
     public TeamMO removeChildByName(BergamotDB db, @Var("site") Site site, String name, String childName)
     {
