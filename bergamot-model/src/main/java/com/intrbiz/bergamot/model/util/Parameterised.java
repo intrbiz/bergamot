@@ -1,6 +1,5 @@
 package com.intrbiz.bergamot.model.util;
 
-import java.util.Iterator;
 import java.util.List;
 
 public interface Parameterised
@@ -22,14 +21,7 @@ public interface Parameterised
 
     default void removeParameter(String name)
     {
-        for (Iterator<Parameter> i = this.getParameters().iterator(); i.hasNext();)
-        {
-            if (name.equals(i.next().getName()))
-            {
-                i.remove();
-                break;
-            }
-        }
+        this.getParameters().removeIf((p) -> {return name.equals(p.getName());});
     }
 
     default void clearParameters()
@@ -44,10 +36,10 @@ public interface Parameterised
 
     default String getParameter(String name, String defaultValue)
     {
-        for (Parameter parameter : this.getParameters())
-        {
-            if (name.equals(parameter.getName())) return parameter.getValue();
-        }
-        return defaultValue;
+        return this.getParameters().stream()
+                .filter((p) -> {return name.equals(p.getName());})
+                .findFirst()
+                .map(Parameter::getValue)
+                .orElse(defaultValue);
     }
 }
