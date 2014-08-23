@@ -1,3 +1,4 @@
+package com.intrbiz.bergamot.test;
 import java.security.AccessControlException;
 
 import javax.script.ScriptEngine;
