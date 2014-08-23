@@ -3,6 +3,7 @@ import java.security.AccessControlException;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
@@ -11,6 +12,16 @@ import static org.junit.Assert.*;
 
 public class TestScripting
 {
+    @Before
+    public void setupSecurityManager()
+    {
+        // only setup the security manager if it is not already loaded
+        if (System.getSecurityManager() == null)
+        {
+            System.setSecurityManager(new SecurityManager());
+        }
+    }
+    
     @Test
     public void testSimpleScript()
     {
