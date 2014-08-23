@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.snmp.script.BergamotScriptContext;
+import com.intrbiz.scripting.RestrictedScriptEngineManager;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.SNMPVersion;
 import com.intrbiz.snmp.security.SNMPAuthMode;
@@ -27,7 +28,7 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
 {
     private Logger logger = Logger.getLogger(SNMPExecutor.class);
     
-    private ScriptEngineManager factory = new ScriptEngineManager();
+    private ScriptEngineManager factory = new RestrictedScriptEngineManager();
 
     public SNMPExecutor()
     {
