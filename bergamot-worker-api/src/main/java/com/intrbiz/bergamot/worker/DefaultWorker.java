@@ -77,7 +77,7 @@ public class DefaultWorker extends AbstractWorker
         WorkerCfg config = this.loadConfiguration();
         logger.debug("Bergamot worker, using configuration:\r\n" + config.toString());
         // setup the queue broker
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl()));
+        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
         // configure the worker
         this.configure(config);
         // go go go

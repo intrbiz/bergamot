@@ -1,11 +1,14 @@
 package com.intrbiz.bergamot.ui;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.bergamot.cluster.ClusterManager;
+import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.action.DispatchResultAction;
@@ -45,6 +48,8 @@ import com.intrbiz.bergamot.ui.router.TimePeriodRouter;
 import com.intrbiz.bergamot.ui.router.TrapRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
+import com.intrbiz.configuration.Configurable;
+import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
 import com.intrbiz.data.cache.tiered.TieredCacheProvider;
@@ -56,13 +61,20 @@ import com.intrbiz.util.pool.database.DatabasePool;
 /**
  * A very basic Bergamot web interface
  */
-public class BergamotApp extends BalsaApplication
-{    
+public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
+{   
+    private UICfg config;
+    
     private ClusterManager clusterManager;
     
     private UpdateServer updateServer;
     
     private final UUID id = UUID.randomUUID();
+    
+    public BergamotApp()
+    {
+        super();
+    }
     
     public UUID id()
     {
@@ -70,9 +82,20 @@ public class BergamotApp extends BalsaApplication
     }
     
     @Override
+    public void configure(UICfg cfg) throws Exception
+    {
+        this.config = cfg;
+    }
+
+    @Override
+    public UICfg getConfiguration()
+    {
+        return this.config;
+    }
+
+    @Override
     protected void setup() throws Exception
     {
-        // TODO - read a config file
         // Setup Gerald - Service name: Bergamot.UI, send every minute
         Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
         // session engine
@@ -80,11 +103,8 @@ public class BergamotApp extends BalsaApplication
         // security engine
         securityEngine(new BergamotSecurityEngine());
         // setup the cache
-        DataManager.get().registerDefaultCacheProvider(new TieredCacheProvider(new HazelcastCacheProvider(this.getInstanceName())));
-        // setup the queues
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool("amqp://127.0.0.1"));
-        // setup the database 
-        DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://127.0.0.1/bergamot").username("bergamot").password("bergamot").build());
+        DataManager.get().registerDefaultCacheProvider(new TieredCacheProvider(new HazelcastCacheProvider(this.getInstanceName())));        
+        // setup the database
         BergamotDB.install();
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -168,8 +188,17 @@ public class BergamotApp extends BalsaApplication
     {
         try
         {
+            // read config
+            UICfg config = loadConfiguration();
+            System.out.println("Using configuration: ");
+            System.out.println(config.toString());
+            // setup the queue manager
+            QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+            // setup data manager
+            DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());
             // start the app
             BergamotApp bergamotApp = new BergamotApp();
+            bergamotApp.configure(config);
             bergamotApp.start();
         }
         catch (Exception e)
@@ -177,5 +206,23 @@ public class BergamotApp extends BalsaApplication
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+    
+    public static UICfg loadConfiguration() throws Exception
+    {
+        UICfg config = null;
+        // try the config file?
+        File configFile = new File(System.getProperty("bergamot.config", "/etc/bergamot/ui/default.xml"));
+        if (configFile.exists())
+        {
+            System.out.println("Reading configuration file " + configFile.getAbsolutePath());
+            config = Configuration.read(UICfg.class, new FileInputStream(configFile));
+        }
+        else
+        {
+            config = new UICfg();
+        }
+        config.applyDefaults();
+        return config;
     }
 }

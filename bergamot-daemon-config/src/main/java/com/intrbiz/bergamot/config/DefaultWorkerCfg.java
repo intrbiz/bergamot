@@ -7,6 +7,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "worker")
 public class DefaultWorkerCfg extends WorkerCfg
 {
+    private static final long serialVersionUID = 1L;
+    
     public DefaultWorkerCfg()
     {
         super();

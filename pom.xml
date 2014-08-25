@@ -81,6 +81,7 @@
     <module>bergamot-cli</module>
     <module>bergamot-watcher-api</module>
     <module>bergamot-watcher-snmp</module>
+    <module>bergamot-daemon-config</module>
   </modules>
   
   <dependencyManagement>
@@ -133,6 +134,16 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-message-model</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-queue</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-daemon-config</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   	</dependencies>

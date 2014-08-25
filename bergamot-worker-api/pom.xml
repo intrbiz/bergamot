@@ -26,11 +26,14 @@
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-queue</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-message-model</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.bergamot</groupId>
+    	<artifactId>bergamot-daemon-config</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -7,4 +7,5 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "notifier")
 public class DefaultNotifierCfg extends NotifierCfg
 {
+    private static final long serialVersionUID = 1L;
 }

@@ -7,8 +7,8 @@
     <artifactId>bergamot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>bergamot-notification-api</artifactId>
-  <name>bergamot-notification-api</name>
+  <artifactId>bergamot-daemon-config</artifactId>
+  <name>bergamot-daemon-config</name>
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,20 +20,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-message-model</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-queue</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>com.intrbiz.express</groupId>
-    	<artifactId>express</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-daemon-config</artifactId>
+    	<groupId>com.intrbiz.core</groupId>
+    	<artifactId>core</artifactId>
     </dependency>
   </dependencies>
 </project>

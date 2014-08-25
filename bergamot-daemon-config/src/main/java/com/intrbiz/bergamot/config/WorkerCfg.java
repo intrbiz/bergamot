@@ -17,6 +17,8 @@ import com.intrbiz.util.uuid.UUIDAdapter;
 
 public abstract class WorkerCfg extends Configuration
 {
+    private static final long serialVersionUID = 1L;
+    
     private BrokerCfg broker;
     
     private int threads = -1;
@@ -104,7 +106,7 @@ public abstract class WorkerCfg extends Configuration
         // the broker
         if (this.broker == null)
         {
-            this.broker = new BrokerCfg("amqp://127.0.0.1");
+            this.broker = new BrokerCfg("amqp://127.0.0.1", "bergamot", "bergamot");
         }
         // default number of threads
         if (this.threads <= 0)

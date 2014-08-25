@@ -13,6 +13,8 @@ import com.intrbiz.util.uuid.UUIDAdapter;
 
 public abstract class NotifierCfg extends Configuration
 {
+    private static final long serialVersionUID = 1L;
+    
     private int threads = -1;
 
     private BrokerCfg broker;
@@ -77,7 +79,7 @@ public abstract class NotifierCfg extends Configuration
         // the broker
         if (this.broker == null)
         {
-            this.broker = new BrokerCfg("amqp://127.0.0.1");
+            this.broker = new BrokerCfg("amqp://127.0.0.1", "bergamot", "bergamot");
         }
         // default number of threads
         if (this.getThreads() <= 0)

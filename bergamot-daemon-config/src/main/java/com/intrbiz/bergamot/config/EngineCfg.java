@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.bergamot.watcher.engine.Engine;
 import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "engine")
@@ -33,7 +32,7 @@ public class EngineCfg extends Configuration
         }
     }
     
-    public EngineCfg(Class<? extends Engine> engine, ExecutorCfg... executors)
+    public EngineCfg(Class<?> engine, ExecutorCfg... executors)
     {
         this(engine.getCanonicalName(), executors);
     }
