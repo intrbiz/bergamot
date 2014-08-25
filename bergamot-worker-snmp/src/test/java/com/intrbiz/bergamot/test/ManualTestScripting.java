@@ -11,7 +11,7 @@ import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
 import static org.junit.Assert.*;
 
-public class TestScripting
+public class ManualTestScripting
 {
     @Before
     public void setupSecurityManager()
