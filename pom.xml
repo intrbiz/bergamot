@@ -164,6 +164,21 @@
 		</repository>
 	</repositories>
 	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>snapshots</id>
+			<url>http://nexus.intrbiz.net/nexus/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>intrbiz</id>
+			<name>Intrbiz</name>
+			<url>http://nexus.intrbiz.net/nexus/content/repositories/releases</url>
+		</pluginRepository>
+	</pluginRepositories>
+	
 	<distributionManagement>
 		<snapshotRepository>
 			<id>snapshots</id>
