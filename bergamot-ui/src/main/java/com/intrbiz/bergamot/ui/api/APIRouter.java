@@ -130,7 +130,7 @@ public class APIRouter extends Router<BergamotApp>
     @Before
     @Any("**")
     /* We don't want to filter the authentication routes */
-    @IgnorePaths({"/auth-token", "/extend-auth-token"})
+    @IgnorePaths({"/auth-token", "/extend-auth-token", "/test/hello/world"})
     @Order(10)
     @WithDataAdapter(BergamotDB.class)
     public void authenticateRequest(BergamotDB db)
@@ -139,7 +139,7 @@ public class APIRouter extends Router<BergamotApp>
         // we may already have the auth from the session, if shared with a UI session
         if (! this.validPrincipal())
         {
-            authenticateRequest(new GenericAuthenticationToken(Util.coalesceEmpty(cookie("bergamot.api.key"), param("key"))));
+            authenticateRequest(new GenericAuthenticationToken(Util.coalesceEmpty(header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key"))));
         }
         // assert that the contact is permitted API access
         require(permission("api.access"));
