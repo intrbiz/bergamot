@@ -12,9 +12,12 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intrbiz.bergamot.model.message.AlertMO;
@@ -190,11 +193,47 @@ public class BergamotTranscoder
         }
     }
     
+    public <T> T decode(InputStream from, JavaType type)
+    {
+        try (JsonParser p = this.factory.getFactory().createParser(from))
+        {
+            return this.factory.readValue(p, type);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to decode event", e);
+        }
+    }
+    
     public <T> T decode(InputStream from, Class<T> type)
     {
         try (JsonParser p = this.factory.getFactory().createParser(from))
         {
             return (T) this.factory.readValue(p, type);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to decode event", e);
+        }
+    }
+    
+    public <T> List<T> decodeList(InputStream from, Class<T> elementType)
+    {
+        try (JsonParser p = this.factory.getFactory().createParser(from))
+        {
+            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, elementType));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to decode event", e);
+        }
+    }
+    
+    public <T> Set<T> decodeSet(InputStream from, Class<T> elementType)
+    {
+        try (JsonParser p = this.factory.getFactory().createParser(from))
+        {
+            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(Set.class, elementType));
         }
         catch (IOException e)
         {
@@ -214,9 +253,60 @@ public class BergamotTranscoder
         }
     }
     
+    public <T> T decode(Reader from, JavaType type)
+    {
+        try (JsonParser p = this.factory.getFactory().createParser(from))
+        {
+            return this.factory.readValue(p, type);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to decode event", e);
+        }
+    }
+    
+    public <T> List<T> decodeList(Reader from, Class<T> elementType)
+    {
+        try (JsonParser p = this.factory.getFactory().createParser(from))
+        {
+            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, elementType));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to decode event", e);
+        }
+    }
+    
+    public <T> Set<T> decodeSet(Reader from, Class<T> elementType)
+    {
+        try (JsonParser p = this.factory.getFactory().createParser(from))
+        {
+            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(Set.class, elementType));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to decode event", e);
+        }
+    }
+    
     public <T> T decodeFromString(String event, Class<T> type)
     {
         return this.decode(new StringReader(event), type);
+    }
+    
+    public <T> T decodeFromString(String event, JavaType type)
+    {
+        return this.decode(new StringReader(event), type);
+    }
+    
+    public <T> List<T> decodeListFromString(String event, Class<T> elementType)
+    {
+        return this.decodeList(new StringReader(event), elementType);
+    }
+    
+    public <T> Set<T> decodeSetFromString(String event, Class<T> elementType)
+    {
+        return this.decodeSet(new StringReader(event), elementType);
     }
     
     public <T> T decodeFromBytes(byte[] event, Class<T> type)
@@ -224,11 +314,62 @@ public class BergamotTranscoder
         return this.decode(new ByteArrayInputStream(event), type);
     }
     
+    public <T> T decodeFromBytes(byte[] event, JavaType type)
+    {
+        return this.decode(new ByteArrayInputStream(event), type);
+    }
+    
+    public <T> List<T> decodeListFromBytes(byte[] event, Class<T> elementType)
+    {
+        return this.decodeList(new ByteArrayInputStream(event), elementType);
+    }
+    
+    public <T> Set<T> decodeSetFromBytes(byte[] event, Class<T> elementType)
+    {
+        return this.decodeSet(new ByteArrayInputStream(event), elementType);
+    }
+    
     public <T> T decode(File event, Class<T> type)
     {
         try (FileReader fr = new FileReader(event))
         {
             return this.decode(fr, type);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to read file", e);
+        }
+    }
+    
+    public <T> T decode(File event, JavaType type)
+    {
+        try (FileReader fr = new FileReader(event))
+        {
+            return this.decode(fr, type);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to read file", e);
+        }
+    }
+    
+    public <T> List<T> decodeList(File event, Class<T> elementType)
+    {
+        try (FileReader fr = new FileReader(event))
+        {
+            return this.decodeList(fr, elementType);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException("Failed to read file", e);
+        }
+    }
+    
+    public <T> Set<T> decodeSet(File event, Class<T> elementType)
+    {
+        try (FileReader fr = new FileReader(event))
+        {
+            return this.decodeSet(fr, elementType);
         }
         catch (IOException e)
         {
