@@ -5,7 +5,10 @@ import java.util.List;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.config.model.ResourceCfg;
+import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
+import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Site;
@@ -46,7 +49,10 @@ public class ConfigAPIRouter extends Router<BergamotApp>
             // add all the config
             for (Config cfg : db.listConfig(site.getId(), null))
             {
-                siteCfg.addObject((TemplatedObjectCfg<?>) cfg.getConfiguration());
+                if ((!(cfg.getConfiguration() instanceof TrapCfg || cfg.getConfiguration() instanceof ServiceCfg || cfg.getConfiguration() instanceof ResourceCfg)) || cfg.isTemplate())
+                {
+                    siteCfg.addObject((TemplatedObjectCfg<?>) cfg.getConfiguration());
+                }
             }
         }
         else
@@ -56,7 +62,10 @@ public class ConfigAPIRouter extends Router<BergamotApp>
             {
                 for (Config cfg : db.listConfig(site.getId(), type))
                 {
-                    siteCfg.addObject((TemplatedObjectCfg<?>) cfg.getConfiguration());
+                    if ((!(cfg.getConfiguration() instanceof TrapCfg || cfg.getConfiguration() instanceof ServiceCfg || cfg.getConfiguration() instanceof ResourceCfg)) || cfg.isTemplate())
+                    {
+                        siteCfg.addObject((TemplatedObjectCfg<?>) cfg.getConfiguration());
+                    }
                 }
             }
         }
@@ -78,7 +87,10 @@ public class ConfigAPIRouter extends Router<BergamotApp>
         // add all the config
         for (Config cfg : db.listConfig(site.getId(), type))
         {
-            siteCfg.addObject((TemplatedObjectCfg<?>) cfg.getConfiguration());
+            if ((!(cfg.getConfiguration() instanceof TrapCfg || cfg.getConfiguration() instanceof ServiceCfg || cfg.getConfiguration() instanceof ResourceCfg)) || cfg.isTemplate())
+            {
+                siteCfg.addObject((TemplatedObjectCfg<?>) cfg.getConfiguration());
+            }
         }
         return siteCfg;
     }
