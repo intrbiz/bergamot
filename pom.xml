@@ -82,6 +82,7 @@
     <module>bergamot-watcher-api</module>
     <module>bergamot-watcher-snmp</module>
     <module>bergamot-daemon-config</module>
+    <module>bergamot-api-client</module>
   </modules>
   
   <dependencyManagement>
