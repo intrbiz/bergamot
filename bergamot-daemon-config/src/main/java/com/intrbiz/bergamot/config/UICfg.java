@@ -67,4 +67,24 @@ public class UICfg extends Configuration
     {
         return Configuration.read(UICfg.class, new FileInputStream(file));
     }
+    
+    /**
+     * Load the UI configuration, either from the default config file, the specified config file or the default config.
+     */
+    public static UICfg loadConfiguration() throws Exception
+    {
+        UICfg config = null;
+        // try the config file?
+        File configFile = new File(System.getProperty("bergamot.config", "/etc/bergamot/ui/default.xml"));
+        if (configFile.exists())
+        {
+            config = Configuration.read(UICfg.class, new FileInputStream(configFile));
+        }
+        else
+        {
+            config = new UICfg();
+        }
+        config.applyDefaults();
+        return config;
+    }
 }

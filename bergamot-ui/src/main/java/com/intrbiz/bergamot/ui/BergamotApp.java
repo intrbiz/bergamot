@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.ui;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +47,6 @@ import com.intrbiz.bergamot.ui.router.TrapRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
 import com.intrbiz.configuration.Configurable;
-import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
 import com.intrbiz.data.cache.tiered.TieredCacheProvider;
@@ -189,7 +186,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         try
         {
             // read config
-            UICfg config = loadConfiguration();
+            UICfg config = UICfg.loadConfiguration();
             System.out.println("Using configuration: ");
             System.out.println(config.toString());
             // setup the queue manager
@@ -206,23 +203,5 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             e.printStackTrace();
             System.exit(-1);
         }
-    }
-    
-    public static UICfg loadConfiguration() throws Exception
-    {
-        UICfg config = null;
-        // try the config file?
-        File configFile = new File(System.getProperty("bergamot.config", "/etc/bergamot/ui/default.xml"));
-        if (configFile.exists())
-        {
-            System.out.println("Reading configuration file " + configFile.getAbsolutePath());
-            config = Configuration.read(UICfg.class, new FileInputStream(configFile));
-        }
-        else
-        {
-            config = new UICfg();
-        }
-        config.applyDefaults();
-        return config;
     }
 }
