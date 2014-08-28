@@ -495,7 +495,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         mo.setAcknowledged(this.isAcknowledged());
         mo.setAcknowledgedAt(this.getAcknowledgedAt() == null ? -1 : this.getAcknowledgedAt().getTime());
         mo.setAcknowledgedBy(Util.nullable(this.getAcknowledgedBy(), Contact::toStubMO));
-        mo.setCheck(this.getCheck().toStubMO());
+        mo.setCheck(this.getCheck().toMO());
         mo.setFlapping(this.isFlapping());
         mo.setHard(this.isHard());
         mo.setId(this.getId());
