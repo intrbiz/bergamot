@@ -11,7 +11,11 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.command.AlertsCommand;
+import com.intrbiz.bergamot.command.ConfigCommand;
 import com.intrbiz.bergamot.command.HelpCommand;
+import com.intrbiz.bergamot.command.SiteXMLCommand;
+import com.intrbiz.bergamot.command.TestCommand;
 import com.intrbiz.bergamot.command.admin.CreateSiteCommand;
 import com.intrbiz.bergamot.command.admin.DBInstallCommand;
 import com.intrbiz.bergamot.command.admin.DBVersionCommand;
@@ -27,8 +31,13 @@ public class BergamotCLI
     {
         super();
         // setup commands
+        // help command
         this.addCommand(new HelpCommand());
         // more generic commands
+        this.addCommand(new ConfigCommand());
+        this.addCommand(new TestCommand());
+        this.addCommand(new SiteXMLCommand());
+        this.addCommand(new AlertsCommand());
         // local commands
         this.addCommand(new CreateSiteCommand());
         this.addCommand(new ListSitesCommand());
