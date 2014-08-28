@@ -3,6 +3,7 @@ package com.intrbiz.bergamot;
 import org.apache.http.NameValuePair;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.call.alert.GetAlertsCall;
 import com.intrbiz.bergamot.call.auth.AuthTokenCall;
 import com.intrbiz.bergamot.call.auth.ExtendAuthTokenCall;
 import com.intrbiz.bergamot.call.config.BuildSiteConfigCall;
@@ -225,6 +226,13 @@ public class BergamotClient
     public GetContactConfigByNameCall getContactConfigByName()
     {
         return new GetContactConfigByNameCall(this);
+    }
+    
+    // alerts
+    
+    public GetAlertsCall getAlerts()
+    {
+        return new GetAlertsCall(this);
     }
     
 }
