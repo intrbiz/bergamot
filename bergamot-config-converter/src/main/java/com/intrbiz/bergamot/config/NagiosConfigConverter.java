@@ -429,7 +429,7 @@ public class NagiosConfigConverter
                 int i = 1;
                 for (String arg : command.getArguments())
                 {
-                    System.out.println("Adding arg: " + arg);
+                    // System.out.println("Adding arg: " + arg);
                     service.getCheckCommand().addParameter(new CfgParameter("arg" + i++, null, null, arg));
                 }
             }
