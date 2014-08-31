@@ -8,7 +8,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.config.BergamotConfigReader;
-import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotConfigImporter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.state.GroupState;
@@ -27,12 +27,12 @@ public class TestDB
         DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://127.0.0.1/bergamot").username("bergamot").password("bergamot").build());
         BergamotDB.install();
         //
-        Collection<BergamotCfg> configs = new BergamotConfigReader().includeDir(new File("/home/cellis/Intrbiz/workspace-new/bergamot/cfg/local/")).build();
-        for (BergamotCfg config : configs)
+        Collection<ValidatedBergamotConfiguration> configs = new BergamotConfigReader().includeDir(new File("/home/cellis/Intrbiz/workspace-new/bergamot/cfg/local/")).build();
+        for (ValidatedBergamotConfiguration config : configs)
         {
-            System.out.println("Importing configuration for " + config.getSite());
+            System.out.println("Importing configuration for " + config.getConfig().getSite());
             // load
-            new BergamotConfigImporter(config).resetState(true).importConfiguration();
+            new BergamotConfigImporter(config.getConfig()).resetState(true).importConfiguration();
         }
         //
         try (BergamotDB db = BergamotDB.connect())

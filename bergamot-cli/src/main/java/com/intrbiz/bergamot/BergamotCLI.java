@@ -21,6 +21,7 @@ import com.intrbiz.bergamot.command.admin.AddSiteAliasCommand;
 import com.intrbiz.bergamot.command.admin.CreateSiteCommand;
 import com.intrbiz.bergamot.command.admin.DBInstallCommand;
 import com.intrbiz.bergamot.command.admin.DBVersionCommand;
+import com.intrbiz.bergamot.command.admin.DBImportConfigCommand;
 import com.intrbiz.bergamot.command.admin.ListSitesCommand;
 
 public class BergamotCLI
@@ -47,6 +48,7 @@ public class BergamotCLI
         this.addCommand(new DBVersionCommand());
         this.addCommand(new DBInstallCommand());
         this.addCommand(new AddSiteAliasCommand());
+        this.addCommand(new DBImportConfigCommand());
     }
 
     public void addCommand(BergamotCLICommand command)

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -12,6 +13,7 @@ import java.util.TreeMap;
 import javax.xml.bind.JAXBException;
 
 import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 
 public class BergamotConfigReader
@@ -47,30 +49,16 @@ public class BergamotConfigReader
         return this;
     }
     
-    public Collection<BergamotCfg> build()
+    public Collection<ValidatedBergamotConfiguration> build()
     {
         this.parse();
-        this.computeInheritenance();
-        this.validate();
-        return this.getConfigurations();
-    }
-    
-    private void computeInheritenance()
-    {
-        // build the inherited hierarchy
+        // validate
+        List<ValidatedBergamotConfiguration> validated = new LinkedList<ValidatedBergamotConfiguration>();
         for (BergamotCfg cfg : this.configurations.values())
         {
-            cfg.computeInheritenance();
+            validated.add(cfg.validate());
         }
-    }
-    
-    private void validate()
-    {
-        // build the inherited hierarchy
-        for (BergamotCfg cfg : this.configurations.values())
-        {
-            cfg.validate();
-        }
+        return validated;
     }
     
     private void parse()

@@ -272,7 +272,7 @@ public class BergamotCfg extends Configuration
         return (T) this.index.get(type.getSimpleName() + "::" + name);
     }
 
-    public void computeInheritenance()
+    private void computeInheritenance(BergamotValidationReport report)
     {
         this.index();
         // walk the object tree and compute the inheritance graph
@@ -280,18 +280,18 @@ public class BergamotCfg extends Configuration
         {
             for (TemplatedObjectCfg<?> object : objects)
             {
-                this.resolveInherit(object);
+                this.resolveInherit(object, report);
                 // process any child templated objects
                 for (TemplatedObjectCfg<?> child : object.getTemplatedChildObjects())
                 {
-                    this.resolveInherit(child);
+                    this.resolveInherit(child, report);
                 }
             }
         }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void resolveInherit(TemplatedObjectCfg<?> object)
+    private void resolveInherit(TemplatedObjectCfg<?> object, BergamotValidationReport report)
     {
         for (String inheritsFrom : object.getInheritedTemplates())
         {
@@ -303,16 +303,16 @@ public class BergamotCfg extends Configuration
             else
             {
                 // error
-                System.err.println("Error: Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
+                report.logError("Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
             }
         }
         if (object instanceof TimePeriodCfg)
         {
-            this.resolveExcludes((TimePeriodCfg) object);
+            this.resolveExcludes((TimePeriodCfg) object, report);
         }
     }
     
-    private void resolveExcludes(TimePeriodCfg object)
+    private void resolveExcludes(TimePeriodCfg object, BergamotValidationReport report)
     {
         for (String exclude : object.getExcludes())
         {
@@ -320,232 +320,327 @@ public class BergamotCfg extends Configuration
             if (excludedTimePeriod == null)
             {
                 // error
-                System.err.println("Error: Cannot find the excluded time period named '" + exclude + "' which is excluded by " + object);
+                report.logError("Cannot find the excluded time period named '" + exclude + "' which is excluded by " + object);
             }
         }
     }
     
-    public void validate()
+    /**
+     * Validate this Bergamot configuration.  Note: you must validate 
+     * a the configuration before using it.
+     */
+    public ValidatedBergamotConfiguration validate()
     {
-        this.validateGroups();
-        this.validateLocations();
-        this.validateHosts();
-        this.validateClusters();
-        this.validateResources();
-        this.validateServices();
-        this.validateTraps();
-        this.validateTeams();
-        this.validateContacts();
-        this.validateCommands();
+        BergamotValidationReport report = new BergamotValidationReport(this.getSite());
+        // compute the inheritance
+        this.computeInheritenance(report);
+        // validate the objects
+        this.validateGroups(report);
+        this.validateLocations(report);
+        this.validateHosts(report);
+        this.validateClusters(report);
+        this.validateResources(report);
+        this.validateServices(report);
+        this.validateTraps(report);
+        this.validateTeams(report);
+        this.validateContacts(report);
+        this.validateCommands(report);
+        return new ValidatedBergamotConfiguration(this, report);
     }
     
-    private void validateGroups()
+    private void validateGroups(BergamotValidationReport report)
     {
         for (GroupCfg group : this.groups)
         {
             for (String groupName : group.getGroups())
             {
-                this.checkGroupExists(groupName, group);
+                this.checkGroupExists(groupName, group, report);
             }
         }
     }
     
-    private void validateHosts()
+    private void validateHosts(BergamotValidationReport report)
     {
         for (HostCfg host : this.hosts)
         {
             for (String groupName : host.getGroups())
             {
-                this.checkGroupExists(groupName, host);
+                this.checkGroupExists(groupName, host, report);
             }
             if (! Util.isEmpty(host.getLocation()))
             {
-                this.checkLocationExists(host.getLocation(), host);
+                this.checkLocationExists(host.getLocation(), host, report);
             }
             // services of the host
             for (ServiceCfg service : host.getServices())
             {
                 for (String groupName : service.getGroups())
                 {
-                    this.checkGroupExists(groupName, service);
+                    this.checkGroupExists(groupName, service, report);
                 }
-                this.validateNotify(service.getNotify(), service);
+                this.validateNotify(service.getNotify(), service, report);
             }
             // traps of the host
             for (TrapCfg trap : host.getTraps())
             {
                 for (String groupName : trap.getGroups())
                 {
-                    this.checkGroupExists(groupName, trap);
+                    this.checkGroupExists(groupName, trap, report);
                 }
-                this.validateNotify(trap.getNotify(), trap);
+                this.validateNotify(trap.getNotify(), trap, report);
             }
         }
     }
     
-    private void validateClusters()
+    private void validateClusters(BergamotValidationReport report)
     {
         for (ClusterCfg cluster : this.clusters)
         {
             for (String groupName : cluster.getGroups())
             {
-                this.checkGroupExists(groupName, cluster);
+                this.checkGroupExists(groupName, cluster, report);
             }
             // resources of the cluster
             for (ResourceCfg resource : cluster.getResources())
             {
                 for (String groupName : resource.getGroups())
                 {
-                    this.checkGroupExists(groupName, resource);
+                    this.checkGroupExists(groupName, resource, report);
                 }
-                this.validateNotify(resource.getNotify(), resource);
+                this.validateNotify(resource.getNotify(), resource, report);
             }
         }
     }
     
-    private void validateServices()
+    private void validateServices(BergamotValidationReport report)
     {
         for (ServiceCfg service : this.services)
         {
             for (String groupName : service.getGroups())
             {
-                this.checkGroupExists(groupName, service);
+                this.checkGroupExists(groupName, service, report);
             }
             if (service.getTemplate() == null || service.getTemplate() == false)
             {
                 service.setTemplate(true);
-                System.err.println("Warn: Top level services must be templates: " + service);
+                report.logWarn("Top level services must be templates: " + service);
             }
-            this.validateNotify(service.getNotify(), service);
+            this.validateNotify(service.getNotify(), service, report);
         }
     }
     
-    private void validateTraps()
+    private void validateTraps(BergamotValidationReport report)
     {
         for (TrapCfg trap : this.traps)
         {
             for (String groupName : trap.getGroups())
             {
-                this.checkGroupExists(groupName, trap);
+                this.checkGroupExists(groupName, trap, report);
             }
             if (trap.getTemplate() == null || trap.getTemplate() == false)
             {
                 trap.setTemplate(true);
-                System.err.println("Warn: Top level traps must be templates: " + trap);
+                report.logWarn("Top level traps must be templates: " + trap);
             }
-            this.validateNotify(trap.getNotify(), trap);
+            this.validateNotify(trap.getNotify(), trap, report);
         }
     }
     
-    private void validateResources()
+    private void validateResources(BergamotValidationReport report)
     {
         for (ResourceCfg resource : this.resources)
         {
             for (String groupName : resource.getGroups())
             {
-                this.checkGroupExists(groupName, resource);
+                this.checkGroupExists(groupName, resource, report);
             }
             if (resource.getTemplate() == null || resource.getTemplate() == false)
             {
                 resource.setTemplate(true);
-                System.err.println("Warn: Top level resources must be templates: " + resource);
+                report.logWarn("Top level resources must be templates: " + resource);
             }
-            this.validateNotify(resource.getNotify(), resource);
+            this.validateNotify(resource.getNotify(), resource, report);
         }
     }
     
-    private void validateNotify(NotifyCfg notify, NamedObjectCfg<?> of)
+    private void validateNotify(NotifyCfg notify, NamedObjectCfg<?> of, BergamotValidationReport report)
     {
         if (notify != null)
         {
             for (String team : notify.getTeams())
             {
-                this.checkTeamExists(team, of);
+                this.checkTeamExists(team, of, report);
             }
             for (String contact : notify.getContacts())
             {
-                this.checkContactExists(contact, of);
+                this.checkContactExists(contact, of, report);
             }
         }
     }
     
-    private void validateLocations()
+    private void validateLocations(BergamotValidationReport report)
     {
         for (LocationCfg location : this.locations)
         {
             if (! Util.isEmpty(location.getLocation()))
             {
-                this.checkLocationExists(location.getLocation(), location);
+                this.checkLocationExists(location.getLocation(), location, report);
             }
         }
     }
     
-    private void validateTeams()
+    private void validateTeams(BergamotValidationReport report)
     {
         for (TeamCfg team : this.teams)
         {
             for (String teamName : team.getTeams())
             {
-                this.checkTeamExists(teamName, team);
+                this.checkTeamExists(teamName, team, report);
             }
         }
     }
     
-    private void validateContacts()
+    private void validateContacts(BergamotValidationReport report)
     {
         for (ContactCfg contact : this.contacts)
         {
             for (String teamName : contact.getTeams())
             {
-                this.checkTeamExists(teamName, contact);
+                this.checkTeamExists(teamName, contact, report);
             }
         }
     }
     
-    private void validateCommands()
+    private void validateCommands(BergamotValidationReport report)
     {
         for (CommandCfg command : this.commands)
         {
-            if (Util.isEmpty(command.getEngine()))
+            if (Util.isEmpty(command.resolve().getEngine()))
             {
-                System.err.println("Warn: The command engine should be specified for " + command);
+                report.logError("The command engine should be specified for " + command);
             }
         }
     }
     
-    private void checkGroupExists(String name, NamedObjectCfg<?> user)
+    private void checkGroupExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
     {
         GroupCfg group = this.lookup(GroupCfg.class, name);
         if (group == null)
         {
-            System.err.println("Error: Cannot find the group '" + name + "' referenced by " + user);
+            report.logError("Cannot find the group '" + name + "' referenced by " + user);
         }
     }
     
-    private void checkLocationExists(String name, NamedObjectCfg<?> user)
+    private void checkLocationExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
     {
         LocationCfg location = this.lookup(LocationCfg.class, name);
         if (location == null)
         {
-            System.err.println("Error: Cannot find the location '" + name + "' referenced by " + user);
+            report.logError("Cannot find the location '" + name + "' referenced by " + user);
         }
     }
     
-    private void checkTeamExists(String name, NamedObjectCfg<?> user)
+    private void checkTeamExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
     {
         TeamCfg team = this.lookup(TeamCfg.class, name);
         if (team == null)
         {
-            System.err.println("Error: Cannot find the team '" + name + "' referenced by " + user);
+            report.logError("Cannot find the team '" + name + "' referenced by " + user);
         }
     }
     
-    private void checkContactExists(String name, NamedObjectCfg<?> user)
+    private void checkContactExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
     {
         ContactCfg contact = this.lookup(ContactCfg.class, name);
         if (contact == null)
         {
-            System.err.println("Error: Cannot find the contact '" + name + "' referenced by " + user);
+            report.logError("Cannot find the contact '" + name + "' referenced by " + user);
+        }
+    }
+    
+    public static class BergamotValidationReport
+    {
+        private final String site;
+        
+        private boolean valid = true;
+        
+        private List<String> errors = new LinkedList<String>();
+        
+        private List<String> warnings = new LinkedList<String>();
+                
+        public BergamotValidationReport(String site)
+        {
+            this.site = site;
+        }
+        
+        public String getSite()
+        {
+            return this.site;
+        }
+        
+        public boolean isValid()
+        {
+            return this.valid;
+        }
+        
+        public List<String> getErrors()
+        {
+            return this.errors;
+        }
+        
+        public List<String> getWarnings()
+        {
+            return this.warnings;
+        }
+        
+        private void logError(String message)
+        {
+            this.valid = false;
+            this.errors.add(message);
+        }
+        
+        private void logWarn(String message)
+        {
+            this.errors.add(message);
+        }
+        
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("The configuration for site '").append(this.getSite()).append("' is ").append(this.isValid() ? "valid." : "invalid!").append("\n");
+            if (this.warnings.size() > 0 || this.errors.size() > 0) sb.append("  Warnings: ").append(this.warnings.size()).append(", Errors: ").append(this.errors.size()).append("\n");
+            for (String error : this.errors)
+            {
+                sb.append("Error: ").append(error).append("\n");
+            }
+            for (String warn : this.warnings)
+            {
+                sb.append("Warn: ").append(warn).append("\n");
+            }
+            return sb.toString();
+        }
+    }
+    
+    public static class ValidatedBergamotConfiguration
+    {
+        private final BergamotCfg config;
+        
+        private final BergamotValidationReport report;
+        
+        private ValidatedBergamotConfiguration(BergamotCfg config, BergamotValidationReport report)
+        {
+            this.config = config;
+            this.report = report;
+        }
+
+        public BergamotCfg getConfig()
+        {
+            return config;
+        }
+
+        public BergamotValidationReport getReport()
+        {
+            return report;
         }
     }
 }

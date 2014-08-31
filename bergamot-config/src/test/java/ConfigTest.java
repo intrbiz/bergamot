@@ -2,7 +2,7 @@ import java.io.File;
 
 import com.intrbiz.bergamot.config.BergamotConfigReader;
 import com.intrbiz.bergamot.config.BergamotConfigWriter;
-import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.config.model.HostCfg;
 
 
@@ -10,12 +10,12 @@ public class ConfigTest
 {
     public static void main(String[] args) throws Exception
     {
-        for (BergamotCfg cfg : new BergamotConfigReader().includeDir(new File("../cfg/local/")).build())
+        for (ValidatedBergamotConfiguration cfg : new BergamotConfigReader().includeDir(new File("../cfg/local/")).build())
         {
             System.out.println(cfg.toString());
-            new BergamotConfigWriter().baseDir(new File(new File("../cfg/" ), cfg.getSite())).config(cfg).write();
+            new BergamotConfigWriter().baseDir(new File(new File("../cfg/" ), cfg.getConfig().getSite())).config(cfg.getConfig()).write();
             // print the resolved config
-            for (HostCfg host : cfg.getHosts())
+            for (HostCfg host : cfg.getConfig().getHosts())
             {
                 System.out.println(host.resolve());
             }
