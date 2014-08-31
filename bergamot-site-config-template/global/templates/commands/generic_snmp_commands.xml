@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command engine="snmp" name="snmp_check" template="yes">
+        <parameter description="The SNMP agent hostname"                  name="host">#{host.address}</parameter>
+        <parameter description="The SNMP version"                         name="snmp-version">#{coalesce(host.getParameter('snmp-version'), host.location.getParameter('snmp-version'), '2')}</parameter>
+        <parameter description="The SNMP community string"                name="snmp-community">#{coalesce(host.getParameter('snmp-community'), host.location.getParameter('snmp-community'), 'public')}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, sha1, md5"   name="snmp-auth">#{coalesce(host.getParameter('snmp-auth'), host.location.getParameter('snmp-auth'), 'sha1')}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, aes128, des" name="snmp-priv">#{coalesce(host.getParameter('snmp-priv'), host.location.getParameter('snmp-priv'), 'aes128')}</parameter>
+        <parameter description="The SNMP V3 username"                     name="snmp-user">#{coalesce(host.getParameter('snmp-user'), host.location.getParameter('snmp-user'))}</parameter>
+        <parameter description="The SNMP V3 password"                     name="snmp-password">#{coalesce(host.getParameter('snmp-password'), host.location.getParameter('snmp-password'))}</parameter>
+        <parameter description="The SNMP V3 engine id"                    name="snmp-engine-id">#{coalesce(host.getParameter('snmp-engine-id'), host.location.getParameter('snmp-engine-id'))}</parameter>
+        <parameter description="The check script"                         name="script"></parameter>
+    </command>
+    
+    <command engine="snmp" name="snmp_get_check" extends="snmp_check" template="yes">
+        <parameter description="The OID to get" name="oid"></parameter>
+        <parameter name="script">
+            <![CDATA[
+            /* Validate that we have the OID */
+            bergamot.require('oid');
+            /* Get the system oid */
+            agent.getValue(bergamot.check.getParameter('oid'), function(varbind) { 
+                bergamot.ok(varbind.valueToString()); 
+            });
+            ]]>
+        </parameter>
+    </command>
+    
+    <command engine="snmp" name="snmp-trap" template="yes">
+        <parameter description="The SNMP agent hostname"                  name="host">#{host.address}</parameter>
+        <parameter description="The SNMP version"                         name="snmp-version">#{coalesce(host.getParameter('snmp-version'), host.location.getParameter('snmp-version'), '2')}</parameter>
+        <parameter description="The SNMP community string"                name="snmp-community">#{coalesce(host.getParameter('snmp-community'), host.location.getParameter('snmp-community'), 'public')}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, sha1, md5"   name="snmp-auth">#{coalesce(host.getParameter('snmp-auth'), host.location.getParameter('snmp-auth'), 'sha1')}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, aes128, des" name="snmp-priv">#{coalesce(host.getParameter('snmp-priv'), host.location.getParameter('snmp-priv'), 'aes128')}</parameter>
+        <parameter description="The SNMP V3 username"                     name="snmp-user">#{coalesce(host.getParameter('snmp-user'), host.location.getParameter('snmp-user'))}</parameter>
+        <parameter description="The SNMP V3 password"                     name="snmp-password">#{coalesce(host.getParameter('snmp-password'), host.location.getParameter('snmp-password'))}</parameter>
+        <parameter description="The SNMP V3 engine id"                    name="snmp-engine-id">#{coalesce(host.getParameter('snmp-engine-id'), host.location.getParameter('snmp-engine-id'))}</parameter>
+    </command>
+    
+</bergamot>

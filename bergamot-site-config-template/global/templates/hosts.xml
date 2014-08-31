@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="generic-host" template="yes">
+        <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
+        <notify teams="admins"/>
+        <state failed-after="4" recovers-after="10"/>
+        <check-command command="check-host-alive"/>
+        <schedule every="5" retry-every="1" time-period="24x7"/>
+    </host>
+    
+    <host name="linux-server" extends="generic-host" template="yes" groups="linux-servers">
+        <notify teams="linux-admins"/>
+        
+        <service extends="memory" groups="linux-services" />
+        
+        <service extends="load"   groups="linux-services" />
+        
+        <service extends="ping"   groups="linux-services" />
+        
+    </host>
+
+    <host name="network-device" extends="generic-host" template="yes" groups="network-devices">
+        <notify teams="network-admins"/>
+        
+        <service extends="snmp_description" groups="network-services"/>
+        
+        <service extends="snmp_name"        groups="network-services"/>
+        
+        <service extends="snmp_location"    groups="network-services"/>
+        
+        <service extends="snmp_contact"     groups="network-services"/>
+        
+        <service extends="snmp_uptime"      groups="network-services"/>
+        
+    </host>
+    
+    <host name="vm-host-server" extends="linux-server" template="yes">
+        <notify teams="linux-admins"/>
+    </host>
+    
+</bergamot>

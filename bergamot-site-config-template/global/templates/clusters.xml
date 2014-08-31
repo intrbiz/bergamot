@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <cluster template="yes" name="generic-cluster">
+        <notifications time-period="24x7"/>
+        <notify teams="admins"/>
+    </cluster>
+    
+</bergamot>

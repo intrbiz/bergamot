@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="check_nrpe_process_bergamot_nginx" extends="check_nrpe">
+        <parameter name="command">check_process_bergamot_nginx</parameter>
+    </command>
+    
+    <command name="check_nrpe_process_bergamot_ui" extends="check_nrpe">
+        <parameter name="command">check_process_bergamot_ui</parameter>
+    </command>
+    
+    <command name="check_nrpe_process_bergamot_notifier_email" extends="check_nrpe">
+        <parameter name="command">check_process_bergamot_notifier_email</parameter>
+    </command>
+    
+    <command name="check_nrpe_process_bergamot_notifier_sms" extends="check_nrpe">
+        <parameter name="command">check_process_bergamot_notifier_sms</parameter>
+    </command>
+    
+    <command name="check_nrpe_process_bergamot_worker_nagios" extends="check_nrpe">
+        <parameter name="command">check_process_bergamot_worker_nagios</parameter>
+    </command>
+    
+    <command name="check_nrpe_process_bergamot_worker_snmp" extends="check_nrpe">
+        <parameter name="command">check_process_bergamot_worker_snmp</parameter>
+    </command>
+    
+    <command name="check_nrpe_process_bergamot_watcher_snmp" extends="check_nrpe">
+        <parameter name="command">check_process_bergamot_watcher_snmp</parameter>
+    </command>
+    
+</bergamot>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <service name="bergamot-service" template="yes" extends="generic-service" groups="bergamot-services">
+        <notify teams="bergamot-admins"/>
+    </service>
+
+</bergamot>

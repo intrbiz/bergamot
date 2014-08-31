@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <group name="services">
+        <summary>Services</summary>
+    </group>
+    
+    <group name="linux-services" groups="services">
+        <summary>Linux Services</summary>
+    </group>
+    
+    <group name="network-services" groups="services">
+        <summary>Network Services</summary>
+    </group>
+    
+    <group name="vm-host-services" groups="linux-services">
+        <summary>VM Host Services</summary>
+    </group>
+    
+    <group name="web-services" groups="services">
+        <summary>Web Services</summary>
+    </group>
+    
+    <group name="hosts">
+        <summary>Hosts</summary>
+    </group>
+    
+    <group name="network-devices" groups="hosts">
+        <summary>Network Devices</summary>
+    </group>
+    
+    <group name="routers" groups="network-devices">
+        <summary>Routers</summary>
+    </group>
+    
+    <group name="switches" groups="network-devices">
+        <summary>Switches</summary>
+    </group>
+    
+    <group name="linux-servers" groups="hosts">
+        <summary>Linux Servers</summary>
+    </group>
+    
+    <group name="vm-servers" groups="linux-servers">
+        <summary>VM Host Servers</summary>
+    </group>
+    
+    <group name="web-servers" groups="hosts">
+        <summary>Web Servers</summary>
+    </group>
+    
+</bergamot>

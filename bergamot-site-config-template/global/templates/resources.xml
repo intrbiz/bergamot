@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <resource template="yes" name="generic-resource">
+        <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
+        <notify teams="admins"/>
+    </resource>
+    
+</bergamot>

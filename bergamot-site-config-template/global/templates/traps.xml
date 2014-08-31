@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <trap template="yes" name="generic-trap">
+        <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
+        <notify teams="admins"/>
+        <state failed-after="1" recovers-after="1"/>
+        <initially status="ok" output="OK"/>
+    </trap>
+    
+    <trap name="network-trap" extends="generic-trap" template="yes">
+        <notify teams="network-admins"/>
+    </trap>
+    
+</bergamot>

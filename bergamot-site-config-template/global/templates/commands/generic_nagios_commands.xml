@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command engine="nagios" name="check-nagios" template="yes">
+        <parameter description="The Nagios plugin command line to execute" name="command_line"></parameter>
+    </command>
+    
+</bergamot>

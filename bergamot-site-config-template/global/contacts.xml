@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <contact name="admin" extends="generic_contact" teams="admins">
+        <summary>Administrator</summary>
+        <email>admin@localhost</email>
+    </contact>
+    
+    <contact name="op" extends="generic_contact" teams="ops">
+        <summary>Operator</summary>
+        <email>op@localhost</email>
+    </contact>
+    
+    <team name="admins" teams="linux-admins, network-admins, bergamot-admins" grants="ui.*, api.*">
+        <summary>Administrators</summary>
+    </team>
+    
+    <team name="linux-admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+        <summary>Linux Administrators</summary>
+    </team>
+    
+    <team name="network-admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+        <summary>Network Administrators</summary>
+    </team>
+    
+    <team name="bergamot-admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+        <summary>Network Administrators</summary>
+    </team>
+    
+    <team name="ops" grants="ui.access, ui.read.*, api.access, api.read.*">
+        <summary>Operators</summary>
+    </team>
+    
+    <team name="api" grants="api.*">
+        <summary>API Only Users</summary>
+    </team>
+    
+</bergamot>

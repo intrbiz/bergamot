@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="bergamot-server" extends="linux-server" template="yes" groups="bergamot-servers">
+        <summary>A generic Bergamot Monitoring server</summary>
+        <notify teams="bergamot-admins"/>
+        
+        <service extends="memory, bergamot-service"/>
+        
+        <service extends="load, bergamot-service"/>
+        
+        <service extends="ping, bergamot-service"/>
+        
+    </host>
+    
+    <host name="bergamot_ui_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring UI server</summary>
+        
+        <service name="bergamot-bergamot-nginx" template="yes" extends="bergamot-service">
+            <summary>Nginx Web Server</summary>
+            <check-command command="check_nrpe_process_bergamot_nginx" />
+        </service>
+        
+        <service name="bergamot_bergamot_ui" template="yes" extends="bergamot-service">
+            <summary>Bergamot Monitoring UI Daemon</summary>
+            <check-command command="check_nrpe_process_bergamot_ui" />
+        </service>
+        
+    </host>
+    
+    <host name="bergamot_notifier_email_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring Email Notifier server</summary>
+        
+        <service name="bergamot-bergamot-notifier-email" template="yes" extends="bergamot-service">
+            <summary>Bergamot Monitoring Email Notifier Daemon</summary>
+            <check-command command="check_nrpe_process_bergamot_notifier_email" />
+        </service>
+        
+    </host>
+    
+    <host name="bergamot_notifier_sms_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring SMS Notifier server</summary>
+        
+        <service name="bergamot-bergamot-notifier-sms" template="yes" extends="bergamot-service">
+            <summary>Bergamot Monitoring SMS Notifier Daemon</summary>
+            <check-command command="check_nrpe_process_bergamot_notifier_sms" />
+        </service>
+        
+    </host>
+    
+    <host name="bergamot_worker_nagios_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring Nagios Worker server</summary>
+        
+        <service name="bergamot-bergamot-worker-nagios" template="yes" extends="bergamot-service">
+            <summary>Bergamot Monitoring Nagios Worker Daemon</summary>
+            <check-command command="check_nrpe_process_bergamot_worker_nagios" />
+        </service>
+        
+    </host>
+    
+    <host name="bergamot_worker_snmp_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring SNMP Worker server</summary>
+
+        <service name="bergamot-bergamot-worker-snmp" template="yes" extends="bergamot-service">
+            <summary>Bergamot Monitoring SNMP Worker Daemon</summary>
+            <check-command command="check_nrpe_process_bergamot_worker_snmp" />
+        </service>
+
+    </host>
+    
+    <host name="bergamot_watcher_snmp_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring SNMP Watcher server</summary>
+        
+        <service name="bergamot-bergamot-watcher-snmp" template="yes" extends="bergamot-service">
+            <summary>Bergamot Monitoring SNMP Watcher Daemon</summary>
+            <check-command command="check_nrpe_process_bergamot_watcher_snmp"/>
+        </service>
+        
+    </host>
+    
+</bergamot>
