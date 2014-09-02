@@ -371,6 +371,11 @@ public class BergamotCfg extends Configuration
             {
                 this.checkLocationExists(host.getLocation(), host, report);
             }
+            // check command for this host
+            if (host.getCheckCommand() != null)
+            {
+                checkCommandExists(host.getCheckCommand().getCommand(), host, report);
+            }
             // services of the host
             for (ServiceCfg service : host.getServices())
             {
@@ -426,6 +431,11 @@ public class BergamotCfg extends Configuration
                 report.logWarn("Top level services must be templates: " + service);
             }
             this.validateNotify(service.getNotify(), service, report);
+            // check command for this service
+            if (service.getCheckCommand() != null)
+            {
+                checkCommandExists(service.getCheckCommand().getCommand(), service, report);
+            }
         }
     }
     
@@ -443,6 +453,11 @@ public class BergamotCfg extends Configuration
                 report.logWarn("Top level traps must be templates: " + trap);
             }
             this.validateNotify(trap.getNotify(), trap, report);
+            // check command for this trap
+            if (trap.getCheckCommand() != null)
+            {
+                checkCommandExists(trap.getCheckCommand().getCommand(), trap, report);
+            }
         }
     }
     
@@ -555,6 +570,15 @@ public class BergamotCfg extends Configuration
         if (contact == null)
         {
             report.logError("Cannot find the contact '" + name + "' referenced by " + user);
+        }
+    }
+    
+    private void checkCommandExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
+    {
+        CommandCfg command = this.lookup(CommandCfg.class, name);
+        if (command == null)
+        {
+            report.logError("Cannot find the command '" + name + "' referenced by " + user);
         }
     }
     
