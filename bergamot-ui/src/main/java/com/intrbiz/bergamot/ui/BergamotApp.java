@@ -99,14 +99,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         sessionEngine(new HazelcastSessionEngine());
         // security engine
         securityEngine(new BergamotSecurityEngine());
-        // setup the cache
-        DataManager.get().registerDefaultCacheProvider(new TieredCacheProvider(new HazelcastCacheProvider(this.getInstanceName())));        
-        // setup the database
-        BergamotDB.install();
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            System.out.println("Database: " + db.getName() + " " + db.getVersion());
-        }
         // setup ClusterManager to manage our critical
         // resources across the cluster
         this.clusterManager = new ClusterManager();
@@ -155,8 +147,12 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void startApplication() throws Exception
     {
-        // Start Gerald
-        Gerald.theMole().start();
+        // setup the database
+        BergamotDB.install();
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            System.out.println("Database: " + db.getName() + " " + db.getVersion());
+        }
         // start the cluster manager
         this.clusterManager.start(this.getInstanceName());
         // register sites with the cluster manager
@@ -169,6 +165,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         }
         // start the update websocket server
         this.updateServer.start();
+        // Start Gerald
+        Gerald.theMole().start();
     }
     
     public ClusterManager getClusterManager()
@@ -189,11 +187,21 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             UICfg config = UICfg.loadConfiguration();
             System.out.println("Using configuration: ");
             System.out.println(config.toString());
+            // compile database
+            System.out.println("Compiling DB");
+            BergamotDB.load();
+            // setup the cache
+            System.out.println("Setting up Hazelcast");
+            DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(BergamotApp.getApplicationInstanceName()));
+            DataManager.get().registerDefaultCacheProvider(new TieredCacheProvider(new HazelcastCacheProvider(BergamotApp.getApplicationInstanceName())));
             // setup the queue manager
+            System.out.println("Setting up RabbitMQ");
             QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
             // setup data manager
+            System.out.println("Setting up PostgreSQL");
             DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());
             // start the app
+            System.out.println("Starting Bergamot UI");
             BergamotApp bergamotApp = new BergamotApp();
             bergamotApp.configure(config);
             bergamotApp.start();
@@ -203,5 +211,10 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+    
+    public static String getApplicationInstanceName()
+    {
+        return BalsaApplication.getApplicationInstanceName(BergamotApp.class);
     }
 }
