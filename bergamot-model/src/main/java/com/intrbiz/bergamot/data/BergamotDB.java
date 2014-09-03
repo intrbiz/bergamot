@@ -89,6 +89,11 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
+    public static void load()
+    {
+        // do nothing
+    }
+    
     /**
      * Install the Bergamot schema into the default database
      */
