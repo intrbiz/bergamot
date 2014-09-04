@@ -398,3 +398,12 @@ span.indent {
 	margin-top: 5px;
 	padding: 5px;
 }
+
+.centre {
+	text-align: center;
+}
+
+#login-box .error {
+	color: #E85752;
+	font-weight: bold;
+}

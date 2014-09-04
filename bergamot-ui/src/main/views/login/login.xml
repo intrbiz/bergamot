@@ -24,9 +24,9 @@
 		<div id="content">
 			<div class="container">			
 				<div id="login-box">
-					<h2 style="text-align: center;">Welcome to Bergamot Monitoring</h2>
-					<h4 style="text-align: center;">Please login to continue</h4>
-					<p rendered="#{error == 'invalid'}" class="error" style="text-align: center;">
+					<h2 class="centre">Welcome to Bergamot Monitoring</h2>
+					<h4 class="centre">Please login to continue</h4>
+					<p rendered="#{error == 'invalid'}" class="error centre">
                     	The username or password you entered was incorrect, please try again.
                     </p>
 					<form method="post" action="#{path('/login')}">
