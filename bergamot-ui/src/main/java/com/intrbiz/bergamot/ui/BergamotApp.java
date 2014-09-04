@@ -154,19 +154,19 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             System.out.println("Database: " + db.getName() + " " + db.getVersion());
         }
         // start the cluster manager
-        // this.clusterManager.start(this.getInstanceName());
+        this.clusterManager.start(this.getInstanceName());
         // register sites with the cluster manager
         try (BergamotDB db = BergamotDB.connect())
         {
             for (Site site : db.listSites())
             {
-                // this.clusterManager.registerSite(site);
+                this.clusterManager.registerSite(site);
             }
         }
         // start the update websocket server
         this.updateServer.start();
         // Start Gerald
-        // Gerald.theMole().start();
+        Gerald.theMole().start();
     }
     
     public ClusterManager getClusterManager()
