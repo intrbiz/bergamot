@@ -44,6 +44,14 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     public void start() throws BalsaException
     {
     }
+    
+    @Override
+    public boolean isValidPrincipal(Principal principal, ValidationLevel validationLevel)
+    {
+        if (validationLevel == ValidationLevel.STRONG)
+            return principal instanceof Contact && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
+        return principal instanceof Contact;
+    }
 
     @Override
     protected byte[] tokenForPrincipal(Principal principal)
