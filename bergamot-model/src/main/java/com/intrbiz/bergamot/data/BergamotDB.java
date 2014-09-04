@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
@@ -73,7 +74,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
             Alert.class,
             Config.class,
             Comment.class,
-            Downtime.class
+            Downtime.class,
+            APIToken.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -504,6 +506,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     @CacheInvalidate({"get_contact_by_name.#{this.getSiteId(id)}.*", "get_contact_by_email.#{this.getSiteId(id)}.*", "get_contact_by_name_or_email.#{this.getSiteId(id)}.*"})
     @SQLRemove(table = Contact.class, name = "remove_contact", since = @SQLVersion({1, 0, 0}))
     public abstract void removeContact(@SQLParam("id") UUID id);
+    
+    // API tokens
+    
+    @Cacheable
+    @SQLSetter(table = APIToken.class, name = "set_api_token", since = @SQLVersion({1, 0, 0}))
+    public abstract void setAPIToken(APIToken token);
+    
+    @Cacheable
+    @SQLGetter(table = APIToken.class, name = "get_api_token", since = @SQLVersion({1, 0, 0}))
+    public abstract APIToken getAPIToken(@SQLParam("token") String token);
+    
+    @Cacheable
+    @SQLRemove(table = APIToken.class, name = "remove_api_token", since = @SQLVersion({1, 0, 0}))
+    public abstract void removeAPIToken(@SQLParam("token") String token);
+    
+    @SQLGetter(table = APIToken.class, name = "get_api_tokens_for_contact", since = @SQLVersion({1, 0, 0}))
+    public abstract List<APIToken> getAPITokensForContact(@SQLParam("contact_id") UUID contactId);
     
     // notifications
     

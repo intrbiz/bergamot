@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,8 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     private static final long serialVersionUID = 1L;
 
     public static final int BCRYPT_WORK_FACTOR = 12;
+    
+    public static enum LockOutReason { ADMINISTRATIVE, AUTOMATIC }
 
     @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<UUID> teamIds = new LinkedList<UUID>();
@@ -50,6 +53,32 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
 
     @SQLColumn(index = 8, name = "revoked_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<String> revokedPermissions = new LinkedList<String>();
+    
+    // account security flags
+    
+    /**
+     * Should the password be changed on next login
+     */
+    @SQLColumn(index = 9, name = "force_password_change", since = @SQLVersion({ 1, 0, 0 }))
+    private boolean forcePasswordChange = false;
+    
+    /**
+     * Is this account locked in any way, IE: reject authentication even with valid credentials
+     */
+    @SQLColumn(index = 10, name = "locked", since = @SQLVersion({ 1, 0, 0 }))
+    private boolean locked = false;
+    
+    /**
+     * Why the account was locked
+     */
+    @SQLColumn(index = 11, name = "locked_reason", since = @SQLVersion({ 1, 0, 0 }))
+    private LockOutReason lockedReason;
+    
+    /**
+     * When this account was locked last
+     */
+    @SQLColumn(index = 12, name = "locked_at", since = @SQLVersion({ 1, 0, 0 }))
+    private Timestamp lockedAt = null;
 
     public Contact()
     {
@@ -113,6 +142,8 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     public void hashPassword(String plainPassword)
     {
         this.passwordHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt(BCRYPT_WORK_FACTOR));
+        // reset as we've updated the password
+        this.forcePasswordChange = false;
     }
 
     public boolean verifyPassword(String plainPassword)
@@ -195,6 +226,76 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     public void setRevokedPermissions(List<String> revokedPermissions)
     {
         this.revokedPermissions = revokedPermissions;
+    }
+
+    public boolean isForcePasswordChange()
+    {
+        return forcePasswordChange;
+    }
+
+    public void setForcePasswordChange(boolean forcePasswordChange)
+    {
+        this.forcePasswordChange = forcePasswordChange;
+    }
+
+    public boolean isLocked()
+    {
+        return locked;
+    }
+
+    public void setLocked(boolean locked)
+    {
+        this.locked = locked;
+    }
+
+    public LockOutReason getLockedReason()
+    {
+        return lockedReason;
+    }
+
+    public void setLockedReason(LockOutReason lockedReason)
+    {
+        this.lockedReason = lockedReason;
+    }
+
+    public Timestamp getLockedAt()
+    {
+        return lockedAt;
+    }
+
+    public void setLockedAt(Timestamp lockedAt)
+    {
+        this.lockedAt = lockedAt;
+    }
+    
+    public Contact forcePasswordChange()
+    {
+        this.forcePasswordChange = true;
+        return this;
+    }
+    
+    public Contact lock(LockOutReason reason)
+    {
+        this.locked = true;
+        this.lockedReason = reason;
+        this.lockedAt = new Timestamp(System.currentTimeMillis());
+        return this;
+    }
+    
+    public Contact unlock()
+    {
+        this.locked = false;
+        this.lockedReason = null;
+        this.lockedAt = null;
+        return this;
+    }
+    
+    public List<APIToken> getAPITokens()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAPITokensForContact(this.getId());
+        }
     }
 
     public String toString()
