@@ -29,7 +29,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
 
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey()
-    protected UUID id = UUID.randomUUID();
+    protected UUID id;
 
     @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
