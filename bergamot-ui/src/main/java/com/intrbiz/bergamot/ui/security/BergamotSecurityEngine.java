@@ -8,12 +8,16 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.balsa.BalsaException;
 import com.intrbiz.balsa.engine.impl.security.SecurityEngineImpl;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
+import com.intrbiz.crypto.cookie.CookieBaker.Expires;
+import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.data.DataException;
 
 public class BergamotSecurityEngine extends SecurityEngineImpl
@@ -34,6 +38,11 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     protected String getMetricsIntelligenceSourceName()
     {
         return "com.intrbiz.bergamot";
+    }
+
+    @Override
+    public void start() throws BalsaException
+    {
     }
 
     @Override
@@ -71,7 +80,6 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
             if (site == null)
             {
                 logger.error("Failed to determine the site for the server name: " + Balsa().request().getServerName() + ", authentication cannot continue.");
-                this.invalidLogins.inc();
                 throw new BalsaSecurityException("No such principal");
             }
             // lookup the principal
@@ -82,16 +90,53 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
             if (! contact.verifyPassword(new String(password)))
             {
                 logger.error("Password mismatch for principal " + username + " => " + site.getId() + "::" + contact.getId());
-                this.invalidLogins.inc();
                 throw new BalsaSecurityException("Invalid password");
+            }
+            // check if the account is locked
+            if (contact.isLocked())
+            {
+                logger.error("Rejecting valid login for principal " + username + " => " + site.getId() + " :: " + contact.getId() + " as the account has been locked.");
+                throw new BalsaSecurityException("Account locked");
             }
             return contact;
         }
         catch (DataException e)
         {
             logger.error("Cannot authenticate principal, database error", e);
-            this.validLogins.inc();
-            throw new BalsaSecurityException("Error getting principal");
+            throw new BalsaSecurityException("Error authenticating principal");
+        }
+    }
+    
+    protected void validateAccessToken(String token, CryptoCookie cookie, Principal principal) throws BalsaSecurityException
+    {
+        // only validate perpetual API tokens
+        if (cookie.getExpiryTime() == Expires.never())
+        {
+            // lookup the API token in the database and validate that it exists and is not revoked
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                APIToken apiToken = db.getAPIToken(token);
+                if (apiToken == null)
+                {
+                    logger.error("Invalid perpetual API token '" + token + "', it does not exist");
+                    throw new BalsaSecurityException("Invalid perpetual API token");
+                }
+                if ( ! ((Contact) principal).getId().equals(apiToken.getContactId()))
+                {
+                    logger.error("Invalid perpetual API token '" + token + "', it does not match the Principal");
+                    throw new BalsaSecurityException("Invalid perpetual API token");
+                }
+                if (apiToken.isRevoked())
+                {
+                    logger.error("Invalid perpetual API token '" + token + "', it is revoked!");
+                    throw new BalsaSecurityException("Invalid perpetual API token");
+                }
+            }
+            catch (DataException e)
+            {
+                logger.error("Cannot authenticate perpetual API token, database error", e);
+                throw new BalsaSecurityException("Failed to validate perpetual API token", e);
+            }
         }
     }
 
