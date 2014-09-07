@@ -4,6 +4,7 @@ import static com.intrbiz.balsa.BalsaContext.*;
 
 import java.nio.ByteBuffer;
 import java.security.Principal;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -23,6 +24,8 @@ import com.intrbiz.data.DataException;
 public class BergamotSecurityEngine extends SecurityEngineImpl
 {
     private Logger logger = Logger.getLogger(BergamotSecurityEngine.class);
+    
+    private SecureRandom random = new SecureRandom();
 
     public BergamotSecurityEngine()
     {
@@ -56,11 +59,23 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     @Override
     protected byte[] tokenForPrincipal(Principal principal)
     {
-        byte[] token = new byte[16];
+        // we combine the UUID with a NONCE,
+        // packed as: nonce1, nonce1 ^ msb, nonce2, nonce2 ^ lsb
+        // this is a little obfuscation but mainly to reduce obvious 
+        // patterns
+        byte[] token = new byte[32];
         ByteBuffer bb = ByteBuffer.wrap(token);
         UUID id = ((Contact) principal).getId();
-        bb.putLong(id.getMostSignificantBits());
-        bb.putLong(id.getLeastSignificantBits());
+        // a NONCE
+        long nonce1 = this.random.nextLong();
+        long nonce2 = this.random.nextLong();
+        // high part
+        bb.putLong(nonce1);
+        bb.putLong(id.getMostSignificantBits() ^ nonce1);
+        // low part
+        bb.putLong(nonce2);
+        bb.putLong(id.getLeastSignificantBits() ^ nonce2);
+        // done
         return token;
     }
 
@@ -68,7 +83,14 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     protected Principal principalForToken(byte[] token)
     {
         ByteBuffer bb = ByteBuffer.wrap(token);
-        UUID id = new UUID(bb.getLong(), bb.getLong());
+        // extract the data we need
+        long nonce1 = bb.getLong();
+        long msb    = bb.getLong();
+        long nonce2 = bb.getLong();
+        long lsb    = bb.getLong();
+        // build the uuid
+        UUID id = new UUID(nonce1 ^ msb, nonce2 ^ lsb);
+        // lookup
         try (BergamotDB db = BergamotDB.connect())
         {
             return db.getContact(id);
