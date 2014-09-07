@@ -419,6 +419,10 @@ span.indent {
 	margin: 10px 0;
 }
 
+#login-box input {
+    color: #2c2c2c;
+}
+
 #login-box input[type=text], #login-box input[type=password] {
 	width: 340px;
 	margin: 5px 0;
@@ -431,6 +435,17 @@ span.indent {
 	font-weight: bold;
 	margin-top: 5px;
 	padding: 5px 10px;
+}
+
+#login-box input[type=checkbox] {
+    margin: 5px 0px 0px 2px;
+}
+
+#login-box label {
+    color: #00BF00;
+    margin: 5px 0;
+    font-size: 16px;
+    padding: 5px;
 }
 
 .centre {

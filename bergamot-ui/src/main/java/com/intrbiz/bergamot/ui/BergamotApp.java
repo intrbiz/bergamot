@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
+import com.intrbiz.balsa.util.Util;
 import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -49,6 +50,7 @@ import com.intrbiz.bergamot.ui.router.TrapRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
 import com.intrbiz.configuration.Configurable;
+import com.intrbiz.crypto.SecretKey;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
 import com.intrbiz.data.cache.tiered.TieredCacheProvider;
@@ -84,6 +86,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     public void configure(UICfg cfg) throws Exception
     {
         this.config = cfg;
+        // setup the application security key
+        if (Util.isEmpty(cfg.getSecurityKey())) this.getSecurityEngine().applicationKey(SecretKey.fromString(cfg.getSecurityKey()));
     }
 
     @Override

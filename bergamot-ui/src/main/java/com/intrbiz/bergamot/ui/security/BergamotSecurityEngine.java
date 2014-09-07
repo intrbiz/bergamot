@@ -146,6 +146,14 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
                 throw new BalsaSecurityException("Failed to validate perpetual API token", e);
             }
         }
+        // account level checks
+        // check if the account is locked
+        Contact contact = (Contact) principal;
+        if (contact.isLocked())
+        {
+            logger.error("Rejecting valid token login for principal " + contact.getName() + " => " + contact.getSiteId() + " :: " + contact.getId() + " as the account has been locked.");
+            throw new BalsaSecurityException("Account locked");
+        }
     }
 
     /**

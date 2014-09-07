@@ -7,15 +7,19 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
 import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.balsa.error.BalsaValidationError;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.AsBoolean;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.CheckStringLength;
+import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
@@ -27,22 +31,57 @@ import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/")
 public class LoginRouter extends Router<BergamotApp>
-{
-    public static final String USERNAME_COOKIE = "bergamot.username";
-    
+{   
     private Logger logger = Logger.getLogger(LoginRouter.class);
     
     @Get("/login")
-    public void login(@Param("redirect") String redirect)
+    public void login(@Param("redirect") String redirect) throws IOException
     {
-        model("redirect", redirect);
-        model("username", cookie(USERNAME_COOKIE));
+        // check for an auto auth cookie
+        String autoAuthToken = cookie("bergamot.auto.login");
+        if (! Util.isEmpty(autoAuthToken))
+        {
+            // try the given auth token and assert the contact has ui.access permission
+            Contact contact = tryAuthenticate(new GenericAuthenticationToken(autoAuthToken));
+            if (contact != null && permission("ui.access"))
+            {
+                logger.info("Successfully auto authenticated user: " + contact.getName() + " => " + contact.getSiteId() + "::" + contact.getId());
+                // setup the session
+                sessionVar("contact", currentPrincipal());
+                sessionVar("site", contact.getSite());
+                // update the auto auth cookie
+                cookie()
+                .name("bergamot.auto.login")
+                .value(app().getSecurityEngine().generateAuthenticationTokenForPrincipal(contact, Expires.after(90, TimeUnit.DAYS)))
+                .path(path("/login"))
+                .expiresAfter(90, TimeUnit.DAYS)
+                .httpOnly()
+                .secure(request().isSecure())
+                .set();
+                // now we can redirect
+                if (contact.isForcePasswordChange())
+                {
+                    var("redirect", redirect);
+                    var("forced", true);
+                    encodeOnly("login/force_change_password");
+                }
+                else
+                {
+                    // redirect
+                    redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
+                }
+                return;
+            }
+        }
+        // show the login page
+        var("redirect", redirect);
+        var("username", cookie("bergamot.username"));
         encodeOnly("login/login");
     }
 
     @Post("/login")
     @RequireValidAccessTokenForURL()
-    public void doLogin(@Param("username") String username, @Param("password") String password, @Param("redirect") String redirect) throws IOException
+    public void doLogin(@Param("username") String username, @Param("password") String password, @Param("redirect") String redirect, @Param("remember_me") @AsBoolean(defaultValue = false, coalesce = CoalesceMode.ALWAYS) Boolean rememberMe) throws IOException
     {
         logger.info("Login: " + username);
         authenticate(username, password);
@@ -52,7 +91,7 @@ public class LoginRouter extends Router<BergamotApp>
         Contact contact = sessionVar("contact", currentPrincipal());
         sessionVar("site", contact.getSite());
         // set a cookie of the username, to remember the user
-        cookie().name(USERNAME_COOKIE).value(username).path(path("/login")).expiresAfter(90, TimeUnit.DAYS).httpOnly().set();
+        cookie().name("bergamot.username").value(username).path(path("/login")).expiresAfter(90, TimeUnit.DAYS).httpOnly().set();
         // force a password change
         if (contact.isForcePasswordChange())
         {
@@ -62,6 +101,18 @@ public class LoginRouter extends Router<BergamotApp>
         }
         else
         {
+            // if remember me is selected then push a long term auth cookie
+            if (rememberMe)
+            {
+                cookie()
+                .name("bergamot.auto.login")
+                .value(app().getSecurityEngine().generateAuthenticationTokenForPrincipal(contact, Expires.after(90, TimeUnit.DAYS)))
+                .path(path("/login"))
+                .expiresAfter(90, TimeUnit.DAYS)
+                .httpOnly()
+                .secure(request().isSecure())
+                .set();
+            }
             // redirect
             redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
         }
@@ -85,6 +136,7 @@ public class LoginRouter extends Router<BergamotApp>
             // since we have updated the principal, we need to 
             // update it in the session
             balsa().session().currentPrincipal(contact);
+            sessionVar("contact", contact);
             logger.info("Password change complete for " + contact.getEmail() + " => " + contact.getSiteId() + "::" + contact.getId());
             // redirect
             redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
@@ -116,7 +168,18 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireValidPrincipal()
     public void logout() throws IOException
     {
+        // deauth the current session
         deauthenticate();
+        // nullify any auto auth cookie
+        cookie()
+        .name("bergamot.auto.login")
+        .value("")
+        .path(path("/login"))
+        .expiresAfter(90, TimeUnit.DAYS)
+        .httpOnly()
+        .secure(request().isSecure())
+        .set();
+        // redirect
         redirect("/login");
     }
     
@@ -128,7 +191,7 @@ public class LoginRouter extends Router<BergamotApp>
         // error during login
         var("error", "invalid");
         var("redirect", redirect);
-        var("username", cookie(USERNAME_COOKIE));
+        var("username", cookie("bergamot.username"));
         // encode login page
         encodeOnly("login/login");
     }
