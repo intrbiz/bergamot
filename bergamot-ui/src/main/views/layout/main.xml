@@ -10,44 +10,95 @@
 		<script src="/js/bower_components/requirejs/require.js"></script>
     	<script src="/js/bower_components/jquery/dist/jquery.js"></script>
     	<script type="text/javascript">
+            <![CDATA[
 			/* Configure require js */
 			require.config({
 			    baseUrl: "/js/bower_components",
 			    waitSeconds: 15
 			});
+            ]]>
 		</script>
+        <script type="text/javascript">
+            <![CDATA[
+            $(document).ready(function() {
+                // setup the menu
+                $('#sub-menu').attr('box_h', $('#sub-menu').height());
+                $('#sub-menu').css('height', '0px');
+                // setup menu show button
+                $('#show-menu').click(function(ev) {
+                    ev.preventDefault();
+                    if (this.shown) {
+                        this.shown = false;
+                        $('#sub-menu').animate({ 'height': '0px' }, 300, function() {
+                            $('#sub-menu').css('visibility', 'hidden');
+                        });
+                    } else {
+                        this.shown = true;
+                        $('#sub-menu').css('visibility', 'visible');
+                        $('#sub-menu').animate({ 'height': $('#sub-menu').attr('box_h') }, 300);
+                    }
+                });
+            });
+            ]]>
+        </script>
 	</head>
 	<body>
 		<div id="header">
 			<div class="container">
 				<div id="logo">
 					<a href="/">
-						<h1>Bergamot</h1>
+                        <h1>Bergamot</h1>
 					</a>
 				</div>
-				<div id="menu">
-					<ul>
-						<li>
-							<a href="/location/">Locations</a>
-						</li>
-						<li>
-							<a href="/group/">Groups</a>
-						</li>
-						<li>
-							<a href="/group/name/hosts">Hosts</a>
-						</li>
-						<li>
-							<a href="/group/name/services">Services</a>
-						</li>
-						<li>
-							<a href="/">Alerts</a>
-						</li>
-					</ul>
-				</div>
+                <p id="welcome">Welcome <a href="/profile/">#{Balsa().currentPrincipal().summary}</a></p>
+                <a id="show-menu" href="#menu">Menu</a>
 			</div>
 		</div>
+        <div id="sub-menu">
+            <div class="container">
+                
+                <ul rendered="#{Balsa().permission('ui.admin')}">
+                    <li>
+                        <a href="/admin/">Admin</a>
+                    </li>
+                </ul>
+                
+                <ul>
+                    <li>
+                        <a href="/profile/">Profile</a>
+                    </li>
+                    <li>
+                        <a href="/logout">Logout</a>
+                    </li>
+                </ul>
+                
+                <ul>
+                    <li>
+                        <a href="/location/">Locations</a>
+                    </li>
+                </ul>
+                
+                <ul>
+                    <li>
+                        <a href="/group/">Groups</a>
+                    </li>
+                    <li>
+                        <a href="/group/name/hosts">Hosts</a>
+                    </li>
+                    <li>
+                        <a href="/group/name/services">Services</a>
+                    </li>
+                </ul>
+                
+                <ul>
+                    <li>
+                        <a href="/">Alerts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 		<div id="content">
-			<div class="container">			
+			<div class="container">
 				<h2>#{title()}</h2>
 				<content/>
 			</div>

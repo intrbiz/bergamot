@@ -12,13 +12,20 @@ body {
 	font-family: 'Open Sans',sans-serif;
 	font-size: 16px;
 	color: #2c2c2c;
-	background-color: #FFFAF1;
+	/* background-color: #FFFAF1; */
+    background-color: #FBFFFA;
 }
 
-a, a:visited, a:active, a:hover {
+a, a:visited, a:active {
 	color: #2c2c2c;
 	text-decoration: underline;
 	outline: none;
+}
+
+a:hover {
+    color: #004D00;
+    text-decoration: underline;
+    outline: none;
 }
 
 h1 {
@@ -59,8 +66,8 @@ table tr:hover {
 #header {
 	height: 50px;
 	background-color: #2c2c2c;
-	color: #FFF;
-	border-bottom: 4px solid #CCC;
+	color: #00BF00;
+	border-bottom: 4px solid #00BF00;
 }
 
 #header h1 {
@@ -69,32 +76,59 @@ table tr:hover {
 	font-weight: bold;
 }
 
-#header a, #header a:visited, #header a:active, #header a:hover {
-	color: #FFF;
+#header a, #header a:visited, #header a:active, 
+#sub-menu a, #sub-menu a:visited, #sub-menu a:active {
+	color: #00BF00;
 	text-decoration: none;
+}
+
+#header a:hover, 
+#sub-menu a:hover {
+    color: #00FF00;
+    text-decoration: none;
 }
 
 #header #logo {
 	width: 300px;
 }
 
-#header #menu {
-	position: absolute;
-	top: 20px;
-	right: 0px;
-	height: 20px;
-	width: 500px;
+#show-menu {
+    display: block;
+    text-indent: 10000px;
+    width: 32px;
+    height: 30px;
+    background: transparent url('menu.png') no-repeat;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    overflow: hidden;
 }
 
-#header #menu ul li a {
-	display: block;
-	float: right;
-	line-height: 16px;
-	font-size: 16px;
-	padding: 4px;
-	height: 20px;
-	margin-left: 10px;
-	text-decoration: underline;
+#welcome {
+    display: block;
+    height: 30px;
+    position: absolute;
+    top: 15px;
+    right: 60px;
+    overflow: hidden;
+}
+
+#sub-menu {
+    background-color: #2c2c2c;
+    color: #00BF00;
+    border-bottom: 4px solid #00BF00;
+    z-index: 1000;
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    width: 100%;
+    visibility: hidden;
+    padding-bottom: 10px;
+}
+
+#sub-menu ul {
+    float: right;
+    margin: 0 20px;
 }
 
 #content {
@@ -291,7 +325,7 @@ table tr:hover {
 }
 
 a:hover .dash_icon {
-    background: #f4f4f4;
+    background-color: #D9E1D9;
 }
 
 .dash_icon h3 {
