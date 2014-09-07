@@ -12,9 +12,9 @@ import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.balsa.error.BalsaValidationError;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsBoolean;
 import com.intrbiz.metadata.Catch;
@@ -49,15 +49,6 @@ public class LoginRouter extends Router<BergamotApp>
                 // setup the session
                 sessionVar("contact", currentPrincipal());
                 sessionVar("site", contact.getSite());
-                // update the auto auth cookie
-                cookie()
-                .name("bergamot.auto.login")
-                .value(app().getSecurityEngine().generateAuthenticationTokenForPrincipal(contact, Expires.after(90, TimeUnit.DAYS)))
-                .path(path("/login"))
-                .expiresAfter(90, TimeUnit.DAYS)
-                .httpOnly()
-                .secure(request().isSecure())
-                .set();
                 // now we can redirect
                 if (contact.isForcePasswordChange())
                 {
@@ -104,9 +95,17 @@ public class LoginRouter extends Router<BergamotApp>
             // if remember me is selected then push a long term auth cookie
             if (rememberMe)
             {
+                // generate the token
+                String token = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(contact);
+                // store the token
+                try (BergamotDB db = BergamotDB.connect())
+                {
+                    db.setAPIToken(new APIToken(token, contact, "Auto login for " + request().getRemoteAddress()));
+                }
+                // set the cookie
                 cookie()
                 .name("bergamot.auto.login")
-                .value(app().getSecurityEngine().generateAuthenticationTokenForPrincipal(contact, Expires.after(90, TimeUnit.DAYS)))
+                .value(token)
                 .path(path("/login"))
                 .expiresAfter(90, TimeUnit.DAYS)
                 .httpOnly()
