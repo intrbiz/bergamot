@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -15,8 +16,10 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A perpetual API token which has been created for a Contact
  */
 @SQLTable(schema = BergamotDB.class, name = "api_token", since = @SQLVersion({ 1, 0, 0 }))
-public class APIToken
+public class APIToken implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * The API Token which will be used for perpetual authentication of external things
      */
@@ -53,11 +56,19 @@ public class APIToken
      * When was it revoked
      */
     @SQLColumn(index = 8, name = "revoked_at", since = @SQLVersion({ 1, 0, 0 }))
-    private Timestamp revokedAt = new Timestamp(System.currentTimeMillis());
+    private Timestamp revokedAt = null;
     
     public APIToken()
     {
         super();
+    }
+    
+    public APIToken(String token, Contact contact, String summary)
+    {
+        this();
+        this.token = token;
+        this.contactId = contact.getId();
+        this.summary = summary;
     }
 
     public String getToken()
