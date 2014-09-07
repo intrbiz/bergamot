@@ -5,21 +5,26 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.intrbiz.Util;
 import com.intrbiz.configuration.Configuration;
+import com.intrbiz.crypto.SecretKey;
 
 @XmlType(name = "ui")
 @XmlRootElement(name = "ui")
 public class UICfg extends Configuration
 {
     private static final long serialVersionUID = 1L;
-    
+
     private BrokerCfg broker;
-    
+
     private DatabaseCfg database;
+
+    private String securityKey;
 
     public UICfg()
     {
@@ -36,7 +41,7 @@ public class UICfg extends Configuration
     {
         this.broker = broker;
     }
-    
+
     @XmlElementRef(type = DatabaseCfg.class)
     public DatabaseCfg getDatabase()
     {
@@ -46,6 +51,17 @@ public class UICfg extends Configuration
     public void setDatabase(DatabaseCfg database)
     {
         this.database = database;
+    }
+
+    @XmlElement(name = "security-key")
+    public String getSecurityKey()
+    {
+        return securityKey;
+    }
+
+    public void setSecurityKey(String securityKey)
+    {
+        this.securityKey = securityKey;
     }
 
     @Override
@@ -61,13 +77,18 @@ public class UICfg extends Configuration
         {
             this.database = new DatabaseCfg("jdbc:postgresql://127.0.0.1:5432/bergamot", "bergamot", "bergamot");
         }
+        // the security key
+        if (Util.isEmpty(securityKey))
+        {
+            this.securityKey = SecretKey.generate().toString();
+        }
     }
-    
+
     public static UICfg read(File file) throws JAXBException, IOException
     {
         return Configuration.read(UICfg.class, new FileInputStream(file));
     }
-    
+
     /**
      * Load the UI configuration, either from the default config file, the specified config file or the default config.
      */
