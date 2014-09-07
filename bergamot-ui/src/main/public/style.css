@@ -406,11 +406,13 @@ span.indent {
 }
 
 #login-box {
-	/*background-color: #f5f5f5;*/
-	border-radius: 4px;
+	background-color: #2c2c2c;
+    color: #00BF00;
 	padding: 10px 20px;
 	width: 360px;
 	margin: 50px auto 0px auto;
+    border-radius: 4px;
+    border-bottom: 4px solid #00BF00;
 }
 
 #login-box form {
@@ -425,11 +427,10 @@ span.indent {
 }
 
 #login-box input[type=submit] {
-	width: 100px;
 	font-size: 16px;
 	font-weight: bold;
 	margin-top: 5px;
-	padding: 5px;
+	padding: 5px 10px;
 }
 
 .centre {
