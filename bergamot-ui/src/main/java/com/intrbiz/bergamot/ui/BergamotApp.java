@@ -86,8 +86,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     public void configure(UICfg cfg) throws Exception
     {
         this.config = cfg;
-        // setup the application security key
-        if (Util.isEmpty(cfg.getSecurityKey())) this.getSecurityEngine().applicationKey(SecretKey.fromString(cfg.getSecurityKey()));
     }
 
     @Override
@@ -105,6 +103,12 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         sessionEngine(new HazelcastSessionEngine());
         // security engine
         securityEngine(new BergamotSecurityEngine());
+        // setup the application security key
+        if (! Util.isEmpty(this.getConfiguration().getSecurityKey()))
+        {
+            // set the key
+            this.getSecurityEngine().applicationKey(SecretKey.fromString(this.getConfiguration().getSecurityKey()));
+        }
         // setup ClusterManager to manage our critical
         // resources across the cluster
         this.clusterManager = new ClusterManager();
