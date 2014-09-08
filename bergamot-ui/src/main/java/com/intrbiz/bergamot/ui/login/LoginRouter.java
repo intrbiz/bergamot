@@ -11,6 +11,7 @@ import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
 import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.balsa.error.BalsaValidationError;
+import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
@@ -49,6 +50,7 @@ public class LoginRouter extends Router<BergamotApp>
                 // setup the session
                 sessionVar("contact", currentPrincipal());
                 sessionVar("site", contact.getSite());
+                sessionVar("bergamot.auto.login", autoAuthToken);
                 // now we can redirect
                 if (contact.isForcePasswordChange())
                 {
@@ -72,7 +74,8 @@ public class LoginRouter extends Router<BergamotApp>
 
     @Post("/login")
     @RequireValidAccessTokenForURL()
-    public void doLogin(@Param("username") String username, @Param("password") String password, @Param("redirect") String redirect, @Param("remember_me") @AsBoolean(defaultValue = false, coalesce = CoalesceMode.ALWAYS) Boolean rememberMe) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void doLogin(BergamotDB db, @Param("username") String username, @Param("password") String password, @Param("redirect") String redirect, @Param("remember_me") @AsBoolean(defaultValue = false, coalesce = CoalesceMode.ALWAYS) Boolean rememberMe) throws IOException
     {
         logger.info("Login: " + username);
         authenticate(username, password);
@@ -98,10 +101,7 @@ public class LoginRouter extends Router<BergamotApp>
                 // generate the token
                 String token = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(contact);
                 // store the token
-                try (BergamotDB db = BergamotDB.connect())
-                {
-                    db.setAPIToken(new APIToken(token, contact, "Auto login for " + request().getRemoteAddress()));
-                }
+                db.setAPIToken(new APIToken(token, contact, "Auto login for " + request().getRemoteAddress()));
                 // set the cookie
                 cookie()
                 .name("bergamot.auto.login")
@@ -165,19 +165,26 @@ public class LoginRouter extends Router<BergamotApp>
 
     @Get("/logout")
     @RequireValidPrincipal()
-    public void logout() throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void logout(BergamotDB db) throws IOException
     {
         // deauth the current session
         deauthenticate();
-        // nullify any auto auth cookie
-        cookie()
-        .name("bergamot.auto.login")
-        .value("")
-        .path(path("/login"))
-        .expiresAfter(90, TimeUnit.DAYS)
-        .httpOnly()
-        .secure(request().isSecure())
-        .set();
+        // clean up any auto auth
+        String autoAuthToken = sessionVar("bergamot.auto.login");
+        if (! Util.isEmpty(autoAuthToken))
+        {
+            db.removeAPIToken(autoAuthToken);
+            // nullify any auto auth cookie
+            cookie()
+            .name("bergamot.auto.login")
+            .value("")
+            .path(path("/login"))
+            .expiresAfter(90, TimeUnit.DAYS)
+            .httpOnly()
+            .secure(request().isSecure())
+            .set();
+        }
         // redirect
         redirect("/login");
     }
