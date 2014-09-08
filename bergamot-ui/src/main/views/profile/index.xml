@@ -1,6 +1,88 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Profile #{Balsa().currentPrincipal().summary}">
+<fragment xmlns="com.intrbiz.balsa" title="Hello #{Balsa().currentPrincipal().summary}">
+
+	<div class="row">
+		<div class="col4 dash_icon">
+			<h3>Your details</h3>
+		    <p>
+			    <span class="label">Username: </span>
+			    <span class="value">#{contact.name}</span>
+		    </p>
+		    <p>
+			    <span class="label">Email: </span>
+			    <span class="value">#{coalesce(contact.email, '')}</span>
+		    </p>
+		    <p>
+			    <span class="label">Pager: </span>
+			    <span class="value">#{coalesce(contact.pager, '')}</span>
+		    </p>
+		    <p>
+			    <span class="label">Mobile: </span>
+			    <span class="value">#{coalesce(contact.mobile, '')}</span>
+		    </p>
+		    <p>
+			    <span class="label">Phone: </span>
+			    <span class="value">#{coalesce(contact.phone, '')}</span>
+		    </p>
+		    <p class="description">
+			    #{coalesce(contact.description, '')}
+		    </p>
+		</div>
+		<div class="col4">
+			<h3>Member of</h3>
+			<data-set var="team" value="#{contact.teams}">
+				<p>
+					<span>#{team.summary}</span>
+				</p>
+			</data-set>
+		</div>
+	</div>
+    
+    <div class="row">
+    	<div class="col12">
+	    	<h3>Your Authentication Tokens</h3>
+	    	<p class="text-body">
+	    		Authentication tokens are used to login to Bergamot without requiring a username and password, 
+	    		these tokens can be used to authenticate with the Bergamot API, with the CLI and to login automatically. 
+	    	</p>
+	    	<table style="width: 1740px;">
+	    		<tr>
+	    			<th>Token</th>
+	    			<th>Purpose</th>
+	    			<th>Created</th>
+	    			<th>Revoked</th>
+	    			<th></th>
+	    		</tr>
+				<data-set var="token" value="#{contact.getAPITokens()}">
+					<tr>
+						<td>#{token.token}</td>
+						<td>#{token.summary}</td>
+						<td>#{dateformat('yyyy-MM-dd', token.created)} at #{dateformat('hh:mm:ss', token.created)}</td>
+						<td>#{if(token.revoked, dateformat('yyyy-MM-dd', token.revokedAt) + ' at ' + dateformat('hh:mm:ss', token.revokedAt), 'no')}</td>
+						<td>
+							<form action="#{path('/profile/revoke-api-token')}" method="post">
+								<input type="hidden" name="token" value="#{token.token}"/>
+								<input type="submit" name="revoke" value="Revoke"/>
+							</form>
+							<form action="#{path('/profile/remove-api-token')}" method="post">
+								<input type="hidden" name="token" value="#{token.token}"/>
+								<input type="submit" name="remove" value="Remove"/>
+							</form>
+						</td>
+					</tr>
+				</data-set>
+			</table>
+			<p class="text-body">
+	    		<h4>Generate authentication token</h4>
+	    		<form action="#{path('/profile/generate-api-token')}" method="post">
+	    			<label for="summary">Purpose: </label>
+	    			<input type="text" name="summary" placeholder="API Access"/>
+	    			<input type="submit" name="generate" value="Generate"/>
+	    		</form>
+	    	</p>
+		</div>
+	</div>
     
 </fragment>
