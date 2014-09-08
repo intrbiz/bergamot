@@ -12,12 +12,8 @@
 			<div class="container">
 				<div id="logo">
 					<a href="/">
-						<h1>Bergamot</h1>
+						<img src="#{public('/bergamot_h40.png')}" alt="Bergamot Monitoring"/>
 					</a>
-				</div>
-				<div id="menu">
-					<ul>
-					</ul>
 				</div>
 			</div>
 		</div>

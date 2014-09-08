@@ -64,11 +64,11 @@
 						<td>
 							<form action="#{path('/profile/revoke-api-token')}" method="post">
 								<input type="hidden" name="token" value="#{token.token}"/>
-								<input type="submit" name="revoke" value="Revoke"/>
+								<input type="submit" name="revoke" value="Revoke" class="danger"/>
 							</form>
 							<form action="#{path('/profile/remove-api-token')}" method="post">
 								<input type="hidden" name="token" value="#{token.token}"/>
-								<input type="submit" name="remove" value="Remove"/>
+								<input type="submit" name="remove" value="Remove" class="danger"/>
 							</form>
 						</td>
 					</tr>

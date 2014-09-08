@@ -7,8 +7,8 @@
 		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
 		<!-- Scripts -->
-		<script src="/js/bower_components/requirejs/require.js"></script>
-    	<script src="/js/bower_components/jquery/dist/jquery.js"></script>
+		<script src="#{public('/js/bower_components/requirejs/require.js')}"></script>
+    	<script src="#{public('/js/bower_components/jquery/dist/jquery.js')}"></script>
     	<script type="text/javascript">
             <![CDATA[
 			/* Configure require js */
@@ -47,7 +47,7 @@
 			<div class="container">
 				<div id="logo">
 					<a href="/">
-                        <h1>Bergamot</h1>
+                        <img src="#{public('/bergamot_h40.png')}" alt="Bergamot Monitoring"/>
 					</a>
 				</div>
                 <p id="welcome">Welcome <a href="/profile/">#{Balsa().currentPrincipal().summary}</a></p>

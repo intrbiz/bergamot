@@ -95,6 +95,10 @@ table tr:hover {
 	width: 300px;
 }
 
+#header #logo img {
+    padding-top: 5px;
+}
+
 #show-menu {
     display: block;
     text-indent: 10000px;
@@ -491,4 +495,8 @@ input[type=submit], input[type=text] {
 
 table form {
 	display: inline;
+}
+
+input[type=submit].danger {
+	color: #E85752;
 }
