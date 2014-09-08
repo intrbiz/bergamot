@@ -142,11 +142,16 @@ table tr:hover {
 	width: 435px;
 	margin: 0 auto;
 	position: relative;
+	overflow: auto;
+}
+
+.full-width {
+	width: 425px;
 }
 
 .row {
 	float: left;
-	width: 435px;
+	width: 425px;
 	margin-bottom: 20px;
 }
 
@@ -154,28 +159,37 @@ table tr:hover {
 
 @media (min-width: 870px) and (max-width: 1304px) {
 	.row {
+		width: 860px;
+	}
+	.container, .full-width {
 		width: 870px;
 	}
-	.container {
-		width: 870px;
+	.full-width {
+		width: 860px;
 	}
 }
 
 @media (min-width: 1305px) and (max-width: 1739px) {
 	.row {
-		width: 1305px;
+		width: 1295px;
 	}
 	.container {
 		width: 1305px;
+	}
+	.full-width {
+		width: 1295px;
 	}
 }
 
 @media (min-width: 1740px) and (max-width: 19200px) {
 	.row {
-		width: 1740px;
+		width: 1730px;
 	}
 	.container {
 		width: 1740px;
+	}
+	.full-width {
+		width: 1730px;
 	}
 }
 
@@ -183,73 +197,73 @@ table tr:hover {
 
 .col1 {
 	float: left;
-	width: 135px;
+	width: 125px;
 	padding: 5px;
 }
 
 .col2 {
 	float: left;
-	width: 280px;
+	width: 270px;
 	padding: 5px;
 }
 
 .col3 {
 	float: left;
-	width: 425px;
+	width: 415px;
 	padding: 5px;
 }
 
 .col4 {
 	float: left;
-	width: 570px;
+	width: 560px;
 	padding: 5px;
 }
 
 .col5 {
 	float: left;
-	width: 715px;
+	width: 705px;
 	padding: 5px;
 }
 
 .col6 {
 	float: left;
-	width: 860px;
+	width: 850px;
 	padding: 5px;
 }
 
 .col7 {
 	float: left;
-	width: 1005px;
+	width: 995px;
 	padding: 5px;
 }
 
 .col8 {
 	float: left;
-	width: 1150px;
+	width: 1140px;
 	padding: 5px;
 }
 
 .col9 {
 	float: left;
-	width: 1295px;
+	width: 1285px;
 	padding: 5px;
 }
 
 .col10 {
 	float: left;
-	width: 1440px;
+	width: 1430px;
 	padding: 5px;
 }
 
 .col11 {
 	float: left;
-	width: 1585px;
+	width: 1575px;
 	padding: 5px;
 }
 
 .col12 {
 	float: left;
-	width: 1740px;
+	width: 1730px;
 	padding: 5px;
 }
 

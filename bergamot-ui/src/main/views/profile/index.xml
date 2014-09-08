@@ -47,7 +47,7 @@
 	    		Authentication tokens are used to login to Bergamot without requiring a username and password, 
 	    		these tokens can be used to authenticate with the Bergamot API, with the CLI and to login automatically. 
 	    	</p>
-	    	<table style="width: 1740px;">
+	    	<table class="full-width">
 	    		<tr>
 	    			<th>Token</th>
 	    			<th>Purpose</th>
