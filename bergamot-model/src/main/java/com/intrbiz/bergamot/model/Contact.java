@@ -27,7 +27,23 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
 
     public static final int BCRYPT_WORK_FACTOR = 12;
     
-    public static enum LockOutReason { ADMINISTRATIVE, AUTOMATIC }
+    public static enum LockOutReason
+    { 
+        ADMINISTRATIVE("Administratively locked"), 
+        AUTOMATIC("Automatically locked");
+        
+        private final String description;
+        
+        private LockOutReason(String description)
+        {
+            this.description = description;
+        }
+        
+        public String getDescription()
+        {
+            return this.description;
+        }
+    }
 
     @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     private List<UUID> teamIds = new LinkedList<UUID>();
