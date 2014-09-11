@@ -4,7 +4,9 @@
 <html xmlns="com.intrbiz.balsa">
 	<head>
 		<title>Bergamot Monitoring - #{title()}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+		<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
 		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
 		<!-- Scripts -->
 		<script src="#{public('/js/bower_components/requirejs/require.js')}"></script>
@@ -47,56 +49,15 @@
 			<div class="container">
 				<div id="logo">
 					<a href="/">
-                        <img src="#{public('/bergamot_h40.png')}" alt="Bergamot Monitoring"/>
+                        <img src="#{public('/bergamot_7_h50.png')}" alt="Bergamot Monitoring"/>
 					</a>
 				</div>
-                <p id="welcome">Welcome <a href="/profile/">#{Balsa().currentPrincipal().summary}</a></p>
-                <a id="show-menu" href="#menu">Menu</a>
+                <a id="show-menu" href="#menu" title="Show Menu">Menu</a>
+                <div id="sub-menu">
+                    <include view="layout/menu"/>
+                </div>
 			</div>
 		</div>
-        <div id="sub-menu">
-            <div class="container">
-                
-                <ul rendered="#{Balsa().permission('ui.admin')}">
-                    <li>
-                        <a href="/admin/">Admin</a>
-                    </li>
-                </ul>
-                
-                <ul>
-                    <li>
-                        <a href="/profile/">Profile</a>
-                    </li>
-                    <li>
-                        <a href="/logout">Logout</a>
-                    </li>
-                </ul>
-                
-                <ul>
-                    <li>
-                        <a href="/location/">Locations</a>
-                    </li>
-                </ul>
-                
-                <ul>
-                    <li>
-                        <a href="/group/">Groups</a>
-                    </li>
-                    <li>
-                        <a href="/group/name/hosts">Hosts</a>
-                    </li>
-                    <li>
-                        <a href="/group/name/services">Services</a>
-                    </li>
-                </ul>
-                
-                <ul>
-                    <li>
-                        <a href="/">Alerts</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
 		<div id="content">
 			<div class="container">
 				<h2>#{title()}</h2>

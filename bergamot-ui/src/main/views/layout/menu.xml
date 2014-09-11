@@ -1,0 +1,72 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The main menu include -->
+<fragment xmlns="com.intrbiz.balsa">
+    
+    <div class="menu-group">    
+        <h4><a href="/profile/"><a href="/profile/">Hello #{Balsa().currentPrincipal().summary}</a></a></h4>
+        <ul>
+            <li>
+                <a href="/">Alerts</a>
+            </li>
+            <li>
+                <a href="/location/">Locations</a>
+            </li>
+            <li>
+                <a href="/group/">Groups</a>
+            </li>
+            <li>
+                <a href="/group/name/hosts">Hosts</a>
+            </li>
+            <li>
+                <a href="/group/name/services">Services</a>
+            </li>
+            <li>
+                <a href="/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Admin Menu -->
+    <container rendered="#{Balsa().permission('ui.admin')}">
+        <div class="menu-group">
+            <h4><a href="/admin/">Admin</a></h4>
+            <ul>
+                <li>
+                    <a href="/admin/team/">Teams</a>
+                </li>
+                <li>
+                    <a href="/admin/contact/">Contacts</a>
+                </li>
+                <li>
+                    <a href="/admin/timeperiod/">Time Periods</a>
+                </li>
+                <li>
+                    <a href="/admin/command/">Commands</a>
+                </li>
+                <li>
+                    <a href="/admin/location/">Locations</a>
+                </li>
+                <li>
+                    <a href="/admin/group/">Groups</a>
+                </li>
+                <li>
+                    <a href="/admin/host/">Hosts</a>
+                </li>
+                <li>
+                    <a href="/admin/service/">Services</a>
+                </li>
+                <li>
+                    <a href="/admin/trap/">Traps</a>
+                </li>
+                <li>
+                    <a href="/admin/cluster/">Clusters</a>
+                </li>
+                <li>
+                    <a href="/admin/resource/">Resources</a>
+                </li>
+            </ul>
+        </div>
+    </container>
+    
+</fragment>

@@ -4,23 +4,16 @@
 <html xmlns="com.intrbiz.balsa">
 	<head>
 		<title>Bergamot Monitoring - Login</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+		<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
 		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
 	</head>
 	<body>
-		<div id="header">
-			<div class="container">
-				<div id="logo">
-					<a href="/">
-						<img src="#{public('/bergamot_h40.png')}" alt="Bergamot Monitoring"/>
-					</a>
-				</div>
-			</div>
-		</div>
 		<div id="content">
 			<div class="container">			
 				<div id="login-box">
-					<h2 class="centre">Welcome to Bergamot Monitoring</h2>
+                    <img src="#{public('/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
 					<h4 class="centre">Please login to continue</h4>
 					<p rendered="#{error == 'invalid'}" class="error centre">
                     	The username or password you entered was incorrect, please try again.
