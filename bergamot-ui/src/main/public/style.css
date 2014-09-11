@@ -403,6 +403,7 @@ a:hover .dash_icon {
 
 .dash_icon > p.output {
     height: 80px;
+    line-height: 20px;
     overflow: hidden;
 }
 
