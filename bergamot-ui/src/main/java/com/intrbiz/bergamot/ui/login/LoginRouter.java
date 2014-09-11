@@ -50,6 +50,7 @@ public class LoginRouter extends Router<BergamotApp>
                 // setup the session
                 sessionVar("contact", currentPrincipal());
                 sessionVar("site", contact.getSite());
+                // record the token in the session for removal on logout
                 sessionVar("bergamot.auto.login", autoAuthToken);
                 // now we can redirect
                 if (contact.isForcePasswordChange())
@@ -99,18 +100,20 @@ public class LoginRouter extends Router<BergamotApp>
             if (rememberMe)
             {
                 // generate the token
-                String token = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(contact);
+                String autoAuthToken = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(contact);
                 // store the token
-                db.setAPIToken(new APIToken(token, contact, "Auto login for " + request().getRemoteAddress()));
+                db.setAPIToken(new APIToken(autoAuthToken, contact, "Auto login for " + request().getRemoteAddress()));
                 // set the cookie
                 cookie()
                 .name("bergamot.auto.login")
-                .value(token)
+                .value(autoAuthToken)
                 .path(path("/login"))
                 .expiresAfter(90, TimeUnit.DAYS)
                 .httpOnly()
                 .secure(request().isSecure())
                 .set();
+                // record the token in the session for removal on logout
+                sessionVar("bergamot.auto.login", autoAuthToken);
             }
             // redirect
             redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
