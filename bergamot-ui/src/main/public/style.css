@@ -69,10 +69,10 @@ table tr:hover {
 }
 
 #header {
-	/*height: 500px;*/
 	background-color: #2c2c2c;
 	color: #00BF00;
 	border-bottom: 4px solid #00BF00;
+    width: 570px;
 }
 
 #header h1 {
@@ -95,6 +95,10 @@ table tr:hover {
 
 #header #logo img {
     padding-top: 5px;
+}
+
+#header .container {
+    overflow: visible;
 }
 
 #show-menu {
@@ -151,59 +155,19 @@ table tr:hover {
 }
 
 .container {
-	width: 435px;
-	margin: 0 auto;
+	width: 570px;
 	position: relative;
-	overflow: auto;
-    overflow: visible;
+	overflow: hidden;
 }
 
 .full-width {
-	width: 425px;
+	width: 560px;
 }
 
 .row {
 	float: left;
-	width: 425px;
+	width: 560px;
 	margin-bottom: 20px;
-}
-
-/* Resizing */
-
-@media (min-width: 870px) and (max-width: 1304px) {
-	.row {
-		width: 860px;
-	}
-	.container, .full-width {
-		width: 870px;
-	}
-	.full-width {
-		width: 860px;
-	}
-}
-
-@media (min-width: 1305px) and (max-width: 1739px) {
-	.row {
-		width: 1295px;
-	}
-	.container {
-		width: 1305px;
-	}
-	.full-width {
-		width: 1295px;
-	}
-}
-
-@media (min-width: 1740px) and (max-width: 19200px) {
-	.row {
-		width: 1730px;
-	}
-	.container {
-		width: 1740px;
-	}
-	.full-width {
-		width: 1730px;
-	}
 }
 
 /* */
@@ -286,7 +250,6 @@ table tr:hover {
 	display: block;
 	float: left;
 	width: 860px;
-	/*margin-bottom: 10px;*/
 }
 
 .row6 .col1 {
@@ -317,7 +280,7 @@ table tr:hover {
 }
 
 .text-body {
-	width: 860px;
+	max-width: 540px;
 }
 
 .pull-right {
@@ -522,4 +485,89 @@ table form {
 
 input[type=submit].danger {
 	color: #E85752;
+}
+
+/* Resizing */
+
+@media (min-width: 571px) and (max-width: 869px) {
+    .row {
+        width: 560px;
+    }
+    .container {
+        width: 570px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 560px;
+        overflow: auto;
+    }
+    .text-body {
+        width: 560px;
+    }
+    #header {
+        width: 100%;
+    }
+    .col5, .col6, .col7, .col8, .col9, .col10, .col11, .col12 {
+        width: 560px;
+        overflow: auto;
+    }
+}
+
+@media (min-width: 870px) and (max-width: 1304px) {
+    .row {
+        width: 860px;
+    }
+    .container {
+        width: 870px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 860px;
+        overflow: auto;
+    }
+    #header {
+        width: 100%;
+    }
+    .col7, .col8, .col9, .col10, .col11, .col12 {
+        width: 860px;
+        overflow: auto;
+    }
+}
+
+@media (min-width: 1305px) and (max-width: 1739px) {
+    .row {
+        width: 1295px;
+    }
+    .container {
+        width: 1305px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 1295px;
+        overflow: auto;
+    }
+    #header {
+        width: 100%;
+    }
+    .col10, .col11, .col12 {
+        width: 1295px;
+        overflow: auto;
+    }
+}
+
+@media (min-width: 1740px) and (max-width: 19200px) {
+    .row {
+        width: 1730px;
+    }
+    .container {
+        width: 1740px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 1730px;
+        overflow: auto;
+    }
+    #header {
+        width: 100%;
+    }
 }

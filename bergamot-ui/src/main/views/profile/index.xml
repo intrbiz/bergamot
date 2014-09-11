@@ -41,13 +41,13 @@
 	</div>
     
     <div class="row">
+    	<h3>Your Authentication Tokens</h3>
+    	<p class="text-body">
+    		Authentication tokens are used to login to Bergamot without requiring a username and password, 
+    		these tokens can be used to authenticate with the Bergamot API, with the CLI and to login automatically. 
+    	</p>
     	<div class="col12">
-	    	<h3>Your Authentication Tokens</h3>
-	    	<p class="text-body">
-	    		Authentication tokens are used to login to Bergamot without requiring a username and password, 
-	    		these tokens can be used to authenticate with the Bergamot API, with the CLI and to login automatically. 
-	    	</p>
-	    	<table class="full-width">
+	    	<table>
 	    		<tr>
 	    			<th>Token</th>
 	    			<th>Purpose</th>
@@ -74,15 +74,15 @@
 					</tr>
 				</data-set>
 			</table>
-			<p class="text-body">
-	    		<h4>Generate authentication token</h4>
-	    		<form action="#{path('/profile/generate-api-token')}" method="post">
-	    			<label for="summary">Purpose: </label>
-	    			<input type="text" name="summary" placeholder="API Access"/>
-	    			<input type="submit" name="generate" value="Generate"/>
-	    		</form>
-	    	</p>
 		</div>
+		<p class="text-body">
+    		<h4>Generate authentication token</h4>
+    		<form action="#{path('/profile/generate-api-token')}" method="post">
+    			<label for="summary">Purpose: </label>
+    			<input type="text" name="summary" placeholder="API Access"/>
+    			<input type="submit" name="generate" value="Generate"/>
+    		</form>
+    	</p>
 	</div>
     
 </fragment>
