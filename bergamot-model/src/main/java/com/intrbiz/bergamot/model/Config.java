@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.NamedObjectCfg;
+import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.BergamotCfgAdapter;
 import com.intrbiz.configuration.Configuration;
@@ -131,6 +132,19 @@ public class Config implements Serializable
     public void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Configuration getResolvedConfiguration()
+    {
+        if (this.configuration != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                db.getConfigResolver(this.siteId).resolveInherit((TemplatedObjectCfg) this.configuration);
+            }
+        }
+        return configuration;
     }
 
     public UUID getId()
