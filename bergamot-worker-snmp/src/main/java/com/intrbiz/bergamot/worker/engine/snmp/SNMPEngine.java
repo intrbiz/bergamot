@@ -35,8 +35,8 @@ public class SNMPEngine extends AbstractEngine
     public void start() throws Exception
     {
         // setup the transport
-        int port = this.getWorker().getConfiguration().getIntParameterValue("snmp-port", 8162);
-        Logger.getLogger(SNMPEngine.class).info("Listening for SNMP traps on port " + port);
+        int port = this.getWorker().getConfiguration().getIntParameterValue("snmp-port", 8161);
+        Logger.getLogger(SNMPEngine.class).info("Querying SNMP agents from port " + port);
         this.transport = SNMPTransport.open(port);
         this.transportThread = new Thread(this.transport, "SNMP-Transport");
         this.transportThread.start();
