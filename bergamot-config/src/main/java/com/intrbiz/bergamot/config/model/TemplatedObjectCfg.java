@@ -56,6 +56,11 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
     {
         this.inheritedTemplates = inheritedTemplates;
     }
+    
+    public boolean isInheriting(String templateName)
+    {
+        return this.getInheritedTemplates().contains(templateName);
+    }
 
     @XmlJavaTypeAdapter(YesNoAdapter.class)
     @XmlAttribute(name = "template")
