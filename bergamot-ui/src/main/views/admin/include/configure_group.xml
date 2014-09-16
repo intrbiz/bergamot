@@ -1,0 +1,119 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+	<div class="col12" style="margin-bottom: 20px;">
+		<h2>Group</h2>
+		<p class="text-body">
+			Groups can be members of multiple groups. 
+		</p>
+    	<ul id="parent_groups">
+	    	<data-set var="parent_group" value="#{configuration.groups}">
+	    		<li>
+    				<select name="parent_groups[#{parent_group_rownum}]" id="extends_#{parent_group_rownum}">
+    					<data-set var="a_group" value="#{groups}">
+    						<option rendered="#{parent_group == a_group.name}" selected="selected" value="#{a_group.name}">#{coalesce(a_group.summary, a_group.name)}</option>
+    						<option rendered="#{parent_group != a_group.name}" value="#{a_group.name}">#{coalesce(a_group.summary, a_group.name)}</option>
+    					</data-set>
+    				</select>
+   					<a class="remove" href="#remove">Remove</a>
+   				</li>
+   			</data-set>
+   			<li id="add_parent_group_row">
+   				<!-- this select is used only for a template -->
+  				<select id="available_parent_groups" style="display: none;">
+   					<data-set var="a_group" value="#{groups}">
+   						<option value="#{a_group.name}">#{coalesce(a_group.summary, a_group.name)}</option>
+   					</data-set>
+   				</select>
+  				<a class="add" id="add_parent_group" href="#add">Add group</a>
+   			</li>
+  		</ul>
+		<script type="text/javascript">
+			(function() {
+			
+				function update_parent_groups() {
+					$('#parent_groups select').each(function(i, e) {
+						if ($(e).attr('id') != 'available_parent_groups') {
+							$(e).attr('id', 'extends_' + i);
+							$(e).attr('name', 'extends[' + i + ']');
+						}
+					});
+				}
+				
+				function remove_parent_group(ev) {
+					ev.preventDefault();
+					$(this).parent().remove();
+					update_parent_groups();
+				}
+				
+				function add_parent_group(ev) {
+					ev.preventDefault();
+					// select
+					var sel = $('#available_parent_groups').clone();
+					$(sel).attr('id', '');
+					$(sel).attr('name', '');
+					$(sel).attr('style', '');
+					// remove
+					var rm  = document.createElement('a');
+					$(rm).attr('href', '#remove');
+					$(rm).text('Remove');
+					$(rm).attr('class', 'remove');
+					// containers
+					var li = document.createElement('li');
+					$(li).html([sel, rm]);
+					// insert
+					$('#add_parent_group_row').before(li);
+					// actions
+					$(rm).click(remove_parent_group);
+					// update
+					update_parent_groups();
+				}
+				
+				// setup
+				$('#add_parent_group').click(add_parent_group);
+				$('#parent_groups .remove').click(remove_parent_group);
+			})();
+		</script>
+		<style>
+			#parent_groups {
+				clear: both;
+			}
+			#parent_groups li {
+				display: block;
+				float: left;
+				background-color: #EEE;
+				border-radius: 5px;
+				padding: 5px 10px;
+				margin: 10px 5px 10px 0px;
+				height: 40px;
+			}
+			
+			#parent_groups .add {
+				background: transparent url('/list-add.png') top left no-repeat;
+				height: 22px;
+				text-indent: 27px;
+				line-height: 22px;
+				overflow: hidden;
+				display: block;
+				float: right;
+				margin-top: 10px;
+			}
+			
+			#parent_groups .remove {
+				background: transparent url('/edit-delete.png') top left no-repeat;
+				width: 22px;
+				height: 22px;
+				text-indent: 10000px;
+				overflow: hidden;
+				display: block;
+				float: right;
+				margin-top: 10px;
+			}
+			
+			#add_parent_group_row {
+				background-color: #FFF !important;
+			}
+		</style>
+	</div>
+</fragment>

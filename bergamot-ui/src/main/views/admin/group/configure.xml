@@ -1,0 +1,17 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Configure Group">
+    
+    <form action="#{path('/admin/location/configure' + if(group.id == null, '', '/id/' + group.id)')}" method="post">
+    	<div clas="row">
+			<include data-configuration="#{group}" data-summary="Team" view="admin/include/configure_name"/>
+			<include data-configuration="#{group}"                     view="admin/include/configure_inherit"/>
+			<include data-configuration="#{group}"                     view="admin/include/configure_group"/>
+    		<div class="col12">
+    			<input type="submit" name="configure" id="configure" value="Configure Group"/>
+    		</div>
+   	 	</div>
+	</form>
+    
+</fragment>

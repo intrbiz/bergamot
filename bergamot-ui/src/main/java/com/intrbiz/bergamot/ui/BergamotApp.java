@@ -49,6 +49,7 @@ import com.intrbiz.bergamot.ui.router.TrapRouter;
 import com.intrbiz.bergamot.ui.router.admin.AdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.CommandAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ContactAdminRouter;
+import com.intrbiz.bergamot.ui.router.admin.GroupAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.LocationAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TeamAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TimePeriodAdminRouter;
@@ -146,6 +147,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new TimePeriodAdminRouter());
         router(new CommandAdminRouter());
         router(new LocationAdminRouter());
+        router(new GroupAdminRouter());
         // API
         router(new APIRouter());
         router(new MetricsAPIRouter());

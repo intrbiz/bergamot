@@ -1,0 +1,67 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Groups">
+    
+    <div clas="row">
+    	<p class="text-body">
+    		Groups allow for checks to be grouped together 
+    		to make navigating easier.
+    	</p>
+    	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+	    			<th>Groups</th>
+	    			<th>Description</th>
+	    		</tr>
+	    		<data-set var="group" value="#{groups}">
+	    			<tr data-group-id="#{group.id}">
+	    				<td><a href="/admin/group/configure/id/#{group.id}">#{group.summary}</a></td>
+	    				<td>#{group.name}</td>
+	    				<td>
+	    					<data-set var="parent_group" value="#{group.groups}">
+	    						<span rendered="#{parent_group_rownum > 0}">, </span>
+	    						<a href="/admin/group/configure/id/#{parent_group.id}">#{coalesce(parent_group.summary, parent_group.name)}</a>
+	    					</data-set>
+	    				</td>
+	    				<td>#{coalesce(group.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+    <div class="row">
+    	<h3>Templates</h3>
+    	<p class="text-body">
+    		Templates are be applied to a group to avoid having to repeatedly configure common parameters.
+    		Below are the templates that can be used.
+    	</p>
+       	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+		    		<th>Groups</th>
+		    		<th>Description</th>
+	    		</tr>
+	    		<data-set var="template" value="#{group_templates}">
+	    			<tr data-group-id="#{template.id}">
+		    			<td><a href="/admin/group/configure/id/#{template.id}" title="Configure this group template">#{template.summary}</a></td>
+	    				<td>#{template.name}</td>
+	    				<td>
+	    					<data-set var="parent_group" value="#{group.groups}">
+	    						<span rendered="#{parent_group_rownum > 0}">, </span>
+	    						<span>#{parent_group}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>#{coalesce(template.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>
