@@ -3,7 +3,7 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Configure Group">
     
-    <form action="#{path('/admin/location/configure' + if(group.id == null, '', '/id/' + group.id)')}" method="post">
+    <form action="#{path('/admin/group/configure' + if(group.id == null, '', '/id/' + group.id)')}" method="post">
     	<div clas="row">
 			<include data-configuration="#{group}" data-summary="Team" view="admin/include/configure_name"/>
 			<include data-configuration="#{group}"                     view="admin/include/configure_inherit"/>

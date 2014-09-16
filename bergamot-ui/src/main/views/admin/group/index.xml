@@ -52,7 +52,7 @@
 		    			<td><a href="/admin/group/configure/id/#{template.id}" title="Configure this group template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>
-	    					<data-set var="parent_group" value="#{group.groups}">
+	    					<data-set var="parent_group" value="#{template.groups}">
 	    						<span rendered="#{parent_group_rownum > 0}">, </span>
 	    						<span>#{parent_group}</span>
 	    					</data-set>
