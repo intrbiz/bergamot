@@ -54,18 +54,21 @@
 	    			<th>Created</th>
 	    			<th>Revoked</th>
 	    			<th></th>
+	    			<th></th>
 	    		</tr>
 				<data-set var="token" value="#{contact.getAPITokens()}">
 					<tr>
 						<td>#{token.token}</td>
 						<td>#{token.summary}</td>
 						<td>#{dateformat('yyyy-MM-dd', token.created)} at #{dateformat('hh:mm:ss', token.created)}</td>
-						<td>#{if(token.revoked, dateformat('yyyy-MM-dd', token.revokedAt) + ' at ' + dateformat('hh:mm:ss', token.revokedAt), 'no')}</td>
+						<td>#{if(token.revoked, 'On ' + dateformat('yyyy-MM-dd', token.revokedAt) + ' at ' + dateformat('hh:mm:ss', token.revokedAt), 'No')}</td>
 						<td>
 							<form action="#{path('/profile/revoke-api-token')}" method="post">
 								<input type="hidden" name="token" value="#{token.token}"/>
 								<input type="submit" name="revoke" value="Revoke" class="danger"/>
 							</form>
+						</td>
+						<td>
 							<form action="#{path('/profile/remove-api-token')}" method="post">
 								<input type="hidden" name="token" value="#{token.token}"/>
 								<input type="submit" name="remove" value="Remove" class="danger"/>

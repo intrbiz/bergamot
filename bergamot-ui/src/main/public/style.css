@@ -47,6 +47,7 @@ ul {
 table {
 	border-collapse: collapse;
     margin: 20px 0;
+    background-color: #FFF;
 }
 
 table th, table td {
@@ -61,7 +62,7 @@ table th {
 }
 
 table tr:nth-child(odd) {
-	background-color: #EEEEEE;
+	background-color: #EEE;
 }
 
 table tr:hover {
@@ -471,19 +472,22 @@ img.centre {
 
 /* */
 
-input[type=submit], input[type=text] {
-	font-weight: bold;
+input[type=submit], input[type=text], input[type=button], input[type=checkbox], select {
 	font-size: 16px;
 	padding: 3px 6px;
 	display: inline;
-	margin: 5px;
+	margin: 5px 5px 5px 0;
 }
 
 table form {
 	display: inline;
 }
 
-input[type=submit].danger {
+input[type=submit] {
+    font-weight: bold;
+}
+
+input[type=submit].danger, input[type=submit].remove, input[type=button].remove {
 	color: #E85752;
 }
 

@@ -1,0 +1,17 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Configure Contact">
+    
+    <form action="#{path('/admin/team/configure' + if(team.id == null, '', '/id/' + team.id)')}" method="post">
+    	<div clas="row">
+			<include data-configuration="#{contact}" data-summary="Contact" view="admin/include/configure_contact"/>
+			<include data-configuration="#{contact}"                        view="admin/include/configure_inherit"/>
+			<include data-configuration="#{contact}" data-summary="Contact" view="admin/include/configure_teams"/>
+    		<div class="col12">
+    			<input type="submit" name="configure" id="configure" value="Configure Team"/>
+    		</div>
+   	 	</div>
+	</form>
+    
+</fragment>

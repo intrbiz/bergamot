@@ -1,0 +1,135 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+	<div class="col12" style="margin-bottom: 20px;">
+		<h2>Templates</h2>
+		<p class="text-body">
+			Configuration may be inherited from multiple templates, this 
+			allows for common settings to be configured once and inherited.
+		</p>
+		<p class="text-body">
+			When multiple templates are inherited, the left template takes 
+			priority.
+		</p>
+    	<ul id="inherits">
+	    	<data-set var="inherit" value="#{configuration.inheritedTemplates}">
+	    		<li>
+    				<label for="extends[#{inherit_rownum}]">#{if(inherit_rownum == 0, 'Inherit from', 'and from')}</label>
+    				<select name="extends[#{inherit_rownum}]" id="extends_#{inherit_rownum}">
+    					<data-set var="template" value="#{templates}">
+    						<option rendered="#{inherit == template.name}" selected="selected" value="#{template.name}">#{coalesce(template.summary, template.name)}</option>
+    						<option rendered="#{inherit != template.name}" value="#{template.name}">#{coalesce(template.summary, template.name)}</option>
+    					</data-set>
+    				</select>
+   					<a class="remove" href="#remove">Remove</a>
+   				</li>
+   			</data-set>
+   			<li id="add_inherit_row">
+   				<!-- this select is used only for a template -->
+  					<select name="available_templates" id="available_templates" style="display: none;">
+   					<data-set var="template" value="#{templates}">
+   						<option value="#{template.name}">#{coalesce(template.summary, template.name)}</option>
+   					</data-set>
+   				</select>
+  					<a class="add" id="add_inherit" href="#add">Inherit Template</a>
+   			</li>
+  		</ul>
+		<script type="text/javascript">
+			(function() {
+			
+				function update_inherits() {
+					$('#inherits select').each(function(i, e) {
+						if ($(e).attr('id') != 'available_templates') {
+							$(e).attr('id', 'extends_' + i);
+							$(e).attr('name', 'extends[' + i + ']');
+							var lb = $(e).siblings('label');
+							$(lb).attr('for', 'extends[' + i + ']');
+							$(lb).text(i == 0 ? 'Inherit from' : 'and from');
+						}
+					});
+				}
+				
+				function remove_inherit(ev) {
+					ev.preventDefault();
+					$(this).parent().remove();
+					update_inherits();
+				}
+				
+				function add_inherit(ev) {
+					ev.preventDefault();
+					// label
+					var lb = document.createElement('label');
+					// select
+					var sel = $('#available_templates').clone();
+					$(sel).attr('id', '');
+					$(sel).attr('name', '');
+					$(sel).attr('style', '');
+					// remove
+					var rm  = document.createElement('a');
+					$(rm).attr('href', '#remove');
+					$(rm).text('Remove');
+					$(rm).attr('class', 'remove');
+					// containers
+					var li = document.createElement('li');
+					$(li).html([lb, sel, rm]);
+					// insert
+					$('#add_inherit_row').before(li);
+					// actions
+					$(rm).click(remove_inherit);
+					// update
+					update_inherits();
+				}
+				
+				// setup
+				$('#add_inherit').click(add_inherit);
+				$('#inherits .remove').click(remove_inherit);
+			})();
+		</script>
+		<style>
+			#inherits {
+				clear: both;
+			}
+			#inherits li {
+				display: block;
+				float: left;
+				background-color: #EEE;
+				border-radius: 5px;
+				padding: 5px 10px;
+				margin: 10px 5px 10px 0px;
+				height: 40px;
+			}
+			
+			#inherits .add {
+				background: transparent url('/list-add.png') top left no-repeat;
+				height: 22px;
+				text-indent: 27px;
+				line-height: 22px;
+				overflow: hidden;
+				display: block;
+				float: right;
+				margin-top: 10px;
+			}
+			
+			#inherits .remove {
+				background: transparent url('/edit-delete.png') top left no-repeat;
+				width: 22px;
+				height: 22px;
+				text-indent: 10000px;
+				overflow: hidden;
+				display: block;
+				float: right;
+				margin-top: 10px;
+			}
+			
+			#add_inherit_row {
+				background-color: #FFF !important;
+			}
+		</style>
+  		<p style="clear: both; padding-top: 20px;">
+   			<input type="checkbox" name="template" id="template" value="yes" checked="checked" rendered="#{configuration.templateBooleanValue}"/>
+   			<input type="checkbox" name="template" id="template" value="yes" rendered="#{! configuration.templateBooleanValue}"/>
+   			<label for="template">This is a template</label>
+		</p>
+	</div>
+</fragment>

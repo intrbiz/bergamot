@@ -1,0 +1,112 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+    <div class="col12" style="margin-bottom: 20px;">
+        <h2>Time Ranges</h2>
+        <p class="text-body">
+            A time period is composed of a number of time ranges.  A 
+            time range specifies a range of hours during which the 
+            time period is active.  Time ranges can be qualified with 
+            contraints such as the day of the week, a day of the month.
+        </p>
+        <ul id="timeranges">
+            <data-set var="range" value="#{configuration.timeRanges}">
+                <li>
+                    <input type="text" name="timerange[#{range_rownum}]" id="timerange_#{range_rownum}" value="#{range}"/>
+                    <a class="remove" href="#remove">Remove</a>
+                </li>
+            </data-set>
+            <li id="add_timerange_row">
+                <a class="add" id="add_timerange" href="#add">Add Time Range</a>
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+            (function() {
+            
+                function update_timeranges() {
+                    $('#timeranges input[type=text]').each(function(i, e) {
+                        $(e).attr('id', 'timerange_' + i);
+                        $(e).attr('name', 'timerange[' + i + ']');
+                    });
+                }
+                
+                function remove_timerange(ev) {
+                    ev.preventDefault();
+                    $(this).parent().remove();
+                    update_timeranges();
+                }
+                
+                function add_timerange(ev) {
+                    ev.preventDefault();
+                    // input
+                    var inp = document.createElement('input');
+                    $(inp).attr('type', 'text');
+                    $(inp).attr('placeholder', 'monday 09:00-17:30');
+                    // remove
+                    var rm  = document.createElement('a');
+                    $(rm).attr('href', '#remove');
+                    $(rm).text('Remove');
+                    $(rm).attr('class', 'remove');
+                    // containers
+                    var li = document.createElement('li');
+                    $(li).html([inp, rm]);
+                    // insert
+                    $('#add_timerange_row').before(li);
+                    // actions
+                    $(rm).click(remove_timerange);
+                    // update
+                    update_timeranges();
+                }
+                
+                // setup
+                $('#add_timerange').click(add_timerange);
+                $('#timeranges .remove').click(remove_timerange);
+            })();
+        </script>
+    <style>
+        #timeranges {
+        }
+        
+        #timeranges li {
+            margin-bottom: 20px;
+            background-color: #EEE;
+            padding: 10px;
+            border-radius: 5px;
+            display: block;
+            float: left;
+            clear: both;
+        }
+        
+        #timeranges input[type=text] {
+            width: 400px;
+        }
+        
+        #timeranges .add {
+            background: transparent url('/list-add.png') top left no-repeat;
+            height: 22px;
+            text-indent: 27px;
+            line-height: 22px;
+            overflow: hidden;
+            display: block;
+            float: left;
+            margin-top: 10px;
+        }
+            
+        #timeranges .remove {
+            background: transparent url('/edit-delete.png') top left no-repeat;
+            width: 22px;
+            height: 22px;
+            text-indent: 10000px;
+            overflow: hidden;
+            display: block;
+            float: right;
+            margin-top: 10px;
+        }
+        
+        #add_timerange_row {
+                background-color: #FFF !important;
+        }
+    </style>
+</fragment>

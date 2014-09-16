@@ -1,0 +1,98 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Teams">
+    
+    <div clas="row">
+    	<p class="text-body">
+    		Teams group together <a href="/admin/contact/">contacts</a> which should 
+    		recieve notifications for the same set of checks and should have similar 
+    		access rights.
+    	</p>
+    	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+	    			<th>Teams</th>
+	    			<th>Contacts</th>
+	    			<th>Grants</th>
+	    			<th>Revokes</th>
+	    			<th>Description</th>
+	    		</tr>
+	    		<data-set var="team" value="#{teams}">
+	    			<tr data-team-id="#{team.id}">
+	    				<td><a href="/admin/team/configure/id/#{team.id}">#{team.summary}</a></td>
+	    				<td>#{team.name}</td>
+	    				<td>
+	    					<data-set var="parent_team" value="#{team.teams}">
+	    						<span rendered="#{parent_team_rownum > 0}">, </span>
+	    						<a href="/team/id/#{team.id}">#{parent_team.summary}</a>
+	    					</data-set>
+	    				</td>
+	    				<td>#{team.getContacts().size}</td>
+	    				<td>
+	    					<data-set var="permission" value="#{team.grantedPermissions}">
+	    						<span rendered="#{permission_rownum > 0}">, </span>
+	    						<span>#{permission}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>
+	    					<data-set var="permission" value="#{team.revokedPermissions}">
+	    						<span rendered="#{permission_rownum > 0}">, </span>
+	    						<span>#{permission}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>#{coalesce(team.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+    <div class="row">
+    	<h3>Templates</h3>
+    	<p class="text-body">
+    		Templates are be applied to a team to avoid having to repeatedly configure common parameters.
+    		Below are the templates that can be used.
+    	</p>
+       	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+		    		<th>Teams</th>
+		    		<th>Grants</th>
+	    			<th>Revokes</th>
+		    		<th>Description</th>
+	    		</tr>
+	    		<data-set var="template" value="#{team_templates}">
+	    			<tr data-team-id="#{template.id}">
+		    			<td><a href="/admin/team/configure/id/#{template.id}" title="Configure this team template">#{template.summary}</a></td>
+	    				<td>#{template.name}</td>
+	    				<td>
+	    					<data-set var="parent_team" value="#{template.configuration.teams}">
+	    						<span rendered="#{parent_team_rownum > 0}">, </span>
+	    						<span>#{parent_team}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>
+	    					<data-set var="permission" value="#{template.configuration.grantedPermissions}">
+	    						<span rendered="#{permission_rownum > 0}">, </span>
+	    						<span>#{permission}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>
+	    					<data-set var="permission" value="#{template.configuration.revokedPermissions}">
+	    						<span rendered="#{permission_rownum > 0}">, </span>
+	    						<span>#{permission}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>#{coalesce(template.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>

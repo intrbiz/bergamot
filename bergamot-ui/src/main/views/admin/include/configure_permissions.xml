@@ -1,0 +1,191 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+		<div class="col12" style="margin-bottom: 20px;">
+		<h2>Permissions</h2>
+		<p class="text-body">
+			Permissions restrict what actions contacts are allowed 
+			to perform.  Permissions are inherited down the team 
+			heirarchy and may be granted or revoked from both teams 
+			and contacts.
+		</p>
+		<h4 style="clear: both;">Granted Permissions</h4>
+		<ul id="grants">
+			<data-set var="grant" value="#{configuration.grantedPermissions}">
+				<li>
+					<select name="grant[#{grant_rownum}]" id="grant_#{grant_rownum}">
+						<data-set var="permission" value="#{permissions}">
+							<option rendered="#{grant == permission.name}" selected="selected" value="#{permission.name}">#{permission.summary} (#{permission.name})</option>
+							<option rendered="#{grant != permission.name}" value="#{permission.name}">#{permission.summary} (#{permission.name})</option>
+						</data-set>
+					</select>
+					<a class="remove" href="#remove">Remove</a>
+				</li>
+			</data-set>
+			<li id="add_grant_row">
+				<select id="available_grants" style="display: none;">
+					<data-set var="permission" value="#{permissions}">
+						<option value="#{permission.name}">#{permission.summary} (#{permission.name})</option>
+					</data-set>
+				</select>
+				<a class="add" id="add_grant" href="#add">Grant Permission</a>
+			</li>
+		</ul>
+		<h4 style="clear: both;">Revoked Permissions</h4>
+		<ul id="revokes">
+			<data-set var="revoke" value="#{configuration.revokedPermissions}">
+				<li>
+					<select name="revoke[#{revoke_rownum}]" id="revoke_#{revoke_rownum}">
+						<data-set var="permission" value="#{permissions}">
+							<option rendered="#{grant == permission.name}" selected="selected" value="#{permission.name}">#{permission.summary} (#{permission.name})</option>
+							<option rendered="#{grant != permission.name}" value="#{permission.name}">#{permission.summary} (#{permission.name})</option>
+						</data-set>
+					</select>
+					<a class="remove" href="#remove">Remove</a>
+				</li>
+			</data-set>
+			<li id="add_revoke_row">
+				<select id="available_revokes" style="display: none;">
+					<data-set var="permission" value="#{permissions}">
+						<option value="#{permission.name}">#{permission.summary} (#{permission.name})</option>
+					</data-set>
+				</select>
+				<a class="add" id="add_revoke" href="#add">Revoke Permission</a>
+			</li>
+		</ul>
+	</div>
+	<script type="text/javascript">
+		(function() {
+		
+			function update_grants() {
+				$('#timeranges input[type=text]').each(function(i, e) {
+					if ($(e).attr('id') != 'available_grants') {
+						$(e).attr('id', 'timerange_' + i);
+						$(e).attr('name', 'timerange[' + i + ']');
+					}
+				});
+			}
+			
+			function remove_grant(ev) {
+				ev.preventDefault();
+				$(this).parent().remove();
+				update_grants();
+			}
+			
+			function add_grant(ev) {
+				ev.preventDefault();
+				// input
+				var sel = $('#available_grants').clone();
+				$(sel).attr('id', '');
+				$(sel).attr('name', '');
+				$(sel).attr('style', '');
+				// remove
+				var rm  = document.createElement('a');
+				$(rm).attr('href', '#remove');
+				$(rm).text('Remove');
+				$(rm).attr('class', 'remove');
+				// containers
+				var li = document.createElement('li');
+				$(li).html([sel, rm]);
+				// insert
+				$('#add_grant_row').before(li);
+				// actions
+				$(rm).click(remove_grant);
+				// update
+				update_grants();
+			}
+			
+			// setup
+			$('#add_grant').click(add_grant);
+			$('#grants .remove').click(remove_grant);
+		})();
+		
+		(function() {
+		
+			function update_revokes() {
+				$('#timeranges input[type=text]').each(function(i, e) {
+					if ($(e).attr('id') != 'available_revokes') {
+						$(e).attr('id', 'timerange_' + i);
+						$(e).attr('name', 'timerange[' + i + ']');
+					}
+				});
+			}
+			
+			function remove_revoke(ev) {
+				ev.preventDefault();
+				$(this).parent().remove();
+				update_revokes();
+			}
+			
+			function add_revoke(ev) {
+				ev.preventDefault();
+				// input
+				var sel = $('#available_revokes').clone();
+				$(sel).attr('id', '');
+				$(sel).attr('name', '');
+				$(sel).attr('style', '');
+				// remove
+				var rm  = document.createElement('a');
+				$(rm).attr('href', '#remove');
+				$(rm).text('Remove');
+				$(rm).attr('class', 'remove');
+				// containers
+				var li = document.createElement('li');
+				$(li).html([sel, rm]);
+				// insert
+				$('#add_revoke_row').before(li);
+				// actions
+				$(rm).click(remove_revoke);
+				// update
+				update_revokes();
+			}
+			
+			// setup
+			$('#add_revoke').click(add_revoke);
+			$('#revokes .remove').click(remove_revoke);
+		})();
+	</script>
+	<style>
+		
+		#grants li, #revokes li {
+			margin-bottom: 20px;
+			background-color: #EEE;
+			padding: 10px;
+			border-radius: 5px;
+			display: block;
+			float: left;
+			clear: both;
+		}
+		
+		#grants input[type=text], #revokes input[type=text] {
+			width: 400px;
+		}
+		
+		#grants .add, #revokes .add {
+			background: transparent url('/list-add.png') top left no-repeat;
+			height: 22px;
+			text-indent: 27px;
+			line-height: 22px;
+			overflow: hidden;
+			display: block;
+			float: left;
+			margin-top: 10px;
+		}
+			
+		#grants .remove, #revokes .remove {
+			background: transparent url('/edit-delete.png') top left no-repeat;
+			width: 22px;
+			height: 22px;
+			text-indent: 10000px;
+			overflow: hidden;
+			display: block;
+			float: right;
+			margin-top: 10px;
+		}
+		
+		#add_grant_row, #add_revoke_row {
+			background-color: #FFF !important;
+		}
+	</style>
+</fragment>

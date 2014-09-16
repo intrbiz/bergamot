@@ -1,0 +1,120 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Contacts">
+    
+    <div clas="row">
+    	<p class="text-body">
+    		Contacts are users of Bergamot Monitoring, they can login and user the UI, 
+    		they can (optionally) use API and most importantly they will be notified 
+    		about checks.  Contacts are usually your systems administrators.
+    	</p>
+    	<div class="col12">
+	    	<table>
+	    		<tr>
+	    			<th>Full Name</th>
+		    		<th>Username</th>
+	    			<th>Email</th>
+	    			<th>Pager</th>
+	    			<th>Mobile</th>
+	    			<th>Phone</th>
+	    			<th>Teams</th>
+	    			<th>Notifications</th>
+	    			<th>Notification Period</th>
+	    			<th>Notification Engines</th>
+	    			<th>Password Change Required</th>
+	    			<th>Locked</th>
+	    			<th></th>
+	    			<th></th>
+	    		</tr>
+	    		<data-set var="contact" value="#{contacts}">
+	    			<tr data-contact-id="#{contact.id}">
+	    				<td><a href="/admin/contact/configure/id/#{contact.id}" title="Configure this contact">#{contact.summary}</a></td>
+	    				<td>#{contact.name}</td>
+	    				<td>#{contact.email}</td>
+	    				<td>#{coalesce(contact.pager, '')}</td>
+	    				<td>#{coalesce(contact.mobile, '')}</td>
+	    				<td>#{coalesce(contact.phone, '')}</td>
+	    				<td>
+	    					<data-set var="team" value="#{contact.teams}">
+	    						<span rendered="#{team_rownum > 0}">, </span>
+	    						<a href="/team/id/#{team.id}">#{team.summary}</a>
+	    					</data-set>
+	    				</td>
+	    				<td>
+	    					<span>#{if(contact.notifications.enabled, 'Yes', 'No')}</span>	    					
+	    				</td>
+	    				<td>
+	    					<a rendered="#{contact.notifications.enabled}" href="/timeperiod/id/#{contact.notifications.timePeriod.id}">#{coalesce(contact.notifications.timePeriod.summary, '')}</a>
+	    				</td>
+	    				<td>
+	    					<span rendered="#{contact.notifications.allEnginesEnabled}">All</span>
+	    					<data-set var="engine" value="#{contact.notifications.engines}" rendered="#{!contact.notifications.allEnginesEnabled}">
+	    						<span rendered="#{engine_rownum > 0}">, </span>
+	    						<span>#{engine.engine}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>#{if(contact.forcePasswordChange, 'Yes', 'No')}</td>
+	    				<td>#{if(contact.locked, coalesce(contact.lockedReason.description, 'Yes'), 'No')}</td>
+	    				<td>
+	    					<!-- Password Reset -->
+	    					<form action="#{path('/admin/contact/reset')}" method="post" rendered="#{! contact.forcePasswordChange}">
+								<input type="hidden" name="id" value="#{contact.id}"/>
+								<input type="submit" name="reset" value="Reset Password" class="danger"/>
+							</form>
+	    				</td>
+	    				<td>
+	    					<!-- Locked -->
+	    					<form action="#{path('/admin/contact/lock')}" method="post" rendered="#{! contact.locked}">
+								<input type="hidden" name="id" value="#{contact.id}"/>
+								<input type="submit" name="lock" value="Lock" class="danger"/>
+							</form>
+							<!-- Unlock -->
+							<form action="#{path('/admin/contact/unlock')}" method="post" rendered="#{contact.locked}">
+								<input type="hidden" name="id" value="#{contact.id}"/>
+								<input type="submit" name="lock" value="Unlock" class="danger"/>
+							</form>
+	    				</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+    <div class="row">
+    	<h3>Templates</h3>
+    	<p class="text-body">
+    		Templates are be applied to a contact to avoid having to repeatedly configure common parameters.
+    		Below are the templates that can be used.
+    	</p>
+       	<div class="col12">
+	    	<table>
+	    		<tr>
+	    			<th>Display Name</th>
+		    		<th>Name</th>
+		    		<th>Description</th>
+		    		<th>Notifications</th>
+		    		<th>Notification Period</th>
+		    		<th>Notification Engines</th>
+	    		</tr>
+	    		<data-set var="template" value="#{contact_templates}">
+	    			<tr data-contact-id="#{template.id}">
+		    			<td><a href="/admin/contact/configure/id/#{template.id}" title="Configure this contact template">#{template.summary}</a></td>
+	    				<td>#{template.name}</td>
+	    				<td>#{coalesce(template.description, '')}</td>
+	    				<td>#{if(template.configuration.notifications.getEnabledBooleanValue(), 'Yes', 'No')}</td>
+	    				<td>#{coalesce(template.configuration.notifications.notificationPeriod, '')}</td>
+	    				<td>
+	    					<span rendered="#{template.configuration.notifications.getAllEnginesEnabledBooleanValue()}">All</span>
+	    					<data-set var="engine" value="#{template.configuration.notifications.notificationEngines}" rendered="#{! template.configuration.notifications.getAllEnginesEnabledBooleanValue()}">
+	    						<span rendered="#{engine_rownum > 0}">, </span>
+	    						<span>#{engine.engine}</span>
+	    					</data-set>
+	    				</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>
