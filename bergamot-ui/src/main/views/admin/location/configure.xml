@@ -9,7 +9,7 @@
 			<include data-configuration="#{location}"                     view="admin/include/configure_inherit"/>
 			<include data-configuration="#{location}"                     view="admin/include/configure_location"/>
     		<div class="col12">
-    			<input type="submit" name="configure" id="configure" value="Configure location"/>
+    			<input type="submit" name="configure" id="configure" value="Configure Location"/>
     		</div>
    	 	</div>
 	</form>
