@@ -54,16 +54,7 @@
                     <a href="/admin/host/">Hosts</a>
                 </li>
                 <li>
-                    <a href="/admin/service/">Services</a>
-                </li>
-                <li>
-                    <a href="/admin/trap/">Traps</a>
-                </li>
-                <li>
                     <a href="/admin/cluster/">Clusters</a>
-                </li>
-                <li>
-                    <a href="/admin/resource/">Resources</a>
                 </li>
             </ul>
         </div>
