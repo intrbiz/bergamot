@@ -1,0 +1,61 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Locations">
+    
+    <div clas="row">
+    	<p class="text-body">
+    		Locations represent the physical location of a 
+    		host.
+    	</p>
+    	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+	    			<th>Location</th>
+	    			<th>Description</th>
+	    		</tr>
+	    		<data-set var="location" value="#{locations}">
+	    			<tr data-location-id="#{location.id}">
+	    				<td><a href="/admin/location/configure/id/#{location.id}">#{location.summary}</a></td>
+	    				<td>#{location.name}</td>
+	    				<td>
+	    					<a rendered="#{location.location != null}" href="/admin/location/configure/id/#{location.location.id}">#{location.location.summary}</a>
+	    				</td>
+	    				<td>#{coalesce(location.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+    <div class="row">
+    	<h3>Templates</h3>
+    	<p class="text-body">
+    		Templates are be applied to a location to avoid having to repeatedly configure common parameters.
+    		Below are the templates that can be used.
+    	</p>
+       	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+		    		<th>Location</th>
+		    		<th>Description</th>
+	    		</tr>
+	    		<data-set var="template" value="#{location_templates}">
+	    			<tr data-location-id="#{template.id}">
+		    			<td><a href="/admin/location/configure/id/#{template.id}" title="Configure this location template">#{template.summary}</a></td>
+	    				<td>#{template.name}</td>
+	    				<td>
+	    					<span>#{template.configuration.location}</span>
+	    				</td>
+	    				<td>#{coalesce(template.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>
