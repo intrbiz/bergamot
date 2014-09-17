@@ -125,6 +125,11 @@ public class NotificationsCfg implements Serializable
         this.ignore = ignore;
     }
     
+    public boolean isIgnore(String state)
+    {
+        return this.getIgnore().contains(state);
+    }
+    
     @XmlElementRef(type = NotificationEngineCfg.class)
     @ResolveWith(CoalesceEmptyCollection.class)
     public List<NotificationEngineCfg> getNotificationEngines()
