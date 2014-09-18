@@ -126,6 +126,11 @@ public class NotificationEngineCfg implements Serializable
     {
         return ignore;
     }
+    
+    public boolean isIgnore(String state)
+    {
+        return this.getIgnore().contains(state);
+    }
 
     public void setIgnore(Set<String> ignore)
     {
