@@ -12,6 +12,7 @@
 	    		<tr>
 		    		<th>Display Name</th>
 		    		<th>Name</th>
+		    		<th>Extends</th>
 		    		<th>Address</th>
 		    		<th>Location</th>
 	    			<th>Groups</th>
@@ -23,6 +24,12 @@
 	    			<tr data-group-id="#{host.id}">
 	    				<td><a href="/admin/host/configure/id/#{host.id}">#{host.summary}</a></td>
 	    				<td>#{host.name}</td>
+	    				<td>
+	    					<data-set var="inherit" value="#{host.configuration.inheritedTemplates}">
+	    						<span rendered="#{inherit_rownum > 0}">, </span>
+	    						<span>#{inherit}</span>
+	    					</data-set>
+	    				</td>
 	    				<td>#{host.address}</td>
 	    				<td>
 	    					<a rendered="#{host.location != null}" href="/admin/location/configure/id/#{host.location.id}">#{coalesce(host.location.summary, host.location.name)}</a>
@@ -53,6 +60,7 @@
 	    		<tr>
 		    		<th>Display Name</th>
 		    		<th>Name</th>
+		    		<th>Extends</th>
 		    		<th>Location</th>
 		    		<th>Groups</th>
 		    		<th>Services</th>
@@ -63,6 +71,12 @@
 	    			<tr data-group-id="#{template.id}">
 		    			<td><a href="/admin/host/configure/id/#{template.id}" title="Configure this host template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
+	    				<td>
+	    					<data-set var="inherit" value="#{template.configuration.inheritedTemplates}">
+	    						<span rendered="#{inherit_rownum > 0}">, </span>
+	    						<span>#{inherit}</span>
+	    					</data-set>
+	    				</td>
 	    				<td>#{coalesce(template.configuration.location, '')}</td>
 	    				<td>
 	    					<data-set var="group" value="#{template.configuration.groups}">

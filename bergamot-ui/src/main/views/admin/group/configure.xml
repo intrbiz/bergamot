@@ -5,9 +5,9 @@
     
     <form action="#{path('/admin/group/configure' + if(group.id == null, '', '/id/' + group.id)')}" method="post">
     	<div clas="row">
-			<include data-configuration="#{group}" data-summary="Team" view="admin/include/configure_name"/>
-			<include data-configuration="#{group}"                     view="admin/include/configure_inherit"/>
-			<include data-configuration="#{group}"                     view="admin/include/configure_group"/>
+			<include data-configuration="#{group}" data-summary="Group" view="admin/include/configure_name"/>
+			<include data-configuration="#{group}"                      view="admin/include/configure_inherit"/>
+			<include data-configuration="#{group}" data-summary="Group" view="admin/include/configure_group"/>
     		<div class="col12">
     			<input type="submit" name="configure" id="configure" value="Configure Group"/>
     		</div>

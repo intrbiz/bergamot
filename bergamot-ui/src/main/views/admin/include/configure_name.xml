@@ -19,43 +19,4 @@
 			<textarea name="description" id="description">#{coalesce(configuration.description, '')}</textarea>
 		</p>
 	</div>
-	<style>
-		form p {
-			display: block;
-			float: left;
-			clear: both;
-		}
-		
-		form p.field label {
-			display: block;
-			float: left;
-			width: 200px;
-			padding: 5px 10px 5px 0;
-			margin: 5px 5px 5px 0;
-			text-align: left;
-		}
-		
-		form p.field.area label {
-			text-align: left;
-			margin-bottom: 0;
-		}
-		
-		form p.field input[type=text] {
-			display: block;
-			float: left;
-			width: 400px;
-			margin: 5px 5px 5px 0;
-		}
-		
-		form p.field textarea {
-			display: block;
-			float: left;
-			clear: both;
-			margin: 0 5px 5px -2px;
-			width: 617px;
-			height: 60px;
-			font-size: 16px;
-			padding: 3px 6px;
-		}
-	</style>
 </fragment>

@@ -3,47 +3,19 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
 	<div class="col12" style="margin-bottom: 20px;">
-		<h2>Parent Location</h2>
+		<h2>Location</h2>
 		<p class="text-body">
-			Locations themself can be within a location.
+			A #{lc(summary)} can be located within a physical location.
 		</p>
 		<p class="field">
 			<label for="location">Location</label>
 			<select name="location" id="location">
-				<option value="">No location</option>
+				<option value="">No Location</option>
 				<data-set var="a_location" value="#{locations}">
-					<option rendered="#{location.location == a_location.name}" selected="selected" value="#{a_location.name}">#{coalesce(a_location.summary, a_location.name)}</option>
-					<option rendered="#{location.location != a_location.name}" value="#{a_location.name}">#{coalesce(a_location.summary, a_location.name)}</option>
+					<option rendered="#{configuration.location == a_location.name}" selected="selected" value="#{a_location.name}">#{coalesce(a_location.summary, a_location.name)}</option>
+					<option rendered="#{configuration.location != a_location.name}" value="#{a_location.name}">#{coalesce(a_location.summary, a_location.name)}</option>
 				</data-set>
 			</select>
 		</p>
 	</div>
-	<style>
-		form p {
-			display: block;
-			float: left;
-			clear: both;
-		}
-		
-		form p.field label {
-			display: block;
-			float: left;
-			width: 200px;
-			padding: 5px 10px 5px 0;
-			margin: 5px 5px 5px 0;
-			text-align: left;
-		}
-		
-		form p.field.area label {
-			text-align: left;
-			margin-bottom: 0;
-		}
-		
-		form p.field select {
-			display: block;
-			float: left;
-			width: 400px;
-			margin: 5px 5px 5px 0;
-		}
-	</style>
 </fragment>

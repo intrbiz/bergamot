@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
+import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
@@ -85,6 +86,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
         model("contact", Util.nullable(db.getConfig(timeperiodId), Config::getResolvedConfiguration));
         model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(ContactCfg.class)));
         model("teams", db.listConfig(site.getId(), Configuration.getRootElement(TeamCfg.class)));
+        model("timeperiods", db.listConfig(site.getId(), Configuration.getRootElement(TimePeriodCfg.class)));
         encode("admin/contact/configure");
     }
     
@@ -95,6 +97,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
         model("contact", new ContactCfg());
         model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(ContactCfg.class)));
         model("teams", db.listConfig(site.getId(), Configuration.getRootElement(TeamCfg.class)));
+        model("timeperiods", db.listConfig(site.getId(), Configuration.getRootElement(TimePeriodCfg.class)));
         encode("admin/contact/configure");
     }
 }

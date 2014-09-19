@@ -1,0 +1,25 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+    <div class="col12" style="margin-bottom: 20px;">
+        <h2>Initially</h2>
+        <p class="text-body">
+            What should the initial state of the check be.
+        </p>
+		<p class="field">
+			<label for="initial_status">Initial Check State</label>
+			<select name="initial_status" id="initial_status">
+				<option value="">Not Specified</option>
+				<data-set var="status" value="#{list('Pending','OK','Warning','Critical','Unknown','Timeout','Error')}">
+					<option rendered="#{configuration.initialState.status == lc(status)}" selected="selected" value="#{lc(status)}">#{status}</option>
+					<option rendered="#{configuration.initialState.status != lc(status)}" value="#{lc(status)}">#{status}</option>
+				</data-set>
+			</select>
+		</p>
+		<p class="field area">
+			<label for="initial_output">Initial Check Output</label>
+			<textarea name="initial_output" id="initial_output">#{coalesce(configuration.initialState.output, '')}</textarea>
+		</p>
+	</div>
+</fragment>

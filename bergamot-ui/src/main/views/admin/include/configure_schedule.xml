@@ -1,0 +1,34 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+	<div class="col12" style="margin-bottom: 20px;">
+		<h2>Check Schedule</h2>
+		<p class="text-body">
+			When should checks be executed.
+		</p>
+		<p class="field">
+			<label for="schedule">Configure Check Schedule</label>
+			<input type="checkbox" name="schedule" id="schedule" value="yes" checked="checked" rendered="#{configuration.schedule != null}"/>
+			<input type="checkbox" name="schedule" id="schedule" value="yes" rendered="#{configuration.schedule == null}"/>
+		</p>
+		<p class="field">
+			<label for="every">Check Interval (Seconds)</label>
+			<input type="text" name="every" id="every" placeholder="5" value="#{coalesce(configuration.schedule.every, '')}"/>
+		</p>
+		<p class="field">
+			<label for="summary">Retry Interval (Seconds)</label>
+			<input type="text" name="retry_every" id="retry_every" placeholder="1" value="#{coalesce(configuration.schedule.retryEvery, '')}"/>
+		</p>
+		<p class="field">
+			<label for="timeperiod">Check Time Period</label>
+			<select name="timeperiod" id="timeperiod">
+				<option value="">No Time Period</option>
+				<data-set var="a_timeperiod" value="#{timeperiods}">
+					<option rendered="#{configuration.scheduler.timePeriod == a_timeperiod.name}" selected="selected" value="#{a_timeperiod.name}">#{coalesce(a_timeperiod.summary, a_timeperiod.name)}</option>
+					<option rendered="#{configuration.scheduler.timePeriod != a_timeperiod.name}" value="#{a_timeperiod.name}">#{coalesce(a_timeperiod.summary, a_timeperiod.name)}</option>
+				</data-set>
+			</select>
+		</p>
+	</div>
+</fragment>

@@ -1,0 +1,126 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa">
+    <div class="col12" style="margin-bottom: 20px;">
+        <h2>Check Command</h2>
+        <p class="text-body">
+            What command should be executed to check this #{summary}
+        </p>
+		<p class="field">
+			<label for="check_command">Check Command</label>
+			<select name="check_command" id="check_command">
+				<option value="">Not Specified</option>
+				<data-set var="command" value="#{commands}">
+					<option rendered="#{configuration.checkCommand.command == command.name}" selected="selected" value="#{command.name}">#{coalesce(command.summary, command.name)}</option>
+					<option rendered="#{configuration.checkCommand.command != command.name}" value="#{command.name}">#{coalesce(command.summary, command.name)}</option>
+				</data-set>
+			</select>
+		</p>
+	</div>
+	    <div class="col12" style="margin-bottom: 20px;">
+        <h2>Check Parameters</h2>
+        <p class="text-body">
+        	Additional information required to execute the selected check command.
+        </p>
+        <div id="check_command_parameters">
+            <ul>
+                <data-set var="check_command_parameter" value="#{configuration.checkCommand.parameters}">
+                    <li>
+                        <a href="#remove" class="remove">Remove</a>
+                        <p class="field name">
+                            <label for="check_command_parameter_name[#{check_command_parameter_rownum}]">Name</label>
+                            <input type="text" name="check_command_parameter_name[#{check_command_parameter_rownum}]" id="check_command_parameter_name[#{check_command_parameter_rownum}]" value="#{check_command_parameter.name}"/>
+                        </p>
+                        <p class="field description">
+                            <label for="check_command_parameter_description[#{check_command_parameter_rownum}]">Description</label>
+                            <input type="text" name="check_command_parameter_description[#{check_command_parameter_rownum}]" id="check_command_parameter_description[#{check_command_parameter_rownum}]" value="#{coalesce(check_command_parameter.description, '')}"/>
+                        </p>
+                        <p class="field area value">
+                            <label for="check_command_parameter_value[#{check_command_parameter_rownum}]">Value</label>
+                            <textarea name="check_command_parameter_value[#{check_command_parameter_rownum}]" id="check_command_parameter_value[#{check_command_parameter_rownum}]">#{coalesce(check_command_parameter.valueOrText, '')}</textarea>
+                        </p>
+                    </li>
+                </data-set>
+                <li id="add_check_command_parameter_row">
+                    <p id="check_command_parameter_template_name" class="field name" style="display: none;">
+                        <label for="check_command_parameter_name[#{check_command_parameter_rownum}]">Name</label>
+                        <input type="text" id="check_command_parameter_template_name_input"/>
+                    </p>
+                    <p id="check_command_parameter_template_description" class="field description" style="display: none;">
+                        <label for="check_command_parameter_description[#{check_command_parameter_rownum}]">Description</label>
+                        <input type="text" id="check_command_parameter_template_description_input"/>
+                    </p>
+                    <p id="check_command_parameter_template_value" class="field area value" style="display: none;">
+                        <label for="check_command_parameter_value[#{check_command_parameter_rownum}]">Value</label>
+                        <textarea id="check_command_parameter_template_value_textarea"></textarea>
+                    </p>
+                    <a class="add" id="add_check_command_parameter" href="#add">Add Parameter</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function() {
+        
+            function update_check_command_parameters() {
+                $('#check_command_parameters p.name input[type=text]').each(function(i, e) {
+                    if ($(e).attr('id') != 'check_command_parameter_template_name_input') {
+                        $(e).attr('id', 'check_command_parameter_name_' + i);
+                        $(e).attr('name', 'check_command_parameter_name[' + i + ']');
+                    }
+                });
+                $('#check_command_parameters p.description input[type=text]').each(function(i, e) {
+                    if ($(e).attr('id') != 'check_command_parameter_template_description_input') {
+                        $(e).attr('id', 'check_command_parameter_description_' + i);
+                        $(e).attr('name', 'check_command_parameter_description[' + i + ']');
+                    }
+                });
+                $('#check_command_parameters p.value textarea').each(function(i, e) {
+                    if ($(e).attr('id') != 'check_command_parameter_template_value_textarea') {
+                        $(e).attr('id', 'check_command_parameter_value_' + i);
+                        $(e).attr('name', 'check_command_parameter_value[' + i + ']');
+                    }
+                });
+            }
+            
+            function remove_check_command_parameter(ev) {
+                ev.preventDefault();
+                $(this).parent().remove();
+                update_check_command_parameters();
+            }
+            
+            function add_check_command_parameter(ev) {
+                ev.preventDefault();
+                // remove
+                var rm  = document.createElement('a');
+                $(rm).attr('href', '#remove');
+                $(rm).text('Remove');
+                $(rm).attr('class', 'remove');
+                // fields
+                var fn = $('#check_command_parameter_template_name').clone();
+                $(fn).attr('style', '');
+                $(fn).attr('id', '');
+                var fd = $('#check_command_parameter_template_description').clone();
+                $(fd).attr('style', '');
+                $(fd).attr('id', '');
+                var fv = $('#check_command_parameter_template_value').clone();
+                $(fv).attr('style', '');
+                $(fv).attr('id', '');
+                // containers
+                var li = document.createElement('li');
+                $(li).html([rm, fn, fd, fv]);
+                // insert
+                $('#add_check_command_parameter_row').before(li);
+                // actions
+                $(rm).click(remove_check_command_parameter);
+                // update
+                update_check_command_parameters();
+            }
+            
+            $('#add_check_command_parameter').click(add_check_command_parameter);
+            $('#check_command_parameters .remove').click(remove_check_command_parameter);
+            
+        })()
+    </script>
+</fragment>

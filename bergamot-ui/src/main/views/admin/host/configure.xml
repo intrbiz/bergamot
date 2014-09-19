@@ -5,8 +5,42 @@
     
     <form action="#{path('/admin/host/configure' + if(host.id == null, '', '/id/' + host.id)')}" method="post">
     	<div clas="row">
-			<include data-configuration="#{host}" data-summary="Team" view="admin/include/configure_host"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_host"/>
 			<include data-configuration="#{host}"                     view="admin/include/configure_inherit"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_location"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_group"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_parameters"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_schedule"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_notifications"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_notify"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_initial"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_state"/>
+			<include data-configuration="#{host}" data-summary="Host" view="admin/include/configure_check_command"/>
+			
+			<div class="col12">
+				<h4>Services On This Host</h4>
+				<ul>
+					<data-set var="service" value="#{host.services}">
+						<li>
+							<a href="#">#{coalesce(service.summary, service.name, join(', ', service.inheritedTemplates), 'Service ' + service_rownum)}</a>
+							<pre>#{service}</pre>
+						</li>
+					</data-set>
+				</ul>
+			</div>
+			
+			<div class="col12">
+				<h4>Traps On This Host</h4>
+				<ul>
+					<data-set var="trap" value="#{host.traps}">
+						<li>
+							<a href="#">#{coalesce(trap.summary, trap.name, join(', ', trap.inheritedTemplates), 'Trap ' + trap_rownum)}</a>
+							<pre>#{trap}</pre>
+						</li>
+					</data-set>
+				</ul>
+			</div>
+			
     		<div class="col12">
     			<input type="submit" name="configure" id="configure" value="Configure Host"/>
     		</div>

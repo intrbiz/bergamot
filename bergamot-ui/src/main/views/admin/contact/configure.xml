@@ -8,6 +8,7 @@
 			<include data-configuration="#{contact}" data-summary="Contact" view="admin/include/configure_contact"/>
 			<include data-configuration="#{contact}"                        view="admin/include/configure_inherit"/>
 			<include data-configuration="#{contact}" data-summary="Contact" view="admin/include/configure_teams"/>
+			<include data-configuration="#{contact}" data-summary="Contact" view="admin/include/configure_notifications"/>
     		<div class="col12">
     			<input type="submit" name="configure" id="configure" value="Configure Team"/>
     		</div>

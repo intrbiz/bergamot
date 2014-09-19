@@ -29,91 +29,51 @@
   				<a class="add" id="add_team" href="#add">Add Team</a>
    			</li>
   		</ul>
-		<script type="text/javascript">
-			(function() {
-			
-				function update_teams() {
-					$('#excludes select').each(function(i, e) {
-						if ($(e).attr('id') != 'available_teams') {
-							$(e).attr('id', 'extends_' + i);
-							$(e).attr('name', 'extends[' + i + ']');
-						}
-					});
-				}
-				
-				function remove_team(ev) {
-					ev.preventDefault();
-					$(this).parent().remove();
-					update_teams();
-				}
-				
-				function add_team(ev) {
-					ev.preventDefault();
-					// select
-					var sel = $('#available_teams').clone();
-					$(sel).attr('id', '');
-					$(sel).attr('name', '');
-					$(sel).attr('style', '');
-					// remove
-					var rm  = document.createElement('a');
-					$(rm).attr('href', '#remove');
-					$(rm).text('Remove');
-					$(rm).attr('class', 'remove');
-					// containers
-					var li = document.createElement('li');
-					$(li).html([sel, rm]);
-					// insert
-					$('#add_team_row').before(li);
-					// actions
-					$(rm).click(remove_team);
-					// update
-					update_teams();
-				}
-				
-				// setup
-				$('#add_team').click(add_team);
-				$('#excludes .remove').click(remove_team);
-			})();
-		</script>
-		<style>
-			#teams {
-				clear: both;
-			}
-			#teams li {
-				display: block;
-				float: left;
-				background-color: #EEE;
-				border-radius: 5px;
-				padding: 5px 10px;
-				margin: 10px 5px 10px 0px;
-				height: 40px;
-			}
-			
-			#teams .add {
-				background: transparent url('/list-add.png') top left no-repeat;
-				height: 22px;
-				text-indent: 27px;
-				line-height: 22px;
-				overflow: hidden;
-				display: block;
-				float: right;
-				margin-top: 10px;
-			}
-			
-			#teams .remove {
-				background: transparent url('/edit-delete.png') top left no-repeat;
-				width: 22px;
-				height: 22px;
-				text-indent: 10000px;
-				overflow: hidden;
-				display: block;
-				float: right;
-				margin-top: 10px;
-			}
-			
-			#add_team_row {
-				background-color: #FFF !important;
-			}
-		</style>
 	</div>
+	<script type="text/javascript">
+		(function() {
+		
+			function update_teams() {
+				$('#excludes select').each(function(i, e) {
+					if ($(e).attr('id') != 'available_teams') {
+						$(e).attr('id', 'extends_' + i);
+						$(e).attr('name', 'extends[' + i + ']');
+					}
+				});
+			}
+			
+			function remove_team(ev) {
+				ev.preventDefault();
+				$(this).parent().remove();
+				update_teams();
+			}
+			
+			function add_team(ev) {
+				ev.preventDefault();
+				// select
+				var sel = $('#available_teams').clone();
+				$(sel).attr('id', '');
+				$(sel).attr('name', '');
+				$(sel).attr('style', '');
+				// remove
+				var rm  = document.createElement('a');
+				$(rm).attr('href', '#remove');
+				$(rm).text('Remove');
+				$(rm).attr('class', 'remove');
+				// containers
+				var li = document.createElement('li');
+				$(li).html([sel, rm]);
+				// insert
+				$('#add_team_row').before(li);
+				// actions
+				$(rm).click(remove_team);
+				// update
+				update_teams();
+			}
+			
+			// setup
+			$('#add_team').click(add_team);
+			$('#excludes .remove').click(remove_team);
+		})();
+	</script>
 </fragment>

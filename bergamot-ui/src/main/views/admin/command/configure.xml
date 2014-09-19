@@ -8,6 +8,7 @@
     		<include data-configuration="#{command}" data-summary="Command" view="admin/include/configure_name"/>
 			<include data-configuration="#{command}" view="admin/include/configure_inherit"/>
     		<include data-configuration="#{command}" view="admin/include/configure_command"/>
+    		<include data-configuration="#{command}" view="admin/include/configure_parameters"/>
 	    	<div class="col12">
 				<input type="submit" name="configure" id="configure" value="Configure Command"/>
     		</div>

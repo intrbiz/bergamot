@@ -59,10 +59,10 @@
 		(function() {
 		
 			function update_grants() {
-				$('#timeranges input[type=text]').each(function(i, e) {
+				$('#grants select').each(function(i, e) {
 					if ($(e).attr('id') != 'available_grants') {
-						$(e).attr('id', 'timerange_' + i);
-						$(e).attr('name', 'timerange[' + i + ']');
+						$(e).attr('id', 'grant_' + i);
+						$(e).attr('name', 'grant[' + i + ']');
 					}
 				});
 			}
@@ -104,10 +104,10 @@
 		(function() {
 		
 			function update_revokes() {
-				$('#timeranges input[type=text]').each(function(i, e) {
+				$('#revokes select').each(function(i, e) {
 					if ($(e).attr('id') != 'available_revokes') {
-						$(e).attr('id', 'timerange_' + i);
-						$(e).attr('name', 'timerange[' + i + ']');
+						$(e).attr('id', 'revoke_' + i);
+						$(e).attr('name', 'revoke[' + i + ']');
 					}
 				});
 			}
@@ -146,46 +146,4 @@
 			$('#revokes .remove').click(remove_revoke);
 		})();
 	</script>
-	<style>
-		
-		#grants li, #revokes li {
-			margin-bottom: 20px;
-			background-color: #EEE;
-			padding: 10px;
-			border-radius: 5px;
-			display: block;
-			float: left;
-			clear: both;
-		}
-		
-		#grants input[type=text], #revokes input[type=text] {
-			width: 400px;
-		}
-		
-		#grants .add, #revokes .add {
-			background: transparent url('/list-add.png') top left no-repeat;
-			height: 22px;
-			text-indent: 27px;
-			line-height: 22px;
-			overflow: hidden;
-			display: block;
-			float: left;
-			margin-top: 10px;
-		}
-			
-		#grants .remove, #revokes .remove {
-			background: transparent url('/edit-delete.png') top left no-repeat;
-			width: 22px;
-			height: 22px;
-			text-indent: 10000px;
-			overflow: hidden;
-			display: block;
-			float: right;
-			margin-top: 10px;
-		}
-		
-		#add_grant_row, #add_revoke_row {
-			background-color: #FFF !important;
-		}
-	</style>
 </fragment>
