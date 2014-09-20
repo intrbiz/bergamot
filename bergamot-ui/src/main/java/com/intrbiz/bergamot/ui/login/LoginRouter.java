@@ -16,6 +16,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsBoolean;
 import com.intrbiz.metadata.Catch;
@@ -190,6 +191,31 @@ public class LoginRouter extends Router<BergamotApp>
         }
         // redirect
         redirect("/login");
+    }
+    
+    /**
+     * Perform a password reset
+     */
+    @Get("/reset")
+    public void reset(@Param("token") String token) throws IOException
+    {
+        // authenticate the token
+        Contact contact = authenticate(new GenericAuthenticationToken(token, CryptoCookie.Flags.Reset));
+        // assert that the contact requires a reset
+        if (! contact.isForcePasswordChange())
+        {
+            // if the password has already been reset, then
+            // this request is a little odd, so force a login
+            redirect(path("/login"));
+        }
+        // setup the session
+        logger.info("Successfully authenticated password reset for user: " + contact.getName() + " => " + contact.getSiteId() + "::" + contact.getId());
+        // setup the session
+        sessionVar("contact", currentPrincipal());
+        sessionVar("site", contact.getSite());
+        // force password change
+        var("forced", true);
+        encodeOnly("login/force_change_password");
     }
     
     @Catch(BalsaSecurityException.class)

@@ -290,6 +290,13 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         return this;
     }
     
+    public Contact resetPassword()
+    {
+        this.passwordHash = null;
+        this.forcePasswordChange = true;
+        return this;
+    }
+    
     public Contact lock(LockOutReason reason)
     {
         this.locked = true;

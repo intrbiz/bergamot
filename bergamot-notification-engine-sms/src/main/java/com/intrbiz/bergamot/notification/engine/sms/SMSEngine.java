@@ -13,6 +13,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -68,7 +69,7 @@ public class SMSEngine extends AbstractNotificationEngine
     @Override
     public void sendNotification(Notification notification)
     {
-        logger.info("Sending SMS notification for " + notification.getCheck() + " to " + notification.getTo());
+        logger.info("Sending SMS notification for " + notification.getNotificationType() + " to " + notification.getTo());
         Timer.Context tctx = this.smsSendTimer.time();
         try
         {
@@ -91,8 +92,7 @@ public class SMSEngine extends AbstractNotificationEngine
                             params.add(new BasicNameValuePair("From", this.from));
                             params.add(new BasicNameValuePair("Body", message));
                             Message sms = this.messageFactory.create(params);
-                            logger.info("Sent SMS, Id: " + sms.getSid());
-                            
+                            logger.info("Sent SMS, Id: " + sms.getSid());                            
                         }
                         catch (Exception e)
                         {
@@ -125,7 +125,14 @@ public class SMSEngine extends AbstractNotificationEngine
 
     protected String buildMessage(Notification notification) throws Exception
     {
-        return this.applyTemplate(notification.getCheck().getCheckType() + "." + notification.getNotificationType() + ".message", notification);
+        if (notification instanceof CheckNotification)
+        {
+            return this.applyTemplate(((CheckNotification)notification).getCheck().getCheckType() + "." + notification.getNotificationType() + ".message", notification);
+        }
+        else
+        {
+            return this.applyTemplate(notification.getNotificationType() + ".message", notification);
+        }
     }
 
     @Override

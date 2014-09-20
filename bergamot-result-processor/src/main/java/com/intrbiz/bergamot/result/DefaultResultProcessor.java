@@ -19,7 +19,7 @@ import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.notification.Notification;
+import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
@@ -117,7 +117,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         this.publishUpdate(check, new Update(check.toMO()));
     }
 
-    protected <T extends Notification> T createNotification(Check<?, ?> check, Alert alertRecord, Calendar now, NotificationType type, Supplier<T> ctor)
+    protected <T extends CheckNotification> T createNotification(Check<?, ?> check, Alert alertRecord, Calendar now, NotificationType type, Supplier<T> ctor)
     {
         T notification = ctor.get();
         // alert id

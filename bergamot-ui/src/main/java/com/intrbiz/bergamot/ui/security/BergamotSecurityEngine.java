@@ -137,8 +137,17 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
         }
     }
     
-    protected void validateAccessToken(String token, CryptoCookie cookie, Principal principal) throws BalsaSecurityException
+    @Override
+    protected void validateAccessToken(String token, CryptoCookie cookie, Principal principal, CryptoCookie.Flag[] requiredFlags) throws BalsaSecurityException
     {
+        // validate the flags
+        if (requiredFlags != null)
+        {
+            for (CryptoCookie.Flag flag : requiredFlags)
+            {
+                if (! cookie.isFlagSet(flag)) throw new BalsaSecurityException("The flag: " + flag.mask + " is missing from the access token");
+            }
+        }
         // only validate perpetual API tokens
         if (cookie.getExpiryTime() == Expires.never())
         {

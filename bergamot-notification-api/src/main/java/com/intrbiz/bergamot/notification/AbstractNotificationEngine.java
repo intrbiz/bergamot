@@ -12,7 +12,10 @@ import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
+import com.intrbiz.bergamot.model.message.notification.CheckNotification;
+import com.intrbiz.bergamot.model.message.notification.GenericNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
+import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.ExpressEntityResolver;
@@ -139,43 +142,58 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
             {
                 if (notification != null)
                 {
-                    if ("this".equals(name))
+                    if ("this".equals(name) || "notification".equals(name))
                     {
                         return notification;
                     }
+                    else if ("site".equals(name))
+                    {
+                        return ((GenericNotification) notification).getSite();
+                    }
+                    else if ("contact".equals(name))
+                    {
+                        if (notification instanceof PasswordResetNotification)
+                        {
+                            return ((PasswordResetNotification) notification).getContact();
+                        }
+                        return null;
+                    }
                     else if ("check".equals(name))
                     {
-                        return notification.getCheck();
+                        return ((CheckNotification) notification).getCheck();
                     }
-                    else if ("service".equals(name) && (notification.getCheck() instanceof ServiceMO))
+                    else if ("service".equals(name) && (((CheckNotification) notification).getCheck() instanceof ServiceMO))
                     {
-                        return notification.getCheck();
+                        return ((CheckNotification) notification).getCheck();
                     }
-                    else if ("trap".equals(name) && (notification.getCheck() instanceof TrapMO))
+                    else if ("trap".equals(name) && (((CheckNotification) notification).getCheck() instanceof TrapMO))
                     {
-                        return notification.getCheck();
+                        return ((CheckNotification) notification).getCheck();
                     }
-                    else if ("resource".equals(name) && (notification.getCheck() instanceof ResourceMO))
+                    else if ("resource".equals(name) && (((CheckNotification) notification).getCheck() instanceof ResourceMO))
                     {
-                        return notification.getCheck();
+                        return ((CheckNotification) notification).getCheck();
                     }
-                    else if ("host".equals(name) && (notification.getCheck() instanceof HostMO))
+                    else if ("host".equals(name) && (((CheckNotification) notification).getCheck() instanceof HostMO))
                     {
-                        return notification.getCheck();
+                        return ((CheckNotification) notification).getCheck();
                     }
-                    else if ("host".equals(name) && (notification.getCheck() instanceof ServiceMO))
+                    else if ("host".equals(name) && (((CheckNotification) notification).getCheck() instanceof ServiceMO))
                     {
-                        return ((ServiceMO) notification.getCheck()).getHost();
+                        return ((ServiceMO) ((CheckNotification) notification).getCheck()).getHost();
                     }
-                    else if ("host".equals(name) && (notification.getCheck() instanceof TrapMO))
+                    else if ("host".equals(name) && (((CheckNotification) notification).getCheck() instanceof TrapMO))
                     {
-                        return ((TrapMO) notification.getCheck()).getHost();
+                        return ((TrapMO) ((CheckNotification) notification).getCheck()).getHost();
                     }
-                    else if ("cluster".equals(name) && (notification.getCheck() instanceof ClusterMO))
+                    else if ("cluster".equals(name) && (((CheckNotification) notification).getCheck() instanceof ClusterMO))
                     {
-                        return notification.getCheck();
+                        return ((CheckNotification) notification).getCheck();
                     }
-                    else if ("cluster".equals(name) && (notification.getCheck() instanceof ResourceMO)) { return ((ResourceMO) notification.getCheck()).getCluster(); }
+                    else if ("cluster".equals(name) && (((CheckNotification) notification).getCheck() instanceof ResourceMO))
+                    { 
+                        return ((ResourceMO) ((CheckNotification) notification).getCheck()).getCluster(); 
+                    }
                 }
                 return null;
             }

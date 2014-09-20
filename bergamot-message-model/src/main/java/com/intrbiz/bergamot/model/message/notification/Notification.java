@@ -2,13 +2,12 @@ package com.intrbiz.bergamot.model.message.notification;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.Message;
+import com.intrbiz.bergamot.model.message.SiteMO;
 
 /**
  * A notification
@@ -20,12 +19,9 @@ public abstract class Notification extends Message
 
     @JsonProperty("to")
     private List<ContactMO> to = new LinkedList<ContactMO>();
-
-    @JsonProperty("check")
-    private CheckMO check;
     
-    @JsonProperty("alert_id")
-    private UUID alertId;
+    @JsonProperty("site")
+    private SiteMO site;
 
     public Notification()
     {
@@ -55,23 +51,13 @@ public abstract class Notification extends Message
         this.to = to;
     }
 
-    public CheckMO getCheck()
+    public SiteMO getSite()
     {
-        return check;
+        return site;
     }
 
-    public void setCheck(CheckMO check)
+    public void setSite(SiteMO site)
     {
-        this.check = check;
-    }
-
-    public UUID getAlertId()
-    {
-        return alertId;
-    }
-
-    public void setAlertId(UUID alertId)
-    {
-        this.alertId = alertId;
+        this.site = site;
     }
 }

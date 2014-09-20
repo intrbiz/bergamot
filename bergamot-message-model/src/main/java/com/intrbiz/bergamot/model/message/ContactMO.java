@@ -100,6 +100,12 @@ public class ContactMO extends NamedObjectMO
     {
         return this.engines.contains(engine);
     }
+    
+    public ContactMO addEngine(String engine)
+    {
+        this.engines.add(engine);
+        return this;
+    }
 
     public List<TeamMO> getTeams()
     {

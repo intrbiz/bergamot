@@ -502,6 +502,10 @@ form p {
     clear: both;
 }
 
+#login-box form p {
+    float: none !important;
+}
+
 form p.field label {
     display: block;
     float: left;

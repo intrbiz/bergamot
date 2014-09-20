@@ -19,6 +19,8 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.notification.CheckNotification;
+import com.intrbiz.bergamot.model.message.notification.GenericNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
@@ -84,7 +86,7 @@ public class EmailEngine extends AbstractNotificationEngine
     {
         if (logger.isTraceEnabled()) logger.trace(notification.toString());
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-        logger.info("Sending email notification for " + notification.getCheck() + " to " + notification.getTo());
+        logger.info("Sending email notification for " + notification.getNotificationType() + " to " + notification.getTo());
         Timer.Context tctx = this.emailSendTimer.time();
         try
         {
@@ -144,8 +146,43 @@ public class EmailEngine extends AbstractNotificationEngine
         }
         return false;
     }
-
+    
     protected Message buildMessage(Session session, Notification notification) throws Exception
+    {
+        if (notification instanceof CheckNotification)
+        {
+            return this.buildCheckMessage(session, (CheckNotification) notification);
+        }
+        else if (notification instanceof GenericNotification)
+        {
+            return this.buildGenericMessage(session, (GenericNotification) notification);
+        }
+        return null;
+    }
+    
+    protected Message buildGenericMessage(Session session, GenericNotification notification) throws Exception
+    {
+        Message message = new MimeMessage(session);
+        // from
+        message.setFrom(new InternetAddress(this.fromAddress));
+        // to address
+        for (ContactMO contact : notification.getTo())
+        {
+            if ((!Util.isEmpty(contact.getEmail())) && contact.hasEngine(this.getName()))
+            {
+                message.addRecipient(RecipientType.TO, new InternetAddress(contact.getEmail()));
+            }
+        }
+        // headers
+        message.setHeader("X-Bergamot-Notification-Id", notification.getId().toString());
+        // sent date
+        message.setSentDate(new Date(notification.getRaised()));
+        // content
+        this.buildGenericMessageContent(message, notification);
+        return message;
+    }
+
+    protected Message buildCheckMessage(Session session, CheckNotification notification) throws Exception
     {
         Message message = new MimeMessage(session) {
             @Override
@@ -166,7 +203,7 @@ public class EmailEngine extends AbstractNotificationEngine
         }
         // headers
         message.setHeader("X-Bergamot-Alert-Id", notification.getAlertId().toString());
-        message.setHeader("Message-ID", this.messageId(notification));
+        message.setHeader("Message-ID", this.checkMessageId(notification));
         message.setHeader("X-Bergamot-Notification-Id", notification.getId().toString());
         message.setHeader("X-Bergamot-Check-Type", notification.getCheck().getType());
         message.setHeader("X-Bergamot-Check-Id", notification.getCheck().getId().toString());
@@ -174,24 +211,31 @@ public class EmailEngine extends AbstractNotificationEngine
         // in reply to?
         if (notification instanceof SendRecovery)
         {
-            message.setHeader("References", this.messageId(notification));
-            message.setHeader("In-Reply-To", this.messageId(notification));
+            message.setHeader("References", this.checkMessageId(notification));
+            message.setHeader("In-Reply-To", this.checkMessageId(notification));
         }
         // sent date
         message.setSentDate(new Date(notification.getRaised()));
         // content
-        this.buildMessageContent(message, notification);
+        this.buildCheckMessageContent(message, notification);
         return message;
     }
     
-    protected String messageId(Notification notification)
+    protected String checkMessageId(CheckNotification notification)
     {
         return "<" + notification.getAlertId().toString() + ".bergamot>";
     }
 
-    protected void buildMessageContent(Message message, Notification notification) throws Exception
+    protected void buildCheckMessageContent(Message message, CheckNotification notification) throws Exception
     {
         String templatePrefix = notification.getCheck().getCheckType() + "." + notification.getNotificationType() + ".";
+        message.setSubject(this.applyTemplate(templatePrefix + "subject", notification));
+        message.setContent(this.applyTemplate(templatePrefix + "content", notification), "text/plain");
+    }
+    
+    protected void buildGenericMessageContent(Message message, GenericNotification notification) throws Exception
+    {
+        String templatePrefix = notification.getNotificationType() + ".";
         message.setSubject(this.applyTemplate(templatePrefix + "subject", notification));
         message.setContent(this.applyTemplate(templatePrefix + "content", notification), "text/plain");
     }
@@ -295,6 +339,18 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "Last checked at #{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}\r\n"
                 + "\r\n"
                 + "For more information: http://bergamot/resource/id/#{resource.id}\r\n"
+                + "\r\n"
+                + "Thank you, Bergamot");
+        // generic
+        // password reset
+        templates.put("password_reset.subject", "Password reset for #{contact.name} at #{coalesce(site.summary, site.name)}");
+        templates.put("password_reset.content", "Hello #{coalesce(contact.summary, contact.name)}\r\n"
+                + "\r\n"
+                + "Welcome to Bergamot Monitoring.  To activate your account on #{coalesce(site.summary, site.name)}, please follow the link below:\r\n"
+                + "\r\n"
+                + "#{notification.url}\r\n"
+                + "\r\n"
+                + "You can login at: http://#{site.name}/\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         return templates;

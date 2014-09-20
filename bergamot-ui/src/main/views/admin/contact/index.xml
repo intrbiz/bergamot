@@ -58,7 +58,7 @@
 	    				<td>#{if(contact.locked, coalesce(contact.lockedReason.description, 'Yes'), 'No')}</td>
 	    				<td>
 	    					<!-- Password Reset -->
-	    					<form action="#{path('/admin/contact/reset')}" method="post" rendered="#{! contact.forcePasswordChange}">
+	    					<form action="#{path('/admin/contact/reset')}" method="post">
 								<input type="hidden" name="id" value="#{contact.id}"/>
 								<input type="submit" name="reset" value="Reset Password" class="danger"/>
 							</form>

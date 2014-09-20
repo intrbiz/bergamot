@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * An alert
  */
 @JsonTypeName("bergamot.send_recovery")
-public class SendRecovery extends Notification
+public class SendRecovery extends CheckNotification
 {
     public SendRecovery()
     {

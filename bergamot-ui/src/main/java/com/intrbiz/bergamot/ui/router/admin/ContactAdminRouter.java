@@ -11,8 +11,6 @@ import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Config;
-import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.model.Contact.LockOutReason;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.Configuration;
@@ -47,11 +45,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void lock(BergamotDB db, @Param("id") @IsaUUID(mandatory = true) UUID contactId) throws IOException
     {
-        Contact contact = db.getContact(contactId);
-        if (contact != null)
-        {
-            db.setContact(contact.lock(LockOutReason.ADMINISTRATIVE));
-        }
+        action("lock-password", db.getContact(contactId));
         redirect(path("/admin/contact/"));
     }
     
@@ -59,11 +53,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void unlock(BergamotDB db, @Param("id") @IsaUUID(mandatory = true) UUID contactId) throws IOException
     {
-        Contact contact = db.getContact(contactId);
-        if (contact != null)
-        {
-            db.setContact(contact.unlock());
-        }
+        action("unlock-password", db.getContact(contactId));
         redirect(path("/admin/contact/"));
     }
     
@@ -71,11 +61,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void reset(BergamotDB db, @Param("id") @IsaUUID(mandatory = true) UUID contactId) throws IOException
     {
-        Contact contact = db.getContact(contactId);
-        if (contact != null)
-        {
-            db.setContact(contact.forcePasswordChange());
-        }
+        action("reset-password", db.getContact(contactId));
         redirect(path("/admin/contact/"));
     }
     
