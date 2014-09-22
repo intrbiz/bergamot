@@ -92,7 +92,7 @@
 					<a href="#remove" class="remove">Remove</a>
 					<p class="field engine">
 						<label for="notification_engine_engine_[#{notification_engine_rownum}]">Notification Engine</label>
-						<input type="text" name="notification_engine_engine_[#{notification_engine_rownum}]" id="notification_engine_engine_#{notification_engine_rownum}" value="#{notification_engine.engine}"/>
+						<input type="text" name="notification_engine_engine[#{notification_engine_rownum}]" id="notification_engine_engine_#{notification_engine_rownum}" value="#{notification_engine.engine}"/>
 					</p>
 					<p class="field enabled">
 						<label for="notification_engine_enabled[#{notification_engine_rownum}]">Notifications Enabled</label>
