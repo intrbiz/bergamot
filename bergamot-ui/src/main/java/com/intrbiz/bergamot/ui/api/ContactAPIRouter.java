@@ -14,7 +14,6 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
@@ -92,24 +91,6 @@ public class ContactAPIRouter extends Router<BergamotApp>
     public ContactCfg getContactConfig(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getContact(id), Contact::getConfiguration);
-    }
-    
-    @Any("/configure")
-    @JSON()
-    @RequirePermission("api.write.contact.create")
-    @WithDataAdapter(BergamotDB.class)
-    public ContactMO configureContact(
-            BergamotDB db, 
-            @Var("site") Site site, 
-            @Param("configuration") @CheckStringLength(min = 1, max = 128 * 1024, mandatory = true) String configurationXML
-    )
-    {
-        // parse the config and allocate the id
-        ContactCfg config = ContactCfg.fromString(ContactCfg.class, configurationXML);
-        config.setId(site.randomObjectId());
-        // create the team
-        Contact contact = action("create-contact", config);
-        return contact.toMO();
     }
     
     @Get("/id/:id/set-password")
