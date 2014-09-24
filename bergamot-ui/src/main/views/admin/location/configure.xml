@@ -1,17 +1,17 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
-<!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Configure Location">
-    
-    <form action="#{path('/admin/location/configure' + if(team.id == null, '', '/id/' + location.id)')}" method="post">
-    	<div clas="row">
-			<include data-configuration="#{location}" data-summary="Location" view="admin/include/configure_name"/>
-			<include data-configuration="#{location}"                         view="admin/include/configure_inherit"/>
-			<include data-configuration="#{location}" data-summary="Location" view="admin/include/configure_location"/>
-    		<div class="col12">
-    			<input type="submit" name="configure" id="configure" value="Configure Location"/>
-    		</div>
-   	 	</div>
-	</form>
-    
+<fragment xmlns="com.intrbiz.balsa" title="Configuration for location #{coalesce(location.summary, location.name)}">
+    <div class="row">
+   		<h4>XML Configuration</h4>
+   		<pre>#{location.toString()}</pre>
+    </div>
+    <div class="row">
+   		<h4>Resolved Configuration</h4>
+   		<p class="text-body">The following is the resultant configuration once templates have been applied:</p>
+   		<pre>#{location.resolve().toString()}</pre>
+    </div>
+    <div class="row">
+    	<a href="/admin/changeset/add/location/id/#{location.id}" class="add">Edit this location</a>
+    	<a href="/admin/changeset/remove/location/id/#{location.id}" class="remove">Remove this location</a>
+    </div>
 </fragment>

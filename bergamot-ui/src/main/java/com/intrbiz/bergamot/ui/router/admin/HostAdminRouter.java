@@ -5,12 +5,7 @@ import java.util.UUID;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
-import com.intrbiz.bergamot.config.model.CommandCfg;
-import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
-import com.intrbiz.bergamot.config.model.LocationCfg;
-import com.intrbiz.bergamot.config.model.TeamCfg;
-import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Site;
@@ -46,26 +41,6 @@ public class HostAdminRouter extends Router<BergamotApp>
     public void showConfigure(BergamotDB db, @AsUUID UUID timeperiodId, @SessionVar("site") Site site)
     {
         model("host", Util.nullable(db.getConfig(timeperiodId), Config::getResolvedConfiguration));
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(HostCfg.class)));
-        model("locations", db.listConfig(site.getId(), Configuration.getRootElement(LocationCfg.class)));
-        model("groups", db.listConfig(site.getId(), Configuration.getRootElement(GroupCfg.class)));
-        model("timeperiods", db.listConfig(site.getId(), Configuration.getRootElement(TimePeriodCfg.class)));
-        model("teams", db.listConfig(site.getId(), Configuration.getRootElement(TeamCfg.class)));
-        model("commands", db.listConfig(site.getId(), Configuration.getRootElement(CommandCfg.class)));
-        encode("admin/host/configure");
-    }
-    
-    @Get("/configure")
-    @WithDataAdapter(BergamotDB.class)
-    public void showConfigureNew(BergamotDB db, @SessionVar("site") Site site)
-    {
-        model("host", new HostCfg());
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(HostCfg.class)));
-        model("locations", db.listConfig(site.getId(), Configuration.getRootElement(LocationCfg.class)));
-        model("groups", db.listConfig(site.getId(), Configuration.getRootElement(GroupCfg.class)));
-        model("timeperiods", db.listConfig(site.getId(), Configuration.getRootElement(TimePeriodCfg.class)));
-        model("teams", db.listConfig(site.getId(), Configuration.getRootElement(TeamCfg.class)));
-        model("commands", db.listConfig(site.getId(), Configuration.getRootElement(CommandCfg.class)));
         encode("admin/host/configure");
     }
 }

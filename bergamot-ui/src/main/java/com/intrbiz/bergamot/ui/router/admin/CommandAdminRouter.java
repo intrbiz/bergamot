@@ -40,17 +40,7 @@ public class CommandAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showConfigure(BergamotDB db, @AsUUID UUID timeperiodId, @SessionVar("site") Site site)
     {
-        model("command", Util.nullable(db.getConfig(timeperiodId), Config::getConfiguration));
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(CommandCfg.class)));
-        encode("admin/command/configure");
-    }
-    
-    @Get("/configure")
-    @WithDataAdapter(BergamotDB.class)
-    public void showConfigureNew(BergamotDB db, @SessionVar("site") Site site)
-    {
-        model("command", new CommandCfg());
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(CommandCfg.class)));
+        model("command", Util.nullable(db.getConfig(timeperiodId), Config::getResolvedConfiguration));
         encode("admin/command/configure");
     }
 }

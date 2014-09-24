@@ -773,6 +773,32 @@ form p.field textarea {
 
 /******************************************************************************/
 
+/* */
+
+a.add {
+    background: transparent url('/list-add.png') top left no-repeat;
+    height: 22px;
+    text-indent: 27px;
+    line-height: 22px;
+    overflow: hidden;
+    display: block;
+    float: left;
+    margin: 10px;
+}
+
+a.remove {
+    background: transparent url('/edit-delete.png') top left no-repeat;
+    height: 22px;
+    text-indent: 27px;
+    line-height: 22px;
+    overflow: hidden;
+    display: block;
+    float: left;
+    margin: 10px;
+}
+
+/* */
+
 /* Resizing */
 
 @media (min-width: 571px) and (max-width: 869px) {

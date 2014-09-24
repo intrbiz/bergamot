@@ -41,18 +41,6 @@ public class LocationAdminRouter extends Router<BergamotApp>
     public void showConfigure(BergamotDB db, @AsUUID UUID timeperiodId, @SessionVar("site") Site site)
     {
         model("location", Util.nullable(db.getConfig(timeperiodId), Config::getResolvedConfiguration));
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(LocationCfg.class)));
-        model("locations", db.listConfig(site.getId(), Configuration.getRootElement(LocationCfg.class)));
-        encode("admin/location/configure");
-    }
-    
-    @Get("/configure")
-    @WithDataAdapter(BergamotDB.class)
-    public void showConfigureNew(BergamotDB db, @SessionVar("site") Site site)
-    {
-        model("location", new LocationCfg());
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(LocationCfg.class)));
-        model("locations", db.listConfig(site.getId(), Configuration.getRootElement(LocationCfg.class)));
         encode("admin/location/configure");
     }
 }

@@ -41,16 +41,6 @@ public class TimePeriodAdminRouter extends Router<BergamotApp>
     public void showConfigure(BergamotDB db, @AsUUID UUID timeperiodId, @SessionVar("site") Site site)
     {
         model("timeperiod", Util.nullable(db.getConfig(timeperiodId), Config::getResolvedConfiguration));
-        model("templates", db.listConfig(site.getId(), Configuration.getRootElement(TimePeriodCfg.class)));
-        encode("admin/timeperiod/configure");
-    }
-    
-    @Get("/configure")
-    @WithDataAdapter(BergamotDB.class)
-    public void showConfigureNew(BergamotDB db, @SessionVar("site") Site site)
-    {
-        model("timeperiod", new TimePeriodCfg());
-        model("templates", db.listConfig(site.getId(), Configuration.getRootElement(TimePeriodCfg.class)));
         encode("admin/timeperiod/configure");
     }
 }

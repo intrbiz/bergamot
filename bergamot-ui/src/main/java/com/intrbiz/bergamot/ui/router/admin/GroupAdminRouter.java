@@ -41,18 +41,6 @@ public class GroupAdminRouter extends Router<BergamotApp>
     public void showConfigure(BergamotDB db, @AsUUID UUID timeperiodId, @SessionVar("site") Site site)
     {
         model("group", Util.nullable(db.getConfig(timeperiodId), Config::getResolvedConfiguration));
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(GroupCfg.class)));
-        model("groups", db.listConfig(site.getId(), Configuration.getRootElement(GroupCfg.class)));
-        encode("admin/group/configure");
-    }
-    
-    @Get("/configure")
-    @WithDataAdapter(BergamotDB.class)
-    public void showConfigureNew(BergamotDB db, @SessionVar("site") Site site)
-    {
-        model("group", new GroupCfg());
-        model("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(GroupCfg.class)));
-        model("groups", db.listConfig(site.getId(), Configuration.getRootElement(GroupCfg.class)));
         encode("admin/group/configure");
     }
 }

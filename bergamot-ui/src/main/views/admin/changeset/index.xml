@@ -1,0 +1,35 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Change Sets">
+    
+    <div clas="row" style="margin-bottom: 20px;">
+    	<h3>Current Change Sets</h3>
+    	<p class="text-body">
+    		A change set contain a number of configuration changes.  This allows for configuration changes to be made transactionally.
+    	</p>
+    </div>
+    
+    <div clas="row">
+    	<h3>Create Change Set</h3>
+    	<p class="text-body">
+    		Create a new change set containing the configuration changes to make.
+    	</p>
+    	<form method="post" action="#{path('/admin/changeset/create')}">
+    		<div class="col12">
+				<p class="field">
+					<label for="name">Change Summary</label>
+					<input type="text" name="summary" id="summary" placeholder="Adding new web server" value=""/>
+				</p>
+				<p class="field area">
+					<label for="description">Change Description</label>
+					<textarea name="description" id="description"></textarea>
+				</p>
+			</div>
+			<div class="col12">
+				<input type="submit" name="create" id="create" value="Create Change Set"/>
+			</div>
+		</form>
+    </div>
+    
+</fragment>

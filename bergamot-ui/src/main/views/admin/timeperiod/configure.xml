@@ -1,18 +1,18 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Configure Time Period">
-    
-    <form action="#{path('/admin/timeperiod/configure' + if(timeperiod.id == null, '', '/id/' + timeperiod.id)')}" method="post">
-    	<div clas="row">
-			<include data-configuration="#{timeperiod}" data-summary="Time Period" view="admin/include/configure_name"/>
-			<include data-configuration="#{timeperiod}" view="admin/include/configure_inherit"/>
-			<include data-configuration="#{timeperiod}" view="admin/include/configure_exclude"/>
-			<include data-configuration="#{timeperiod}" view="admin/include/configure_timeperiod"/>
-    		<div class="col12">
-    			<input type="submit" name="configure" id="configure" value="Configure Time Period"/>
-    		</div>
-   	 	</div>
-	</form>
-    
+<fragment xmlns="com.intrbiz.balsa" title="Configuration for time period #{coalesce(timeperiod.summary, timeperiod.name)}">
+    <div class="row">
+   		<h4>XML Configuration</h4>
+   		<pre>#{timeperiod.toString()}</pre>
+    </div>
+    <div class="row">
+   		<h4>Resolved Configuration</h4>
+   		<p class="text-body">The following is the resultant configuration once templates have been applied:</p>
+   		<pre>#{timeperiod.resolve().toString()}</pre>
+    </div>
+    <div class="row">
+    	<a href="/admin/changeset/add/timeperiod/id/#{timeperiod.id}" class="add">Edit this time period</a>
+    	<a href="/admin/changeset/remove/timeperiod/id/#{timeperiod.id}" class="remove">Remove this time period</a>
+    </div>
 </fragment>
