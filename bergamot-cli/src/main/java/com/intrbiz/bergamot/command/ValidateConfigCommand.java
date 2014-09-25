@@ -8,7 +8,7 @@ import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
 import com.intrbiz.bergamot.config.BergamotConfigReader;
-import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 
 public class ValidateConfigCommand extends BergamotCLICommand
 {

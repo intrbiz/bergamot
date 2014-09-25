@@ -6,7 +6,7 @@ import com.intrbiz.bergamot.compat.config.builder.NagiosConfigBuilder;
 import com.intrbiz.bergamot.config.BergamotConfigWriter;
 import com.intrbiz.bergamot.config.NagiosConfigConverter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
-import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 
 public class NagiosToBergamot
 {    

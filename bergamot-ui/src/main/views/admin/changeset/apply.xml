@@ -1,0 +1,50 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa" title="Apply change set #{changeset.summary}">
+    <div class="row">
+		<h3>Ready to apply change set #{changeset.summary}</h3>
+		<p class="text-body">#{changeset.description}</p>
+		
+		<p rendered="#{report.isValid()}">
+			This change is valid and can be applied, it will result in the following changes.
+		</p>
+		<p rendered="#{! report.isValid()}">
+			This change is NOT valid and cannot be applied, it contains the following errors:
+		</p>
+		<!--  -->
+		<data-set var="change_report" value="#{report.changes}">
+			<div>
+				<h4>Change: #{change_report.change.summary}</h4>
+				<!-- Parsed -->
+				<container rendered="#{change_report.parsed}">
+						<p>Successfully parsed change configuration:</p>
+						<pre style="margin-bottom: 20px;">#{change_report.configuration.toString()}</pre>
+				</container>
+				<container rendered="#{! change_report.parsed}">
+						<p>Failed to parse the change configuration:</p>
+						<p>#{change_report.parseReport}</p>
+				</container>
+				<!-- Validated -->
+				<container rendered="#{change_report.validated}">
+						<p>Successfully validated the change configuration</p>
+						<pre style="margin-bottom: 20px;">#{change_report.validationReport.toString()}</pre>
+				</container>
+				<container rendered="#{! change_report.validated}">
+						<p>Failed to validate the change configuration</p>
+						<pre style="margin-bottom: 20px;">#{change_report.validationReport.toString()}</pre>
+				</container>
+				<!-- Effects -->
+				<container rendered="#{change_report.isValid()}">
+						<p>#{change_report.description}</p>
+				</container>
+			</div>
+		</data-set>
+		<!--  -->
+		<p rendered="#{report.isValid()}">
+			Are you sure you wish to apply this change?
+		</p>
+		<p rendered="#{! report.isValid()}">
+			Edit this change?
+		</p>
+    </div>
+</fragment>

@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.config.validator.BergamotCfgValidator;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "bergamot")
@@ -18,6 +20,20 @@ import com.intrbiz.configuration.Configuration;
 public class BergamotCfg extends Configuration
 {
     private static final long serialVersionUID = 1L;
+    
+    public static final Class<?>[] OBJECT_TYPES = {
+        TeamCfg.class,
+        ContactCfg.class,
+        TimePeriodCfg.class,
+        LocationCfg.class,
+        GroupCfg.class,
+        CommandCfg.class,
+        ServiceCfg.class,
+        TrapCfg.class,
+        HostCfg.class,
+        ResourceCfg.class,
+        ClusterCfg.class
+    };
     
     private String site = "default";
 
@@ -48,6 +64,16 @@ public class BergamotCfg extends Configuration
     public BergamotCfg()
     {
         super();
+    }
+    
+    public BergamotCfg(String site, TemplatedObjectCfg<?>... objects)
+    {
+        super();
+        this.site = site;
+        for (TemplatedObjectCfg<?> object : objects)
+        {
+            this.addObject(object);
+        }
     }
 
     @XmlElementRef(type = TeamCfg.class)
@@ -271,59 +297,6 @@ public class BergamotCfg extends Configuration
     {
         return (T) this.index.get(type.getSimpleName() + "::" + name);
     }
-
-    private void computeInheritenance(BergamotValidationReport report)
-    {
-        this.index();
-        // walk the object tree and compute the inheritance graph
-        for (List<? extends TemplatedObjectCfg<?>> objects : this.getAllObjects())
-        {
-            for (TemplatedObjectCfg<?> object : objects)
-            {
-                this.resolveInherit(object, report);
-                // process any child templated objects
-                for (TemplatedObjectCfg<?> child : object.getTemplatedChildObjects())
-                {
-                    this.resolveInherit(child, report);
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void resolveInherit(TemplatedObjectCfg<?> object, BergamotValidationReport report)
-    {
-        for (String inheritsFrom : object.getInheritedTemplates())
-        {
-            TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
-            if (superObject != null)
-            {
-                ((TemplatedObjectCfg) object).addInheritedObject(superObject);
-            }
-            else
-            {
-                // error
-                report.logError("Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
-            }
-        }
-        if (object instanceof TimePeriodCfg)
-        {
-            this.resolveExcludes((TimePeriodCfg) object, report);
-        }
-    }
-    
-    private void resolveExcludes(TimePeriodCfg object, BergamotValidationReport report)
-    {
-        for (String exclude : object.getExcludes())
-        {
-            TimePeriodCfg excludedTimePeriod = this.lookup(TimePeriodCfg.class, exclude);
-            if (excludedTimePeriod == null)
-            {
-                // error
-                report.logError("Cannot find the excluded time period named '" + exclude + "' which is excluded by " + object);
-            }
-        }
-    }
     
     /**
      * Validate this Bergamot configuration.  Note: you must validate 
@@ -331,340 +304,6 @@ public class BergamotCfg extends Configuration
      */
     public ValidatedBergamotConfiguration validate()
     {
-        BergamotValidationReport report = new BergamotValidationReport(this.getSite());
-        // compute the inheritance
-        this.computeInheritenance(report);
-        // validate the objects
-        this.validateGroups(report);
-        this.validateLocations(report);
-        this.validateHosts(report);
-        this.validateClusters(report);
-        this.validateResources(report);
-        this.validateServices(report);
-        this.validateTraps(report);
-        this.validateTeams(report);
-        this.validateContacts(report);
-        this.validateCommands(report);
-        return new ValidatedBergamotConfiguration(this, report);
-    }
-    
-    private void validateGroups(BergamotValidationReport report)
-    {
-        for (GroupCfg group : this.groups)
-        {
-            for (String groupName : group.getGroups())
-            {
-                this.checkGroupExists(groupName, group, report);
-            }
-        }
-    }
-    
-    private void validateHosts(BergamotValidationReport report)
-    {
-        for (HostCfg host : this.hosts)
-        {
-            for (String groupName : host.getGroups())
-            {
-                this.checkGroupExists(groupName, host, report);
-            }
-            if (! Util.isEmpty(host.getLocation()))
-            {
-                this.checkLocationExists(host.getLocation(), host, report);
-            }
-            // check command for this host
-            if (host.getCheckCommand() != null)
-            {
-                checkCommandExists(host.getCheckCommand().getCommand(), host, report);
-            }
-            // services of the host
-            for (ServiceCfg service : host.getServices())
-            {
-                for (String groupName : service.getGroups())
-                {
-                    this.checkGroupExists(groupName, service, report);
-                }
-                this.validateNotify(service.getNotify(), service, report);
-            }
-            // traps of the host
-            for (TrapCfg trap : host.getTraps())
-            {
-                for (String groupName : trap.getGroups())
-                {
-                    this.checkGroupExists(groupName, trap, report);
-                }
-                this.validateNotify(trap.getNotify(), trap, report);
-            }
-        }
-    }
-    
-    private void validateClusters(BergamotValidationReport report)
-    {
-        for (ClusterCfg cluster : this.clusters)
-        {
-            for (String groupName : cluster.getGroups())
-            {
-                this.checkGroupExists(groupName, cluster, report);
-            }
-            // resources of the cluster
-            for (ResourceCfg resource : cluster.getResources())
-            {
-                for (String groupName : resource.getGroups())
-                {
-                    this.checkGroupExists(groupName, resource, report);
-                }
-                this.validateNotify(resource.getNotify(), resource, report);
-            }
-        }
-    }
-    
-    private void validateServices(BergamotValidationReport report)
-    {
-        for (ServiceCfg service : this.services)
-        {
-            for (String groupName : service.getGroups())
-            {
-                this.checkGroupExists(groupName, service, report);
-            }
-            if (service.getTemplate() == null || service.getTemplate() == false)
-            {
-                service.setTemplate(true);
-                report.logWarn("Top level services must be templates: " + service);
-            }
-            this.validateNotify(service.getNotify(), service, report);
-            // check command for this service
-            if (service.getCheckCommand() != null)
-            {
-                checkCommandExists(service.getCheckCommand().getCommand(), service, report);
-            }
-        }
-    }
-    
-    private void validateTraps(BergamotValidationReport report)
-    {
-        for (TrapCfg trap : this.traps)
-        {
-            for (String groupName : trap.getGroups())
-            {
-                this.checkGroupExists(groupName, trap, report);
-            }
-            if (trap.getTemplate() == null || trap.getTemplate() == false)
-            {
-                trap.setTemplate(true);
-                report.logWarn("Top level traps must be templates: " + trap);
-            }
-            this.validateNotify(trap.getNotify(), trap, report);
-            // check command for this trap
-            if (trap.getCheckCommand() != null)
-            {
-                checkCommandExists(trap.getCheckCommand().getCommand(), trap, report);
-            }
-        }
-    }
-    
-    private void validateResources(BergamotValidationReport report)
-    {
-        for (ResourceCfg resource : this.resources)
-        {
-            for (String groupName : resource.getGroups())
-            {
-                this.checkGroupExists(groupName, resource, report);
-            }
-            if (resource.getTemplate() == null || resource.getTemplate() == false)
-            {
-                resource.setTemplate(true);
-                report.logWarn("Top level resources must be templates: " + resource);
-            }
-            this.validateNotify(resource.getNotify(), resource, report);
-        }
-    }
-    
-    private void validateNotify(NotifyCfg notify, NamedObjectCfg<?> of, BergamotValidationReport report)
-    {
-        if (notify != null)
-        {
-            for (String team : notify.getTeams())
-            {
-                this.checkTeamExists(team, of, report);
-            }
-            for (String contact : notify.getContacts())
-            {
-                this.checkContactExists(contact, of, report);
-            }
-        }
-    }
-    
-    private void validateLocations(BergamotValidationReport report)
-    {
-        for (LocationCfg location : this.locations)
-        {
-            if (! Util.isEmpty(location.getLocation()))
-            {
-                this.checkLocationExists(location.getLocation(), location, report);
-            }
-        }
-    }
-    
-    private void validateTeams(BergamotValidationReport report)
-    {
-        for (TeamCfg team : this.teams)
-        {
-            for (String teamName : team.getTeams())
-            {
-                this.checkTeamExists(teamName, team, report);
-            }
-        }
-    }
-    
-    private void validateContacts(BergamotValidationReport report)
-    {
-        for (ContactCfg contact : this.contacts)
-        {
-            for (String teamName : contact.getTeams())
-            {
-                this.checkTeamExists(teamName, contact, report);
-            }
-        }
-    }
-    
-    private void validateCommands(BergamotValidationReport report)
-    {
-        for (CommandCfg command : this.commands)
-        {
-            if (Util.isEmpty(command.resolve().getEngine()))
-            {
-                report.logError("The command engine should be specified for " + command);
-            }
-        }
-    }
-    
-    private void checkGroupExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
-    {
-        GroupCfg group = this.lookup(GroupCfg.class, name);
-        if (group == null)
-        {
-            report.logError("Cannot find the group '" + name + "' referenced by " + user);
-        }
-    }
-    
-    private void checkLocationExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
-    {
-        LocationCfg location = this.lookup(LocationCfg.class, name);
-        if (location == null)
-        {
-            report.logError("Cannot find the location '" + name + "' referenced by " + user);
-        }
-    }
-    
-    private void checkTeamExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
-    {
-        TeamCfg team = this.lookup(TeamCfg.class, name);
-        if (team == null)
-        {
-            report.logError("Cannot find the team '" + name + "' referenced by " + user);
-        }
-    }
-    
-    private void checkContactExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
-    {
-        ContactCfg contact = this.lookup(ContactCfg.class, name);
-        if (contact == null)
-        {
-            report.logError("Cannot find the contact '" + name + "' referenced by " + user);
-        }
-    }
-    
-    private void checkCommandExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
-    {
-        CommandCfg command = this.lookup(CommandCfg.class, name);
-        if (command == null)
-        {
-            report.logError("Cannot find the command '" + name + "' referenced by " + user);
-        }
-    }
-    
-    public static class BergamotValidationReport
-    {
-        private final String site;
-        
-        private boolean valid = true;
-        
-        private List<String> errors = new LinkedList<String>();
-        
-        private List<String> warnings = new LinkedList<String>();
-                
-        public BergamotValidationReport(String site)
-        {
-            this.site = site;
-        }
-        
-        public String getSite()
-        {
-            return this.site;
-        }
-        
-        public boolean isValid()
-        {
-            return this.valid;
-        }
-        
-        public List<String> getErrors()
-        {
-            return this.errors;
-        }
-        
-        public List<String> getWarnings()
-        {
-            return this.warnings;
-        }
-        
-        private void logError(String message)
-        {
-            this.valid = false;
-            this.errors.add(message);
-        }
-        
-        private void logWarn(String message)
-        {
-            this.errors.add(message);
-        }
-        
-        public String toString()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.append("The configuration for site '").append(this.getSite()).append("' is ").append(this.isValid() ? "valid." : "invalid!").append("\n");
-            if (this.warnings.size() > 0 || this.errors.size() > 0) sb.append("  Warnings: ").append(this.warnings.size()).append(", Errors: ").append(this.errors.size()).append("\n");
-            for (String error : this.errors)
-            {
-                sb.append("Error: ").append(error).append("\n");
-            }
-            for (String warn : this.warnings)
-            {
-                sb.append("Warn: ").append(warn).append("\n");
-            }
-            return sb.toString();
-        }
-    }
-    
-    public static class ValidatedBergamotConfiguration
-    {
-        private final BergamotCfg config;
-        
-        private final BergamotValidationReport report;
-        
-        private ValidatedBergamotConfiguration(BergamotCfg config, BergamotValidationReport report)
-        {
-            this.config = config;
-            this.report = report;
-        }
-
-        public BergamotCfg getConfig()
-        {
-            return config;
-        }
-
-        public BergamotValidationReport getReport()
-        {
-            return report;
-        }
+        return new BergamotCfgValidator(this).validate();
     }
 }

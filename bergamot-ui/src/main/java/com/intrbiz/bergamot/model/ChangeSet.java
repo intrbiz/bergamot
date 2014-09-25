@@ -1,9 +1,9 @@
 package com.intrbiz.bergamot.model;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
-
-import com.intrbiz.bergamot.config.model.BergamotCfg;
 
 public class ChangeSet implements Serializable
 {
@@ -15,7 +15,7 @@ public class ChangeSet implements Serializable
     
     private String description;
     
-    private BergamotCfg configuration;
+    private List<Change> changes = new LinkedList<Change>();
     
     public ChangeSet()
     {
@@ -28,7 +28,6 @@ public class ChangeSet implements Serializable
         this.id = UUID.randomUUID();
         this.summary = summary;
         this.description = description;
-        this.configuration = new BergamotCfg();
     }
 
     public UUID getId()
@@ -61,13 +60,13 @@ public class ChangeSet implements Serializable
         this.description = description;
     }
 
-    public BergamotCfg getConfiguration()
+    public List<Change> getChanges()
     {
-        return configuration;
+        return changes;
     }
 
-    public void setConfiguration(BergamotCfg configuration)
+    public void setChanges(List<Change> changes)
     {
-        this.configuration = configuration;
+        this.changes = changes;
     }
 }

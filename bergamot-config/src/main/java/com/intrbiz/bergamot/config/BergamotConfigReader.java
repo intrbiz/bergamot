@@ -13,8 +13,8 @@ import java.util.TreeMap;
 import javax.xml.bind.JAXBException;
 
 import com.intrbiz.bergamot.config.model.BergamotCfg;
-import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 
 public class BergamotConfigReader
 {

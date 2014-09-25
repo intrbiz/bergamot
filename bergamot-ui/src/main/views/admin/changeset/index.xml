@@ -8,6 +8,24 @@
     	<p class="text-body">
     		A change set contain a number of configuration changes.  This allows for configuration changes to be made transactionally.
     	</p>
+    	<table>
+    		<tr>
+    			<th>Summary</th>
+    			<th>Created</th>
+    			<th>State</th>
+    			<th></th>
+    		</tr>
+    		<data-set var="changeset" value="#{changesets}">
+    			<tr>
+    				<td>#{changeset.summary}</td>
+    				<td></td>
+    				<td>Pending</td>
+    				<td>
+    					<a href="/admin/changeset/apply/id/#{changeset.id}">Apply Change Set</a>
+    				</td>
+    			</tr>
+    		</data-set>
+    	</table>
     </div>
     
     <div clas="row">
@@ -18,7 +36,7 @@
     	<form method="post" action="#{path('/admin/changeset/create')}">
     		<div class="col12">
 				<p class="field">
-					<label for="name">Change Summary</label>
+					<label for="summary">Change Summary</label>
 					<input type="text" name="summary" id="summary" placeholder="Adding new web server" value=""/>
 				</p>
 				<p class="field area">

@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
 import com.intrbiz.bergamot.config.BergamotConfigReader;
 import com.intrbiz.bergamot.config.UICfg;
-import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotConfigImporter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.data.DataManager;

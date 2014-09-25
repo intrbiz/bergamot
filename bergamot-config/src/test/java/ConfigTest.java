@@ -2,8 +2,8 @@ import java.io.File;
 
 import com.intrbiz.bergamot.config.BergamotConfigReader;
 import com.intrbiz.bergamot.config.BergamotConfigWriter;
-import com.intrbiz.bergamot.config.model.BergamotCfg.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.config.model.HostCfg;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 
 
 public class ConfigTest
