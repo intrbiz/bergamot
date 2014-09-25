@@ -6,6 +6,10 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
+import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
+import com.intrbiz.bergamot.config.validator.BergamotConfigResolver;
+import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
@@ -31,6 +35,7 @@ import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.Cache;
 import com.intrbiz.data.cache.CacheInvalidate;
@@ -195,9 +200,22 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLGetter(table = Config.class, name = "get_config_by_name", since = @SQLVersion({1, 0, 0}))
     public abstract Config getConfigByName(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
     
-    public ConfigResolver getConfigResolver(UUID siteId)
+    public BergamotObjectLocator getObjectLocator(final UUID siteId)
     {
-        return new ConfigResolver(this, siteId);
+        return new BergamotObjectLocator()
+        {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
+            {
+                return (T) Util.nullable(BergamotDB.this.getConfigByName(siteId, Configuration.getRootElement(type), name), Config::getConfiguration);
+            }
+        };
+    }
+    
+    public BergamotConfigResolver getConfigResolver(final UUID siteId)
+    {
+        return new BergamotConfigResolver(this.getObjectLocator(siteId));
     }
     
     // time period

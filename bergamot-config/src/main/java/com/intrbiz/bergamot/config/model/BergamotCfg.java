@@ -1,41 +1,36 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.config.validator.BergamotCfgValidator;
+import com.intrbiz.bergamot.config.validator.BergamotConfigValidator;
+import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "bergamot")
 @XmlRootElement(name = "bergamot")
-public class BergamotCfg extends Configuration
+public class BergamotCfg extends Configuration implements BergamotObjectLocator
 {
     private static final long serialVersionUID = 1L;
-    
-    public static final Class<?>[] OBJECT_TYPES = {
-        TeamCfg.class,
-        ContactCfg.class,
-        TimePeriodCfg.class,
-        LocationCfg.class,
-        GroupCfg.class,
-        CommandCfg.class,
-        ServiceCfg.class,
-        TrapCfg.class,
-        HostCfg.class,
-        ResourceCfg.class,
-        ClusterCfg.class
-    };
-    
+
+    public static final Class<?>[] OBJECT_TYPES = { TeamCfg.class, ContactCfg.class, TimePeriodCfg.class, LocationCfg.class, GroupCfg.class, CommandCfg.class, ServiceCfg.class, TrapCfg.class, HostCfg.class, ResourceCfg.class, ClusterCfg.class };
+
     private String site = "default";
+
+    private String summary;
+
+    private String description;
 
     private List<TeamCfg> teams = new LinkedList<TeamCfg>();
 
@@ -65,7 +60,7 @@ public class BergamotCfg extends Configuration
     {
         super();
     }
-    
+
     public BergamotCfg(String site, TemplatedObjectCfg<?>... objects)
     {
         super();
@@ -74,6 +69,28 @@ public class BergamotCfg extends Configuration
         {
             this.addObject(object);
         }
+    }
+
+    @XmlElement(name = "summary")
+    public String getSummary()
+    {
+        return summary;
+    }
+
+    public void setSummary(String summary)
+    {
+        this.summary = summary;
+    }
+
+    @XmlElement(name = "summary")
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     @XmlElementRef(type = TeamCfg.class)
@@ -221,8 +238,20 @@ public class BergamotCfg extends Configuration
         this.traps.addAll(other.getTraps());
         this.resources.addAll(other.getResources());
         this.clusters.addAll(other.getClusters());
+        // update the index
+        this.index(true);
     }
-    
+
+    public void addObjects(Collection<TemplatedObjectCfg<?>> objects)
+    {
+        for (TemplatedObjectCfg<?> object : objects)
+        {
+            this.addObject(object);
+        }
+        // update the index
+        this.index(true);
+    }
+
     public void addObject(TemplatedObjectCfg<?> object)
     {
         if (object instanceof ClusterCfg)
@@ -269,6 +298,8 @@ public class BergamotCfg extends Configuration
         {
             this.traps.add((TrapCfg) object);
         }
+        // update the index
+        this.index(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -277,16 +308,19 @@ public class BergamotCfg extends Configuration
         return new List[] { this.clusters, this.commands, this.contacts, this.groups, this.hosts, this.locations, this.resources, this.services, this.teams, this.timePeriods, this.traps };
     }
 
-    public void index()
+    public void index(boolean force)
     {
-        this.index.clear();
-        for (List<? extends TemplatedObjectCfg<?>> objects : this.getAllObjects())
+        if (force || this.index.isEmpty())
         {
-            for (TemplatedObjectCfg<?> object : objects)
+            this.index.clear();
+            for (List<? extends TemplatedObjectCfg<?>> objects : this.getAllObjects())
             {
-                if (!Util.isEmpty(object.getName()))
+                for (TemplatedObjectCfg<?> object : objects)
                 {
-                    this.index.put(object.getClass().getSimpleName() + "::" + object.getName(), object);
+                    if (!Util.isEmpty(object.getName()))
+                    {
+                        this.index.put(object.getClass().getSimpleName() + "::" + object.getName(), object);
+                    }
                 }
             }
         }
@@ -295,15 +329,15 @@ public class BergamotCfg extends Configuration
     @SuppressWarnings("unchecked")
     public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
     {
+        this.index(false);
         return (T) this.index.get(type.getSimpleName() + "::" + name);
     }
-    
+
     /**
-     * Validate this Bergamot configuration.  Note: you must validate 
-     * a the configuration before using it.
+     * Validate this Bergamot configuration. Note: you must validate a the configuration before using it.
      */
     public ValidatedBergamotConfiguration validate()
     {
-        return new BergamotCfgValidator(this).validate();
+        return new BergamotConfigValidator(this).validate();
     }
 }

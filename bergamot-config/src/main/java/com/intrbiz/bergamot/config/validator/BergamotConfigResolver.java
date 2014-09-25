@@ -1,20 +1,38 @@
-package com.intrbiz.bergamot.data;
+package com.intrbiz.bergamot.config.validator;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 
-public abstract class AbstractConfigResolver
+public class BergamotConfigResolver
 {   
-    private Logger logger = Logger.getLogger(AbstractConfigResolver.class);
+    private Logger logger = Logger.getLogger(BergamotConfigResolver.class);
+    
+    protected final BergamotObjectLocator locator;
+    
+    public BergamotConfigResolver(BergamotObjectLocator locator)
+    {
+        super();
+        this.locator = locator;
+    }
+    
+    public BergamotObjectLocator getLocator()
+    {
+        return this.locator;
+    }
+    
+    public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
+    {
+        return this.locator.lookup(type, name);
+    }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends TemplatedObjectCfg<T>> T resolveInherit(T object)
     {
         for (String inheritsFrom : object.getInheritedTemplates())
         {
-            TemplatedObjectCfg<?> superObject = lookup(object.getClass(), inheritsFrom);
+            TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
             if (superObject != null)
             {
                 ((TemplatedObjectCfg) object).addInheritedObject(superObject);
@@ -36,7 +54,7 @@ public abstract class AbstractConfigResolver
     {
         for (String exclude : object.getExcludes())
         {
-            TimePeriodCfg excludedTimePeriod = lookup(TimePeriodCfg.class, exclude);
+            TimePeriodCfg excludedTimePeriod = this.lookup(TimePeriodCfg.class, exclude);
             if (excludedTimePeriod == null)
             {
                 // error
@@ -45,6 +63,4 @@ public abstract class AbstractConfigResolver
         }
         return object;
     }
-    
-    public abstract <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name);
 }

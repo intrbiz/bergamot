@@ -19,12 +19,19 @@ import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 
-public class BergamotCfgValidator
+public class BergamotConfigValidator extends BergamotConfigResolver
 {
     private final BergamotCfg cfg;
     
-    public  BergamotCfgValidator(BergamotCfg cfg)
+    public  BergamotConfigValidator(BergamotCfg cfg)
     {
+        super(cfg);
+        this.cfg = cfg;
+    }
+    
+    public  BergamotConfigValidator(BergamotCfg cfg, BergamotObjectLocator... locators)
+    {
+        super(BergamotObjectLocator.from(cfg, locators));
         this.cfg = cfg;
     }
     
@@ -338,11 +345,5 @@ public class BergamotCfgValidator
             report.logError("Cannot find the command '" + name + "' referenced by " + user);
         }
     }
-    
-    // lookup
-    
-    public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
-    {
-        return this.cfg.lookup(type, name);
-    }
+
 }
