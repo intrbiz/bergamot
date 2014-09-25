@@ -81,7 +81,7 @@ public class NagiosConfigConverter
         // hosts
         this.convertHosts();
         // link
-        this.config.index();
+        this.config.index(true);
         this.linkContacts();
         this.linkServices();
         this.linkHostgroups();

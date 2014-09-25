@@ -41,10 +41,10 @@
 		</data-set>
 		<!--  -->
 		<p rendered="#{report.isValid()}">
-			Are you sure you wish to apply this change?
+			<a href="/admin/changeset/apply/id/#{changeset.id}">Apply these changes</a>
 		</p>
 		<p rendered="#{! report.isValid()}">
-			Edit this change?
+			<a href="/admin/changeset/current">Edit these changes</a>
 		</p>
     </div>
 </fragment>

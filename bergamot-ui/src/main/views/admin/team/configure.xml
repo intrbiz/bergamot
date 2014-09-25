@@ -11,7 +11,7 @@
    		<pre>#{team.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/changeset/add/team/id/#{team.id}" class="add">Edit this team</a>
-    	<a href="/admin/changeset/remove/team/id/#{team.id}" class="remove">Remove this team</a>
+    	<a href="/admin/configchange/add/team/id/#{team.id}" class="add">Edit this team</a>
+    	<a href="/admin/configchange/remove/team/id/#{team.id}" class="remove">Remove this team</a>
     </div>
 </fragment>

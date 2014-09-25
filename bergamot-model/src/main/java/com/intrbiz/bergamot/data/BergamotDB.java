@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.Config;
+import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.Group;
@@ -80,7 +81,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
             Config.class,
             Comment.class,
             Downtime.class,
-            APIToken.class
+            APIToken.class,
+            ConfigChange.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -217,6 +219,26 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new BergamotConfigResolver(this.getObjectLocator(siteId));
     }
+    
+    @SQLSetter(table = ConfigChange.class, name = "set_config_change", since = @SQLVersion({1, 0, 0}))
+    public abstract void setConfigChange(ConfigChange change);
+    
+    @SQLGetter(table = ConfigChange.class, name = "get_config_change", since = @SQLVersion({1, 0, 0}))
+    public abstract ConfigChange getConfigChange(@SQLParam("id") UUID id);
+    
+    @SQLRemove(table = ConfigChange.class, name = "remove_config_change", since = @SQLVersion({1, 0, 0}))
+    public abstract void removeConfigChange(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = ConfigChange.class, name = "list_config_changes", since = @SQLVersion({1, 0, 0}), 
+            orderBy = { @SQLOrder(value = "applied", direction = Direction.DESC), @SQLOrder(value = "updated", direction = Direction.DESC) }
+    )
+    public abstract List<ConfigChange> listConfigChanges(@SQLParam("site_id") UUID siteId);
+    
+    @SQLGetter(table = ConfigChange.class, name = "list_config_changes", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.config_change WHERE site_id = p_site_id AND applied = FALSE"),
+            orderBy = @SQLOrder(value = "updated", direction = Direction.DESC)
+    )
+    public abstract List<ConfigChange> getPendingConfigChanges(@SQLParam("site_id") UUID siteId);
     
     // time period
     

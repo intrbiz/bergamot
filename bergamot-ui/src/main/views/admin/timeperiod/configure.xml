@@ -12,7 +12,7 @@
    		<pre>#{timeperiod.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/changeset/add/timeperiod/id/#{timeperiod.id}" class="add">Edit this time period</a>
-    	<a href="/admin/changeset/remove/timeperiod/id/#{timeperiod.id}" class="remove">Remove this time period</a>
+    	<a href="/admin/configchange/add/timeperiod/id/#{timeperiod.id}" class="add">Edit this time period</a>
+    	<a href="/admin/configchange/remove/timeperiod/id/#{timeperiod.id}" class="remove">Remove this time period</a>
     </div>
 </fragment>

@@ -11,7 +11,7 @@
    		<pre>#{group.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/changeset/add/group/id/#{group.id}" class="add">Edit this group</a>
-    	<a href="/admin/changeset/remove/group/id/#{group.id}" class="remove">Remove this group</a>
+    	<a href="/admin/configchange/add/group/id/#{group.id}" class="add">Edit this group</a>
+    	<a href="/admin/configchange/remove/group/id/#{group.id}" class="remove">Remove this group</a>
     </div>
 </fragment>

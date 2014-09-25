@@ -12,7 +12,7 @@
    		<pre>#{contact.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/changeset/add/contact/id/#{contact.id}" class="add">Edit this contact</a>
-    	<a href="/admin/changeset/remove/contact/id/#{contact.id}" class="remove">Remove this contact</a>
+    	<a href="/admin/configchange/add/contact/id/#{contact.id}" class="add">Edit this contact</a>
+    	<a href="/admin/configchange/remove/contact/id/#{contact.id}" class="remove">Remove this contact</a>
     </div>
 </fragment>

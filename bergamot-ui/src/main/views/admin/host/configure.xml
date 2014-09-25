@@ -11,7 +11,7 @@
    		<pre>#{host.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/changeset/add/host/id/#{host.id}" class="add">Edit this host</a>
-    	<a href="/admin/changeset/remove/host/id/#{host.id}" class="remove">Remove this host</a>
+    	<a href="/admin/configchange/add/host/id/#{host.id}" class="add">Edit this host</a>
+    	<a href="/admin/configchange/remove/host/id/#{host.id}" class="remove">Remove this host</a>
     </div>
 </fragment>

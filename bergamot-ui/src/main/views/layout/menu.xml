@@ -54,7 +54,7 @@
                     <a href="/admin/host/">Hosts</a>
                 </li>
                 <li>
-                    <a href="/admin/changeset/">Change Sets</a>
+                    <a href="/admin/configchange/">Configuration Changes</a>
                 </li>
             </ul>
         </div>

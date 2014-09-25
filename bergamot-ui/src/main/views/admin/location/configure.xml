@@ -11,7 +11,7 @@
    		<pre>#{location.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/changeset/add/location/id/#{location.id}" class="add">Edit this location</a>
-    	<a href="/admin/changeset/remove/location/id/#{location.id}" class="remove">Remove this location</a>
+    	<a href="/admin/configchange/add/location/id/#{location.id}" class="add">Edit this location</a>
+    	<a href="/admin/configchange/remove/location/id/#{location.id}" class="remove">Remove this location</a>
     </div>
 </fragment>

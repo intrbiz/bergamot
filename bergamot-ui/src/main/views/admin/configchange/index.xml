@@ -12,16 +12,20 @@
     		<tr>
     			<th>Summary</th>
     			<th>Created</th>
-    			<th>State</th>
+    			<th>Pending</th>
+    			<th></th>
     			<th></th>
     		</tr>
-    		<data-set var="changeset" value="#{changesets}">
+    		<data-set var="change" value="#{changes}">
     			<tr>
-    				<td>#{changeset.summary}</td>
-    				<td></td>
-    				<td>Pending</td>
+    				<td>#{change.summary}</td>
+    				<td>#{dateformat('EEEE dd/MM/yyyy', change.created)}</td>
+    				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
     				<td>
-    					<a href="/admin/changeset/apply/id/#{changeset.id}">Apply Change Set</a>
+    					<a href="/admin/configchange/edit/id/#{change.id}">Edit Change</a>
+    				</td>
+    				<td>
+    					<a href="/admin/configchange/validate/id/#{change.id}">Apply Change</a>
     				</td>
     			</tr>
     		</data-set>
@@ -29,11 +33,8 @@
     </div>
     
     <div clas="row">
-    	<h3>Create Change Set</h3>
-    	<p class="text-body">
-    		Create a new change set containing the configuration changes to make.
-    	</p>
-    	<form method="post" action="#{path('/admin/changeset/create')}">
+    	<h3>Create Change</h3>
+    	<form method="post" action="#{path('/admin/configchange/create')}">
     		<div class="col12">
 				<p class="field">
 					<label for="summary">Change Summary</label>
@@ -45,7 +46,7 @@
 				</p>
 			</div>
 			<div class="col12">
-				<input type="submit" name="create" id="create" value="Create Change Set"/>
+				<input type="submit" name="create" id="create" value="Create Change"/>
 			</div>
 		</form>
     </div>

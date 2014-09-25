@@ -11,7 +11,7 @@
    		<pre>#{command.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/changeset/add/command/id/#{command.id}" class="add">Edit this command</a>
-    	<a href="/admin/changeset/remove/command/id/#{command.id}" class="remove">Remove this command</a>
+    	<a href="/admin/configchange/add/command/id/#{command.id}" class="add">Edit this command</a>
+    	<a href="/admin/configchange/remove/command/id/#{command.id}" class="remove">Remove this command</a>
     </div>
 </fragment>
