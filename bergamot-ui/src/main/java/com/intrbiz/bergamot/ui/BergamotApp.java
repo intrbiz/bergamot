@@ -184,14 +184,18 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         {
             System.out.println("Database: " + db.getName() + " " + db.getVersion());
         }
-        // start the cluster manager
-        this.clusterManager.start(this.getInstanceName());
-        // register sites with the cluster manager
-        try (BergamotDB db = BergamotDB.connect())
+        // don't bother starting scheduler etc on ui only nodes
+        if (!Boolean.getBoolean("bergamot.ui.only"))
         {
-            for (Site site : db.listSites())
+            // start the cluster manager
+            this.clusterManager.start(this.getInstanceName());
+            // register sites with the cluster manager
+            try (BergamotDB db = BergamotDB.connect())
             {
-                this.clusterManager.registerSite(site);
+                for (Site site : db.listSites())
+                {
+                    this.clusterManager.registerSite(site);
+                }
             }
         }
         // start the update websocket server
