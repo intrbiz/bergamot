@@ -2,11 +2,16 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa" title="Change #{change.summary}">
     <div class="row">
-    	<form id="changes" method="post" action="#{path('/admin/configchange/save/id/' + change.id)}">
+    	<form id="changes" method="post" action="#{path('/admin/configchange/edit/id/' + change.id)}">
 			<div class="col12">
 				<p class="field area">
 					<label for="change_configuration">Configuration</label>
-					<textarea name="change_configuration" id="change_configuration" style="height: 600px; width: 1700px;">#{change.configuration.toString()}</textarea>
+					<textarea name="change_configuration" id="change_configuration" style="height: 600px; width: 1700px;">#{if(error == null, change.configuration.toString(), bad_configuration)}</textarea>
+					<div class="error" rendered="#{error != null}">
+						<p>An error was detected in the above configuration:</p>
+						<p>#{error}</p>
+						<p>Please correct this error and save your change again.</p>
+					</div>
 				</p>
 			</div>
 	   		<div class="col12">

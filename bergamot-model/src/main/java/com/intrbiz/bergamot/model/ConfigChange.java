@@ -39,12 +39,12 @@ public class ConfigChange implements Serializable
     
     @SQLColumn(index = 5, name = "created", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
-
-    @SQLColumn(index = 6, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
-    protected Timestamp updated = new Timestamp(System.currentTimeMillis());
     
-    @SQLColumn(index = 7, name = "applied", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "applied", since = @SQLVersion({ 1, 0, 0 }))
     protected boolean applied = false;
+
+    @SQLColumn(index = 7, name = "applied_at", since = @SQLVersion({ 1, 0, 0 }))
+    protected Timestamp appliedAt;
 
     @SQLColumn(index = 8, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected Configuration configuration;
@@ -64,8 +64,9 @@ public class ConfigChange implements Serializable
             this.summary = configuration.getSummary();
             this.description = configuration.getDescription();
         }
-        this.updated = this.created = new Timestamp(System.currentTimeMillis());
+        this.created = new Timestamp(System.currentTimeMillis());
         this.applied = false;
+        this.appliedAt = null;
         this.configuration = configuration;
     }
 
@@ -129,16 +130,6 @@ public class ConfigChange implements Serializable
         this.created = created;
     }
 
-    public Timestamp getUpdated()
-    {
-        return updated;
-    }
-
-    public void setUpdated(Timestamp updated)
-    {
-        this.updated = updated;
-    }
-
     public boolean isApplied()
     {
         return applied;
@@ -147,5 +138,15 @@ public class ConfigChange implements Serializable
     public void setApplied(boolean applied)
     {
         this.applied = applied;
+    }
+
+    public Timestamp getAppliedAt()
+    {
+        return appliedAt;
+    }
+
+    public void setAppliedAt(Timestamp appliedAt)
+    {
+        this.appliedAt = appliedAt;
     }
 }

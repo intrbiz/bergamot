@@ -10,8 +10,9 @@ import com.intrbiz.bergamot.BergamotCLIException;
 import com.intrbiz.bergamot.config.BergamotConfigReader;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
-import com.intrbiz.bergamot.data.BergamotConfigImporter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.importer.BergamotConfigImporter;
+import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.util.pool.database.DatabasePool;
 
@@ -79,7 +80,8 @@ public class DBImportConfigCommand extends BergamotCLICommand
         for (ValidatedBergamotConfiguration bcfg : bcfgs)
         {
             System.out.println("Importing configuration for " + bcfg.getConfig().getSite());
-            new BergamotConfigImporter(bcfg.getConfig()).resetState(true).importConfiguration();
+            BergamotImportReport report = new BergamotConfigImporter(bcfg).resetState(true).importConfiguration();
+            System.out.println(report.toString());
             System.out.println("Import committed for: " + bcfg.getConfig().getSite());
         }
         // all ok

@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.config.BergamotConfigReader;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
-import com.intrbiz.bergamot.data.BergamotConfigImporter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.util.compiler.CompilerTool;
@@ -32,7 +32,7 @@ public class TestDB
         {
             System.out.println("Importing configuration for " + config.getConfig().getSite());
             // load
-            new BergamotConfigImporter(config.getConfig()).resetState(true).importConfiguration();
+            new BergamotConfigImporter(config).resetState(true).importConfiguration();
         }
         //
         try (BergamotDB db = BergamotDB.connect())

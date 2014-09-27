@@ -1,19 +1,32 @@
 package com.intrbiz.bergamot.ui.router.admin;
 
+import static com.intrbiz.Util.*;
+
 import java.io.IOException;
+import java.io.StringReader;
+import java.sql.Timestamp;
 import java.util.UUID;
+
+import javax.xml.bind.JAXBException;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.importer.BergamotConfigImporter;
+import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
+import com.intrbiz.metadata.Catch;
+import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Param;
+import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -48,7 +61,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         redirect(path("/admin/configchange/edit/id/" + change.getId()));
     }
     
-    @Any("/edit/id/:id")
+    @Get("/edit/id/:id")
     @WithDataAdapter(BergamotDB.class)
     public void edit(BergamotDB db, @AsUUID UUID id)
     {
@@ -57,11 +70,11 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         encode("admin/configchange/edit");
     }
     
-    @Any("/save/id/:id")
+    @Post("/edit/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void save(BergamotDB db, @AsUUID UUID id, @Param("change_configuration") String configuration) throws IOException
+    public void save(BergamotDB db, @AsUUID UUID id, @Param("change_configuration") String configuration) throws IOException, JAXBException
     {
-        BergamotCfg cfg = BergamotCfg.fromString(BergamotCfg.class, configuration);
+        BergamotCfg cfg = Configuration.read(BergamotCfg.class, new StringReader(configuration));
         // update
         ConfigChange change = db.getConfigChange(id);
         change.setConfiguration(cfg);
@@ -84,5 +97,56 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         db.setConfigChange(change);
         // edit
         redirect(path("/admin/configchange/edit/id/" + change.getId()));
+    }
+    
+    @Catch(JAXBException.class)
+    @Post("/edit/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void saveError(BergamotDB db, @AsUUID UUID id, @Param("change_configuration") String configuration)
+    {
+        JAXBException error = (JAXBException) balsa().getException();
+        Throwable linked = error.getLinkedException();
+        // the change
+        var("change", db.getConfigChange(id));
+        var("error", coalesceEmpty(error.getMessage(), nullable(linked, Throwable::getMessage), "Error parsing XML"));
+        var("bad_configuration", configuration);
+        // edit configuration
+        encode("admin/configchange/edit");
+    }
+    
+    @Any("/validate/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void validate(BergamotDB db, @SessionVar("site") Site site, @AsUUID UUID id)
+    {
+        ConfigChange change = var("change", db.getConfigChange(id));
+        //
+        BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
+        ValidatedBergamotConfiguration validated = cfg.validate(db.getObjectLocator(site.getId()));
+        //
+        var("change", change);
+        var("report", validated.getReport());
+        //
+        encode("admin/configchange/validate");
+    }
+    
+    @Any("/apply/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void apply(BergamotDB db, @SessionVar("site") Site site, @AsUUID UUID id)
+    {
+        ConfigChange change = var("change", db.getConfigChange(id));
+        //
+        BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
+        ValidatedBergamotConfiguration validated = cfg.validate(db.getObjectLocator(site.getId()));
+        // import
+        BergamotImportReport report = new BergamotConfigImporter(validated).resetState(false).importConfiguration();
+        // update the db
+        change.setApplied(true);
+        change.setAppliedAt(new Timestamp(System.currentTimeMillis()));
+        db.setConfigChange(change);
+        //
+        var("change", change);
+        var("report", report);
+        //
+        encode("admin/configchange/apply");
     }
 }

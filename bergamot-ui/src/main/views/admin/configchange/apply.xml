@@ -1,9 +1,9 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
-<fragment xmlns="com.intrbiz.balsa" title="Apply change set #{changeset.summary}">
+<fragment xmlns="com.intrbiz.balsa" title="Applied change #{change.summary}">
     <div class="row">
-		<h3>Ready to apply change set #{changeset.summary}</h3>
-		<p class="text-body">#{changeset.description}</p>
-		<h3>Change Applied Successfully</h3>
+		<h3>Applied change #{change.summary} #{if(report.successful, 'successfully', 'unsuccessfully')}</h3>
+		<p class="text-body">#{change.description}</p>
+		<pre>#{report.toString()}</pre>
     </div>
 </fragment>

@@ -1,10 +1,8 @@
-package com.intrbiz.bergamot.data;
+package com.intrbiz.bergamot.importer;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
@@ -28,6 +26,8 @@ import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.config.model.VirtualCheckCfg;
+import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
@@ -56,8 +56,8 @@ import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParser;
 import com.intrbiz.data.DataException;
 
 public class BergamotConfigImporter
-{
-    private Logger logger = Logger.getLogger(BergamotConfigImporter.class);
+{    
+    private BergamotImportReport  report;
     
     private Site site;
     
@@ -65,9 +65,10 @@ public class BergamotConfigImporter
     
     private boolean resetState = false;
     
-    public BergamotConfigImporter(BergamotCfg config)
+    public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
-        this.config = config;
+        if (! validated.getReport().isValid()) throw new RuntimeException("Cannot import invalid configuration");
+        this.config = validated.getConfig();
     }
     
     public BergamotConfigImporter resetState(boolean resetState)
@@ -76,33 +77,38 @@ public class BergamotConfigImporter
         return this;
     }
     
-    public void importConfiguration()
-    {   
-        try (BergamotDB db = BergamotDB.connect())
+    public BergamotImportReport importConfiguration()
+    {
+        if (this.report == null)
         {
-            db.execute(()->{
-                // setup the site
-                this.loadSite(db);
-                // load the commands
-                this.loadCommands(db);
-                // time periods
-                this.loadTimePeriods(db);
-                // teams
-                this.loadTeams(db);
-                // contacts
-                this.loadContacts(db);
-                // load the locations
-                this.loadLocations(db);
-                // groups
-                this.loadGroups(db);
-                // hosts
-                this.loadHosts(db);
-                // clusters
-                this.loadClusters(db);
-                // templates
-                this.loadTemplates(db);
-            });
+            this.report = new BergamotImportReport(this.config.getSite());
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                db.execute(()->{
+                    // setup the site
+                    this.loadSite(db);
+                    // load the commands
+                    this.loadCommands(db);
+                    // time periods
+                    this.loadTimePeriods(db);
+                    // teams
+                    this.loadTeams(db);
+                    // contacts
+                    this.loadContacts(db);
+                    // load the locations
+                    this.loadLocations(db);
+                    // groups
+                    this.loadGroups(db);
+                    // hosts
+                    this.loadHosts(db);
+                    // clusters
+                    this.loadClusters(db);
+                    // templates
+                    this.loadTemplates(db);
+                });
+            }
         }
+        return this.report;
     }
     
     private void loadTemplates(BergamotDB db)
@@ -139,7 +145,7 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                logger.info("Loading command " + cfg.resolve().getName());
+                this.report.info("Loading command " + cfg.resolve().getName());
                 // load
                 Command command = db.getCommandByName(this.site.getId(), cfg.getName());
                 if(command == null)
@@ -165,7 +171,7 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                logger.info("Loading location " + cfg.resolve().getName());
+                this.report.info("Loading location " + cfg.resolve().getName());
                 // load
                 Location location = db.getLocationByName(this.site.getId(), cfg.getName());
                 if (location == null)
@@ -195,7 +201,7 @@ public class BergamotConfigImporter
                         Location p = db.getLocationByName(this.site.getId(), pn);
                         if (p != null)
                         {
-                            logger.info("Adding location " + l.getName() + " to location " + p.getName());
+                            this.report.info("Adding location " + l.getName() + " to location " + p.getName());
                             db.addLocationChild(p, l);
                         }
                     }
@@ -211,7 +217,7 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                logger.info("Loading group " + cfg.resolve().getName());
+                this.report.info("Loading group " + cfg.resolve().getName());
                 // load
                 Group group = db.getGroupByName(this.site.getId(), cfg.getName());
                 if (group == null)
@@ -240,7 +246,7 @@ public class BergamotConfigImporter
                         Group parent = db.getGroupByName(this.site.getId(), parentName);
                         if (parent != null)
                         {
-                            logger.info("Adding group " + child.getName() + " to group " + parent.getName());
+                            this.report.info("Adding group " + child.getName() + " to group " + parent.getName());
                             db.addGroupChild(parent, child);
                         }
                     }
@@ -255,7 +261,7 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                logger.info("Loading time period " + cfg.resolve().getName());
+                this.report.info("Loading time period " + cfg.resolve().getName());
                 // load
                 TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), cfg.getName());
                 if (timePeriod == null)
@@ -284,7 +290,7 @@ public class BergamotConfigImporter
                         TimePeriod excluded = db.getTimePeriodByName(this.site.getId(), excludeName);
                         if (excluded != null)
                         {
-                            logger.info("Adding exclude time period " + excluded.getName() + " to time period " + timePeriod.getName());
+                            this.report.info("Adding exclude time period " + excluded.getName() + " to time period " + timePeriod.getName());
                             db.addTimePeriodExclude(timePeriod, excluded);
                         }
                     }
@@ -299,7 +305,7 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                logger.info("Loading team " + cfg.resolve().getName());
+                this.report.info("Loading team " + cfg.resolve().getName());
                 // load
                 Team team = db.getTeamByName(this.site.getId(), cfg.getName());
                 if (team == null)
@@ -328,7 +334,7 @@ public class BergamotConfigImporter
                         Team parent = db.getTeamByName(this.site.getId(), parentName);
                         if (parent != null)
                         {
-                            logger.info("Adding team " + child.getName() + " to team " + parent.getName());
+                            this.report.info("Adding team " + child.getName() + " to team " + parent.getName());
                             db.addTeamChild(parent, child);
                         }
                     }
@@ -344,7 +350,7 @@ public class BergamotConfigImporter
             if (! cfg.getTemplateBooleanValue())
             {
                 ContactCfg rcfg = cfg.resolve();
-                logger.info("Loading contact " + rcfg.getName());
+                this.report.info("Loading contact " + rcfg.getName());
                 // load
                 Contact contact = db.getContactByName(this.site.getId(), rcfg.getName());
                 if (contact == null)
@@ -369,7 +375,7 @@ public class BergamotConfigImporter
                     Team team = db.getTeamByName(this.site.getId(), teamName);
                     if (team != null)
                     {
-                        logger.info("Adding contact " + contact.getName() + " to team " + team.getName());
+                        this.report.info("Adding contact " + contact.getName() + " to team " + team.getName());
                         team.addContact(contact);
                     }
                 }
@@ -429,7 +435,7 @@ public class BergamotConfigImporter
             {
                 // resolved config
                 HostCfg rcfg = cfg.resolve();
-                logger.info("Loading host " + rcfg.getName());
+                this.report.info("Loading host " + rcfg.getName());
                 // load
                 Host host = db.getHostByName(this.site.getId(), rcfg.getName());
                 if (host == null)
@@ -512,7 +518,7 @@ public class BergamotConfigImporter
                 checkCommand.configure(rcfg.getCheckCommand());
                 checkCommand.setCommandId(command.getId());
                 db.setCheckCommand(checkCommand);
-                logger.info("Added command " + command.getName() + " to check " + check.getName());
+                this.report.info("Added command " + command.getName() + " to check " + check.getName());
             }
             else
             {
@@ -555,7 +561,7 @@ public class BergamotConfigImporter
             Group group = db.getGroupByName(this.site.getId(), groupName);
             if (group != null)
             {
-                logger.info("Adding check " + check.getName() + " to group " + group.getName());
+                this.report.info("Adding check " + check.getName() + " to group " + group.getName());
                 check.getGroupIds().add(group.getId());
             }
         }
@@ -565,7 +571,7 @@ public class BergamotConfigImporter
     {
         // resolve
         ServiceCfg rcfg = cfg.resolve();
-        logger.info("Adding service " + rcfg.getName() + " to host " + host.getName());
+        this.report.info("Adding service " + rcfg.getName() + " to host " + host.getName());
         // create the service
         Service service = db.getServiceOnHost(host.getId(), rcfg.getName());
         if (service == null)
@@ -591,7 +597,7 @@ public class BergamotConfigImporter
     {
         // resolve
         TrapCfg rcfg = cfg.resolve();
-        logger.info("Adding trap " + rcfg.getName() + " to host " + host.getName());
+        this.report.info("Adding trap " + rcfg.getName() + " to host " + host.getName());
         // create the service
         Trap trap = db.getTrapOnHost(host.getId(), cfg.getName());
         if (trap == null)
@@ -626,7 +632,7 @@ public class BergamotConfigImporter
             if (cond != null)
             {
                 check.setCondition(cond);
-                logger.info("Using virtual check condition " + cond.toString() + " for " + check);
+                this.report.info("Using virtual check condition " + cond.toString() + " for " + check);
                 // cross reference the checks
                 check.setReferenceIds(cond.computeDependencies().stream().map(Check::getId).collect(Collectors.toList()));
             }
@@ -641,7 +647,7 @@ public class BergamotConfigImporter
             {
                 // resolved config
                 ClusterCfg rcfg = cfg.resolve();
-                logger.info("Loading cluster " + rcfg.getName());
+                this.report.info("Loading cluster " + rcfg.getName());
                 // load
                 Cluster cluster = db.getClusterByName(this.site.getId(), cfg.getName());
                 if (cluster == null)
@@ -671,7 +677,7 @@ public class BergamotConfigImporter
     {
         // resolve
         ResourceCfg rcfg = cfg.resolve();
-        logger.info("Adding resource " + rcfg.getName() + " to cluster " + cluster.getName());
+        this.report.info("Adding resource " + rcfg.getName() + " to cluster " + cluster.getName());
         // create the service
         Resource resource = db.getResourceOnCluster(cluster.getId(), rcfg.getName());
         if (resource == null)

@@ -14,8 +14,9 @@ import com.intrbiz.bergamot.config.BergamotConfigReader;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
-import com.intrbiz.bergamot.data.BergamotConfigImporter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.importer.BergamotConfigImporter;
+import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.util.pool.database.DatabasePool;
@@ -128,7 +129,8 @@ public class CreateSiteCommand extends BergamotCLICommand
         // now import the site config
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)
         {
-            new BergamotConfigImporter(vbcfg.getConfig()).resetState(true).importConfiguration();
+            BergamotImportReport report = new BergamotConfigImporter(vbcfg).resetState(true).importConfiguration();
+            System.out.println(report.toString());
         }
         // all done
         System.out.println("Created the site '" + siteName + "' and imported the default configuration, have fun :)");

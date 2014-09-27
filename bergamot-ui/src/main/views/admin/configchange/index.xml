@@ -13,6 +13,7 @@
     			<th>Summary</th>
     			<th>Created</th>
     			<th>Pending</th>
+    			<th>Applied At</th>
     			<th></th>
     			<th></th>
     		</tr>
@@ -21,11 +22,12 @@
     				<td>#{change.summary}</td>
     				<td>#{dateformat('EEEE dd/MM/yyyy', change.created)}</td>
     				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
+    				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt), '')}</td>
     				<td>
-    					<a href="/admin/configchange/edit/id/#{change.id}">Edit Change</a>
+    					<a href="/admin/configchange/edit/id/#{change.id}" rendered="#{! change.applied}">Edit Change</a>
     				</td>
     				<td>
-    					<a href="/admin/configchange/validate/id/#{change.id}">Apply Change</a>
+    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{! change.applied}">Apply Change</a>
     				</td>
     			</tr>
     		</data-set>

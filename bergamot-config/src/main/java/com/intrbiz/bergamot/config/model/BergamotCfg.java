@@ -348,4 +348,9 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
     {
         return new BergamotConfigValidator(this).validate();
     }
+    
+    public ValidatedBergamotConfiguration validate(BergamotObjectLocator... additionalLocators)
+    {
+        return new BergamotConfigValidator(this, additionalLocators).validate();
+    }
 }
