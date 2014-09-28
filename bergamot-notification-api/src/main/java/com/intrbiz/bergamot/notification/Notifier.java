@@ -15,5 +15,7 @@ public interface Notifier extends Configurable<NotifierCfg>
     
     UUID getSite();
     
+    long getSleepTime();
+    
     void sendNotification(Notification notification);
 }

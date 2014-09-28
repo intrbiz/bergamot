@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -27,6 +28,8 @@ public abstract class AbstractNotifier implements Notifier
     protected NotifierCfg configuration;
     
     protected UUID site = null;
+    
+    protected long sleepTime = 0;
 
     public AbstractNotifier()
     {
@@ -51,6 +54,8 @@ public abstract class AbstractNotifier implements Notifier
     protected void configure() throws Exception
     {
         this.site = this.configuration.getSite();
+        this.sleepTime = this.configuration.getSleepTime() <= 0 ? 0 : TimeUnit.SECONDS.toMillis(this.configuration.getSleepTime());
+        logger.info("Using " + this.configuration.getThreads() + " thread with sleep time of " + this.sleepTime);
         // load the notification engines
         for (NotificationEngineCfg engineCfg : this.configuration.getEngines())
         {
@@ -65,6 +70,11 @@ public abstract class AbstractNotifier implements Notifier
     public UUID getSite()
     {
         return this.site;
+    }
+    
+    public long getSleepTime()
+    {
+        return this.sleepTime;
     }
 
     @Override
@@ -93,6 +103,18 @@ public abstract class AbstractNotifier implements Notifier
         for (NotificationEngine notificationEngine : this.engines.values())
         {
             notificationEngine.sendNotification(notification);
+        }
+        // sleep
+        // TODO: improve
+        if (this.getSleepTime() > 0)
+        {
+            try
+            {
+                Thread.sleep(this.getSleepTime());
+            }
+            catch (InterruptedException e)
+            {
+            }
         }
     }
 }

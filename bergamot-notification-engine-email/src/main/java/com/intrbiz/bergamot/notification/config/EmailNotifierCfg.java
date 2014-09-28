@@ -12,6 +12,8 @@ import com.intrbiz.configuration.CfgParameter;
 @XmlRootElement(name = "notifier")
 public class EmailNotifierCfg extends NotifierCfg
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public void applyDefaults()
     {

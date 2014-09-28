@@ -22,6 +22,8 @@ public abstract class NotifierCfg extends Configuration
     private List<NotificationEngineCfg> engines = new LinkedList<NotificationEngineCfg>();
 
     private UUID site = null;
+    
+    private int sleepTime = 6;
 
     public NotifierCfg()
     {
@@ -71,6 +73,25 @@ public abstract class NotifierCfg extends Configuration
     public void setEngines(List<NotificationEngineCfg> engines)
     {
         this.engines = engines;
+    }
+
+    /**
+     * How long (seconds) to sleep after sending a message.  
+     * Some mail providers will disabled accounts sending too 
+     * fast.  Setting sleep-time > 0 will cause the 
+     * notification engine to sleep before sending the 
+     * next message.
+     * 
+     */
+    @XmlAttribute(name = "sleep-time")
+    public int getSleepTime()
+    {
+        return sleepTime;
+    }
+
+    public void setSleepTime(int sleepTime)
+    {
+        this.sleepTime = sleepTime;
     }
 
     @Override
