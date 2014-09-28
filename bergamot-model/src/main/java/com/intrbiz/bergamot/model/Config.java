@@ -65,6 +65,11 @@ public class Config implements Serializable
         super();
         this.id = id;
         this.siteId = siteId;
+        this.fromConfiguration(configuration);
+    }
+    
+    public Config fromConfiguration(NamedObjectCfg<?> configuration)
+    {
         this.type = Configuration.getRootElement(configuration.getClass());
         this.name = configuration.getName();
         this.template = configuration.getTemplateBooleanValue();
@@ -72,6 +77,7 @@ public class Config implements Serializable
         this.summary = Util.coalesceEmpty(configuration.getSummary(), Util.ucFirst(this.name));
         this.description = configuration.getDescription();
         this.configuration = configuration;
+        return this;
     }
 
     public UUID getSiteId()
