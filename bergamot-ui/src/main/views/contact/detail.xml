@@ -1,37 +1,37 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Contact #{contact.summary}">
+<fragment xmlns="com.intrbiz.balsa" title="Contact #{the_contact.summary}">
 
 	<div class="row">
 		<div class="col4 dash_icon">
 		    <p>
 			    <span class="label">Username: </span>
-			    <span class="value">#{contact.name}</span>
+			    <span class="value">#{the_contact.name}</span>
 		    </p>
 		    <p>
 			    <span class="label">Email: </span>
-			    <span class="value">#{coalesce(contact.email, '')}</span>
+			    <span class="value">#{coalesce(the_contact.email, '')}</span>
 		    </p>
 		    <p>
 			    <span class="label">Pager: </span>
-			    <span class="value">#{coalesce(contact.pager, '')}</span>
+			    <span class="value">#{coalesce(the_contact.pager, '')}</span>
 		    </p>
 		    <p>
 			    <span class="label">Mobile: </span>
-			    <span class="value">#{coalesce(contact.mobile, '')}</span>
+			    <span class="value">#{coalesce(the_contact.mobile, '')}</span>
 		    </p>
 		    <p>
 			    <span class="label">Phone: </span>
-			    <span class="value">#{coalesce(contact.phone, '')}</span>
+			    <span class="value">#{coalesce(the_contact.phone, '')}</span>
 		    </p>
 		    <p class="description">
-			    #{coalesce(contact.description, '')}
+			    #{coalesce(the_contact.description, '')}
 		    </p>
 		</div>
 		<div class="col4">
 			<h3>Member of</h3>
-			<data-set var="team" value="#{contact.teams}">
+			<data-set var="team" value="#{the_contact.teams}">
 				<p>
 					<a href="/team/id/#{team.id}">#{team.summary}</a>
 				</p>
@@ -44,11 +44,11 @@
 			<h3>Notifications</h3>
 			<p>
 				<span class="label wide">Notifications enabled</span>
-				<span class="value">#{if(contact.notifications.enabled, 'yes', 'no')}</span>
+				<span class="value">#{if(the_contact.notifications.enabled, 'yes', 'no')}</span>
 			</p>
 			<p>
 				<span class="label wide">Notification period</span>
-				<span class="value"><a href="/timeperiod/id/#{contact.notifications.timePeriod.id}">#{contact.notifications.timePeriod.summary}</a></span>
+				<span class="value"><a href="/timeperiod/id/#{the_contact.notifications.timePeriod.id}">#{the_contact.notifications.timePeriod.summary}</a></span>
 			</p>
 		</div>
 	</div>
@@ -56,7 +56,7 @@
 	<div class="row">
 		<div class="col12">
 			<h3>XML</h3>
-			<pre>#{contact.configuration.toString()}</pre>
+			<pre>#{the_contact.configuration.toString()}</pre>
 		</div>
 	</div>
 	

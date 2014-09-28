@@ -23,7 +23,7 @@ public class ContactRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void contact(BergamotDB db, @AsUUID UUID id)
     {
-        model("contact", db.getTeam(id));
+        var("the_contact", db.getContact(id));
         encode("contact/detail");
     }
 }
