@@ -11,19 +11,19 @@
         <email>op@localhost</email>
     </contact>
     
-    <team name="admins" teams="linux-admins, network-admins, bergamot-admins" grants="ui.*, api.*">
+    <team name="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
         <summary>Administrators</summary>
     </team>
     
-    <team name="linux-admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="linux-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
         <summary>Linux Administrators</summary>
     </team>
     
-    <team name="network-admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="network-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
         <summary>Network Administrators</summary>
     </team>
     
-    <team name="bergamot-admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="bergamot-admins" teams="admins" grants="ui.*, api.*">
         <summary>Network Administrators</summary>
     </team>
     
