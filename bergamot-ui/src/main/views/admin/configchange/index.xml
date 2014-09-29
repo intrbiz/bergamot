@@ -13,16 +13,16 @@
     			<th>Summary</th>
     			<th>Created</th>
     			<th>Pending</th>
-    			<th>Applied At</th>
+    			<th>Applied</th>
     			<th></th>
     			<th></th>
     		</tr>
     		<data-set var="change" value="#{changes}">
     			<tr>
     				<td>#{change.summary}</td>
-    				<td>#{dateformat('EEEE dd/MM/yyyy', change.created)}</td>
+    				<td>#{dateformat('EEEE dd/MM/yyyy', change.created) + ' at ' + dateformat('HH:mm:ss', change.created)}</td>
     				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
-    				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt), '')}</td>
+    				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt)  + ' at ' + dateformat('HH:mm:ss', change.appliedAt), '')}</td>
     				<td>
     					<a href="/admin/configchange/edit/id/#{change.id}" rendered="#{! change.applied}">Edit Change</a>
     				</td>

@@ -230,7 +230,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract void removeConfigChange(@SQLParam("id") UUID id);
     
     @SQLGetter(table = ConfigChange.class, name = "list_config_changes", since = @SQLVersion({1, 0, 0}), 
-            orderBy = { @SQLOrder(value = "applied", direction = Direction.DESC), @SQLOrder(value = "created", direction = Direction.DESC) }
+            orderBy = { @SQLOrder(value = "applied", direction = Direction.ASC), @SQLOrder(value = "created", direction = Direction.DESC) }
     )
     public abstract List<ConfigChange> listConfigChanges(@SQLParam("site_id") UUID siteId);
     

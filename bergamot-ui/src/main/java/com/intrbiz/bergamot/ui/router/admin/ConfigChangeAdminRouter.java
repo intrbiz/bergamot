@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBException;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -91,6 +92,8 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         // update the change
         UUID currentChangeId = sessionVar("current_change");
         ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), new BergamotCfg(site.getName(), "Edit " + type, null)) : db.getConfigChange(currentChangeId);
+        // remove the object id
+        ((NamedObjectCfg<?>) cfg).setId(null);
         // add the object
         ((BergamotCfg) change.getConfiguration()).addObject(cfg);
         // update

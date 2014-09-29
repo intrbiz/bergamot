@@ -28,6 +28,14 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializab
 
     private Set<String> teams = new LinkedHashSet<String>();
 
+    private String firstName;
+
+    private String preferredName;
+
+    private String familyName;
+
+    private String fullName;
+
     private String email;
 
     private String pager;
@@ -75,6 +83,54 @@ public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializab
     public boolean containsTeam(String name)
     {
         return this.teams.contains(name);
+    }
+
+    @XmlElement(name = "first-name")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getFirstName()
+    {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName)
+    {
+        this.firstName = firstName;
+    }
+
+    @XmlElement(name = "preferred-name")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getPreferredName()
+    {
+        return preferredName;
+    }
+
+    public void setPreferredName(String preferredName)
+    {
+        this.preferredName = preferredName;
+    }
+
+    @XmlElement(name = "family-name")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getFamilyName()
+    {
+        return familyName;
+    }
+
+    public void setFamilyName(String familyName)
+    {
+        this.familyName = familyName;
+    }
+
+    @XmlElement(name = "full-name")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getFullName()
+    {
+        return fullName;
+    }
+
+    public void setFullName(String fullName)
+    {
+        this.fullName = fullName;
     }
 
     @XmlElement(name = "email")

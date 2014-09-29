@@ -3,7 +3,7 @@
 <fragment xmlns="com.intrbiz.balsa" title="Applied change #{change.summary}">
     <div class="row">
 		<h3>Applied change #{change.summary} #{if(report.successful, 'successfully', 'unsuccessfully')}</h3>
-		<p class="text-body">#{change.description}</p>
+		<p class="text-body">#{coalesce(change.description, '')}</p>
 		<pre>#{report.toString()}</pre>
     </div>
 </fragment>
