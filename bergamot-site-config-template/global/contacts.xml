@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <contact name="admin" extends="generic_contact" teams="admins">
+    <contact name="admin" extends="generic_contact" teams="bergamot-admins">
         <summary>Administrator</summary>
         <email>admin@localhost</email>
     </contact>
