@@ -36,7 +36,10 @@
 
     <service name="ping" extends="linux-service" template="yes">
         <summary>Ping</summary>
-        <check-command command="check_ping"/>
+        <check-command command="check_ping">
+            <parameter name="arg1">100.0,20%</parameter>
+            <parameter name="arg2">500.0,60%</parameter>
+        </check-command>
     </service>
     
     <service name="snmp_description" extends="network-service" template="yes">
