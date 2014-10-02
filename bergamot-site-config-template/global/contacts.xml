@@ -24,7 +24,7 @@
     </team>
     
     <team name="bergamot-admins" teams="admins" grants="ui.*, api.*">
-        <summary>Network Administrators</summary>
+        <summary>Bergamot Administrators</summary>
     </team>
     
     <team name="ops" grants="ui.access, ui.read.*, api.access, api.read.*">
