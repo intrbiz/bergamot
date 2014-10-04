@@ -78,4 +78,14 @@
         
     </host>
     
+    <host name="bergamot_rabbitmq_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring RabbitMQ server</summary>
+        
+        <service name="bergamot-rabbitmq" template="yes" extends="bergamot-service">
+            <summary>RabbitMQ Server</summary>
+            <check-command command="check_nrpe_service_rabbitmq_server" />
+        </service>
+        
+    </host>
+    
 </bergamot>
