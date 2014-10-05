@@ -88,4 +88,14 @@
         
     </host>
     
+    <host name="bergamot_postgresql_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring PostgreSQL server</summary>
+        
+        <service name="bergamot-postgresql" template="yes" extends="bergamot-service">
+            <summary>RabbitMQ Server</summary>
+            <check-command command="check_nrpe_service_postgresql" />
+        </service>
+        
+    </host>
+    
 </bergamot>

@@ -33,4 +33,8 @@
         <parameter name="command">check_service_rabbitmq_server</parameter>
     </command>
     
+    <command name="check_nrpe_service_postgresql" extends="check_nrpe">
+        <parameter name="command">check_service_postgresql</parameter>
+    </command>
+    
 </bergamot>
