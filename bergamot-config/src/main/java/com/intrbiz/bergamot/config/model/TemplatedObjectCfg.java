@@ -20,8 +20,6 @@ import com.intrbiz.configuration.Configuration;
 public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extends Configuration
 {
     private static final long serialVersionUID = 1L;
-    
-    public enum ObjectState { PRESENT, ABSENT }
 
     private Set<String> inheritedTemplates = new LinkedHashSet<String>();
 
@@ -31,7 +29,7 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
 
     private File loadedFrom;
 
-    private ObjectState state = null;
+    private Boolean removed;
 
     public TemplatedObjectCfg()
     {
@@ -48,25 +46,23 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
     {
         this.loadedFrom = loadedFrom;
     }
-
-    /**
-     * The state of this object: present (default) or absent.
-     * This can be used to remove objects.
-     */
-    @XmlAttribute(name = "state")
-    public ObjectState getState()
+    
+    @XmlJavaTypeAdapter(YesNoAdapter.class)
+    @XmlAttribute(name = "removed")
+    public Boolean getRemoved()
     {
-        return state;
+        return removed;
     }
     
-    public ObjectState getOrDefaultState()
+    @XmlTransient
+    public boolean getRemovedBooleanValue()
     {
-        return state == null ? ObjectState.PRESENT : this.state;
+        return this.removed == null ? false : true;
     }
 
-    public void setState(ObjectState state)
+    public void setRemoved(Boolean removed)
     {
-        this.state = state;
+        this.removed = removed;
     }
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
