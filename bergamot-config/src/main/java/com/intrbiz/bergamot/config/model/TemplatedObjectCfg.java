@@ -20,6 +20,8 @@ import com.intrbiz.configuration.Configuration;
 public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extends Configuration
 {
     private static final long serialVersionUID = 1L;
+    
+    public enum ObjectState { PRESENT, ABSENT }
 
     private Set<String> inheritedTemplates = new LinkedHashSet<String>();
 
@@ -28,6 +30,8 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
     private List<P> inherits = new LinkedList<P>();
 
     private File loadedFrom;
+
+    private ObjectState state = null;
 
     public TemplatedObjectCfg()
     {
@@ -45,6 +49,26 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
         this.loadedFrom = loadedFrom;
     }
 
+    /**
+     * The state of this object: present (default) or absent.
+     * This can be used to remove objects.
+     */
+    @XmlAttribute(name = "state")
+    public ObjectState getState()
+    {
+        return state;
+    }
+    
+    public ObjectState getOrDefaultState()
+    {
+        return state == null ? ObjectState.PRESENT : this.state;
+    }
+
+    public void setState(ObjectState state)
+    {
+        this.state = state;
+    }
+
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "extends")
     public Set<String> getInheritedTemplates()
@@ -56,7 +80,7 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
     {
         this.inheritedTemplates = inheritedTemplates;
     }
-    
+
     public boolean isInheriting(String templateName)
     {
         return this.getInheritedTemplates().contains(templateName);
@@ -98,9 +122,9 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
     }
 
     public abstract List<TemplatedObjectCfg<?>> getTemplatedChildObjects();
-    
+
     /**
-     * Process the inheritance hierarchy and produce a resolved configuration 
+     * Process the inheritance hierarchy and produce a resolved configuration
      */
     @SuppressWarnings("unchecked")
     public P resolve(ObjectResolver<P> resolver)
