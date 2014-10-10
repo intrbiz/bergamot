@@ -202,6 +202,32 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLGetter(table = Config.class, name = "get_config_by_name", since = @SQLVersion({1, 0, 0}))
     public abstract Config getConfigByName(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
     
+    @SQLGetter(table = Config.class, name = "list_dependent_config", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND required_templates @> ARRAY[p_qualified_template_name]")
+    )
+    public abstract List<Config> listDependentConfig(@SQLParam("site_id") UUID siteId, @SQLParam(value = "qualified_template_name", virtual = true) String qualifiedTemplateName);
+    
+    /**
+     * Recursively find all objects which utilise the given template
+     */
+    @SQLGetter(table = Config.class, name = "list_all_dependent_config_objects", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery("WITH RECURSIVE config_graph AS ( " + 
+                              "    SELECT c.* " +
+                              "    FROM bergamot.config c " + 
+                              "    WHERE c.site_id = p_site_id AND c.required_templates @> ARRAY[p_qualified_template_name] " +
+                              "    UNION  " +
+                              "    SELECT c.* " +
+                              "    FROM bergamot.config c, config_graph cg " + 
+                              "    WHERE c.site_id = p_site_id AND c.required_templates @> ARRAY[cg.type || ':' || cg.name] " +
+                              "    ) " +
+                              "    SELECT * " +
+                              "    FROM config_graph cg " +
+                              "    WHERE cg.template = FALSE")
+    )
+    public abstract List<Config> listAllDependentConfigObjects(@SQLParam("site_id") UUID siteId, @SQLParam(value = "qualified_template_name", virtual = true) String qualifiedTemplateName);
+    
+        
+    
     public BergamotObjectLocator getObjectLocator(final UUID siteId)
     {
         return new BergamotObjectLocator()

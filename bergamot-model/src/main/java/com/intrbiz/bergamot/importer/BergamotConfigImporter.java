@@ -1,6 +1,8 @@
 package com.intrbiz.bergamot.importer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -66,6 +68,8 @@ public class BergamotConfigImporter
     
     private boolean resetState = false;
     
+    private Map<String, Config> cascadedChanges = new HashMap<String, Config>();
+    
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
         if (! validated.getReport().isValid()) throw new RuntimeException("Cannot import invalid configuration");
@@ -85,9 +89,11 @@ public class BergamotConfigImporter
             this.report = new BergamotImportReport(this.config.getSite());
             try (BergamotDB db = BergamotDB.connect())
             {
-                db.execute(()->{
+                db.execute(()-> {
                     // setup the site
                     this.loadSite(db);
+                    // templates
+                    this.loadTemplates(db);
                     // load the commands
                     this.loadCommands(db);
                     // time periods
@@ -104,8 +110,6 @@ public class BergamotConfigImporter
                     this.loadHosts(db);
                     // clusters
                     this.loadClusters(db);
-                    // templates
-                    this.loadTemplates(db);
                 });
             }
         }
@@ -132,10 +136,20 @@ public class BergamotConfigImporter
                     {
                         conf.fromConfiguration((NamedObjectCfg<?>) object);
                         this.report.info("Reconfiguring existing " + type + " template: " + object.getName() + " (" + conf.getId() + ")");
+                        // cascade - note this recursively queries for all objects affected by a change to this template
+                        for (Config config : conf.listAllDependentsObjects())
+                        {
+                            this.cascadedChanges.put(config.getQualifiedName(), config);
+                        }
                     }
                     db.setConfig(conf);
                 }
             }
+        }
+        // process any cascaded objects
+        for (Config config : this.cascadedChanges.values())
+        {
+            this.report.info("Change cascades to: " + config.getType() + ":" + config.getName());
         }
     }
     
