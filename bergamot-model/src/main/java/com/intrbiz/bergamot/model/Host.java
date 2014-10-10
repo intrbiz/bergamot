@@ -44,10 +44,16 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         this.address = Util.coalesceEmpty(rcfg.getAddress(), this.name);
         this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
         this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
-        this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
-        this.checkInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getEvery());
-        this.retryInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getRetryEvery());
+        if (rcfg.getState() != null)
+        {
+            this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
+            this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
+        }
+        if (rcfg.getSchedule() != null)
+        {
+            this.checkInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getEvery());
+            this.retryInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getRetryEvery());
+        }
         this.enabled = rcfg.getEnabledBooleanValue();
         this.suppressed = rcfg.getSuppressedBooleanValue();
     }
