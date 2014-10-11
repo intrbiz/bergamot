@@ -40,7 +40,8 @@ public class HostAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showConfigure(BergamotDB db, @AsUUID UUID timeperiodId, @SessionVar("site") Site site)
     {
-        model("host", Util.nullable(db.getConfig(timeperiodId), Config::getResolvedConfiguration));
+        Config config = model("config", db.getConfig(timeperiodId));
+        model("host", Util.nullable(config, Config::getResolvedConfiguration));
         encode("admin/host/configure");
     }
 }

@@ -69,7 +69,7 @@
 	    		</tr>
 	    		<data-set var="template" value="#{host_templates}">
 	    			<tr data-group-id="#{template.id}">
-		    			<td><a href="/admin/host/configure/id/#{template.id}" title="Configure this host template">#{template.summary}</a></td>
+		    			<td><a href="/admin/host/configure/id/#{template.id}" title="Configure this host template">#{coalesce(template.summary, ucfirst(template.name))}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>
 	    					<data-set var="inherit" value="#{template.configuration.inheritedTemplates}">

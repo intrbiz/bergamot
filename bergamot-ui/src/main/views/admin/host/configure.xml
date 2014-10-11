@@ -11,7 +11,25 @@
    		<pre>#{host.resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/configchange/add/host/id/#{host.id}" class="add">Edit this host</a>
-    	<a href="/admin/configchange/remove/host/id/#{host.id}" class="remove">Remove this host</a>
+    	<a href="/admin/configchange/add/host/id/#{config.id}" class="add">Edit this host</a>
+    	<a href="/admin/configchange/remove/host/id/#{config.id}" class="remove">Remove this host</a>
+    </div>
+    <div class="row" rendered="#{host.getTemplateBooleanValue()}">
+    	<h4>Dependents</h4>
+    	<p>Any change to this configuration template, will cascade to the following:</p>
+    	<table>
+    		<tr>
+    			<th>Type</th>
+    		    <th>Display Name</th>
+    			<th>Name</th>
+    		</tr>
+    		<data-set var="dep" value="#{config.listAllDependentsObjects()}">
+    			<tr>
+    				<td>#{ucfirst(dep.type)}</td>
+    			    <td><a href="/admin/host/configure/id/#{dep.id}" title="Configure">#{coalesce(dep.summary, ucfirst(dep.name))}</a></td>
+    				<td>#{dep.name}</td>
+    			</tr>
+    		</data-set>
+    	</table>
     </div>
 </fragment>
