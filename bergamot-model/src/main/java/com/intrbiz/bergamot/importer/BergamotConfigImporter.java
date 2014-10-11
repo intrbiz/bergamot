@@ -1,8 +1,12 @@
 package com.intrbiz.bergamot.importer;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -68,7 +72,11 @@ public class BergamotConfigImporter
     
     private boolean resetState = false;
     
-    private Map<String, Config> cascadedChanges = new HashMap<String, Config>();
+    private boolean createSite = false;
+    
+    private Map<String, CascadedChange> cascadedChanges = new HashMap<String, CascadedChange>();
+    
+    private Set<String> loadedObjects = new HashSet<String>();
     
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
@@ -82,35 +90,51 @@ public class BergamotConfigImporter
         return this;
     }
     
+    public BergamotConfigImporter createSite(boolean createSite)
+    {
+        this.createSite = createSite;
+        return this;
+    }
+    
     public BergamotImportReport importConfiguration()
     {
         if (this.report == null)
         {
             this.report = new BergamotImportReport(this.config.getSite());
-            try (BergamotDB db = BergamotDB.connect())
+            try
             {
-                db.execute(()-> {
-                    // setup the site
-                    this.loadSite(db);
-                    // templates
-                    this.loadTemplates(db);
-                    // load the commands
-                    this.loadCommands(db);
-                    // time periods
-                    this.loadTimePeriods(db);
-                    // teams
-                    this.loadTeams(db);
-                    // contacts
-                    this.loadContacts(db);
-                    // load the locations
-                    this.loadLocations(db);
-                    // groups
-                    this.loadGroups(db);
-                    // hosts
-                    this.loadHosts(db);
-                    // clusters
-                    this.loadClusters(db);
-                });
+                try (BergamotDB db = BergamotDB.connect())
+                {
+                    db.execute(()-> {
+                        // setup the site
+                        this.loadSite(db);
+                        // templates
+                        this.loadTemplates(db);
+                        // load the commands
+                        this.loadCommands(db);
+                        // time periods
+                        this.loadTimePeriods(db);
+                        // teams
+                        this.loadTeams(db);
+                        // contacts
+                        this.loadContacts(db);
+                        // load the locations
+                        this.loadLocations(db);
+                        // groups
+                        this.loadGroups(db);
+                        // hosts
+                        this.loadHosts(db);
+                        // clusters
+                        this.loadClusters(db);
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                this.report.error("Configuration change aborted due to unhandled error: " + e.getMessage());
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                this.report.error(sw.toString());
             }
         }
         return this.report;
@@ -139,17 +163,13 @@ public class BergamotConfigImporter
                         // cascade - note this recursively queries for all objects affected by a change to this template
                         for (Config config : conf.listAllDependentsObjects())
                         {
-                            this.cascadedChanges.put(config.getQualifiedName(), config);
+                            this.report.info("  Change cascades to: " + config.getType() + ":" + config.getName());
+                            this.cascadedChanges.put(config.getQualifiedName(), new CascadedChange(object, conf, config));
                         }
                     }
                     db.setConfig(conf);
                 }
             }
-        }
-        // process any cascaded objects
-        for (Config config : this.cascadedChanges.values())
-        {
-            this.report.info("Change cascades to: " + config.getType() + ":" + config.getName());
         }
     }
     
@@ -158,13 +178,20 @@ public class BergamotConfigImporter
         this.site = db.getSiteByName(this.config.getSite());
         if (this.site == null)
         {
-            this.site = new Site();
-            this.site.setId(Site.randomSiteId());
-            this.site.setName(this.config.getSite());
-            this.site.setSummary(this.config.getSite());
-            db.setSite(site);
+            if (this.createSite)
+            {
+                this.site = new Site();
+                this.site.setId(Site.randomSiteId());
+                this.site.setName(this.config.getSite());
+                this.site.setSummary(this.config.getSite());
+                db.setSite(site);
+            }
+            else
+            {
+                this.report.error("Site '" + this.config.getSite() + "' does not exist and cannot be created, aborting!");
+                throw new RuntimeException("Site '" + this.config.getSite() + "' does not exist and cannot be created, aborting!");
+            }
         }
-        db.setSite(this.site);
     }
     
     private void loadCommands(BergamotDB db)
@@ -473,52 +500,80 @@ public class BergamotConfigImporter
 
     private void loadHosts(BergamotDB db)
     {
+        // load all directly modified hosts
         for (HostCfg cfg : this.config.getHosts())
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                // resolved config
-                HostCfg rcfg = cfg.resolve();
-                // load
-                Host host = db.getHostByName(this.site.getId(), rcfg.getName());
-                if (host == null)
+                this.loadHost(cfg, db);
+            }
+        }
+        // load any hosts where a template change cascades
+        for (CascadedChange change : this.cascadedChanges.values())
+        {
+            if (change.dependent.getConfiguration() instanceof HostCfg)
+            {
+                HostCfg hcfg = (HostCfg) change.dependent.getConfiguration();
+                if (! (hcfg.getTemplateBooleanValue() || this.loadedObjects.contains("host:" + hcfg.getName())))
                 {
-                    cfg.setId(this.site.randomObjectId());
-                    host = new Host();
-                    this.report.info("Configuring new host: " + cfg.resolve().getName());
-                }
-                else
-                {
-                    cfg.setId(host.getId());
-                    this.report.info("Reconfiguring existing host: " + cfg.resolve().getName() + " (" + cfg.getId() + ")");
-                }
-                host.configure(cfg);
-                // load the check details
-                this.loadActiveCheck(host, rcfg, db);
-                // add locations
-                host.setLocationId(null);
-                String locationName = rcfg.getLocation();
-                if (!Util.isEmpty(locationName))
-                {
-                    Location location = db.getLocationByName(this.site.getId(), locationName);
-                    if (location != null)
-                    {
-                        host.setLocationId(location.getId());
-                    }
-                }
-                // add the host
-                db.setHost(host);
-                // add services
-                for (ServiceCfg scfg : rcfg.getServices())
-                {
-                    this.loadService(host, scfg, db);
-                }
-                // add traps
-                for (TrapCfg tcfg : rcfg.getTraps())
-                {
-                    this.loadTrap(host, tcfg, db);
+                    this.report.info("Reconfiguring host " + hcfg.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
+                    // first we need to resolve the inheritance for the cascaded object
+                    db.getConfigResolver(this.site.getId()).resolveInherit(hcfg);
+                    // load
+                    this.loadHost(hcfg, db);
                 }
             }
+        }
+    }
+    
+    private void loadHost(HostCfg cfg, BergamotDB db)
+    {
+        HostCfg rcfg = cfg.resolve();
+        if (this.loadedObjects.contains("host:" + rcfg.getName()))
+        {
+            this.report.info("Skipping reconfiguring host " + rcfg.getName());
+            return;
+        }
+        this.report.info("Loading host:\r\n" + rcfg.toString());
+        // load
+        Host host = db.getHostByName(this.site.getId(), rcfg.getName());
+        if (host == null)
+        {
+            cfg.setId(this.site.randomObjectId());
+            host = new Host();
+            this.report.info("Configuring new host: " + rcfg.getName());
+        }
+        else
+        {
+            cfg.setId(host.getId());
+            this.report.info("Reconfiguring existing host: " + rcfg.getName() + " (" + cfg.getId() + ")");
+        }
+        host.configure(cfg);
+        // load the check details
+        this.loadActiveCheck(host, rcfg, db);
+        // add locations
+        host.setLocationId(null);
+        String locationName = rcfg.getLocation();
+        if (!Util.isEmpty(locationName))
+        {
+            Location location = db.getLocationByName(this.site.getId(), locationName);
+            if (location != null)
+            {
+                host.setLocationId(location.getId());
+            }
+        }
+        // add the host
+        db.setHost(host);
+        this.loadedObjects.add("host:" + rcfg.getName());
+        // add services
+        for (ServiceCfg scfg : rcfg.getServices())
+        {
+            this.loadService(host, scfg, db);
+        }
+        // add traps
+        for (TrapCfg tcfg : rcfg.getTraps())
+        {
+            this.loadTrap(host, tcfg, db);
         }
     }
     
@@ -743,5 +798,21 @@ public class BergamotConfigImporter
         this.loadVirtualCheck(resource, rcfg, db);
         // add
         db.setResource(resource);
+    }
+    
+    private static class CascadedChange
+    {
+        public final Config dependent;
+        
+        public final Config template;
+        
+        public final TemplatedObjectCfg<?> change;
+        
+        public CascadedChange(TemplatedObjectCfg<?> change, Config template, Config dependent)
+        {
+            this.change = change;
+            this.template = template;
+            this.dependent = dependent;
+        }
     }
 }

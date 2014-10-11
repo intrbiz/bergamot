@@ -24,28 +24,49 @@ public class BergamotConfigResolver
     
     public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
     {
-        return this.locator.lookup(type, name);
+        T inherited = this.locator.lookup(type, name);
+        logger.debug("Looked up inherited object: " + type.getSimpleName() + "::" + name + " ==> " + inherited);
+        return inherited;
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends TemplatedObjectCfg<T>> T resolveInherit(T object)
     {
-        for (String inheritsFrom : object.getInheritedTemplates())
+        if (((TemplatedObjectCfg) object).getInherits().size() > 0)
         {
-            TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
-            if (superObject != null)
-            {
-                ((TemplatedObjectCfg) object).addInheritedObject(superObject);
-            }
-            else
-            {
-                // error
-                logger.warn("Error: Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
-            }
+            logger.debug("Skipping previously resolved object: " + object.getClass().getSimpleName() + "::" + object.getName());
         }
-        if (object instanceof TimePeriodCfg)
+        else
         {
-            resolveExcludes((TimePeriodCfg) object);
+            logger.debug("Resolving inheritance for " + object.getClass().getSimpleName() + "::" + object.getName());
+            for (String inheritsFrom : object.getInheritedTemplates())
+            {
+                logger.debug("Looking up inherited object: " + inheritsFrom);   
+                TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
+                if (superObject != null)
+                {
+                    // we need to recursively ensure that the inherited object is resolved
+                    this.resolveInherit((TemplatedObjectCfg) superObject);
+                    // add the inherited object
+                    ((TemplatedObjectCfg) object).addInheritedObject(superObject);
+                }
+                else
+                {
+                    // error
+                    logger.error("Cannot find the inherited object " + inheritsFrom + "!");
+                    logger.warn("Error: Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
+                }
+            }
+            // child objects
+            for (TemplatedObjectCfg<?> child : object.getTemplatedChildObjects())
+            {
+                this.resolveInherit((TemplatedObjectCfg) child);
+            }
+            // special cases
+            if (object instanceof TimePeriodCfg)
+            {
+                resolveExcludes((TimePeriodCfg) object);
+            }
         }
         return object;
     }

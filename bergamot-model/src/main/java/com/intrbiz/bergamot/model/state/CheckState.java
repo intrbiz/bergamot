@@ -391,10 +391,12 @@ public class CheckState extends BergamotObject<CheckStateMO>
             this.setLastHardOutput(this.getOutput());
         }
         // set the attempt
-        if (cfg instanceof RealCheckCfg)
+        if (cfg instanceof RealCheckCfg && ((RealCheckCfg<?>)cfg).getState() != null)
         {
             this.setAttempt(((RealCheckCfg<?>)cfg).getState().getRecoversAfter());
         }
+        // update last check time
+        this.setLastCheckTime(new Timestamp(System.currentTimeMillis()));
     }
     
     public String toString()

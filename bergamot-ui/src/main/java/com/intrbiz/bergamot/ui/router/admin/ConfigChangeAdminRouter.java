@@ -80,6 +80,8 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         ConfigChange change = db.getConfigChange(id);
         change.setConfiguration(cfg);
         db.setConfigChange(change);
+        // nullify the current change id
+        sessionVar("current_change", null);
         // back to list
         redirect(path("/admin/configchange/"));
     }
@@ -121,6 +123,9 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void validate(BergamotDB db, @SessionVar("site") Site site, @AsUUID UUID id)
     {
+        // nullify any current change
+        sessionVar("current_change", null);
+        // get the change
         ConfigChange change = var("change", db.getConfigChange(id));
         //
         BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
@@ -136,6 +141,9 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void apply(BergamotDB db, @SessionVar("site") Site site, @AsUUID UUID id)
     {
+        // nullify any current change
+        sessionVar("current_change", null);
+        // get the change
         ConfigChange change = var("change", db.getConfigChange(id));
         //
         BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
@@ -143,9 +151,12 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         // import
         BergamotImportReport report = new BergamotConfigImporter(validated).resetState(false).importConfiguration();
         // update the db
-        change.setApplied(true);
-        change.setAppliedAt(new Timestamp(System.currentTimeMillis()));
-        db.setConfigChange(change);
+        if (report.isSuccessful())
+        {
+            change.setApplied(true);
+            change.setAppliedAt(new Timestamp(System.currentTimeMillis()));
+            db.setConfigChange(change);
+        }
         //
         var("change", change);
         var("report", report);

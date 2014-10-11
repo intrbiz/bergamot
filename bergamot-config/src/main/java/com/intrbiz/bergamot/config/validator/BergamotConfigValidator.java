@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.config.validator;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
@@ -22,6 +24,8 @@ import com.intrbiz.bergamot.config.model.TrapCfg;
 public class BergamotConfigValidator extends BergamotConfigResolver
 {
     private final BergamotCfg cfg;
+    
+    private Logger logger = Logger.getLogger(BergamotConfigValidator.class);
     
     public  BergamotConfigValidator(BergamotCfg cfg)
     {
@@ -78,22 +82,41 @@ public class BergamotConfigValidator extends BergamotConfigResolver
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void resolveInherit(TemplatedObjectCfg<?> object, BergamotValidationReport report)
     {
-        for (String inheritsFrom : object.getInheritedTemplates())
+        if (((TemplatedObjectCfg) object).getInherits().size() > 0)
         {
-            TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
-            if (superObject != null)
-            {
-                ((TemplatedObjectCfg) object).addInheritedObject(superObject);
-            }
-            else
-            {
-                // error
-                report.logError("Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
-            }
+            logger.debug("Skipping previously resolved object: " + object.getClass().getSimpleName() + "::" + object.getName());
         }
-        if (object instanceof TimePeriodCfg)
+        else
         {
-            this.resolveExcludes((TimePeriodCfg) object, report);
+            logger.debug("Resolving inheritance for " + object.getClass().getSimpleName() + "::" + object.getName());
+            for (String inheritsFrom : object.getInheritedTemplates())
+            {
+                logger.debug("Looking up inherited object: " + inheritsFrom);
+                TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
+                if (superObject != null)
+                {
+                    // we need to recursively ensure that the inherited object is resolved
+                    this.resolveInherit((TemplatedObjectCfg) superObject, report);
+                    // add the inherited object
+                    ((TemplatedObjectCfg) object).addInheritedObject(superObject);
+                }
+                else
+                {
+                    // error
+                    logger.error("Cannot find the inherited object " + inheritsFrom + "!");
+                    report.logError("Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
+                }
+            }
+            // child objects
+            for (TemplatedObjectCfg<?> child : object.getTemplatedChildObjects())
+            {
+                this.resolveInherit((TemplatedObjectCfg) child, report);
+            }
+            // special cases
+            if (object instanceof TimePeriodCfg)
+            {
+                this.resolveExcludes((TimePeriodCfg) object, report);
+            }
         }
     }
     

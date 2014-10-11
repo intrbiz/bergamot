@@ -52,7 +52,7 @@ public class BergamotImportReport
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("The import was").append(this.isSuccessful() ? "successful." : "unsuccessful!").append("\n");
+        sb.append("The import was ").append(this.isSuccessful() ? "successful." : "unsuccessful!").append("\n");
         for (String error : this.errors)
         {
             sb.append("Error: ").append(error).append("\n");

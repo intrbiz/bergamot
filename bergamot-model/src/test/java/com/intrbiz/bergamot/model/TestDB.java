@@ -32,7 +32,7 @@ public class TestDB
         {
             System.out.println("Importing configuration for " + config.getConfig().getSite());
             // load
-            new BergamotConfigImporter(config).resetState(true).importConfiguration();
+            new BergamotConfigImporter(config).createSite(true).resetState(true).importConfiguration();
         }
         //
         try (BergamotDB db = BergamotDB.connect())
