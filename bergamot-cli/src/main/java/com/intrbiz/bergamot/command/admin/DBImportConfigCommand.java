@@ -80,7 +80,7 @@ public class DBImportConfigCommand extends BergamotCLICommand
         for (ValidatedBergamotConfiguration bcfg : bcfgs)
         {
             System.out.println("Importing configuration for " + bcfg.getConfig().getSite());
-            BergamotImportReport report = new BergamotConfigImporter(bcfg).resetState(true).importConfiguration();
+            BergamotImportReport report = new BergamotConfigImporter(bcfg).createSite(true).resetState(true).importConfiguration();
             System.out.println(report.toString());
             System.out.println("Import committed for: " + bcfg.getConfig().getSite());
         }
