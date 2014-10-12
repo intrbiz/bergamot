@@ -2,7 +2,7 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
-	<a href="/group/name/#{group.name}">
+	<a href="/group/id/#{group.id}">
 		<div class="col3 dash_icon">
 		    <h3>
 				<span class="dash_img #{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">

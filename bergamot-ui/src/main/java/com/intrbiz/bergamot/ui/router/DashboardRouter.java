@@ -11,6 +11,8 @@ import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
+import static com.intrbiz.bergamot.ui.util.Sorter.*;
+
 @Prefix("/")
 @Template("layout/main")
 @RequireValidPrincipal()
@@ -21,6 +23,8 @@ public class DashboardRouter extends Router<BergamotApp>
     public void index(BergamotDB db, @SessionVar("site") Site site)
     {
         model("alerts", db.listChecksThatAreNotOk(site.getId()));
+        model("groups", orderGroupsByStatus(db.getRootGroups(site.getId())));
+        model("locations", orderLocationsByStatus(db.getRootLocations(site.getId())));
         encode("index");
     }
 }

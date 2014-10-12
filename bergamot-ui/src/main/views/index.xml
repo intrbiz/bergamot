@@ -1,14 +1,34 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Alerts">
+<fragment xmlns="com.intrbiz.balsa" title="Overview">
 
-		<div class="row">
+		<!-- Alerts -->
+		<div class="row" rendered="#{! alerts.isEmpty()}">
+			<h2>Alerts</h2>
 			<data-set var="check" value="#{alerts}">
 				<include view="include/check"/>
 			</data-set>
 		</div>
 		
+		<!-- Overview -->
+		<!-- An overview of groups -->
+		<div class="row">
+			<h2>Groups</h2>
+			<data-set var="group" value="#{groups}">
+				<include view="include/group"/>
+			</data-set>
+		</div>
+		
+		<!-- An overview of locations -->
+		<div class="row">
+			<h2>Locations</h2>
+			<data-set var="location" value="#{locations}">
+				<include view="include/location"/>
+			</data-set>
+		</div>
+		
+		<!-- Hard refresh -->
 		<script type="text/javascript">
 			$(document).ready(function(){
 				setTimeout(function(){
@@ -16,5 +36,4 @@
 				}, 30000);
 			});
 		</script>
-	
 </fragment>

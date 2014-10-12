@@ -7,7 +7,7 @@
         <h4><a href="/profile/"><a href="/profile/">Hello #{Balsa().currentPrincipal().summary}</a></a></h4>
         <ul>
             <li>
-                <a href="/">Alerts</a>
+                <a href="/">Overview</a>
             </li>
             <li>
                 <a href="/location/">Locations</a>
