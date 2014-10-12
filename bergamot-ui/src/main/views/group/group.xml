@@ -34,7 +34,7 @@
 		    bergamot_ui_server_state.attachTo("div.check");
 
 		    bergamot_api_driver.attachTo(document, {
-				url: "ws://" + #{'"' + Balsa().request.serverName + '"'} + "/websocket",
+				url: #{'"' + bergamot_update_url() + '"'},
 		    });
 		});
 		

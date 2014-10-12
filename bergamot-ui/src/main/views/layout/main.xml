@@ -5,8 +5,8 @@
 	<head>
 		<title>Bergamot Monitoring - #{title()}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-		<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
-		<link href='http://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
+		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
 		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
 		<!-- Scripts -->
 		<script src="#{public('/js/bower_components/requirejs/require.js')}"></script>

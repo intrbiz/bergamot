@@ -34,6 +34,7 @@ import com.intrbiz.bergamot.ui.api.TeamAPIRouter;
 import com.intrbiz.bergamot.ui.api.TestAPIRouter;
 import com.intrbiz.bergamot.ui.api.TimePeriodAPIRouter;
 import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
+import com.intrbiz.bergamot.ui.express.BergamotUpdateURL;
 import com.intrbiz.bergamot.ui.login.LoginRouter;
 import com.intrbiz.bergamot.ui.router.ClusterRouter;
 import com.intrbiz.bergamot.ui.router.ContactRouter;
@@ -124,6 +125,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         this.clusterManager = new ClusterManager();
         // websocket update server
         this.updateServer = new UpdateServer(Integer.getInteger("bergamot.websocket.port", 8081));
+        // express functions
+        immutableFunction(new BergamotUpdateURL());
         // some actions
         action(new ExecuteCheckAction());
         action(new SchedulerActions());
