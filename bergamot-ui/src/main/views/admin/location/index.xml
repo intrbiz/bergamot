@@ -18,7 +18,7 @@
 	    		</tr>
 	    		<data-set var="location" value="#{locations}">
 	    			<tr data-location-id="#{location.id}">
-	    				<td><a href="/admin/location/configure/id/#{location.id}">#{location.summary}</a></td>
+	    				<td><a href="/admin/config/id/#{location.id}">#{location.summary}</a></td>
 	    				<td>#{location.name}</td>
 	    				<td>
 	    					<a rendered="#{location.location != null}" href="/admin/location/configure/id/#{location.location.id}">#{location.location.summary}</a>
@@ -46,7 +46,7 @@
 	    		</tr>
 	    		<data-set var="template" value="#{location_templates}">
 	    			<tr data-location-id="#{template.id}">
-		    			<td><a href="/admin/location/configure/id/#{template.id}" title="Configure this location template">#{template.summary}</a></td>
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this location template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>
 	    					<span>#{template.configuration.location}</span>

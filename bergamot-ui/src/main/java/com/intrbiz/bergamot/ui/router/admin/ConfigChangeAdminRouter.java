@@ -62,6 +62,14 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         redirect(path("/admin/configchange/edit/id/" + change.getId()));
     }
     
+    @Get("/view/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void view(BergamotDB db, @AsUUID UUID id)
+    {
+        var("change", db.getConfigChange(id));
+        encode("admin/configchange/view");
+    }
+    
     @Get("/edit/id/:id")
     @WithDataAdapter(BergamotDB.class)
     public void edit(BergamotDB db, @AsUUID UUID id)
@@ -73,11 +81,12 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Post("/edit/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void save(BergamotDB db, @AsUUID UUID id, @Param("change_configuration") String configuration) throws IOException, JAXBException
+    public void save(BergamotDB db, @AsUUID UUID id, @Param("change_configuration") String configuration, @SessionVar("site") Site site) throws IOException, JAXBException
     {
         BergamotCfg cfg = Configuration.read(BergamotCfg.class, new StringReader(configuration));
         // update
         ConfigChange change = db.getConfigChange(id);
+        cfg.setSite(site.getName());
         change.setConfiguration(cfg);
         db.setConfigChange(change);
         // nullify the current change id
@@ -88,7 +97,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Any("/add/:type/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void edit(BergamotDB db, @SessionVar("site") Site site, String type, @AsUUID UUID id) throws IOException
+    public void add(BergamotDB db, @SessionVar("site") Site site, String type, @AsUUID UUID id) throws IOException
     {
         TemplatedObjectCfg<?> cfg = (TemplatedObjectCfg<?>) db.getConfig(id).getConfiguration();
         // update the change
@@ -96,6 +105,26 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), new BergamotCfg(site.getName(), "Edit " + type, null)) : db.getConfigChange(currentChangeId);
         // remove the object id
         ((NamedObjectCfg<?>) cfg).setId(null);
+        // add the object
+        ((BergamotCfg) change.getConfiguration()).addObject(cfg);
+        // update
+        db.setConfigChange(change);
+        // edit
+        redirect(path("/admin/configchange/edit/id/" + change.getId()));
+    }
+    
+    @Any("/remove/:type/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void remove(BergamotDB db, @SessionVar("site") Site site, String type, @AsUUID UUID id) throws Exception
+    {
+        TemplatedObjectCfg<?> cfg = (TemplatedObjectCfg<?>) db.getConfig(id).getConfiguration();
+        // update the change
+        UUID currentChangeId = sessionVar("current_change");
+        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), new BergamotCfg(site.getName(), "Edit " + type, null)) : db.getConfigChange(currentChangeId);
+        // remove the object id
+        ((NamedObjectCfg<?>) cfg).setId(null);
+        // set removed
+        cfg.setRemoved(true);
         // add the object
         ((BergamotCfg) change.getConfiguration()).addObject(cfg);
         // update

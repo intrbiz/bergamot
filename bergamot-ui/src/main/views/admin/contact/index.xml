@@ -29,7 +29,7 @@
 	    		</tr>
 	    		<data-set var="contact" value="#{contacts}">
 	    			<tr data-contact-id="#{contact.id}">
-	    				<td><a href="/admin/contact/configure/id/#{contact.id}" title="Configure this contact">#{contact.summary}</a></td>
+	    				<td><a href="/admin/config/id/#{contact.id}" title="Configure this contact">#{contact.summary}</a></td>
 	    				<td>#{contact.name}</td>
 	    				<td>#{contact.email}</td>
 	    				<td>#{coalesce(contact.pager, '')}</td>
@@ -99,7 +99,7 @@
 	    		</tr>
 	    		<data-set var="template" value="#{contact_templates}">
 	    			<tr data-contact-id="#{template.id}">
-		    			<td><a href="/admin/contact/configure/id/#{template.id}" title="Configure this contact template">#{template.summary}</a></td>
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this contact template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>#{coalesce(template.description, '')}</td>
 	    				<td>#{if(template.configuration.notifications.getEnabledBooleanValue(), 'Yes', 'No')}</td>

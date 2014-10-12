@@ -1,20 +1,21 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
-<fragment xmlns="com.intrbiz.balsa" title="Configuration for host #{coalesce(host.summary, host.name)}">
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Configuration for #{config.type} #{coalesce(config.summary, config.name)}">
     <div class="row">
    		<h4>XML Configuration</h4>
-   		<pre>#{host.toString()}</pre>
+   		<pre>#{config.getConfiguration().toString()}</pre>
     </div>
     <div class="row">
    		<h4>Resolved Configuration</h4>
    		<p class="text-body">The following is the resultant configuration once templates have been applied:</p>
-   		<pre>#{host.resolve().toString()}</pre>
+   		<pre>#{config.getResolvedConfiguration().resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/configchange/add/host/id/#{config.id}" class="add">Edit this host</a>
-    	<a href="/admin/configchange/remove/host/id/#{config.id}" class="remove">Remove this host</a>
+    	<a href="/admin/configchange/add/contact/id/#{config.id}" class="add">Edit this #{config.type}</a>
+    	<a href="/admin/configchange/remove/contact/id/#{config.id}" class="remove">Remove this #{config.type}</a>
     </div>
-    <div class="row" rendered="#{host.getTemplateBooleanValue()}">
+    <div class="row" rendered="#{config.template}">
     	<h4>Dependents</h4>
     	<p>Any change to this configuration template, will cascade to the following:</p>
     	<table>
@@ -26,7 +27,7 @@
     		<data-set var="dep" value="#{config.listAllDependentsObjects()}">
     			<tr>
     				<td>#{ucfirst(dep.type)}</td>
-    			    <td><a href="/admin/host/configure/id/#{dep.id}" title="Configure">#{coalesce(dep.summary, ucfirst(dep.name))}</a></td>
+    			    <td><a href="/admin/config/id/#{dep.id}" title="Configure">#{coalesce(dep.summary, ucfirst(dep.name))}</a></td>
     				<td>#{dep.name}</td>
     			</tr>
     		</data-set>

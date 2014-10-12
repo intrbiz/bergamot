@@ -18,7 +18,7 @@
 	    		</tr>
 	    		<data-set var="group" value="#{groups}">
 	    			<tr data-group-id="#{group.id}">
-	    				<td><a href="/admin/group/configure/id/#{group.id}">#{group.summary}</a></td>
+	    				<td><a href="/admin/config/id/#{group.id}">#{group.summary}</a></td>
 	    				<td>#{group.name}</td>
 	    				<td>
 	    					<data-set var="parent_group" value="#{group.groups}">
@@ -49,7 +49,7 @@
 	    		</tr>
 	    		<data-set var="template" value="#{group_templates}">
 	    			<tr data-group-id="#{template.id}">
-		    			<td><a href="/admin/group/configure/id/#{template.id}" title="Configure this group template">#{template.summary}</a></td>
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this group template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>
 	    					<data-set var="parent_group" value="#{template.groups}">

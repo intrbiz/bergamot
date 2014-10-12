@@ -16,7 +16,7 @@
 	    		</tr>
 	    		<data-set var="command" value="#{commands}">
 	    			<tr data-command-id="#{command.id}">
-	    				<td><a href="/admin/command/configure/id/#{command.id}">#{command.summary}</a></td>
+	    				<td><a href="/admin/config/id/#{command.id}">#{command.summary}</a></td>
 	    				<td>#{command.name}</td>
 	    				<td>#{coalesce(command.engine, '')}</td>
 	    				<td>#{coalesce(command.executor, '')}</td>
@@ -51,7 +51,7 @@
 	    		</tr>
 	    		<data-set var="template" value="#{command_templates}">
 	    			<tr data-command-id="#{template.id}">
-		    			<td><a href="/admin/command/configure/id/#{template.id}" title="Configure this command template">#{template.summary}</a></td>
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this command template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>#{coalesce(template.configuration.engine, '')}</td>
 	    				<td>#{coalesce(template.configuration.executor, '')}</td>

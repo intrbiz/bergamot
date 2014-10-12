@@ -3,18 +3,14 @@ package com.intrbiz.bergamot.ui.router.admin;
 import java.io.IOException;
 import java.util.UUID;
 
-import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
-import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaUUID;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
@@ -61,13 +57,5 @@ public class ContactAdminRouter extends Router<BergamotApp>
     {
         action("reset-password", db.getContact(contactId));
         redirect(path("/admin/contact/"));
-    }
-    
-    @Get("/configure/id/:id")
-    @WithDataAdapter(BergamotDB.class)
-    public void showConfigure(BergamotDB db, @AsUUID UUID id, @SessionVar("site") Site site)
-    {
-        model("contact", Util.nullable(db.getConfig(id), Config::getResolvedConfiguration));
-        encode("admin/contact/configure");
     }
 }

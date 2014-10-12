@@ -1,10 +1,9 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Change Sets">
+<fragment xmlns="com.intrbiz.balsa" title="Configuration Changes">
     
     <div clas="row" style="margin-bottom: 20px;">
-    	<h3>Current Change Sets</h3>
     	<p class="text-body">
     		A change set contain a number of configuration changes.  This allows for configuration changes to be made transactionally.
     	</p>
@@ -16,6 +15,7 @@
     			<th>Applied</th>
     			<th></th>
     			<th></th>
+    			<th></th>
     		</tr>
     		<data-set var="change" value="#{changes}">
     			<tr>
@@ -23,6 +23,9 @@
     				<td>#{dateformat('EEEE dd/MM/yyyy', change.created) + ' at ' + dateformat('HH:mm:ss', change.created)}</td>
     				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
     				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt)  + ' at ' + dateformat('HH:mm:ss', change.appliedAt), '')}</td>
+    				<td>
+    					<a href="/admin/configchange/view/id/#{change.id}">View Change</a>
+    				</td>
     				<td>
     					<a href="/admin/configchange/edit/id/#{change.id}" rendered="#{! change.applied}">Edit Change</a>
     				</td>
@@ -35,7 +38,7 @@
     </div>
     
     <div clas="row">
-    	<h3>Create Change</h3>
+    	<h3>Create Configuration Change</h3>
     	<form method="post" action="#{path('/admin/configchange/create')}">
     		<div class="col12">
 				<p class="field">

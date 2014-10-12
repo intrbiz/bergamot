@@ -22,7 +22,7 @@
 	    		</tr>
 	    		<data-set var="team" value="#{teams}">
 	    			<tr data-team-id="#{team.id}">
-	    				<td><a href="/admin/team/configure/id/#{team.id}">#{team.summary}</a></td>
+	    				<td><a href="/admin/config/id/#{team.id}">#{team.summary}</a></td>
 	    				<td>#{team.name}</td>
 	    				<td>
 	    					<data-set var="parent_team" value="#{team.teams}">
@@ -68,7 +68,7 @@
 	    		</tr>
 	    		<data-set var="template" value="#{team_templates}">
 	    			<tr data-team-id="#{template.id}">
-		    			<td><a href="/admin/team/configure/id/#{template.id}" title="Configure this team template">#{template.summary}</a></td>
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this team template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>
 	    					<data-set var="parent_team" value="#{template.configuration.teams}">

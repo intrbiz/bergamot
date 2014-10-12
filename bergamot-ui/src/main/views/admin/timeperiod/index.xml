@@ -14,7 +14,7 @@
 	    		</tr>
 	    		<data-set var="timeperiod" value="#{timeperiods}">
 	    			<tr>
-	    				<td><a href="/admin/timeperiod/configure/id/#{timeperiod.id}">#{timeperiod.summary}</a></td>
+	    				<td><a href="/admin/config/id/#{timeperiod.id}">#{timeperiod.summary}</a></td>
 	    				<td>#{timeperiod.name}</td>
 	    				<td>
 	    					<data-set var="excluded" value="#{timeperiod.getExcludes()}">
@@ -46,7 +46,7 @@
 	    		</tr>
 	    		<data-set var="template" value="#{command_templates}">
 	    			<tr data-command-id="#{template.id}">
-		    			<td><a href="/admin/timeperiod/configure/id/#{template.id}" title="Configure this time period template">#{template.summary}</a></td>
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this time period template">#{template.summary}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>#{coalesce(template.configuration.engine, '')}</td>
 	    				<td>#{coalesce(template.configuration.executor, '')}</td>
