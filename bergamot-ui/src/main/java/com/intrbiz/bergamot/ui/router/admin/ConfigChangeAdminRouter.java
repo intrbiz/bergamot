@@ -178,7 +178,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
         ValidatedBergamotConfiguration validated = cfg.validate(db.getObjectLocator(site.getId()));
         // import
-        BergamotImportReport report = new BergamotConfigImporter(validated).resetState(false).importConfiguration();
+        BergamotImportReport report = new BergamotConfigImporter(validated).resetState(false).online(true).importConfiguration();
         // update the db
         if (report.isSuccessful())
         {

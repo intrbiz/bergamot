@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,11 +57,17 @@ import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
+import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
+import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
+import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
+import com.intrbiz.bergamot.queue.SchedulerQueue;
+import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParser;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataException;
+import com.intrbiz.queue.RoutedProducer;
 
 public class BergamotConfigImporter
 {    
@@ -74,9 +81,13 @@ public class BergamotConfigImporter
     
     private boolean createSite = false;
     
+    private boolean online = false;
+    
     private Map<String, CascadedChange> cascadedChanges = new HashMap<String, CascadedChange>();
     
     private Set<String> loadedObjects = new HashSet<String>();
+    
+    private List<DelayedSchedulerAction> delayedSchedulerActions = new LinkedList<DelayedSchedulerAction>(); 
     
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
@@ -96,6 +107,12 @@ public class BergamotConfigImporter
         return this;
     }
     
+    public BergamotConfigImporter online(boolean online)
+    {
+        this.online = online;
+        return this;
+    }
+    
     public BergamotImportReport importConfiguration()
     {
         if (this.report == null)
@@ -103,6 +120,7 @@ public class BergamotConfigImporter
             this.report = new BergamotImportReport(this.config.getSite());
             try
             {
+                // update database
                 try (BergamotDB db = BergamotDB.connect())
                 {
                     db.execute(()-> {
@@ -127,6 +145,28 @@ public class BergamotConfigImporter
                         // clusters
                         this.loadClusters(db);
                     });
+                }
+                // we must publish any scheduling changes after we have committed the transaction
+                // publish all scheduling changes
+                if (this.online)
+                {
+                    try (SchedulerQueue queue = SchedulerQueue.open())
+                    {
+                        try (RoutedProducer<SchedulerAction> producer = queue.publishSchedulerActions())
+                        {
+                            for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
+                            {
+                                this.report.info("Publishing scheduler action: " + delayedAction.change + " for check " + delayedAction.check.getClass().getSimpleName() + ":" + delayedAction.check.getName());
+                                // apply the scheduling change
+                                if (delayedAction.change == DelayedSchedulerAction.SchedulingChange.RESCHEDULE)
+                                {
+                                    producer.publish(new SchedulerKey(delayedAction.check.getSiteId(), delayedAction.check.getPool()), new RescheduleCheck(delayedAction.check.toStubMO()));
+                                }
+                                // ensure the check is enabled
+                                producer.publish(new SchedulerKey(delayedAction.check.getSiteId(), delayedAction.check.getPool()), new EnableCheck(delayedAction.check.toStubMO()));
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception e)
@@ -737,6 +777,7 @@ public class BergamotConfigImporter
         }
         // add the host
         db.setHost(host);
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(DelayedSchedulerAction.SchedulingChange.RESCHEDULE, host));
         this.loadedObjects.add("host:" + cfg.getName());
         // add services
         for (ServiceCfg scfg : rcfg.getServices())
@@ -863,6 +904,7 @@ public class BergamotConfigImporter
         this.loadActiveCheck(service, rcfg, db);
         // add
         db.setService(service);
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(DelayedSchedulerAction.SchedulingChange.RESCHEDULE, service));
     }
     
     private void loadTrap(Host host, TrapCfg cfg, BergamotDB db)
@@ -1014,6 +1056,21 @@ public class BergamotConfigImporter
             this.change = change;
             this.template = template;
             this.dependent = dependent;
+        }
+    }
+    
+    private static class DelayedSchedulerAction
+    {
+        public enum SchedulingChange { RESCHEDULE, REMOVE }
+        
+        public final ActiveCheck<?,?> check;
+        
+        public final SchedulingChange change;
+        
+        public DelayedSchedulerAction(SchedulingChange change, ActiveCheck<?,?> check)
+        {
+            this.change = change;
+            this.check = check;
         }
     }
 }
