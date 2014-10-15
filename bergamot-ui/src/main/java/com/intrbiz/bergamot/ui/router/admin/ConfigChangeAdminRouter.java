@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 
+import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -88,6 +89,8 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         ConfigChange change = db.getConfigChange(id);
         cfg.setSite(site.getName());
         change.setConfiguration(cfg);
+        change.setSummary(Util.coalesceEmpty(cfg.getSummary(), change.getSummary(), ""));
+        change.setDescription(cfg.getDescription());
         db.setConfigChange(change);
         // nullify the current change id
         sessionVar("current_change", null);

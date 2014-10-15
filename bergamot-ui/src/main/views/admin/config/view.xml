@@ -12,8 +12,8 @@
    		<pre>#{config.getResolvedConfiguration().resolve().toString()}</pre>
     </div>
     <div class="row">
-    	<a href="/admin/configchange/add/contact/id/#{config.id}" class="add">Edit this #{config.type}</a>
-    	<a href="/admin/configchange/remove/contact/id/#{config.id}" class="remove">Remove this #{config.type}</a>
+    	<a href="/admin/configchange/add/#{config.type}/id/#{config.id}" class="add">Edit this #{config.type}</a>
+    	<a href="/admin/configchange/remove/#{config.type}/id/#{config.id}" class="remove">Remove this #{config.type}</a>
     </div>
     <div class="row" rendered="#{config.template}">
     	<h4>Dependents</h4>

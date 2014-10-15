@@ -90,7 +90,7 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
         this.summary = summary;
     }
 
-    @XmlElement(name = "summary")
+    @XmlElement(name = "description")
     public String getDescription()
     {
         return description;
