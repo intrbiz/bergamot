@@ -59,6 +59,7 @@ import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
+import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
@@ -158,7 +159,11 @@ public class BergamotConfigImporter
                             {
                                 this.report.info("Publishing scheduler action: " + delayedAction.change + " for check " + delayedAction.check.getClass().getSimpleName() + ":" + delayedAction.check.getName());
                                 // apply the scheduling change
-                                if (delayedAction.change == DelayedSchedulerAction.SchedulingChange.RESCHEDULE)
+                                if (delayedAction.change == DelayedSchedulerAction.SchedulingChange.SCHEDULE)
+                                {
+                                    producer.publish(new SchedulerKey(delayedAction.check.getSiteId(), delayedAction.check.getPool()), new ScheduleCheck(delayedAction.check.toStubMO()));
+                                }
+                                else if (delayedAction.change == DelayedSchedulerAction.SchedulingChange.RESCHEDULE)
                                 {
                                     producer.publish(new SchedulerKey(delayedAction.check.getSiteId(), delayedAction.check.getPool()), new RescheduleCheck(delayedAction.check.toStubMO()));
                                 }
@@ -749,16 +754,19 @@ public class BergamotConfigImporter
         }
         this.report.info("Loading host:\r\n" + rcfg.toString());
         // load
+        DelayedSchedulerAction.SchedulingChange hostSchedulingChange = null;
         Host host = db.getHostByName(this.site.getId(), rcfg.getName());
         if (host == null)
         {
             cfg.setId(this.site.randomObjectId());
             host = new Host();
+            hostSchedulingChange = DelayedSchedulerAction.SchedulingChange.SCHEDULE;
             this.report.info("Configuring new host: " + rcfg.getName());
         }
         else
         {
             cfg.setId(host.getId());
+            hostSchedulingChange = DelayedSchedulerAction.SchedulingChange.RESCHEDULE;
             this.report.info("Reconfiguring existing host: " + rcfg.getName() + " (" + cfg.getId() + ")");
         }
         host.configure(cfg);
@@ -777,7 +785,7 @@ public class BergamotConfigImporter
         }
         // add the host
         db.setHost(host);
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(DelayedSchedulerAction.SchedulingChange.RESCHEDULE, host));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(hostSchedulingChange, host));
         this.loadedObjects.add("host:" + cfg.getName());
         // add services
         for (ServiceCfg scfg : rcfg.getServices())
@@ -886,17 +894,20 @@ public class BergamotConfigImporter
         // resolve
         ServiceCfg rcfg = cfg.resolve();
         // create the service
+        DelayedSchedulerAction.SchedulingChange serviceSchedulingChange = null;
         Service service = db.getServiceOnHost(host.getId(), rcfg.getName());
         if (service == null)
         {
             cfg.setId(this.site.randomObjectId());
             service = new Service();
             service.setHostId(host.getId());
+            serviceSchedulingChange = DelayedSchedulerAction.SchedulingChange.SCHEDULE;
             this.report.info("Configuring new service: " + cfg.resolve().getName() + " on host " + host.getName());
         }
         else
         {
             cfg.setId(service.getId());
+            serviceSchedulingChange = DelayedSchedulerAction.SchedulingChange.RESCHEDULE;
             this.report.info("Reconfiguring existing service: " + cfg.resolve().getName() + " on host " + host.getName() + " (" + cfg.getId() + ")");
         }
         service.configure(cfg);
@@ -904,7 +915,7 @@ public class BergamotConfigImporter
         this.loadActiveCheck(service, rcfg, db);
         // add
         db.setService(service);
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(DelayedSchedulerAction.SchedulingChange.RESCHEDULE, service));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(serviceSchedulingChange, service));
     }
     
     private void loadTrap(Host host, TrapCfg cfg, BergamotDB db)
@@ -1061,7 +1072,7 @@ public class BergamotConfigImporter
     
     private static class DelayedSchedulerAction
     {
-        public enum SchedulingChange { RESCHEDULE, REMOVE }
+        public enum SchedulingChange { SCHEDULE, RESCHEDULE, REMOVE }
         
         public final ActiveCheck<?,?> check;
         
