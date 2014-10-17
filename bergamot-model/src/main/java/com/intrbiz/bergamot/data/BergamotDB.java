@@ -203,7 +203,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract Config getConfigByName(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
     
     @SQLGetter(table = Config.class, name = "list_dependent_config", since = @SQLVersion({1, 0, 0}),
-            query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND required_templates @> ARRAY[p_qualified_template_name]")
+            query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND required_templates @> ARRAY[p_qualified_template_name] AND (NOT (type = 'service' OR type = 'trap' OR type = 'resource'))")
     )
     public abstract List<Config> listDependentConfig(@SQLParam("site_id") UUID siteId, @SQLParam(value = "qualified_template_name", virtual = true) String qualifiedTemplateName);
     
@@ -222,7 +222,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                               "    ) " +
                               "    SELECT * " +
                               "    FROM config_graph cg " +
-                              "    WHERE cg.template = FALSE")
+                              "    WHERE cg.template = FALSE AND (NOT (type = 'service' OR type = 'trap' OR type = 'resource'))")
     )
     public abstract List<Config> listAllDependentConfigObjects(@SQLParam("site_id") UUID siteId, @SQLParam(value = "qualified_template_name", virtual = true) String qualifiedTemplateName);
     
