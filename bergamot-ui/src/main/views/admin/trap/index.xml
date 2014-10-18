@@ -1,0 +1,44 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Traps">
+    
+    <div class="row">
+    	<h3>Templates</h3>
+    	<p class="text-body">
+    		Templates are be applied to a trap of a host to avoid having to repeatedly configure common parameters.
+    		Below are the templates that can be used.
+    	</p>
+       	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+		    		<th>Extends</th>
+		    		<th>Groups</th>
+		    		<th>Description</th>
+	    		</tr>
+	    		<data-set var="template" value="#{trap_templates}">
+	    			<tr data-group-id="#{template.id}">
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this trap template">#{coalesce(template.summary, ucfirst(template.name))}</a></td>
+	    				<td>#{template.name}</td>
+	    				<td>
+	    					<data-set var="inherit" value="#{template.configuration.inheritedTemplates}">
+	    						<span rendered="#{inherit_rownum > 0}">, </span>
+	    						<span>#{inherit}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>
+	    					<data-set var="group" value="#{template.configuration.groups}">
+	    						<span rendered="#{group_rownum > 0}">, </span>
+	    						<span>#{group}</span>
+	    					</data-set>
+	    				</td>
+	    				<td>#{coalesce(template.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>

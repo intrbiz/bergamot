@@ -1,11 +1,11 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Hosts">
+<fragment xmlns="com.intrbiz.balsa" title="Clusters">
     
     <div clas="row">
     	<p class="text-body">
-    		Hosts are networked devices which should be checked.  Hosts also contain service and trap checks.
+    		Clusters are virtual devices which are the combination of multiple clusters.
     	</p>
     	<div class="col12">
 	    	<table>
@@ -13,36 +13,32 @@
 		    		<th>Display Name</th>
 		    		<th>Name</th>
 		    		<th>Extends</th>
-		    		<th>Address</th>
 		    		<th>Location</th>
 	    			<th>Groups</th>
-	    			<th>Services</th>
-	    			<th>Traps</th>
+	    			<th>Resources</th>
 	    			<th>Description</th>
 	    		</tr>
-	    		<data-set var="host" value="#{hosts}">
-	    			<tr data-group-id="#{host.id}">
-	    				<td><a href="/admin/config/id/#{host.id}">#{host.summary}</a></td>
-	    				<td>#{host.name}</td>
+	    		<data-set var="cluster" value="#{clusters}">
+	    			<tr data-group-id="#{cluster.id}">
+	    				<td><a href="/admin/config/id/#{cluster.id}">#{cluster.summary}</a></td>
+	    				<td>#{cluster.name}</td>
 	    				<td>
-	    					<data-set var="inherit" value="#{host.configuration.inheritedTemplates}">
+	    					<data-set var="inherit" value="#{cluster.configuration.inheritedTemplates}">
 	    						<span rendered="#{inherit_rownum > 0}">, </span>
 	    						<span>#{inherit}</span>
 	    					</data-set>
 	    				</td>
-	    				<td>#{host.address}</td>
 	    				<td>
-	    					<a rendered="#{host.location != null}" href="/admin/config/id/#{host.location.id}">#{coalesce(host.location.summary, host.location.name)}</a>
+	    					<a rendered="#{cluster.location != null}" href="/admin/config/id/#{cluster.location.id}">#{coalesce(cluster.location.summary, cluster.location.name)}</a>
 	    				</td>
 	    				<td>
-	    					<data-set var="group" value="#{host.groups}">
+	    					<data-set var="group" value="#{cluster.groups}">
 	    						<span rendered="#{group_rownum > 0}">, </span>
 	    						<a href="/admin/config/id/#{group.id}">#{coalesce(group.summary, group.name)}</a>
 	    					</data-set>
 	    				</td>
-	    				<td>#{host.services.size()}</td>
-	    				<td>#{host.traps.size()}</td>
-	    				<td>#{coalesce(host.description, '')}</td>
+	    				<td>#{cluster.resources.size()}</td>
+	    				<td>#{coalesce(cluster.description, '')}</td>
 	    			</tr>
 	    		</data-set>
 	    	</table>
@@ -52,7 +48,7 @@
     <div class="row">
     	<h3>Templates</h3>
     	<p class="text-body">
-    		Templates are be applied to a host to avoid having to repeatedly configure common parameters.
+    		Templates are be applied to a cluster to avoid having to repeatedly configure common parameters.
     		Below are the templates that can be used.
     	</p>
        	<div class="col12">
@@ -63,13 +59,12 @@
 		    		<th>Extends</th>
 		    		<th>Location</th>
 		    		<th>Groups</th>
-		    		<th>Services</th>
-	    			<th>Traps</th>
+		    		<th>Resources</th>
 		    		<th>Description</th>
 	    		</tr>
-	    		<data-set var="template" value="#{host_templates}">
+	    		<data-set var="template" value="#{cluster_templates}">
 	    			<tr data-group-id="#{template.id}">
-		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this host template">#{coalesce(template.summary, ucfirst(template.name))}</a></td>
+		    			<td><a href="/admin/config/id/#{template.id}" title="Configure this cluster template">#{coalesce(template.summary, ucfirst(template.name))}</a></td>
 	    				<td>#{template.name}</td>
 	    				<td>
 	    					<data-set var="inherit" value="#{template.configuration.inheritedTemplates}">
@@ -84,8 +79,7 @@
 	    						<span>#{group}</span>
 	    					</data-set>
 	    				</td>
-	    				<td>#{template.configuration.services.size()}</td>
-	    				<td>#{template.configuration.traps.size()}</td>
+	    				<td>#{template.configuration.resources.size()}</td>
 	    				<td>#{coalesce(template.description, '')}</td>
 	    			</tr>
 	    		</data-set>

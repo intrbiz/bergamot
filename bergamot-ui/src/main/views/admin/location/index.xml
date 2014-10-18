@@ -21,7 +21,7 @@
 	    				<td><a href="/admin/config/id/#{location.id}">#{location.summary}</a></td>
 	    				<td>#{location.name}</td>
 	    				<td>
-	    					<a rendered="#{location.location != null}" href="/admin/location/configure/id/#{location.location.id}">#{location.location.summary}</a>
+	    					<a rendered="#{location.location != null}" href="/admin/config/id/#{location.location.id}">#{location.location.summary}</a>
 	    				</td>
 	    				<td>#{coalesce(location.description, '')}</td>
 	    			</tr>

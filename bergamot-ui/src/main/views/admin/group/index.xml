@@ -23,7 +23,7 @@
 	    				<td>
 	    					<data-set var="parent_group" value="#{group.groups}">
 	    						<span rendered="#{parent_group_rownum > 0}">, </span>
-	    						<a href="/admin/group/configure/id/#{parent_group.id}">#{coalesce(parent_group.summary, parent_group.name)}</a>
+	    						<a href="/admin/config/id/#{parent_group.id}">#{coalesce(parent_group.summary, parent_group.name)}</a>
 	    					</data-set>
 	    				</td>
 	    				<td>#{coalesce(group.description, '')}</td>

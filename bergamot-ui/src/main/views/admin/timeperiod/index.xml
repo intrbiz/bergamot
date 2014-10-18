@@ -19,7 +19,7 @@
 	    				<td>
 	    					<data-set var="excluded" value="#{timeperiod.getExcludes()}">
 	    						<span rendered="#{excluded_rownum > 0}">, </span>
-	    						<a href="/admin/timeperiod/configure/id/#{excluded.id}">#{excluded.summary}</a>
+	    						<a href="/admin/config/id/#{excluded.id}">#{excluded.summary}</a>
 	    					</data-set>
 	    				</td>
 	    				<td>#{coalesce(timeperiod.description, '')}</td>
