@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -70,7 +71,7 @@ public class SMSEngine extends AbstractNotificationEngine
     @Override
     public void sendNotification(Notification notification)
     {
-        logger.info("Sending SMS notification for " + notification.getNotificationType() + " to " + notification.getTo());
+        logger.info("Sending SMS notification for " + notification.getNotificationType() + " to " + notification.getTo().stream().map(ContactMO::getPager).filter((e) -> { return e != null; }).collect(Collectors.toList()));
         Timer.Context tctx = this.smsSendTimer.time();
         try
         {

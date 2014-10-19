@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.mail.Message;
 import javax.mail.Message.RecipientType;
@@ -87,7 +88,7 @@ public class EmailEngine extends AbstractNotificationEngine
     {
         if (logger.isTraceEnabled()) logger.trace(notification.toString());
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-        logger.info("Sending email notification for " + notification.getNotificationType() + " to " + notification.getTo());
+        logger.info("Sending email notification for " + notification.getNotificationType() + " to " + notification.getTo().stream().map(ContactMO::getEmail).filter((e) -> { return e != null; }).collect(Collectors.toList()));
         Timer.Context tctx = this.emailSendTimer.time();
         try
         {
