@@ -148,7 +148,7 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
                     }
                     else if ("site".equals(name))
                     {
-                        return ((GenericNotification) notification).getSite();
+                        return ((Notification) notification).getSite();
                     }
                     else if ("contact".equals(name))
                     {
