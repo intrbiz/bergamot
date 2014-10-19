@@ -365,28 +365,38 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         child.setLocationId(parent.getId());
         this.setLocation(child);
-        this.getAdapterCache().remove("get_locations_in_location." + parent.getId());
+        this.invalidateLocationsInLocation(parent.getId());
     }
     
     public void removeLocationChild(Location parent, Location child)
     {
         child.setLocationId(null);
         this.setLocation(child);
-        this.getAdapterCache().remove("get_locations_in_location." + parent.getId());
+        this.invalidateLocationsInLocation(parent.getId());
+    }
+    
+    public void invalidateLocationsInLocation(UUID locationId)
+    {
+        this.getAdapterCache().remove("get_locations_in_location." + locationId);
     }
     
     public void addLocationHost(Location location, Host host)
     {
         host.setLocationId(location.getId());
         this.setHost(host);
-        this.getAdapterCache().remove("get_hosts_in_location." + location.getId());
+        this.invalidateHostsInLocation(location.getId());
     }
     
     public void removeLocationHost(Location location, Host host)
     {
         host.setLocationId(null);
         this.setHost(host);
-        this.getAdapterCache().remove("get_hosts_in_location." + location.getId());
+        this.invalidateHostsInLocation(location.getId());
+    }
+    
+    public void invalidateHostsInLocation(UUID locationId)
+    {
+        this.getAdapterCache().remove("get_hosts_in_location." + locationId);
     }
     
     // group
@@ -431,14 +441,19 @@ public abstract class BergamotDB extends DatabaseAdapter
             child.getGroupIds().add(parent.getId());
         }   
         this.setGroup(child);
-        this.getAdapterCache().remove("get_groups_in_group." + parent.getId());
+        this.invalidateGroupsInGroup(parent.getId());
     }
     
     public void removeGroupChild(Group parent, Group child)
     {
         child.getGroupIds().remove(parent.getId());
         this.setGroup(child);
-        this.getAdapterCache().remove("get_groups_in_group." + parent.getId());
+        this.invalidateGroupsInGroup(parent.getId());
+    }
+    
+    public void invalidateGroupsInGroup(UUID groupId)
+    {
+        this.getAdapterCache().remove("get_groups_in_group." + groupId);
     }
     
     public void addCheckToGroup(Group group, Check<?,?> check)
@@ -447,23 +462,23 @@ public abstract class BergamotDB extends DatabaseAdapter
         {
             check.getGroupIds().add(group.getId());
         }
-        this.setCheck(check);
-        this.getAdapterCache().remove("get_hosts_in_group." + group.getId());
-        this.getAdapterCache().remove("get_services_in_group." + group.getId());
-        this.getAdapterCache().remove("get_traps_in_group." + group.getId());
-        this.getAdapterCache().remove("get_clusters_in_group." + group.getId());
-        this.getAdapterCache().remove("get_resources_in_group." + group.getId());
+        this.invalidateChecksInGroup(group.getId());
     }
     
     public void removeCheckFromGroup(Group group, Check<?,?> check)
     {
         check.getGroupIds().remove(group.getId());
         this.setCheck(check);
-        this.getAdapterCache().remove("get_hosts_in_group." + group.getId());
-        this.getAdapterCache().remove("get_services_in_group." + group.getId());
-        this.getAdapterCache().remove("get_traps_in_group." + group.getId());
-        this.getAdapterCache().remove("get_clusters_in_group." + group.getId());
-        this.getAdapterCache().remove("get_resources_in_group." + group.getId());
+        this.invalidateChecksInGroup(group.getId());
+    }
+    
+    public void invalidateChecksInGroup(UUID groupId)
+    {
+        this.getAdapterCache().remove("get_hosts_in_group." + groupId);
+        this.getAdapterCache().remove("get_services_in_group." + groupId);
+        this.getAdapterCache().remove("get_traps_in_group." + groupId);
+        this.getAdapterCache().remove("get_clusters_in_group." + groupId);
+        this.getAdapterCache().remove("get_resources_in_group." + groupId);        
     }
     
     // team
@@ -502,14 +517,19 @@ public abstract class BergamotDB extends DatabaseAdapter
             child.getTeamIds().add(parent.getId());
         }
         this.setTeam(child);
-        this.getAdapterCache().remove("get_teams_in_team." + parent.getId());
+        this.invalidateTeamsInTeam(parent.getId());
     }
     
     public void removeTeamChild(Team parent, Team child)
     {
         child.getTeamIds().remove(parent.getId());
         this.setTeam(child);
-        this.getAdapterCache().remove("get_teams_in_team." + parent.getId());
+        this.invalidateTeamsInTeam(parent.getId());
+    }
+    
+    public void invalidateTeamsInTeam(UUID teamId)
+    {
+        this.getAdapterCache().remove("get_teams_in_team." + teamId);
     }
     
     public void addContactToTeam(Team parent, Contact contact)
@@ -519,14 +539,19 @@ public abstract class BergamotDB extends DatabaseAdapter
             contact.getTeamIds().add(parent.getId());
         }
         this.setContact(contact);
-        this.getAdapterCache().remove("get_contacts_in_team." + parent.getId());
+        this.invalidateContactsInTeam(parent.getId());
     }
     
     public void removeContactFromTeam(Team parent, Contact contact)
     {
         contact.getTeamIds().remove(parent.getId());
         this.setContact(contact);
-        this.getAdapterCache().remove("get_contacts_in_team." + parent.getId());
+        this.invalidateContactsInTeam(parent.getId());
+    }
+    
+    public void invalidateContactsInTeam(UUID teamId)
+    {
+        this.getAdapterCache().remove("get_contacts_in_team." + teamId);
     }
     
     // contact

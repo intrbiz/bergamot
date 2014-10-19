@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -88,7 +90,7 @@ public class BergamotConfigImporter
     
     private Set<String> loadedObjects = new HashSet<String>();
     
-    private List<DelayedSchedulerAction> delayedSchedulerActions = new LinkedList<DelayedSchedulerAction>(); 
+    private List<DelayedSchedulerAction> delayedSchedulerActions = new LinkedList<DelayedSchedulerAction>();
     
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
@@ -146,6 +148,10 @@ public class BergamotConfigImporter
                         // clusters
                         this.loadClusters(db);
                     });
+                    // to avoid cache concurrency issues, clear the entire cache
+                    // we'll improve this in later releases
+                    this.report.info("Clearing all caches");
+                    db.cacheClear();
                 }
                 // we must publish any scheduling changes after we have committed the transaction
                 // publish all scheduling changes
@@ -174,8 +180,9 @@ public class BergamotConfigImporter
                     }
                 }
             }
-            catch (Exception e)
+            catch (Throwable e)
             {
+                Logger.getLogger(BergamotConfigImporter.class).error("Failed to import configuration", e);
                 this.report.error("Configuration change aborted due to unhandled error: " + e.getMessage());
                 StringWriter sw = new StringWriter();
                 e.printStackTrace(new PrintWriter(sw));
@@ -773,6 +780,8 @@ public class BergamotConfigImporter
         // load the check details
         this.loadActiveCheck(host, rcfg, db);
         // add locations
+        if (host.getLocationId() != null)
+            db.invalidateHostsInLocation(host.getLocationId());
         host.setLocationId(null);
         String locationName = rcfg.getLocation();
         if (!Util.isEmpty(locationName))
@@ -781,6 +790,7 @@ public class BergamotConfigImporter
             if (location != null)
             {
                 host.setLocationId(location.getId());
+                db.invalidateHostsInLocation(location.getId());
             }
         }
         // add the host
@@ -877,6 +887,10 @@ public class BergamotConfigImporter
             }
         }
         // the groups
+        for (UUID oldGroupId : check.getGroupIds())
+        {
+            db.invalidateChecksInGroup(oldGroupId);
+        }
         check.getGroupIds().clear();
         for (String groupName : rcfg.getGroups())
         {
@@ -885,6 +899,7 @@ public class BergamotConfigImporter
             {
                 this.report.info("Adding check " + check.getName() + " to group " + group.getName());
                 check.getGroupIds().add(group.getId());
+                db.invalidateChecksInGroup(group.getId());
             }
         }
     }
