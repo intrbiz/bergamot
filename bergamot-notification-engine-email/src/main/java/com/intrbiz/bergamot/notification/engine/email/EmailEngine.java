@@ -254,7 +254,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', host.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/host/id/#{host.id}\r\n"
+                + "For more information: https://#{site.name}/host/id/#{host.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         templates.put("host.recovery.subject", "Recovery for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
@@ -264,7 +264,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', host.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/host/id/#{host.id}\r\n"
+                + "For more information: https://#{site.name}/host/id/#{host.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         // cluster
@@ -273,7 +273,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/cluster/id/#{cluster.id}\r\n"
+                + "For more information: https://#{site.name}/cluster/id/#{cluster.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         templates.put("cluster.recovery.subject", "Recovery for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
@@ -281,7 +281,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/cluster/id/#{cluster.id}\r\n"
+                + "For more information: https://#{site.name}/cluster/id/#{cluster.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         // service
@@ -292,7 +292,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/service/id/#{service.id}\r\n"
+                + "For more information: https://#{site.name}/service/id/#{service.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         templates.put("service.recovery.subject", "Recovery for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
@@ -302,7 +302,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/service/id/#{service.id}\r\n"
+                + "For more information: https://#{site.name}/service/id/#{service.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         // trap
@@ -313,7 +313,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', trap.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/trap/id/#{trap.id}\r\n"
+                + "For more information: https://#{site.name}/trap/id/#{trap.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         templates.put("trap.recovery.subject", "Recovery for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
@@ -323,7 +323,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', trap.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/trap/id/#{trap.id}\r\n"
+                + "For more information: https://#{site.name}/trap/id/#{trap.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         // resource
@@ -332,7 +332,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/resource/id/#{resource.id}\r\n"
+                + "For more information: https://#{site.name}/resource/id/#{resource.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         templates.put("resource.recovery.subject", "Recovery for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
@@ -340,7 +340,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Last checked at #{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}\r\n"
                 + "\r\n"
-                + "For more information: http://bergamot/resource/id/#{resource.id}\r\n"
+                + "For more information: https://#{site.name}/resource/id/#{resource.id}\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         // generic
@@ -352,7 +352,7 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "#{notification.url}\r\n"
                 + "\r\n"
-                + "You can login at: http://#{site.name}/\r\n"
+                + "You can login at: https://#{site.name}/\r\n"
                 + "\r\n"
                 + "Thank you, Bergamot");
         return templates;

@@ -104,7 +104,13 @@ public abstract class AbstractNotifier implements Notifier
         {
             notificationEngine.sendNotification(notification);
         }
-        // sleep
+        sleep();
+    }
+    
+    protected void sleep()
+    {
+        // sleep, an attempt to avoid mail services banning 
+        // an account
         // TODO: improve
         if (this.getSleepTime() > 0)
         {
