@@ -26,6 +26,7 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
+import com.intrbiz.queue.QueueException;
 
 public class EmailEngine extends AbstractNotificationEngine
 {
@@ -127,6 +128,7 @@ public class EmailEngine extends AbstractNotificationEngine
         {
             this.emailSendErrors.inc();
             logger.error("Failed to send email notification", e);
+            throw new QueueException("Failed to send email notification", e);
         }
         finally
         {

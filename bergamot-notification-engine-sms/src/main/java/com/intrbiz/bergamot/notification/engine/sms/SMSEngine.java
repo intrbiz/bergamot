@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
+import com.intrbiz.queue.QueueException;
 import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.resource.factory.MessageFactory;
 import com.twilio.sdk.resource.instance.Message;
@@ -106,6 +107,7 @@ public class SMSEngine extends AbstractNotificationEngine
             {
                 this.smsSendErrors.inc();
                 logger.error("Failed to send SMS notification", e);
+                throw new QueueException("Failed to send email notification", e);
             }
         }
         finally
