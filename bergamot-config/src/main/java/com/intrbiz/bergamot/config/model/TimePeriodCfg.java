@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -14,6 +15,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.adapter.TimeRangeAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
+import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
@@ -27,6 +29,8 @@ public class TimePeriodCfg extends NamedObjectCfg<TimePeriodCfg>
     private Set<String> excludes = new LinkedHashSet<String>();
 
     private List<TimeRange> timeRanges = new LinkedList<TimeRange>();
+    
+    private TimeZoneCfg timeZone = null;
 
     public TimePeriodCfg()
     {
@@ -57,6 +61,23 @@ public class TimePeriodCfg extends NamedObjectCfg<TimePeriodCfg>
     public void setTimeRanges(List<TimeRange> timeRanges)
     {
         this.timeRanges = timeRanges;
+    }
+
+    @XmlElementRef(type = TimeZoneCfg.class)
+    @ResolveWith(Coalesce.class)
+    public TimeZoneCfg getTimeZone()
+    {
+        return timeZone;
+    }
+
+    public void setTimeZone(TimeZoneCfg timeZone)
+    {
+        this.timeZone = timeZone;
+    }
+    
+    public TimeZoneCfg getOrDefaultTimeZone()
+    {
+        return this.timeZone == null ? TimeZoneCfg.getSystemDefault() : this.timeZone;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
