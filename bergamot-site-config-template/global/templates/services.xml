@@ -8,20 +8,24 @@
         <schedule every="5" retry-every="1" time-period="24x7"/>
     </service>
     
-    <service name="linux-service" extends="generic-service" template="yes">
+    <service name="linux-service" groups="linux-services" extends="generic-service" template="yes">
         <notify teams="linux-admins"/>
     </service>
     
-    <service name="network-service" extends="generic-service" template="yes">
+    <service name="network-service" groups="network-services" extends="generic-service" template="yes">
         <notify teams="network-admins"/>
         <schedule every="15" retry-every="5" time-period="24x7"/>
     </service>
     
-    <service name="vm-host-service" extends="linux-service" template="yes">
+    <service name="vm-host-service" groups="vm-host-services" extends="linux-service" template="yes">
     </service>
     
-    <service name="web-service" extends="generic-service" template="yes">
-        <notify teams="network-admins"/>
+    <service name="web-service" groups="web-services" extends="generic-service" template="yes">
+        <notify teams="web-admins"/>
+    </service>
+    
+    <service name="db-service" groups="db-services" extends="generic-service" template="yes">
+        <notify teams="db-admins"/>
     </service>
     
     <service name="load" extends="linux-service" template="yes">
@@ -33,6 +37,36 @@
         <summary>Memory</summary>
         <check-command command="check_nrpe_mem"/>
     </service>
+    
+    <service name="users" extends="linux-service" template="yes">
+        <summary>Active Users</summary>
+        <check-command command="check_nrpe_users"/>
+    </service>
+    
+    <service name="zombie_procs" extends="linux-service" template="yes">
+        <summary>Zombie Processes</summary>
+        <check-command command="check_nrpe_zombie_procs"/>
+    </service>
+    
+    <service name="total_procs" extends="linux-service" template="yes">
+        <summary>Total Processes</summary>
+        <check-command command="check_nrpe_total_procs"/>
+    </service>
+    
+    <service name="disk_space_root" extends="linux-service" template="yes">
+        <summary>Disk Space: /</summary>
+        <check-command command="check_nrpe_disk_space_root"/>
+    </service>
+    
+    <service name="service_ssh" extends="linux-service" template="yes">
+        <summary>Service: SSH Server</summary>
+        <check-command command="check_nrpe_ssh"/>
+    </service>
+    
+    <service name="local_ntp_offset" extends="linux-service" template="yes">
+        <summary>Local NTP Offset</summary>
+        <check-command command="check_nrpe_local_ntp_offset"/>
+    </service>
 
     <service name="ping" extends="linux-service" template="yes">
         <summary>Ping</summary>
@@ -40,6 +74,26 @@
             <parameter name="arg1">100.0,20%</parameter>
             <parameter name="arg2">500.0,60%</parameter>
         </check-command>
+    </service>
+    
+    <service name="service_apache" extends="web-service" template="yes">
+        <summary>Service: Apache HTTPD</summary>
+        <check-command command="check_nrpe_apache"/>
+    </service>
+    
+    <service name="service_nginx" extends="web-service" template="yes">
+        <summary>Service: Nginx</summary>
+        <check-command command="check_nrpe_nginx"/>
+    </service>
+    
+    <service name="service_mysql" extends="db-service" template="yes">
+        <summary>Service: MySQL</summary>
+        <check-command command="check_nrpe_mysql"/>
+    </service>
+    
+    <service name="service_postgresql" extends="db-service" template="yes">
+        <summary>Service: PostgreSQL</summary>
+        <check-command command="check_nrpe_postgresql"/>
     </service>
     
     <service name="snmp_description" extends="network-service" template="yes">

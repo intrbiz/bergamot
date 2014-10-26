@@ -11,32 +11,63 @@
     
     <host name="linux-server" extends="generic-host" template="yes" groups="linux-servers">
         <notify teams="linux-admins"/>
-        
-        <service extends="memory" groups="linux-services" />
-        
-        <service extends="load"   groups="linux-services" />
-        
-        <service extends="ping"   groups="linux-services" />
-        
+        <!-- Services -->
+        <service extends="memory"            groups="linux-services" />
+        <service extends="load"              groups="linux-services" />
+        <service extends="ping"              groups="linux-services" />
+        <service extends="users"             groups="linux-services" />
+        <service extends="zombie_procs"      groups="linux-services" />
+        <service extends="total_procs"       groups="linux-services" />
+        <service extends="disk_space_root"   groups="linux-services" />
+        <service extends="service_ssh"       groups="linux-services" />
+        <service extends="local_ntp_offset"  groups="linux-services" />
+    </host>
+    
+    <host name="web-server" extends="linux-server" template="yes" groups="web-servers">
+        <notify teams="web-admins"/>
+    </host>
+    
+    <host name="db-server" extends="linux-server" template="yes" groups="db-servers">
+        <notify teams="db-admins"/>
+    </host>
+    
+    <host name="vm-host-server" extends="linux-server" template="yes"groups="vm-servers">
+    </host>
+    
+    <host name="nginx-server" extends="web-server" template="yes" groups="web-servers">
+        <service extends="service_nginx"  groups="linux-services" />
+    </host>
+    
+    <host name="apache-server" extends="web-server" template="yes" groups="web-servers">
+        <service extends="service_nginx"  groups="linux-services" />
+    </host>
+    
+    <host name="mysql-server" extends="db-server" template="yes" groups="db-servers">
+        <service extends="service_mysql"  groups="db-services" />
+    </host>
+    
+    <host name="postgresql-server" extends="db-server" template="yes" groups="db-servers">
+        <service extends="service_postgresql"  groups="db-services" />
     </host>
 
     <host name="network-device" extends="generic-host" template="yes" groups="network-devices">
         <notify teams="network-admins"/>
-        
-        <service extends="snmp_description" groups="network-services"/>
-        
-        <service extends="snmp_name"        groups="network-services"/>
-        
-        <service extends="snmp_location"    groups="network-services"/>
-        
-        <service extends="snmp_contact"     groups="network-services"/>
-        
-        <service extends="snmp_uptime"      groups="network-services"/>
-        
     </host>
     
-    <host name="vm-host-server" extends="linux-server" template="yes">
-        <notify teams="linux-admins"/>
+    <host name="snmp-network-device" extends="network-device" template="yes" groups="network-devices">
+        <notify teams="network-admins"/>
+        <!-- Services -->
+        <service extends="snmp_description" groups="network-services"/>
+        <service extends="snmp_name"        groups="network-services"/>
+        <service extends="snmp_location"    groups="network-services"/>
+        <service extends="snmp_contact"     groups="network-services"/>
+        <service extends="snmp_uptime"      groups="network-services"/>
+    </host>
+    
+    <host name="router" extends="network-device" template="yes" groups="routers">
+    </host>
+    
+    <host name="switch" extends="network-device" template="yes" groups="switches">
     </host>
     
 </bergamot>

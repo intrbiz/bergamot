@@ -23,6 +23,14 @@
         <summary>Network Administrators</summary>
     </team>
     
+    <team name="web-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+        <summary>Web Administrators</summary>
+    </team>
+    
+    <team name="db-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+        <summary>DB Administrators</summary>
+    </team>
+    
     <team name="bergamot-admins" teams="admins" grants="ui.*, api.*">
         <summary>Bergamot Administrators</summary>
     </team>

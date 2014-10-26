@@ -21,6 +21,10 @@
         <summary>Web Services</summary>
     </group>
     
+    <group name="db-services" groups="services">
+        <summary>DB Services</summary>
+    </group>
+    
     <group name="hosts">
         <summary>Hosts</summary>
     </group>
@@ -47,6 +51,10 @@
     
     <group name="web-servers" groups="hosts">
         <summary>Web Servers</summary>
+    </group>
+    
+    <group name="db-servers" groups="hosts">
+        <summary>DB Servers</summary>
     </group>
     
 </bergamot>
