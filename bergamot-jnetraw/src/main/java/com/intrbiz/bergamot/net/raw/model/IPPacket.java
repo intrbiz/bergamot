@@ -1,10 +1,11 @@
-package raw.model;
+package com.intrbiz.bergamot.net.raw.model;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-import raw.model.payload.ICMPPacket;
+import com.intrbiz.bergamot.net.raw.model.payload.ICMPPacket;
 
 public class IPPacket
 {
@@ -23,7 +24,7 @@ public class IPPacket
     
     private short id;
     
-    private byte flags;
+    private short flags;
     
     private short fragmentOffset;
     
@@ -43,7 +44,22 @@ public class IPPacket
     {
         super();
         this.ipVersion = 4;
-        
+        this.ipHeaderLength = 5;
+        this.ttl = 64;
+    }
+    
+    public IPPacket(byte protocol, InetAddress source, InetAddress destination, IPPayload payload)
+    {
+        super();
+        if (! (source instanceof Inet4Address && destination instanceof Inet4Address))
+            throw new IllegalArgumentException("Source and destination must be IPv4 addresses!");
+        this.ipVersion = 4;
+        this.ipHeaderLength = 5;
+        this.ttl = 64;
+        this.protocol = protocol;
+        this.sourceIPAddress = source.getAddress();
+        this.destinationIPAddress = source.getAddress();
+        this.payload = payload;
     }
     
     public IPPacket(ByteBuffer from)
@@ -67,7 +83,7 @@ public class IPPacket
         this.id = from.getShort();
         // 6 - flags and frag offset
         s = from.getShort();
-        this.flags = (byte) (s >> 13);
+        this.flags = (short) (s >> 13);
         this.fragmentOffset = (short) (s & 0x1FFF);
         // 8 - ttl
         this.ttl = from.get();
@@ -94,6 +110,46 @@ public class IPPacket
         }
     }
     
+    public int computeLength()
+    {
+        return 20 + (this.payload == null ? 0 : this.payload.computeLength());
+    }
+    
+    public void pack(ByteBuffer to)
+    {
+        int start = to.position();
+        // compute the total packet length
+        this.totalLength = (short) (this.computeLength() & 0xFFFF);
+        // version and ihl
+        to.put((byte) ((this.ipVersion << 4) & (this.ipHeaderLength & 0xF)));
+        // dscp and ecn
+        to.put((byte) ((this.dscp << 2) & (this.ecn & 0x3)));
+        // total length
+        to.putShort(this.totalLength);
+        // id
+        to.putShort(this.id);
+        // flags and fragment offset
+        to.putShort((short) ((this.flags << 13) & (this.fragmentOffset & 0x1FFF)));
+        // ttl
+        to.put(this.ttl);
+        // protocol
+        to.put(this.protocol);
+        // checksum
+        to.putShort((short) 0);
+        // src ip
+        to.put(this.sourceIPAddress);
+        // dst ip
+        to.put(this.destinationIPAddress);
+        // compute the header checksum
+        int end = to.position();
+        to.position(start);
+        this.headerChecksum = this.computeChecksum(to, 20);
+        to.putShort(start + 10, this.headerChecksum);
+        to.position(end);
+        // pack the payload
+        this.payload.pack(to);
+    }
+    
     private short computeChecksum(ByteBuffer buffer, int headerLength)
     {
         int start = buffer.position();
@@ -102,9 +158,9 @@ public class IPPacket
         buffer.putShort(start + 10, (short) 0);
         // compute
         int sum = 0;
-        while (buffer.position() <= end)
+        while (buffer.position() < end)
         {
-            sum += buffer.getShort() & 0xFFFF;
+            sum += ((int) buffer.getShort()) & 0xFFFF;
         }
         sum = (sum >> 16) + (sum & 0xFFFF);
         sum = (sum >> 16) + (sum & 0xFFFF);
@@ -122,8 +178,10 @@ public class IPPacket
         // compute the checksum
         short computedChecksum = this.computeChecksum(buffer, headerLength);
         // verify
-        System.out.println("IP Header Checksum: " + checksum + " == " + computedChecksum);
-        if (checksum != computedChecksum) throw new RuntimeException("Invalid IP Header Checksum");
+        if (checksum != computedChecksum)
+        {
+            throw new RuntimeException("Invalid IP Header Checksum: got=" + checksum + ", expected=" + computedChecksum + ", ihl=" + headerLength);
+        }
         return checksum;
     }
 
@@ -187,12 +245,12 @@ public class IPPacket
         this.id = id;
     }
 
-    public byte getFlags()
+    public short getFlags()
     {
         return flags;
     }
 
-    public void setFlags(byte flags)
+    public void setFlags(short flags)
     {
         this.flags = flags;
     }
