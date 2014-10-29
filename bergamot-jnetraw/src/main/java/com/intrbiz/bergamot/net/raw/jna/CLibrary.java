@@ -112,6 +112,10 @@ public interface CLibrary extends Library
 
     /* Socket flags */
     public static final int MSG_DONTWAIT = 0x40;
+    
+    public static final int SO_RCVTIMEO  = 20;
+    
+    public static final int SOL_SOCKET   = 1;
 
     /*
      * Access the library
