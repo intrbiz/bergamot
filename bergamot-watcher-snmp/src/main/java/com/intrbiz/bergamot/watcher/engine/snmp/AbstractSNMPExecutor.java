@@ -58,7 +58,7 @@ public abstract class AbstractSNMPExecutor extends AbstractExecutors<SNMPEngine>
         String host = watchedCheck.getParameter("host");
         if (SNMPVersion.V1 == version)
         {
-            return this.getEngine().getTransport().openV2Context(host, watchedCheck.getParameter("snmp-community"));
+            return this.getEngine().getTransport().openV1Context(host, watchedCheck.getParameter("snmp-community"));
         }
         else if (SNMPVersion.V2C == version)
         {
