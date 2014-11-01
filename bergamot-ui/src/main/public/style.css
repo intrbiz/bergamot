@@ -128,6 +128,7 @@ table tr:hover {
     width: 270px;
     visibility: hidden;
     font-family: 'Merriweather Sans', sans-serif;
+    line-height: 22px;
 }
 
 #sub-menu ul {
