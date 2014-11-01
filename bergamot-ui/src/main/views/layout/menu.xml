@@ -4,7 +4,7 @@
 <fragment xmlns="com.intrbiz.balsa">
     
     <div class="menu-group">    
-        <h4><a href="/profile/"><a href="/profile/">Hello #{Balsa().currentPrincipal().summary}</a></a></h4>
+        <h4><a href="/profile/">Hello #{Balsa().currentPrincipal().summary}</a></h4>
         <ul>
             <li>
                 <a href="/">Overview</a>
