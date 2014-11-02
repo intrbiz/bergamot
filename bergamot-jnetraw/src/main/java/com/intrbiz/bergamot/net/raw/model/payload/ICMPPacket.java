@@ -13,6 +13,8 @@ public class ICMPPacket implements IPPayload
     
     public static final byte ICMP_TYPE_ECHO = 8;
     
+    public static final byte ICMP_TYPE_REPLY = 0;
+    
     public static final byte[] DEFAULT_DATA = createDefaultData();
     
     private static final byte[] createDefaultData()

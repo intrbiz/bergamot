@@ -84,6 +84,7 @@
     <module>bergamot-daemon-config</module>
     <module>bergamot-api-client</module>
     <module>bergamot-jnetraw</module>
+    <module>bergamot-pinger</module>
   </modules>
   
   <dependencyManagement>
