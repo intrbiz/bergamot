@@ -120,6 +120,9 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected <T extends CheckNotification> T createNotification(Check<?, ?> check, Alert alertRecord, Calendar now, NotificationType type, Supplier<T> ctor)
     {
         T notification = ctor.get();
+        // the site
+        notification.setSite(check.getSite().toMO());
+        notification.setRaised(System.currentTimeMillis());
         // alert id
         notification.setAlertId(alertRecord.getId());
         // compute the engines available
