@@ -24,7 +24,7 @@
 		    </p>
 		    <p rendered="#{check.type == 'host'}">
 		    	<span class="label">Name: </span>
-		   		<span class="value">#{check.name} (#{check.address})</span>
+		   		<span class="value">#{check.name}</span>
 	    	</p>
 		    <p rendered="#{check.type == 'host' || check.type == 'service' || check.type == 'trap'}" class="field-attempt">
 			    <span class="label">Attempt: </span>
