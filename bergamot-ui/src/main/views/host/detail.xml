@@ -243,13 +243,6 @@
 				</data-set>
 			</div>
 		</div>
-		
-		<div class="row">
-			<div class="col12">
-				<h3>XML</h3>
-				<pre>#{host.configuration.toString()}</pre>
-			</div>
-		</div>
 	
 	</container>
 	

@@ -53,11 +53,4 @@
 		</div>
 	</div>
 	
-	<div class="row">
-		<div class="col12">
-			<h3>XML</h3>
-			<pre>#{the_contact.configuration.toString()}</pre>
-		</div>
-	</div>
-	
 </fragment>

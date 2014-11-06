@@ -36,11 +36,4 @@
 		</div>
 	</div>
 	
-	<div class="row">
-		<div class="col12">
-			<h3>XML</h3>
-			<pre>#{team.configuration.toString()}</pre>
-		</div>
-	</div>
-	
 </fragment>

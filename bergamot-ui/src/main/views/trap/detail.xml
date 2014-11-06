@@ -119,9 +119,7 @@
 	<!-- Configuration -->
 	
 	<container rendered="#{Balsa().permission('ui.config.view')}">
-	
 		<h2>Configuration</h2>
-		
 		<div class="row">
 			<div class="col4 dash_icon">
 				<h3>Notify</h3>
@@ -149,15 +147,7 @@
 					<span class="value"><a href="/timeperiod/id/#{trap.notifications.timePeriod.id}">#{trap.notifications.timePeriod.summary}</a></span>
 				</p>
 			</div>
-		</div>
-		
-		<div class="row">
-			<div class="col12">
-				<h3>XML</h3>
-				<pre>#{trap.configuration.toString()}</pre>
-			</div>
-		</div>
-	
+		</div>	
 	</container>
 	
 	<script type="text/javascript">
