@@ -2,6 +2,7 @@
 <bergamot site="bergamot.template">
     
     <host name="generic-host" template="yes">
+        <summary>Generic Host</summary>
         <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
         <notify teams="admins"/>
         <state failed-after="4" recovers-after="10"/>
@@ -10,6 +11,7 @@
     </host>
     
     <host name="linux-server" extends="generic-host" template="yes" groups="linux-servers">
+        <summary>Linux Server</summary>
         <notify teams="linux-admins"/>
         <!-- Services -->
         <service extends="memory"            groups="linux-services" />
@@ -24,37 +26,46 @@
     </host>
     
     <host name="web-server" extends="linux-server" template="yes" groups="web-servers">
+        <summary>Web Server</summary>
         <notify teams="web-admins"/>
     </host>
     
     <host name="db-server" extends="linux-server" template="yes" groups="db-servers">
+        <summary>DB Server</summary>
         <notify teams="db-admins"/>
     </host>
     
     <host name="vm-host-server" extends="linux-server" template="yes"groups="vm-servers">
+        <summary>VM Host Server</summary>
     </host>
     
     <host name="nginx-server" extends="web-server" template="yes" groups="web-servers">
+        <summary>Web Server (Nginx)</summary>
         <service extends="service_nginx"  groups="linux-services" />
     </host>
     
     <host name="apache-server" extends="web-server" template="yes" groups="web-servers">
+        <summary>Web Server (Apache)</summary>
         <service extends="service_nginx"  groups="linux-services" />
     </host>
     
     <host name="mysql-server" extends="db-server" template="yes" groups="db-servers">
+        <summary>DB Server (MySQL)</summary>
         <service extends="service_mysql"  groups="db-services" />
     </host>
     
     <host name="postgresql-server" extends="db-server" template="yes" groups="db-servers">
+        <summary>DB Server (PostgreSQL)</summary>
         <service extends="service_postgresql"  groups="db-services" />
     </host>
 
     <host name="network-device" extends="generic-host" template="yes" groups="network-devices">
+        <summary>Network Device</summary>
         <notify teams="network-admins"/>
     </host>
     
     <host name="snmp-network-device" extends="network-device" template="yes" groups="network-devices">
+        <summary>Network Device (SNMP)</summary>
         <notify teams="network-admins"/>
         <!-- Services -->
         <service extends="snmp_description" groups="network-services"/>
@@ -65,9 +76,11 @@
     </host>
     
     <host name="router" extends="network-device" template="yes" groups="routers">
+        <summary>Router</summary>
     </host>
     
     <host name="switch" extends="network-device" template="yes" groups="switches">
+        <summary>Switch</summary>
     </host>
     
 </bergamot>
