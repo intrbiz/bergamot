@@ -4,6 +4,33 @@
     <div class="row">
 		<h3>Applied change #{change.summary} #{if(report.successful, 'successfully', 'unsuccessfully')}</h3>
 		<p class="text-body">#{coalesce(change.description, '')}</p>
-		<pre>#{report.toString()}</pre>
+		<img src="#{public('apply_change.gif')}" id="loader"/>
+		<pre id="report">Applying change...</pre>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var poll = function() {
+				   	$.getJSON('/admin/configchange/poll/apply/id/' + #{'\'' + taskid + '\''}, function(data) { 
+						if (data.stat == 'ok')
+						{
+							if (data.complete)
+							{
+								$('#loader').css('display', 'none');
+								$('#report').html(data.result);
+							}
+							else
+							{
+								setTimeout(poll, 2000);
+							}	
+						}
+						else
+						{
+							$('#loader').css('display', 'none');
+							$('#report').html('Error: ' + data.message);
+						}
+					});
+				};
+				setTimeout(poll, 2000);
+			})
+		</script>
     </div>
 </fragment>

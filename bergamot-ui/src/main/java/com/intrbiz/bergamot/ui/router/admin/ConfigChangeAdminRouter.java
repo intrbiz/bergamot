@@ -4,20 +4,20 @@ import static com.intrbiz.Util.*;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.engine.task.BalsaTaskState;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Site;
@@ -163,7 +163,6 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
         ValidatedBergamotConfiguration validated = cfg.validate(db.getObjectLocator(site.getId()));
         //
-        var("change", change);
         var("report", validated.getReport());
         //
         encode("admin/configchange/validate");
@@ -178,21 +177,62 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         // get the change
         ConfigChange change = var("change", db.getConfigChange(id));
         //
-        BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
-        ValidatedBergamotConfiguration validated = cfg.validate(db.getObjectLocator(site.getId()));
-        // import
-        BergamotImportReport report = new BergamotConfigImporter(validated).resetState(false).online(true).importConfiguration();
-        // update the db
-        if (report.isSuccessful())
-        {
-            change.setApplied(true);
-            change.setAppliedAt(new Timestamp(System.currentTimeMillis()));
-            db.setConfigChange(change);
-        }
+        String taskId = deferredActionWithId(id.toString(), "apply-config-change", site.getId(), id);
         //
         var("change", change);
-        var("report", report);
+        var("taskid", taskId);
         //
         encode("admin/configchange/apply");
+    }
+    
+    @Any("/poll/apply/id/:id")
+    public void pollApply(@SessionVar("site") Site site, @AsUUID UUID id) throws IOException
+    {
+        // get the task state
+        BalsaTaskState state = pollDeferredAction(id.toString());
+        // output JSON response
+        JsonGenerator json = response().ok().json().getJsonWriter();
+        json.writeStartObject();
+        // output
+        if (state != null)
+        {
+            if (state.isComplete())
+            {
+                // get the value
+                try
+                {
+                    BergamotImportReport report = state.get();
+                    // stat
+                    json.writeFieldName("stat");
+                    json.writeString("ok");
+                    json.writeFieldName("complete");
+                    json.writeBoolean(true);
+                    json.writeFieldName("result");
+                    json.writeString(report.toString());
+                }
+                catch (Exception e)
+                {
+                    json.writeFieldName("stat");
+                    json.writeString("error");
+                    json.writeFieldName("message");
+                    json.writeString(e.getMessage());        
+                }
+            }
+            else
+            {
+                json.writeFieldName("stat");
+                json.writeString("ok");
+                json.writeFieldName("complete");
+                json.writeBoolean(false);
+            }
+        }
+        else
+        {
+            json.writeFieldName("stat");
+            json.writeString("error");
+            json.writeFieldName("message");
+            json.writeString("No such change");
+        }
+        json.writeEndObject();
     }
 }

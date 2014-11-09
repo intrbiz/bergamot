@@ -1,10 +1,13 @@
 package com.intrbiz.bergamot.importer;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BergamotImportReport
+public class BergamotImportReport implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     private final String site;
 
     private boolean successful = true;

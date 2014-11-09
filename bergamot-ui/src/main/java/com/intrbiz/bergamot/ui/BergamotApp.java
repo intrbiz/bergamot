@@ -5,11 +5,13 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
+import com.intrbiz.balsa.engine.impl.task.HazelcastTaskEngine;
 import com.intrbiz.balsa.util.Util;
 import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
 import com.intrbiz.bergamot.ui.action.ContactActions;
 import com.intrbiz.bergamot.ui.action.DispatchResultAction;
 import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
@@ -114,6 +116,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     {
         // Setup Gerald - Service name: Bergamot.UI, send every minute
         Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
+        // task engine
+        taskEngine(new HazelcastTaskEngine());
         // session engine
         sessionEngine(new HazelcastSessionEngine());
         // security engine
@@ -138,6 +142,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new TimePeriodActions());
         action(new TeamActions());
         action(new ContactActions());
+        action(new ConfigChangeActions());
         // Setup the application routers
         router(new LoginRouter());
         router(new DashboardRouter());
