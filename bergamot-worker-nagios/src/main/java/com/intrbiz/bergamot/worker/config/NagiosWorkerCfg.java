@@ -15,6 +15,8 @@ import com.intrbiz.bergamot.worker.engine.nrpe.NRPEExecutor;
 @XmlRootElement(name = "worker")
 public class NagiosWorkerCfg extends WorkerCfg
 {
+    private static final long serialVersionUID = 1L;
+
     public NagiosWorkerCfg()
     {
         super();
