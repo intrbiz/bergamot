@@ -85,6 +85,7 @@
     <module>bergamot-api-client</module>
     <module>bergamot-jnetraw</module>
     <module>bergamot-pinger</module>
+    <module>bergamot-worker-http</module>
   </modules>
   
   <dependencyManagement>
