@@ -63,7 +63,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             check.connect(executeCheck.getParameter("host"));
             // optional parameters
             // virtual host
-            if (executeCheck.containsParameter("virtual_host")) check.path(executeCheck.getParameter("virtual_host", null));
+            if (executeCheck.containsParameter("virtual_host")) check.host(executeCheck.getParameter("virtual_host", null));
             // port number
             if (executeCheck.containsParameter("port")) check.port(executeCheck.getIntParameter("port", -1));
             // ssl
