@@ -61,6 +61,11 @@ public class HTTPChecker
     {
         this(Runtime.getRuntime().availableProcessors(), 5, 60);
     }
+    
+    public HTTPChecker(int threads)
+    {
+        this(threads, 5, 60);
+    }
 
     public int getDefaultRequestTimeoutSeconds()
     {

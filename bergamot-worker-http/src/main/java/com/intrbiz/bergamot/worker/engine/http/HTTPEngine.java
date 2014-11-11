@@ -27,7 +27,7 @@ public class HTTPEngine extends AbstractEngine
             this.addExecutor(new HTTPExecutor());
         }
         // setup our checker
-        this.checker = new HTTPChecker();
+        this.checker = new HTTPChecker(this.getWorker().getConfiguration().getThreads());
     }
     
     public HTTPChecker getChecker()
