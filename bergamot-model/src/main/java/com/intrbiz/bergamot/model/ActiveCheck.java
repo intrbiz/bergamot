@@ -159,7 +159,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         {
             ValueExpression vexp = new ValueExpression(context, parameter.getValue());
             String value = (String) vexp.get(context, this);
-            if (Util.isEmpty(value))
+            if (! Util.isEmpty(value))
             {
                 if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
                 executeCheck.setParameter(parameter.getName(), value);
