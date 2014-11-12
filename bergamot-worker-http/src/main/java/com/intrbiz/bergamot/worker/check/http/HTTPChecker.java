@@ -59,7 +59,7 @@ public class HTTPChecker
 
     public HTTPChecker()
     {
-        this(Runtime.getRuntime().availableProcessors(), 5, 60);
+        this((Runtime.getRuntime().availableProcessors() * 2) + 4, 5, 60);
     }
     
     public HTTPChecker(int threads)
