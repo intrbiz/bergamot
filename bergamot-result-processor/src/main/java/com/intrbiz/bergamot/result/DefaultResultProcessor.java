@@ -61,14 +61,17 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     // should be process this result?
                     if (!check.isEnabled())
                     {
-                        logger.warn("Discarding result " + result.getId() + " for " + result.getCheckType() + " " + result.getCheckId() + " because it is disabled.");
+                        logger.warn("Discarding result " + result.getId() + " for " + result.getCheckType() + "::" + result.getCheckId() + " because it is disabled.");
                         return;
                     }
                     // apply the result
                     CheckState state = check.getState();
+                    // copy from previous values
+                    boolean wasOk   = state.isOk();
+                    boolean wasHard = state.isHard();
                     // apply the result
                     boolean isHardStateChange = this.applyResult((RealCheck<?, ?>) check, state, result);
-                    logger.info("State change: hard: " + isHardStateChange + ", transitioning: " + state.isTransitioning() + ", attempt: " + state.getAttempt());
+                    logger.info("State change for " + result.getCheckType() + "::" + result.getCheckId() + ": hard: " + isHardStateChange + ", transitioning: " + state.isTransitioning() + ", attempt: " + state.getAttempt());
                     // stats
                     this.computeStats(check, state, result);
                     // update the check state
@@ -76,9 +79,12 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     db.commit();
                     // reschedule active checks if they are in transition 
                     // or have changed hard state
-                    if (check instanceof ActiveCheck && (state.isTransitioning() || isHardStateChange))
+                    // or the ok state has changed
+                    // or the hard state has changed
+                    if (check instanceof ActiveCheck && (state.isTransitioning() || isHardStateChange || wasOk ^ state.isOk() || wasHard ^ state.isHard()))
                     {
                         // inform the scheduler to reschedule this check
+                        logger.info("Sending reschedule for " + result.getCheckType() + "::" + result.getCheckId() + ", transition: " + state.isTransitioning() + ", hard state change: " + isHardStateChange + ", ok change: " + (wasOk ^ state.isOk()) + ", hard change: " + (wasHard ^ state.isHard()));
                         this.rescheduleCheck((ActiveCheck<?,?>) check);
                     }
                     // send the general state update notifications
