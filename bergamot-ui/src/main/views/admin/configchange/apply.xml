@@ -15,7 +15,7 @@
 							if (data.complete)
 							{
 								$('#loader').css('display', 'none');
-								$('#report').html(data.result);
+								$('#report').text(data.result);
 							}
 							else
 							{
@@ -25,7 +25,7 @@
 						else
 						{
 							$('#loader').css('display', 'none');
-							$('#report').html('Error: ' + data.message);
+							$('#report').text('Error: ' + data.message);
 						}
 					});
 				};
