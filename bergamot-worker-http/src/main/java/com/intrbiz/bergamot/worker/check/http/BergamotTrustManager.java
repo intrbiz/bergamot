@@ -44,7 +44,7 @@ public class BergamotTrustManager implements X509TrustManager
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            Logger.getLogger(BergamotTrustManager.class).fatal("Failed to load bundled Mozilla trust store!");
             throw new RuntimeException("Failed to load trust store");
         }
     }

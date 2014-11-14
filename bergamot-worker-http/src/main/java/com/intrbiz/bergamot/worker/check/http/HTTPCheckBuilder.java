@@ -218,8 +218,8 @@ public abstract class HTTPCheckBuilder
             request.headers().add(e.getKey(), e.getValue());
         }
         // submit the check
-        this.submit(this.address, this.port, this.connectTimeout, this.requestTimeout, this.ssl, this.permitInvalidCerts, request, this.responseHandler, this.errorHandler);
+        this.submit(this.address, this.port, this.connectTimeout, this.requestTimeout, this.ssl, this.permitInvalidCerts, this.virtualHost, request, this.responseHandler, this.errorHandler);
     }
     
-    protected abstract void submit(final String address, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler);
+    protected abstract void submit(final String address, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final String SNIHost, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler);
 }
