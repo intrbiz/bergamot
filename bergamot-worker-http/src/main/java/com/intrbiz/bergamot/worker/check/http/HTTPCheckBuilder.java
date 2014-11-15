@@ -7,6 +7,8 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
@@ -40,6 +42,8 @@ public abstract class HTTPCheckBuilder
     private Consumer<HTTPCheckResponse> responseHandler;
     
     private Consumer<Throwable> errorHandler;
+    
+    private List<String> ciphers = new LinkedList<String>();
     
     public HTTPCheckBuilder()
     {
@@ -117,6 +121,27 @@ public abstract class HTTPCheckBuilder
     public HTTPCheckBuilder permitInvalidCerts(boolean permitInvalidCerts)
     {
         this.permitInvalidCerts = permitInvalidCerts;
+        return this;
+    }
+    
+    public HTTPCheckBuilder enabledSSLCiphers(List<String> ciphers)
+    {
+        this.ciphers.addAll(ciphers);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enabledSSLCiphers(String[] ciphers)
+    {
+        for (String cipher : ciphers)
+        {
+            this.ciphers.add(cipher);
+        }
+        return this;
+    }
+    
+    public HTTPCheckBuilder enableSSLCipher(String cipher)
+    {
+        this.ciphers.add(cipher);
         return this;
     }
     
@@ -218,8 +243,8 @@ public abstract class HTTPCheckBuilder
             request.headers().add(e.getKey(), e.getValue());
         }
         // submit the check
-        this.submit(this.address, this.port, this.connectTimeout, this.requestTimeout, this.ssl, this.permitInvalidCerts, this.virtualHost, request, this.responseHandler, this.errorHandler);
+        this.submit(this.address, this.port, this.connectTimeout, this.requestTimeout, this.ssl, this.permitInvalidCerts, this.virtualHost, this.ciphers, request, this.responseHandler, this.errorHandler);
     }
     
-    protected abstract void submit(final String address, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final String SNIHost, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler);
+    protected abstract void submit(final String address, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final String SNIHost, final List<String> ciphers, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler);
 }

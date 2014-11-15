@@ -18,6 +18,7 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -25,10 +26,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManager;
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 import com.intrbiz.util.IBThreadFactory;
 
@@ -98,7 +95,7 @@ public class HTTPChecker
     /**
      * Create an SSL engine
      */
-    private SSLEngine createSSLEngine(boolean permitInvalidCerts, String host, int port)
+    private SSLEngine createSSLEngine(boolean permitInvalidCerts, String host, int port, List<String> ciphers)
     {
         try
         {
@@ -114,12 +111,21 @@ public class HTTPChecker
              *  * MD5
              */
             SSLEngine sslEngine = context.createSSLEngine(host, port);
-            sslEngine.setEnabledProtocols(TLSConstants.PROTOCOLS.SAFE_PROTOCOLS);
-            sslEngine.setEnabledCipherSuites(TLSConstants.getCipherNames(TLSConstants.CIPHERS.SAFE_CIPHERS));
             sslEngine.setUseClientMode(true);
+            // protocols
+            sslEngine.setEnabledProtocols(TLSConstants.PROTOCOLS.SAFE_PROTOCOLS);
+            // enabled ciphers
+            if (ciphers == null || ciphers.isEmpty())
+            {
+                sslEngine.setEnabledCipherSuites(TLSConstants.getCipherNames(TLSConstants.CIPHERS.SAFE_CIPHERS));
+            }
+            else
+            {
+                sslEngine.setEnabledCipherSuites(ciphers.toArray(new String[0]));
+            }
+            // enable checking that the hostname matches the cert
             if (! permitInvalidCerts)
             {
-                // enable checking that the hostname matches the cert
                 SSLParameters params = new SSLParameters();
                 params.setEndpointIdentificationAlgorithm("HTTPS");
                 sslEngine.setSSLParameters(params);
@@ -133,7 +139,7 @@ public class HTTPChecker
         }
     }
     
-    protected void submit(final String host, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final String SNIHost, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler)
+    protected void submit(final String host, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final String SNIHost, final List<String> ciphers, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler)
     {
         // configure the client
         Bootstrap b = new Bootstrap();
@@ -146,7 +152,7 @@ public class HTTPChecker
             public void initChannel(SocketChannel ch) throws Exception
             {
                 // Create the SSL Engine
-                SSLEngine sslEngine = ssl ? createSSLEngine(permitInvalidCerts, SNIHost, port) : null;
+                SSLEngine sslEngine = ssl ? createSSLEngine(permitInvalidCerts, SNIHost, port, ciphers) : null;
                 // Timeouts
                 ch.pipeline().addLast(
                         new ReadTimeoutHandler(  requestTimeout < 0 ? HTTPChecker.this.defaultRequestTimeoutSeconds : requestTimeout /* seconds */ ), 
@@ -181,9 +187,9 @@ public class HTTPChecker
     {
         return new HTTPCheckBuilder() {
             @Override
-            protected void submit(String address, int port, int connectTimeout, int requestTimeout, boolean ssl, boolean permitInvalidCerts, String SNIHost, FullHttpRequest request, Consumer<HTTPCheckResponse> responseHandler, Consumer<Throwable> errorHandler)
+            protected void submit(String address, int port, int connectTimeout, int requestTimeout, boolean ssl, boolean permitInvalidCerts, String SNIHost, List<String> ciphers, FullHttpRequest request, Consumer<HTTPCheckResponse> responseHandler, Consumer<Throwable> errorHandler)
             {
-                HTTPChecker.this.submit(address, port, connectTimeout, requestTimeout, ssl, permitInvalidCerts, SNIHost, request, responseHandler, errorHandler);
+                HTTPChecker.this.submit(address, port, connectTimeout, requestTimeout, ssl, permitInvalidCerts, SNIHost, ciphers, request, responseHandler, errorHandler);
             }
         };
     }
@@ -197,19 +203,5 @@ public class HTTPChecker
         catch (InterruptedException e)
         {
         }
-    }
-    
-    public static void main(String[] args)
-    {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.INFO);
-        //
-        HTTPChecker hc = new HTTPChecker();
-        //
-        hc.check().connect("www.bbc.co.uk").get("/").execute(System.out::println, System.out::println);
-        hc.check().connect("intrbiz.com").https().get("/").execute(System.out::println, (e) -> { e.printStackTrace(); });
-        hc.check().connect("payments.sstaffs.gov.uk").https().get("/").execute(System.out::println, (e) -> { e.printStackTrace(); });
-        hc.check().connect("obs.intrbiz.net").https().permitInvalidCerts().get("/").execute(System.out::println, (e) -> { e.printStackTrace(); });
-        hc.check().connect("forms.shropshire.gov.uk").https().permitInvalidCerts().get("/").execute(System.out::println, (e) -> { e.printStackTrace(); });
     }
 }
