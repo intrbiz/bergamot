@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -44,6 +45,8 @@ public abstract class HTTPCheckBuilder
     private Consumer<Throwable> errorHandler;
     
     private List<String> ciphers = new LinkedList<String>();
+    
+    private List<String> protocols = new LinkedList<String>();
     
     public HTTPCheckBuilder()
     {
@@ -124,13 +127,13 @@ public abstract class HTTPCheckBuilder
         return this;
     }
     
-    public HTTPCheckBuilder enabledSSLCiphers(List<String> ciphers)
+    public HTTPCheckBuilder enabledSSLCiphers(Collection<String> ciphers)
     {
         this.ciphers.addAll(ciphers);
         return this;
     }
     
-    public HTTPCheckBuilder enabledSSLCiphers(String[] ciphers)
+    public HTTPCheckBuilder enabledSSLCiphers(String... ciphers)
     {
         for (String cipher : ciphers)
         {
@@ -142,6 +145,51 @@ public abstract class HTTPCheckBuilder
     public HTTPCheckBuilder enableSSLCipher(String cipher)
     {
         this.ciphers.add(cipher);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enabledSSLProtocols(Collection<String> protocols)
+    {
+        this.protocols.addAll(protocols);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enabledSSLProtocols(String... protocols)
+    {
+        for (String protocol : protocols)
+        {
+            this.protocols.add(protocol);
+        }
+        return this;
+    }
+    
+    public HTTPCheckBuilder enableSSLProtocol(String protocol)
+    {
+        this.protocols.add(protocol);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enableSSLv3()
+    {
+        this.protocols.add(TLSConstants.PROTOCOLS.SSLv3);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enableTLSv1()
+    {
+        this.protocols.add(TLSConstants.PROTOCOLS.TLSv1);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enableTLSv1_1()
+    {
+        this.protocols.add(TLSConstants.PROTOCOLS.TLSv1_1);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enableTLSv1_2()
+    {
+        this.protocols.add(TLSConstants.PROTOCOLS.TLSv1_2);
         return this;
     }
     
@@ -243,8 +291,34 @@ public abstract class HTTPCheckBuilder
             request.headers().add(e.getKey(), e.getValue());
         }
         // submit the check
-        this.submit(this.address, this.port, this.connectTimeout, this.requestTimeout, this.ssl, this.permitInvalidCerts, this.virtualHost, this.ciphers, request, this.responseHandler, this.errorHandler);
+        this.submit(
+                this.address, 
+                this.port, 
+                this.connectTimeout, 
+                this.requestTimeout, 
+                this.ssl, 
+                this.permitInvalidCerts, 
+                this.virtualHost, 
+                this.protocols, 
+                this.ciphers, 
+                request, 
+                this.responseHandler, 
+                this.errorHandler
+        );
     }
     
-    protected abstract void submit(final String address, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final String SNIHost, final List<String> ciphers, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler);
+    protected abstract void submit(
+            final String address, 
+            final int port, 
+            final int connectTimeout, 
+            final int requestTimeout, 
+            final boolean ssl, 
+            final boolean permitInvalidCerts, 
+            final String SNIHost,
+            final List<String> protocols,
+            final List<String> ciphers, 
+            final FullHttpRequest request, 
+            final Consumer<HTTPCheckResponse> responseHandler, 
+            final Consumer<Throwable> errorHandler
+    );
 }

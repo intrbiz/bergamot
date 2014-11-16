@@ -95,7 +95,7 @@ public class HTTPChecker
     /**
      * Create an SSL engine
      */
-    private SSLEngine createSSLEngine(boolean permitInvalidCerts, String host, int port, List<String> ciphers)
+    private SSLEngine createSSLEngine(boolean permitInvalidCerts, String host, int port, List<String> protocols, List<String> ciphers)
     {
         try
         {
@@ -112,8 +112,15 @@ public class HTTPChecker
              */
             SSLEngine sslEngine = context.createSSLEngine(host, port);
             sslEngine.setUseClientMode(true);
-            // protocols
-            sslEngine.setEnabledProtocols(TLSConstants.PROTOCOLS.SAFE_PROTOCOLS);
+            // enabled protocols
+            if (protocols == null || protocols.isEmpty())
+            {
+                sslEngine.setEnabledProtocols(TLSConstants.PROTOCOLS.SAFE_PROTOCOLS);    
+            }
+            else
+            {
+                sslEngine.setEnabledProtocols(protocols.toArray(new String[0]));
+            }
             // enabled ciphers
             if (ciphers == null || ciphers.isEmpty())
             {
@@ -139,7 +146,20 @@ public class HTTPChecker
         }
     }
     
-    protected void submit(final String host, final int port, final int connectTimeout, final int requestTimeout, final boolean ssl, final boolean permitInvalidCerts, final String SNIHost, final List<String> ciphers, final FullHttpRequest request, final Consumer<HTTPCheckResponse> responseHandler, final Consumer<Throwable> errorHandler)
+    protected void submit(
+            final String host, 
+            final int port, 
+            final int connectTimeout, 
+            final int requestTimeout, 
+            final boolean ssl, 
+            final boolean permitInvalidCerts, 
+            final String SNIHost,
+            final List<String> protocols,
+            final List<String> ciphers, 
+            final FullHttpRequest request, 
+            final Consumer<HTTPCheckResponse> responseHandler, 
+            final Consumer<Throwable> errorHandler
+    )
     {
         // configure the client
         Bootstrap b = new Bootstrap();
@@ -152,7 +172,7 @@ public class HTTPChecker
             public void initChannel(SocketChannel ch) throws Exception
             {
                 // Create the SSL Engine
-                SSLEngine sslEngine = ssl ? createSSLEngine(permitInvalidCerts, SNIHost, port, ciphers) : null;
+                SSLEngine sslEngine = ssl ? createSSLEngine(permitInvalidCerts, SNIHost, port, protocols, ciphers) : null;
                 // Timeouts
                 ch.pipeline().addLast(
                         new ReadTimeoutHandler(  requestTimeout < 0 ? HTTPChecker.this.defaultRequestTimeoutSeconds : requestTimeout /* seconds */ ), 
@@ -187,9 +207,35 @@ public class HTTPChecker
     {
         return new HTTPCheckBuilder() {
             @Override
-            protected void submit(String address, int port, int connectTimeout, int requestTimeout, boolean ssl, boolean permitInvalidCerts, String SNIHost, List<String> ciphers, FullHttpRequest request, Consumer<HTTPCheckResponse> responseHandler, Consumer<Throwable> errorHandler)
+            protected void submit(
+                    String address, 
+                    int port, 
+                    int connectTimeout, 
+                    int requestTimeout, 
+                    boolean ssl, 
+                    boolean permitInvalidCerts, 
+                    String SNIHost,
+                    List<String> protocols, 
+                    List<String> ciphers, 
+                    FullHttpRequest request, 
+                    Consumer<HTTPCheckResponse> responseHandler, 
+                    Consumer<Throwable> errorHandler
+            )
             {
-                HTTPChecker.this.submit(address, port, connectTimeout, requestTimeout, ssl, permitInvalidCerts, SNIHost, ciphers, request, responseHandler, errorHandler);
+                HTTPChecker.this.submit(
+                        address, 
+                        port, 
+                        connectTimeout, 
+                        requestTimeout, 
+                        ssl, 
+                        permitInvalidCerts, 
+                        SNIHost, 
+                        protocols, 
+                        ciphers, 
+                        request, 
+                        responseHandler, 
+                        errorHandler
+                );
             }
         };
     }
