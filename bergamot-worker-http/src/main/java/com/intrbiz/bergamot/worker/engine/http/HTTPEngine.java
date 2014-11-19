@@ -1,6 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.http;
 
-import com.intrbiz.bergamot.worker.check.http.HTTPChecker;
+import com.intrbiz.bergamot.check.http.HTTPChecker;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 
 /**

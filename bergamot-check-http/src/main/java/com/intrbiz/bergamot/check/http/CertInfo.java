@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.worker.check.http;
+package com.intrbiz.bergamot.check.http;
 
 import java.io.IOException;
 import java.security.PublicKey;

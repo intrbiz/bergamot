@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.worker.check.http;
+package com.intrbiz.bergamot.check.http;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

@@ -25,19 +25,15 @@
     	<version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
-    	<groupId>log4j</groupId>
-    	<artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>io.netty</groupId>
-    	<artifactId>netty-all</artifactId>
-    	<version>4.0.12.Final</version>
-    </dependency>
-    <dependency>
 		<groupId>com.intrbiz.util</groupId>
 		<artifactId>bootstrap</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</dependency>
+    <dependency>
+    	<groupId>com.intrbiz.bergamot</groupId>
+    	<artifactId>bergamot-check-http</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   	<build>
 		<finalName>bergamot-http-worker</finalName>

@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.worker.check.http;
+package com.intrbiz.bergamot.check.http;
 
 /**
  * A subject alternate name

@@ -1,12 +1,12 @@
-package com.intrbiz.bergamot.worker.engine.http;
+package com.intrbiz.bergamot.check.http;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.worker.check.http.HTTPChecker;
-import com.intrbiz.bergamot.worker.check.http.TLSConstants;
-import com.intrbiz.bergamot.worker.check.http.TLSConstants.CipherInfo;
+import com.intrbiz.bergamot.check.http.HTTPChecker;
+import com.intrbiz.bergamot.check.http.TLSConstants;
+import com.intrbiz.bergamot.check.http.TLSConstants.CipherInfo;
 
 public class CipherTests
 {

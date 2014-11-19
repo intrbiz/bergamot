@@ -86,6 +86,7 @@
     <module>bergamot-jnetraw</module>
     <module>bergamot-pinger</module>
     <module>bergamot-worker-http</module>
+    <module>bergamot-check-http</module>
   </modules>
   
   <dependencyManagement>
