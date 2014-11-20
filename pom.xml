@@ -87,6 +87,7 @@
     <module>bergamot-pinger</module>
     <module>bergamot-worker-http</module>
     <module>bergamot-check-http</module>
+    <module>bergamot-check-tcp</module>
   </modules>
   
   <dependencyManagement>
