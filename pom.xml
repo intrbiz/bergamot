@@ -88,6 +88,7 @@
     <module>bergamot-worker-http</module>
     <module>bergamot-check-http</module>
     <module>bergamot-check-tcp</module>
+    <module>bergamot-agent</module>
   </modules>
   
   <dependencyManagement>
