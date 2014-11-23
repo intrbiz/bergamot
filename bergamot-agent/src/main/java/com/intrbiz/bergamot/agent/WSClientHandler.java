@@ -6,7 +6,6 @@ import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
@@ -35,20 +34,13 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
     @Override
     public void channelActive(ChannelHandlerContext ctx)
     {
-        logger.info("Connected, starting handshake");
+        logger.debug("Connected, starting handshake");
         handshaker.handshake(ctx.channel());
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx)
-    {
-        logger.info("Disconnected!");
     }
 
     public void channelHandshaked(ChannelHandlerContext ctx)
     {
-        logger.info("Handshake done");
-        ctx.channel().writeAndFlush(new PingWebSocketFrame());
+        logger.debug("Handshake done");
         ctx.channel().writeAndFlush(new TextWebSocketFrame("{\"type\":\"bergamot.api.util.ping\",\"request_id\":\"testing_12345\"}"));
     }
 
@@ -73,12 +65,12 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
             }
             else if (frame instanceof PongWebSocketFrame)
             {
-                logger.info("Got pong, whoop");
+                logger.debug("Got pong, whoop");
             }
             else if (frame instanceof CloseWebSocketFrame)
             {
-                logger.info("Closing connection");
-                ctx.channel().close();
+                logger.debug("Closing connection");
+                ctx.close();
             }
         }
         else
@@ -90,7 +82,7 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable e)
     {
-        e.printStackTrace();
+        logger.error("Unhandled error communicating with Bergamot server", e);
         ctx.close();
     }
 }
