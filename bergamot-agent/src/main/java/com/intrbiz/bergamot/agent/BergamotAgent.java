@@ -10,7 +10,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.net.URI;
@@ -21,6 +20,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.gerald.polyakov.Node;
 import com.intrbiz.util.IBThreadFactory;
 
 /**
@@ -34,10 +34,13 @@ public class BergamotAgent
     private EventLoopGroup eventLoop;
     
     private Timer timer;
+    
+    private Node node;
 
-    public BergamotAgent(URI server)
+    public BergamotAgent(URI server, Node node)
     {
         this.server = server;
+        this.node = node;
         this.eventLoop = new NioEventLoopGroup(1, new IBThreadFactory("bergamot-agent", false));
         this.timer = new Timer();
         // background GC task
@@ -52,6 +55,16 @@ public class BergamotAgent
                 logger.debug("Memory: " + rt.freeMemory() + " " + rt.totalMemory() + " " + rt.maxMemory());
             }
         }, 30_000L, 30_000L);
+    }
+    
+    public Node getNode()
+    {
+        return this.node;
+    }
+    
+    public URI getServer()
+    {
+        return this.server;
     }
 
     public void connect() throws Exception
@@ -68,7 +81,7 @@ public class BergamotAgent
                 // HTTP handling
                 ch.pipeline().addLast("codec",      new HttpClientCodec()); 
                 ch.pipeline().addLast("aggregator", new HttpObjectAggregator(65536));
-                ch.pipeline().addLast("handler",    new WSClientHandler(BergamotAgent.this.server));
+                ch.pipeline().addLast("handler",    new WSClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.node));
             }
         });
         // connect the client
@@ -87,22 +100,6 @@ public class BergamotAgent
                             BergamotAgent.this.scheduleReconnect();
                         }
                     });
-                    // setup period ping
-                    BergamotAgent.this.timer.scheduleAtFixedRate(new TimerTask() {
-                        @Override
-                        public void run()
-                        {
-                            if (channel.isActive())
-                            {
-                                BergamotAgent.this.logger.debug("Sending ping to server");
-                                channel.writeAndFlush(new TextWebSocketFrame("{\"type\":\"bergamot.api.util.ping\",\"request_id\":\"testing_12345\"}"));
-                            }
-                            else
-                            {
-                                this.cancel();
-                            }
-                        }
-                    }, 15_000L, 15_000L);
                 }
                 else
                 {
@@ -149,7 +146,7 @@ public class BergamotAgent
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         //
-        BergamotAgent agent = new BergamotAgent(new URI("ws://127.0.0.1:8081/websocket"));
+        BergamotAgent agent = new BergamotAgent(new URI("ws://127.0.0.1:8081/websocket"), Node.service("BergamotAgent"));
         agent.connect();
     }
 }

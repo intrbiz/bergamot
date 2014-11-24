@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.agent;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
@@ -14,21 +15,50 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 
 import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
+
+import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
+import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
+import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
+import com.intrbiz.gerald.polyakov.Node;
 
 public class WSClientHandler extends ChannelInboundHandlerAdapter
 {
     private Logger logger = Logger.getLogger(WSClientHandler.class);
 
     private final WebSocketClientHandshaker handshaker;
+    
+    private final Timer timer;
+    
+    private final BergamotAgentTranscoder transcoder = BergamotAgentTranscoder.getDefaultInstance();
+    
+    private final Node node;
 
-    public WSClientHandler(URI server)
+    public WSClientHandler(Timer timer, URI server, Node node)
     {
         super();
+        this.timer = timer;
+        this.node = node;
         HttpHeaders headers = new DefaultHttpHeaders();
         headers.set(HttpHeaders.Names.USER_AGENT, "BergamotAgent/1.0.0 (Java)");
         this.handshaker = WebSocketClientHandshakerFactory.newHandshaker(server, WebSocketVersion.V13, null, false, headers);
+    }
+    
+    protected AgentHello createHello()
+    {
+        AgentHello hello = new AgentHello(UUID.randomUUID().toString());
+        hello.setHostId(this.node.getHostId());
+        hello.setHostName(this.node.getHostName());
+        hello.setServiceId(this.node.getServiceId());
+        hello.setServiceName(this.node.getServiceName());
+        hello.setAgentName("BergamotAgent");
+        hello.setAgentVariant("Java");
+        hello.setAgentVersion("1.0.0");
+        return hello;
     }
 
     @Override
@@ -41,7 +71,26 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
     public void channelHandshaked(ChannelHandlerContext ctx)
     {
         logger.debug("Handshake done");
-        ctx.channel().writeAndFlush(new TextWebSocketFrame("{\"type\":\"bergamot.api.util.ping\",\"request_id\":\"testing_12345\"}"));
+        final Channel channel = ctx.channel();
+        // hello
+        channel.writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(this.createHello())));
+        // schedule ping
+        this.timer.scheduleAtFixedRate(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                if (channel.isActive())
+                {
+                    logger.debug("Sending ping to server");
+                    channel.writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new AgentPing(UUID.randomUUID().toString()))));
+                }
+                else
+                {
+                    this.cancel();
+                }
+            }
+        }, 15_000L, 15_000L);
     }
 
     @Override
