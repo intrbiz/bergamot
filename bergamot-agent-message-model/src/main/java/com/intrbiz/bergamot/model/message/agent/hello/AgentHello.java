@@ -29,6 +29,15 @@ public class AgentHello extends AgentMessage
 
     @JsonProperty("agent_version")
     private String agentVersion;
+    
+    @JsonProperty("protocol_version")
+    private int protocolVersion;
+    
+    @JsonProperty("nonce")
+    private String nonce;
+    
+    @JsonProperty("timestamp")
+    private long timestamp;
 
     public AgentHello()
     {
@@ -113,5 +122,35 @@ public class AgentHello extends AgentMessage
     public void setAgentVersion(String agentVersion)
     {
         this.agentVersion = agentVersion;
+    }
+
+    public String getNonce()
+    {
+        return nonce;
+    }
+
+    public void setNonce(String nonce)
+    {
+        this.nonce = nonce;
+    }
+
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp)
+    {
+        this.timestamp = timestamp;
+    }
+
+    public int getProtocolVersion()
+    {
+        return protocolVersion;
+    }
+
+    public void setProtocolVersion(int protocolVersion)
+    {
+        this.protocolVersion = protocolVersion;
     }
 }

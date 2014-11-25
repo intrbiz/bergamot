@@ -22,8 +22,12 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
+import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
+import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.bergamot.util.AgentUtil;
 import com.intrbiz.gerald.polyakov.Node;
 
 public class WSClientHandler extends ChannelInboundHandlerAdapter
@@ -37,6 +41,8 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
     private final BergamotAgentTranscoder transcoder = BergamotAgentTranscoder.getDefaultInstance();
     
     private final Node node;
+    
+    private AgentHello hello;
 
     public WSClientHandler(Timer timer, URI server, Node node)
     {
@@ -48,17 +54,35 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
         this.handshaker = WebSocketClientHandshakerFactory.newHandshaker(server, WebSocketVersion.V13, null, false, headers);
     }
     
-    protected AgentHello createHello()
+    protected AgentHello getHello()
     {
-        AgentHello hello = new AgentHello(UUID.randomUUID().toString());
-        hello.setHostId(this.node.getHostId());
-        hello.setHostName(this.node.getHostName());
-        hello.setServiceId(this.node.getServiceId());
-        hello.setServiceName(this.node.getServiceName());
-        hello.setAgentName("BergamotAgent");
-        hello.setAgentVariant("Java");
-        hello.setAgentVersion("1.0.0");
-        return hello;
+        if (this.hello == null)
+        {
+            this.hello = new AgentHello(UUID.randomUUID().toString());
+            hello.setHostId(this.node.getHostId());
+            hello.setHostName(this.node.getHostName());
+            hello.setServiceId(this.node.getServiceId());
+            hello.setServiceName(this.node.getServiceName());
+            hello.setAgentName("BergamotAgent");
+            hello.setAgentVariant("Java");
+            hello.setAgentVersion("1.0.0");
+            hello.setNonce(AgentUtil.newNonce());
+            hello.setTimestamp(System.currentTimeMillis());
+            hello.setProtocolVersion(1);
+        }
+        return this.hello;
+    }
+    
+    protected AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)
+    {
+        if (request instanceof AgentPing)
+        {
+            logger.debug("Got ping from server");
+            return new AgentPong(UUID.randomUUID().toString());
+        }
+        // unhandled
+        logger.warn("Unhandled message: " + request);
+        return new GeneralError(request, "Unimplemented");
     }
 
     @Override
@@ -73,7 +97,8 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
         logger.debug("Handshake done");
         final Channel channel = ctx.channel();
         // hello
-        channel.writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(this.createHello())));
+        logger.debug("Sending hello to server");
+        channel.writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(this.getHello())));
         // schedule ping
         this.timer.scheduleAtFixedRate(new TimerTask()
         {
@@ -111,6 +136,29 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
             if (frame instanceof TextWebSocketFrame)
             {
                 logger.info("Message: " + ((TextWebSocketFrame) frame).text());
+                try
+                {
+                    AgentMessage request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), AgentMessage.class);
+                    // process the request
+                    if (request instanceof AgentMessage)
+                    {
+                        // process the message and respond
+                        AgentMessage response = this.processMessage(ctx, request);
+                        if (response != null)
+                        {
+                            ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(response)));
+                        }
+                    }
+                    else
+                    {
+                        ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new GeneralError(request, "Bad request"))));
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.error("Failed to decode request", e);
+                    ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new GeneralError("Failed to decode request"))));
+                }
             }
             else if (frame instanceof PongWebSocketFrame)
             {

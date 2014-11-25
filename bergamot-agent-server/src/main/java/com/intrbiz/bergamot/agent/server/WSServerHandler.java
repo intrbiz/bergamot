@@ -32,6 +32,7 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
+import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 
 
 public class WSServerHandler extends SimpleChannelInboundHandler<Object>
@@ -140,7 +141,7 @@ public class WSServerHandler extends SimpleChannelInboundHandler<Object>
         }
     }
     
-    private AgentMessage processMessage(final ChannelHandlerContext ctx, AgentMessage request)
+    private AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)
     {
         if (request instanceof AgentHello)
         {
@@ -152,7 +153,7 @@ public class WSServerHandler extends SimpleChannelInboundHandler<Object>
         else if (request instanceof AgentPing)
         {
             logger.debug("Got ping from agent");
-            return new AgentPing(UUID.randomUUID().toString());
+            return new AgentPong(UUID.randomUUID().toString());
         }
         // unhandled
         logger.warn("Unhandled message: " + request);
