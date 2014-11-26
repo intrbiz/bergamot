@@ -9,6 +9,7 @@ import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
+import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
@@ -17,7 +18,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUTime;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUUsage;
 
-public class CPUInfoHandler
+public class CPUInfoHandler implements AgentHandler
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
 
@@ -26,6 +27,7 @@ public class CPUInfoHandler
         super();
     }
     
+    @Override
     public Class<?>[] getMessages()
     {
         return new Class[] {
@@ -33,6 +35,7 @@ public class CPUInfoHandler
         };
     }
 
+    @Override
     public AgentMessage handle(AgentMessage request)
     {
         try
@@ -111,11 +114,5 @@ public class CPUInfoHandler
             Cpu cpui = cpus[i];
             System.out.println("CPU [" + i + "] Time: " + cpui.getTotal() + " " + cpui.getSys() + " " + cpui.getUser() + " " + cpui.getWait());
         }
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        CPUInfoHandler cih = new CPUInfoHandler();
-        System.out.println( cih.handle(null) );
     }
 }

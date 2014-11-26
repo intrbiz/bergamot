@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.agent;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -15,11 +16,19 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
+import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
+import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
+import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 import com.intrbiz.gerald.polyakov.Node;
 import com.intrbiz.util.IBThreadFactory;
 
@@ -36,6 +45,10 @@ public class BergamotAgent
     private Timer timer;
     
     private Node node;
+    
+    private ConcurrentMap<Class<?>, AgentHandler> handlers = new ConcurrentHashMap<Class<?>, AgentHandler>();
+    
+    private AgentHandler defaultHandler;
 
     public BergamotAgent(URI server, Node node)
     {
@@ -55,6 +68,8 @@ public class BergamotAgent
                 logger.debug("Memory: " + rt.freeMemory() + " " + rt.totalMemory() + " " + rt.maxMemory());
             }
         }, 30_000L, 30_000L);
+        // handlers
+        this.registerHandler(new CPUInfoHandler());
     }
     
     public Node getNode()
@@ -65,6 +80,20 @@ public class BergamotAgent
     public URI getServer()
     {
         return this.server;
+    }
+    
+    public void registerHandler(AgentHandler handler)
+    {
+        for (Class<?> cls : handler.getMessages())
+        {
+            this.handlers.put(cls, handler);
+        }
+    }
+    
+    public AgentHandler getHandler(Class<?> messageType)
+    {
+        AgentHandler handler = this.handlers.get(messageType);
+        return handler == null ? this.defaultHandler : handler;
     }
 
     public void connect() throws Exception
@@ -81,7 +110,29 @@ public class BergamotAgent
                 // HTTP handling
                 ch.pipeline().addLast("codec",      new HttpClientCodec()); 
                 ch.pipeline().addLast("aggregator", new HttpObjectAggregator(65536));
-                ch.pipeline().addLast("handler",    new WSClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.node));
+                ch.pipeline().addLast("handler",    new WSClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.node)
+                {
+                    @Override
+                    protected AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)
+                    {
+                        if (request instanceof AgentPing)
+                        {
+                            logger.debug("Got ping from server");
+                            return new AgentPong(UUID.randomUUID().toString());
+                        }
+                        else if (request != null)
+                        {
+                            AgentHandler handler = getHandler(request.getClass());
+                            if (handler != null)
+                            {
+                                return handler.handle(request);
+                            }
+                        }
+                        // unhandled
+                        logger.warn("Unhandled message: " + request);
+                        return new GeneralError(request, "Unimplemented");
+                    }
+                });
             }
         });
         // connect the client

@@ -26,11 +26,10 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
-import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 import com.intrbiz.bergamot.util.AgentUtil;
 import com.intrbiz.gerald.polyakov.Node;
 
-public class WSClientHandler extends ChannelInboundHandlerAdapter
+public abstract class WSClientHandler extends ChannelInboundHandlerAdapter
 {
     private Logger logger = Logger.getLogger(WSClientHandler.class);
 
@@ -73,17 +72,7 @@ public class WSClientHandler extends ChannelInboundHandlerAdapter
         return this.hello;
     }
     
-    protected AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)
-    {
-        if (request instanceof AgentPing)
-        {
-            logger.debug("Got ping from server");
-            return new AgentPong(UUID.randomUUID().toString());
-        }
-        // unhandled
-        logger.warn("Unhandled message: " + request);
-        return new GeneralError(request, "Unimplemented");
-    }
+    protected abstract AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx)
