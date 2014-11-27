@@ -5,12 +5,15 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.net.URI;
@@ -25,8 +28,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
+import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
+import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 import com.intrbiz.gerald.polyakov.Node;
@@ -69,6 +73,7 @@ public class BergamotAgent
             }
         }, 30_000L, 30_000L);
         // handlers
+        this.setDefaultHandler(new DefaultHandler());
         this.registerHandler(new CPUInfoHandler());
     }
     
@@ -90,6 +95,11 @@ public class BergamotAgent
         }
     }
     
+    public void setDefaultHandler(AgentHandler handler)
+    {
+        this.defaultHandler = handler;
+    }
+    
     public AgentHandler getHandler(Class<?> messageType)
     {
         AgentHandler handler = this.handlers.get(messageType);
@@ -108,9 +118,12 @@ public class BergamotAgent
             public void initChannel(SocketChannel ch) throws Exception
             {
                 // HTTP handling
-                ch.pipeline().addLast("codec",      new HttpClientCodec()); 
-                ch.pipeline().addLast("aggregator", new HttpObjectAggregator(65536));
-                ch.pipeline().addLast("handler",    new WSClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.node)
+                ChannelPipeline pipeline = ch.pipeline();
+                pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  30 /* seconds */ )); 
+                pipeline.addLast("write-timeout", new WriteTimeoutHandler( 30 /* seconds */ ));
+                pipeline.addLast("codec",         new HttpClientCodec()); 
+                pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
+                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.node)
                 {
                     @Override
                     protected AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)
@@ -120,6 +133,16 @@ public class BergamotAgent
                             logger.debug("Got ping from server");
                             return new AgentPong(UUID.randomUUID().toString());
                         }
+                        else if (request instanceof AgentPong)
+                        {
+                            logger.debug("Got pong from server");
+                            return null;
+                        }
+                        else if (request instanceof AgentError)
+                        {
+                            logger.warn("Got error from server: " + ((AgentError) request).getMessage());
+                            return null;
+                        }
                         else if (request != null)
                         {
                             AgentHandler handler = getHandler(request.getClass());
@@ -128,9 +151,7 @@ public class BergamotAgent
                                 return handler.handle(request);
                             }
                         }
-                        // unhandled
-                        logger.warn("Unhandled message: " + request);
-                        return new GeneralError(request, "Unimplemented");
+                        return null;
                     }
                 });
             }

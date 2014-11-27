@@ -6,6 +6,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,6 +25,9 @@ import io.netty.util.CharsetUtil;
 
 import java.net.SocketAddress;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -35,11 +39,13 @@ import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 
 
-public class WSServerHandler extends SimpleChannelInboundHandler<Object>
+public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
 {
-    private static final Logger logger = Logger.getLogger(WSServerHandler.class);
+    private static final Logger logger = Logger.getLogger(AgentServerHandler.class);
 
     private static final String WEBSOCKET_PATH = "/agent";
+    
+    private final AgentServer server;
 
     private WebSocketServerHandshaker handshaker;
     
@@ -49,9 +55,14 @@ public class WSServerHandler extends SimpleChannelInboundHandler<Object>
     
     private SocketAddress remoteAddress;
     
-    public WSServerHandler()
+    private Channel channel;
+    
+    private ConcurrentMap<String, Consumer<AgentMessage>> pendingRequests = new ConcurrentHashMap<String, Consumer<AgentMessage>>();
+    
+    public AgentServerHandler(AgentServer server)
     {
         super();
+        this.server = server;
     }
     
     public AgentHello getHello()
@@ -62,6 +73,42 @@ public class WSServerHandler extends SimpleChannelInboundHandler<Object>
     public SocketAddress getRemoteAddress()
     {
         return this.remoteAddress;
+    }
+    
+    public Channel getChannel()
+    {
+        return this.channel;
+    }
+    
+    public void sendMessageToAgent(AgentMessage message, Consumer<AgentMessage> onResponse)
+    {
+        // ensure the message has an id
+        if (message.getId() == null) message.setId(UUID.randomUUID().toString());
+        // stash the message
+        this.pendingRequests.put(message.getId(), onResponse);
+        // send the message
+        this.channel.writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message)));
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception
+    {
+        this.channel = ctx.channel();
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception
+    {
+        // unregister this agent
+        if (this.hello != null)
+        {
+            this.server.unregisterAgent(this);
+        }
+        // invoke any pending messages
+        for (Consumer<AgentMessage> callback : this.pendingRequests.values())
+        {
+            callback.accept(new GeneralError("Channel closed"));
+        }
     }
 
     @Override
@@ -119,25 +166,17 @@ public class WSServerHandler extends SimpleChannelInboundHandler<Object>
         try
         {
             AgentMessage request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), AgentMessage.class);
-            // process the request
-            if (request instanceof AgentMessage)
+            // process the message and respond
+            AgentMessage response = this.processMessage(ctx, request);
+            if (response != null)
             {
-                // process the message and respond
-                AgentMessage response = this.processMessage(ctx, request);
-                if (response != null)
-                {
-                    ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(response)));
-                }
-            }
-            else
-            {
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new GeneralError(request, "Bad request"))));
+                ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(response)));
             }
         }
         catch (Exception e)
         {
             logger.error("Failed to decode request", e);
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new GeneralError("Failed to decode request"))));
+            ctx.close();
         }
     }
     
@@ -148,6 +187,9 @@ public class WSServerHandler extends SimpleChannelInboundHandler<Object>
             this.hello = (AgentHello) request;
             this.remoteAddress = ctx.channel().remoteAddress();
             logger.info("Got hello from " + this.remoteAddress + " " + this.hello.toString());
+            // register ourselves
+            this.server.registerAgent(this);
+            // no response
             return null;
         }
         else if (request instanceof AgentPing)
@@ -155,9 +197,23 @@ public class WSServerHandler extends SimpleChannelInboundHandler<Object>
             logger.debug("Got ping from agent");
             return new AgentPong(UUID.randomUUID().toString());
         }
-        // unhandled
+        else if (request instanceof AgentPong)
+        {
+            logger.debug("Got pong from agent");
+            return null;
+        }
+        else
+        {
+            // do we have a callback to invoke
+            Consumer<AgentMessage> callback = this.pendingRequests.remove(request.getId());
+            if (callback != null)
+            {
+                callback.accept(request);
+                return null;
+            }
+        }
         logger.warn("Unhandled message: " + request);
-        return new GeneralError(request, "Unimplemented");
+        return null;
     }
 
     private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res)

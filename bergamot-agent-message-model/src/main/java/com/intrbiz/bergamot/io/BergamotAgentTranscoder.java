@@ -20,10 +20,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
+import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUInfo;
+import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUTime;
+import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUUsage;
 
 /**
  * Encode and decode messages
@@ -37,7 +42,13 @@ public class BergamotAgentTranscoder
         AgentHello.class,
         // ping
         AgentPing.class,
-        AgentPong.class
+        AgentPong.class,
+        // cpu
+        CheckCPU.class,
+        CPUInfo.class,
+        CPUTime.class,
+        CPUUsage.class,
+        CPUStat.class
     };
     
     private static final BergamotAgentTranscoder US = new BergamotAgentTranscoder();

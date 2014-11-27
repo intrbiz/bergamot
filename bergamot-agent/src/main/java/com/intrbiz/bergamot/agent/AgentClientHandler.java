@@ -29,9 +29,9 @@ import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.util.AgentUtil;
 import com.intrbiz.gerald.polyakov.Node;
 
-public abstract class WSClientHandler extends ChannelInboundHandlerAdapter
+public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
 {
-    private Logger logger = Logger.getLogger(WSClientHandler.class);
+    private Logger logger = Logger.getLogger(AgentClientHandler.class);
 
     private final WebSocketClientHandshaker handshaker;
     
@@ -43,7 +43,7 @@ public abstract class WSClientHandler extends ChannelInboundHandlerAdapter
     
     private AgentHello hello;
 
-    public WSClientHandler(Timer timer, URI server, Node node)
+    public AgentClientHandler(Timer timer, URI server, Node node)
     {
         super();
         this.timer = timer;
@@ -77,13 +77,13 @@ public abstract class WSClientHandler extends ChannelInboundHandlerAdapter
     @Override
     public void channelActive(ChannelHandlerContext ctx)
     {
-        logger.debug("Connected, starting handshake");
+        logger.trace("Connected, starting handshake");
         handshaker.handshake(ctx.channel());
     }
 
     public void channelHandshaked(ChannelHandlerContext ctx)
     {
-        logger.debug("Handshake done");
+        logger.trace("Handshake done");
         final Channel channel = ctx.channel();
         // hello
         logger.debug("Sending hello to server");
@@ -96,7 +96,7 @@ public abstract class WSClientHandler extends ChannelInboundHandlerAdapter
             {
                 if (channel.isActive())
                 {
-                    logger.debug("Sending ping to server");
+                    logger.trace("Sending ping to server");
                     channel.writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new AgentPing(UUID.randomUUID().toString()))));
                 }
                 else
@@ -124,7 +124,7 @@ public abstract class WSClientHandler extends ChannelInboundHandlerAdapter
             WebSocketFrame frame = (WebSocketFrame) msg;
             if (frame instanceof TextWebSocketFrame)
             {
-                logger.info("Message: " + ((TextWebSocketFrame) frame).text());
+                logger.debug("Message: " + ((TextWebSocketFrame) frame).text());
                 try
                 {
                     AgentMessage request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), AgentMessage.class);
@@ -151,11 +151,11 @@ public abstract class WSClientHandler extends ChannelInboundHandlerAdapter
             }
             else if (frame instanceof PongWebSocketFrame)
             {
-                logger.debug("Got pong, whoop");
+                logger.trace("Got pong, whoop");
             }
             else if (frame instanceof CloseWebSocketFrame)
             {
-                logger.debug("Closing connection");
+                logger.trace("Closing connection");
                 ctx.close();
             }
         }
