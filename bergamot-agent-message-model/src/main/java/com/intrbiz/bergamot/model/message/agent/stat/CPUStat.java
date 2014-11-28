@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.message.agent.stat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUInfo;
@@ -12,18 +13,25 @@ import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUUsage;
 @JsonTypeName("bergamot.agent.stat.cpu")
 public class CPUStat extends AgentMessage
 {
+    @JsonProperty("cpu-count")
     private int cpuCount = 0;
 
+    @JsonProperty("load")
     private List<Double> load = new ArrayList<Double>(3);
 
+    @JsonProperty("total-usage")
     private CPUUsage totalUsage;
 
+    @JsonProperty("usage")
     private List<CPUUsage> usage = new ArrayList<CPUUsage>();
 
+    @JsonProperty("info")
     private List<CPUInfo> info = new ArrayList<CPUInfo>();
 
+    @JsonProperty("total-time")
     private CPUTime totalTime;
 
+    @JsonProperty("time")
     private List<CPUTime> time = new ArrayList<CPUTime>();
 
     public CPUStat()

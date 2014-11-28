@@ -1,17 +1,22 @@
 package com.intrbiz.bergamot.model.message.agent.stat.cpu;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentType;
 
 @JsonTypeName("bergamot.agent.model.cpu-usage")
 public class CPUUsage extends AgentType
 {
+    @JsonProperty("total")
     private double total;
 
+    @JsonProperty("system")
     private double system;
 
+    @JsonProperty("user")
     private double user;
 
+    @JsonProperty("wait")
     private double wait;
 
     public CPUUsage()
