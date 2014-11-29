@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
+import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 
 public class AgentServer implements Runnable
@@ -161,6 +162,10 @@ public class AgentServer implements Runnable
             // check the agents disk usage
             agent.sendMessageToAgent(new CheckDisk(), (response) -> {
                 System.out.println("Got Disk usage: " + response);
+            });
+            // check the agents os usage
+            agent.sendMessageToAgent(new CheckOS(), (response) -> {
+                System.out.println("Got OS usage: " + response);
             });
         });
         s.start();
