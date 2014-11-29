@@ -24,6 +24,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
+import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 
@@ -156,6 +157,10 @@ public class AgentServer implements Runnable
             // check the agents mem usage
             agent.sendMessageToAgent(new CheckMem(), (response) -> {
                 System.out.println("Got Mem usage: " + response);
+            });
+            // check the agents disk usage
+            agent.sendMessageToAgent(new CheckDisk(), (response) -> {
+                System.out.println("Got Disk usage: " + response);
             });
         });
         s.start();

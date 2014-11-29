@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
+import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
@@ -77,6 +78,7 @@ public class BergamotAgent
         this.setDefaultHandler(new DefaultHandler());
         this.registerHandler(new CPUInfoHandler());
         this.registerHandler(new MemInfoHandler());
+        this.registerHandler(new DiskInfoHandler());
     }
     
     public Node getNode()
