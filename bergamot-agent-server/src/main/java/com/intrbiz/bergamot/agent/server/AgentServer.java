@@ -27,6 +27,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
+import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 
 public class AgentServer implements Runnable
@@ -166,6 +167,10 @@ public class AgentServer implements Runnable
             // check the agents os usage
             agent.sendMessageToAgent(new CheckOS(), (response) -> {
                 System.out.println("Got OS usage: " + response);
+            });
+            // check the agents uptime
+            agent.sendMessageToAgent(new CheckUptime(), (response) -> {
+                System.out.println("Got Uptime: " + response);
             });
         });
         s.start();

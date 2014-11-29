@@ -24,6 +24,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
+import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
@@ -32,6 +33,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskStat;
 import com.intrbiz.bergamot.model.message.agent.stat.MemStat;
 import com.intrbiz.bergamot.model.message.agent.stat.OSStat;
+import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUTime;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUUsage;
@@ -65,7 +67,10 @@ public class BergamotAgentTranscoder
         DiskStat.class,
         // os
         CheckOS.class,
-        OSStat.class
+        OSStat.class,
+        // uptime
+        CheckUptime.class,
+        UptimeStat.class
     };
     
     private static final BergamotAgentTranscoder US = new BergamotAgentTranscoder();
