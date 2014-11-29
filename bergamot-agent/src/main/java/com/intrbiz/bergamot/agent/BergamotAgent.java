@@ -31,6 +31,7 @@ import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
+import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
 import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
 import com.intrbiz.bergamot.agent.handler.UptimeInfoHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
@@ -83,6 +84,7 @@ public class BergamotAgent
         this.registerHandler(new DiskInfoHandler());
         this.registerHandler(new OSInfoHandler());
         this.registerHandler(new UptimeInfoHandler());
+        this.registerHandler(new NetIfInfoHandler());
     }
     
     public Node getNode()

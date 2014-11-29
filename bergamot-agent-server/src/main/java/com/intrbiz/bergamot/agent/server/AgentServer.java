@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
+import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
@@ -171,6 +172,10 @@ public class AgentServer implements Runnable
             // check the agents uptime
             agent.sendMessageToAgent(new CheckUptime(), (response) -> {
                 System.out.println("Got Uptime: " + response);
+            });
+            // check the agents network
+            agent.sendMessageToAgent(new CheckNetIf(), (response) -> {
+                System.out.println("Got Network Info: " + response);
             });
         });
         s.start();
