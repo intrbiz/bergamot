@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.agent.handler;
 
-import java.util.UUID;
-
 import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.CpuInfo;
 import org.hyperic.sigar.CpuPerc;
@@ -40,7 +38,7 @@ public class CPUInfoHandler implements AgentHandler
     {
         try
         {
-            CPUStat stat = new CPUStat(UUID.randomUUID().toString());
+            CPUStat stat = new CPUStat(request);
             // cpu info
             CpuInfo[] infos = this.sigar.getCpuInfoList();
             stat.setCpuCount(infos.length);
@@ -101,18 +99,5 @@ public class CPUInfoHandler implements AgentHandler
         ret.setUser(time.getTotal());
         ret.setWait(time.getWait());
         return ret;
-    }
-
-    public void getCPUTime() throws SigarException
-    {
-        Cpu cpu = this.sigar.getCpu();
-        System.out.println("CPU Time: " + cpu.getTotal() + " " + cpu.getSys() + " " + cpu.getUser() + " " + cpu.getWait());
-        //
-        Cpu[] cpus = this.sigar.getCpuList();
-        for (int i = 0; i < cpus.length; i++)
-        {
-            Cpu cpui = cpus[i];
-            System.out.println("CPU [" + i + "] Time: " + cpui.getTotal() + " " + cpui.getSys() + " " + cpui.getUser() + " " + cpui.getWait());
-        }
     }
 }

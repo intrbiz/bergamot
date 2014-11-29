@@ -24,6 +24,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
+import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 
 public class AgentServer implements Runnable
@@ -151,6 +152,10 @@ public class AgentServer implements Runnable
             // check the agents CPU usage
             agent.sendMessageToAgent(new CheckCPU(), (response) -> {
                 System.out.println("Got CPU usage: " + response);
+            });
+            // check the agents mem usage
+            agent.sendMessageToAgent(new CheckMem(), (response) -> {
+                System.out.println("Got Mem usage: " + response);
             });
         });
         s.start();
