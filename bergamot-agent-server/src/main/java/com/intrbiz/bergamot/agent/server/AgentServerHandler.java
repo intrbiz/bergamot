@@ -29,6 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
+import javax.net.ssl.SSLEngine;
+
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
@@ -59,10 +61,13 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
     
     private ConcurrentMap<String, Consumer<AgentMessage>> pendingRequests = new ConcurrentHashMap<String, Consumer<AgentMessage>>();
     
-    public AgentServerHandler(AgentServer server)
+    private final SSLEngine engine;
+    
+    public AgentServerHandler(AgentServer server, SSLEngine engine)
     {
         super();
         this.server = server;
+        this.engine = engine;
     }
     
     public AgentHello getHello()
@@ -126,6 +131,7 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
 
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception
     {
+        System.out.println("Got Client Cert: " + this.engine.getSession().getPeerPrincipal() + " " + this.engine.getSession().getPeerCertificates());
         // Handle a bad request.
         if (!req.getDecoderResult().isSuccess())
         {

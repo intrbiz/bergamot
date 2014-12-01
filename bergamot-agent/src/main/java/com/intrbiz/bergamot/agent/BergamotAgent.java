@@ -12,16 +12,26 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.util.concurrent.GenericFutureListener;
 
+import java.io.File;
 import java.net.URI;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -34,6 +44,7 @@ import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
 import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
 import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
 import com.intrbiz.bergamot.agent.handler.UptimeInfoHandler;
+import com.intrbiz.bergamot.crypto.util.KeyStoreUtil;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
@@ -58,12 +69,15 @@ public class BergamotAgent
     private ConcurrentMap<Class<?>, AgentHandler> handlers = new ConcurrentHashMap<Class<?>, AgentHandler>();
     
     private AgentHandler defaultHandler;
+    
+    private SSLContext sslContext;
 
     public BergamotAgent(URI server, Node node)
     {
         this.server = server;
         this.node = node;
         this.eventLoop = new NioEventLoopGroup(1, new IBThreadFactory("bergamot-agent", false));
+        this.sslContext = this.createContext();
         this.timer = new Timer();
         // background GC task
         // we want to deliberately 
@@ -85,6 +99,50 @@ public class BergamotAgent
         this.registerHandler(new OSInfoHandler());
         this.registerHandler(new UptimeInfoHandler());
         this.registerHandler(new NetIfInfoHandler());
+    }
+    
+    private SSLContext createContext()
+    {
+        try
+        {
+            String pass = "abc123";
+            // create the keystore
+            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File("test.agent.key"), new File("test.agent.crt"), new File("ca.crt"));
+            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File("ca.crt"));
+            // the key manager
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(sks, pass.toCharArray());
+            // the trust manager
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(tks);
+            // the context
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+            return context;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to init SSLContext");
+        }
+    }
+    
+    private SSLEngine createSSLEngine(String host, int port)
+    {
+        try
+        {
+            SSLEngine sslEngine = this.sslContext.createSSLEngine(host, port);
+            sslEngine.setUseClientMode(true);
+            sslEngine.setNeedClientAuth(true);
+            SSLParameters params = new SSLParameters();
+            params.setEndpointIdentificationAlgorithm("HTTPS");
+            params.setNeedClientAuth(true);
+            sslEngine.setSSLParameters(params);
+            return sslEngine;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to init SSLEngine", e);
+        }
     }
     
     public Node getNode()
@@ -118,6 +176,7 @@ public class BergamotAgent
 
     public void connect() throws Exception
     {
+        SSLEngine engine = createSSLEngine(this.server.getHost(), this.server.getPort());
         // configure the client
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
@@ -131,6 +190,7 @@ public class BergamotAgent
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  30 /* seconds */ )); 
                 pipeline.addLast("write-timeout", new WriteTimeoutHandler( 30 /* seconds */ ));
+                pipeline.addLast("ssl",           new SslHandler(engine));
                 pipeline.addLast("codec",         new HttpClientCodec()); 
                 pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
                 pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.node)
@@ -228,7 +288,7 @@ public class BergamotAgent
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         //
-        BergamotAgent agent = new BergamotAgent(new URI("ws://127.0.0.1:8081/websocket"), Node.service("BergamotAgent"));
+        BergamotAgent agent = new BergamotAgent(new URI("ws://hub.bergamot.local:8081/agent"), Node.service("BergamotAgent"));
         agent.connect();
     }
 }

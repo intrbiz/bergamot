@@ -10,19 +10,30 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 
+import java.io.File;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.TrustManagerFactory;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.crypto.util.KeyStoreUtil;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
@@ -46,11 +57,57 @@ public class AgentServer implements Runnable
     private ConcurrentMap<UUID, AgentServerHandler> agents = new ConcurrentHashMap<UUID, AgentServerHandler>();
     
     private Consumer<AgentServerHandler> onAgentRegister;
+    
+    private SSLContext sslContext;
 
     public AgentServer(int port)
     {
         super();
         this.port = port;
+        this.sslContext = this.createContext();
+    }
+    
+    private SSLContext createContext()
+    {
+        try
+        {
+            String pass = "abc123";
+            // create the keystore
+            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File("hub.bergamot.local.key"), new File("hub.bergamot.local.crt"), new File("ca.crt"));
+            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File("ca.crt"));
+            // the key manager
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(sks, pass.toCharArray());
+            // the trust manager
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(tks);
+            // the context
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+            return context;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to init SSLContext");
+        }
+    }
+    
+    private SSLEngine createSSLEngine()
+    {
+        try
+        {
+            SSLEngine sslEngine = this.sslContext.createSSLEngine();
+            sslEngine.setUseClientMode(false);
+            sslEngine.setNeedClientAuth(true);
+            SSLParameters params = new SSLParameters();
+            params.setNeedClientAuth(true);
+            sslEngine.setSSLParameters(params);
+            return sslEngine;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to init SSLEngine", e);
+        }
     }
     
     public void registerAgent(AgentServerHandler agent)
@@ -103,6 +160,8 @@ public class AgentServer implements Runnable
         workerGroup = new NioEventLoopGroup();
         try
         {
+            SSLEngine engine = createSSLEngine();
+            //
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup);
             b.channel(NioServerSocketChannel.class);
@@ -114,13 +173,14 @@ public class AgentServer implements Runnable
                     ChannelPipeline pipeline = ch.pipeline();
                     pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  30 /* seconds */ )); 
                     pipeline.addLast("write-timeout", new WriteTimeoutHandler( 30 /* seconds */ ));
+                    pipeline.addLast("ssl",           new SslHandler(engine));
                     pipeline.addLast("codec-http",    new HttpServerCodec());
                     pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
-                    pipeline.addLast("handler",       new AgentServerHandler(AgentServer.this));
+                    pipeline.addLast("handler",       new AgentServerHandler(AgentServer.this, engine));
                 }
             });
             //
-            Channel ch = b.bind(port).sync().channel();
+            Channel ch = b.bind(this.port).sync().channel();
             logger.info("Web socket server started at port " + port + '.');
             //
             ch.closeFuture().sync();
