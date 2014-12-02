@@ -19,6 +19,13 @@ import com.intrbiz.configuration.Configuration;
 
 public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extends Configuration
 {
+    public enum ObjectState {
+        PRESENT,
+        ABSENT,
+        REMOVED, /* Synonym for Absent */
+        CHANGED
+    }
+    
     private static final long serialVersionUID = 1L;
 
     private Set<String> inheritedTemplates = new LinkedHashSet<String>();
@@ -29,7 +36,7 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
 
     private File loadedFrom;
 
-    private Boolean removed;
+    private ObjectState state;
 
     public TemplatedObjectCfg()
     {
@@ -47,22 +54,15 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
         this.loadedFrom = loadedFrom;
     }
     
-    @XmlJavaTypeAdapter(YesNoAdapter.class)
-    @XmlAttribute(name = "removed")
-    public Boolean getRemoved()
+    @XmlAttribute(name = "state")
+    public final ObjectState getState()
     {
-        return removed;
-    }
-    
-    @XmlTransient
-    public boolean getRemovedBooleanValue()
-    {
-        return this.removed == null ? false : true;
+        return this.state;
     }
 
-    public void setRemoved(Boolean removed)
+    public final void setState(ObjectState state)
     {
-        this.removed = removed;
+        this.state = state;
     }
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
