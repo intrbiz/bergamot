@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    <command name="http_check" engine="http">
+        <summary>HTTP Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port"></parameter>
+        <parameter name="virtual_host">#{host.name}</parameter>
+        <parameter name="ssl">no</parameter>
+        <parameter name="permit_invalid_certs">no</parameter>
+        <parameter name="version"></parameter>
+        <parameter name="method"></parameter>
+        <parameter name="path"></parameter>
+        <parameter name="status">200,301,302,304</parameter>
+        <parameter name="critical_response_time">2500</parameter>
+        <parameter name="warning_response_time">1000</parameter>
+        <parameter name="length"></parameter>
+        <parameter name="contains"></parameter>
+    </command>
+    <command name="https_check" engine="http">
+        <summary>HTTPS Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port"></parameter>
+        <parameter name="virtual_host">#{host.name}</parameter>
+        <parameter name="ssl">yes</parameter>
+        <parameter name="permit_invalid_certs">no</parameter>
+        <parameter name="version"></parameter>
+        <parameter name="method"></parameter>
+        <parameter name="path"></parameter>
+        <parameter name="status">200,301,302,304</parameter>
+        <parameter name="critical_response_time">2500</parameter>
+        <parameter name="warning_response_time">1000</parameter>
+        <parameter name="length"></parameter>
+        <parameter name="contains"></parameter>
+    </command>
+</bergamot>
