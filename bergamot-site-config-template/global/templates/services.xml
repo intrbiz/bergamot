@@ -28,6 +28,10 @@
         <notify teams="db-admins"/>
     </service>
     
+    <service name="website-service" groups="websites" extends="generic-service" template="yes">
+        <notify teams="web-admins"/>
+    </service>
+    
     <service name="load" extends="linux-service" template="yes">
         <summary>Load</summary>
         <check-command command="check_nrpe_load"/>
