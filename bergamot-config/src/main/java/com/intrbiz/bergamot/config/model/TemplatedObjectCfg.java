@@ -36,7 +36,7 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
 
     private File loadedFrom;
 
-    private ObjectState state;
+    private ObjectState objectState;
 
     public TemplatedObjectCfg()
     {
@@ -55,14 +55,14 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
     }
     
     @XmlAttribute(name = "state")
-    public final ObjectState getState()
+    public final ObjectState getObjectState()
     {
-        return this.state;
+        return this.objectState;
     }
 
-    public final void setState(ObjectState state)
+    public final void setObjectState(ObjectState objectState)
     {
-        this.state = state;
+        this.objectState = objectState;
     }
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
