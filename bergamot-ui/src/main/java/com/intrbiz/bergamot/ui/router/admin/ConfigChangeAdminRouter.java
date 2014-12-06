@@ -16,6 +16,7 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
+import com.intrbiz.bergamot.config.model.TemplatedObjectCfg.ObjectState;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
@@ -127,7 +128,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         // remove the object id
         ((NamedObjectCfg<?>) cfg).setId(null);
         // set removed
-        cfg.setRemoved(true);
+        cfg.setObjectState(ObjectState.REMOVED);
         // add the object
         ((BergamotCfg) change.getConfiguration()).addObject(cfg);
         // update
