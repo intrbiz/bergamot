@@ -24,9 +24,9 @@ public class ProtocolTests
             .enabledSSLProtocols(protocol)
             .get("/")
             .execute((r) -> {
-                System.out.println("Supported  : " + protocol);
+                System.out.println("Supported (intrbiz.com)  : " + protocol);
             }, (e) -> {
-                System.out.println("Unsupported: " + protocol + " | " + e.getMessage());
+                System.out.println("Unsupported (intrbiz.com): " + protocol + " | " + e.getMessage());
             });
         }
     }

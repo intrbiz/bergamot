@@ -281,7 +281,7 @@ public abstract class HTTPCheckBuilder
         // default to connection close
         request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         // virtual host
-        if (this.port == 80) request.headers().add(HttpHeaders.Names.HOST, this.virtualHost);
+        if (this.port == 80 || this.port == 443) request.headers().add(HttpHeaders.Names.HOST, this.virtualHost);
         else request.headers().add(HttpHeaders.Names.HOST, this.virtualHost + ":" + this.port);
         // user agent
         request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring Check HTTP 1.0.0");
