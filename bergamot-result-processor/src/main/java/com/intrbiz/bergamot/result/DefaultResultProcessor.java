@@ -65,34 +65,29 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                         return;
                     }
                     // apply the result
-                    CheckState state = check.getState();
-                    // copy from previous values
-                    boolean wasOk   = state.isOk();
-                    boolean wasHard = state.isHard();
-                    // apply the result
-                    boolean isHardStateChange = this.applyResult((RealCheck<?, ?>) check, state, result);
-                    logger.info("State change for " + result.getCheckType() + "::" + result.getCheckId() + ": hard: " + isHardStateChange + ", transitioning: " + state.isTransitioning() + ", attempt: " + state.getAttempt());
+                    Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), result);
+                    logger.info("State change for " + result.getCheckType() + "::" + result.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
                     // stats
-                    this.computeStats(check, state, result);
+                    this.computeStats(check, transition.nextState, result);
                     // update the check state
-                    db.setCheckState(state);
+                    db.setCheckState(transition.nextState);
                     db.commit();
                     // reschedule active checks if they are in transition 
                     // or have changed hard state
                     // or the ok state has changed
                     // or the hard state has changed
-                    if (check instanceof ActiveCheck && (state.isTransitioning() || isHardStateChange || wasOk ^ state.isOk() || wasHard ^ state.isHard()))
+                    if (check instanceof ActiveCheck && (transition.stateChange || transition.hardChange))
                     {
                         // inform the scheduler to reschedule this check
-                        logger.info("Sending reschedule for " + result.getCheckType() + "::" + result.getCheckId() + ", transition: " + state.isTransitioning() + ", hard state change: " + isHardStateChange + ", ok change: " + (wasOk ^ state.isOk()) + ", hard change: " + (wasHard ^ state.isHard()));
+                        logger.info("Sending reschedule for " + result.getCheckType() + "::" + result.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
                         this.rescheduleCheck((ActiveCheck<?,?>) check);
                     }
                     // send the general state update notifications
                     this.sendStateUpdate(check);
                     // send notifications
-                    if (isHardStateChange)
+                    if (transition.hardChange)
                     {
-                        if (state.isOk())
+                        if (check.getState().isOk())
                         {
                             // send recovery
                             this.sendRecovery(check, db);
@@ -104,7 +99,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                         }
                     }
                     // update any virtual checks
-                    this.updateVirtualChecks(check, state, result, isHardStateChange, db);
+                    this.updateVirtualChecks(check, transition, result, db);
                 }
                 else
                 {
@@ -205,13 +200,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
         }
     }
-
-    /**
-     * Apply the result to the current state of the check
-     * 
-     * @return true if a hard state change happened
-     */
-    protected boolean applyResult(RealCheck<?, ?> check, CheckState state, Result result)
+    
+    protected Transition computeResultTransition(RealCheck<?,?> check, CheckState currentState, Result result)
     {
         // validate that status matches ok
         Status resultStatus = Status.parse(result.getStatus());
@@ -219,57 +209,66 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         {
             result.setOk(resultStatus.isOk());
         }
-        // is the state changing
-        boolean isTransition = state.isOk() ^ result.isOk();
-        boolean isFlapping = isTransition & state.isTransitioning();
-        // copy the last hard state
-        if (isTransition && state.isHard())
+        // the next state
+        CheckState nextState = currentState.clone();
+        // apply the result to the next state
+        nextState.setOk(result.isOk());
+        nextState.pushOkHistory(result.isOk());
+        nextState.setStatus(resultStatus);
+        nextState.setOutput(result.getOutput());
+        nextState.setLastRuntime(result.getRuntime());
+        nextState.setLastCheckTime(new Timestamp(result.getExecuted()));
+        // compute the transition
+        // do we have a state change
+        if (currentState.isOk() ^ nextState.isOk())
         {
-            state.setLastHardOk(state.isOk());
-            state.setLastHardStatus(state.getStatus());
-            state.setLastHardOutput(state.getOutput());
-        }
-        // update the state
-        state.setLastCheckId(result.getId());
-        state.setLastCheckTime(new Timestamp(result.getExecuted()));
-        state.setOk(result.isOk());
-        state.pushOkHistory(result.isOk());
-        state.setStatus(resultStatus);
-        state.setOutput(result.getOutput());
-        state.setFlapping(isFlapping);
-        // apply thresholds
-        if (isTransition)
-        {
-            state.setAttempt(1);
-            state.setHard(false);
-            state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
-            state.setTransitioning(true);
-            // check for immediate transition
-            state.setHard(state.getAttempt() >= check.computeCurrentAttemptThreshold(state));
-            if (state.isHard())
+            // we've changed state
+            nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
+            // begin or immediately transition
+            if (check.computeCurrentAttemptThreshold(nextState) > 1)
             {
-                state.setTransitioning(false);
-                return state.isHard() && (state.isOk() ^ state.isLastHardOk());
+                // start the transition
+                nextState.setHard(false);
+                nextState.setTransitioning(true);
+                nextState.setAttempt(1);               
+                return new Transition(currentState, nextState, true, false);
+            }
+            else
+            {
+                // immediately enter hard state
+                nextState.setHard(true);
+                nextState.setTransitioning(false);
+                nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
+                return new Transition(currentState, nextState, true, true);
             }
         }
-        else if (! (state.isHard() && state.getAttempt() >= check.computeCurrentAttemptThreshold(state)))
+        else if (currentState.isHard())
         {
-            int attempt = state.getAttempt() + 1;
-            if (attempt > check.computeCurrentAttemptThreshold(state)) attempt = check.computeCurrentAttemptThreshold(state);
-            state.setAttempt(attempt);
-            state.setHard(attempt >= check.computeCurrentAttemptThreshold(state));
-            if (state.isHard())
-            {
-                state.setTransitioning(false);
-            }
-            return state.isHard() && (state.isOk() ^ state.isLastHardOk());
+            // steady state
+            return new Transition(currentState, nextState, false, false);
         }
-        return false;
+        else
+        {
+            // during transition
+            nextState.setAttempt(currentState.getAttempt() + 1);
+            // have we reached a hard state
+            if (nextState.getAttempt() >= check.computeCurrentAttemptThreshold(nextState))
+            {
+                nextState.setHard(true);
+                nextState.setTransitioning(false);
+                nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
+                return new Transition(currentState, nextState, false, true);
+            }
+            else
+            {
+                return new Transition(currentState, nextState, false, false);
+            }
+        }
     }
 
     // virtual check handling
 
-    protected void updateVirtualChecks(Check<?, ?> check, CheckState state, Result result, boolean isHardStateChange, BergamotDB db)
+    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, Result result, BergamotDB db)
     {
         for (VirtualCheck<?, ?> referencedBy : check.getReferencedBy())
         {
@@ -289,7 +288,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             this.sendStateUpdate(referencedBy);
             // send notifications
             // only send notifications when a dependent check has reached a hard state change
-            if (isStateChange && isHardStateChange)
+            if (isStateChange && transition.hardChange)
             {
                 if (referencedBy.getState().isOk())
                 {
@@ -352,5 +351,24 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             logger.debug("Last check latency: processing => " + state.getLastCheckProcessingLatency() + "ms, execution => " + state.getLastCheckExecutionLatency() + "ms processes");
         }
     }
-    
+ 
+    public static class Transition
+    {
+        public final CheckState previousState;
+        
+        public final CheckState nextState;
+        
+        public final boolean stateChange;
+        
+        public final boolean hardChange;
+
+        public Transition(CheckState previousState, CheckState nextState, boolean stateChange, boolean hardChange)
+        {
+            super();
+            this.previousState = previousState;
+            this.nextState = nextState;
+            this.stateChange = stateChange;
+            this.hardChange = hardChange;
+        }
+    }
 }

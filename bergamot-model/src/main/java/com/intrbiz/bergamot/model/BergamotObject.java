@@ -5,7 +5,7 @@ import java.io.Serializable;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
-public abstract class BergamotObject<T extends MessageObject> implements Serializable
+public abstract class BergamotObject<T extends MessageObject> implements Serializable, Cloneable
 {
     private static final long serialVersionUID = 1L;
     

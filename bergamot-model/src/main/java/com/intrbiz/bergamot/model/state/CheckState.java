@@ -19,7 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * The state of a check
  */
 @SQLTable(schema = BergamotDB.class, name = "check_state", since = @SQLVersion({ 1, 0, 0 }))
-public class CheckState extends BergamotObject<CheckStateMO>
+public class CheckState extends BergamotObject<CheckStateMO> implements Cloneable
 {
     private static final long serialVersionUID = 1L;
     
@@ -402,5 +402,17 @@ public class CheckState extends BergamotObject<CheckStateMO>
     public String toString()
     {
         return "CheckState { check => " + this.checkId + ", ok => " + this.ok + " }";
+    }
+    
+    public CheckState clone()
+    {
+        try
+        {
+            return (CheckState) super.clone();
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 }

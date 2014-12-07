@@ -15,6 +15,7 @@ public class SimpleTests
         //
         HTTPChecker hc = new HTTPChecker();
         //
+        /*
         hc.check().connect("www.bbc.co.uk").get("/")
             .execute(System.out::println, System.out::println);
         hc.check().connect("intrbiz.com").https().get("/")
@@ -25,5 +26,8 @@ public class SimpleTests
             .execute((r) -> { System.out.println(r.getRuntime() + "ms"); }, (e) -> { e.printStackTrace(); });
         hc.check().connect("forms.shropshire.gov.uk").https().permitInvalidCerts().get("/")
             .execute((r) -> { System.out.println(r.getRuntime() + "ms"); }, (e) -> { e.printStackTrace(); });
+        */
+        hc.check().connect("sias.riskadvisory.net").https().get("/")
+        .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
     }
 }
