@@ -14,20 +14,23 @@ public class SimpleTests
         Logger.getRootLogger().setLevel(Level.INFO);
         //
         HTTPChecker hc = new HTTPChecker();
-        //
-        /*
+        
         hc.check().connect("www.bbc.co.uk").get("/")
-            .execute(System.out::println, System.out::println);
+        .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
+        
         hc.check().connect("intrbiz.com").https().get("/")
-            .execute((r) -> { System.out.println(r.getRuntime() + "ms"); }, (e) -> { e.printStackTrace(); });
+        .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
+        
         hc.check().connect("payments.sstaffs.gov.uk").https().get("/")
-            .execute((r) -> { System.out.println(r.getRuntime() + "ms"); }, (e) -> { e.printStackTrace(); });
+        .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
+        
         hc.check().connect("obs.intrbiz.net").https().permitInvalidCerts().get("/")
-            .execute((r) -> { System.out.println(r.getRuntime() + "ms"); }, (e) -> { e.printStackTrace(); });
+        .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
+        
         hc.check().connect("forms.shropshire.gov.uk").https().permitInvalidCerts().get("/")
-            .execute((r) -> { System.out.println(r.getRuntime() + "ms"); }, (e) -> { e.printStackTrace(); });
-        */
-        hc.check().connect("sias.riskadvisory.net").https().get("/")
+        .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
+        
+        hc.check().connect("sias.riskadvisory.net").https().get("/index.php/auth")
         .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
     }
 }
