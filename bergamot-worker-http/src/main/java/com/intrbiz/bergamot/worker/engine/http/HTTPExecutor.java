@@ -95,6 +95,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             (error) -> {
                 tctx.stop();
                 failedRequests.inc();
+                logger.error("Error processing HTTP check", error);
                 resultSubmitter.accept(new Result().fromCheck(executeCheck).error(error));
             });
         }
