@@ -43,53 +43,89 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
     }
     
     @Test
-    public void testTransition()
+    public void testOkToBadTransition()
     {
         Transition transition;
         // the check
         RealCheck<?, ?> check = newCheck(4, 4);
         // initial state
-        CheckState state = newState(Status.PENDING, "Pending", true, 10, false);
+        CheckState state = newState(Status.OK, "All Good", true, 4, false);
         // result
         Result result = newResult(false, "CRITICAL", "Ooops");
         // apply the result
         transition = this.computeResultTransition(check, state, result);
-        System.out.println("Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
         // apply the result
         transition = this.computeResultTransition(check, state, result);
-        System.out.println("Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
         // apply the result
         transition = this.computeResultTransition(check, state, result);
-        System.out.println("Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
         // apply the result
         transition = this.computeResultTransition(check, state, result);
-        System.out.println("Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
         // apply the result
         transition = this.computeResultTransition(check, state, result);
-        System.out.println("Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
         // apply the result
         transition = this.computeResultTransition(check, state, result);
-        System.out.println("Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
     }
     
     @Test
-    public void testSingleTransition()
+    public void testSingleOkToBadTransition()
     {
         Transition transition;
         // the check
         RealCheck<?, ?> check = newCheck(1, 1);
         // initial state
-        CheckState state = newState(Status.PENDING, "Pending", true, 10, false);
+        CheckState state = newState(Status.PENDING, "Pending", true, 1, false);
         // result
         Result result = newResult(false, "CRITICAL", "Ooops");
         // apply the result
         transition = this.computeResultTransition(check, state, result);
-        System.out.println("Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("SO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+    }
+    
+    @Test
+    public void testBadToOkTransition()
+    {
+        Transition transition;
+        // the check
+        RealCheck<?, ?> check = newCheck(4, 4);
+        // initial state
+        CheckState state = newState(Status.CRITICAL, "Not Good", true, 4, false);
+        // result
+        Result result = newResult(true, "OK", "All Good");
+        // apply the result
+        transition = this.computeResultTransition(check, state, result);
+        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, result);
+        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, result);
+        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, result);
+        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, result);
+        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, result);
+        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
     }
 }
