@@ -13,12 +13,11 @@ import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -43,6 +42,8 @@ public class HTTPChecker
     private int defaultRequestTimeoutSeconds;
 
     private int defaultConnectTimeoutSeconds;
+    
+    private final Timer timer;
 
     public HTTPChecker(int threads, int defaultConnectTimeoutSeconds, int defaultRequestTimeoutSeconds)
     {
@@ -53,6 +54,8 @@ public class HTTPChecker
         this.badCertContext = this.createContext(true);
         // setup the Netty event loop
         this.eventLoop = new NioEventLoopGroup(threads, new IBThreadFactory("bergamot-http-checker", false));
+        // timer
+        this.timer = new Timer();
     }
 
     public HTTPChecker()
@@ -178,11 +181,6 @@ public class HTTPChecker
             {
                 // Create the SSL Engine
                 SSLEngine sslEngine = ssl ? createSSLEngine(permitInvalidCerts, SNIHost, port, protocols, ciphers) : null;
-                // Timeouts
-                ch.pipeline().addLast(
-                        new ReadTimeoutHandler(  requestTimeout < 0 ? HTTPChecker.this.defaultRequestTimeoutSeconds : requestTimeout /* seconds */ ), 
-                        new WriteTimeoutHandler( requestTimeout < 0 ? HTTPChecker.this.defaultRequestTimeoutSeconds : requestTimeout /* seconds */ )
-                );
                 // SSL support
                 if (ssl) ch.pipeline().addLast(new SslHandler(sslEngine));
                 // HTTP handling
@@ -190,7 +188,7 @@ public class HTTPChecker
                         new HttpClientCodec(),
                         new HttpContentDecompressor(),
                         new HttpObjectAggregator(1 * 1024 * 1024 /* 1 MiB */),
-                        new HTTPClientHandler(sslEngine, request, responseHandler, errorHandler)
+                        new HTTPClientHandler(HTTPChecker.this.timer, sslEngine, request, responseHandler, errorHandler)
                 );
             }
         });
@@ -202,7 +200,8 @@ public class HTTPChecker
             {
                 if (future.isDone() && (!future.isSuccess()))
                 {
-                    errorHandler.accept(future.cause());
+                    if (errorHandler != null)
+                        errorHandler.accept(future.cause());
                 }
             }
         });
