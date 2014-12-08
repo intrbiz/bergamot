@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import com.intrbiz.bergamot.check.http.TLSConstants.CipherInfo;
+
 /**
  * Fluent interface to construct a HTTP check
  */
@@ -145,6 +147,15 @@ public abstract class HTTPCheckBuilder
     public HTTPCheckBuilder enableSSLCipher(String cipher)
     {
         this.ciphers.add(cipher);
+        return this;
+    }
+    
+    public HTTPCheckBuilder enabledSSLCiphers(CipherInfo... ciphers)
+    {
+        for (CipherInfo cipher : ciphers)
+        {
+            this.ciphers.add(cipher.getName());
+        }
         return this;
     }
     
