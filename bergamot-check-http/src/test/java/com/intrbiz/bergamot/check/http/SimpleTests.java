@@ -30,7 +30,7 @@ public class SimpleTests
         hc.check().connect("forms.shropshire.gov.uk").https().permitInvalidCerts().get("/")
         .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
         
-        hc.check().connect("sias.riskadvisory.net").https().get("/index.php/auth")
+        hc.check().connect("sias.riskadvisory.net").https().enabledSSLCiphers(TLSConstants.CIPHERS.SAFE_CIPHERS).get("/index.php/auth")
         .execute((r) -> { System.out.println(r.getRuntime() + "ms\n" + r); }, (e) -> { e.printStackTrace(); });
     }
 }
