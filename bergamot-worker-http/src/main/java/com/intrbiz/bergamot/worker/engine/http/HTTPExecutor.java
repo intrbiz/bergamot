@@ -80,6 +80,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             }
             // execute
             check.execute((response) -> {
+                logger.info("Got response for HTTP check (" + executeCheck.getId() + ")\n" + response);
                 // compute the result
                 Result result = new Result().fromCheck(executeCheck);           
                 // check the response
@@ -95,7 +96,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             (error) -> {
                 tctx.stop();
                 failedRequests.inc();
-                logger.error("Error processing HTTP check", error);
+                logger.error("Error for HTTP check (" + executeCheck.getId() + ")", error);
                 resultSubmitter.accept(new Result().fromCheck(executeCheck).error(error));
             });
         }
