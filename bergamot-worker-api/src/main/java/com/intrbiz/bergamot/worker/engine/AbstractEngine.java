@@ -121,18 +121,18 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     {
         // open the queue
         this.queue = WorkerQueue.open();
-        // start all the consumers
-        for (int i = 0; i < this.getWorker().getConfiguration().getThreads(); i ++)
-        {
-            logger.info("Creating consumer " + i);
-            this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName()));
-        }
         // the producer
         this.resultProducer = this.queue.publishResults();
         // start the executors
         for (Executor<?> ex : this.getExecutors())
         {
             ex.start();
+        }
+        // start all the consumers
+        for (int i = 0; i < this.getWorker().getConfiguration().getThreads(); i ++)
+        {
+            logger.info("Creating consumer " + i);
+            this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName()));
         }
     }
 
