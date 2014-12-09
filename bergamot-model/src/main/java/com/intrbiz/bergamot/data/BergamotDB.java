@@ -575,7 +575,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @SQLGetter(table = Contact.class, name = "get_contact_by_name_or_email", since = @SQLVersion({1, 0, 0}),
-            query = @SQLQuery("SELECT * FROM bergamot.contact WHERE name = p_name_or_email OR email = p_name_or_email")
+            query = @SQLQuery("SELECT * FROM bergamot.contact WHERE site_id = p_site_id AND (name = p_name_or_email OR email = p_name_or_email)")
     )
     public abstract Contact getContactByNameOrEmail(@SQLParam("site_id") UUID siteId, @SQLParam(value = "name_or_email", virtual = true) String nameOrEmail);
     
