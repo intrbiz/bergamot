@@ -401,7 +401,7 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     
     public String toString()
     {
-        return "CheckState { check => " + this.checkId + ", ok => " + this.ok + " }";
+        return "CheckState { check => " + this.checkId + ", ok => " + this.ok + ", status => " + this.status + ", output => " + this.output + ", attempt => " + this.attempt + ", hard => " + this.hard + " }";
     }
     
     public CheckState clone()
