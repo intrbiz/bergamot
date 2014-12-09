@@ -17,7 +17,7 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
         CheckState state = new CheckState();
         state.setCheckId(UUID.randomUUID());
         state.setStatus(status);
-        state.setOk(state.isOk());
+        state.setOk(status.isOk());
         state.setOutput(output);
         state.setHard(hard);
         state.setAttempt(attempt);
@@ -45,6 +45,7 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
     @Test
     public void testOkToBadTransition()
     {
+        System.out.println("---------------------------------");
         Transition transition;
         // the check
         RealCheck<?, ?> check = newCheck(4, 4);
@@ -76,11 +77,13 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
         transition = this.computeResultTransition(check, state, result);
         System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
+        System.out.println("---------------------------------");
     }
     
     @Test
     public void testSingleOkToBadTransition()
     {
+        System.out.println("---------------------------------");
         Transition transition;
         // the check
         RealCheck<?, ?> check = newCheck(1, 1);
@@ -91,11 +94,13 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
         // apply the result
         transition = this.computeResultTransition(check, state, result);
         System.out.println("SO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        System.out.println("---------------------------------");
     }
     
     @Test
     public void testBadToOkTransition()
     {
+        System.out.println("---------------------------------");
         Transition transition;
         // the check
         RealCheck<?, ?> check = newCheck(4, 4);
@@ -127,5 +132,6 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
         transition = this.computeResultTransition(check, state, result);
         System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
         state = transition.nextState;
+        System.out.println("---------------------------------");
     }
 }
