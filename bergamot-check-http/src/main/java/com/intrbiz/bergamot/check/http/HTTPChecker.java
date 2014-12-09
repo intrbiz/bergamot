@@ -11,6 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -26,6 +27,8 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManager;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.util.IBThreadFactory;
 
 /**
@@ -33,6 +36,8 @@ import com.intrbiz.util.IBThreadFactory;
  */
 public class HTTPChecker
 {   
+    private final Logger logger = Logger.getLogger(HTTPChecker.class);
+    
     private final SSLContext defaultContext;
     
     private final SSLContext badCertContext;
@@ -198,6 +203,8 @@ public class HTTPChecker
             @Override
             public void operationComplete(ChannelFuture future) throws Exception
             {
+                if (logger.isTraceEnabled()) 
+                    logger.trace("Connection to " + host + ":" + port + " " + HttpHeaders.getHeader(request, "Host"));
                 if (future.isDone() && (!future.isSuccess()))
                 {
                     if (errorHandler != null)
