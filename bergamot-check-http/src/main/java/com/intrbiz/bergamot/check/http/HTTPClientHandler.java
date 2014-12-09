@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.ssl.SslHandshakeCompletionEvent;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -79,6 +80,29 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
     @Override
     public void channelActive(ChannelHandlerContext ctx)
     {
+        logger.debug("Connection opened: " + ctx.channel().remoteAddress());
+        if (this.sslEngine == null)
+        {
+            // plain request
+            this.sendRequest(ctx);
+        }
+    }
+    
+    public void userEventTriggered(ChannelHandlerContext ctx, Object event)
+    {
+        if (this.sslEngine != null && event instanceof SslHandshakeCompletionEvent)
+        {
+            SslHandshakeCompletionEvent ev = (SslHandshakeCompletionEvent) event;
+            logger.debug("SSL handshake complete: " + ev.isSuccess());
+            if (ev.isSuccess())
+            {
+                this.sendRequest(ctx);
+            }
+        }
+    }
+    
+    protected void sendRequest(ChannelHandlerContext ctx)
+    {
         logger.debug("Sending HTTP request");
         this.start = System.currentTimeMillis();
         // schedule timeout for 60 seconds
@@ -96,11 +120,18 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
     }
 
     @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception
+    {
+        logger.debug("Connection closed: " + ctx.channel().remoteAddress());
+    }
+
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
     {
-        logger.debug("Error processing HTTP request: " + cause);
+        logger.error("Error processing HTTP request: " + cause);
         // invoke the callback
-        this.errorHandler.accept(cause);
+        if (this.errorHandler != null) 
+            this.errorHandler.accept(cause);
     }
     
     protected void onTimeout()
