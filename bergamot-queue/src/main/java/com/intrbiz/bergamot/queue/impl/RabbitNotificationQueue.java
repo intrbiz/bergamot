@@ -82,6 +82,24 @@ public class RabbitNotificationQueue extends NotificationQueue
             }
         };
     }
+    
+    @Override
+    public Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site)
+    {
+        return new RabbitConsumer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), handler, this.source.getRegistry().timer("consume-notifications"), 1, false)
+        {
+            public String setupQueue(Channel on) throws IOException
+            {
+                // exchange
+                on.exchangeDeclare("bergamot.notification", "topic", true);
+                // queue
+                String queueName = on.queueDeclare().getQueue();
+                // bind using the site
+                on.queueBind(queueName, "bergamot.notification", site == null ? "#" : site.toString());
+                return queueName;
+            }
+        };
+    }
 
     @Override
     public void close()

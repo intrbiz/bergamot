@@ -14,7 +14,7 @@ import com.intrbiz.queue.RoutedProducer;
 import com.intrbiz.queue.name.GenericKey;
 
 /**
- * Send notification events
+ * Send update events
  */
 public abstract class UpdateQueue extends QueueAdapter
 {    

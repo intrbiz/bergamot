@@ -234,7 +234,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
                             logger.debug("Sending notification to client: " + n);
                             ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new NotificationEvent((CheckNotification) n))));
                         }
-                    }, rfns.getSiteId(), "web-notify");
+                    }, rfns.getSiteId());
                 }
                 catch (QueueException e)
                 {

@@ -34,5 +34,15 @@ public abstract class NotificationQueue extends QueueAdapter
         return this.publishNotifications(null);
     }
     
+    /**
+     * Consume notifications using a queue for the given engine name, 
+     * this balances events over multiple consumers for each engine.
+     */
     public abstract Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site, String engineName);
+    
+    /**
+     * Consume notifications using an ephemeral queue so that 
+     * all web notification consumers see all events
+     */
+    public abstract Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site);
 }
