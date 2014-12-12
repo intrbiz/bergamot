@@ -9,8 +9,8 @@
 		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
 		<link rel="stylesheet" type="text/css" href="#{public('/style.css')}" />
 		<!-- Scripts -->
-		<script src="#{public('/js/bower_components/requirejs/require.js')}"></script>
-    	<script src="#{public('/js/bower_components/jquery/dist/jquery.js')}"></script>
+		<script src="#{public('/js/v1.1.0/bower_components/requirejs/require.js')}"></script>
+    	<script src="#{public('/js/v1.1.0/bower_components/jquery/dist/jquery.js')}"></script>
     	<script type="text/javascript">
             <![CDATA[
 			/* Configure require js */
