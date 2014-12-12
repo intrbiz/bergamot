@@ -10,6 +10,9 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
 	    "bergamot.api.register_for_updates": { request: true },
 	    "bergamot.api.registered_for_updates": { response: true },
 	    "bergamot.api.event.update": { event: true, raise_event: "bergamot-api-update" },
+        "bergamot.api.register_for_notifications": { request: true },
+        "bergamot.api.registered_for_notifications": { response: true },
+        "bergamot.api.event.notification": { event: true, raise_event: "bergamot-api-notification" },
 	};
 	
 	this.defaultAttrs({
@@ -25,10 +28,11 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
 	    this.requestIdCounter = 0;
 	    this.sendQueue = [];
 	    this.pendingRequests = { };
-	    // setup our even handlers
+	    // setup our event handlers
 	    this.on('bergamot-api-send', this.onAPISend);
 	    this.on('bergamot-api-ping', this.onPing);
 	    this.on('bergamot-api-register-for-updates', this.onRegisterForUpdates);
+        this.on('bergamot-api-register-for-notifications', this.onRegisterForNotifications);
 	    // setup internal on connected handler
 	    this.on('bergamot-api-connected', this.pingOnConnected);
 	    // connect the websocket
@@ -232,6 +236,14 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
 		check_ids: data.check_ids
 	    }, data.onResponse, data.onError);
 	};
+    
+    this.onRegisterForNotifications = function(/*Event*/ ev, /*Object*/ data)
+    {
+        this.doAPISend({
+        type: "bergamot.api.register_for_notifications", 
+        site_id: data.site_id
+        }, data.onResponse, data.onError);
+    };
 	
     }, logger);
 });

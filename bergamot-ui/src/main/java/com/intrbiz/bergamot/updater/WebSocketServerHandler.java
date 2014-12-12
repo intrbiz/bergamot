@@ -34,12 +34,18 @@ import com.intrbiz.bergamot.model.message.api.APIObject;
 import com.intrbiz.bergamot.model.message.api.APIRequest;
 import com.intrbiz.bergamot.model.message.api.APIResponse;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
+import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
+import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
+import com.intrbiz.bergamot.model.message.api.notification.RegisteredForNotifications;
 import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
+import com.intrbiz.bergamot.model.message.notification.CheckNotification;
+import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.update.Update;
+import com.intrbiz.bergamot.queue.NotificationQueue;
 import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.QueueException;
@@ -59,6 +65,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
     private UpdateQueue queue;
 
     private Consumer<Update> updateConsumer;
+    
+    private NotificationQueue notificationQueue;
+    
+    private Consumer<Notification> notificationConsumer;
 
     private BergamotTranscoder transcoder = new BergamotTranscoder();
     
@@ -71,8 +81,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
     public void channelInactive(ChannelHandlerContext ctx) throws Exception
     {
         // shutdown the queues
-        if (this.updateConsumer != null) this.updateConsumer.close();
-        if (this.queue != null) this.queue.close();
+        if (this.updateConsumer != null)       this.updateConsumer.close();
+        if (this.queue != null)                this.queue.close();
+        if (this.notificationConsumer != null) this.notificationConsumer.close();
+        if (this.notificationQueue != null)    this.notificationQueue.close();
         // super
         super.channelInactive(ctx);
     }
@@ -126,7 +138,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
             ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
             return;
         }
-        // only suppor text frames
+        // only support text frames
         if (!(frame instanceof TextWebSocketFrame)) throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass().getName()));
         // get the frame
         try
@@ -141,7 +153,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
             else
             {
                 ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new APIError("Bad request"))));
-                // TODO close
+                ctx.channel().close();
             }
         }
         catch (Exception e)
@@ -149,7 +161,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
             logger.error("Failed to decode request", e);
             // send an error response
             ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new APIError("Failed to decode request"))));
-            // TODO close
+            ctx.channel().close();
         }
     }
     
@@ -168,39 +180,71 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
             if (this.queue == null || this.updateConsumer == null)
             {
                 logger.info("Reigster for updates, for checks: " + rfsn.getCheckIds());
-                //
                 Set<String> bindings = new HashSet<String>();
                 for (UUID checkId : rfsn.getCheckIds())
                 {
-                    bindings.add(Site.getSiteId(checkId).toString() + "." + checkId.toString());
+                    if (checkId != null) bindings.add(Site.getSiteId(checkId).toString() + "." + checkId.toString());
                 }
-                //
-                try
+                if (! bindings.isEmpty())
                 {
-                    this.queue = UpdateQueue.open();
-                    this.updateConsumer = this.queue.consumeUpdates((u) -> {
-                        // send update to client
-                        // logger.info("Got update from queue: " + u);
-                        ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new UpdateEvent(u))));
-                    }, bindings);
-                }
-                catch (QueueException e)
-                {
-                    this.queue = null;
-                    this.updateConsumer = null;
-                    logger.error("Failed to setup queue", e);
-                    return new APIError("Failed to setup queue");
+                    try
+                    {
+                        this.queue = UpdateQueue.open();
+                        this.updateConsumer = this.queue.consumeUpdates((u) -> {
+                            // send update to client
+                            // logger.info("Got update from queue: " + u);
+                            ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new UpdateEvent(u))));
+                        }, bindings);
+                    }
+                    catch (QueueException e)
+                    {
+                        this.queue = null;
+                        this.updateConsumer = null;
+                        logger.error("Failed to setup queue", e);
+                        return new APIError("Failed to setup queue");
+                    }
                 }
             }
             else
             {
                 for (UUID checkId : rfsn.getCheckIds())
                 {
-                    logger.info("Updating bindings: " + checkId);
-                    this.updateConsumer.addBinding(Site.getSiteId(checkId).toString() + "." + checkId.toString());
+                    if (checkId != null)
+                    {
+                        logger.info("Updating bindings: " + checkId);
+                        this.updateConsumer.addBinding(Site.getSiteId(checkId).toString() + "." + checkId.toString());
+                    }
                 }
             }
             return new RegisteredForUpdates(rfsn);
+        }
+        else if (request instanceof RegisterForNotifications)
+        {
+            RegisterForNotifications rfns = (RegisterForNotifications) request;
+            // listen for notifications
+            if (this.notificationQueue == null || this.notificationConsumer == null)
+            {
+                logger.info("Registering for notifications, for site: " + rfns.getSiteId());
+                try
+                {
+                    this.notificationQueue = NotificationQueue.open();
+                    this.notificationConsumer = this.notificationQueue.consumeNotifications((n) -> {
+                        if (n instanceof CheckNotification)
+                        {
+                            logger.debug("Sending notification to client: " + n);
+                            ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new NotificationEvent((CheckNotification) n))));
+                        }
+                    }, rfns.getSiteId(), "web-notify");
+                }
+                catch (QueueException e)
+                {
+                    this.notificationQueue = null;
+                    this.notificationConsumer = null;
+                    logger.error("Failed to setup notification queue", e);
+                    return new APIError("Failed to setup notification queue");
+                }
+            }
+            return new RegisteredForNotifications(rfns);
         }
         return new APIError("Not found");
     }

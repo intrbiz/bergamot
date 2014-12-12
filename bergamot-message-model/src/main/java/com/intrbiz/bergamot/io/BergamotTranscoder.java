@@ -40,6 +40,9 @@ import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
+import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
+import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
+import com.intrbiz.bergamot.model.message.api.notification.RegisteredForNotifications;
 import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
@@ -116,6 +119,9 @@ public class BergamotTranscoder
         UpdateEvent.class,
         RegisterForUpdates.class,
         RegisteredForUpdates.class,
+        NotificationEvent.class,
+        RegisterForNotifications.class,
+        RegisteredForNotifications.class,
         // control
         RegisterWatcher.class,
         // watcher

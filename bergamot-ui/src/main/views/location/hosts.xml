@@ -23,15 +23,9 @@
 	</container>
 	
 	<script type="text/javascript">
-		require(["bergamot/lib/util/console-log", "bergamot/lib/ui/check-state", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_server_state, bergamot_api_driver)
-		{
-		    bergamot_console_log.attachTo(document);
-
+		<![CDATA[
+		require(["bergamot/lib/ui/check-state"], function(bergamot_ui_server_state) {
 		    bergamot_ui_server_state.attachTo("div.check");
-
-		    bergamot_api_driver.attachTo(document, {
-				url: #{'"' + bergamot_update_url() + '"'},
-		    });
 		});
 		
 		// execute all hosts
@@ -42,6 +36,7 @@
 				$.getJSON('/api/location/id/' + id + '/execute-all-hosts', function(data) { /* all ok */ });
 			});
 		});
+		]]>
 	</script>
 	
 </fragment>
