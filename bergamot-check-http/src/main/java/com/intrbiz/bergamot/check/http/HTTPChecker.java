@@ -19,6 +19,7 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -61,6 +62,34 @@ public class HTTPChecker
         this.eventLoop = new NioEventLoopGroup(threads, new IBThreadFactory("bergamot-http-checker", false));
         // timer
         this.timer = new Timer();
+        // some util timer tasks
+        // log some GC stats
+        this.timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run()
+            {
+                Runtime rt = Runtime.getRuntime();
+                logger.info("Memory: " + rt.freeMemory() + " free of " + rt.totalMemory() + " committed of " + rt.maxMemory() + " max");
+            }
+        }, 60_000L, 60_000L);
+        // every 5 minutes forcefully purge the timer queue
+        // we cancel most task (hopefully)
+        this.timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run()
+            {
+                // purge the timer queue
+                HTTPChecker.this.timer.purge();
+            }
+        }, 300_000L, 300_000L);
+        // force a GC?
+        this.timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run()
+            {
+                System.gc();
+            }
+        }, 120_000L, 120_000L);
     }
 
     public HTTPChecker()

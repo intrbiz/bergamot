@@ -106,13 +106,7 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
         logger.debug("Sending HTTP request");
         this.start = System.currentTimeMillis();
         // schedule timeout for 60 seconds
-        this.timeoutTask = new TimerTask() {
-            @Override
-            public void run()
-            {
-                HTTPClientHandler.this.onTimeout();
-            }
-        };
+        this.timeoutTask = new TimeoutTask(this);
         this.timer.schedule(this.timeoutTask, this.start + 60_000L);
         // send the request
         if (logger.isTraceEnabled()) logger.trace("Request:\n" + this.request);
@@ -123,6 +117,7 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
     public void channelInactive(ChannelHandlerContext ctx) throws Exception
     {
         logger.debug("Connection closed: " + ctx.channel().remoteAddress());
+        if (this.timeoutTask != null) this.timeoutTask.cancel();
     }
 
     @Override
@@ -142,4 +137,31 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
         if (this.errorHandler != null) 
             this.errorHandler.accept(new TimeoutException("Timeout getting response from server"));
     }
+    
+    /**
+     * Timeout timer task which will nullify the HTTPClientHandler immediately
+     */
+    protected static class TimeoutTask extends TimerTask
+    {
+        private volatile HTTPClientHandler handler;
+        
+        public TimeoutTask(HTTPClientHandler handler)
+        {
+            this.handler = handler;
+        }
+        
+        @Override
+        public void run()
+        {
+            if (this.handler != null) this.handler.onTimeout();
+            this.handler = null;
+        }
+        
+        @Override
+        public boolean cancel()
+        {
+            this.handler = null;
+            return super.cancel();
+        }
+    };
 }
