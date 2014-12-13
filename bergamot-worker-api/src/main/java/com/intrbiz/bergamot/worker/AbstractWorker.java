@@ -62,7 +62,7 @@ public abstract class AbstractWorker implements Worker
         {
             Engine engine = (Engine) engineCfg.create();
             engine.setWorker(this);
-            logger.info("Adding engine: " + engine);
+            logger.debug("Adding engine: " + engine);
             this.engines.put(engine.getName(), engine);
         }
     }

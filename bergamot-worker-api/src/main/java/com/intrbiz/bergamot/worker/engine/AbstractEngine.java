@@ -99,7 +99,8 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     public void execute(ExecuteCheck task)
     {
         this.execute(task, (result) -> {
-            logger.debug("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
+            if (logger.isTraceEnabled()) 
+                logger.trace("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
             this.resultProducer.publish(new ResultKey(task.getSiteId(), task.getProcessingPool()), result);
         });
     }
@@ -131,7 +132,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
         // start all the consumers
         for (int i = 0; i < this.getWorker().getConfiguration().getThreads(); i ++)
         {
-            logger.info("Creating consumer " + i);
+            logger.trace("Creating consumer " + i);
             this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName()));
         }
     }
@@ -139,7 +140,8 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     @Override
     public void handleDevliery(ExecuteCheck event) throws IOException
     {
-        logger.debug("Got task: " + event);
+        if (logger.isTraceEnabled())
+            logger.trace("Got task: " + event);
         this.execute(event);
     }
 }
