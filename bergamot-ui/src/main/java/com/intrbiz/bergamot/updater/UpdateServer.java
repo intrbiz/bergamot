@@ -11,7 +11,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.apache.log4j.Logger;
+
+import com.intrbiz.bergamot.updater.handler.DefaultHandler;
+import com.intrbiz.bergamot.updater.handler.PingHandler;
+import com.intrbiz.bergamot.updater.handler.RegisterForNotificationsHandler;
+import com.intrbiz.bergamot.updater.handler.RegisterForUpdatesHandler;
+import com.intrbiz.bergamot.updater.handler.RequestHandler;
 
 public class UpdateServer implements Runnable
 {
@@ -24,11 +33,39 @@ public class UpdateServer implements Runnable
     private EventLoopGroup workerGroup;
 
     private Thread runner = null;
+    
+    private ConcurrentMap<Class<?>, RequestHandler> handlers = new ConcurrentHashMap<Class<?>, RequestHandler>();
+    
+    private RequestHandler defaultHandler;
 
     public UpdateServer(int port)
     {
         super();
         this.port = port;
+        // register default handlers
+        this.registerDefaultHandler(new DefaultHandler());
+        this.registerHandler(new PingHandler());
+        this.registerHandler(new RegisterForUpdatesHandler());
+        this.registerHandler(new RegisterForNotificationsHandler());
+    }
+    
+    public void registerHandler(RequestHandler handler)
+    {
+       for (Class<?> type : handler.getRequestTypes())
+       {
+           this.handlers.put(type, handler);
+       }
+    }
+    
+    public void registerDefaultHandler(RequestHandler handler)
+    {
+        this.defaultHandler = handler;
+    }
+    
+    public RequestHandler getHandler(Class<?> type)
+    {
+        RequestHandler handler = this.handlers.get(type);
+        return handler == null ? this.defaultHandler : handler;
     }
 
     public void run()
@@ -48,7 +85,7 @@ public class UpdateServer implements Runnable
                     ChannelPipeline pipeline = ch.pipeline();
                     pipeline.addLast("codec-http", new HttpServerCodec());
                     pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
-                    pipeline.addLast("handler", new WebSocketServerHandler());
+                    pipeline.addLast("handler",    new WebSocketServerHandler(UpdateServer.this));
                 }
             });
             //

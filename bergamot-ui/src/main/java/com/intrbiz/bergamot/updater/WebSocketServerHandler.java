@@ -6,6 +6,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,34 +23,14 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.io.BergamotTranscoder;
-import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.api.APIObject;
 import com.intrbiz.bergamot.model.message.api.APIRequest;
-import com.intrbiz.bergamot.model.message.api.APIResponse;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
-import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
-import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
-import com.intrbiz.bergamot.model.message.api.notification.RegisteredForNotifications;
-import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
-import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
-import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
-import com.intrbiz.bergamot.model.message.api.util.APIPing;
-import com.intrbiz.bergamot.model.message.api.util.APIPong;
-import com.intrbiz.bergamot.model.message.notification.CheckNotification;
-import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.bergamot.model.message.update.Update;
-import com.intrbiz.bergamot.queue.NotificationQueue;
-import com.intrbiz.bergamot.queue.UpdateQueue;
-import com.intrbiz.queue.Consumer;
-import com.intrbiz.queue.QueueException;
-
+import com.intrbiz.bergamot.updater.context.ClientContext;
+import com.intrbiz.bergamot.updater.handler.RequestHandler;
 
 /**
  * Handles handshakes and messages
@@ -60,32 +41,41 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
 
     private static final String WEBSOCKET_PATH = "/websocket";
 
+    private final UpdateServer server;
+
+    private ClientContext context;
+
     private WebSocketServerHandshaker handshaker;
 
-    private UpdateQueue queue;
-
-    private Consumer<Update> updateConsumer;
-    
-    private NotificationQueue notificationQueue;
-    
-    private Consumer<Notification> notificationConsumer;
-
     private BergamotTranscoder transcoder = new BergamotTranscoder();
-    
-    public WebSocketServerHandler()
+
+    public WebSocketServerHandler(UpdateServer server)
     {
         super();
+        this.server = server;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception
+    {
+        final Channel channel = ctx.channel();
+        // setup the context
+        this.context = new ClientContext()
+        {
+            @Override
+            public void send(APIObject value)
+            {
+                channel.writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(value)));
+            }
+        };
+        super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception
     {
-        // shutdown the queues
-        if (this.updateConsumer != null)       this.updateConsumer.close();
-        if (this.queue != null)                this.queue.close();
-        if (this.notificationConsumer != null) this.notificationConsumer.close();
-        if (this.notificationQueue != null)    this.notificationQueue.close();
-        // super
+        // shutdown the context
+        if (this.context != null) this.context.close();
         super.channelInactive(ctx);
     }
 
@@ -126,127 +116,46 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
 
     private void handleWebSocketFrame(final ChannelHandlerContext ctx, WebSocketFrame frame)
     {
-        // Check for closing frame
         if (frame instanceof CloseWebSocketFrame)
         {
+            // Check for closing frame
             this.handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
             return;
         }
-        // ping pong
-        if (frame instanceof PingWebSocketFrame)
+        else if (frame instanceof PingWebSocketFrame)
         {
+            // ping pong
             ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
             return;
         }
-        // only support text frames
-        if (!(frame instanceof TextWebSocketFrame)) throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass().getName()));
-        // get the frame
-        try
+        else if (frame instanceof TextWebSocketFrame)
         {
-            APIObject request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), APIObject.class);
-            // process the request
-            if (request instanceof APIRequest)
+            // only support text frames
+            try
             {
-                APIResponse response = this.processAPIRequest(ctx, (APIRequest) request);
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(response)));
+                APIObject request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), APIObject.class);
+                // process the request
+                if (request instanceof APIRequest)
+                {
+                    // process the request
+                    RequestHandler handler = this.server.getHandler(request.getClass());
+                    if (handler != null) handler.onRequest(this.context, (APIRequest) request);
+                    else ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new APIError("Not found"))));
+                }
+                else
+                {
+                    ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new APIError("Bad request"))));
+                    ctx.channel().close();
+                }
             }
-            else
+            catch (Exception e)
             {
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new APIError("Bad request"))));
+                logger.error("Failed to decode request", e);
+                // send an error response
+                ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new APIError("Failed to decode request"))));
                 ctx.channel().close();
             }
         }
-        catch (Exception e)
-        {
-            logger.error("Failed to decode request", e);
-            // send an error response
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(new APIError("Failed to decode request"))));
-            ctx.channel().close();
-        }
-    }
-    
-    private APIResponse processAPIRequest(final ChannelHandlerContext ctx, APIRequest request)
-    {
-        if (request instanceof APIPing)
-        {
-            APIPing ping = (APIPing) request;
-            logger.trace("Returning pong");
-            return new APIPong(ping);
-        }
-        else if (request instanceof RegisterForUpdates)
-        {
-            RegisterForUpdates rfsn = (RegisterForUpdates) request;
-            // setup the queue
-            if (this.queue == null || this.updateConsumer == null)
-            {
-                logger.info("Reigster for updates, for checks: " + rfsn.getCheckIds());
-                Set<String> bindings = new HashSet<String>();
-                for (UUID checkId : rfsn.getCheckIds())
-                {
-                    if (checkId != null) bindings.add(Site.getSiteId(checkId).toString() + "." + checkId.toString());
-                }
-                if (! bindings.isEmpty())
-                {
-                    try
-                    {
-                        this.queue = UpdateQueue.open();
-                        this.updateConsumer = this.queue.consumeUpdates((u) -> {
-                            // send update to client
-                            // logger.info("Got update from queue: " + u);
-                            ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new UpdateEvent(u))));
-                        }, bindings);
-                    }
-                    catch (QueueException e)
-                    {
-                        this.queue = null;
-                        this.updateConsumer = null;
-                        logger.error("Failed to setup queue", e);
-                        return new APIError("Failed to setup queue");
-                    }
-                }
-            }
-            else
-            {
-                for (UUID checkId : rfsn.getCheckIds())
-                {
-                    if (checkId != null)
-                    {
-                        logger.info("Updating bindings: " + checkId);
-                        this.updateConsumer.addBinding(Site.getSiteId(checkId).toString() + "." + checkId.toString());
-                    }
-                }
-            }
-            return new RegisteredForUpdates(rfsn);
-        }
-        else if (request instanceof RegisterForNotifications)
-        {
-            RegisterForNotifications rfns = (RegisterForNotifications) request;
-            // listen for notifications
-            if (this.notificationQueue == null || this.notificationConsumer == null)
-            {
-                logger.info("Registering for notifications, for site: " + rfns.getSiteId());
-                try
-                {
-                    this.notificationQueue = NotificationQueue.open();
-                    this.notificationConsumer = this.notificationQueue.consumeNotifications((n) -> {
-                        if (n instanceof CheckNotification)
-                        {
-                            logger.debug("Sending notification to client: " + n);
-                            ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new NotificationEvent((CheckNotification) n))));
-                        }
-                    }, rfns.getSiteId());
-                }
-                catch (QueueException e)
-                {
-                    this.notificationQueue = null;
-                    this.notificationConsumer = null;
-                    logger.error("Failed to setup notification queue", e);
-                    return new APIError("Failed to setup notification queue");
-                }
-            }
-            return new RegisteredForNotifications(rfns);
-        }
-        return new APIError("Not found");
     }
 
     private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res)
@@ -277,6 +186,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
 
     private static String getWebSocketLocation(FullHttpRequest req)
     {
-        return "ws://" + req.headers().get(HOST) + WEBSOCKET_PATH;
+        return "wss://" + req.headers().get(HOST) + WEBSOCKET_PATH;
     }
 }
