@@ -133,7 +133,8 @@ public class AbstractEngine implements Engine, DeliveryHandler<CheckEvent>
     @Override
     public void handleDevliery(CheckEvent event) throws IOException
     {
-        logger.debug("Got event: " + event);
+        if (logger.isTraceEnabled())
+            logger.trace("Got event: " + event);
         if (event instanceof RegisterCheck)
         {
             this.registerCheck((RegisterCheck) event);
@@ -151,7 +152,8 @@ public class AbstractEngine implements Engine, DeliveryHandler<CheckEvent>
             if (executor.accept(check))
             {
                 executor.register(check, (result) -> {
-                    logger.debug("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
+                    if (logger.isTraceEnabled())
+                        logger.trace("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
                     this.resultProducer.publish(new ResultKey(check.getSiteId(), check.getProcessingPool()), result);
                 });
                 return;
