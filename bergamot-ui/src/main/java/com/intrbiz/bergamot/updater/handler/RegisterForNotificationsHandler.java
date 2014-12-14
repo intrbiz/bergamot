@@ -27,9 +27,14 @@ public class RegisterForNotificationsHandler extends RequestHandler
     public void onRequest(ClientContext context, APIRequest request)
     {
         RegisterForNotifications rfns = (RegisterForNotifications) request;
-        // listen for notifications
-        if (context.var("notificationConsumer") == null)
+        // validate the site id
+        if (! context.getSite().getId().equals(rfns.getSiteId()))
         {
+            context.send(new APIError("Invalid site id given"));
+        }
+        else if (context.var("notificationConsumer") == null)
+        {
+            // listen for notifications
             logger.info("Registering for notifications, for site: " + rfns.getSiteId());
             try
             {

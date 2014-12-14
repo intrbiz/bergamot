@@ -14,6 +14,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
@@ -25,12 +26,18 @@ import io.netty.util.CharsetUtil;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
+import com.intrbiz.balsa.BalsaApplication;
+import com.intrbiz.balsa.BalsaContext;
+import com.intrbiz.balsa.engine.session.BalsaSession;
+import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.api.APIObject;
 import com.intrbiz.bergamot.model.message.api.APIRequest;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.updater.context.ClientContext;
 import com.intrbiz.bergamot.updater.handler.RequestHandler;
+import com.intrbiz.bergamot.updater.util.CookieJar;
 
 /**
  * Handles handshakes and messages
@@ -91,6 +98,38 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
             handleWebSocketFrame(ctx, (WebSocketFrame) msg);
         }
     }
+    
+    private void authenticateContext(FullHttpRequest request) throws BalsaSecurityException
+    {
+        // extract the Balsa session cookie
+        CookieJar cookies = CookieJar.parseCookies(HttpHeaders.getHeader(request, HttpHeaders.Names.COOKIE));
+        String sessionId = cookies.cookie(BalsaSession.COOKIE_NAME);
+        if (Util.isEmpty(sessionId)) 
+            throw new BalsaSecurityException("No Blasa session cookie found");
+        // lookup the session
+        final BalsaApplication application = BalsaApplication.getInstance();
+        final BalsaSession     session     = application.getSessionEngine().getSession(sessionId);
+        if (session == null) 
+            throw new BalsaSecurityException("Invalid session id");
+        // lookup the site and principal
+        try
+        {
+            BalsaContext.withContext(application, session, () -> {
+                WebSocketServerHandler.this.context.setSite(session.var("site"));
+                WebSocketServerHandler.this.context.setPrincipal(session.currentPrincipal());
+                return null;
+            });
+        }
+        catch (Exception e)
+        {
+            if (e instanceof BalsaSecurityException) 
+                throw (BalsaSecurityException) e;
+            throw new BalsaSecurityException("Failed to get site and principal from session", e);
+        }
+        // finally validate
+        if (this.context.getSite() == null || this.context.getPrincipal() == null)
+            throw new BalsaSecurityException("Failed to get site and principal");
+    }
 
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception
     {
@@ -100,8 +139,19 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
         }
+        // Authenticate this connection
+        try
+        {
+            this.authenticateContext(req);
+            logger.info("Authenticated websock connection for principal: " + this.context.getPrincipal());
+        }
+        catch (BalsaSecurityException e)
+        {
+            logger.error("Denying access for websocket", e);
+            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
+            return;
+        }
         // Handshake
-        logger.trace("Handshaking websocket request Origin: " + req.headers().get("Origin") + " url: " + req.getUri());
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, false);
         this.handshaker = wsFactory.newHandshaker(req);
         if (this.handshaker == null)

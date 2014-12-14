@@ -38,7 +38,9 @@ public class RegisterForUpdatesHandler extends RequestHandler
             Set<String> bindings = new HashSet<String>();
             for (UUID checkId : rfsn.getCheckIds())
             {
-                if (checkId != null) bindings.add(Site.getSiteId(checkId).toString() + "." + checkId.toString());
+                // validate the check id
+                if (checkId != null && context.getSite().getId().equals(Site.getSiteId(checkId))) 
+                    bindings.add(Site.getSiteId(checkId).toString() + "." + checkId.toString());
             }
             if (!bindings.isEmpty())
             {
@@ -71,16 +73,27 @@ public class RegisterForUpdatesHandler extends RequestHandler
         }
         else
         {
+            Set<String> bindings = new HashSet<String>();
             for (UUID checkId : rfsn.getCheckIds())
             {
-                if (checkId != null)
-                {
-                    logger.info("Updating bindings: " + checkId);
-                    Consumer<Update> updateConsumer = context.var("updateConsumer");
-                    updateConsumer.addBinding(Site.getSiteId(checkId).toString() + "." + checkId.toString());
-                }
+                // validate the check id
+                if (checkId != null && context.getSite().getId().equals(Site.getSiteId(checkId))) 
+                    bindings.add(Site.getSiteId(checkId).toString() + "." + checkId.toString());
             }
-            context.send(new RegisteredForUpdates(rfsn));
+            if (!bindings.isEmpty())
+            {
+                Consumer<Update> updateConsumer = context.var("updateConsumer");
+                for (String binding : bindings)
+                {
+                    logger.info("Updating bindings, adding: " + binding);
+                    updateConsumer.addBinding(binding);
+                }
+                context.send(new RegisteredForUpdates(rfsn));
+            }
+            else
+            {
+                context.send(new APIError("No valid bindings"));
+            }
         }
     }
 }
