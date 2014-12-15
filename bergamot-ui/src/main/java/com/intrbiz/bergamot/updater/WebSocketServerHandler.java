@@ -24,8 +24,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
 
-import java.util.concurrent.Callable;
-
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
@@ -116,14 +114,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         // lookup the site and principal
         try
         {
-            BalsaContext.withContext(application, session, new Callable<Object>() {
-                @Override
-                public Object call()
-                {
-                    WebSocketServerHandler.this.context.setSite(session.var("site"));
-                    WebSocketServerHandler.this.context.setPrincipal(session.currentPrincipal());
-                    return null;
-                }
+            BalsaContext.withContext(application, session, () -> {
+                WebSocketServerHandler.this.context.setSite(session.var("site"));
+                WebSocketServerHandler.this.context.setPrincipal(session.currentPrincipal());
+                return null;
             });
         }
         catch (Exception e)
