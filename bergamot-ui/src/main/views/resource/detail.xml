@@ -4,8 +4,8 @@
 <fragment xmlns="com.intrbiz.balsa" title="Resource #{resource.summary} on Cluster #{resource.cluster.summary}">
 
 	<div class="row submenu pull-right">
-		<a rendered="#{resource.suppressed}"  href="/resource/unsuppress/#{resource.id}">Unsupress</a>
-		<a rendered="#{!resource.suppressed}" href="/resource/suppress/#{resource.id}">Supress</a>
+		<a rendered="#{resource.suppressed}"  href="/resource/unsuppress/#{resource.id}">Unsuppress</a>
+		<a rendered="#{!resource.suppressed}" href="/resource/suppress/#{resource.id}">Suppress</a>
 		<a rendered="#{resource.enabled}"     href="/resource/disable/#{resource.id}">Disable</a>
 		<a rendered="#{!resource.enabled}"    href="/resource/enable/#{resource.id}">Enable</a>
 	</div>

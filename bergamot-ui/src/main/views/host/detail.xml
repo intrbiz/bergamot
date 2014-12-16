@@ -4,8 +4,8 @@
 <fragment xmlns="com.intrbiz.balsa" title="Host #{host.summary}">
 
 	<div class="row submenu pull-right">
-		<a rendered="#{host.suppressed}"  href="/host/unsuppress/#{host.id}">Unsupress</a>
-		<a rendered="#{!host.suppressed}" href="/host/suppress/#{host.id}">Supress</a>
+		<a rendered="#{host.suppressed}"  href="/host/unsuppress/#{host.id}">Unsuppress</a>
+		<a rendered="#{!host.suppressed}" href="/host/suppress/#{host.id}">Suppress</a>
 		<a rendered="#{host.enabled}"     href="/host/disable/#{host.id}">Disable</a>
 		<a rendered="#{!host.enabled}"    href="/host/enable/#{host.id}">Enable</a>
 		<a href="/host/execute/#{host.id}" id="check-now" data-check-id="#{host.id}">Check now</a>
