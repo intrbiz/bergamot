@@ -3,6 +3,10 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Hello #{Balsa().currentPrincipal().summary}">
 
+	<div class="row submenu pull-right">
+		<a href="/change-password?redirect=#{path('/profile/')}">Change password</a>
+	</div>
+
 	<div class="row">
 		<div class="col4 dash_icon">
 			<h3>Your details</h3>

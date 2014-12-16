@@ -121,6 +121,15 @@ public class LoginRouter extends Router<BergamotApp>
         }
     }
     
+    @Get("/change-password")
+    @RequirePrincipal()
+    public void changePassword(@Param("redirect") String redirect)
+    {
+        var("redirect", redirect);
+        var("forced", false);
+        encodeOnly("login/force_change_password");
+    }
+    
     @Post("/force-change-password")
     @RequirePrincipal()
     @RequireValidAccessTokenForURL()
