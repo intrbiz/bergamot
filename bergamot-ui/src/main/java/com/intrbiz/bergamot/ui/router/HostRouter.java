@@ -116,4 +116,28 @@ public class HostRouter extends Router<BergamotApp>
         }
         redirect("/host/id/" + id);
     }
+    
+    @Any("/suppress-services/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void suppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    {
+        for (Service service : db.getServicesOnHost(id))
+        {
+            service.setSuppressed(true);
+            db.setService(service);
+        }
+        redirect("/host/id/" + id);
+    }
+    
+    @Any("/unsuppress-services/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    {
+        for (Service service : db.getServicesOnHost(id))
+        {
+            service.setSuppressed(false);
+            db.setService(service);
+        }
+        redirect("/host/id/" + id);
+    }
 }

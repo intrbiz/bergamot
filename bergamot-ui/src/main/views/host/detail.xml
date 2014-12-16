@@ -4,10 +4,10 @@
 <fragment xmlns="com.intrbiz.balsa" title="Host #{host.summary}">
 
 	<div class="row submenu pull-right">
-		<a rendered="#{host.suppressed}"  href="/host/unsuppress/#{host.id}">Unsuppress</a>
-		<a rendered="#{!host.suppressed}" href="/host/suppress/#{host.id}">Suppress</a>
-		<a rendered="#{host.enabled}"     href="/host/disable/#{host.id}">Disable</a>
-		<a rendered="#{!host.enabled}"    href="/host/enable/#{host.id}">Enable</a>
+		<a rendered="#{host.suppressed}"   href="/host/unsuppress/#{host.id}">Unsuppress</a>
+		<a rendered="#{!host.suppressed}"  href="/host/suppress/#{host.id}">Suppress</a>
+		<a rendered="#{host.enabled}"      href="/host/disable/#{host.id}">Disable</a>
+		<a rendered="#{!host.enabled}"     href="/host/enable/#{host.id}">Enable</a>
 		<a href="/host/execute/#{host.id}" id="check-now" data-check-id="#{host.id}">Check now</a>
 	</div>
 
@@ -71,7 +71,9 @@
 	<h2 rendered="#{! host.services.isEmpty()}">Services</h2>
 	
 	<div class="row submenu pull-right" rendered="#{! host.services.isEmpty()}">
-		<a href="/host/execute-services/#{host.id}" id="check-services-now" data-host-id="#{host.id}">Check all services now</a>
+		<a href="/host/unsuppress-services/#{host.id}" id="unsuppress-services" data-host-id="#{host.id}">Unsuppress all</a>
+		<a href="/host/suppress-services/#{host.id}"   id="suppress-services"   data-host-id="#{host.id}">Suppress all</a>
+		<a href="/host/execute-services/#{host.id}"    id="check-services-now"  data-host-id="#{host.id}">Check all now</a>
 	</div>
 
 	<div class="row hostgroup services" rendered="#{! host.services.isEmpty()}">
@@ -265,6 +267,22 @@
 				ev.preventDefault();
 				var id = $(this).attr("data-host-id");
 				$.getJSON('/api/host/id/' + id + '/execute-services', function(data) { /* all ok */ });
+			});
+		});
+		// suppress services check
+		$(document).ready(function() {
+			$('#suppress-services').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-host-id");
+				$.getJSON('/api/host/id/' + id + '/suppress-services', function(data) { /* all ok */ });
+			});
+		});
+		// unsuppress services check
+		$(document).ready(function() {
+			$('#unsuppress-services').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-host-id");
+				$.getJSON('/api/host/id/' + id + '/unsuppress-services', function(data) { /* all ok */ });
 			});
 		});
 		]]>
