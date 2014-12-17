@@ -86,8 +86,7 @@ public class ServiceRouter extends Router<BergamotApp>
         Service service = db.getService(id);
         if (service != null)
         {
-            service.setSuppressed(true);
-            db.setService(service);
+            action("suppress-check", service);
         }
         redirect("/service/id/" + id);
     }
@@ -99,8 +98,7 @@ public class ServiceRouter extends Router<BergamotApp>
         Service service = db.getService(id);
         if (service != null)
         {
-            service.setSuppressed(false);
-            db.setService(service);
+            action("unsuppress-check", service);
         }
         redirect("/service/id/" + id);
     }

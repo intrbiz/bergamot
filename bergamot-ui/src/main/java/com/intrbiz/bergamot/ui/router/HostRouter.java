@@ -123,8 +123,7 @@ public class HostRouter extends Router<BergamotApp>
     {
         for (Service service : db.getServicesOnHost(id))
         {
-            service.setSuppressed(true);
-            db.setService(service);
+            action("suppress-check", service);
         }
         redirect("/host/id/" + id);
     }
@@ -135,8 +134,7 @@ public class HostRouter extends Router<BergamotApp>
     {
         for (Service service : db.getServicesOnHost(id))
         {
-            service.setSuppressed(false);
-            db.setService(service);
+            action("unsuppress-check", service);
         }
         redirect("/host/id/" + id);
     }

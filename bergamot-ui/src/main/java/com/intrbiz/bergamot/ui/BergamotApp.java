@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.ui.action.CheckActions;
 import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
 import com.intrbiz.bergamot.ui.action.ContactActions;
 import com.intrbiz.bergamot.ui.action.DispatchResultAction;
@@ -143,6 +144,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new TeamActions());
         action(new ContactActions());
         action(new ConfigChangeActions());
+        action(new CheckActions());
         // Setup the application routers
         router(new LoginRouter());
         router(new DashboardRouter());

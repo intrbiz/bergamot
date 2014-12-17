@@ -72,8 +72,7 @@ public class TrapRouter extends Router<BergamotApp>
         Trap trap = db.getTrap(id);
         if (trap != null)
         {
-            trap.setSuppressed(true);
-            db.setTrap(trap);
+            action("suppress-check", trap);
         }
         redirect("/trap/id/" + id);
     }
@@ -85,8 +84,7 @@ public class TrapRouter extends Router<BergamotApp>
         Trap trap = db.getTrap(id);
         if (trap != null)
         {
-            trap.setSuppressed(false);
-            db.setTrap(trap);
+            action("unsuppress-check", trap);
         }
         redirect("/trap/id/" + id);
     }

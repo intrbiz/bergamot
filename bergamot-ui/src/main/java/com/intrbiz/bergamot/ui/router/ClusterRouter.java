@@ -72,8 +72,7 @@ public class ClusterRouter extends Router<BergamotApp>
         Cluster cluster = db.getCluster(id);
         if (cluster != null)
         {
-            cluster.setSuppressed(true);
-            db.setCluster(cluster);
+            action("suppress-check", cluster);
         }
         redirect("/cluster/id/" + id);
     }
@@ -85,8 +84,7 @@ public class ClusterRouter extends Router<BergamotApp>
         Cluster cluster = db.getCluster(id);
         if (cluster != null)
         {
-            cluster.setSuppressed(false);
-            db.setCluster(cluster);
+            action("unsuppress-check", cluster);
         }
         redirect("/cluster/id/" + id);
     }

@@ -141,8 +141,7 @@ public class HostAPIRouter extends Router<BergamotApp>
         int suppressed = 0;
         for (Service service : host.getServices())
         {
-            service.setSuppressed(true);
-            db.setService(service);
+            action("suppress-check", service);
             suppressed++;
         }
         return "Ok, suppressed " + suppressed + " services";
@@ -158,8 +157,7 @@ public class HostAPIRouter extends Router<BergamotApp>
         int unsuppressed = 0;
         for (Service service : host.getServices())
         {
-            service.setSuppressed(false);
-            db.setService(service);
+            action("unsuppress-check", service);
             unsuppressed++;
         }
         return "Ok, unsuppressed " + unsuppressed + " services";

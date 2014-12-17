@@ -72,8 +72,7 @@ public class ResourceRouter extends Router<BergamotApp>
         Resource resource = db.getResource(id);
         if (resource != null)
         {
-            resource.setSuppressed(true);
-            db.setResource(resource);
+            action("suppress-check", resource);
         }
         redirect("/resource/id/" + id);
     }
@@ -85,8 +84,7 @@ public class ResourceRouter extends Router<BergamotApp>
         Resource resource = db.getResource(id);
         if (resource != null)
         {
-            resource.setSuppressed(false);
-            db.setResource(resource);
+            action("unsuppress-check", resource);
         }
         redirect("/resource/id/" + id);
     }
