@@ -7,6 +7,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Cluster;
+import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -85,6 +86,28 @@ public class ClusterRouter extends Router<BergamotApp>
         if (cluster != null)
         {
             action("unsuppress-check", cluster);
+        }
+        redirect("/cluster/id/" + id);
+    }
+    
+    @Any("/suppress-resource/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void suppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    {
+        for (Resource resource : db.getResourcesOnCluster(id))
+        {
+            action("suppress-check", resource);
+        }
+        redirect("/cluster/id/" + id);
+    }
+    
+    @Any("/unsuppress-resource/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    {
+        for (Resource resource : db.getResourcesOnCluster(id))
+        {
+            action("unsuppress-check", resource);
         }
         redirect("/cluster/id/" + id);
     }

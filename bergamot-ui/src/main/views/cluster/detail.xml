@@ -58,6 +58,11 @@
 	<!-- Resources -->
 	
 	<h2 rendered="#{! cluster.resources.isEmpty()}">Resources</h2>
+	
+	<div class="row submenu pull-right" rendered="#{! host.services.isEmpty()}">
+		<a href="/cluster/unsuppress-resource/#{host.id}" id="unsuppress-resources" data-cluster-id="#{cluster.id}">Unsuppress all</a>
+		<a href="/cluster/suppress-resource/#{host.id}"   id="suppress-resources"   data-cluster-id="#{cluster.id}">Suppress all</a>
+	</div>
 
 	<div class="row hostgroup services" rendered="#{! cluster.resources.isEmpty()}">
 		<data-set var="check" value="#{cluster.resources}">
@@ -159,6 +164,22 @@
 		<![CDATA[
 		require(["bergamot/lib/ui/check-state"], function(bergamot_ui_server_state) {
 		    bergamot_ui_server_state.attachTo("div.check");
+		});
+		// suppress resources check
+		$(document).ready(function() {
+			$('#suppress-resources').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-cluster-id");
+				$.getJSON('/api/cluster/id/' + id + '/suppress-resource', function(data) { /* all ok */ });
+			});
+		});
+		// unsuppress resources check
+		$(document).ready(function() {
+			$('#unsuppress-resources').click(function(ev) {
+				ev.preventDefault();
+				var id = $(this).attr("data-cluster-id");
+				$.getJSON('/api/cluster/id/' + id + '/unsuppress-resource', function(data) { /* all ok */ });
+			});
 		});
 		]]>
 	</script>

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -116,5 +117,37 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     public ClusterCfg getClusterConfig(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getCluster(id), Cluster::getConfiguration);
+    }
+    
+    @Get("/id/:id/suppress-services")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String suppressServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    { 
+        Cluster cluster = db.getCluster(id);
+        if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");
+        int suppressed = 0;
+        for (Resource resource : cluster.getResources())
+        {
+            action("suppress-check", resource);
+            suppressed++;
+        }
+        return "Ok, suppressed " + suppressed + " services";
+    }
+    
+    @Get("/id/:id/unsuppress-services")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    { 
+        Cluster cluster = db.getCluster(id);
+        if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");
+        int unsuppressed = 0;
+        for (Resource resource : cluster.getResources())
+        {
+            action("unsuppress-check", resource);
+            unsuppressed++;
+        }
+        return "Ok, unsuppressed " + unsuppressed + " services";
     }
 }
