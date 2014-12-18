@@ -71,8 +71,8 @@
 	<h2 rendered="#{! host.services.isEmpty()}">Services</h2>
 	
 	<div class="row submenu pull-right" rendered="#{! host.services.isEmpty()}">
-		<a href="/host/unsuppress-services/#{host.id}" id="unsuppress-services" data-host-id="#{host.id}">Unsuppress all</a>
-		<a href="/host/suppress-services/#{host.id}"   id="suppress-services"   data-host-id="#{host.id}">Suppress all</a>
+		<a href="/host/unsuppress-all/#{host.id}"      id="unsuppress-all"      data-host-id="#{host.id}">Unsuppress all</a>
+		<a href="/host/suppress-all/#{host.id}"        id="suppress-all"        data-host-id="#{host.id}">Suppress all</a>
 		<a href="/host/execute-services/#{host.id}"    id="check-services-now"  data-host-id="#{host.id}">Check all now</a>
 	</div>
 
@@ -269,20 +269,20 @@
 				$.getJSON('/api/host/id/' + id + '/execute-services', function(data) { /* all ok */ });
 			});
 		});
-		// suppress services check
+		// suppress all checks
 		$(document).ready(function() {
-			$('#suppress-services').click(function(ev) {
+			$('#suppress-all').click(function(ev) {
 				ev.preventDefault();
 				var id = $(this).attr("data-host-id");
-				$.getJSON('/api/host/id/' + id + '/suppress-services', function(data) { /* all ok */ });
+				$.getJSON('/api/host/id/' + id + '/suppress-all', function(data) { /* all ok */ });
 			});
 		});
-		// unsuppress services check
+		// unsuppress all checks
 		$(document).ready(function() {
-			$('#unsuppress-services').click(function(ev) {
+			$('#unsuppress-all').click(function(ev) {
 				ev.preventDefault();
 				var id = $(this).attr("data-host-id");
-				$.getJSON('/api/host/id/' + id + '/unsuppress-services', function(data) { /* all ok */ });
+				$.getJSON('/api/host/id/' + id + '/unsuppress-all', function(data) { /* all ok */ });
 			});
 		});
 		]]>

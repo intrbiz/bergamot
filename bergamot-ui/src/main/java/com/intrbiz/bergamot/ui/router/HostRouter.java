@@ -9,6 +9,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
@@ -117,7 +118,7 @@ public class HostRouter extends Router<BergamotApp>
         redirect("/host/id/" + id);
     }
     
-    @Any("/suppress-services/:id")
+    @Any("/suppress-all/:id")
     @WithDataAdapter(BergamotDB.class)
     public void suppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
@@ -125,16 +126,24 @@ public class HostRouter extends Router<BergamotApp>
         {
             action("suppress-check", service);
         }
+        for (Trap trap : db.getTrapsOnHost(id))
+        {
+            action("suppress-check", trap);
+        }
         redirect("/host/id/" + id);
     }
     
-    @Any("/unsuppress-services/:id")
+    @Any("/unsuppress-all/:id")
     @WithDataAdapter(BergamotDB.class)
     public void unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
     {
         for (Service service : db.getServicesOnHost(id))
         {
             action("unsuppress-check", service);
+        }
+        for (Trap trap : db.getTrapsOnHost(id))
+        {
+            action("suppress-check", trap);
         }
         redirect("/host/id/" + id);
     }
