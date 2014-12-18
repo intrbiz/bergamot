@@ -69,6 +69,28 @@ public class ServiceAPIRouter extends Router<BergamotApp>
         return "Ok";
     }
     
+    @Get("/id/:id/suppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String suppressService(BergamotDB db, @AsUUID UUID id)
+    { 
+        Service service = db.getService(id);
+        if (service == null) throw new BalsaNotFound("No service with id '" + id + "' exists.");
+        action("suppress-check", service);
+        return "Ok";
+    }
+    
+    @Get("/id/:id/unsuppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String unsuppressService(BergamotDB db, @AsUUID UUID id)
+    { 
+        Service service = db.getService(id);
+        if (service == null) throw new BalsaNotFound("No service with id '" + id + "' exists.");
+        action("unsuppress-check", service);
+        return "Ok";
+    }
+    
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
