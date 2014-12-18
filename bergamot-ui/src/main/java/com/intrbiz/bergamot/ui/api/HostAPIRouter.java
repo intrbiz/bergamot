@@ -217,6 +217,48 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, unsuppressed " + unsuppressed + " traps";
     }
     
+    @Get("/id/:id/suppress-all")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String suppressAllOnHost(BergamotDB db, @AsUUID UUID id)
+    { 
+        Host host = db.getHost(id);
+        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        int suppressed = 0;
+        for (Service service : host.getServices())
+        {
+            action("suppress-check", service);
+            suppressed++;
+        }
+        for (Trap trap : host.getTraps())
+        {
+            action("suppress-check", trap);
+            suppressed++;
+        }
+        return "Ok, suppressed " + suppressed;
+    }
+    
+    @Get("/id/:id/unsuppress-all")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String unsuppressAllOnHost(BergamotDB db, @AsUUID UUID id)
+    { 
+        Host host = db.getHost(id);
+        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        int unsuppressed = 0;
+        for (Service service : host.getServices())
+        {
+            action("unsuppress-check", service);
+            unsuppressed++;
+        }
+        for (Trap trap : host.getTraps())
+        {
+            action("unsuppress-check", trap);
+            unsuppressed++;
+        }
+        return "Ok, unsuppressed " + unsuppressed;
+    }
+    
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
