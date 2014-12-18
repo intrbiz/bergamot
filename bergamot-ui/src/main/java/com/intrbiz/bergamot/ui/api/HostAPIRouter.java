@@ -115,6 +115,28 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok";
     }
     
+    @Get("/id/:id/suppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String suppress(BergamotDB db, @AsUUID UUID id)
+    { 
+        Host host = db.getHost(id);
+        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        action("suppress-check", host);
+        return "Ok";
+    }
+    
+    @Get("/id/:id/unsuppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String unsuppress(BergamotDB db, @AsUUID UUID id)
+    { 
+        Host host = db.getHost(id);
+        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        action("unsuppress-check", host);
+        return "Ok";
+    }
+    
     @Get("/id/:id/execute-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
