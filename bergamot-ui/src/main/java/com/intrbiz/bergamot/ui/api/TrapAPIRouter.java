@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -83,6 +84,28 @@ public class TrapAPIRouter extends Router<BergamotApp>
         // dispatch the result for processing
         action("dispatch-result", result);
         return "Accepted";
+    }
+    
+    @Get("/id/:id/suppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String suppressTrap(BergamotDB db, @AsUUID UUID id)
+    { 
+        Trap trap = db.getTrap(id);
+        if (trap == null) throw new BalsaNotFound("No trap with id '" + id + "' exists.");
+        action("suppress-check", trap);
+        return "Ok";
+    }
+    
+    @Get("/id/:id/unsuppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String unsuppressTrap(BergamotDB db, @AsUUID UUID id)
+    { 
+        Trap trap = db.getTrap(id);
+        if (trap == null) throw new BalsaNotFound("No trap with id '" + id + "' exists.");
+        action("unsuppress-check", trap);
+        return "Ok";
     }
     
     @Get("/name/:host/:name/config.xml")
