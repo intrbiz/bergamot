@@ -119,10 +119,10 @@ public class ClusterAPIRouter extends Router<BergamotApp>
         return Util.nullable(db.getCluster(id), Cluster::getConfiguration);
     }
     
-    @Get("/id/:id/suppress-services")
+    @Get("/id/:id/suppress-resources")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    public String suppressResourcesOnCluster(BergamotDB db, @AsUUID UUID id)
     { 
         Cluster cluster = db.getCluster(id);
         if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");
@@ -135,10 +135,10 @@ public class ClusterAPIRouter extends Router<BergamotApp>
         return "Ok, suppressed " + suppressed + " services";
     }
     
-    @Get("/id/:id/unsuppress-services")
+    @Get("/id/:id/unsuppress-resources")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressResourcesOnCluster(BergamotDB db, @AsUUID UUID id)
     { 
         Cluster cluster = db.getCluster(id);
         if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");
