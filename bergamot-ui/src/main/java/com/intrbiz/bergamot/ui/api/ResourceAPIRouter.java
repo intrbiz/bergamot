@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -71,5 +72,27 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     public ResourceCfg getResourceConfig(BergamotDB db, @AsUUID UUID id)
     {
         return Util.nullable(db.getResource(id), Resource::getConfiguration);
+    }
+    
+    @Get("/id/:id/suppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String suppressResource(BergamotDB db, @AsUUID UUID id)
+    { 
+        Resource resource = db.getResource(id);
+        if (resource == null) throw new BalsaNotFound("No resource with id '" + id + "' exists.");
+        action("suppress-check", resource);
+        return "Ok";
+    }
+    
+    @Get("/id/:id/unsuppress")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String unsuppressCluster(BergamotDB db, @AsUUID UUID id)
+    { 
+        Resource resource = db.getResource(id);
+        if (resource == null) throw new BalsaNotFound("No resource with id '" + id + "' exists.");
+        action("unsuppress-check", resource);
+        return "Ok";
     }
 }
