@@ -1,0 +1,61 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa">
+	<div class="row" id="alert-#{alert.id}">
+		<div class="submenu pull-right" rendered="#{!(alert.acknowledged or alert.recovered)}">
+			<a href="#acknowledge-alert" id="acknowledge-#{alert.id}" data-acknowledge-alert="#{alert.id}">Acknowledge this alert</a>
+		</div>
+	    <div class="col4 dash_icon alert">
+			<h3>
+				<span class="dash_img #{alert.status.toString().toLowerCase()}" title="The check is #{alert.status.toString().toLowerCase()}">
+					<img src="#{public('/dialog-information.png')}" />
+				</span>
+				<span class="name">#{alert.check.summary}</span>
+		    </h3>
+		    <p>
+			    <span class="label">Status: </span>
+			    <span class="value">#{alert.status.toString().substring(0,1) + alert.status.toString().substring(1).toLowerCase()}</span>
+		    </p>
+		    <p class="output">
+			    <span class="label">Output: </span>
+			    <span class="value">#{coalesce(alert.output, '')}</span>
+		    </p>
+	    </div>
+	    <div class="col4 dash_icon alert">
+		    <p>
+			    <span class="label">Raised: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)}</span>
+		    </p>
+		    <p>
+			    <span class="label">Recovered: </span>
+			    <span class="value">#{if(alert.recovered, 'Yes', 'No')}</span>
+		    </p>
+		    <p rendered="#{alert.recovered}">
+		    	<span class="label">At: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', alert.recoveredAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.recoveredAt)}</span>
+		    </p>
+		    <p class="alert-acknowledged">
+			    <span class="label">Acknowledged: </span>
+			    <span class="value">#{if(alert.acknowledged, 'Yes', 'No')}</span>
+		    </p>
+		    <p rendered="#{alert.acknowledged}">
+		    	<span class="label">At: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', alert.acknowledgedAt)} on #{dateformat('EEEE dd/MM/yyyy', acknowledgedAt)}</span>
+		    </p>
+		    <p rendered="#{alert.acknowledged}">
+		    	<span class="label">By: </span>
+			    <span class="value">#{alert.acknowledgedBy.summary}</span>
+		    </p>
+	    </div>
+	    <div class="col4 dash_icon alert">
+	    	<h3>Comments</h3>
+	    	<ul>
+		    	<data-set var="comment" value="#{alert.comments}">
+		    		<li>
+		    			<a href="#show-comment" data-comment-id="#{comment.id}">#{comment.summary}</a>
+		    		</li>
+		    	</data-set>
+	    	</ul>
+	    </div>
+	</div>
+</fragment>

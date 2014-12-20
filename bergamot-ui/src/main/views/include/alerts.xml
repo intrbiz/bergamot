@@ -1,0 +1,63 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa">
+	<container rendered="#{! alerts.isEmpty()}">
+	
+		<h2>Alert History</h2>
+				
+		<data-set var="alert" value="#{alerts}">
+			<include view="include/alert"/>
+		</data-set>
+		<div id="acknowledge_modal" class="reveal-modal">
+	     	<h1>Acknowledge Alert</h1>
+	     	<form id="acknowledge_form" method="post" action="#acknowledge">
+	     		<p>To acknowledge this alert please explain how it has been resolved.</p>
+	     		<p>
+	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Summary: </span>
+	     			<input type="text" id="acknowledgement_summary" name="summary" placeholder="Plugged power cable back in" style="width: 402px;"/>
+	     		</p>
+	     		<p>
+	     			<textarea id="acknowledgement_comment" name="comment" style="width: 500px; height: 150px;"></textarea>
+	     		</p>
+	     		<p id="acknowledge_error" style="display: none;" class="error">
+	     			Failed to acknowledge this alert, please make sure you provide a summary and comment and try again.
+	     		</p>
+	     		<p>
+	     			<input type="submit" id="do_acknowledgement" name="acknowledge" value="Acknowledge"/>
+	     		</p>
+	     	</form>
+	    	<a class="close-reveal-modal">&#215;</a>
+		</div>
+		<script type="text/javascript">
+			<![CDATA[
+			// acknowledge alerts
+			$(document).ready(function() {
+				$('a[data-acknowledge-alert]').click(function(ev) {
+					ev.preventDefault();
+					var alert_id = $(this).attr('data-acknowledge-alert');
+					$('#acknowledgement_id').val(alert_id);
+					$('#acknowledge_form').attr('action', #{'"' + path('/api/alert/id') + '/"')} + alert_id + '/acknowledge');
+					$('#acknowledge_form').attr('data-acknowledge-alert', alert_id);
+					$('#acknowledge_error').hide();
+					$('#acknowledge_modal').reveal();
+				});
+				$('#acknowledge_form').submit(function(ev) {
+					ev.preventDefault();
+					var alert_id = $(this).attr('data-acknowledge-alert');
+					$.post($(this).attr('action'), $("#acknowledge_form").serialize())
+					 .done(function(data) {
+					 	$('#acknowledge_modal').trigger('reveal:close');
+					 	// fetch the rerendered content
+					 	$.get(#{'"' + path('/api/alert/id') + '/"')} + alert_id + '/render', function(data) {
+					 		$('#alert-' + alert_id).replaceWith(data);
+					 	});
+					 })
+					 .fail(function() {
+					 	$('#acknowledge_error').show();
+					 });
+				});
+			});
+			]]>
+		</script>
+	</container>
+</fragment>

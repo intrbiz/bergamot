@@ -70,7 +70,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
             BergamotDB db, 
             @AsUUID UUID id,
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
-            @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String comment
+            @Param("comment") @CheckStringLength(min = 0, max = 4096, mandatory = false) String comment
     )
     {
         Alert alert = db.getAlert(id);
@@ -91,5 +91,14 @@ public class AlertsAPIRouter extends Router<BergamotApp>
             });
         }
         return alert.toMO();
+    }
+    
+    @Get("/id/:id/render")
+    @JSON
+    @WithDataAdapter(BergamotDB.class)
+    public String renderAlert(BergamotDB db, @AsUUID UUID id)
+    {
+        Alert alert = var("alert", db.getAlert(id));
+        return alert == null ? null : encodeBuffered("include/alert");
     }
 }

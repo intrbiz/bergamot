@@ -1073,7 +1073,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     // comments
     
     @Cacheable
-    @CacheInvalidate({"get_comments_for_object.#{object_id}"})
+    @CacheInvalidate({"get_comments_for_object.*"})
     @SQLSetter(table = Comment.class, name = "set_comment", since = @SQLVersion({1, 0, 0}))
     public abstract void setComment(Comment comment);
     

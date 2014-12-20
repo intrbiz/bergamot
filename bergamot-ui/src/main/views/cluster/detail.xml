@@ -70,58 +70,8 @@
 		</data-set>
 	</div>
 	
-	<!-- History -->
-	
-	<container rendered="#{! alerts.isEmpty()}">
-	
-		<h2>Alert History</h2>
-				
-		<data-set var="alert" value="#{alerts}">
-			<div class="row">
-			    <div class="col4 dash_icon alert">
-					<h3>
-						<span class="dash_img #{alert.status.toString().toLowerCase()}" title="The cluster is #{alert.status.toString().toLowerCase()}">
-							<img src="/host-icon.png" />
-						</span>
-						<span class="name">#{cluster.summary}</span>
-				    </h3>
-				    <p>
-					    <span class="label">Status: </span>
-					    <span class="value">#{alert.status.toString().substring(0,1) + alert.status.toString().substring(1).toLowerCase()}</span>
-				    </p>
-				    <p class="output">
-					    <span class="label">Output: </span>
-					    <span class="value">#{coalesce(alert.output, '')}</span>
-				    </p>
-			    </div>
-			    <div class="col4 dash_icon alert">
-				    <p>
-					    <span class="label">Raised: </span>
-					    <span class="value">#{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)}</span>
-				    </p>
-				    <p>
-					    <span class="label">Recovered: </span>
-					    <span class="value">#{if(alert.recovered, 'Yes', 'No')}</span>
-				    </p>
-				    <p rendered="#{alert.recovered}">
-				    	<span class="label">Recovered At: </span>
-					    <span class="value">#{dateformat('HH:mm:ss', alert.recoveredAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.recoveredAt)}</span>
-				    </p>
-			    </div>
-			    <div class="col4 dash_icon alert">
-				    <p>
-					    <span class="label">Acknowledged: </span>
-					    <span class="value">#{if(alert.acknowledged, 'Yes', 'No')}</span>
-				    </p>
-				    <p rendered="#{alert.acknowledged}">
-				    	<span class="label">Recovered At: </span>
-					    <span class="value">#{dateformat('HH:mm:ss', alert.acknowledgedAt)} on #{dateformat('EEEE dd/MM/yyyy', acknowledgedAt)}</span>
-				    </p>
-			    </div>
-			</div>
-		</data-set>
-	
-	</container>
+	<!-- Alerts -->
+	<include view="include/alerts"/>
 	
 	<!-- Configuration -->
 	
