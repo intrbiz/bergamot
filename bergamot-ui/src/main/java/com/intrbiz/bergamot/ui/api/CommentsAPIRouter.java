@@ -133,4 +133,12 @@ public class CommentsAPIRouter extends Router<BergamotApp>
         db.setComment(comment);
         return comment.toMO();
     }
+    
+    @Get("/id/:id/render")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String renderComment(BergamotDB db, @AsUUID UUID id)
+    {
+        return var("comment", db.getComment(id)) == null ? null : encodeBuffered("include/comment");
+    }
 }

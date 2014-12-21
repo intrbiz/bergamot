@@ -40,7 +40,7 @@
 		    </p>
 		    <p rendered="#{alert.acknowledged}">
 		    	<span class="label">At: </span>
-			    <span class="value">#{dateformat('HH:mm:ss', alert.acknowledgedAt)} on #{dateformat('EEEE dd/MM/yyyy', acknowledgedAt)}</span>
+			    <span class="value">#{dateformat('HH:mm:ss', alert.acknowledgedAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.acknowledgedAt)}</span>
 		    </p>
 		    <p rendered="#{alert.acknowledged}">
 		    	<span class="label">By: </span>
@@ -52,7 +52,7 @@
 	    	<ul>
 		    	<data-set var="comment" value="#{alert.comments}">
 		    		<li>
-		    			<a href="#show-comment" data-comment-id="#{comment.id}">#{comment.summary}</a>
+		    			<a href="#show-comment" data-comment-id="#{comment.id}">#{comment.summary} by #{comment.author.summary} at #{dateformat('HH:mm:ss', comment.updated)} on #{dateformat('EEEE dd/MM/yyyy', comment.updated)}</a>
 		    		</li>
 		    	</data-set>
 	    	</ul>

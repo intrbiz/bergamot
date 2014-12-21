@@ -28,6 +28,11 @@
 	     	</form>
 	    	<a class="close-reveal-modal">&#215;</a>
 		</div>
+		<div id="comment_modal" class="reveal-modal">
+			<div id="comment_container">
+	     	</div>
+	    	<a class="close-reveal-modal">&#215;</a>
+		</div>
 		<script type="text/javascript">
 			<![CDATA[
 			// acknowledge alerts
@@ -35,7 +40,6 @@
 				$('a[data-acknowledge-alert]').click(function(ev) {
 					ev.preventDefault();
 					var alert_id = $(this).attr('data-acknowledge-alert');
-					$('#acknowledgement_id').val(alert_id);
 					$('#acknowledge_form').attr('action', #{'"' + path('/api/alert/id') + '/"')} + alert_id + '/acknowledge');
 					$('#acknowledge_form').attr('data-acknowledge-alert', alert_id);
 					$('#acknowledge_error').hide();
@@ -50,11 +54,31 @@
 					 	// fetch the rerendered content
 					 	$.get(#{'"' + path('/api/alert/id') + '/"')} + alert_id + '/render', function(data) {
 					 		$('#alert-' + alert_id).replaceWith(data);
+					 		// comment handlers
+							$('#alert-' + alert_id).find('a[data-comment-id]').click(function(ev) {
+								ev.preventDefault();
+								var comment_id = $(this).attr('data-comment-id');
+								// get the comment content
+								$.get(#{'"' + path('/api/comment/id') + '/"')} + comment_id + '/render', function(data) {
+								 	$('#comment_container').html(data);
+									$('#comment_modal').reveal();
+								});
+							});
 					 	});
 					 })
 					 .fail(function() {
 					 	$('#acknowledge_error').show();
 					 });
+				});
+				// comment handlers
+				$('a[data-comment-id]').click(function(ev) {
+					ev.preventDefault();
+					var comment_id = $(this).attr('data-comment-id');
+					// get the comment content
+					$.get(#{'"' + path('/api/comment/id') + '/"')} + comment_id + '/render', function(data) {
+					 	$('#comment_container').html(data);
+						$('#comment_modal').reveal();
+					});
 				});
 			});
 			]]>

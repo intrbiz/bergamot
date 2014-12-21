@@ -58,7 +58,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 1, 1}),
+        version = @SQLVersion({1, 1, 2}),
         tables = {
             Site.class,
             Location.class,
@@ -704,7 +704,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract Alert getCurrentAlertForCheck(@SQLParam("check_id") UUID checkId);
     
     @SQLGetter(table = Alert.class, name = "list_alerts", since = @SQLVersion({1, 0, 0}),
-            query = @SQLQuery("SELECT * FROM bergamot.alert WHERE site_id = p_site_id AND recovered = FALSE ORDER BY raised DESC")
+            query = @SQLQuery("SELECT * FROM bergamot.alert WHERE site_id = p_site_id AND recovered = FALSE AND acknowledged = FALSE ORDER BY raised DESC")
     )
     public abstract List<Alert> listAlerts(@SQLParam("site_id") UUID siteId);
     
