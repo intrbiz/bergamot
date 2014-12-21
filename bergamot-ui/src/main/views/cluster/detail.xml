@@ -74,41 +74,7 @@
 	<include view="include/alerts"/>
 	
 	<!-- Configuration -->
-	
-	<container rendered="#{Balsa().permission('ui.config.view')}">
-	
-		<h2>Configuration</h2>
-			
-		<div class="row">
-			<div class="col4 dash_icon">
-			    <h3>Notify</h3>
-				<data-set var="contact" value="#{cluster.contacts}">
-					<p>
-						<span class="label wide">Contact</span>
-						<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
-					</p>
-				</data-set>
-				<data-set var="team" value="#{cluster.teams}">
-					<p>
-						<span class="label wide">Team</span>
-						<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
-					</p>
-				</data-set>
-			</div>
-			<div class="col4 dash_icon">
-				<h3>Notifications</h3>
-				<p>
-					<span class="label wide">Notifications enabled</span>
-					<span class="value">#{if(cluster.notifications.enabled, 'yes', 'no')}</span>
-				</p>
-				<p>
-					<span class="label wide">Notification period</span>
-					<span class="value"><a href="/timeperiod/id/#{cluster.notifications.timePeriod.id}">#{cluster.notifications.timePeriod.summary}</a></span>
-				</p>
-			</div>
-		</div>
-	
-	</container>
+	<include view="include/check_configuration" data-check="#{cluster}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

@@ -1,0 +1,83 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa">
+	<container rendered="#{Balsa().permission('ui.config.view')}">
+		<h2>Configuration</h2>
+		<div class="row">
+			<div class="submenu pull-right" rendered="#{Balsa().permission('ui.view.config-all')}">
+				<a href="/admin/config/id/#{check.id}">View configuration</a>
+			</div>
+			<div class="col4 dash_icon" rendered="#{check.type == 'host' or check.type == 'service'}">
+				<h3>Scheduling</h3>
+				<p>
+					<span class="label wide">Check period</span>
+					<span class="value"><a href="/timeperiod/id/#{check.timePeriod.id}">#{check.timePeriod.summary}</a></span>
+				</p>
+				<p>
+					<span class="label wide">Check interval</span>
+					<span class="value">#{check.checkInterval / 1000}s</span>
+				</p>
+				<p>
+					<span class="label wide">Retry interval</span>
+					<span class="value">#{check.retryInterval / 1000}s</span>
+				</p>
+			</div>
+			<div class="col4 dash_icon">
+				<h3>Notifications</h3>
+				<p>
+					<span class="label wide">Notifications enabled</span>
+					<span class="value">#{if(check.notifications.enabled, 'yes', 'no')}</span>
+				</p>
+				<p>
+					<span class="label wide">Notification period</span>
+					<span class="value"><a href="/timeperiod/id/#{check.notifications.timePeriod.id}">#{check.notifications.timePeriod.summary}</a></span>
+				</p>
+			</div>
+			<div class="col4 dash_icon">
+				<h3>Notify</h3>
+				<data-set var="contact" value="#{check.contacts}">
+					<p>
+						<span class="label wide">Contact</span>
+						<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
+					</p>
+				</data-set>
+				<data-set var="team" value="#{check.teams}">
+					<p>
+						<span class="label wide">Team</span>
+						<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
+					</p>
+				</data-set>
+			</div>
+		</div>
+	</container>
+	<container rendered="#{Balsa().permission('ui.view.config-all') and (check.type == 'host' or check.type == 'service')}">
+		<div class="row">
+			<div class="col4 dash_icon">
+				<h3>Command</h3>
+				<p>
+					<span class="label wide">Command: </span>
+					<span class="value"><a href="/command/id/#{check.checkCommand.command.id}/">#{check.checkCommand.command.summary}</a></span>
+				</p>
+				<p>
+					<span class="label wide">Command Engine: </span>
+					<span class="value">#{check.checkCommand.command.engine}</span>
+				</p>
+			</div>
+			<div class="col8 dash_icon">
+				<h3>Command Parameters</h3>
+				<table style="width: 1150px;">
+					<tr>
+						<th>Parameter Name</th>
+						<th>Parameter Value</th>
+					</tr>
+					<data-set var="parameter" value="#{check.checkCommand.resolveCheckParameters()}">
+						<tr>
+							<td>#{parameter.name}</td>
+							<td>#{parameter.value}</td>
+						</tr>
+					</data-set>
+				</table>
+			</div>
+		</div>
+	</container>
+</fragment>

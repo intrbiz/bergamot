@@ -63,92 +63,11 @@
 		</div>
 	</div>
 	
-	<!-- History -->
-	
-	<container rendered="#{! alerts.isEmpty()}">
-	
-		<h2>Alert History</h2>
-				
-		<data-set var="alert" value="#{alerts}">
-			<div class="row">
-			    <div class="col4 dash_icon alert">
-					<h3>
-						<span class="dash_img #{alert.status.toString().toLowerCase()}" title="The trap is #{alert.status.toString().toLowerCase()}">
-							<img src="/trap-icon.png" />
-						</span>
-						<span class="name">#{trap.summary}</span>
-				    </h3>
-				    <p>
-					    <span class="label">Status: </span>
-					    <span class="value">#{alert.status.toString().substring(0,1) + alert.status.toString().substring(1).toLowerCase()}</span>
-				    </p>
-				    <p class="output">
-					    <span class="label">Output: </span>
-					    <span class="value">#{coalesce(alert.output, '')}</span>
-				    </p>
-			    </div>
-			    <div class="col4 dash_icon alert">
-				    <p>
-					    <span class="label">Raised: </span>
-					    <span class="value">#{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)}</span>
-				    </p>
-				    <p>
-					    <span class="label">Recovered: </span>
-					    <span class="value">#{if(alert.recovered, 'Yes', 'No')}</span>
-				    </p>
-				    <p rendered="#{alert.recovered}">
-				    	<span class="label">Recovered At: </span>
-					    <span class="value">#{dateformat('HH:mm:ss', alert.recoveredAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.recoveredAt)}</span>
-				    </p>
-			    </div>
-			    <div class="col4 dash_icon alert">
-				    <p>
-					    <span class="label">Acknowledged: </span>
-					    <span class="value">#{if(alert.acknowledged, 'Yes', 'No')}</span>
-				    </p>
-				    <p rendered="#{alert.acknowledged}">
-				    	<span class="label">Recovered At: </span>
-					    <span class="value">#{dateformat('HH:mm:ss', alert.acknowledgedAt)} on #{dateformat('EEEE dd/MM/yyyy', acknowledgedAt)}</span>
-				    </p>
-			    </div>
-			</div>
-		</data-set>
-	
-	</container>
+	<!-- Alerts -->
+	<include view="include/alerts"/>
 	
 	<!-- Configuration -->
-	
-	<container rendered="#{Balsa().permission('ui.config.view')}">
-		<h2>Configuration</h2>
-		<div class="row">
-			<div class="col4 dash_icon">
-				<h3>Notify</h3>
-				<data-set var="contact" value="#{trap.contacts}">
-					<p>
-						<span class="label wide">Contact</span>
-						<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
-					</p>
-				</data-set>
-				<data-set var="team" value="#{trap.teams}">
-					<p>
-						<span class="label wide">Team</span>
-						<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
-					</p>
-				</data-set>
-			</div>
-			<div class="col4 dash_icon">
-				<h3>Notifications</h3>
-				<p>
-					<span class="label wide">Notifications enabled</span>
-					<span class="value">#{if(trap.notifications.enabled, 'yes', 'no')}</span>
-				</p>
-				<p>
-					<span class="label wide">Notification period</span>
-					<span class="value"><a href="/timeperiod/id/#{trap.notifications.timePeriod.id}">#{trap.notifications.timePeriod.summary}</a></span>
-				</p>
-			</div>
-		</div>	
-	</container>
+	<include view="include/check_configuration" data-check="#{trap}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

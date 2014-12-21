@@ -67,106 +67,11 @@
 	<!-- Alerts -->
 	<include view="include/alerts"/>
 	
-	<container rendered="#{Balsa().permission('ui.config.view')}">
+	<!-- Stats -->
+	<include view="include/check_stats" data-check="#{service}"/>
 	
-		<h2>Configuration</h2>
-		
-		<div class="row">
-			<div class="col4 dash_icon">
-				<h3>Notify</h3>
-				<data-set var="contact" value="#{service.contacts}">
-					<p>
-						<span class="label wide">Contact</span>
-						<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
-					</p>
-				</data-set>
-				<data-set var="team" value="#{service.teams}">
-					<p>
-						<span class="label wide">Team</span>
-						<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
-					</p>
-				</data-set>
-			</div>
-			<div class="col4 dash_icon">
-				<h3>Scheduling</h3>
-				<p>
-					<span class="label wide">Check period</span>
-					<span class="value"><a href="/timeperiod/id/#{service.timePeriod.id}">#{service.timePeriod.summary}</a></span>
-				</p>
-				<p>
-					<span class="label wide">Check interval</span>
-					<span class="value">#{service.checkInterval / 1000}s</span>
-				</p>
-				<p>
-					<span class="label wide">Retry interval</span>
-					<span class="value">#{service.retryInterval / 1000}s</span>
-				</p>
-			</div>
-			<div class="col4 dash_icon">
-				<h3>Notifications</h3>
-				<p>
-					<span class="label wide">Notifications enabled</span>
-					<span class="value">#{if(service.notifications.enabled, 'yes', 'no')}</span>
-				</p>
-				<p>
-					<span class="label wide">Notification period</span>
-					<span class="value"><a href="/timeperiod/id/#{service.notifications.timePeriod.id}">#{service.notifications.timePeriod.summary}</a></span>
-				</p>
-			</div>
-		</div>
-		
-		<div class="row">
-			<div class="col4 dash_icon">
-				<h3>Statistics</h3>
-				<p>
-					<span class="label wide">Last runtime: </span>
-					<span class="value">#{service.state.lastRuntime} ms</span>
-				</p>
-				<p>
-					<span class="label wide">Average runtime: </span>
-					<span class="value">#{service.state.averageRuntime} ms</span>
-				</p>
-				<p>
-					<span class="label wide">Last processing latency: </span>
-					<span class="value">#{service.state.lastCheckProcessingLatency} ms</span>
-				</p>
-				<p>
-					<span class="label wide">Average processing latency: </span>
-					<span class="value">#{service.state.averageCheckProcessingLatency} ms</span>
-				</p>
-				<p>
-					<span class="label wide">Last execution latency: </span>
-					<span class="value">#{service.state.lastCheckExecutionLatency} ms</span>
-				</p>
-				<p>
-					<span class="label wide">Average execution latency: </span>
-					<span class="value">#{service.state.averageCheckExecutionLatency} ms</span>
-				</p>
-			</div>
-			<div class="col4 dash_icon">
-				<h3>Command</h3>
-				<p>
-					<span class="label wide">Command Engine: </span>
-					<span class="value">#{service.checkCommand.command.engine}</span>
-				</p>
-				<p>
-					<span class="label wide">Command Name: </span>
-					<span class="value">#{service.checkCommand.command.name}</span>
-				</p>
-				<p>
-					<span class="label wide">Parameters:</span>
-					<span class="value">&nbsp;</span>
-				</p>
-				<data-set var="parameter" value="#{service.checkCommand.resolveCheckParameters()}">
-					<p>
-						<span class="label wide indent">#{parameter.name}: </span>
-						<span class="value">#{parameter.value}</span>
-					</p>
-				</data-set>
-			</div>
-		</div>
-	
-	</container>
+	<!-- Configuration -->
+	<include view="include/check_configuration" data-check="#{service}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

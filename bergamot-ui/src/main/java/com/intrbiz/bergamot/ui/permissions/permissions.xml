@@ -4,8 +4,16 @@
 		<description>A contact must be granted this permission in order to be able to login and access the web user interface</description>
 	</permission>
 	<permission name="ui.config.view">
-		<summary>Allow access to view check configuration</summary>
-		<description>A contact must be granted this permission in order to be able to view check configuration</description>
+		<summary>Allow access to view basic check configuration</summary>
+		<description>A contact must be granted this permission in order to be able to view basic check configuration, this does not include check command configuration.</description>
+	</permission>
+	<permission name="ui.view.config-all">
+		<summary>Allow access to view all check configuration</summary>
+		<description>A contact must be granted this permission in order to be able to view all check configuration, including sensitive data.</description>
+	</permission>
+	<permission name="ui.view.stats">
+		<summary>Allow access to view check statistics</summary>
+		<description>A contact must be granted this permission in order to be able to view statistics about a check</description>
 	</permission>
 	<!-- API -->
 	<permission name="api.access">
