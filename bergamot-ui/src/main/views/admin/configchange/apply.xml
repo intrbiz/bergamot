@@ -2,7 +2,7 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa" title="Applied change #{change.summary}">
     <div class="row">
-		<h3>Applied change #{change.summary} #{if(report.successful, 'successfully', 'unsuccessfully')}</h3>
+		<h3 id="report_title">The minions are busy applying this configuration change, please me patient</h3>
 		<p class="text-body">#{coalesce(change.description, '')}</p>
 		<img src="#{public('apply_change.gif')}" id="loader"/>
 		<pre id="report">Applying change...</pre>
