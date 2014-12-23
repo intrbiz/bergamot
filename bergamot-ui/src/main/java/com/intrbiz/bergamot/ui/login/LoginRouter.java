@@ -15,6 +15,7 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Any;
@@ -247,5 +248,41 @@ public class LoginRouter extends Router<BergamotApp>
     {
         String to = Util.isEmpty(redirect) ? request().getPathInfo() : redirect;
         redirect("/login?redirect=" + Util.urlEncode(to, Util.UTF8));
+    }
+    
+    @Get("/reset-password")
+    public void resetPassword(@Param("username") String username) throws IOException
+    {
+        var("username", Util.coalesceEmpty(username, cookie("bergamot.username"), null));
+        encodeOnly("login/reset_password");
+    }
+    
+    @Post("/reset-password")
+    @RequireValidAccessTokenForURL()
+    @WithDataAdapter(BergamotDB.class)
+    public void doResetPassword(BergamotDB db, @Param("username") String username) throws IOException
+    {
+        // lookup the site
+        Site site = db.getSiteByName(request().getServerName());
+        if (site != null)
+        {
+            // lookup the contact
+            Contact contact = db.getContactByNameOrEmail(site.getId(), username);
+            if (contact != null)
+            {
+                action("reset-password", contact);
+            }
+            else
+            {
+                var("error", "no-such-contact");
+                logger.info("Got password reset for a contact I don't know: '" + username + "'");
+            }
+        }
+        else
+        {
+            var("error", "no-such-site");
+            logger.info("Got password reset for a site I don't know: '" + request().getServerName() + "'");
+        }
+        encodeOnly("login/reset_password_sent");
     }
 }

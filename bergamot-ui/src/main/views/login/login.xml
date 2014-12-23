@@ -20,7 +20,7 @@
                     </p>
 					<form method="post" action="#{path('/login')}">
 						<p>
-							<input type="text" id="username" name="username" placeholder="Enter your username" value="#{coalesce(username, '')}"/>
+							<input type="text" id="username" name="username" placeholder="Enter your username" value="#{coalesce(username, '')}" title="Enter your username or email address"/>
 						</p>
 						<p>
 							<input type="password" id="password" name="password" placeholder="Enter your password"/>
@@ -35,6 +35,9 @@
 							<input type="submit" id="login"    name="login"    value="Login"/>
 						</p>
 					</form>
+					<p rendered="#{error == 'invalid'}" class="error">
+                    	<a href="/reset-password?username=#{urlencode(coalesce(username, ''))}" class="error">Forgotten your password?</a>
+                    </p>
 				</div>
 			</div>
 		</div>
