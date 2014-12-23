@@ -22,6 +22,17 @@
 					<span class="value">#{check.retryInterval / 1000}s</span>
 				</p>
 			</div>
+			<div class="col4 dash_icon" rendered="#{check.type == 'host' or check.type == 'service' or check.type == 'trap'}">
+				<h3>State transitions</h3>
+				<p>
+					<span class="label wide">Fails after</span>
+					<span class="value">#{check.alertAttemptThreshold} attempts</span>
+				</p>
+				<p>
+					<span class="label wide">Recovers after</span>
+					<span class="value">#{check.recoveryAttemptThreshold} attempts</span>
+				</p>
+			</div>
 			<div class="col4 dash_icon">
 				<h3>Notifications</h3>
 				<p>
