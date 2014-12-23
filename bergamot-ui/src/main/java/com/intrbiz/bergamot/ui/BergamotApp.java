@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
-import com.intrbiz.balsa.engine.impl.task.HazelcastTaskEngine;
 import com.intrbiz.balsa.util.Util;
 import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.config.UICfg;
@@ -118,7 +117,11 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         // Setup Gerald - Service name: Bergamot.UI, send every minute
         Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
         // task engine
-        taskEngine(new HazelcastTaskEngine());
+        /*
+         * TODO: disable the shared task engine as we are getting issues with 
+         * serialising Apache Log4J Loggers
+         * taskEngine(new HazelcastTaskEngine());
+         */
         // session engine
         sessionEngine(new HazelcastSessionEngine());
         // security engine
