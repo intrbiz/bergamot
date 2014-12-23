@@ -33,6 +33,8 @@
 					<span class="value">#{check.recoveryAttemptThreshold} attempts</span>
 				</p>
 			</div>
+		</div>
+		<div class="row">
 			<div class="col4 dash_icon">
 				<h3>Notifications</h3>
 				<p>
