@@ -327,7 +327,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     }
     
     /**
-     * Get comments against this downtime
+     * Get comments against this check
      * @param limit the maximum number of comments to get
      */
     @Override
@@ -340,7 +340,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     }
 
     /**
-     * Get comments against this downtime
+     * Get comments against this check
      */
     @Override
     public List<Comment> getComments()
