@@ -164,6 +164,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
 
     public boolean verifyPassword(String plainPassword)
     {
+        if (plainPassword == null || this.passwordHash == null) return false;
         return BCrypt.checkpw(plainPassword, this.passwordHash);
     }
 
