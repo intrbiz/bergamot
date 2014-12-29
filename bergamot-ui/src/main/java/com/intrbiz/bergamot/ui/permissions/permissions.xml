@@ -15,6 +15,14 @@
 		<summary>Allow access to view check statistics</summary>
 		<description>A contact must be granted this permission in order to be able to view statistics about a check</description>
 	</permission>
+	<permission name="ui.read.comments">
+		<summary>Allow access to view check comments</summary>
+		<description>A contact must be granted this permission in order to be able to view comments on a check</description>
+	</permission>
+	<permission name="ui.write.comments">
+		<summary>Allow access to add check comments</summary>
+		<description>A contact must be granted this permission in order to be able to add comments to a check</description>
+	</permission>
 	<!-- API -->
 	<permission name="api.access">
 		<summary>Allow API access</summary>
@@ -87,5 +95,18 @@
 	<permission name="api.read.time-period.config">
 		<summary>Allow reading of time periods configuration</summary>
 		<description>A contact must be granted this permission in order to be able to read time period configuration</description>
+	</permission>
+	<!-- Comments -->
+	<permission name="api.write.comment.create">
+		<summary>Allow creation of comments</summary>
+		<description>A contact must be granted this permission in order to be able to create comments</description>
+	</permission>
+	<permission name="api.write.comment.remove">
+		<summary>Allow removal of comments</summary>
+		<description>A contact must be granted this permission in order to be able to remove comments</description>
+	</permission>
+	<permission name="api.read.comment">
+		<summary>Allow reading of comments</summary>
+		<description>A contact must be granted this permission in order to be able to read comments</description>
 	</permission>
 </permissions>

@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
-	<h1 class="summary">#{comment.summary}</h1>
+	<h3 class="summary">#{comment.summary}</h3>
     <div class="comment">#{coalesce(comment.comment, '')}</div>
 	<div class="metadata" style="margin-top: 10px;">
 		<span>By #{comment.author.summary} at #{dateformat('HH:mm:ss', comment.updated)} on #{dateformat('EEEE dd/MM/yyyy', comment.updated)}</span>

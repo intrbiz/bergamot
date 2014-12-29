@@ -1,0 +1,53 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa">
+	<container rendered="#{Balsa().permission('ui.read.comments')}">
+		<h2>Comments</h2>
+		<data-set var="comment" value="#{check.getComments()}">
+			<div class="row" id="comment-#{comment.id}">
+				<include view="include/comment"/>
+	    	</div>
+		</data-set>
+		<div class="row" id="add_comment_row" rendered="#{Balsa().permission('ui.write.comments') and Balsa().permission('api.read.comment') and Balsa().permission('api.write.comment.create')}">
+			<h3>Add comment</h3>
+		    <form id="comment_form" method="post" action="#comment">
+	     		<p>
+	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Summary: </span>
+	     			<input type="text" id="comment_summary" name="summary" placeholder="Seeing random issues" style="width: 402px;"/>
+	     		</p>
+	     		<p>
+	     			<textarea id="comment_comment" name="comment" style="width: 500px; height: 150px;"></textarea>
+	     		</p>
+	     		<p id="comment_error" style="display: none;" class="error">
+	     			Failed to save this comment, please make sure you provide a summary and comment and try again.
+	     		</p>
+	     		<p>
+	     			<input type="submit" id="add_comment" name="add_comment" value="Add Comment"/>
+	     		</p>
+		    </form>
+	   	</div>
+	  	<script type="text/javascript" rendered="#{Balsa().permission('ui.write.comments') and Balsa().permission('api.read.comment') and Balsa().permission('api.write.comment.create')}">
+			<![CDATA[
+				$('#comment_form').submit(function(ev) {
+					ev.preventDefault();
+					$.post(#{'"' + path('/api/comment/add-comment-to-object/id/') + check.id + '"'}, $("#comment_form").serialize())
+					 .done(function(theComment) {
+					 	// render the comment
+					 	$.get(#{'"' + path('/api/comment/id') + '/"')} + theComment.id + '/render', function(commentHtml) {
+						 	// container
+						 	var comdiv = document.createElement('div');
+						 	$(comdiv).attr('class', 'row');
+						 	$(comdiv).attr('id', 'comment-' + theComment.id);
+					 		$(comdiv).html(commentHtml);
+					 		// insert
+					 		$('#add_comment_row').before(comdiv);
+						});
+					 })
+					 .fail(function() {
+					 	$('#comment_error').show();
+					 });
+				});
+			]]>
+		</script>
+	</container>
+</fragment>

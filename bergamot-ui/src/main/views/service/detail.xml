@@ -67,6 +67,9 @@
 	<!-- Alerts -->
 	<include view="include/alerts"/>
 	
+	<!-- Comments -->
+	<include view="include/comments" data-check="#{service}"/>
+	
 	<!-- Stats -->
 	<include view="include/check_stats" data-check="#{service}"/>
 	

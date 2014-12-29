@@ -25,6 +25,7 @@ import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 
@@ -34,6 +35,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
 {
 
     @Get("/id/:id")
+    @RequirePermission("api.read.comment")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     public CommentMO getComment(BergamotDB db, @AsUUID UUID id)
@@ -42,6 +44,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     }
     
     @Get("/id/:id/remove")
+    @RequirePermission("api.write.comment.remove")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     public Boolean removeComment(BergamotDB db, @AsUUID UUID id)
@@ -51,6 +54,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     }
     
     @Get("/for-object/id/:id")
+    @RequirePermission("api.read.comment")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     public List<CommentMO> getCommentsForObject(
@@ -64,6 +68,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     }
     
     @Any("/add-comment-to-check/id/:id")
+    @RequirePermission("api.write.comment.create")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     public CommentMO addCommentToCheck(
@@ -100,6 +105,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     }
     
     @Any("/add-comment-to-downtime/id/:id")
+    @RequirePermission("api.write.comment.create")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     public CommentMO addCommentToDowntime(
@@ -118,6 +124,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     }
     
     @Any("/add-comment-to-object/id/:id")
+    @RequirePermission("api.write.comment.create")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     public CommentMO addCommentToObject(
@@ -135,6 +142,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     }
     
     @Get("/id/:id/render")
+    @RequirePermission("api.read.comment")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     public String renderComment(BergamotDB db, @AsUUID UUID id)

@@ -66,6 +66,9 @@
 	<!-- Alerts -->
 	<include view="include/alerts"/>
 	
+	<!-- Comments -->
+	<include view="include/comments" data-check="#{trap}"/>
+	
 	<!-- Configuration -->
 	<include view="include/check_configuration" data-check="#{trap}"/>
 	
