@@ -134,4 +134,63 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
         state = transition.nextState;
         System.out.println("---------------------------------");
     }
+    
+    @Test
+    public void testFlappingOkToBadTransition()
+    {
+        System.out.println("---------------------------------");
+        Transition transition;
+        // the check
+        RealCheck<?, ?> check = newCheck(4, 4);
+        // initial state
+        CheckState state = newState(Status.OK, "Ok", true, 4, false);
+        // result
+        Result badResult = newResult(false, "CRITICAL", "Ooops");
+        Result okResult = newResult(true, "OK", "All Good");
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, okResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, okResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        // apply the result
+        transition = this.computeResultTransition(check, state, badResult);
+        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        state = transition.nextState;
+        System.out.println("---------------------------------");
+    }
 }

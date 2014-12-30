@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
 
 public abstract class RealCheckMO extends CheckMO
 {
@@ -15,6 +16,9 @@ public abstract class RealCheckMO extends CheckMO
     
     @JsonProperty("check_command")
     protected CheckCommandMO checkCommand;
+    
+    @JsonProperty("stats")
+    protected CheckStatsMO stats;
 
     public RealCheckMO()
     {
@@ -59,5 +63,15 @@ public abstract class RealCheckMO extends CheckMO
     public void setCheckCommand(CheckCommandMO checkCommand)
     {
         this.checkCommand = checkCommand;
+    }
+
+    public CheckStatsMO getStats()
+    {
+        return stats;
+    }
+
+    public void setStats(CheckStatsMO stats)
+    {
+        this.stats = stats;
     }
 }

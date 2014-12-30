@@ -34,6 +34,7 @@ import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
+import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
 import com.intrbiz.configuration.Configuration;
@@ -50,15 +51,18 @@ import com.intrbiz.data.db.compiler.meta.SQLLimit;
 import com.intrbiz.data.db.compiler.meta.SQLOffset;
 import com.intrbiz.data.db.compiler.meta.SQLOrder;
 import com.intrbiz.data.db.compiler.meta.SQLParam;
+import com.intrbiz.data.db.compiler.meta.SQLPatch;
 import com.intrbiz.data.db.compiler.meta.SQLQuery;
 import com.intrbiz.data.db.compiler.meta.SQLRemove;
 import com.intrbiz.data.db.compiler.meta.SQLSchema;
 import com.intrbiz.data.db.compiler.meta.SQLSetter;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
+import com.intrbiz.data.db.compiler.meta.ScriptType;
+import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 1, 2}),
+        version = @SQLVersion({1, 2, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -82,7 +86,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
             Comment.class,
             Downtime.class,
             APIToken.class,
-            ConfigChange.class
+            ConfigChange.class,
+            CheckStats.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -1126,6 +1131,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLGetter(table = Downtime.class, name = "list_downtimes", since = @SQLVersion({1, 0, 0}))
     public abstract List<Downtime> listDowntimes(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);
     
+    // stats
+    
+    @Cacheable
+    @SQLSetter(table = CheckStats.class, name = "set_check_stats", since = @SQLVersion({1, 0, 0}))
+    public abstract void setCheckStats(CheckStats state);
+    
+    @Cacheable
+    @SQLGetter(table = CheckStats.class, name = "get_check_stats", since = @SQLVersion({1, 0, 0}))
+    public abstract CheckStats getCheckStats(@SQLParam("check_id") UUID id);
+    
+    @Cacheable
+    @SQLRemove(table = CheckStats.class, name = "remove_check_stats", since = @SQLVersion({1, 0, 0}))
+    public abstract void removeCheckStats(@SQLParam("check_id") UUID id);
+    
     // generic
     
     public void setCheck(Check<?, ?> check)
@@ -1313,5 +1332,36 @@ public abstract class BergamotDB extends DatabaseAdapter
     public UUID getSiteId(UUID objectId)
     {
         return Site.getSiteId(objectId);
+    }
+    
+    // patches
+    
+    @SQLPatch(name = "move_stats_from_state", index = 1, type = ScriptType.UPGRADE, version = @SQLVersion({1, 2, 0}), skip = false)
+    public static SQLScript moveStatsFromState()
+    {
+        return new SQLScript(
+            "INSERT INTO bergamot.check_stats (check_id, last_runtime, average_runtime, last_check_execution_latency, average_check_execution_latency, last_check_processing_latency, average_check_processing_latency) (SELECT check_id, last_runtime, average_runtime, last_check_execution_latency, average_check_execution_latency, last_check_processing_latency, average_check_processing_latency FROM bergamot.check_state)"
+        );
+    }
+    
+    @SQLPatch(name = "drop_state_stats_columns", index = 2, type = ScriptType.UPGRADE, version = @SQLVersion({1, 2, 0}), skip = false)
+    public static SQLScript dropStateStatsColumns()
+    {
+        return new SQLScript(
+          // state table
+          "ALTER TABLE bergamot.check_state DROP COLUMN last_runtime",
+          "ALTER TABLE bergamot.check_state DROP COLUMN average_runtime",
+          "ALTER TABLE bergamot.check_state DROP COLUMN last_check_execution_latency",
+          "ALTER TABLE bergamot.check_state DROP COLUMN average_check_execution_latency",
+          "ALTER TABLE bergamot.check_state DROP COLUMN last_check_processing_latency",
+          "ALTER TABLE bergamot.check_state DROP COLUMN average_check_processing_latency",
+          // state type
+          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_runtime",
+          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_runtime",
+          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_check_execution_latency",
+          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_check_execution_latency",
+          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_check_processing_latency",
+          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_check_processing_latency"
+        );
     }
 }

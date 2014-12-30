@@ -25,6 +25,7 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.model.state.CheckState;
+import com.intrbiz.bergamot.model.state.CheckStats;
 
 public class DefaultResultProcessor extends AbstractResultProcessor
 {
@@ -67,10 +68,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     // apply the result
                     Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), result);
                     logger.info("State change for " + result.getCheckType() + "::" + result.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
-                    // stats
-                    this.computeStats(check, transition.nextState, result);
+                    // compute the check stats
+                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), result);
                     // update the check state
                     db.setCheckState(transition.nextState);
+                    db.setCheckStats(stats);
                     db.commit();
                     // reschedule active checks if they are in transition 
                     // or have changed hard state
@@ -148,7 +150,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         logger.warn("Recovery for " + check);
         if (!check.isSuppressedOrInDowntime())
         {
-            // ger the current alert for this check
+            // get the current alert for this check
             Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
             alertRecord.setRecovered(true);
             alertRecord.setRecoveredAt(new Timestamp(System.currentTimeMillis()));
@@ -216,7 +218,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         nextState.pushOkHistory(result.isOk());
         nextState.setStatus(resultStatus);
         nextState.setOutput(result.getOutput());
-        nextState.setLastRuntime(result.getRuntime());
         nextState.setLastCheckTime(new Timestamp(result.getExecuted()));
         // compute the transition
         // do we have a state change
@@ -334,22 +335,24 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         return isStateChange;
     }
     
-    protected void computeStats(Check<?,?> check, CheckState state, Result result)
+    protected CheckStats computeStats(CheckStats stats, Result result)
     {
-        // stats
-        state.setLastRuntime(result.getRuntime());
-        state.setAverageRuntime(state.getAverageRuntime() == 0 ? state.getLastRuntime() : ((state.getLastRuntime() + state.getAverageRuntime()) / 2D));
+        CheckStats nextStats = stats.clone();
+        // compute the stats
+        nextStats.setLastRuntime(result.getRuntime());
+        nextStats.setAverageRuntime(stats.getAverageRuntime() == 0 ? stats.getLastRuntime() : ((stats.getLastRuntime() + stats.getAverageRuntime()) / 2D));
         // check latencies
         if (result.getCheck() != null && result.getCheck() instanceof ExecuteCheck)
         {
-            state.setLastCheckProcessingLatency(result.getProcessed() - ((ExecuteCheck) result.getCheck()).getScheduled());
-            state.setLastCheckExecutionLatency(result.getExecuted() - ((ExecuteCheck) result.getCheck()).getScheduled());
+            nextStats.setLastCheckProcessingLatency(result.getProcessed() - ((ExecuteCheck) result.getCheck()).getScheduled());
+            nextStats.setLastCheckExecutionLatency( result.getExecuted()  - ((ExecuteCheck) result.getCheck()).getScheduled());
             // moving average
-            state.setAverageCheckExecutionLatency(state.getAverageCheckExecutionLatency() == 0 ? state.getLastCheckExecutionLatency() : ((state.getAverageCheckExecutionLatency() + state.getLastCheckExecutionLatency()) / 2D));
-            state.setAverageCheckProcessingLatency(state.getAverageCheckProcessingLatency() == 0 ? state.getLastCheckProcessingLatency() : ((state.getAverageCheckProcessingLatency() + state.getLastCheckProcessingLatency()) / 2D));
+            nextStats.setAverageCheckExecutionLatency( stats.getAverageCheckExecutionLatency()  == 0 ? stats.getLastCheckExecutionLatency()  : ((stats.getAverageCheckExecutionLatency()  + stats.getLastCheckExecutionLatency())  / 2D));
+            nextStats.setAverageCheckProcessingLatency(stats.getAverageCheckProcessingLatency() == 0 ? stats.getLastCheckProcessingLatency() : ((stats.getAverageCheckProcessingLatency() + stats.getLastCheckProcessingLatency()) / 2D));
             // log
-            logger.debug("Last check latency: processing => " + state.getLastCheckProcessingLatency() + "ms, execution => " + state.getLastCheckExecutionLatency() + "ms processes");
+            logger.debug("Last check latency: processing => " + nextStats.getLastCheckProcessingLatency() + "ms, execution => " + nextStats.getLastCheckExecutionLatency() + "ms processes");
         }
+        return stats;
     }
  
     public static class Transition

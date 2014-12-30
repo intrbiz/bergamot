@@ -112,26 +112,6 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
      */
     @SQLColumn(index = 15, name = "last_hard_output", since = @SQLVersion({ 1, 0, 0 }))
     private String lastHardOutput = "Pending";
-    
-    // stats
-    
-    @SQLColumn(index = 16, name = "last_runtime", since = @SQLVersion({ 1, 0, 0 }))
-    private double lastRuntime;
-
-    @SQLColumn(index = 17, name = "average_runtime", since = @SQLVersion({ 1, 0, 0 }))
-    private double averageRuntime;
-
-    @SQLColumn(index = 18, name = "last_check_execution_latency", since = @SQLVersion({ 1, 0, 0 }))
-    private double lastCheckExecutionLatency;
-
-    @SQLColumn(index = 19, name = "average_check_execution_latency", since = @SQLVersion({ 1, 0, 0 }))
-    private double averageCheckExecutionLatency;
-
-    @SQLColumn(index = 20, name = "last_check_processing_latency", since = @SQLVersion({ 1, 0, 0 }))
-    private double lastCheckProcessingLatency;
-
-    @SQLColumn(index = 21, name = "average_check_processing_latency", since = @SQLVersion({ 1, 0, 0 }))
-    private double averageCheckProcessingLatency;
 
     public CheckState()
     {
@@ -292,66 +272,6 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     {
         this.lastHardOutput = lastHardOutput;
     }
-    
-    public double getLastRuntime()
-    {
-        return lastRuntime;
-    }
-
-    public void setLastRuntime(double lastRuntime)
-    {
-        this.lastRuntime = lastRuntime;
-    }
-
-    public double getLastCheckExecutionLatency()
-    {
-        return lastCheckExecutionLatency;
-    }
-
-    public void setLastCheckExecutionLatency(double lastCheckExecutionLatency)
-    {
-        this.lastCheckExecutionLatency = lastCheckExecutionLatency;
-    }
-
-    public double getAverageCheckExecutionLatency()
-    {
-        return averageCheckExecutionLatency;
-    }
-
-    public void setAverageCheckExecutionLatency(double averageCheckExecutionLatency)
-    {
-        this.averageCheckExecutionLatency = averageCheckExecutionLatency;
-    }
-
-    public double getLastCheckProcessingLatency()
-    {
-        return lastCheckProcessingLatency;
-    }
-
-    public void setLastCheckProcessingLatency(double lastCheckProcessingLatency)
-    {
-        this.lastCheckProcessingLatency = lastCheckProcessingLatency;
-    }
-
-    public double getAverageCheckProcessingLatency()
-    {
-        return averageCheckProcessingLatency;
-    }
-
-    public void setAverageCheckProcessingLatency(double averageCheckProcessingLatency)
-    {
-        this.averageCheckProcessingLatency = averageCheckProcessingLatency;
-    }
-
-    public double getAverageRuntime()
-    {
-        return averageRuntime;
-    }
-
-    public void setAverageRuntime(double averageRuntime)
-    {
-        this.averageRuntime = averageRuntime;
-    }
 
     @Override
     public CheckStateMO toMO(boolean stub)
@@ -370,12 +290,6 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
         mo.setLastHardOk(this.isLastHardOk());
         mo.setLastHardStatus(this.getLastHardStatus().toString());
         mo.setLastHardOutput(this.getLastHardOutput());
-        mo.setAverageCheckExecutionLatency(this.getAverageCheckExecutionLatency());
-        mo.setAverageCheckProcessingLatency(this.getAverageCheckProcessingLatency());
-        mo.setAverageRuntime(this.getAverageRuntime());
-        mo.setLastRuntime(this.getLastRuntime());
-        mo.setLastCheckExecutionLatency(this.getLastCheckExecutionLatency());
-        mo.setLastCheckProcessingLatency(this.getLastCheckProcessingLatency());
         return mo;
     }
     
