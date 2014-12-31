@@ -16,7 +16,10 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 /**
- * The state of a check
+ * The current state of a check
+ * 
+ * This is always the most current state of a check
+ * 
  */
 @SQLTable(schema = BergamotDB.class, name = "check_state", since = @SQLVersion({ 1, 0, 0 }))
 public class CheckState extends BergamotObject<CheckStateMO> implements Cloneable
