@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.data;
 
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +36,7 @@ import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
+import com.intrbiz.bergamot.model.state.CheckTransition;
 import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
 import com.intrbiz.configuration.Configuration;
@@ -62,7 +64,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 2, 0}),
+        version = @SQLVersion({1, 3, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -87,7 +89,8 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
             Downtime.class,
             APIToken.class,
             ConfigChange.class,
-            CheckStats.class
+            CheckStats.class,
+            CheckTransition.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -1144,6 +1147,25 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLRemove(table = CheckStats.class, name = "remove_check_stats", since = @SQLVersion({1, 0, 0}))
     public abstract void removeCheckStats(@SQLParam("check_id") UUID id);
+    
+    // transition log
+    
+    @SQLSetter(table = CheckTransition.class, name = "log_check_transition", since = @SQLVersion({1, 3, 0}))
+    public abstract void logCheckTransition(CheckTransition transition);
+    
+    @SQLGetter(table = CheckTransition.class, name = "get_check_transition", since = @SQLVersion({1, 3, 0}))
+    public abstract CheckTransition getCheckTransition(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({1, 3, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC))
+    public abstract CheckTransition listCheckTransitionsForCheck(@SQLParam("check_id") UUID checkId, @SQLOffset long offset, @SQLLimit long limit);
+    
+    @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({1, 3, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
+            query = @SQLQuery("SELECT * FROM bergamot.check_transition WHERE check_id = p_check_id AND applied_at BETWEEN p_from AND p_to")
+    )
+    public abstract CheckTransition listCheckTransitionsForCheckByDate(@SQLParam("check_id") UUID checkId, @SQLParam(value = "from", virtual = true) Timestamp from, @SQLParam(value = "to", virtual = true) Timestamp to);
+    
+    @SQLRemove(table = CheckTransition.class, name = "remove_check_Transition", since = @SQLVersion({1, 3, 0}))
+    public abstract void removeCheckTransition(@SQLParam("id") UUID id);
     
     // generic
     
