@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.result;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
+import com.intrbiz.bergamot.model.state.CheckTransition;
 
 public class DefaultResultProcessor extends AbstractResultProcessor
 {
@@ -68,6 +70,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     // apply the result
                     Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), result);
                     logger.info("State change for " + result.getCheckType() + "::" + result.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
+                    // log the transition
+                    db.logCheckTransition(transition.toCheckTransition(result.getId(), check.getId(), new Timestamp(result.getProcessed())));
                     // compute the check stats
                     CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), result);
                     // update the check state
@@ -372,6 +376,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             this.nextState = nextState;
             this.stateChange = stateChange;
             this.hardChange = hardChange;
+        }
+        
+        public CheckTransition toCheckTransition(UUID id, UUID checkId, Timestamp appliedAt)
+        {
+            return new CheckTransition(id, checkId, appliedAt, this.stateChange, this.hardChange, this.previousState, this.nextState);
         }
     }
 }
