@@ -64,7 +64,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 3, 0}),
+        version = @SQLVersion({1, 3, 3}),
         tables = {
             Site.class,
             Location.class,
@@ -1384,6 +1384,22 @@ public abstract class BergamotDB extends DatabaseAdapter
           "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_check_execution_latency",
           "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_check_processing_latency",
           "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_check_processing_latency"
+        );
+    }
+    
+    @SQLPatch(name = "install_check_transition_indexes", index = 3, type = ScriptType.INSTALL, version = @SQLVersion({1, 3, 3}), skip = false)
+    public static SQLScript installCheckTransitionIndexes()
+    {
+        return new SQLScript(
+           "CREATE INDEX check_transition_check_id_applied_at_idx ON bergamot.check_transition (check_id, applied_at)"
+        );
+    }
+    
+    @SQLPatch(name = "upgrade_check_transition_indexes", index = 3, type = ScriptType.UPGRADE, version = @SQLVersion({1, 3, 3}), skip = false)
+    public static SQLScript upgradeCheckTransitionIndexes()
+    {
+        return new SQLScript(
+           "CREATE INDEX check_transition_check_id_applied_at_idx ON bergamot.check_transition (check_id, applied_at)"
         );
     }
 }
