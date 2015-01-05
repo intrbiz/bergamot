@@ -15,6 +15,10 @@
 		<summary>Allow access to view check statistics</summary>
 		<description>A contact must be granted this permission in order to be able to view statistics about a check</description>
 	</permission>
+	<permission name="ui.view.stats.transitions">
+		<summary>Allow access to view check state transitions</summary>
+		<description>A contact must be granted this permission in order to be able to view state transitions for a check</description>
+	</permission>
 	<permission name="ui.read.comments">
 		<summary>Allow access to view check comments</summary>
 		<description>A contact must be granted this permission in order to be able to view comments on a check</description>

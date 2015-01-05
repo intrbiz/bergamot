@@ -4,6 +4,9 @@
 	<container rendered="#{check.stats != null and Balsa().permission('ui.view.stats')}">
 		<h2>Statistics</h2>
 		<div class="row">
+			<div class="submenu pull-right" rendered="#{Balsa().permission('ui.view.stats.transitions')}">
+				<a href="/stats/transitions/check/id/#{check.id}">View check transitions</a>
+			</div>
 			<div class="col4 dash_icon">
 				<p>
 					<span class="label wide">Last runtime: </span>
