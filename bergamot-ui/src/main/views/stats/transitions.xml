@@ -8,7 +8,7 @@
 	</div>
 
 	<div class="row">
-		<div class="col12">
+		<div class="col4">
 			<p>
 				The following is the transition log for #{check.type} #{check.summary}#{if(check.host != null, ' on host ' + check.host.summary, '')}.
 				This summaries the state change caused by every execution of a check.
@@ -18,7 +18,11 @@
 	
 	<div class="row">
 		<div class="col12">
-			<table>
+			<p>
+				<a href="/stats/transitions/check/id/#{check.id}?offset=#{offset - limit}&amp;limit=#{limit}" rendered="#{offset > 0}">Newer</a>
+				<a href="/stats/transitions/check/id/#{check.id}?offset=#{offset + limit}&amp;limit=#{limit}" rendered="#{transitions.size() > 0}" style="float: right;">Older</a>
+			</p>
+			<table style="width: 100%;">
 				<tr>
 					<th>Changed At</th>
 					<th>Hard State Change</th>
@@ -45,7 +49,7 @@
 						<td>#{if(transition.previousHard, 'Yes', 'No')}</td>
 					</tr>
 				</data-set>
-			</table>
+			</table>			
 		</div>
 	</div>
 	
