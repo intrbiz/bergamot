@@ -17,6 +17,8 @@ import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.security.password.check.BadPassword;
+import com.intrbiz.bergamot.ui.security.password.check.PasswordCheckEngine;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsBoolean;
@@ -136,8 +138,12 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireValidAccessTokenForURL()
     public void changePassword(@Param("password") @CheckStringLength(mandatory = true, min = 8) String password, @Param("confirm_password") @CheckStringLength(mandatory = true, min = 8) String confirmPassword, @Param("redirect") String redirect) throws IOException
     {
-        if (password.equals(confirmPassword))
+        try
         {
+            // verify the password == confirm_password
+            if (! password.equals(confirmPassword)) throw new BadPassword("mismatch");
+            // enforce the default password policy
+            PasswordCheckEngine.getDefaultInstance().check(password);
             // update the password
             Contact contact = currentPrincipal();
             logger.info("Processing password change for " + contact.getEmail() + " => " + contact.getSiteId() + "::" + contact.getId());
@@ -154,11 +160,11 @@ public class LoginRouter extends Router<BergamotApp>
             // redirect
             redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
         }
-        else
+        catch (BadPassword e)
         {
             var("redirect", redirect);
             var("forced", true);
-            var("error", "mismatch");
+            var("error", e.getMessage());
             encodeOnly("login/force_change_password");
         }
     }
