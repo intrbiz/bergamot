@@ -20,6 +20,8 @@ public class ScheduleCfg implements Serializable
 
     private Long retryEvery;
     
+    private Long changingEvery;
+    
     private String timePeriod;
 
     public ScheduleCfg()
@@ -49,6 +51,18 @@ public class ScheduleCfg implements Serializable
     public void setRetryEvery(Long retryEvery)
     {
         this.retryEvery = retryEvery;
+    }
+
+    @XmlAttribute(name = "changing-every")
+    @ResolveWith(Coalesce.class)
+    public Long getChangingEvery()
+    {
+        return changingEvery;
+    }
+
+    public void setChangingEvery(Long changingEvery)
+    {
+        this.changingEvery = changingEvery;
     }
 
     @XmlAttribute(name="time-period")
