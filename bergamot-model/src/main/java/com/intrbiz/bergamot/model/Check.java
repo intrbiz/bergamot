@@ -366,4 +366,13 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
             mo.setComments(this.getComments().stream().map(Comment::toStubMO).collect(Collectors.toList()));
         }
     }
+    
+    @Override
+    public void configure(C configuration, C resolvedConfiguration)
+    {
+        super.configure(configuration, resolvedConfiguration);
+        // configure basic check state
+        this.enabled    = resolvedConfiguration.getEnabledBooleanValue();
+        this.suppressed = resolvedConfiguration.getSuppressedBooleanValue();
+    }
 }

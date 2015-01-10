@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.model;
 
 import java.util.UUID;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.TrapMO;
@@ -29,17 +28,9 @@ public class Trap extends PassiveCheck<TrapMO, TrapCfg>
     }
     
     @Override
-    public void configure(TrapCfg cfg)
+    public void configure(TrapCfg configuration, TrapCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        TrapCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
-        this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
-        this.enabled = rcfg.getEnabledBooleanValue();
-        this.suppressed = rcfg.getSuppressedBooleanValue();
+        super.configure(configuration, resolvedConfiguration);
     }
 
     @Override

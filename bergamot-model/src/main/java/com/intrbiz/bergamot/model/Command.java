@@ -2,12 +2,10 @@ package com.intrbiz.bergamot.model;
 
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.util.Parameter;
-import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLUnique;
@@ -34,21 +32,11 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
     }
 
     @Override
-    public void configure(CommandCfg cfg)
+    public void configure(CommandCfg configuration, CommandCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        CommandCfg rcfg = cfg.resolve();
-        this.engine = rcfg.getEngine();
-        this.executor = rcfg.getExecutor();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        // load the parameters
-        this.clearParameters();
-        for (CfgParameter cp : rcfg.getParameters())
-        {
-            this.addParameter(cp.getName(), cp.getValueOrText());
-        }
+        super.configure(configuration, resolvedConfiguration);
+        this.engine   = resolvedConfiguration.getEngine();
+        this.executor = resolvedConfiguration.getExecutor();
     }
 
     public String getEngine()

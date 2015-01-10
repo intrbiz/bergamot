@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.TimeRangesAdapter;
@@ -46,16 +45,12 @@ public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> impleme
     }
 
     @Override
-    public void configure(TimePeriodCfg cfg)
+    public void configure(TimePeriodCfg configuration, TimePeriodCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        TimePeriodCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesce(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
+        super.configure(configuration, resolvedConfiguration);
         // load the time ranges
         this.ranges.clear();
-        this.ranges.addAll(rcfg.getTimeRanges());
+        this.ranges.addAll(resolvedConfiguration.getTimeRanges());
     }
 
     public List<TimeRange> getRanges()

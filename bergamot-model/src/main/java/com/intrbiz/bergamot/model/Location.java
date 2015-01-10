@@ -38,14 +38,10 @@ public class Location extends NamedObject<LocationMO, LocationCfg> implements Co
     }
 
     @Override
-    public void configure(LocationCfg cfg)
+    public void configure(LocationCfg configuration, LocationCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        LocationCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        this.workerPool = rcfg.getWorkerPool();
+        super.configure(configuration, resolvedConfiguration);
+        this.workerPool = resolvedConfiguration.getWorkerPool();
     }
 
     public List<Host> getHosts()

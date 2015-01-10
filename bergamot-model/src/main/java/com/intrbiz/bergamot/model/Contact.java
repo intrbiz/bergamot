@@ -102,24 +102,20 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     }
 
     @Override
-    public void configure(ContactCfg cfg)
+    public void configure(ContactCfg configuration, ContactCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        ContactCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
+        super.configure(configuration, resolvedConfiguration);
         // email
-        this.email = rcfg.getEmail();
+        this.email  = resolvedConfiguration.getEmail();
         // phones
-        this.mobile = rcfg.getMobile();
-        this.pager = rcfg.getPager();
-        this.phone = rcfg.getPhone();
+        this.mobile = resolvedConfiguration.getMobile();
+        this.pager  = resolvedConfiguration.getPager();
+        this.phone  = resolvedConfiguration.getPhone();
         // permissions
         this.grantedPermissions.clear();
-        this.grantedPermissions.addAll(rcfg.getGrantedPermissions());
+        this.grantedPermissions.addAll(resolvedConfiguration.getGrantedPermissions());
         this.revokedPermissions.clear();
-        this.revokedPermissions.addAll(rcfg.getRevokedPermissions());
+        this.revokedPermissions.addAll(resolvedConfiguration.getRevokedPermissions());
     }
 
     public List<UUID> getTeamIds()

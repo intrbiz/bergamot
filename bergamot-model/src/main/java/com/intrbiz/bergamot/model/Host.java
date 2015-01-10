@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.model;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
@@ -36,26 +35,10 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     }
 
     @Override
-    public void configure(HostCfg cfg)
+    public void configure(HostCfg cfg, HostCfg rcfg)
     {
-        super.configure(cfg);
-        HostCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
+        super.configure(cfg, rcfg);
         this.address = Util.coalesceEmpty(rcfg.getAddress(), this.name);
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        if (rcfg.getState() != null)
-        {
-            this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
-            this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
-        }
-        if (rcfg.getSchedule() != null)
-        {
-            this.checkInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getEvery());
-            this.retryInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getRetryEvery());
-        }
-        this.enabled = rcfg.getEnabledBooleanValue();
-        this.suppressed = rcfg.getSuppressedBooleanValue();
     }
 
     public final String getType()

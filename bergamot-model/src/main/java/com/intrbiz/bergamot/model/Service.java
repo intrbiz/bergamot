@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
@@ -30,26 +29,9 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     }
 
     @Override
-    public void configure(ServiceCfg cfg)
+    public void configure(ServiceCfg cfg, ServiceCfg rcfg)
     {
-        super.configure(cfg);
-        ServiceCfg rcfg = cfg.resolve();
-        //
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        if (rcfg.getState() != null)
-        {
-            this.alertAttemptThreshold = rcfg.getState().getFailedAfter();
-            this.recoveryAttemptThreshold = rcfg.getState().getRecoversAfter();
-        }
-        if (rcfg.getSchedule() != null)
-        {
-            this.checkInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getEvery());
-            this.retryInterval = TimeUnit.MINUTES.toMillis(rcfg.getSchedule().getRetryEvery());
-        }
-        this.enabled = rcfg.getEnabledBooleanValue();
-        this.suppressed = rcfg.getSuppressedBooleanValue();
+        super.configure(cfg, rcfg);
     }
 
     public final String getType()

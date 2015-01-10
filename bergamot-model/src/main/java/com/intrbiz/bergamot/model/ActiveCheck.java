@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.express.BergamotEntityResolver;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -55,7 +56,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
      * How often should checks be executed when transitioning between hard states (in milliseconds)
      */
     @SQLColumn(index = 5, name = "changing_interval", since = @SQLVersion({ 1, 4, 0 }))
-    protected long changingInterval = TimeUnit.MINUTES.toMillis(1);
+    protected long changingInterval = 0;
 
     public ActiveCheck()
     {
@@ -92,9 +93,25 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         this.changingInterval = changingInterval;
     }
 
+    /**
+     * Compute the current interval for this check using the 
+     * check state and the configured intervals.
+     */
     public long getCurrentInterval()
     {
-        return (this.getState().isOk() && this.getState().isHard()) ? this.getCheckInterval() : this.getRetryInterval();
+        CheckState state = this.getState();
+        if (state.isSoft() && this.getChangingInterval() > 0)
+        {
+            return this.getChangingInterval();
+        }
+        else if (state.isHardOk())
+        {
+            return this.getCheckInterval();
+        }
+        else
+        {
+            return this.getRetryInterval();
+        }
     }
 
     public TimePeriod getTimePeriod()
@@ -202,6 +219,18 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         if (!stub)
         {
             mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
+        }
+    }
+    
+    public void configure(C configuration, C resolvedConfiguration)
+    {
+        super.configure(configuration, resolvedConfiguration);
+        // scheduling
+        if (resolvedConfiguration.getSchedule() != null)
+        {
+            this.checkInterval    = TimeUnit.MINUTES.toMillis(resolvedConfiguration.getSchedule().getEvery());
+            this.retryInterval    = TimeUnit.MINUTES.toMillis(resolvedConfiguration.getSchedule().getRetryEvery());
+            this.changingInterval = TimeUnit.MINUTES.toMillis(Util.coalesce(resolvedConfiguration.getSchedule().getChangingEvery(), resolvedConfiguration.getSchedule().getRetryEvery()));
         }
     }
 }

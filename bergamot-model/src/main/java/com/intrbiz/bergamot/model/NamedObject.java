@@ -60,12 +60,21 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
     {
         super();
     }
+    
+    public final void configure(C configuration)
+    {
+        this.configure(configuration, configuration.resolve());
+    }
 
-    public void configure(C configuration)
+    public void configure(C configuration, C resolvedConfiguration)
     {
         // ids and site
         this.setId(configuration.getId());
         this.setSiteId(Site.getSiteId(this.getId()));
+        // naming
+        this.name        = resolvedConfiguration.getName();
+        this.summary     = Util.coalesceEmpty(resolvedConfiguration.getSummary(), this.name);
+        this.description = Util.coalesceEmpty(resolvedConfiguration.getDescription(), "");
         // copy the parameters
         this.parameters.clear();
         for (CfgParameter param : configuration.getParameters())

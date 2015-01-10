@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.model;
 
 import java.util.UUID;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.ResourceMO;
@@ -29,15 +28,9 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
     }
 
     @Override
-    public void configure(ResourceCfg cfg)
+    public void configure(ResourceCfg configuration, ResourceCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        ResourceCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        this.enabled = rcfg.getEnabledBooleanValue();
-        this.suppressed = rcfg.getSuppressedBooleanValue();
+        super.configure(configuration, resolvedConfiguration);
     }
 
     @Override

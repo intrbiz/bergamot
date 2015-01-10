@@ -29,6 +29,10 @@ public class ScheduleCfg implements Serializable
         super();
     }
 
+    /**
+     * The interval to use (in minutes) when the check is ok.
+     * @return
+     */
     @XmlAttribute(name = "every")
     @ResolveWith(Coalesce.class)
     public Long getEvery()
@@ -41,6 +45,9 @@ public class ScheduleCfg implements Serializable
         this.every = every;
     }
 
+    /**
+     * The interval to use (in minutes) when the check is not ok.
+     */
     @XmlAttribute(name = "retry-every")
     @ResolveWith(Coalesce.class)
     public Long getRetryEvery()
@@ -53,6 +60,10 @@ public class ScheduleCfg implements Serializable
         this.retryEvery = retryEvery;
     }
 
+    /**
+     * The interval to use (in minutes) when the check is transitioning (chaning) 
+     * state.  If this is not specified then the retry interval is used.
+     */
     @XmlAttribute(name = "changing-every")
     @ResolveWith(Coalesce.class)
     public Long getChangingEvery()

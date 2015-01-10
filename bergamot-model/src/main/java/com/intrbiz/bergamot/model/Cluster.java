@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.model;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.ClusterMO;
@@ -26,15 +25,9 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
     }
     
     @Override
-    public void configure(ClusterCfg cfg)
+    public void configure(ClusterCfg configuration, ClusterCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        ClusterCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
-        this.enabled = rcfg.getEnabledBooleanValue();
-        this.suppressed = rcfg.getSuppressedBooleanValue();
+        super.configure(configuration, resolvedConfiguration);
     }
 
     @Override

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.TeamMO;
@@ -39,18 +38,14 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
     }
 
     @Override
-    public void configure(TeamCfg cfg)
+    public void configure(TeamCfg configuration, TeamCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        TeamCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesce(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
+        super.configure(configuration, resolvedConfiguration);
         // permissions
         this.grantedPermissions.clear();
-        this.grantedPermissions.addAll(rcfg.getGrantedPermissions());
+        this.grantedPermissions.addAll(resolvedConfiguration.getGrantedPermissions());
         this.revokedPermissions.clear();
-        this.revokedPermissions.addAll(rcfg.getRevokedPermissions());
+        this.revokedPermissions.addAll(resolvedConfiguration.getRevokedPermissions());
     }
 
     public List<UUID> getTeamIds()

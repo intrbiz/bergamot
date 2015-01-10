@@ -91,4 +91,16 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
             mo.setCheckCommand(Util.nullable(this.getCheckCommand(), CheckCommand::toStubMO));
         }
     }
+    
+    @Override
+    public void configure(C configuration, C resolvedConfiguration)
+    {
+        super.configure(configuration, resolvedConfiguration);
+        // configure state thresholds
+        if (resolvedConfiguration.getState() != null)
+        {
+            this.alertAttemptThreshold    = resolvedConfiguration.getState().getFailedAfter();
+            this.recoveryAttemptThreshold = resolvedConfiguration.getState().getRecoversAfter();
+        }
+    }
 }

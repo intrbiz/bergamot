@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CheckMO;
@@ -35,13 +34,9 @@ public class Group extends NamedObject<GroupMO, GroupCfg> implements Commented
     }
 
     @Override
-    public void configure(GroupCfg cfg)
+    public void configure(GroupCfg configuration, GroupCfg resolvedConfiguration)
     {
-        super.configure(cfg);
-        GroupCfg rcfg = cfg.resolve();
-        this.name = rcfg.getName();
-        this.summary = Util.coalesceEmpty(rcfg.getSummary(), this.name);
-        this.description = Util.coalesceEmpty(rcfg.getDescription(), "");
+        super.configure(configuration, resolvedConfiguration);
     }
 
     public GroupState getState()
