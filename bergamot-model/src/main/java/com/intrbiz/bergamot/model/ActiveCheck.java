@@ -51,6 +51,12 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     @SQLColumn(index = 4, name = "worker_pool", since = @SQLVersion({ 1, 0, 0 }))
     protected String workerPool;
 
+    /**
+     * How often should checks be executed when transitioning between hard states (in milliseconds)
+     */
+    @SQLColumn(index = 5, name = "changing_interval", since = @SQLVersion({ 1, 4, 0 }))
+    protected long changingInterval = TimeUnit.MINUTES.toMillis(1);
+
     public ActiveCheck()
     {
         super();
@@ -76,6 +82,16 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         this.retryInterval = retryInterval;
     }
 
+    public long getChangingInterval()
+    {
+        return changingInterval;
+    }
+
+    public void setChangingInterval(long changingInterval)
+    {
+        this.changingInterval = changingInterval;
+    }
+
     public long getCurrentInterval()
     {
         return (this.getState().isOk() && this.getState().isHard()) ? this.getCheckInterval() : this.getRetryInterval();
@@ -99,7 +115,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     {
         this.timePeriodId = timePeriodId;
     }
-    
+
     public String getWorkerPool()
     {
         return workerPool;
@@ -109,11 +125,12 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     {
         this.workerPool = workerPool;
     }
-    
+
     public abstract String resolveWorkerPool();
 
     /**
      * Construct the routing key which should be used to route this execute check message
+     * 
      * @return
      */
     public GenericKey getRoutingKey()
@@ -121,11 +138,12 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         Command command = Util.nullable(this.getCheckCommand(), CheckCommand::getCommand);
         if (command == null) return null;
         // th key
-        return new GenericKey(this.getSiteId() +  "." + Util.coalesceEmpty(this.resolveWorkerPool(), "any") +  "." +  command.getEngine());
+        return new GenericKey(this.getSiteId() + "." + Util.coalesceEmpty(this.resolveWorkerPool(), "any") + "." + command.getEngine());
     }
-    
+
     /**
      * Get the TTL in ms for the execute check message
+     * 
      * @return
      */
     public long getMessageTTL()
@@ -159,7 +177,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         {
             ValueExpression vexp = new ValueExpression(context, parameter.getValue());
             String value = (String) vexp.get(context, this);
-            if (! Util.isEmpty(value))
+            if (!Util.isEmpty(value))
             {
                 if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
                 executeCheck.setParameter(parameter.getName(), value);

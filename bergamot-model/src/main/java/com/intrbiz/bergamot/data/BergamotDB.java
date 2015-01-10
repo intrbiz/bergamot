@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.data;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -64,7 +65,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 3, 3}),
+        version = @SQLVersion({1, 4, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1401,5 +1402,59 @@ public abstract class BergamotDB extends DatabaseAdapter
         return new SQLScript(
            "CREATE INDEX check_transition_check_id_applied_at_idx ON bergamot.check_transition (check_id, applied_at)"
         );
+    }
+    
+    /*
+    @SQLPatch(name = "drop_state_stats_columns", index = 2, type = ScriptType.UPGRADE, version = @SQLVersion({1, 2, 0}), skip = false)
+    public static SQLScript dropStateStatsColumns()
+    {
+        return new SQLScript(
+          // state table
+          "ALTER TABLE bergamot.check_state DROP COLUMN last_runtime",
+          // state type
+          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_runtime",
+        );
+    }
+    */
+    
+    public static void main(String[] args) throws Exception
+    {
+        if (args.length == 1 && "install".equals(args[0]))
+        {
+            DatabaseAdapterCompiler.main(new String[] { "install", BergamotDB.class.getCanonicalName() });
+        }
+        else if (args.length == 2 && "upgrade".equals(args[0]))
+        {
+            DatabaseAdapterCompiler.main(new String[] { "upgrade", BergamotDB.class.getCanonicalName(), args[1] });
+        }
+        else
+        {
+            // interactive
+            try (Scanner input = new Scanner(System.in))
+            {
+                for (;;)
+                {
+                    System.out.print("Would you like to generate the install or upgrade schema: ");
+                    String action = input.nextLine();
+                    // process the action
+                    if ("exit".equals(action) || "quit".equals(action) || "q".equals(action))
+                    {
+                        System.exit(0);
+                    }
+                    else if ("install".equalsIgnoreCase(action) || "in".equalsIgnoreCase(action) || "i".equalsIgnoreCase(action))
+                    {
+                        DatabaseAdapterCompiler.main(new String[] { "install", BergamotDB.class.getCanonicalName() });
+                        System.exit(0);
+                    }
+                    else if ("upgrade".equalsIgnoreCase(action) || "up".equalsIgnoreCase(action) || "u".equalsIgnoreCase(action))
+                    {
+                        System.out.print("What is the current installed version: ");
+                        String version = input.nextLine();
+                        DatabaseAdapterCompiler.main(new String[] { "upgrade", BergamotDB.class.getCanonicalName(), version });
+                        System.exit(0);
+                    }
+                }
+            }
+        }
     }
 }
