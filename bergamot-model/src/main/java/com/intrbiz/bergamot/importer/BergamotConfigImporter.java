@@ -737,7 +737,14 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.loadContact(cfg, db);
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    this.removeContact(cfg, db);
+                }
+                else
+                {
+                    this.loadContact(cfg, db);
+                }
             }
         }
         // load any contact where a template change cascades
@@ -755,6 +762,16 @@ public class BergamotConfigImporter
                     this.loadContact(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeContact(ContactCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing contact: " + cfg.resolve().getName());
+        Contact contact = db.getContactByName(this.site.getId(), cfg.resolve().getName());
+        if (contact != null)
+        {
+            db.removeContact(contact.getId());
         }
     }
     
