@@ -32,6 +32,7 @@ import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
+import com.intrbiz.bergamot.config.model.TemplatedObjectCfg.ObjectState;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.config.model.VirtualCheckCfg;
@@ -192,39 +193,6 @@ public class BergamotConfigImporter
         return this.report;
     }
     
-    private void loadTemplates(BergamotDB db)
-    {
-        for (List<? extends TemplatedObjectCfg<?>> objects : this.config.getAllObjects())
-        {
-            for (TemplatedObjectCfg<?> object : objects)
-            {
-                if (object.getTemplateBooleanValue() && object instanceof NamedObjectCfg)
-                {
-                    String type = Configuration.getRootElement(((NamedObjectCfg<?>) object).getClass());
-                    //
-                    Config conf = db.getConfigByName(this.site.getId(), type, object.getName());
-                    if (conf == null)
-                    {
-                        conf =  new Config(this.site.randomObjectId(), this.site.getId(), (NamedObjectCfg<?>) object);
-                        this.report.info("Configuring new " + type + " template: " + object.getName());
-                    }
-                    else
-                    {
-                        conf.fromConfiguration((NamedObjectCfg<?>) object);
-                        this.report.info("Reconfiguring existing " + type + " template: " + object.getName() + " (" + conf.getId() + ")");
-                        // cascade - note this recursively queries for all objects affected by a change to this template
-                        for (Config config : conf.listAllDependentsObjects())
-                        {
-                            this.report.info("  Change cascades to: " + config.getType() + ":" + config.getName());
-                            this.cascadedChanges.put(config.getQualifiedName(), new CascadedChange(object, conf, config));
-                        }
-                    }
-                    db.setConfig(conf);
-                }
-            }
-        }
-    }
-    
     private void loadSite(BergamotDB db)
     {
         this.site = db.getSiteByName(this.config.getSite());
@@ -246,13 +214,63 @@ public class BergamotConfigImporter
         }
     }
     
+    private void loadTemplates(BergamotDB db)
+    {
+        for (List<? extends TemplatedObjectCfg<?>> objects : this.config.getAllObjects())
+        {
+            for (TemplatedObjectCfg<?> object : objects)
+            {
+                if (object.getTemplateBooleanValue() && object instanceof NamedObjectCfg)
+                {
+                    String type = Configuration.getRootElement(((NamedObjectCfg<?>) object).getClass());
+                    //
+                    Config conf = db.getConfigByName(this.site.getId(), type, object.getName());
+                    if (conf == null)
+                    {
+                        conf =  new Config(this.site.randomObjectId(), this.site.getId(), (NamedObjectCfg<?>) object);
+                        this.report.info("Configuring new " + type + " template: " + object.getName());
+                    }
+                    else
+                    {
+                        if (ObjectState.isRemove(object.getObjectState()))
+                        {
+                            // TODO: we currently don't cope with deleting templated
+                            throw new RuntimeException("Removing template is not currently supported!");
+                        }
+                        else
+                        {
+                            conf.fromConfiguration((NamedObjectCfg<?>) object);
+                            this.report.info("Reconfiguring existing " + type + " template: " + object.getName() + " (" + conf.getId() + ")");
+                            // cascade - note this recursively queries for all objects affected by a change to this template
+                            for (Config config : conf.listAllDependentsObjects())
+                            {
+                                this.report.info("  Change cascades to: " + config.getType() + ":" + config.getName());
+                                this.cascadedChanges.put(config.getQualifiedName(), new CascadedChange(object, conf, config));
+                            }
+                        }
+                    }
+                    db.setConfig(conf);
+                }
+            }
+        }
+    }
+    
     private void loadCommands(BergamotDB db)
     {
         for (CommandCfg cfg : this.config.getCommands())
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.loadCommand(cfg, db);
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    // remove the command
+                    this.removeCommand(cfg, db);
+                }
+                else
+                {
+                    // add or change the command
+                    this.loadCommand(cfg, db);
+                }
             }
         }
         // load any commands where a template change cascades
@@ -270,6 +288,19 @@ public class BergamotConfigImporter
                     this.loadCommand(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeCommand(CommandCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing command: " + cfg.resolve().getName());
+        // remove the command
+        Command command = db.getCommandByName(this.site.getId(), cfg.getName());
+        if (command != null)
+        {
+            // TODO: remove should cascade and remove and CheckCommands which 
+            //       are using this command
+            db.removeCommand(command.getId());
         }
     }
     
@@ -306,7 +337,16 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.loadLocation(cfg, db);
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    // remove the location
+                    this.removeLocation(cfg, db);
+                }
+                else
+                {
+                    // add or change the location
+                    this.loadLocation(cfg, db);
+                }
             }
         }
         // link the tree
@@ -314,7 +354,11 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.linkLocation(cfg, db);
+                if (ObjectState.isChange(cfg.getObjectState()))
+                {
+                    // only link locations that are being changed or added
+                    this.linkLocation(cfg, db);
+                }
             }
         }
         // load any location where a template change cascades
@@ -333,6 +377,18 @@ public class BergamotConfigImporter
                     this.linkLocation(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeLocation(LocationCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing location: " + cfg.resolve().getName());
+        // remove the location
+        Location location = db.getLocationByName(this.site.getId(), cfg.getName());
+        if (location != null)
+        {
+            // TODO: remove location should delink any child locations
+            db.removeLocation(location.getId());
         }
     }
     
@@ -385,7 +441,14 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.loadGroup(cfg, db);
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    this.removeGroup(cfg, db);
+                }
+                else
+                {
+                    this.loadGroup(cfg, db);
+                }
             }
         }
         // link the tree
@@ -393,7 +456,10 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.linkGroup(cfg, db);
+                if (ObjectState.isChange(cfg.getObjectState()))
+                {
+                    this.linkGroup(cfg, db);
+                }
             }
         }
         // load any group where a template change cascades
@@ -412,6 +478,18 @@ public class BergamotConfigImporter
                     this.linkGroup(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeGroup(GroupCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing group: " + cfg.resolve().getName());
+        // remove the group
+        Group group = db.getGroupByName(this.site.getId(), cfg.getName());
+        if (group != null)
+        {
+            // TODO: remove group should delink any child groups
+            db.removeGroup(group.getId());
         }
     }
     
