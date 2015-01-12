@@ -639,7 +639,14 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.loadTeam(cfg, db);
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    this.removeTeam(cfg, db);
+                }
+                else
+                {
+                    this.loadTeam(cfg, db);
+                }
             }
         }
         // link the tree
@@ -647,7 +654,10 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.linkTeam(cfg, db);
+                if (ObjectState.isChange(cfg.getObjectState()))
+                {
+                    this.linkTeam(cfg, db);
+                }
             }
         }
         // load any team where a template change cascades
@@ -666,6 +676,16 @@ public class BergamotConfigImporter
                     this.linkTeam(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeTeam(TeamCfg cfg, BergamotDB db)
+    {
+        this.report.info("Remove team: " + cfg.resolve().getName());
+        Team team = db.getTeamByName(this.site.getId(), cfg.getName());
+        if (team != null)
+        {
+            db.removeTeam(team.getId());
         }
     }
     
