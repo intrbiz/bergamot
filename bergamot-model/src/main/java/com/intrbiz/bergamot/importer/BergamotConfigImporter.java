@@ -583,7 +583,7 @@ public class BergamotConfigImporter
     
     private void removeTimePeriod(TimePeriodCfg cfg, BergamotDB db)
     {
-        this.report.info("Remove timeperiod: " + cfg.resolve().getName());
+        this.report.info("Removing timeperiod: " + cfg.resolve().getName());
         TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), cfg.getName());
         if (timePeriod != null)
         {
@@ -681,7 +681,7 @@ public class BergamotConfigImporter
     
     private void removeTeam(TeamCfg cfg, BergamotDB db)
     {
-        this.report.info("Remove team: " + cfg.resolve().getName());
+        this.report.info("Removing team: " + cfg.resolve().getName());
         Team team = db.getTeamByName(this.site.getId(), cfg.getName());
         if (team != null)
         {
