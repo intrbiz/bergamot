@@ -23,7 +23,17 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
         PRESENT,
         ABSENT,
         REMOVED, /* Synonym for Absent */
-        CHANGED
+        CHANGED;
+        
+        public static boolean isRemove(ObjectState state)
+        {
+            return state == ABSENT || state == REMOVED;
+        }
+        
+        public static boolean isChange(ObjectState state)
+        {
+            return state == PRESENT || state == CHANGED || state == null;
+        }
     }
     
     private static final long serialVersionUID = 1L;
