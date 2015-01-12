@@ -541,7 +541,14 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.loadTimePeriod(cfg, db);
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    this.removeTimePeriod(cfg, db);
+                }
+                else
+                {
+                    this.loadTimePeriod(cfg, db);
+                }
             }
         }
         // link excludes
@@ -549,7 +556,10 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.linkTimePeriod(cfg, db);
+                if (ObjectState.isChange(cfg.getObjectState()))
+                {
+                    this.linkTimePeriod(cfg, db);
+                }
             }
         }
         // load any timeperiod where a template change cascades
@@ -568,6 +578,16 @@ public class BergamotConfigImporter
                     this.linkTimePeriod(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeTimePeriod(TimePeriodCfg cfg, BergamotDB db)
+    {
+        this.report.info("Remove timeperiod: " + cfg.resolve().getName());
+        TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), cfg.getName());
+        if (timePeriod != null)
+        {
+            db.removeTimePeriod(timePeriod.getId());
         }
     }
     
