@@ -71,7 +71,6 @@ import com.intrbiz.configuration.Configurable;
 import com.intrbiz.crypto.SecretKey;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
-import com.intrbiz.data.cache.tiered.TieredCacheProvider;
 import com.intrbiz.gerald.Gerald;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
@@ -253,7 +252,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             // setup the cache
             System.out.println("Setting up Hazelcast");
             DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(BergamotApp.getApplicationInstanceName()));
-            DataManager.get().registerDefaultCacheProvider(new TieredCacheProvider(new HazelcastCacheProvider(BergamotApp.getApplicationInstanceName())));
+            DataManager.get().registerDefaultCacheProvider(DataManager.get().cacheProvider("hazelcast"));
             // setup the queue manager
             System.out.println("Setting up RabbitMQ");
             QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
