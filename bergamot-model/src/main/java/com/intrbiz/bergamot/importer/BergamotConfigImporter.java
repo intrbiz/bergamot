@@ -151,6 +151,7 @@ public class BergamotConfigImporter
                     });
                     // to avoid cache concurrency issues, clear the entire cache
                     // we'll improve this in later releases
+                    // note: when clearing the cahce, that should propagate to all nodes
                     this.report.info("Clearing all caches");
                     db.cacheClear();
                 }
