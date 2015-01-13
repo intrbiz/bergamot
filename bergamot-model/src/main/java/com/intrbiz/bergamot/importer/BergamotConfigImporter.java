@@ -1261,7 +1261,24 @@ public class BergamotConfigImporter
         // add resources
         for (ResourceCfg scfg : rcfg.getResources())
         {
-            this.loadResource(cluster, scfg, db);
+            if (ObjectState.isRemove(scfg.getObjectState()))
+            {
+                this.removeResource(cluster, scfg, db);
+            }
+            else
+            {
+                this.loadResource(cluster, scfg, db);
+            }
+        }
+    }
+    
+    private void removeResource(Cluster cluster, ResourceCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing resource: " + cfg.resolve().getName() + " on cluster " + cluster.getName());
+        Resource resource = db.getResourceOnCluster(cluster.getId(), cfg.resolve().getName());
+        if (resource != null)
+        {
+            db.removeResource(resource.getId());
         }
     }
     
