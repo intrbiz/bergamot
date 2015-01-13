@@ -1186,7 +1186,14 @@ public class BergamotConfigImporter
         {
             if (!cfg.getTemplateBooleanValue())
             {
-                
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    this.removeCluster(cfg, db);
+                }
+                else
+                {
+                    this.loadCluster(cfg, db);
+                }
             }
         }
         // load any clusters where a template change cascades
@@ -1207,6 +1214,20 @@ public class BergamotConfigImporter
                     this.loadCluster(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeCluster(ClusterCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing cluster: " + cfg.resolve().getName());
+        Cluster cluster = db.getClusterByName(this.site.getId(), cfg.getName());
+        if (cluster != null)
+        {
+            for (Resource resource : cluster.getResources())
+            {
+                db.removeResource(resource.getId());
+            }
+            db.removeCluster(cluster.getId());
         }
     }
     
