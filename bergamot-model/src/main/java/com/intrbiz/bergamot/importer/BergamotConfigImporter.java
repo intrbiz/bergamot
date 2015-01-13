@@ -862,7 +862,14 @@ public class BergamotConfigImporter
         {
             if (! cfg.getTemplateBooleanValue())
             {
-                this.loadHost(cfg, db);
+                if (ObjectState.isRemove(cfg.getObjectState()))
+                {
+                    this.removeHost(cfg, db);
+                }
+                else
+                {
+                    this.loadHost(cfg, db);
+                }
             }
         }
         // load any hosts where a template change cascades
@@ -883,6 +890,27 @@ public class BergamotConfigImporter
                     this.loadHost(cfg, db);
                 }
             }
+        }
+    }
+    
+    private void removeHost(HostCfg cfg, BergamotDB db)
+    {
+        // remove this host and all its services
+        this.report.info("Removing host: " + cfg.resolve().getName());
+        Host host = db.getHostByName(this.site.getId(), cfg.resolve().getName());
+        if (host != null)
+        {
+            // remove all services
+            for (Service service : host.getServices())
+            {
+                // remove
+                db.removeService(service.getId());
+                // remove from scheduler
+                this.delayedSchedulerActions.add(new DelayedSchedulerAction(DelayedSchedulerAction.SchedulingChange.REMOVE, service));
+            }
+            // remove the host
+            db.removeHost(host.getId());
+            this.delayedSchedulerActions.add(new DelayedSchedulerAction(DelayedSchedulerAction.SchedulingChange.REMOVE, host));
         }
     }
     
@@ -935,6 +963,7 @@ public class BergamotConfigImporter
         // add services
         for (ServiceCfg scfg : rcfg.getServices())
         {
+            
             this.loadService(host, scfg, db);
         }
         // add traps
