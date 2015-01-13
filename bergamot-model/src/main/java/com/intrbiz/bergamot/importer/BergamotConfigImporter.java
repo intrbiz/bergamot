@@ -963,8 +963,14 @@ public class BergamotConfigImporter
         // add services
         for (ServiceCfg scfg : rcfg.getServices())
         {
-            
-            this.loadService(host, scfg, db);
+            if (ObjectState.isRemove(cfg.getObjectState()))
+            {
+                this.removeService(host, scfg, db);
+            }
+            else
+            {
+                this.loadService(host, scfg, db);
+            }
         }
         // add traps
         for (TrapCfg tcfg : rcfg.getTraps())
@@ -1065,6 +1071,19 @@ public class BergamotConfigImporter
                 check.getGroupIds().add(group.getId());
                 db.invalidateChecksInGroup(group.getId());
             }
+        }
+    }
+    
+    private void removeService(Host host, ServiceCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing service: " + cfg.resolve().getName() + " on host " + host.getName());
+        Service service = db.getServiceOnHost(host.getId(), cfg.resolve().getName());
+        if (service != null)
+        {
+            // remove service
+            db.removeService(service.getId());
+            // remove from scheduler
+            this.delayedSchedulerActions.add(new DelayedSchedulerAction(DelayedSchedulerAction.SchedulingChange.REMOVE, service));
         }
     }
 
