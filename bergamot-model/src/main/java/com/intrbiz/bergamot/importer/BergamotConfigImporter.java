@@ -975,7 +975,14 @@ public class BergamotConfigImporter
         // add traps
         for (TrapCfg tcfg : rcfg.getTraps())
         {
-            this.loadTrap(host, tcfg, db);
+            if (ObjectState.isRemove(cfg.getObjectState()))
+            {
+                this.removeTrap(host, tcfg, db);
+            }
+            else
+            {
+                this.loadTrap(host, tcfg, db);
+            }
         }
     }
     
@@ -1114,6 +1121,16 @@ public class BergamotConfigImporter
         // add
         db.setService(service);
         this.delayedSchedulerActions.add(new DelayedSchedulerAction(serviceSchedulingChange, service));
+    }
+    
+    private void removeTrap(Host host, TrapCfg cfg, BergamotDB db)
+    {
+        this.report.info("Removing trap: " + cfg.resolve().getName() + " on host " + host.getName());
+        Trap trap = db.getTrapOnHost(host.getId(), cfg.getName());
+        if (trap != null)
+        {
+            db.removeTrap(trap.getId());
+        }
     }
     
     private void loadTrap(Host host, TrapCfg cfg, BergamotDB db)
