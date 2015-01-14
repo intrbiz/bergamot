@@ -65,7 +65,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 4, 0}),
+        version = @SQLVersion({1, 5, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -440,7 +440,18 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_group_by_name.#{this.getSiteId(id)}.*", "get_root_groups.#{this.getSiteId(id)}.*", "get_groups_in_group.#{id}"})
-    @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                        "UPDATE bergamot.group SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "UPDATE bergamot.contact  SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "UPDATE bergamot.host     SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "UPDATE bergamot.service  SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "UPDATE bergamot.trap     SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "UPDATE bergamot.cluster  SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "UPDATE bergamot.resource SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "DELETE FROM bergamot.group WHERE id = p_id"
+            )
+    )
     public abstract void removeGroup(@SQLParam("id") UUID id);
     
     public void addGroupChild(Group parent, Group child)
@@ -516,7 +527,18 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_team_by_name.#{this.getSiteId(id)}.*", "get_teams_in_team.#{id}", "get_contacts_in_team.#{id}"})
-    @SQLRemove(table = Team.class, name = "remove_team", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Team.class, name = "remove_team", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                    "UPDATE bergamot.team     SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.contact  SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.host     SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.service  SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.trap     SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.cluster  SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.resource SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
+                    "DELETE FROM bergamot.team WHERE id = p_id"
+            )
+    )
     public abstract void removeTeam(@SQLParam("id") UUID id);
     
     public void addTeamChild(Team parent, Team child)
@@ -604,7 +626,16 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_contact_by_name.#{this.getSiteId(id)}.*", "get_contact_by_email.#{this.getSiteId(id)}.*", "get_contact_by_name_or_email.#{this.getSiteId(id)}.*"})
-    @SQLRemove(table = Contact.class, name = "remove_contact", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Contact.class, name = "remove_contact", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                    "UPDATE bergamot.host     SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.service  SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.trap     SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.cluster  SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
+                    "UPDATE bergamot.resource SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
+                    "DELETE FROM bergamot.contact WHERE id = p_id"
+            )
+    )
     public abstract void removeContact(@SQLParam("id") UUID id);
     
     // API tokens
@@ -859,7 +890,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_host_by_name.#{this.getSiteId(id)}.*", "get_host_by_address.#{this.getSiteId(id)}.*"})
-    @SQLRemove(table = Host.class, name = "remove_host", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Host.class, name = "remove_host", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                    "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
+                    "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
+                    "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
+                    "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
+                    "DELETE FROM bergamot.host                           WHERE id = p_id"
+            )
+    )
     public abstract void removeHost(@SQLParam("id") UUID id);
     
     public void addServiceToHost(Host host, Service service)
@@ -933,7 +977,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"check_command.#{id}", "check_state.#{id}"})
-    @SQLRemove(table = Service.class, name = "remove_service", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Service.class, name = "remove_service", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                    "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
+                    "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
+                    "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
+                    "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
+                    "DELETE FROM bergamot.service                        WHERE id = p_id"
+            )
+    )
     public abstract void removeService(@SQLParam("id") UUID id);
     
     // trap
@@ -975,7 +1032,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"check_command.#{id}", "check_state.#{id}"})
-    @SQLRemove(table = Trap.class, name = "remove_trap", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Trap.class, name = "remove_trap", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                    "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
+                    "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
+                    "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
+                    "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
+                    "DELETE FROM bergamot.trap                           WHERE id = p_id"
+            )
+    )
     public abstract void removeTrap(@SQLParam("id") UUID id);
     
     // cluster
@@ -1001,7 +1071,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_cluster_by_name.#{this.getSiteId(id)}.*", "get_clusters_referencing_check.*"})
-    @SQLRemove(table = Cluster.class, name = "remove_cluster", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Cluster.class, name = "remove_cluster", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                    "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
+                    "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
+                    "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
+                    "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
+                    "DELETE FROM bergamot.cluster                        WHERE id = p_id"
+            )
+    )
     public abstract void removeCluster(@SQLParam("id") UUID id);
     
     @Cacheable
@@ -1062,7 +1145,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_resources_referencing_check.*"})
-    @SQLRemove(table = Resource.class, name = "remove_resource", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Resource.class, name = "remove_resource", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery(
+                    "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
+                    "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
+                    "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
+                    "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
+                    "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
+                    "DELETE FROM bergamot.resource                       WHERE id = p_id"
+            )
+    )
     public abstract void removeResource(@SQLParam("id") UUID id);
     
     @Cacheable
@@ -1403,19 +1499,6 @@ public abstract class BergamotDB extends DatabaseAdapter
            "CREATE INDEX check_transition_check_id_applied_at_idx ON bergamot.check_transition (check_id, applied_at)"
         );
     }
-    
-    /*
-    @SQLPatch(name = "drop_state_stats_columns", index = 2, type = ScriptType.UPGRADE, version = @SQLVersion({1, 2, 0}), skip = false)
-    public static SQLScript dropStateStatsColumns()
-    {
-        return new SQLScript(
-          // state table
-          "ALTER TABLE bergamot.check_state DROP COLUMN last_runtime",
-          // state type
-          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_runtime",
-        );
-    }
-    */
     
     public static void main(String[] args) throws Exception
     {
