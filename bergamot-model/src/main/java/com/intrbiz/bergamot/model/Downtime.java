@@ -43,7 +43,7 @@ public class Downtime extends BergamotObject<DowntimeMO> implements Serializable
      * The site id
      */
     @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     private UUID siteId;
 
     /**
@@ -80,7 +80,7 @@ public class Downtime extends BergamotObject<DowntimeMO> implements Serializable
      * Whom created this downtime
      */
     @SQLColumn(index = 8, name = "created_by_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL)
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({ 1, 0, 0 }))
     protected UUID createdById;
     
     /**

@@ -33,7 +33,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     private UUID id;
 
     @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     private UUID siteId;
 
     /**
@@ -150,7 +150,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
      * Whom acknowledged this alert
      */
     @SQLColumn(index = 21, name = "acknowledged_by_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL)
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({ 1, 0, 0 }))
     private UUID acknowledgedById;
 
     /**

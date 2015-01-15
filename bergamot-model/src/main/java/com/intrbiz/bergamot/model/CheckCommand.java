@@ -13,7 +13,9 @@ import com.intrbiz.bergamot.model.message.CheckCommandMO;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.model.util.Parameterised;
 import com.intrbiz.configuration.CfgParameter;
+import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -31,6 +33,7 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
     private UUID checkId;
 
     @SQLColumn(index = 2, name = "command_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLForeignKey(references = Command.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 6, 0 }))
     private UUID commandId;
 
     @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))

@@ -31,7 +31,7 @@ public class Notifications extends BergamotObject<NotificationsMO>
     private boolean enabled = true;
 
     @SQLColumn(index = 3, name = "timeperiod_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT)
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     private UUID timePeriodId;
 
     @SQLColumn(index = 4, name = "alerts_enabled", since = @SQLVersion({ 1, 0, 0 }))

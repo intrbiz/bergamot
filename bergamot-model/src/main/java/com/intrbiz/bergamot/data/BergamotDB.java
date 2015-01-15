@@ -65,7 +65,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 5, 0}),
+        version = @SQLVersion({1, 6, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1489,6 +1489,113 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new SQLScript(
            "CREATE INDEX check_transition_check_id_applied_at_idx ON bergamot.check_transition (check_id, applied_at)"
+        );
+    }
+    
+    @SQLPatch(name = "add_validate_group_ids", index = 1, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    public static SQLScript addValidateGroupIds()
+    {
+        return new SQLScript(
+              "CREATE OR REPLACE FUNCTION bergamot.validate_group_ids(p_ids uuid[])\n" +
+              "RETURNS boolean AS\n" +
+              "$BODY$\n" +
+              "DECLARE\n" +
+              "  v_ret boolean;\n" +
+              "BEGIN\n" +
+              "  v_ret := true;\n" +
+              "  IF p_ids IS NOT NULL THEN\n" +
+              "    SELECT (count(*) = array_length(p_ids, 1)) INTO v_ret FROM bergamot.group WHERE p_ids @> ARRAY[id];\n" +
+              "  END IF;\n" +
+              "  RETURN v_ret;\n" +
+              "END;\n" +
+              "$BODY$\n" +
+              "LANGUAGE plpgsql VOLATILE",
+              "ALTER FUNCTION bergamot.validate_group_ids(uuid[]) OWNER TO bergamot"
+        );
+    }
+    
+    @SQLPatch(name = "add_validate_team_ids", index = 2, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    public static SQLScript addValidateTeamIds()
+    {
+        return new SQLScript(
+              "CREATE OR REPLACE FUNCTION bergamot.validate_team_ids(p_ids uuid[])\n" +
+              "RETURNS boolean AS\n" +
+              "$BODY$\n" +
+              "DECLARE\n" +
+              "  v_ret boolean;\n" +
+              "BEGIN\n" +
+              "  v_ret := true;\n" +
+              "  IF p_ids IS NOT NULL THEN\n" +
+              "    SELECT (count(*) = array_length(p_ids, 1)) INTO v_ret FROM bergamot.team WHERE p_ids @> ARRAY[id];\n" +
+              "  END IF;\n" +
+              "  RETURN v_ret;\n" +
+              "END;\n" +
+              "$BODY$\n" +
+              "LANGUAGE plpgsql VOLATILE",
+              "ALTER FUNCTION bergamot.validate_team_ids(uuid[]) OWNER TO bergamot"
+        );
+    }
+    
+    @SQLPatch(name = "add_validate_contact_ids", index = 3, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    public static SQLScript addValidateContactIds()
+    {
+        return new SQLScript(
+              "CREATE OR REPLACE FUNCTION bergamot.validate_contact_ids(p_ids uuid[])\n" +
+              "RETURNS boolean AS\n" +
+              "$BODY$\n" +
+              "DECLARE\n" +
+              "  v_ret boolean;\n" +
+              "BEGIN\n" +
+              "  v_ret := true;\n" +
+              "  IF p_ids IS NOT NULL THEN\n" +
+              "    SELECT (count(*) = array_length(p_ids, 1)) INTO v_ret FROM bergamot.contact WHERE p_ids @> ARRAY[id];\n" +
+              "  END IF;\n" +
+              "  RETURN v_ret;\n" +
+              "END;\n" +
+              "$BODY$\n" +
+              "LANGUAGE plpgsql VOLATILE",
+              "ALTER FUNCTION bergamot.validate_contact_ids(uuid[]) OWNER TO bergamot"
+        );
+    }
+    
+    @SQLPatch(name = "add_check_constraints", index = 4, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    public static SQLScript addCheckConstraints()
+    {
+        return new SQLScript(
+                // groups
+                "ALTER TABLE bergamot.group ADD CONSTRAINT \"check_groups\" CHECK ( bergamot.validate_group_ids(group_ids) )",
+                // teams
+                "ALTER TABLE bergamot.team    ADD CONSTRAINT \"check_teams\" CHECK ( bergamot.validate_team_ids(team_ids) )",
+                // contacts
+                "ALTER TABLE bergamot.contact ADD CONSTRAINT \"check_teams\" CHECK ( bergamot.validate_team_ids(team_ids) )",
+                // hosts
+                "ALTER TABLE bergamot.host     ADD CONSTRAINT \"check_groups\"   CHECK ( bergamot.validate_group_ids(group_ids) )",
+                "ALTER TABLE bergamot.host     ADD CONSTRAINT \"check_teams\"    CHECK ( bergamot.validate_team_ids(team_ids) )",
+                "ALTER TABLE bergamot.host     ADD CONSTRAINT \"check_contacts\" CHECK ( bergamot.validate_contact_ids(contact_ids) )",
+                // services
+                "ALTER TABLE bergamot.service  ADD CONSTRAINT \"check_groups\"   CHECK ( bergamot.validate_group_ids(group_ids) )",
+                "ALTER TABLE bergamot.service  ADD CONSTRAINT \"check_teams\"    CHECK ( bergamot.validate_team_ids(team_ids) )",
+                "ALTER TABLE bergamot.service  ADD CONSTRAINT \"check_contacts\" CHECK ( bergamot.validate_contact_ids(contact_ids) )",
+                // traps
+                "ALTER TABLE bergamot.trap     ADD CONSTRAINT \"check_groups\"   CHECK ( bergamot.validate_group_ids(group_ids) )",
+                "ALTER TABLE bergamot.trap     ADD CONSTRAINT \"check_teams\"    CHECK ( bergamot.validate_team_ids(team_ids) )",
+                "ALTER TABLE bergamot.trap     ADD CONSTRAINT \"check_contacts\" CHECK ( bergamot.validate_contact_ids(contact_ids) )",
+                // clusters
+                "ALTER TABLE bergamot.cluster  ADD CONSTRAINT \"check_groups\"   CHECK ( bergamot.validate_group_ids(group_ids) )",
+                "ALTER TABLE bergamot.cluster  ADD CONSTRAINT \"check_teams\"    CHECK ( bergamot.validate_team_ids(team_ids) )",
+                "ALTER TABLE bergamot.cluster  ADD CONSTRAINT \"check_contacts\" CHECK ( bergamot.validate_contact_ids(contact_ids) )",
+                // resources
+                "ALTER TABLE bergamot.resource ADD CONSTRAINT \"check_groups\"   CHECK ( bergamot.validate_group_ids(group_ids) )",
+                "ALTER TABLE bergamot.resource ADD CONSTRAINT \"check_teams\"    CHECK ( bergamot.validate_team_ids(team_ids) )",
+                "ALTER TABLE bergamot.resource ADD CONSTRAINT \"check_contacts\" CHECK ( bergamot.validate_contact_ids(contact_ids) )"
+        );
+    }
+    
+    @SQLPatch(name = "add_site_alias_index", index = 5, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    public static SQLScript addSiteAliasIndex()
+    {
+        return new SQLScript(
+                "CREATE INDEX \"site_aliases_idx\" ON bergamot.site USING gin (aliases)"
         );
     }
     

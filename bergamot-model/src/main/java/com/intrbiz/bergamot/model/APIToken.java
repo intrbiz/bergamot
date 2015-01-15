@@ -31,7 +31,7 @@ public class APIToken implements Serializable
      * The contact whom this token represents
      */
     @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     private UUID contactId;
     
     @SQLColumn(index = 3, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))

@@ -23,7 +23,7 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
     private static final long serialVersionUID = 1L;
     
     @SQLColumn(index = 1, name = "notifications_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT)
+    @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey
     private UUID notificationsId;
 
@@ -35,7 +35,7 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
     private boolean enabled;
 
     @SQLColumn(index = 4, name = "timeperiod_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT)
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     private UUID timePeriodId;
 
     @SQLColumn(index = 5, name = "alerts_enabled", since = @SQLVersion({ 1, 0, 0 }))

@@ -26,7 +26,7 @@ public class Location extends NamedObject<LocationMO, LocationCfg> implements Co
     private static final long serialVersionUID = 1L;
 
     @SQLColumn(index = 1, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Location.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT)
+    @SQLForeignKey(references = Location.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     protected UUID locationId;
 
     @SQLColumn(index = 2, name = "worker_pool", since = @SQLVersion({ 1, 0, 0 }))
