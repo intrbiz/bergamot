@@ -1484,15 +1484,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "install_check_transition_indexes", index = 3, type = ScriptType.INSTALL, version = @SQLVersion({1, 3, 3}), skip = false)
-    public static SQLScript installCheckTransitionIndexes()
-    {
-        return new SQLScript(
-           "CREATE INDEX check_transition_check_id_applied_at_idx ON bergamot.check_transition (check_id, applied_at)"
-        );
-    }
-    
-    @SQLPatch(name = "upgrade_check_transition_indexes", index = 3, type = ScriptType.UPGRADE, version = @SQLVersion({1, 3, 3}), skip = false)
+    @SQLPatch(name = "add_check_transition_indexes", index = 3, type = ScriptType.BOTH, version = @SQLVersion({1, 3, 3}), skip = false)
     public static SQLScript upgradeCheckTransitionIndexes()
     {
         return new SQLScript(
