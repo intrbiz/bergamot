@@ -4,12 +4,11 @@ import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.scheduler.ActiveCheckSchedulerAction;
 import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.PauseScheduler;
+import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.ResumeScheduler;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
@@ -95,34 +94,53 @@ public abstract class AbstractScheduler implements Scheduler
         {
             this.resume();
         }
-        else if (action instanceof ActiveCheckSchedulerAction)
+        else if (action instanceof ScheduleCheck)
         {
-            ActiveCheckMO checkMo = ((ActiveCheckSchedulerAction) action).getCheck();
-            // lookup the check
             try (BergamotDB db = BergamotDB.connect())
             {
-                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(checkMo.getId());
+                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((ScheduleCheck) action).getCheck());
                 if (check != null)
                 {
-                    // apply the scheduler action
-                    if (action instanceof ScheduleCheck)
-                    {
-                        this.schedule(check);
-                    }
-                    else if (action instanceof RescheduleCheck)
-                    {
-                        this.reschedule(check);
-                    }
-                    else if (action instanceof EnableCheck)
-                    {
-                        this.enable(check);
-                    }
-                    else if (action instanceof DisableCheck)
-                    {
-                        this.disable(check);
-                    }
+                    this.schedule(check);
                 }
             }
+        }
+        else if (action instanceof RescheduleCheck)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((RescheduleCheck) action).getCheck());
+                if (check != null)
+                {
+                    this.reschedule(check);
+                }
+            }
+        }
+        else if (action instanceof EnableCheck)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((EnableCheck) action).getCheck());
+                if (check != null)
+                {
+                    this.enable(check);
+                }
+            }
+        }
+        else if (action instanceof DisableCheck)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((DisableCheck) action).getCheck());
+                if (check != null)
+                {
+                    this.disable(check);
+                }
+            }
+        }
+        else if (action instanceof UnscheduleCheck)
+        {
+            this.unschedule(((UnscheduleCheck) action).getCheck());
         }
     }
 }

@@ -48,6 +48,11 @@ public interface Scheduler
     void disable(ActiveCheck<?,?> check);
     
     /**
+     * Remove the given check from the scheduler
+     */
+    void unschedule(UUID check);
+    
+    /**
      * Make this scheduler responsible for the given pool
      * @param site the site id
      * @param pool the per site pool id

@@ -5,17 +5,17 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * Schedule an active check
+ * Remove the check from the scheduler
  */
-@JsonTypeName("bergamot.schedule_check")
-public class ScheduleCheck extends ActiveCheckSchedulerAction
+@JsonTypeName("bergamot.unschedule_check")
+public class UnscheduleCheck extends ActiveCheckSchedulerAction
 {
-    public ScheduleCheck()
+    public UnscheduleCheck()
     {
         super();
     }
     
-    public ScheduleCheck(UUID check)
+    public UnscheduleCheck(UUID check)
     {
         super(check);
     }

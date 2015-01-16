@@ -146,7 +146,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     protected void rescheduleCheck(ActiveCheck<?, ?> check)
     {
         if (logger.isTraceEnabled()) logger.trace("Rescheduling " + check + " due to state change");
-        this.schedulerActionProducer.publish(new GenericKey(check.getSiteId().toString()), new RescheduleCheck(check.toStubMO()));
+        this.schedulerActionProducer.publish(new GenericKey(check.getSiteId().toString()), new RescheduleCheck(check.getId()));
     }
 
     protected void publishNotification(Check<?, ?> check, Notification notification)

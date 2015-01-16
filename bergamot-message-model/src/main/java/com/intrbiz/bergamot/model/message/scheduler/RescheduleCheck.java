@@ -1,7 +1,8 @@
 package com.intrbiz.bergamot.model.message.scheduler;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 
 /**
  * Update the scheduling of an active check
@@ -14,7 +15,7 @@ public class RescheduleCheck extends ActiveCheckSchedulerAction
         super();
     }
     
-    public RescheduleCheck(ActiveCheckMO check)
+    public RescheduleCheck(UUID check)
     {
         super(check);
     }

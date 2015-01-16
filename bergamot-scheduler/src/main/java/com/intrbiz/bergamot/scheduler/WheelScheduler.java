@@ -287,6 +287,12 @@ public class WheelScheduler extends AbstractScheduler
     {
         this.disableJob(check.getId());
     }
+    
+    @Override
+    public void unschedule(UUID check)
+    {
+        this.removeJob(check);
+    }
 
     @Override
     public void schedule(ActiveCheck<?,?> check)

@@ -1,7 +1,8 @@
 package com.intrbiz.bergamot.model.message.scheduler;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 
 /**
  * An action which alters with the scheduling of an active check
@@ -9,25 +10,25 @@ import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 public class ActiveCheckSchedulerAction extends SchedulerAction
 {
     @JsonProperty("check")
-    private ActiveCheckMO check;
+    private UUID check;
     
     public ActiveCheckSchedulerAction()
     {
         super();
     }
     
-    public ActiveCheckSchedulerAction(ActiveCheckMO check)
+    public ActiveCheckSchedulerAction(UUID check)
     {
         super();
         this.check = check;
     }
 
-    public ActiveCheckMO getCheck()
+    public UUID getCheck()
     {
         return check;
     }
 
-    public void setCheck(ActiveCheckMO check)
+    public void setCheck(UUID check)
     {
         this.check = check;
     }

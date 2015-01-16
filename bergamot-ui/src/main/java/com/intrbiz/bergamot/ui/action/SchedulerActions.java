@@ -26,7 +26,7 @@ public class SchedulerActions
     {
         synchronized (this)
         {
-            this.schedulerActionProducer.publish(new SchedulerKey(check.getSiteId(), check.getPool()), new EnableCheck(check.toStubMO()));
+            this.schedulerActionProducer.publish(new SchedulerKey(check.getSiteId(), check.getPool()), new EnableCheck(check.getId()));
         }
     }
     
@@ -35,7 +35,7 @@ public class SchedulerActions
     {
         synchronized (this)
         {
-            this.schedulerActionProducer.publish(new SchedulerKey(check.getSiteId(), check.getPool()), new DisableCheck(check.toStubMO()));
+            this.schedulerActionProducer.publish(new SchedulerKey(check.getSiteId(), check.getPool()), new DisableCheck(check.getId()));
         }
     }
 }
