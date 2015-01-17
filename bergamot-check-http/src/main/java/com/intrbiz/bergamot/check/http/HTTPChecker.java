@@ -30,6 +30,8 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
+import com.intrbiz.bergamot.crypto.util.TLSConstants;
 import com.intrbiz.util.IBThreadFactory;
 
 /**

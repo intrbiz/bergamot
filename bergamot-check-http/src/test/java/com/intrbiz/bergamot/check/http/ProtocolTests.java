@@ -4,8 +4,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.check.http.HTTPChecker;
-import com.intrbiz.bergamot.check.http.TLSConstants;
+import com.intrbiz.bergamot.crypto.util.TLSConstants;
 
 public class ProtocolTests
 {

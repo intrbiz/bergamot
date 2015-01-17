@@ -15,6 +15,8 @@ import javax.net.ssl.SSLEngine;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.crypto.util.TLSInfo;
+
 public class HTTPClientHandler extends ChannelInboundHandlerAdapter
 {
     private final Logger logger = Logger.getLogger(HTTPClientHandler.class);
@@ -62,7 +64,7 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
             {
                 try
                 {
-                    tlsInfo = new TLSInfo(this.sslEngine);
+                    tlsInfo = TLSInfo.fromSSLEngine(this.sslEngine);
                 }
                 catch (Exception e)
                 {

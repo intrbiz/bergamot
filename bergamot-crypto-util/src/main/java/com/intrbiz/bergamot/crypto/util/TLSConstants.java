@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.check.http;
+package com.intrbiz.bergamot.crypto.util;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;

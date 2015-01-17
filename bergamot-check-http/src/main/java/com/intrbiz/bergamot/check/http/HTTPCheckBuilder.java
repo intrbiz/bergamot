@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-import com.intrbiz.bergamot.check.http.TLSConstants.CipherInfo;
+import com.intrbiz.bergamot.crypto.util.TLSConstants;
+import com.intrbiz.bergamot.crypto.util.TLSConstants.CipherInfo;
 
 /**
  * Fluent interface to construct a HTTP check

@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.check.http;
+package com.intrbiz.bergamot.crypto.util;
 
 /**
  * A subject alternate name

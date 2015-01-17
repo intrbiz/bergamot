@@ -24,6 +24,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
 
 import java.net.SocketAddress;
+import java.security.Principal;
+import java.security.cert.Certificate;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,6 +35,7 @@ import javax.net.ssl.SSLEngine;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.crypto.util.CertInfo;
 import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
@@ -131,24 +134,32 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
 
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception
     {
-        System.out.println("Got Client Cert: " + this.engine.getSession().getPeerPrincipal() + " " + this.engine.getSession().getPeerCertificates());
         // Handle a bad request.
         if (!req.getDecoderResult().isSuccess())
         {
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
         }
-        // Handshake
-        logger.trace("Handshaking websocket request url: " + req.getUri());
-        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, false);
-        this.handshaker = wsFactory.newHandshaker(req);
-        if (this.handshaker == null)
+        // validate the certificate
+        if (this.validateClientCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()))
         {
-            WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+            // got a good client certificate, start the WS handshake
+            logger.trace("Handshaking websocket request url: " + req.getUri());
+            WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, false);
+            this.handshaker = wsFactory.newHandshaker(req);
+            if (this.handshaker == null)
+            {
+                WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+            }
+            else
+            {
+                this.handshaker.handshake(ctx.channel(), req);
+            }
         }
         else
         {
-            this.handshaker.handshake(ctx.channel(), req);
+            // bad client certificate, terminate the connection
+            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
         }
     }
 
@@ -238,6 +249,29 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
         {
             f.addListener(ChannelFutureListener.CLOSE);
         }
+    }
+    
+    private boolean validateClientCertificate(Principal clientPrincipal, Certificate[] clientCertificates)
+    {
+        // assert that we have a certificate
+        if (clientPrincipal == null || clientCertificates == null || clientCertificates.length == 0)
+        {
+            logger.debug("No client certificate provided, cannot validate");
+            return false;
+        }
+        try
+        {
+            // get easy to use information about the client from the certificate
+            CertInfo clientInfo = CertInfo.fromCertificate(clientCertificates[0]);
+            System.out.println("Connection from client: " + clientInfo.getSubject().getCommonName());
+            //
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.error("Error validating client certificate", e);
+        }
+        return false;
     }
 
     @Override

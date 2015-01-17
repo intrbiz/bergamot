@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.check.http;
+package com.intrbiz.bergamot.crypto.util;
 
 import java.io.InputStream;
 import java.net.Socket;
@@ -34,7 +34,7 @@ public class BergamotTrustManager extends X509ExtendedTrustManager implements X5
     {
         try
         {
-            InputStream trustStoreStream = HTTPChecker.class.getResourceAsStream("trust_store.jks");
+            InputStream trustStoreStream = BergamotTrustManager.class.getResourceAsStream("trust_store.jks");
             // Create our trust key store
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(trustStoreStream, "bergamot".toCharArray());
@@ -47,8 +47,7 @@ public class BergamotTrustManager extends X509ExtendedTrustManager implements X5
         }
         catch (Exception e)
         {
-            Logger.getLogger(BergamotTrustManager.class).fatal("Failed to load bundled Mozilla trust store!");
-            throw new RuntimeException("Failed to load trust store");
+            throw new RuntimeException("Failed to load bundled Mozilla trust store!");
         }
     }
     

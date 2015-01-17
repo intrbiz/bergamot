@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.check.http;
 
 import io.netty.handler.codec.http.FullHttpResponse;
 
+import com.intrbiz.bergamot.crypto.util.TLSInfo;
+
 public class HTTPCheckResponse
 {
     private final long runtime;
