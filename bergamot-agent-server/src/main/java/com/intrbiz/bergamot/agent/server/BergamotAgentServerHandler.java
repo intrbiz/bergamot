@@ -44,13 +44,13 @@ import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 
 
-public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
+public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Object>
 {
-    private static final Logger logger = Logger.getLogger(AgentServerHandler.class);
+    private static final Logger logger = Logger.getLogger(BergamotAgentServerHandler.class);
 
     private static final String WEBSOCKET_PATH = "/agent";
     
-    private final AgentServer server;
+    private final BergamotAgentServer server;
 
     private WebSocketServerHandshaker handshaker;
     
@@ -66,11 +66,27 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
     
     private final SSLEngine engine;
     
-    public AgentServerHandler(AgentServer server, SSLEngine engine)
+    private Certificate clientCertificate;
+    
+    private CertInfo clientCertificateInfo;
+    
+    private boolean clientCertificateMatch = false;
+    
+    public BergamotAgentServerHandler(BergamotAgentServer server, SSLEngine engine)
     {
         super();
         this.server = server;
         this.engine = engine;
+    }
+    
+    public CertInfo getClientCertificateInfo()
+    {
+        return this.clientCertificateInfo;
+    }
+    
+    public boolean isClientCertificateMatch()
+    {
+        return this.clientCertificateMatch;
     }
     
     public AgentHello getHello()
@@ -184,11 +200,7 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
         {
             AgentMessage request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), AgentMessage.class);
             // process the message and respond
-            AgentMessage response = this.processMessage(ctx, request);
-            if (response != null)
-            {
-                ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(response)));
-            }
+            this.processMessage(ctx, request);
         }
         catch (Exception e)
         {
@@ -197,27 +209,33 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
         }
     }
     
-    private AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)
+    private void processMessage(final ChannelHandlerContext ctx, final AgentMessage request) throws Exception
     {
         if (request instanceof AgentHello)
         {
             this.hello = (AgentHello) request;
             this.remoteAddress = ctx.channel().remoteAddress();
             logger.info("Got hello from " + this.remoteAddress + " " + this.hello.toString());
-            // register ourselves
-            this.server.registerAgent(this);
-            // no response
-            return null;
+            // compare the hello with the certificate
+            if (this.validateHelloMatchesCertificate() || (! this.server.isRequireMatchingCertificate()))
+            {
+                // register ourselves
+                this.server.registerAgent(this);
+            }
+            else
+            {
+                // reject this connection
+                this.writeMessageAndClose(ctx, new GeneralError("The client certificate name does not match the host name."));
+            }
         }
         else if (request instanceof AgentPing)
         {
             logger.debug("Got ping from agent");
-            return new AgentPong(UUID.randomUUID().toString());
+            writeMessage(ctx, new AgentPong(UUID.randomUUID().toString()));
         }
         else if (request instanceof AgentPong)
         {
             logger.debug("Got pong from agent");
-            return null;
         }
         else
         {
@@ -226,11 +244,38 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
             if (callback != null)
             {
                 callback.accept(request);
-                return null;
+            }
+            else
+            {
+                logger.warn("Unhandled message: " + request);
             }
         }
-        logger.warn("Unhandled message: " + request);
-        return null;
+    }
+    
+    private void writeMessage(final ChannelHandlerContext ctx, final AgentMessage message) throws Exception
+    {
+        ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message)));
+    }
+    
+    private void writeMessageAndClose(final ChannelHandlerContext ctx, final AgentMessage message) throws Exception
+    {
+        ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message))).addListener(ChannelFutureListener.CLOSE);
+    }
+    
+    private boolean validateHelloMatchesCertificate()
+    {
+        logger.debug("Check agent name matches certificate: " + this.hello.getHostName() + " == " + this.clientCertificateInfo.getSubject().getCommonName());
+        if (this.clientCertificateInfo.getSubject().getCommonName().equals(this.getHello().getHostName()))
+        {
+            logger.info("Agent hello host name matches certificate");
+            this.clientCertificateMatch = true;
+        }
+        else
+        {
+            logger.warn("Agent hello host name does not match certificate, possible certificate reuse!");
+            this.clientCertificateMatch = false;
+        }
+        return this.clientCertificateMatch;
     }
 
     private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res)
@@ -262,9 +307,9 @@ public class AgentServerHandler extends SimpleChannelInboundHandler<Object>
         try
         {
             // get easy to use information about the client from the certificate
-            CertInfo clientInfo = CertInfo.fromCertificate(clientCertificates[0]);
-            System.out.println("Connection from client: " + clientInfo.getSubject().getCommonName());
-            //
+            this.clientCertificate = clientCertificates[0];
+            this.clientCertificateInfo = CertInfo.fromCertificate(this.clientCertificate); 
+            logger.info("Connection from client: " + this.clientCertificateInfo.getSubject().getCommonName());
             return true;
         }
         catch (Exception e)

@@ -33,7 +33,9 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.agent.server.config.BergamotAgentServerCfg;
 import com.intrbiz.bergamot.crypto.util.KeyStoreUtil;
+import com.intrbiz.bergamot.crypto.util.TLSConstants;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
@@ -41,12 +43,11 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
+import com.intrbiz.configuration.Configurable;
 
-public class AgentServer implements Runnable
+public class BergamotAgentServer implements Runnable, Configurable<BergamotAgentServerCfg>
 {
-    private Logger logger = Logger.getLogger(AgentServer.class);
-
-    private int port;
+    private Logger logger = Logger.getLogger(BergamotAgentServer.class);
 
     private EventLoopGroup bossGroup;
 
@@ -54,17 +55,29 @@ public class AgentServer implements Runnable
 
     private Thread runner = null;
     
-    private ConcurrentMap<UUID, AgentServerHandler> agents = new ConcurrentHashMap<UUID, AgentServerHandler>();
+    private ConcurrentMap<UUID, BergamotAgentServerHandler> agents = new ConcurrentHashMap<UUID, BergamotAgentServerHandler>();
     
-    private Consumer<AgentServerHandler> onAgentRegister;
+    private Consumer<BergamotAgentServerHandler> onAgentRegister;
     
     private SSLContext sslContext;
+    
+    private BergamotAgentServerCfg configuration;
 
-    public AgentServer(int port)
+    public BergamotAgentServer()
     {
         super();
-        this.port = port;
+    }
+    
+    public void configure(BergamotAgentServerCfg cfg)
+    {
+        this.configuration = cfg;
+        // setup the SSL context
         this.sslContext = this.createContext();
+    }
+    
+    public BergamotAgentServerCfg getConfiguration()
+    {
+        return this.configuration;
     }
     
     private SSLContext createContext()
@@ -73,8 +86,8 @@ public class AgentServer implements Runnable
         {
             String pass = "abc123";
             // create the keystore
-            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File("hub.bergamot.local.key"), new File("hub.bergamot.local.crt"), new File("ca.crt"));
-            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File("ca.crt"));
+            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File(this.configuration.getKeyFile()), new File(this.configuration.getCertificateFile()), new File(this.configuration.getCaCertificateFile()));
+            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File(this.configuration.getCaCertificateFile()));
             // the key manager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(sks, pass.toCharArray());
@@ -97,11 +110,15 @@ public class AgentServer implements Runnable
         try
         {
             SSLEngine sslEngine = this.sslContext.createSSLEngine();
-            sslEngine.setUseClientMode(false);
-            sslEngine.setNeedClientAuth(true);
+            // setup ssl params
             SSLParameters params = new SSLParameters();
             params.setNeedClientAuth(true);
             sslEngine.setSSLParameters(params);
+            // setup ssl engine
+            sslEngine.setUseClientMode(false);
+            sslEngine.setNeedClientAuth(true);
+            sslEngine.setEnabledProtocols(TLSConstants.PROTOCOLS.SAFE_PROTOCOLS);
+            sslEngine.setEnabledCipherSuites(TLSConstants.getCipherNames(TLSConstants.CIPHERS.SAFE_CIPHERS));
             return sslEngine;
         }
         catch (Exception e)
@@ -110,7 +127,7 @@ public class AgentServer implements Runnable
         }
     }
     
-    public void registerAgent(AgentServerHandler agent)
+    public void registerAgent(BergamotAgentServerHandler agent)
     {
         // register the agent
         AgentHello hello = agent.getHello();
@@ -119,7 +136,7 @@ public class AgentServer implements Runnable
         if (logger.isDebugEnabled())
         {
             logger.debug("Registered agents:");
-            for (AgentServerHandler ag : this.agents.values())
+            for (BergamotAgentServerHandler ag : this.agents.values())
             {
                 logger.info("  Agent: " + ag.getHello().getHostId() + " " + ag.getHello().getHostName() + " :: " + ag.getHello().getServiceId() + " " + ag.getHello().getServiceName());
             }
@@ -128,30 +145,35 @@ public class AgentServer implements Runnable
         if (this.onAgentRegister != null) this.onAgentRegister.accept(agent);
     }
     
-    public void unregisterAgent(AgentServerHandler agent)
+    public void unregisterAgent(BergamotAgentServerHandler agent)
     {
         AgentHello hello = agent.getHello();
         this.agents.remove(hello.getHostId());
     }
     
-    public AgentServerHandler getRegisteredAgent(UUID id)
+    public BergamotAgentServerHandler getRegisteredAgent(UUID id)
     {
         return this.agents.get(id);
     }
     
-    public Collection<AgentServerHandler> getRegisteredAgents()
+    public Collection<BergamotAgentServerHandler> getRegisteredAgents()
     {
         return this.agents.values();
     }
     
-    public void setOnAgentRegisterHandler(Consumer<AgentServerHandler> onAgentRegister)
+    public void setOnAgentRegisterHandler(Consumer<BergamotAgentServerHandler> onAgentRegister)
     {
         this.onAgentRegister = onAgentRegister;
     }
     
-    public Consumer<AgentServerHandler> getOnAgentRegister()
+    public Consumer<BergamotAgentServerHandler> getOnAgentRegister()
     {
         return this.onAgentRegister;
+    }
+
+    public boolean isRequireMatchingCertificate()
+    {
+        return this.configuration.isRequireMatchingCertificate();
     }
 
     public void run()
@@ -176,12 +198,12 @@ public class AgentServer implements Runnable
                     pipeline.addLast("ssl",           new SslHandler(engine));
                     pipeline.addLast("codec-http",    new HttpServerCodec());
                     pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
-                    pipeline.addLast("handler",       new AgentServerHandler(AgentServer.this, engine));
+                    pipeline.addLast("handler",       new BergamotAgentServerHandler(BergamotAgentServer.this, engine));
                 }
             });
             //
-            Channel ch = b.bind(this.port).sync().channel();
-            logger.info("Web socket server started at port " + port + '.');
+            Channel ch = b.bind(this.configuration.getPort()).sync().channel();
+            logger.info("Web socket server started at port " + this.configuration.getPort() + '.');
             //
             ch.closeFuture().sync();
         }
@@ -209,9 +231,18 @@ public class AgentServer implements Runnable
     {
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
-        //
-        AgentServer s = new AgentServer(8081);
-        s.setOnAgentRegisterHandler((agent) -> {
+        //  the configuration
+        BergamotAgentServerCfg cfg = new BergamotAgentServerCfg();
+        cfg.setCaCertificateFile("ca.crt");
+        cfg.setKeyFile("hub.bergamot.local.key");
+        cfg.setCertificateFile("hub.bergamot.local.crt");
+        cfg.setPort(8081);
+        cfg.setRequireMatchingCertificate(true);
+        // setup the server
+        BergamotAgentServer server = new BergamotAgentServer();
+        server.configure(cfg);
+        // setup handlers
+        server.setOnAgentRegisterHandler((agent) -> {
             System.out.println("Agent registered: " + agent.getHello());
             // check the agents CPU usage
             agent.sendMessageToAgent(new CheckCPU(), (response) -> {
@@ -238,6 +269,7 @@ public class AgentServer implements Runnable
                 System.out.println("Got Network Info: " + response);
             });
         });
-        s.start();
+        // go go go
+        server.start();
     }
 }
