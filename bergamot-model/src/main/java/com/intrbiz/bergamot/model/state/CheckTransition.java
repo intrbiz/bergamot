@@ -52,7 +52,7 @@ public class CheckTransition extends BergamotObject<CheckStateMO>
     private boolean stateChange;
     
     /**
-     * Did this transition result in a hard state change.  IE the check state reached 
+     * Did this transition result in a hard change.  IE the check state reached 
      * the attempt threshold which caused a hard change in state.
      */
     @SQLColumn(index = 5, name = "hard_change", since = @SQLVersion({ 1, 3, 0 }))
@@ -230,12 +230,24 @@ public class CheckTransition extends BergamotObject<CheckStateMO>
     @SQLColumn(index = 33, name = "next_last_hard_output", since = @SQLVersion({ 1, 3, 0 }))
     private String nextLastHardOutput = "Pending";
     
+    /**
+     * Does this transition result in an alert, IE: A hard change from ok to not ok.
+     */
+    @SQLColumn(index = 34, name = "alert", since = @SQLVersion({ 1, 7, 0 }))
+    private boolean alert;
+    
+    /**
+     * Does this transition result in a recovery, IE: A hard change from not ok to ok.
+     */
+    @SQLColumn(index = 35, name = "recovery", since = @SQLVersion({ 1, 7, 0 }))
+    private boolean recovery;
+    
     public CheckTransition()
     {
         super();
     }
     
-    public CheckTransition(UUID id, UUID checkId, Timestamp appliedAt, boolean stateChange, boolean hardChange, CheckState previous, CheckState next)
+    public CheckTransition(UUID id, UUID checkId, Timestamp appliedAt, boolean stateChange, boolean hardChange, boolean alert, boolean recovery, CheckState previous, CheckState next)
     {
         super();
         this.id = id;
@@ -577,9 +589,28 @@ public class CheckTransition extends BergamotObject<CheckStateMO>
         this.nextLastHardOutput = nextLastHardOutput;
     }
     
+    public boolean isAlert()
+    {
+        return alert;
+    }
+
+    public void setAlert(boolean alert)
+    {
+        this.alert = alert;
+    }
+
+    public boolean isRecovery()
+    {
+        return recovery;
+    }
+
+    public void setRecovery(boolean recovery)
+    {
+        this.recovery = recovery;
+    }
     
     // helpers
-    
+
     public CheckState toPreviousState()
     {
         CheckState state = new CheckState();

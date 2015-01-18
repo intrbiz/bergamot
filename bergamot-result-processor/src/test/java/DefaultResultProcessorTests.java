@@ -1,3 +1,4 @@
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import org.junit.Test;
@@ -9,19 +10,26 @@ import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 
+import static org.junit.Assert.*;
+
 
 public class DefaultResultProcessorTests extends DefaultResultProcessor
 {
-    private CheckState newState(Status status, String output, boolean hard, int attempt, boolean transitioning)
+    private CheckState newState(Status status, boolean hard, int attempt, boolean transitioning, Status lastStatus, boolean lastHard)
     {
         CheckState state = new CheckState();
         state.setCheckId(UUID.randomUUID());
         state.setStatus(status);
         state.setOk(status.isOk());
-        state.setOutput(output);
+        state.setOutput(status.toString().toLowerCase());
         state.setHard(hard);
         state.setAttempt(attempt);
         state.setTransitioning(transitioning);
+        state.setLastHardOk(lastStatus.isOk());
+        state.setLastHardStatus(lastStatus);
+        state.setLastHardOutput(lastStatus.toString().toLowerCase());
+        state.setLastHardOk(lastHard);
+        state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
         return state;
     }
     
@@ -43,154 +51,336 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
     }
     
     @Test
-    public void testOkToBadTransition()
+    public void testSimpleBadTransition()
     {
-        System.out.println("---------------------------------");
+        RealCheck<?,?> check = newCheck(2, 2);
+        CheckState state = newState(Status.OK, true, 2, false, Status.PENDING, true);
+        // the transition
         Transition transition;
-        // the check
-        RealCheck<?, ?> check = newCheck(4, 4);
-        // initial state
-        CheckState state = newState(Status.OK, "All Good", true, 4, false);
-        // result
-        Result result = newResult(false, "CRITICAL", "Ooops");
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("O2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        System.out.println("---------------------------------");
+        // apply a second bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == true);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 2", transition.nextState.getAttempt() == 2);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
     }
     
     @Test
-    public void testSingleOkToBadTransition()
+    public void testSimpleGoodTransition()
     {
-        System.out.println("---------------------------------");
+        RealCheck<?,?> check = newCheck(2, 2);
+        CheckState state = newState(Status.CRITICAL, true, 2, false, Status.OK, true);
+        // the transition
         Transition transition;
-        // the check
-        RealCheck<?, ?> check = newCheck(1, 1);
-        // initial state
-        CheckState state = newState(Status.PENDING, "Pending", true, 1, false);
-        // result
-        Result result = newResult(false, "CRITICAL", "Ooops");
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("SO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        System.out.println("---------------------------------");
+        // apply a good result
+        transition = this.computeResultTransition(check, state, newResult(true, "OK", "ok"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
+        state = transition.nextState;
+        // apply a second good result
+        transition = this.computeResultTransition(check, state, newResult(false, "OK", "ok"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == false);
+        assertTrue("Is a recovery", transition.recovery == true);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 2", transition.nextState.getAttempt() == 2);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
     }
     
     @Test
-    public void testBadToOkTransition()
+    public void testFlappingBadTransition()
     {
-        System.out.println("---------------------------------");
+        RealCheck<?,?> check = newCheck(2, 2);
+        CheckState state = newState(Status.OK, true, 2, false, Status.PENDING, true);
+        // the transition
         Transition transition;
-        // the check
-        RealCheck<?, ?> check = newCheck(4, 4);
-        // initial state
-        CheckState state = newState(Status.CRITICAL, "Not Good", true, 4, false);
-        // result
-        Result result = newResult(true, "OK", "All Good");
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a good result
+        transition = this.computeResultTransition(check, state, newResult(true, "OK", "ok"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a second bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == true);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 2", transition.nextState.getAttempt() == 2);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
+    }
+
+    @Test
+    public void testFlappingGoodTransition()
+    {
+        RealCheck<?,?> check = newCheck(2, 2);
+        CheckState state = newState(Status.CRITICAL, true, 2, false, Status.OK, true);
+        // the transition
+        Transition transition;
+        // apply a good result
+        transition = this.computeResultTransition(check, state, newResult(true, "OK", "ok"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, result);
-        System.out.println("B2O: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a good result
+        transition = this.computeResultTransition(check, state, newResult(true, "OK", "ok"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
         state = transition.nextState;
-        System.out.println("---------------------------------");
+        // apply a second good result
+        transition = this.computeResultTransition(check, state, newResult(false, "OK", "ok"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == false);
+        assertTrue("Is a recovery", transition.recovery == true);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 2", transition.nextState.getAttempt() == 2);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
     }
     
     @Test
-    public void testFlappingOkToBadTransition()
+    public void testStagedBadTransition()
     {
-        System.out.println("---------------------------------");
+        RealCheck<?,?> check = newCheck(3, 3);
+        CheckState state = newState(Status.OK, true, 2, false, Status.PENDING, true);
+        // the transition
         Transition transition;
-        // the check
-        RealCheck<?, ?> check = newCheck(4, 4);
-        // initial state
-        CheckState state = newState(Status.OK, "Ok", true, 4, false);
-        // result
-        Result badResult = newResult(false, "CRITICAL", "Ooops");
-        Result okResult = newResult(true, "OK", "All Good");
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "WARNING", "warning"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is warning", transition.nextState.getStatus() == Status.WARNING);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a second bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "WARNING", "warning"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is warning", transition.nextState.getStatus() == Status.WARNING);
+        assertTrue("Next state attempt is 2", transition.nextState.getAttempt() == 2);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a final bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == true);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 3", transition.nextState.getAttempt() == 3);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
+    }
+    
+    @Test
+    public void testSimpleCombinedTransition()
+    {
+        RealCheck<?,?> check = newCheck(2, 2);
+        CheckState state = newState(Status.OK, true, 2, false, Status.PENDING, true);
+        // the transition
+        Transition transition;
+        // apply a bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a second bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == true);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 2", transition.nextState.getAttempt() == 2);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, okResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
+        // apply a good result
+        transition = this.computeResultTransition(check, state, newResult(true, "OK", "ok"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is not a hard change", transition.hardChange == false);
+        assertTrue("Is not an alert", transition.alert == false);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is not hard", transition.nextState.isHard() == false);
+        assertTrue("Next state is transitioning", transition.nextState.isTransitioning() == true);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
         state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, okResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        // apply the result
-        transition = this.computeResultTransition(check, state, badResult);
-        System.out.println("FO2B: Transition: state_change=" + transition.stateChange + ", hard_change=" + transition.hardChange + " from " + transition.previousState + " to " + transition.nextState);
-        state = transition.nextState;
-        System.out.println("---------------------------------");
+        // apply a second good result
+        transition = this.computeResultTransition(check, state, newResult(false, "OK", "ok"));
+        assertTrue("Is not a state change", transition.stateChange == false);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == false);
+        assertTrue("Is a recovery", transition.recovery == true);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 2", transition.nextState.getAttempt() == 2);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
+    }
+    
+    @Test
+    public void testImmediateBadTransition()
+    {
+        RealCheck<?,?> check = newCheck(1, 1);
+        CheckState state = newState(Status.OK, true, 2, false, Status.PENDING, true);
+        // the transition
+        Transition transition;
+        // apply a bad result
+        transition = this.computeResultTransition(check, state, newResult(false, "CRITICAL", "critical"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == true);
+        assertTrue("Is not a recovery", transition.recovery == false);
+        assertTrue("Next state is not ok", transition.nextState.isOk() == false);
+        assertTrue("Next state is critical", transition.nextState.getStatus() == Status.CRITICAL);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
+    }
+    
+    @Test
+    public void testImmediateGoodTransition()
+    {
+        RealCheck<?,?> check = newCheck(1, 1);
+        CheckState state = newState(Status.CRITICAL, true, 2, false, Status.OK, true);
+        // the transition
+        Transition transition;
+        // apply a good result
+        transition = this.computeResultTransition(check, state, newResult(false, "OK", "ok"));
+        assertTrue("Is a state change", transition.stateChange == true);
+        assertTrue("Is a hard change", transition.hardChange == true);
+        assertTrue("Is an alert", transition.alert == false);
+        assertTrue("Is a recovery", transition.recovery == true);
+        assertTrue("Next state is ok", transition.nextState.isOk() == true);
+        assertTrue("Next state is ok", transition.nextState.getStatus() == Status.OK);
+        assertTrue("Next state attempt is 1", transition.nextState.getAttempt() == 1);
+        assertTrue("Next state is hard", transition.nextState.isHard() == true);
+        assertTrue("Next state is no transitioning", transition.nextState.isTransitioning() == false);
+        assertTrue("Next state last hard ok copied", transition.previousState.isOk() == transition.nextState.isLastHardOk());
+        assertTrue("Next state last hard status copied", transition.previousState.getStatus() == transition.nextState.getLastHardStatus());
     }
 }

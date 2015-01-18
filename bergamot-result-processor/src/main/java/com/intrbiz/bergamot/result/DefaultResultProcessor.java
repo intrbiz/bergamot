@@ -227,6 +227,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
         {
+            // if the previous state was a hard state, update the last known hard state as we've now left that state
+            if (currentState.isHard())
+            {
+                nextState.setLastHardOk(currentState.isOk());
+                nextState.setLastHardStatus(currentState.getStatus());
+                nextState.setLastHardOutput(currentState.getOutput());
+            }
             // we've changed state
             nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
             // begin or immediately transition
@@ -236,7 +243,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(false);
                 nextState.setTransitioning(true);
                 nextState.setAttempt(1);               
-                return new Transition(currentState, nextState, true, false);
+                return new Transition(currentState, nextState, true, false, false, false);
             }
             else
             {
@@ -244,13 +251,14 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                return new Transition(currentState, nextState, true, true);
+                nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
+                return new Transition(currentState, nextState, true, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
             }
         }
         else if (currentState.isHard())
         {
             // steady state
-            return new Transition(currentState, nextState, false, false);
+            return new Transition(currentState, nextState, false, false, false, false);
         }
         else
         {
@@ -262,11 +270,12 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                return new Transition(currentState, nextState, false, true);
+                nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
+                return new Transition(currentState, nextState, false, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
             }
             else
             {
-                return new Transition(currentState, nextState, false, false);
+                return new Transition(currentState, nextState, false, false, false, false);
             }
         }
     }
@@ -368,19 +377,25 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         public final boolean stateChange;
         
         public final boolean hardChange;
+        
+        public final boolean alert;
+        
+        public final boolean recovery;
 
-        public Transition(CheckState previousState, CheckState nextState, boolean stateChange, boolean hardChange)
+        public Transition(CheckState previousState, CheckState nextState, boolean stateChange, boolean hardChange, boolean alert, boolean recovery)
         {
             super();
             this.previousState = previousState;
             this.nextState = nextState;
             this.stateChange = stateChange;
             this.hardChange = hardChange;
+            this.alert = alert;
+            this.recovery = recovery;
         }
         
         public CheckTransition toCheckTransition(UUID id, UUID checkId, Timestamp appliedAt)
         {
-            return new CheckTransition(id, checkId, appliedAt, this.stateChange, this.hardChange, this.previousState, this.nextState);
+            return new CheckTransition(id, checkId, appliedAt, this.stateChange, this.hardChange, this.alert, this.recovery, this.previousState, this.nextState);
         }
     }
 }
