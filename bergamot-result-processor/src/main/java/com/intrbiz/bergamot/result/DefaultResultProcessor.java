@@ -91,18 +91,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     // send the general state update notifications
                     this.sendStateUpdate(check);
                     // send notifications
-                    if (transition.hardChange)
+                    if (transition.alert)
                     {
-                        if (check.getState().isOk())
-                        {
-                            // send recovery
-                            this.sendRecovery(check, db);
-                        }
-                        else
-                        {
-                            // send alert
-                            this.sendAlert(check, db);
-                        }
+                        this.sendAlert(check, db);
+                    }
+                    else if (transition.recovery)
+                    {
+                        this.sendRecovery(check, db);
                     }
                     // update any virtual checks
                     this.updateVirtualChecks(check, transition, result, db);
