@@ -1,0 +1,5 @@
+<bergamot-agent server="wss://hub.bergamot.local:8081/agent">
+	<ca-certificate-file>ca.crt</ca-certificate-file>
+	<key-file>test.agent.key</key-file>
+	<certificate-file>test.agent.crt</certificate-file>
+</bergamot-agent>

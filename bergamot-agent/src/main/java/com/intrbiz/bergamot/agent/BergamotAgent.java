@@ -18,6 +18,9 @@ import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -32,11 +35,13 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManagerFactory;
+import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.agent.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
@@ -49,12 +54,13 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.configuration.Configurable;
 import com.intrbiz.gerald.polyakov.Node;
 import com.intrbiz.util.IBThreadFactory;
 
 /**
  */
-public class BergamotAgent
+public class BergamotAgent implements Configurable<BergamotAgentCfg>
 {
     private Logger logger = Logger.getLogger(BergamotAgent.class);
     
@@ -71,13 +77,12 @@ public class BergamotAgent
     private AgentHandler defaultHandler;
     
     private SSLContext sslContext;
-
-    public BergamotAgent(URI server, Node node)
+    
+    private BergamotAgentCfg configuration;
+    
+    public BergamotAgent()
     {
-        this.server = server;
-        this.node = node;
-        this.eventLoop = new NioEventLoopGroup(1, new IBThreadFactory("bergamot-agent", false));
-        this.sslContext = this.createContext();
+        super();
         this.timer = new Timer();
         // background GC task
         // we want to deliberately 
@@ -101,14 +106,29 @@ public class BergamotAgent
         this.registerHandler(new NetIfInfoHandler());
     }
     
+    public BergamotAgentCfg getConfiguration()
+    {
+        return this.configuration;
+    }
+
+    @Override
+    public void configure(BergamotAgentCfg cfg) throws Exception
+    {
+        this.configuration = cfg;
+        this.server = new URI(cfg.getServer());
+        this.node = Node.service("BergamotAgent");
+        this.eventLoop = new NioEventLoopGroup(1, new IBThreadFactory("bergamot-agent", false));
+        this.sslContext = this.createContext();
+    }
+    
     private SSLContext createContext()
     {
         try
         {
             String pass = "abc123";
             // create the keystore
-            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File("test.agent.key"), new File("test.agent.crt"), new File("ca.crt"));
-            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File("ca.crt"));
+            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File(this.configuration.getKeyFile()), new File(this.configuration.getCertificateFile()), new File(this.configuration.getCaCertificateFile()));
+            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File(this.configuration.getCaCertificateFile()));
             // the key manager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(sks, pass.toCharArray());
@@ -173,8 +193,13 @@ public class BergamotAgent
         AgentHandler handler = this.handlers.get(messageType);
         return handler == null ? this.defaultHandler : handler;
     }
+    
+    public void start()
+    {
+        this.connect();
+    }
 
-    public void connect() throws Exception
+    private void connect()
     {
         SSLEngine engine = createSSLEngine(this.server.getHost(), this.server.getPort());
         // configure the client
@@ -227,7 +252,7 @@ public class BergamotAgent
             }
         });
         // connect the client
-        b.connect(this.server.getHost(), this.server.getPort()).addListener(new GenericFutureListener<ChannelFuture>() {
+        b.connect(this.server.getHost(), (this.server.getPort() <= 0 ? 443 : this.server.getPort())).addListener(new GenericFutureListener<ChannelFuture>() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception
             {
@@ -285,10 +310,27 @@ public class BergamotAgent
 
     public static void main(String[] args) throws Exception
     {
+        // setup loggiing
+        setupLogging();
+        // load our config
+        BergamotAgentCfg config = readConfig();
+        // start the agent
+        BergamotAgent agent = new BergamotAgent();
+        agent.configure(config);
+        agent.start();
+    }
+    
+    private static void setupLogging()
+    {
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
-        //
-        BergamotAgent agent = new BergamotAgent(new URI("ws://hub.bergamot.local:8081/agent"), Node.service("BergamotAgent"));
-        agent.connect();
+    }
+    
+    private static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
+    {
+        try (FileInputStream input = new FileInputStream(new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml"))))
+        {
+            return BergamotAgentCfg.read(BergamotAgentCfg.class, input);
+        }
     }
 }
