@@ -50,7 +50,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
     {
         return super.accept(task) && 
                (task instanceof ExecuteCheck) && 
-               HTTPEngine.NAME.equals(((ExecuteCheck) task).getEngine()) &&
+               HTTPEngine.NAME.equalsIgnoreCase(((ExecuteCheck) task).getEngine()) &&
                CertificateExecutor.NAME.equalsIgnoreCase(((ExecuteCheck) task).getExecutor());
     }
     

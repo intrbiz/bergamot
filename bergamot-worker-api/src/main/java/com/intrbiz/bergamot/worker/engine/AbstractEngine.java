@@ -113,8 +113,10 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
             if (executor.accept(task))
             {
                 executor.execute(task, onResult);
+                return;
             }
         }
+        onResult.accept(new Result().fromCheck(task).error("No executor found to execute check"));
     }
 
     @Override
