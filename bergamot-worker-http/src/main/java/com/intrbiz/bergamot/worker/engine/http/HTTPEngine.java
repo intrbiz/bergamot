@@ -25,6 +25,7 @@ public class HTTPEngine extends AbstractEngine
         if (this.executors.isEmpty())
         {
             this.addExecutor(new HTTPExecutor());
+            this.addExecutor(new CertificateExecutor());
         }
         // setup our checker
         this.checker = new HTTPChecker(this.getWorker() != null && this.getWorker().getConfiguration() != null ? this.getWorker().getConfiguration().getThreads() : ((Runtime.getRuntime().availableProcessors() * 2) + 4));

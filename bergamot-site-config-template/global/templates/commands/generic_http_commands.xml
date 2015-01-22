@@ -32,4 +32,13 @@
         <parameter name="length"></parameter>
         <parameter name="contains"></parameter>
     </command>
+    <command name="certificate_check" engine="http" executor="certificate">
+        <summary>HTTPS Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port"></parameter>
+        <parameter name="virtual_host">#{host.name}</parameter>
+        <parameter name="version"></parameter>
+        <parameter name="method"></parameter>
+        <parameter name="path"></parameter>
+    </command>
 </bergamot>

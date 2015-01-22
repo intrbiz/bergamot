@@ -24,9 +24,11 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
 {
+    public static final String NAME = "http";
+    
     private Logger logger = Logger.getLogger(HTTPExecutor.class);
     
-    private final Timer httpRequestTimer;
+    private final Timer requestTimer;
     
     private final Counter failedRequests;
     
@@ -35,25 +37,28 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
         super();
         // setup metrics
         IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.http");
-        this.httpRequestTimer = source.getRegistry().timer("all-http-requests");
+        this.requestTimer = source.getRegistry().timer("all-http-requests");
         this.failedRequests = source.getRegistry().counter("failed-http-requests");
     }
     
     /**
-     * Only execute Checks where the engine == "http"
+     * Only execute Checks where the engine == "http" and (executor == "http" or executor == null)
      */
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && (task instanceof ExecuteCheck) && HTTPEngine.NAME.equals(((ExecuteCheck) task).getEngine());
+        return super.accept(task) && 
+               (task instanceof ExecuteCheck) && 
+               HTTPEngine.NAME.equalsIgnoreCase(((ExecuteCheck) task).getEngine()) &&
+               (HTTPExecutor.NAME.equalsIgnoreCase(((ExecuteCheck) task).getExecutor()) || Util.isEmpty(((ExecuteCheck) task).getExecutor()));
     }
     
     @Override
     public void execute(final ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
     {
-        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
+        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getExecutor() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         // time it
-        final Timer.Context tctx = this.httpRequestTimer.time();
+        final Timer.Context tctx = this.requestTimer.time();
         try
         {
             if (Util.isEmpty(executeCheck.getParameter("host"))) throw new RuntimeException("The host must be defined!");
