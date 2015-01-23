@@ -360,7 +360,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             // log
             logger.debug("Last check latency: processing => " + nextStats.getLastCheckProcessingLatency() + "ms, execution => " + nextStats.getLastCheckExecutionLatency() + "ms processes");
         }
-        return stats;
+        return nextStats;
     }
  
     public static class Transition
