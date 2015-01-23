@@ -255,6 +255,8 @@ public class CheckTransition extends BergamotObject<CheckStateMO>
         this.appliedAt = appliedAt;
         this.stateChange = stateChange;
         this.hardChange = hardChange;
+        this.alert = alert;
+        this.recovery = recovery;
         this.fromPreviousState(previous);
         this.fromNextState(next);
     }
