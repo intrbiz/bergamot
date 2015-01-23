@@ -62,6 +62,7 @@ import com.intrbiz.bergamot.model.message.scheduler.PauseScheduler;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.ResumeScheduler;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
+import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 import com.intrbiz.bergamot.model.message.update.Update;
@@ -110,6 +111,7 @@ public class BergamotTranscoder
         DisableCheck.class,
         ScheduleCheck.class,
         RescheduleCheck.class,
+        UnscheduleCheck.class,
         PauseScheduler.class,
         ResumeScheduler.class,
         // API
