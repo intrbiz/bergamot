@@ -543,7 +543,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     public void addTeamChild(Team parent, Team child)
     {
-        if (! child.getTeamIds().contains(parent))
+        if (! child.getTeamIds().contains(parent.getId()))
         {
             child.getTeamIds().add(parent.getId());
         }
