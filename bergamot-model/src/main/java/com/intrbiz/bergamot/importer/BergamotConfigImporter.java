@@ -61,11 +61,12 @@ import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
+import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
+import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
@@ -1013,6 +1014,17 @@ public class BergamotConfigImporter
         }
     }
     
+    private void loadCheckStats(Check<?,?> check, CheckCfg<?> cfg, BergamotDB db)
+    {
+        CheckStats stats = db.getCheckStats(check.getId());
+        if (stats == null || this.resetState)
+        {
+            stats = new CheckStats();
+            stats.setCheckId(check.getId());
+            db.setCheckStats(stats);
+        }
+    }
+    
     private void loadRealCheck(RealCheck<?,?> check, RealCheckCfg<?> rcfg, BergamotDB db)
     {
         this.loadCheck(check, rcfg, db);
@@ -1043,6 +1055,8 @@ public class BergamotConfigImporter
         check.setPool(this.site.computeProcessingPool(check.getId()));
         // the state
         this.loadCheckState(check, rcfg, db);
+        // the stats
+        this.loadCheckStats(check, rcfg, db);
         // notifications
         this.loadNotifications(check.getId(), rcfg.getNotifications(), db);
         // notify
