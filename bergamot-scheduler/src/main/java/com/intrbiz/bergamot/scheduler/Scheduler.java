@@ -26,26 +26,21 @@ public interface Scheduler
     
     /**
      * Reschedule the given check due to some form of state change
+     * @param interval - the new interval of the check, optional if <= 0
      */
-    void reschedule(ActiveCheck<?,?> check);
-    
-    /**
-     * Remove the given check from the scheduler
-     * @param check the check to remove
-     */
-    void remove(ActiveCheck<?,?> check);
+    void reschedule(ActiveCheck<?,?> check, long interval);
     
     /**
      * Ensure that the given check is enabled, so that it will be 
      * executed
      */
-    void enable(ActiveCheck<?,?> check);
+    void enable(UUID check);
     
     /**
      * Ensure that the given check is disable, so that it will not be 
      * executed
      */
-    void disable(ActiveCheck<?,?> check);
+    void disable(UUID check);
     
     /**
      * Remove the given check from the scheduler

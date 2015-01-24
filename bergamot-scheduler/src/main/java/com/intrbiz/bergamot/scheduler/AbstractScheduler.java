@@ -8,11 +8,11 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.PauseScheduler;
-import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.ResumeScheduler;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
+import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
@@ -112,31 +112,17 @@ public abstract class AbstractScheduler implements Scheduler
                 ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((RescheduleCheck) action).getCheck());
                 if (check != null)
                 {
-                    this.reschedule(check);
+                    this.reschedule(check, ((RescheduleCheck) action).getInterval());
                 }
             }
         }
         else if (action instanceof EnableCheck)
         {
-            try (BergamotDB db = BergamotDB.connect())
-            {
-                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((EnableCheck) action).getCheck());
-                if (check != null)
-                {
-                    this.enable(check);
-                }
-            }
+            this.enable(((EnableCheck) action).getCheck());
         }
         else if (action instanceof DisableCheck)
         {
-            try (BergamotDB db = BergamotDB.connect())
-            {
-                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((DisableCheck) action).getCheck());
-                if (check != null)
-                {
-                    this.disable(check);
-                }
-            }
+            this.disable(((DisableCheck) action).getCheck());
         }
         else if (action instanceof UnscheduleCheck)
         {

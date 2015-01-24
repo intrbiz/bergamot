@@ -277,15 +277,15 @@ public class WheelScheduler extends AbstractScheduler
     }
 
     @Override
-    public void enable(ActiveCheck<?,?> check)
+    public void enable(UUID check)
     {
-        this.enableJob(check.getId());
+        this.enableJob(check);
     }
 
     @Override
-    public void disable(ActiveCheck<?,?> check)
+    public void disable(UUID check)
     {
-        this.disableJob(check.getId());
+        this.disableJob(check);
     }
     
     @Override
@@ -304,16 +304,11 @@ public class WheelScheduler extends AbstractScheduler
     }
 
     @Override
-    public void reschedule(ActiveCheck<?,?> check)
+    public void reschedule(ActiveCheck<?,?> check, long interval)
     {
-        logger.info("Rescheduling " + check + " with interval " + check.getCurrentInterval());
-        this.rescheduleJob(check.getId(), check.getCurrentInterval(), check.getTimePeriod());
-    }
-    
-    @Override
-    public void remove(ActiveCheck<?,?> check)
-    {
-        this.removeJob(check.getId());
+        interval = interval > 0 ? interval : check.getCurrentInterval();
+        logger.info("Rescheduling " + check + " with interval " + interval);
+        this.rescheduleJob(check.getId(), interval, check.getTimePeriod());
     }
 
     @Override
