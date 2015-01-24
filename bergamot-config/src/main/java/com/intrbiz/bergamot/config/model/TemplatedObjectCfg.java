@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
+import com.intrbiz.bergamot.config.adapter.ObjectStateAdapter;
 import com.intrbiz.bergamot.config.adapter.YesNoAdapter;
 import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ObjectResolver;
@@ -64,6 +65,7 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
         this.loadedFrom = loadedFrom;
     }
     
+    @XmlJavaTypeAdapter(ObjectStateAdapter.class)
     @XmlAttribute(name = "state")
     public final ObjectState getObjectState()
     {
