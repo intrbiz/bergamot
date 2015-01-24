@@ -19,6 +19,7 @@ import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ResultKey;
+import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.RoutedProducer;
 import com.intrbiz.queue.name.GenericKey;
@@ -143,10 +144,10 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         this.updateProducer = this.updateQueue.publishUpdates();
     }
 
-    protected void rescheduleCheck(ActiveCheck<?, ?> check)
+    protected void rescheduleCheck(ActiveCheck<?, ?> check, long interval)
     {
-        if (logger.isTraceEnabled()) logger.trace("Rescheduling " + check + " due to state change");
-        this.schedulerActionProducer.publish(new GenericKey(check.getSiteId().toString()), new RescheduleCheck(check.getId()));
+        if (logger.isTraceEnabled()) logger.trace("Rescheduling " + check.getType() + "::" + check.getId() + " [" + check.getName() + "]" + " with new interval " + interval + " due to state change");
+        this.schedulerActionProducer.publish(new SchedulerKey(check.getSiteId(), check.getPool()), new RescheduleCheck(check.getId(), interval));
     }
 
     protected void publishNotification(Check<?, ?> check, Notification notification)

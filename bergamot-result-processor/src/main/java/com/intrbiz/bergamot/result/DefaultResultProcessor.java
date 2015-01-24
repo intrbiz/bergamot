@@ -78,15 +78,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     db.setCheckState(transition.nextState);
                     db.setCheckStats(stats);
                     db.commit();
-                    // reschedule active checks if they are in transition 
-                    // or have changed hard state
-                    // or the ok state has changed
-                    // or the hard state has changed
-                    if (check instanceof ActiveCheck && (transition.stateChange || transition.hardChange))
+                    // reschedule active checks if we have changed state at all
+                    if ((check instanceof ActiveCheck) && (transition.stateChange || transition.hardChange))
                     {
                         // inform the scheduler to reschedule this check
-                        logger.info("Sending reschedule for " + result.getCheckType() + "::" + result.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
-                        this.rescheduleCheck((ActiveCheck<?,?>) check);
+                        long interval = ((ActiveCheck<?,?>) check).computeCurrentInterval(transition.nextState);
+                        logger.info("Sending reschedule for " + check.getType() + "::" + check.getId() + "[" + check.getName() + "]");
+                        this.rescheduleCheck((ActiveCheck<?,?>) check, interval);
                     }
                     // send the general state update notifications
                     this.sendStateUpdate(check);
