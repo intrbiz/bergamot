@@ -108,7 +108,6 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
      */
     public long computeCurrentInterval(CheckState state)
     {
-        
         if (state.isSoft() && this.getChangingInterval() > 0)
         {
             return this.getChangingInterval();
