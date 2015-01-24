@@ -25,7 +25,8 @@
 			<table style="width: 100%;">
 				<tr>
 					<th>Changed At</th>
-					<th>Hard State Change</th>
+					<th>State Change</th>
+					<th>Hard Change</th>
 					<th>Alert</th>
 					<th>Recovery</th>
 					<th>Status</th>
@@ -40,6 +41,7 @@
 				<data-set var="transition" value="#{transitions}">
 					<tr>
 						<td>#{dateformat('HH:mm:ss', transition.appliedAt)} on #{dateformat('EEEE dd/MM/yyyy', transition.appliedAt)}</td>
+						<td>#{if(transition.stateChange, 'Yes', 'No')}</td>
 						<td>#{if(transition.hardChange, 'Yes', 'No')}</td>
 						<td>#{if(transition.alert, 'Yes', 'No')}</td>
 						<td>#{if(transition.recovery, 'Yes', 'No')}</td>
