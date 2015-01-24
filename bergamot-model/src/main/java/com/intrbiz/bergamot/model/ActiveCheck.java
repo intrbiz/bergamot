@@ -93,13 +93,22 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         this.changingInterval = changingInterval;
     }
 
+    
+    /**
+     * Get the current check interval for this check, given it's current state
+     */
+    public long getCurrentInterval()
+    {
+        return this.computeCurrentInterval(this.getState());
+    }
+    
     /**
      * Compute the current interval for this check using the 
      * check state and the configured intervals.
      */
-    public long getCurrentInterval()
+    public long computeCurrentInterval(CheckState state)
     {
-        CheckState state = this.getState();
+        
         if (state.isSoft() && this.getChangingInterval() > 0)
         {
             return this.getChangingInterval();
