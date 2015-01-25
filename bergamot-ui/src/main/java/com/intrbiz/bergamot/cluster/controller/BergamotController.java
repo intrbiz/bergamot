@@ -1,17 +1,16 @@
-package com.intrbiz.bergamot.controller;
+package com.intrbiz.bergamot.cluster.controller;
 
 import java.io.IOException;
+
+import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Command;
-import com.intrbiz.bergamot.model.Host;
-import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 import com.intrbiz.bergamot.model.message.event.control.ControlEvent;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
-import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.queue.ControlQueue;
 import com.intrbiz.bergamot.queue.WatcherQueue;
 import com.intrbiz.bergamot.queue.key.WatcherKey;
@@ -28,6 +27,8 @@ public class BergamotController implements DeliveryHandler<ControlEvent>
     protected Consumer<ControlEvent> controlConsumer;
     
     protected RoutedProducer<CheckEvent> watcherProducer;
+    
+    private Logger logger = Logger.getLogger(BergamotController.class);
     
     public BergamotController()
     {
@@ -55,24 +56,16 @@ public class BergamotController implements DeliveryHandler<ControlEvent>
     {
         try (BergamotDB db = BergamotDB.connect())
         {
-            for (Location location : db.listLocations(watcher.getSite()))
+            for (Trap trap : db.listTraps(watcher.getSite()))
             {
-                for (Host host : location.getHosts())
+                logger.info("Registering trap: " + trap);
+                CheckCommand checkCommand = trap.getCheckCommand();
+                if (checkCommand != null)
                 {
-                    for (Trap trap : host.getTraps())
+                    Command command = checkCommand.getCommand();
+                    if (command != null && watcher.getEngine().equalsIgnoreCase(command.getEngine()))
                     {
-                        System.out.println("Registering trap: " + trap);
-                        CheckCommand checkCommand = trap.getCheckCommand();
-                        if (checkCommand != null)
-                        {
-                            Command command = checkCommand.getCommand();
-                            if (command != null && watcher.getEngine().equalsIgnoreCase(command.getEngine()))
-                            {
-                                RegisterCheck register = trap.registerCheck();
-                                System.out.println(new WatcherKey(watcher.getId(), watcher.getEngine()) + " => " + register);
-                                this.watcherProducer.publish(new WatcherKey(watcher.getWatcher(), watcher.getEngine()), register);
-                            }
-                        }
+                        this.watcherProducer.publish(new WatcherKey(watcher.getWatcher(), watcher.getEngine()), trap.registerCheck());
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.cluster;
+package com.intrbiz.bergamot.cluster.model;
 
 import java.io.Serializable;
 import java.util.UUID;

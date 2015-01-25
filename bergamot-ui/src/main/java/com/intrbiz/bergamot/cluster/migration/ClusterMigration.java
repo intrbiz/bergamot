@@ -1,6 +1,8 @@
-package com.intrbiz.bergamot.cluster;
+package com.intrbiz.bergamot.cluster.migration;
 
 import java.io.Serializable;
+
+import com.intrbiz.bergamot.cluster.ClusterManager;
 
 public interface ClusterMigration extends Serializable
 {

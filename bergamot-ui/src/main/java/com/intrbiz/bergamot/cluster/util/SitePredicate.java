@@ -1,9 +1,10 @@
-package com.intrbiz.bergamot.cluster;
+package com.intrbiz.bergamot.cluster.util;
 
 import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.hazelcast.query.Predicate;
+import com.intrbiz.bergamot.cluster.model.ProcessingPool;
 
 /**
  * Filter the processing pool map based on the site of the processing pool

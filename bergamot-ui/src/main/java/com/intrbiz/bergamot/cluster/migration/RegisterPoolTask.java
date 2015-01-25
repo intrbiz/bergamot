@@ -1,9 +1,10 @@
-package com.intrbiz.bergamot.cluster;
+package com.intrbiz.bergamot.cluster.migration;
 
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;

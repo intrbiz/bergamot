@@ -1,8 +1,10 @@
-package com.intrbiz.bergamot.cluster;
+package com.intrbiz.bergamot.cluster.migration;
 
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+
+import com.intrbiz.bergamot.cluster.ClusterManager;
 
 public class DeregisterPoolTask implements ClusterMigration
 {
