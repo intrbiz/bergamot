@@ -65,7 +65,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({1, 7, 0}),
+        version = @SQLVersion({1, 8, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1024,6 +1024,15 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = Trap.class, name = "list_traps", since = @SQLVersion({1, 0, 0}))
     public abstract List<Trap> listTraps(@SQLParam("site_id") UUID siteId);
+    
+    @SQLGetter(table = Trap.class, name = "list_traps_for_watcher", since = @SQLVersion({1, 8, 0}),
+            query = @SQLQuery("SELECT t.* FROM bergamot.trap t" +
+                              " JOIN bergamot.check_command cc ON (t.id = cc.check_id)" +
+                              " JOIN bergamot.command c ON (cc.command_id = c.id)" +
+                              " JOIN bergamot.host h ON (t.host_id = h.id)" +
+                              " WHERE (c.site_id = p_site_id OR p_site_id IS NULL) AND (h.location_id = p_location_id OR p_location_id IS NULL) AND (c.engine = p_engine OR p_engine IS NULL)")
+    )
+    public abstract List<Trap> listTrapsForWatcher(@SQLParam("site_id") UUID siteId, @SQLParam(value = "location_id", virtual = true) UUID locationId, @SQLParam(value = "engine", virtual = true) String engine);
     
     @SQLGetter(table = Trap.class, name = "list_traps_that_are_not_ok", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT c.* FROM bergamot.trap c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")

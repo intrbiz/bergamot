@@ -4,13 +4,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.CheckCommand;
-import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 import com.intrbiz.bergamot.model.message.event.control.ControlEvent;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
+import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.queue.ControlQueue;
 import com.intrbiz.bergamot.queue.WatcherQueue;
 import com.intrbiz.bergamot.queue.key.WatcherKey;
@@ -54,21 +54,26 @@ public class BergamotController implements DeliveryHandler<ControlEvent>
     
     private void registerWatcher(RegisterWatcher watcher) throws IOException
     {
-        try (BergamotDB db = BergamotDB.connect())
+        // validate that the watcher has given us at least one filter
+        if (watcher.getId() != null && (watcher.getSite() != null || watcher.getLocation() != null || (! Util.isEmpty(watcher.getEngine()))))
         {
-            for (Trap trap : db.listTraps(watcher.getSite()))
+            // send register check events to the watcher
+            try (BergamotDB db = BergamotDB.connect())
             {
-                logger.info("Registering trap: " + trap);
-                CheckCommand checkCommand = trap.getCheckCommand();
-                if (checkCommand != null)
+                for (Trap trap : db.listTrapsForWatcher(watcher.getSite(), watcher.getLocation(), watcher.getEngine()))
                 {
-                    Command command = checkCommand.getCommand();
-                    if (command != null && watcher.getEngine().equalsIgnoreCase(command.getEngine()))
+                    RegisterCheck registerCheck = trap.registerCheck();
+                    if (registerCheck != null)
                     {
-                        this.watcherProducer.publish(new WatcherKey(watcher.getWatcher(), watcher.getEngine()), trap.registerCheck());
+                        logger.info("Registering trap: " + trap + " with watcher " + watcher.getId() + " [" + watcher.getSite() + "/" + watcher.getLocation() + "/" + watcher.getEngine() + "]");
+                        this.watcherProducer.publish(new WatcherKey(watcher.getWatcher(), watcher.getEngine()), registerCheck);
                     }
                 }
             }
+        }
+        else
+        {
+            logger.warn("The watcher: " + watcher.getId() + " cannot be registered as it does not provide any information about the traps it can handle");
         }
     }
 }
