@@ -92,6 +92,7 @@
     <module>bergamot-agent-server</module>
     <module>bergamot-agent-message-model</module>
     <module>bergamot-crypto-util</module>
+    <module>bergamot-nagios</module>
   </modules>
   
   <dependencyManagement>
