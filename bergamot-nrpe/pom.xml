@@ -32,5 +32,10 @@
     	<groupId>com.intrbiz.core</groupId>
     	<artifactId>core</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.bergamot</groupId>
+    	<artifactId>bergamot-nagios</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>
