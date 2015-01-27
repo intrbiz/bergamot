@@ -15,21 +15,32 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>org.hamcrest</groupId>
-    	<artifactId>hamcrest-all</artifactId>
-    </dependency>
-    <dependency>
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
     </dependency>
     <dependency>
     	<groupId>com.intrbiz.core</groupId>
     	<artifactId>core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.hamcrest</groupId>
+    	<artifactId>hamcrest-library</artifactId>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.hamcrest</groupId>
+    	<artifactId>hamcrest-integration</artifactId>
+    	<scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.hamcrest</groupId>
+    	<artifactId>hamcrest-core</artifactId>
+    	<scope>test</scope>
     </dependency>
   </dependencies>
 </project>

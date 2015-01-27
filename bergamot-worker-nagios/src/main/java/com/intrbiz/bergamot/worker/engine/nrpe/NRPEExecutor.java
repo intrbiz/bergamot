@@ -9,7 +9,6 @@ import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
-import com.intrbiz.bergamot.nagios.util.NagiosPluginParser;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -40,14 +39,13 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && (task instanceof ExecuteCheck) && NRPEEngine.NAME.equals(((ExecuteCheck) task).getEngine());
+        return super.accept(task) && NRPEEngine.NAME.equalsIgnoreCase(task.getEngine());
     }
     
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
     {
-        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
-        // time it
+        logger.info("Executing NRPE check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Timer.Context tctx = this.nrpeRequestTimer.time();
         try
         {
@@ -63,8 +61,9 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                 host, 5666, 5,  60, 
                 (response) -> {
                     Result result = new Result().fromCheck(executeCheck);
-                    NagiosPluginParser.parseNagiosExitCode(response.getResponseCode(), result);
-                    NagiosPluginParser.parseNagiosOutput(response.getOutput(), result);
+                    result.setOk(response.toOk());
+                    result.setStatus(response.toStatus());
+                    result.setOutput(response.getOutput());
                     result.setRuntime(response.getRuntime());
                     tctx.stop();
                     resultSubmitter.accept(result);

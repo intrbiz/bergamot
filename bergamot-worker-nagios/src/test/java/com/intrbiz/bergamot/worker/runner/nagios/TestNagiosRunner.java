@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 
-public class ManualTestNagiosRunner
+public class TestNagiosRunner
 {
     private NagiosExecutor runner;
 
@@ -164,7 +164,6 @@ public class ManualTestNagiosRunner
         );
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testFailingNRPE()
     {
@@ -179,7 +178,7 @@ public class ManualTestNagiosRunner
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
                 assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
-                assertThat(result.getStatus(), anyOf(equalTo("CRITICAL"), equalTo("UNKNOWN")));
+                assertThat(result.getStatus(), equalTo("ERROR"));
                 assertThat(result.getOutput(), is(not(nullValue())));
                 assertThat(result.getRuntime(), is(greaterThan(0D)));
                 assertThat(result.getExecuted(), is(not(nullValue())));

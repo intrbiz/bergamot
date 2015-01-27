@@ -117,7 +117,7 @@ public class NRPEClient implements AutoCloseable
     public NRPEResponse hello() throws IOException
     {
         NRPEPacket response = this.send(new NRPEPacket().version2().hello());
-        return new NRPEResponse(response.getResponseCode(), response.getOutput(), response.getRuntime());
+        return new NRPEResponse(response.getOutput(), response.getResponseCode(), response.getRuntime());
     }
 
     /**
@@ -131,7 +131,7 @@ public class NRPEClient implements AutoCloseable
     {
         if (command == null) throw new IllegalArgumentException("The command cannot be null");
         NRPEPacket response = this.send(new NRPEPacket().version2().command(command));
-        return new NRPEResponse(response.getResponseCode(), response.getOutput(), response.getRuntime());
+        return new NRPEResponse(response.getOutput(), response.getResponseCode(), response.getRuntime());
     }
 
     /**
@@ -146,7 +146,7 @@ public class NRPEClient implements AutoCloseable
     {
         if (command == null) throw new IllegalArgumentException("The command cannot be null");
         NRPEPacket response = this.send(new NRPEPacket().version2().command(command, args));
-        return new NRPEResponse(response.getResponseCode(), response.getOutput(), response.getRuntime());
+        return new NRPEResponse(response.getOutput(), response.getResponseCode(), response.getRuntime());
     }
 
     /**
@@ -161,7 +161,7 @@ public class NRPEClient implements AutoCloseable
     {
         if (command == null) throw new IllegalArgumentException("The command cannot be null");
         NRPEPacket response = this.send(new NRPEPacket().version2().command(command, args));
-        return new NRPEResponse(response.getResponseCode(), response.getOutput(), response.getRuntime());
+        return new NRPEResponse(response.getOutput(), response.getResponseCode(), response.getRuntime());
     }
 
     /**

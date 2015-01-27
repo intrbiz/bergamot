@@ -136,7 +136,7 @@ public class NRPEPoller
     public <T> void hello(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler) throws IOException
     {
         this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().hello(), (p) -> {
-            responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));
+            responseHandler.accept(new NRPEResponse(p.getOutput(), p.getResponseCode(), p.getRuntime()));
         }, errorHandler);
     }
 
@@ -147,7 +147,7 @@ public class NRPEPoller
 
     public <T> void command(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command) throws IOException
     {
-        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command), (p) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));}, errorHandler);
+        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command), (p) -> {responseHandler.accept(new NRPEResponse(p.getOutput(), p.getResponseCode(), p.getRuntime()));}, errorHandler);
     }
 
     public <T> void command(String host, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, List<String> args) throws IOException
@@ -157,7 +157,7 @@ public class NRPEPoller
 
     public <T> void command(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, List<String> args) throws IOException
     {
-        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), (p) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));}, errorHandler);
+        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), (p) -> {responseHandler.accept(new NRPEResponse(p.getOutput(), p.getResponseCode(), p.getRuntime()));}, errorHandler);
     }
 
     public <T> void command(String host, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, String... args) throws IOException
@@ -167,7 +167,7 @@ public class NRPEPoller
 
     public <T> void command(String host, int port, int connectTimeout, int requestTimeout, Consumer<NRPEResponse> responseHandler, Consumer<Throwable> errorHandler, String command, String... args) throws IOException
     {
-        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), (p) -> {responseHandler.accept(new NRPEResponse(p.getResponseCode(), p.getOutput(), p.getRuntime()));}, errorHandler);
+        this.submit(host, port, connectTimeout, requestTimeout, new NRPEPacket().version2().command(command, args), (p) -> {responseHandler.accept(new NRPEResponse(p.getOutput(), p.getResponseCode(), p.getRuntime()));}, errorHandler);
     }
 
     public void shutdown()
