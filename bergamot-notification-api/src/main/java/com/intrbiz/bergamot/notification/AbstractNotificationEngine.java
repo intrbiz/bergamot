@@ -13,7 +13,6 @@ import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
-import com.intrbiz.bergamot.model.message.notification.GenericNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.express.DefaultContext;
