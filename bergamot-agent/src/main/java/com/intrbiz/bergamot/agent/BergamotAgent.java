@@ -45,6 +45,7 @@ import com.intrbiz.bergamot.agent.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
+import com.intrbiz.bergamot.agent.handler.ExecHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
 import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
 import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
@@ -80,6 +81,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     private BergamotAgentCfg configuration;
     
+    private volatile Channel channel;
+    
     public BergamotAgent()
     {
         super();
@@ -104,6 +107,19 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new OSInfoHandler());
         this.registerHandler(new UptimeInfoHandler());
         this.registerHandler(new NetIfInfoHandler());
+        this.registerHandler(new ExecHandler());
+        // shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run()
+            {
+                BergamotAgent.this.logger.info("Bergamot Agent shutting down");
+                if (BergamotAgent.this.channel != null && BergamotAgent.this.channel.isActive())
+                {
+                    BergamotAgent.this.channel.close();
+                }
+            }
+        });
     }
     
     public BergamotAgentCfg getConfiguration()
@@ -259,11 +275,14 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 final Channel channel = future.channel();
                 if (future.isDone() && future.isSuccess())
                 {
+                    // stash the channel
+                    BergamotAgent.this.channel = channel;
                     // setup close listener
                     channel.closeFuture().addListener(new GenericFutureListener<ChannelFuture>() {
                         @Override
                         public void operationComplete(ChannelFuture future) throws Exception
                         {
+                            BergamotAgent.this.channel = null;
                             BergamotAgent.this.scheduleReconnect();
                         }
                     });
@@ -274,7 +293,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                     BergamotAgent.this.scheduleReconnect();
                 }
             }
-        });        
+        });
     }
     
     protected void scheduleReconnect()

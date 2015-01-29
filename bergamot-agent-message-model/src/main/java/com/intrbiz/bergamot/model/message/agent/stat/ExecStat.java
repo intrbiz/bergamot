@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.message.agent.stat;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
@@ -93,5 +94,77 @@ public class ExecStat extends AgentMessage implements Parameterised
     public void setParameters(List<Parameter> parameters)
     {
         this.parameters = parameters;
+    }
+    
+    @JsonIgnore
+    public ExecStat pending(String output)
+    {
+        this.setOk(true);
+        this.setStatus("PENDING");
+        this.setOutput(output);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ExecStat ok(String output)
+    {
+        this.setOk(true);
+        this.setStatus("OK");
+        this.setOutput(output);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ExecStat warning(String output)
+    {
+        this.setOk(false);
+        this.setStatus("WARNING");
+        this.setOutput(output);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ExecStat critical(String output)
+    {
+        this.setOk(false);
+        this.setStatus("CRITICAL");
+        this.setOutput(output);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ExecStat unknown(String output)
+    {
+        this.setOk(false);
+        this.setStatus("UNKNOWN");
+        this.setOutput(output);
+        return this;
+    }
+
+    @JsonIgnore
+    public ExecStat error(Throwable t)
+    {
+        this.setOk(false);
+        this.setStatus("ERROR");
+        this.setOutput(t.getMessage());
+        return this;
+    }
+    
+    @JsonIgnore
+    public ExecStat error(String message)
+    {
+        this.setOk(false);
+        this.setStatus("ERROR");
+        this.setOutput(message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ExecStat timeout(String message)
+    {
+        this.setOk(false);
+        this.setStatus("TIMEOUT");
+        this.setOutput(message);
+        return this;
     }
 }

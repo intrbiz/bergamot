@@ -42,6 +42,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
+import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.configuration.Configurable;
 
@@ -147,6 +148,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     
     public void unregisterAgent(BergamotAgentServerHandler agent)
     {
+        logger.debug("Agent unregister!");
         AgentHello hello = agent.getHello();
         this.agents.remove(hello.getHostId());
     }
@@ -267,6 +269,14 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             // check the agents network
             agent.sendMessageToAgent(new CheckNetIf(), (response) -> {
                 System.out.println("Got Network Info: " + response);
+            });
+            // exec some shit
+            ExecCheck exec = new ExecCheck();
+            exec.setEngine("nagios");
+            exec.setName("check_mem");
+            exec.addParameter("command_line", "/usr/lib/nagios/plugins/check_mem -u -C -w 80 -c 90");
+            agent.sendMessageToAgent(exec, (response) -> {
+                System.out.println("Got Exec result: " + response);
             });
         });
         // go go go
