@@ -22,7 +22,6 @@
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-jnetraw</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>

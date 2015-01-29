@@ -51,27 +51,22 @@
 		<dependency>
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>data-annotations</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>data-manager</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>data-database-adapter-compiler</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>
-			<version>0.3m</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>cache-hazelcast</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>

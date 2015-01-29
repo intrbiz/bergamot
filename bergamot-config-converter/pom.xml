@@ -22,17 +22,14 @@
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-config</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-compat-nagios</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
-    	<version>1.2.14</version>
     </dependency>
   </dependencies>
 </project>

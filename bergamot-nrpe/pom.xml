@@ -26,7 +26,6 @@
     <dependency>
     	<groupId>io.netty</groupId>
     	<artifactId>netty-all</artifactId>
-    	<version>4.0.12.Final</version>
     </dependency>
     <dependency>
     	<groupId>com.intrbiz.core</groupId>
@@ -35,7 +34,6 @@
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-nagios</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
