@@ -6,12 +6,14 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.queue.impl.RabbitWorkerQueue;
+import com.intrbiz.bergamot.queue.key.ResultKey;
+import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
+import com.intrbiz.queue.name.NullKey;
 
 /**
  * Send events to and from compute hosts
@@ -30,22 +32,22 @@ public abstract class WorkerQueue extends QueueAdapter
     
     // checks
     
-    public abstract RoutedProducer<ExecuteCheck> publishChecks(GenericKey defaultKey);
+    public abstract RoutedProducer<ExecuteCheck, WorkerKey> publishChecks(WorkerKey defaultKey);
     
-    public RoutedProducer<ExecuteCheck> publishChecks()
+    public RoutedProducer<ExecuteCheck, WorkerKey> publishChecks()
     {
         return this.publishChecks(null);
     }
     
-    public abstract Consumer<ExecuteCheck> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine);
+    public abstract Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine);
     
-    public abstract Consumer<ExecuteCheck> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler);
+    public abstract Consumer<ExecuteCheck, NullKey> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler);
     
     // result
     
-    public abstract RoutedProducer<Result> publishResults(GenericKey defaultKey);
+    public abstract RoutedProducer<Result, ResultKey> publishResults(ResultKey defaultKey);
     
-    public RoutedProducer<Result> publishResults()
+    public RoutedProducer<Result, ResultKey> publishResults()
     {
         return this.publishResults(null);
     }
@@ -53,11 +55,11 @@ public abstract class WorkerQueue extends QueueAdapter
     /**
      * Consume results targeted to a specific processor
      */
-    public abstract Consumer<Result> consumeResults(DeliveryHandler<Result> handler, String instance);
+    public abstract Consumer<Result, ResultKey> consumeResults(DeliveryHandler<Result> handler, String instance);
     
     /**
      * Consume results which were not successfully routed to the intended processor
      * @return
      */
-    public abstract Consumer<Result> consumeFallbackResults(DeliveryHandler<Result> handler);
+    public abstract Consumer<Result, ResultKey> consumeFallbackResults(DeliveryHandler<Result> handler);
 }

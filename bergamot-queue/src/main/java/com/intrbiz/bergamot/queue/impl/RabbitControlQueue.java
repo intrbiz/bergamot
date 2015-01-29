@@ -12,7 +12,7 @@ import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.Producer;
 import com.intrbiz.queue.QueueBrokerPool;
 import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.name.GenericKey;
+import com.intrbiz.queue.name.NullKey;
 import com.intrbiz.queue.rabbit.RabbitConsumer;
 import com.intrbiz.queue.rabbit.RabbitProducer;
 import com.rabbitmq.client.Channel;
@@ -44,7 +44,7 @@ public class RabbitControlQueue extends ControlQueue
     @Override
     public Producer<ControlEvent> publishControlEvents()
     {
-        return new RabbitProducer<ControlEvent>(this.broker, this.transcoder.asQueueEventTranscoder(ControlEvent.class), new GenericKey(""), this.source.getRegistry().timer("publish-control-events"))
+        return new RabbitProducer<ControlEvent, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(ControlEvent.class), new NullKey(), this.source.getRegistry().timer("publish-control-events"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -55,9 +55,9 @@ public class RabbitControlQueue extends ControlQueue
     }
 
     @Override
-    public Consumer<ControlEvent> consumeControlEvents(DeliveryHandler<ControlEvent> handler)
+    public Consumer<ControlEvent, NullKey> consumeControlEvents(DeliveryHandler<ControlEvent> handler)
     {
-        return new RabbitConsumer<ControlEvent>(this.broker, this.transcoder.asQueueEventTranscoder(ControlEvent.class), handler, this.source.getRegistry().timer("consume-control-events"))
+        return new RabbitConsumer<ControlEvent, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(ControlEvent.class), handler, this.source.getRegistry().timer("consume-control-events"))
         {
             public String setupQueue(Channel on) throws IOException
             {

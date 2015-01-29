@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
+import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
@@ -21,7 +22,6 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.value.ValueExpression;
-import com.intrbiz.queue.name.GenericKey;
 
 /**
  * A check which is actively polled
@@ -158,14 +158,13 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
      * 
      * @return
      */
-    public GenericKey getRoutingKey()
+    public WorkerKey getRoutingKey()
     {
         Command command = Util.nullable(this.getCheckCommand(), CheckCommand::getCommand);
         if (command == null) return null;
-        // th key
-        return new GenericKey(this.getSiteId() + "." + Util.coalesceEmpty(this.resolveWorkerPool(), "any") + "." + command.getEngine());
+        // the key
+        return new WorkerKey(this.getSiteId(), this.resolveWorkerPool(), command.getEngine());
     }
-
     /**
      * Get the TTL in ms for the execute check message
      * 

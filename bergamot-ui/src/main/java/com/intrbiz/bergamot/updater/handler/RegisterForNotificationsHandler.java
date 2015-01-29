@@ -10,6 +10,7 @@ import com.intrbiz.bergamot.model.message.api.notification.RegisteredForNotifica
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.queue.NotificationQueue;
+import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.bergamot.updater.context.ClientContext;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.QueueException;
@@ -48,7 +49,7 @@ public class RegisterForNotificationsHandler extends RequestHandler
                 }, rfns.getSiteId()));
                 // on close
                 context.onClose((ctx) -> {
-                    Consumer<Notification> c = ctx.var("notificationConsumer");
+                    Consumer<Notification, NotificationKey> c = ctx.var("notificationConsumer");
                     if (c != null) c.close();
                     NotificationQueue q = ctx.var("notificationQueue");
                     if (q != null) q.close();

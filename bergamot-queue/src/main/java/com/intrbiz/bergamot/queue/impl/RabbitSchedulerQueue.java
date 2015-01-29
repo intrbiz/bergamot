@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
+import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.Consumer;
@@ -13,7 +14,6 @@ import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueBrokerPool;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 import com.intrbiz.queue.rabbit.RabbitConsumer;
 import com.intrbiz.queue.rabbit.RabbitProducer;
 import com.rabbitmq.client.Channel;
@@ -43,9 +43,9 @@ public class RabbitSchedulerQueue extends SchedulerQueue
     }
 
     @Override
-    public RoutedProducer<SchedulerAction> publishSchedulerActions(GenericKey defaultKey)
+    public RoutedProducer<SchedulerAction, SchedulerKey> publishSchedulerActions(SchedulerKey defaultKey)
     {
-        return new RabbitProducer<SchedulerAction>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), defaultKey, this.source.getRegistry().timer("publish-scheduler-action"))
+        return new RabbitProducer<SchedulerAction, SchedulerKey>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), defaultKey, this.source.getRegistry().timer("publish-scheduler-action"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -56,9 +56,9 @@ public class RabbitSchedulerQueue extends SchedulerQueue
     }
 
     @Override
-    public Consumer<SchedulerAction> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler)
+    public Consumer<SchedulerAction, SchedulerKey> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler)
     {
-        return new RabbitConsumer<SchedulerAction>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), handler, this.source.getRegistry().timer("consume-scheduler-action"))
+        return new RabbitConsumer<SchedulerAction, SchedulerKey>(this.broker, this.transcoder.asQueueEventTranscoder(SchedulerAction.class), handler, this.source.getRegistry().timer("consume-scheduler-action"))
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -73,13 +73,13 @@ public class RabbitSchedulerQueue extends SchedulerQueue
             @Override
             protected void addQueueBinding(Channel on, String binding) throws IOException
             {
-                on.queueBind(this.queue, "bergamot.scheduler", binding.toString());
+                on.queueBind(this.queue, "bergamot.scheduler", binding);
             }
             
             @Override
             protected void removeQueueBinding(Channel on, String binding) throws IOException
             {
-                on.queueUnbind(this.queue, "bergamot.scheduler", binding.toString());
+                on.queueUnbind(this.queue, "bergamot.scheduler", binding);
             }
         };
     }

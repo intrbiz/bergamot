@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 import com.intrbiz.bergamot.queue.impl.RabbitWatcherQueue;
+import com.intrbiz.bergamot.queue.key.WatcherKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueAdapter;
@@ -28,7 +29,7 @@ public abstract class WatcherQueue extends QueueAdapter
     
     // watcher
     
-    public abstract RoutedProducer<CheckEvent> publishWatcherEvents();
+    public abstract RoutedProducer<CheckEvent, WatcherKey> publishWatcherEvents();
     
-    public abstract Consumer<CheckEvent> consumeWatcherEvents(DeliveryHandler<CheckEvent> handler, UUID watcher, String engine);
+    public abstract Consumer<CheckEvent, WatcherKey> consumeWatcherEvents(DeliveryHandler<CheckEvent> handler, UUID watcher, String engine);
 }

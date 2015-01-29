@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.queue.key.WatcherKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.RoutedProducer;
+import com.intrbiz.queue.name.NullKey;
 
 public class BergamotController implements DeliveryHandler<ControlEvent>
 {
@@ -24,9 +25,9 @@ public class BergamotController implements DeliveryHandler<ControlEvent>
     
     protected WatcherQueue watcherQueue;
     
-    protected Consumer<ControlEvent> controlConsumer;
+    protected Consumer<ControlEvent, NullKey> controlConsumer;
     
-    protected RoutedProducer<CheckEvent> watcherProducer;
+    protected RoutedProducer<CheckEvent, WatcherKey> watcherProducer;
     
     private Logger logger = Logger.getLogger(BergamotController.class);
     

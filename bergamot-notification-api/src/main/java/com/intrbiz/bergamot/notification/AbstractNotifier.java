@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.queue.NotificationQueue;
+import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.queue.Consumer;
 
 public abstract class AbstractNotifier implements Notifier
@@ -23,7 +24,7 @@ public abstract class AbstractNotifier implements Notifier
     
     protected NotificationQueue queue;
 
-    protected List<Consumer<Notification>> consumers = new LinkedList<Consumer<Notification>>();
+    protected List<Consumer<Notification, NotificationKey>> consumers = new LinkedList<Consumer<Notification, NotificationKey>>();
 
     protected NotifierCfg configuration;
     

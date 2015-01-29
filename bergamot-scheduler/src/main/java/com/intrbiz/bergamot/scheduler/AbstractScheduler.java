@@ -16,21 +16,21 @@ import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
+import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.QueueException;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 
 
 public abstract class AbstractScheduler implements Scheduler
 {   
     private WorkerQueue workerQueue;
     
-    private RoutedProducer<ExecuteCheck> executeCheckProducer;
+    private RoutedProducer<ExecuteCheck, WorkerKey> executeCheckProducer;
     
     private SchedulerQueue schedulerQueue;
     
-    private Consumer<SchedulerAction> schedulerActionConsumer;
+    private Consumer<SchedulerAction, SchedulerKey> schedulerActionConsumer;
     
     public AbstractScheduler()
     {
@@ -79,7 +79,7 @@ public abstract class AbstractScheduler implements Scheduler
     
     protected abstract void removeJobsInPool(UUID site, int pool);
 
-    protected void publishExecuteCheck(ExecuteCheck check, GenericKey routingKey, long ttl)
+    protected void publishExecuteCheck(ExecuteCheck check, WorkerKey routingKey, long ttl)
     {
         this.executeCheckProducer.publish(routingKey, check, ttl);
     }

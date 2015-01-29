@@ -163,7 +163,7 @@ public class BergamotConfigImporter
                 {
                     try (SchedulerQueue queue = SchedulerQueue.open())
                     {
-                        try (RoutedProducer<SchedulerAction> producer = queue.publishSchedulerActions())
+                        try (RoutedProducer<SchedulerAction, SchedulerKey> producer = queue.publishSchedulerActions())
                         {
                             for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
                             {

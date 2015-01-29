@@ -5,12 +5,12 @@ import java.util.UUID;
 
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.queue.impl.RabbitNotificationQueue;
+import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 
 /**
  * Send notification events
@@ -27,9 +27,9 @@ public abstract class NotificationQueue extends QueueAdapter
         return QueueManager.getInstance().queueAdapter(NotificationQueue.class);
     }
     
-    public abstract RoutedProducer<Notification> publishNotifications(GenericKey defaultKey);
+    public abstract RoutedProducer<Notification, NotificationKey> publishNotifications(NotificationKey defaultKey);
     
-    public RoutedProducer<Notification> publishNotifications()
+    public RoutedProducer<Notification, NotificationKey> publishNotifications()
     {
         return this.publishNotifications(null);
     }
@@ -38,11 +38,11 @@ public abstract class NotificationQueue extends QueueAdapter
      * Consume notifications using a queue for the given engine name, 
      * this balances events over multiple consumers for each engine.
      */
-    public abstract Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site, String engineName);
+    public abstract Consumer<Notification, NotificationKey> consumeNotifications(DeliveryHandler<Notification> handler, UUID site, String engineName);
     
     /**
      * Consume notifications using an ephemeral queue so that 
      * all web notification consumers see all events
      */
-    public abstract Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site);
+    public abstract Consumer<Notification, NotificationKey> consumeNotifications(DeliveryHandler<Notification> handler, UUID site);
 }

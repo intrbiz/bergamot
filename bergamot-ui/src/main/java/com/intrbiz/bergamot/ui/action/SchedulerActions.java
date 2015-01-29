@@ -13,7 +13,7 @@ public class SchedulerActions
 {
     private SchedulerQueue queue;
 
-    private RoutedProducer<SchedulerAction> schedulerActionProducer;
+    private RoutedProducer<SchedulerAction, SchedulerKey> schedulerActionProducer;
 
     public SchedulerActions()
     {

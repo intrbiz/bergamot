@@ -14,7 +14,7 @@ public class DispatchResultAction
     
     private WorkerQueue queue;
     
-    private RoutedProducer<Result> resultProducer;
+    private RoutedProducer<Result, ResultKey> resultProducer;
     
     public DispatchResultAction()
     {

@@ -43,9 +43,9 @@ public class RabbitWatcherQueue extends WatcherQueue
     }
 
     @Override
-    public RoutedProducer<CheckEvent> publishWatcherEvents()
+    public RoutedProducer<CheckEvent, WatcherKey> publishWatcherEvents()
     {
-        return new RabbitProducer<CheckEvent>(this.broker, this.transcoder.asQueueEventTranscoder(CheckEvent.class), null, this.source.getRegistry().timer("publish-watcher-events"))
+        return new RabbitProducer<CheckEvent, WatcherKey>(this.broker, this.transcoder.asQueueEventTranscoder(CheckEvent.class), null, this.source.getRegistry().timer("publish-watcher-events"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -56,9 +56,9 @@ public class RabbitWatcherQueue extends WatcherQueue
     }
 
     @Override
-    public Consumer<CheckEvent> consumeWatcherEvents(DeliveryHandler<CheckEvent> handler, UUID watcher, String engine)
+    public Consumer<CheckEvent, WatcherKey> consumeWatcherEvents(DeliveryHandler<CheckEvent> handler, UUID watcher, String engine)
     {
-        return new RabbitConsumer<CheckEvent>(this.broker, this.transcoder.asQueueEventTranscoder(CheckEvent.class), handler, this.source.getRegistry().timer("consume-watcher-events"))
+        return new RabbitConsumer<CheckEvent, WatcherKey>(this.broker, this.transcoder.asQueueEventTranscoder(CheckEvent.class), handler, this.source.getRegistry().timer("consume-watcher-events"))
         {
             public String setupQueue(Channel on) throws IOException
             {

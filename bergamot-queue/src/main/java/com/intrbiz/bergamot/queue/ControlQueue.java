@@ -8,6 +8,7 @@ import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.Producer;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;
+import com.intrbiz.queue.name.NullKey;
 
 /**
  * Publish and consume control events
@@ -32,5 +33,5 @@ public abstract class ControlQueue extends QueueAdapter
     
     public abstract Producer<ControlEvent> publishControlEvents();
     
-    public abstract Consumer<ControlEvent> consumeControlEvents(DeliveryHandler<ControlEvent> handler);
+    public abstract Consumer<ControlEvent, NullKey> consumeControlEvents(DeliveryHandler<ControlEvent> handler);
 }

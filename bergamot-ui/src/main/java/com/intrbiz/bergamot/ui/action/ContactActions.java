@@ -15,21 +15,21 @@ import com.intrbiz.bergamot.config.model.NotificationsCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Contact.LockOutReason;
 import com.intrbiz.bergamot.model.NotificationEngine;
 import com.intrbiz.bergamot.model.Notifications;
-import com.intrbiz.bergamot.model.Status;
-import com.intrbiz.bergamot.model.TimePeriod;
-import com.intrbiz.bergamot.model.Contact.LockOutReason;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.Team;
+import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.queue.NotificationQueue;
+import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Action;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 
 public class ContactActions
 {
@@ -37,7 +37,7 @@ public class ContactActions
     
     private NotificationQueue notificationQueue;
     
-    private RoutedProducer<Notification> notificationsProducer;
+    private RoutedProducer<Notification, NotificationKey> notificationsProducer;
     
     public ContactActions()
     {
@@ -126,7 +126,7 @@ public class ContactActions
             }
             // send a notification, only via email
             this.notificationsProducer.publish(
-                    new GenericKey(contact.getSite().getId().toString()),
+                    new NotificationKey(contact.getSite().getId()),
                     new PasswordResetNotification(contact.getSite().toMO(), contact.toMO().addEngine("email"), url) 
             );
             logger.info("Sent password reset for contact " + contact.getSite().getName() + "::" + contact.getName() + " (" + contact.getId() + ")");

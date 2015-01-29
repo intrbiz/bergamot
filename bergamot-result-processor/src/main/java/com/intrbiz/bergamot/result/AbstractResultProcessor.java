@@ -18,11 +18,13 @@ import com.intrbiz.bergamot.queue.NotificationQueue;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
+import com.intrbiz.bergamot.queue.key.UpdateKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
+import com.intrbiz.queue.name.NullKey;
 
 public abstract class AbstractResultProcessor implements ResultProcessor
 {
@@ -32,23 +34,23 @@ public abstract class AbstractResultProcessor implements ResultProcessor
 
     private WorkerQueue workerQueue;
 
-    private List<Consumer<Result>> resultConsumers = new LinkedList<Consumer<Result>>();
+    private List<Consumer<Result, ResultKey>> resultConsumers = new LinkedList<Consumer<Result, ResultKey>>();
     
-    private List<Consumer<Result>> fallbackConsumers = new LinkedList<Consumer<Result>>();
+    private List<Consumer<Result, ResultKey>> fallbackConsumers = new LinkedList<Consumer<Result, ResultKey>>();
 
-    private List<Consumer<ExecuteCheck>> deadConsumers = new LinkedList<Consumer<ExecuteCheck>>();
+    private List<Consumer<ExecuteCheck, NullKey>> deadConsumers = new LinkedList<Consumer<ExecuteCheck, NullKey>>();
 
     private SchedulerQueue schedulerQueue;
 
-    private RoutedProducer<SchedulerAction> schedulerActionProducer;
+    private RoutedProducer<SchedulerAction, SchedulerKey> schedulerActionProducer;
 
     private NotificationQueue notificationsQueue;
 
-    private RoutedProducer<Notification> notificationsProducer;
+    private RoutedProducer<Notification, NotificationKey> notificationsProducer;
 
     private UpdateQueue updateQueue;
 
-    private RoutedProducer<Update> updateProducer;
+    private RoutedProducer<Update, UpdateKey> updateProducer;
 
     private int threads = Runtime.getRuntime().availableProcessors();
 
@@ -72,17 +74,12 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     @Override
     public void ownPool(UUID site, int pool)
     {
-        for (Consumer<Result> consumer : this.resultConsumers)
+        for (Consumer<Result, ResultKey> consumer : this.resultConsumers)
         {
             consumer.addBinding(new ResultKey(site, pool));
             break;
         }
-        for (Consumer<Result> consumer : this.fallbackConsumers)
-        {
-            consumer.addBinding(new ResultKey(site, pool));
-            break;
-        }
-        for (Consumer<ExecuteCheck> consumer : this.deadConsumers)
+        for (Consumer<Result, ResultKey> consumer : this.fallbackConsumers)
         {
             consumer.addBinding(new ResultKey(site, pool));
             break;
@@ -92,17 +89,12 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     @Override
     public void disownPool(UUID site, int pool)
     {
-        for (Consumer<Result> consumer : this.resultConsumers)
+        for (Consumer<Result, ResultKey> consumer : this.resultConsumers)
         {
             consumer.removeBinding(new ResultKey(site, pool));
             break;
         }
-        for (Consumer<Result> consumer : this.fallbackConsumers)
-        {
-            consumer.removeBinding(new ResultKey(site, pool));
-            break;
-        }
-        for (Consumer<ExecuteCheck> consumer : this.deadConsumers)
+        for (Consumer<Result, ResultKey> consumer : this.fallbackConsumers)
         {
             consumer.removeBinding(new ResultKey(site, pool));
             break;
@@ -153,12 +145,12 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     protected void publishNotification(Check<?, ?> check, Notification notification)
     {
         if (logger.isTraceEnabled()) logger.trace("Sending notification:\r\n" + notification);
-        this.notificationsProducer.publish(new GenericKey(check.getSiteId().toString()), notification);
+        this.notificationsProducer.publish(new NotificationKey(check.getSiteId()), notification);
     }
 
     protected void publishUpdate(Check<?, ?> check, Update update)
     {
         if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
-        this.updateProducer.publish(new GenericKey(check.getSiteId().toString() + "." + check.getId()), update);
+        this.updateProducer.publish(new UpdateKey(check.getSiteId(), check.getId()), update);
     }
 }

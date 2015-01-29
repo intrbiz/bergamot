@@ -3,12 +3,12 @@ package com.intrbiz.bergamot.queue;
 
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.queue.impl.RabbitSchedulerQueue;
+import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 
 /**
  * Send scheduling actiions
@@ -25,12 +25,12 @@ public abstract class SchedulerQueue extends QueueAdapter
         return QueueManager.getInstance().queueAdapter(SchedulerQueue.class);
     }
     
-    public abstract RoutedProducer<SchedulerAction> publishSchedulerActions(GenericKey defaultKey);
+    public abstract RoutedProducer<SchedulerAction, SchedulerKey> publishSchedulerActions(SchedulerKey defaultKey);
     
-    public RoutedProducer<SchedulerAction> publishSchedulerActions()
+    public RoutedProducer<SchedulerAction, SchedulerKey> publishSchedulerActions()
     {
         return this.publishSchedulerActions(null);
     }
     
-    public abstract Consumer<SchedulerAction> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler);
+    public abstract Consumer<SchedulerAction, SchedulerKey> consumeSchedulerActions(DeliveryHandler<SchedulerAction> handler);
 }

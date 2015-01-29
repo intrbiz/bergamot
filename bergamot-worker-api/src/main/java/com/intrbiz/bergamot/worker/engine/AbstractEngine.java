@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ResultKey;
+import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.bergamot.worker.Worker;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
@@ -32,9 +33,9 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
 
     private WorkerQueue queue;
 
-    private List<Consumer<ExecuteCheck>> consumers = new LinkedList<Consumer<ExecuteCheck>>();
+    private List<Consumer<ExecuteCheck, WorkerKey>> consumers = new LinkedList<Consumer<ExecuteCheck, WorkerKey>>();
     
-    protected RoutedProducer<Result> resultProducer;
+    protected RoutedProducer<Result, ResultKey> resultProducer;
 
     public AbstractEngine(final String name)
     {

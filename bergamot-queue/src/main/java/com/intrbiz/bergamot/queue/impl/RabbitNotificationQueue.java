@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.queue.NotificationQueue;
+import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.Consumer;
@@ -13,7 +14,6 @@ import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueBrokerPool;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.GenericKey;
 import com.intrbiz.queue.rabbit.RabbitConsumer;
 import com.intrbiz.queue.rabbit.RabbitProducer;
 import com.rabbitmq.client.Channel;
@@ -43,9 +43,9 @@ public class RabbitNotificationQueue extends NotificationQueue
     }
 
     @Override
-    public RoutedProducer<Notification> publishNotifications(GenericKey defaultKey)
+    public RoutedProducer<Notification, NotificationKey> publishNotifications(NotificationKey defaultKey)
     {
-        return new RabbitProducer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), defaultKey, this.source.getRegistry().timer("publish-notifications"))
+        return new RabbitProducer<Notification, NotificationKey>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), defaultKey, this.source.getRegistry().timer("publish-notifications"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -61,9 +61,9 @@ public class RabbitNotificationQueue extends NotificationQueue
     }
 
     @Override
-    public Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site, String engineName)
+    public Consumer<Notification, NotificationKey> consumeNotifications(DeliveryHandler<Notification> handler, UUID site, String engineName)
     {
-        return new RabbitConsumer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), handler, this.source.getRegistry().timer("consume-notifications"), 1, false)
+        return new RabbitConsumer<Notification, NotificationKey>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), handler, this.source.getRegistry().timer("consume-notifications"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -84,9 +84,9 @@ public class RabbitNotificationQueue extends NotificationQueue
     }
     
     @Override
-    public Consumer<Notification> consumeNotifications(DeliveryHandler<Notification> handler, UUID site)
+    public Consumer<Notification, NotificationKey> consumeNotifications(DeliveryHandler<Notification> handler, UUID site)
     {
-        return new RabbitConsumer<Notification>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), handler, this.source.getRegistry().timer("consume-notifications"), 1, false)
+        return new RabbitConsumer<Notification, NotificationKey>(this.broker, this.transcoder.asQueueEventTranscoder(Notification.class), handler, this.source.getRegistry().timer("consume-notifications"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {

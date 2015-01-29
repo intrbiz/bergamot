@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.queue.UpdateQueue;
+import com.intrbiz.bergamot.queue.key.UpdateKey;
 import com.intrbiz.bergamot.updater.context.ClientContext;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.QueueException;
@@ -50,7 +51,7 @@ public class RegisterForUpdatesHandler extends RequestHandler
                     context.var("updateConsumer", queue.consumeUpdates((u) -> { context.send(new UpdateEvent(u)); }, bindings));
                     // on close handler
                     context.onClose((ctx) -> {
-                        Consumer<Update> c = ctx.var("updateConsumer");
+                        Consumer<Update, UpdateKey> c = ctx.var("updateConsumer");
                         if (c != null) c.close();
                         UpdateQueue q = ctx.var("updateQueue");
                         if (q != null) q.close();
@@ -73,17 +74,17 @@ public class RegisterForUpdatesHandler extends RequestHandler
         }
         else
         {
-            Set<String> bindings = new HashSet<String>();
+            Set<UpdateKey> bindings = new HashSet<UpdateKey>();
             for (UUID checkId : rfsn.getCheckIds())
             {
                 // validate the check id
                 if (checkId != null && context.getSite().getId().equals(Site.getSiteId(checkId))) 
-                    bindings.add(Site.getSiteId(checkId).toString() + "." + checkId.toString());
+                    bindings.add(new UpdateKey(Site.getSiteId(checkId), checkId));
             }
             if (!bindings.isEmpty())
             {
-                Consumer<Update> updateConsumer = context.var("updateConsumer");
-                for (String binding : bindings)
+                Consumer<Update, UpdateKey> updateConsumer = context.var("updateConsumer");
+                for (UpdateKey binding : bindings)
                 {
                     logger.info("Updating bindings, adding: " + binding);
                     updateConsumer.addBinding(binding);

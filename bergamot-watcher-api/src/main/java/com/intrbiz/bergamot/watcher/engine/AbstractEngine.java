@@ -19,6 +19,7 @@ import com.intrbiz.bergamot.queue.ControlQueue;
 import com.intrbiz.bergamot.queue.WatcherQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ResultKey;
+import com.intrbiz.bergamot.queue.key.WatcherKey;
 import com.intrbiz.bergamot.watcher.Watcher;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
@@ -43,11 +44,11 @@ public class AbstractEngine implements Engine, DeliveryHandler<CheckEvent>
     
     protected ControlQueue controlQueue;
 
-    protected Consumer<CheckEvent> watcherEventConsumer;
+    protected Consumer<CheckEvent, WatcherKey> watcherEventConsumer;
     
     protected Producer<ControlEvent> controlEventProducer;
     
-    private RoutedProducer<Result> resultProducer;
+    private RoutedProducer<Result, ResultKey> resultProducer;
 
     public AbstractEngine(final String name)
     {
