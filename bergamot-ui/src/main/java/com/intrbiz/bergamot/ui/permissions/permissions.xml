@@ -31,6 +31,10 @@
 		<summary>Allow access to view check downtime</summary>
 		<description>A contact must be granted this permission in order to be able to view downtime on a check</description>
 	</permission>
+	<permission name="ui.write.downtime">
+		<summary>Allow access to add check downtime</summary>
+		<description>A contact must be granted this permission in order to be able to add downtime to a check</description>
+	</permission>
 	<!-- API -->
 	<permission name="api.access">
 		<summary>Allow API access</summary>
