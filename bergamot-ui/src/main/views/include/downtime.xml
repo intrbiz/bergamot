@@ -1,0 +1,21 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa">
+	<div class="col4 dash_icon downtime">
+		<h3 class="summary">#{downtime.summary}</h3>
+	    <div class="description">#{coalesce(downtime.description, '')}</div>
+		<div class="metadata" style="margin-top: 10px;">
+			<span>By #{downtime.author.summary} at #{dateformat('HH:mm:ss', downtime.updated)} on #{dateformat('EEEE dd/MM/yyyy', downtime.updated)}</span>
+	    </div>
+    </div>
+    <div class="col4 dash_icon dowtime">
+		    <p>
+			    <span class="label">Starts: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', downtime.starts)} on #{dateformat('EEEE dd/MM/yyyy', downtime.starts)}</span>
+		    </p>
+		    <p>
+		    	<span class="label">Ends: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', downtime.ends)} on #{dateformat('EEEE dd/MM/yyyy', downtime.ends)}</span>
+		    </p>
+	    </div>
+</fragment>
