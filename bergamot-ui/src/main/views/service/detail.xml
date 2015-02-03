@@ -70,6 +70,9 @@
 	<!-- Comments -->
 	<include view="include/comments" data-check="#{service}"/>
 	
+	<!-- Downtime -->
+	<include view="include/downtimes" data-check="#{service}"/>
+	
 	<!-- Stats -->
 	<include view="include/check_stats" data-check="#{service}"/>
 	
