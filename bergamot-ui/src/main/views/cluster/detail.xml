@@ -76,6 +76,9 @@
 	<!-- Comments -->
 	<include view="include/comments" data-check="#{cluster}"/>
 	
+	<!-- Downtime -->
+	<include view="include/downtimes" data-check="#{cluster}"/>
+	
 	<!-- Configuration -->
 	<include view="include/check_configuration" data-check="#{cluster}"/>
 	
