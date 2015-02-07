@@ -71,6 +71,9 @@
 	<!-- Comments -->
 	<include view="include/comments" data-check="#{resource}"/>
 	
+	<!-- Downtime -->
+	<include view="include/downtimes" data-check="#{resource}"/>
+	
 	<!-- Configuration -->
 	<include view="include/check_configuration" data-check="#{resource}"/>
 	
