@@ -1210,7 +1210,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     // downtime
     
     @Cacheable
-    @CacheInvalidate({"get_downtimes_for_check.#{check_id}", "get_all_downtimes_for_check.#{check_id}"})
+    @CacheInvalidate({"get_downtimes_for_check.#{check_id}.*", "get_all_downtimes_for_check.#{check_id}"})
     @SQLSetter(table = Downtime.class, name = "set_downtime", since = @SQLVersion({1, 0, 0}))
     public abstract void setDowntime(Downtime downtime);
     
