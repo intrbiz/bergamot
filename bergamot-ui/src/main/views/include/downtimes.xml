@@ -3,10 +3,73 @@
 <fragment xmlns="com.intrbiz.balsa">
 	<container rendered="#{Balsa().permission('ui.read.downtime')}">
 		<h2>Downtime</h2>
+		<div class="row">
+			<div class="submenu pull-right" rendered="#{Balsa().permission('ui.write.downtime')}">
+				<a data-check-id="#{check.id}" id="add_downtime" href="#add-downtime">Add downtime</a>
+			</div>
+		</div>
 		<data-set var="downtime" value="#{check.getDowntime()}">
 			<div class="row" id="downtime-#{downtime.id}">
 				<include view="include/downtime"/>
 	    	</div>
 		</data-set>
+		<div id="downtime_modal" class="reveal-modal">
+	     	<h1>Add Dowtime</h1>
+	     	<form id="downtime_form" method="post" action="#downtime">
+	     		<p>Please explain why downtime is being added to this check.</p>
+	     		<p>
+	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Summary: </span>
+	     			<input type="text" id="downtime_summary" name="summary" placeholder="Down for service upgrade" style="width: 402px;"/>
+	     		</p>
+	     		<p>
+	     			<textarea id="downtime_description" name="description" style="width: 500px; height: 150px;"></textarea>
+	     		</p>
+	     		<p>
+	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Starts: </span>
+	     			<input type="text" id="downtime_starts" name="starts" placeholder="" style="width: 402px;"/>
+	     		</p>
+	     		<p>
+	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Ends: </span>
+	     			<input type="text" id="downtime_ends" name="ends" placeholder="" style="width: 402px;"/>
+	     		</p>
+	     		<p id="downtime_error" style="display: none;" class="error">
+	     			Failed to add downtime for this check, please try again.
+	     		</p>
+	     		<p>
+	     			<input type="submit" id="do_add_downtime" name="add_downtime" value="Add Downtime"/>
+	     		</p>
+	     	</form>
+	    	<a class="close-reveal-modal">&#215;</a>
+		</div>
+		<script type="text/javascript">
+			<![CDATA[
+				$(document).ready(function() {
+					$('#add_downtime').click(function(ev) {
+						ev.preventDefault();
+						var check_id = $(this).attr('data-check-id');
+						$('#downtime_form').attr('action', #{'"' + path('/api') + '"'} + '/downtime/add-downtime-to-check/id/' + check_id);
+						$('#acknowledge_form').attr('data-check-id', check_id);
+						// TODO: proper data handling
+						var now = (new Date()).getTime();
+						$('#downtime_starts').val( now );
+						$('#downtime_ends').val( (now + 7200000) );
+						$('#downtime_error').hide();
+						$('#downtime_modal').reveal();
+					});
+					$('#downtime_form').submit(function(ev) {
+					ev.preventDefault();
+					var check_id = $(this).attr('data-check-id');
+					$.post($(this).attr('action'), $("#downtime_form").serialize())
+					 .done(function(data) {
+					 	$('#downtime_modal').trigger('reveal:close');
+					 	// TODO: render the added downtime
+					 })
+					 .fail(function() {
+					 	$('#acknowledge_error').show();
+					 });
+				});
+				});
+			]]>
+		</script>
 	</container>
 </fragment>
