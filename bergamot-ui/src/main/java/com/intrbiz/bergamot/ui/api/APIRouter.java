@@ -14,6 +14,7 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.ErrorMO;
@@ -130,7 +131,7 @@ public class APIRouter extends Router<BergamotApp>
     @Before
     @Any("**")
     /* We don't want to filter the authentication routes */
-    @IgnorePaths({"/auth-token", "/extend-auth-token", "/test/hello/world"})
+    @IgnorePaths({"/auth-token", "/extend-auth-token", "/test/hello/world", "/app/auth-token"})
     @Order(10)
     @WithDataAdapter(BergamotDB.class)
     public void authenticateRequest(BergamotDB db)
@@ -146,6 +147,21 @@ public class APIRouter extends Router<BergamotApp>
         // setup the site based on the authenticated principal
         Contact contact = var("contact", currentPrincipal());
         var("site", contact.getSite());
+    }
+    
+    /**
+     * Authenticate a user for API access on behalf of an application, 
+     * this will generate a perpetual auth token
+     */
+    @Any("/app/auth-token")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public AuthTokenMO getAppAuthToken(BergamotDB db, @Param("app") @CheckStringLength(mandatory = true, min = 3, max = 80) String appName, @Param("username") String username, @Param("password") String password)
+    {
+        authenticateRequest(username, password);
+        String token = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(currentPrincipal());
+        db.setAPIToken(new APIToken(token, currentPrincipal(), Util.coalesceEmpty("Application: " + appName)));
+        return new AuthTokenMO(token, 0L);
     }
     
     /**
