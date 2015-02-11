@@ -26,7 +26,7 @@ public class StatsRouter extends Router<BergamotApp>
             BergamotDB db, 
             @AsUUID UUID id, 
             @Param("offset") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L)   long offset,
-            @Param("limit")  @IsaLong(min = 1, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 25L) long limit
+            @Param("limit")  @IsaLong(min = 1, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 100L) long limit
     )
     {
         model("check", db.getCheck(id));
