@@ -97,25 +97,25 @@
   
   <dependencyManagement>
   	<dependencies>
-  		<dependency>
-  			<groupId>junit</groupId>
-  			<artifactId>junit</artifactId>
-  			<version>4.10</version>
+  	  	<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-watcher-api</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   		<dependency>
-  			<groupId>org.hamcrest</groupId>
-  			<artifactId>hamcrest-all</artifactId>
-  			<version>1.1</version>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-worker-api</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   		<dependency>
-  			<groupId>com.intrbiz.core</groupId>
-  			<artifactId>core</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-check-http</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   		<dependency>
-  			<groupId>log4j</groupId>
-  			<artifactId>log4j</artifactId>
-  			<version>1.2.14</version>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-nrpe</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
@@ -131,11 +131,6 @@
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-config</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.express</groupId>
-  			<artifactId>express</artifactId>
-  			<version>4.0.0-SNAPSHOT</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
@@ -157,10 +152,165 @@
   			<artifactId>bergamot-daemon-config</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
+   		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-result-processor</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-scheduler</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-jnetraw</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-model</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-agent-message-model</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-crypto-util</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-nagios</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-notification-api</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.core</groupId>
+  			<artifactId>core</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.express</groupId>
+  			<artifactId>express</artifactId>
+  			<version>4.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.balsa</groupId>
+  			<artifactId>balsa-core</artifactId>
+  			<version>4.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.balsa</groupId>
+  			<artifactId>balsa-data</artifactId>
+  			<version>4.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.balsa</groupId>
+  			<artifactId>balsa-hazelcast</artifactId>
+  			<version>4.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.gerald</groupId>
+  			<artifactId>gerald-the-mole</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.gerald</groupId>
+  			<artifactId>polyakov-model</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.snmp-ib</groupId>
+  			<artifactId>snmp-ib</artifactId>
+  			<version>1.0.0-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>data-annotations</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>data-manager</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>data-database-adapter-compiler</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>cache-hazelcast</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>queue</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>crypto</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>scripting</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.util</groupId>
+  			<artifactId>bootstrap</artifactId>
+  			<version>1.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.3p.sigar</groupId>
+  			<artifactId>sigar</artifactId>
+  			<version>1.6.4</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>net.java.dev.jna</groupId>
+  			<artifactId>jna</artifactId>
+  			<version>4.0.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>org.bouncycastle</groupId>
+  			<artifactId>bcprov-jdk16</artifactId>
+  			<version>1.46</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.sun.mail</groupId>
+  			<artifactId>javax.mail</artifactId>
+  			<version>1.5.2</version>
+  		</dependency>
   		<dependency>
   			<groupId>junit</groupId>
   			<artifactId>junit-dep</artifactId>
   			<version>4.10</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
+  			<version>4.10</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>org.hamcrest</groupId>
+  			<artifactId>hamcrest-all</artifactId>
+  			<version>1.1</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>log4j</groupId>
+  			<artifactId>log4j</artifactId>
+  			<version>1.2.14</version>
   		</dependency>
   		<dependency>
   			<groupId>org.hamcrest</groupId>
@@ -183,34 +333,9 @@
   			<version>4.0.12.Final</version>
   		</dependency>
   		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-agent-message-model</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.gerald</groupId>
-  			<artifactId>polyakov-model</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.3p.sigar</groupId>
-  			<artifactId>sigar</artifactId>
-  			<version>1.6.4</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>bootstrap</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-crypto-util</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-nagios</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<groupId>com.twilio.sdk</groupId>
+  			<artifactId>twilio-java-sdk</artifactId>
+  			<version>3.4.4</version>
   		</dependency>
   		<dependency>
   			<groupId>com.fasterxml.jackson.core</groupId>
@@ -238,134 +363,9 @@
   			<version>4.3.1</version>
   		</dependency>
   		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>data-annotations</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>data-manager</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>data-database-adapter-compiler</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
   			<groupId>org.mindrot</groupId>
   			<artifactId>jbcrypt</artifactId>
   			<version>0.3m</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>cache-hazelcast</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>queue</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>net.java.dev.jna</groupId>
-  			<artifactId>jna</artifactId>
-  			<version>4.0.0</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>crypto</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>org.bouncycastle</groupId>
-  			<artifactId>bcprov-jdk16</artifactId>
-  			<version>1.46</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.sun.mail</groupId>
-  			<artifactId>javax.mail</artifactId>
-  			<version>1.5.2</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-notification-api</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.twilio.sdk</groupId>
-  			<artifactId>twilio-java-sdk</artifactId>
-  			<version>3.4.4</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-jnetraw</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-model</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.balsa</groupId>
-  			<artifactId>balsa-core</artifactId>
-  			<version>4.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.balsa</groupId>
-  			<artifactId>balsa-data</artifactId>
-  			<version>4.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-result-processor</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-scheduler</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.balsa</groupId>
-  			<artifactId>balsa-hazelcast</artifactId>
-  			<version>4.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.gerald</groupId>
-  			<artifactId>gerald-the-mole</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-watcher-api</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.snmp-ib</groupId>
-  			<artifactId>snmp-ib</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-worker-api</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-check-http</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-nrpe</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.util</groupId>
-  			<artifactId>scripting</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>
