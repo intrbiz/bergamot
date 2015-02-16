@@ -83,4 +83,12 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
         db.setDowntime(downtime);
         return downtime.toMO();
     }
+    
+    @Get("/id/:id/render")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String renderDowntime(BergamotDB db, @AsUUID UUID id)
+    {
+        return var("downtime", db.getDowntime(id)) == null ? null : encodeBuffered("include/downtime");
+    }
 }

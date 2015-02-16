@@ -3,7 +3,7 @@
 <fragment xmlns="com.intrbiz.balsa">
 	<container rendered="#{Balsa().permission('ui.read.downtime')}">
 		<h2>Downtime</h2>
-		<div class="row">
+		<div class="row" id="downtime_header_row">
 			<div class="submenu pull-right" rendered="#{Balsa().permission('ui.write.downtime')}">
 				<a data-check-id="#{check.id}" id="add_downtime" href="#add-downtime">Add downtime</a>
 			</div>
@@ -57,17 +57,43 @@
 						$('#downtime_modal').reveal();
 					});
 					$('#downtime_form').submit(function(ev) {
-					ev.preventDefault();
-					var check_id = $(this).attr('data-check-id');
-					$.post($(this).attr('action'), $("#downtime_form").serialize())
-					 .done(function(data) {
-					 	$('#downtime_modal').trigger('reveal:close');
-					 	// TODO: render the added downtime
-					 })
-					 .fail(function() {
-					 	$('#acknowledge_error').show();
-					 });
-				});
+						ev.preventDefault();
+						var check_id = $(this).attr('data-check-id');
+						$.post($(this).attr('action'), $("#downtime_form").serialize())
+						 .done(function(theDowntime) {
+						 	$('#downtime_modal').trigger('reveal:close');
+						 	// render the added downtime
+						 	$.get(#{'"' + path('/api') + '"')} + '/downtime/id/' + theDowntime.id + '/render', function(downtimeHtml) {
+							 	// container
+							 	var dwtdiv = document.createElement('div');
+							 	$(dwtdiv).attr('class', 'row');
+							 	$(dwtdiv).attr('id', 'downtime-' + theDowntime.id);
+						 		$(dwtdiv).html(downtimeHtml);
+						 		// bind remove handler
+						 		$(dwtdiv).find('a[data-downtime-id]').click(function(ev) {
+									ev.preventDefault();
+									// remove the downtime
+									var downtime_id = $(this).attr('data-downtime-id');
+									$.get(#{'"' + path('/api') + '"')} + '/downtime/id/' + downtime_id + '/remove', function(removed) {
+										if (removed) $('#downtime-' + downtime_id).remove();
+									});
+								});
+						 		// insert
+						 		$('#downtime_header_row').after(dwtdiv);
+							});
+						 })
+						 .fail(function() {
+						 	$('#acknowledge_error').show();
+						 });
+					});
+					$('a[data-downtime-id]').click(function(ev) {
+						ev.preventDefault();
+						// remove the downtime
+						var downtime_id = $(this).attr('data-downtime-id');
+						$.get(#{'"' + path('/api') + '"')} + '/downtime/id/' + downtime_id + '/remove', function(removed) {
+							if (removed) $('#downtime-' + downtime_id).remove();
+						});
+					});
 				});
 			]]>
 		</script>
