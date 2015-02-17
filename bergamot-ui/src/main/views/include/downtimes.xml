@@ -26,11 +26,11 @@
 	     		</p>
 	     		<p>
 	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Starts: </span>
-	     			<input type="text" id="downtime_starts" name="starts" placeholder="" style="width: 402px;"/>
+	     			<input type="text" data-datetime="yes" id="downtime_starts" name="starts" placeholder="YYYY-MM-DD 00:00" style="width: 402px;"/>
 	     		</p>
 	     		<p>
 	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Ends: </span>
-	     			<input type="text" id="downtime_ends" name="ends" placeholder="" style="width: 402px;"/>
+	     			<input type="text" data-datetime="yes" id="downtime_ends" name="ends" placeholder="YYYY-MM-DD 00:00" style="width: 402px;"/>
 	     		</p>
 	     		<p id="downtime_error" style="display: none;" class="error">
 	     			Failed to add downtime for this check, please try again.
@@ -44,15 +44,18 @@
 		<script type="text/javascript">
 			<![CDATA[
 				$(document).ready(function() {
+					$('input[data-datetime]').appendDtpicker({
+						"dateFormat": "YYYY-MM-DD hh:mm",
+						"minuteInterval": 15,
+						"futureOnly": true,
+						"todayButton": false,
+						"closeOnSelected": true
+					});
 					$('#add_downtime').click(function(ev) {
 						ev.preventDefault();
 						var check_id = $(this).attr('data-check-id');
 						$('#downtime_form').attr('action', #{'"' + path('/api') + '"'} + '/downtime/add-downtime-to-check/id/' + check_id);
 						$('#acknowledge_form').attr('data-check-id', check_id);
-						// TODO: proper data handling
-						var now = (new Date()).getTime();
-						$('#downtime_starts').val( now );
-						$('#downtime_ends').val( (now + 7200000) );
 						$('#downtime_error').hide();
 						$('#downtime_modal').reveal();
 					});
