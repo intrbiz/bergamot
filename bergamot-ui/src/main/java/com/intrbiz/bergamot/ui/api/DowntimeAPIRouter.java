@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.ui.api;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -15,12 +16,12 @@ import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.message.DowntimeMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.AsDate;
 import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaInt;
-import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
@@ -67,17 +68,18 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     public DowntimeMO addDowntimeToCheck(
             BergamotDB db, 
             @AsUUID UUID id,
-            @Param("starts") @IsaLong(min = 0, mandatory = true) Long startTime,
-            @Param("ends") @IsaLong(min = 0, mandatory = true) Long endTime,
+            @Param("starts") @AsDate("yyyy-MM-dd HH:mm") Date startTime,
+            @Param("ends") @AsDate("yyyy-MM-dd HH:mm") Date endTime,
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary,
             @Param("description") @CheckStringLength(min = 1, max = 4096, mandatory = true) String description
     )
     {
+        // TODO: timezone handling
         Check<?, ?> check = db.getCheck(id);
         if (check == null) throw new BalsaNotFound("No check with id: " + id);
         //
-        Timestamp starts = new Timestamp(startTime);
-        Timestamp ends = new Timestamp(endTime);
+        Timestamp starts = new Timestamp(startTime.getTime());
+        Timestamp ends = new Timestamp(endTime.getTime());
         //
         Downtime downtime = new Downtime().createdBy(this.currentPrincipal()).on(check).between(starts, ends).summary(summary).description(description);
         db.setDowntime(downtime);
