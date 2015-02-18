@@ -46,7 +46,7 @@
 				$(document).ready(function() {
 					$('input[data-datetime]').appendDtpicker({
 						"dateFormat": "YYYY-MM-DD hh:mm",
-						"minuteInterval": 15,
+						"minuteInterval": 5,
 						"futureOnly": true,
 						"todayButton": false,
 						"closeOnSelected": true
