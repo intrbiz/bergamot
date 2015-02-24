@@ -58,8 +58,8 @@ public class SMSEngine extends AbstractNotificationEngine
     {
         super.configure();
         // auth details
-        this.accountSid = this.config.getStringParameterValue("twillo.account", "");
-        this.authToken = this.config.getStringParameterValue("twillo.token", "");
+        this.accountSid = this.config.getStringParameterValue("twilio.account", "");
+        this.authToken = this.config.getStringParameterValue("twilio.token", "");
         // from number
         this.from = this.config.getStringParameterValue("from", "");
         // setup the client
