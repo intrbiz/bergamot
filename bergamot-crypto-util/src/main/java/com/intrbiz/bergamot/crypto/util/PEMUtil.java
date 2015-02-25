@@ -1,9 +1,12 @@
 package com.intrbiz.bergamot.crypto.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -29,6 +32,20 @@ public class PEMUtil
         }
     }
     
+    public static Certificate loadCertificate(String data) throws IOException
+    {
+        try (InputStream in = new ByteArrayInputStream(data.getBytes()))
+        {
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            Certificate cert =  factory.generateCertificate(in);
+            return cert;
+        }
+        catch (Exception e)
+        {
+            throw new IOException("Error loading certificate", e);
+        }
+    }
+    
     public static PrivateKey loadKey(File file) throws IOException
     {
         try
@@ -36,6 +53,26 @@ public class PEMUtil
             // need to use some BC classes to parse PEM files
             // fecking Java, POS at times
             try (PemReader pr = new PemReader(new FileReader(file)))
+            {
+                PemObject obj = pr.readPemObject();
+                KeyFactory kf = KeyFactory.getInstance("RSA");
+                PrivateKey key = kf.generatePrivate(new PKCS8EncodedKeySpec(obj.getContent()));
+                return key;
+            }
+        }
+        catch (Exception e)
+        {
+            throw new IOException("Error loading key", e);
+        }
+    }
+    
+    public static PrivateKey loadKey(String data) throws IOException
+    {
+        try
+        {
+            // need to use some BC classes to parse PEM files
+            // fecking Java, POS at times
+            try (PemReader pr = new PemReader(new StringReader(data)))
             {
                 PemObject obj = pr.readPemObject();
                 KeyFactory kf = KeyFactory.getInstance("RSA");
