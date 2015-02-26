@@ -1,10 +1,15 @@
 package com.intrbiz.bergamot.agent.agent.config;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.intrbiz.Util;
 import com.intrbiz.configuration.Configuration;
 
 @XmlRootElement(name = "bergamot-agent")
@@ -15,48 +20,63 @@ public class BergamotAgentCfg extends Configuration
 
     private String server;
     
-    private String caCertificateFile;
+    private String caCertificate;
     
-    private String keyFile;
+    private String key;
     
-    private String certificateFile;
+    private String certificate;
     
     public BergamotAgentCfg()
     {
         super();
     }
 
-    @XmlElement(name = "ca-certificate-file")
-    public String getCaCertificateFile()
+    @XmlElement(name = "ca-certificate")
+    public String getCaCertificate()
     {
-        return caCertificateFile;
+        return caCertificate;
+    }
+    
+    public String getCaCertificateTrimmed()
+    {
+        return trim(this.getCaCertificate());
     }
 
-    public void setCaCertificateFile(String caCertificateFile)
+    public void setCaCertificate(String caCertificate)
     {
-        this.caCertificateFile = caCertificateFile;
+        this.caCertificate = caCertificate;
     }
 
-    @XmlElement(name = "key-file")
-    public String getKeyFile()
+    @XmlElement(name = "key")
+    public String getKey()
     {
-        return keyFile;
+        return key;
+    }
+    
+    public String getKeyTrimmed()
+    {
+        return trim(this.getKey());
     }
 
-    public void setKeyFile(String keyFile)
+    public void setKey(String key)
     {
-        this.keyFile = keyFile;
+        this.key = key;
     }
 
-    @XmlElement(name = "certificate-file")
-    public String getCertificateFile()
+    @XmlElement(name = "certificate")
+    public String getCertificate()
     {
-        return certificateFile;
+        return certificate;
+    }
+    
+    public String getCertificateTrimmed()
+    {
+        return trim(this.getCertificate());
     }
 
-    public void setCertificateFile(String certificateFile)
+    public void setCertificate(String certificate)
     {
-        this.certificateFile = certificateFile;
+        this.certificate = certificate;
     }
 
     @XmlAttribute(name = "server")
@@ -68,5 +88,24 @@ public class BergamotAgentCfg extends Configuration
     public void setServer(String server)
     {
         this.server = server;
+    }
+    
+    private static String trim(String in)
+    {
+        if (Util.isEmpty(in)) return null;
+        StringBuilder out = new StringBuilder();
+        try (BufferedReader r = new BufferedReader(new StringReader(in)))
+        {
+            String l;
+            while ((l = r.readLine()) != null)
+            {
+                if (! Util.isEmpty(l)) out.append(l.trim()).append("\r\n");
+            }
+        }
+        catch (IOException e)
+        {
+        }
+        String trimmed = out.toString();
+        return Util.isEmpty(trimmed) ? null : trimmed;
     }
 }

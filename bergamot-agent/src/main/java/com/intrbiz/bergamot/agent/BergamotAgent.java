@@ -143,8 +143,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         {
             String pass = "abc123";
             // create the keystore
-            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File(this.configuration.getKeyFile()), new File(this.configuration.getCertificateFile()), new File(this.configuration.getCaCertificateFile()));
-            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File(this.configuration.getCaCertificateFile()));
+            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, this.configuration.getKeyTrimmed(), this.configuration.getCertificateTrimmed(), this.configuration.getCaCertificateTrimmed());
+            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(this.configuration.getCaCertificateTrimmed());
             // the key manager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(sks, pass.toCharArray());
@@ -158,7 +158,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Failed to init SSLContext");
+            throw new RuntimeException("Failed to init SSLContext", e);
         }
     }
     
