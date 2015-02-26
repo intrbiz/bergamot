@@ -64,6 +64,8 @@ import com.intrbiz.bergamot.model.message.scheduler.ResumeScheduler;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
+import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
+import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.queue.QueueEventTranscoder;
@@ -132,7 +134,10 @@ public class BergamotTranscoder
         // generic
         ErrorMO.class,
         // auth
-        AuthTokenMO.class
+        AuthTokenMO.class,
+        // stats
+        CheckStatsMO.class,
+        CheckTransitionMO.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();

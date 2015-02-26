@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.BergamotObject;
 import com.intrbiz.bergamot.model.Status;
-import com.intrbiz.bergamot.model.message.state.CheckStateMO;
+import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -22,7 +22,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * 
  */
 @SQLTable(schema = BergamotDB.class, name = "check_transition", since = @SQLVersion({ 1, 3, 0 }))
-public class CheckTransition extends BergamotObject<CheckStateMO>
+public class CheckTransition extends BergamotObject<CheckTransitionMO>
 {
     private static final long serialVersionUID = 1L;
     
@@ -689,5 +689,46 @@ public class CheckTransition extends BergamotObject<CheckStateMO>
         this.nextOutput = state.getOutput();
         this.nextStatus = state.getStatus();
         this.nextTransitioning = state.isTransitioning();
+    }
+    
+    public CheckTransitionMO toMO(boolean stub)
+    {
+        CheckTransitionMO mo = new CheckTransitionMO();
+        mo.setId(this.getId());
+        mo.setCheckId(this.getCheckId());
+        mo.setAppliedAt(this.getAppliedAt().getTime());
+        mo.setStateChange(this.isStateChange());
+        mo.setHardChange(this.isHardChange());
+        mo.setPreviousOk(this.isPreviousOk());
+        mo.setPreviousStatus(this.getPreviousStatus().toString());
+        mo.setPreviousOutput(this.getPreviousOutput());
+        mo.setPreviousLastCheckTime(this.getPreviousLastCheckTime().getTime());
+        mo.setPreviousLastCheckId(this.getPreviousLastCheckId());
+        mo.setPreviousAttempt(this.getPreviousAttempt());
+        mo.setPreviousHard(this.isPreviousHard());
+        mo.setPreviousTransitioning(this.isPreviousTransitioning());
+        mo.setPreviousFlapping(this.isPreviousFlapping());
+        mo.setPreviousLastStateChange(this.getPreviousLastStateChange().getTime());
+        mo.setPreviousOkHistory(this.getPreviousOkHistory());
+        mo.setPreviousLastHardOk(this.isPreviousLastHardOk());
+        mo.setPreviousLastHardStatus(this.getPreviousLastHardStatus().toString());
+        mo.setPreviousLastHardOutput(this.getPreviousLastHardOutput());
+        mo.setNextOk(this.isNextOk());
+        mo.setNextStatus(this.getNextStatus().toString());
+        mo.setNextOutput(this.getNextOutput());
+        mo.setNextLastCheckTime(this.getNextLastCheckTime().getTime());
+        mo.setNextLastCheckId(this.getNextLastCheckId());
+        mo.setNextAttempt(this.getNextAttempt());
+        mo.setNextHard(this.isNextHard());
+        mo.setNextTransitioning(this.isNextTransitioning());
+        mo.setNextFlapping(this.isNextFlapping());
+        mo.setNextLastStateChange(this.getNextLastStateChange().getTime());
+        mo.setNextOkHistory(this.getNextOkHistory());
+        mo.setNextLastHardOk(this.isNextLastHardOk());
+        mo.setNextLastHardStatus(this.getNextLastHardStatus().toString());
+        mo.setNextLastHardOutput(this.getNextLastHardOutput());
+        mo.setAlert(this.isAlert());
+        mo.setRecovery(this.isRecovery());
+        return mo;
     }
 }
