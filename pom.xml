@@ -93,6 +93,7 @@
     <module>bergamot-agent-message-model</module>
     <module>bergamot-crypto-util</module>
     <module>bergamot-nagios</module>
+    <module>bergamot-worker-agent</module>
   </modules>
   
   <dependencyManagement>
@@ -366,6 +367,11 @@
   			<groupId>org.mindrot</groupId>
   			<artifactId>jbcrypt</artifactId>
   			<version>0.3m</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-agent-server</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>

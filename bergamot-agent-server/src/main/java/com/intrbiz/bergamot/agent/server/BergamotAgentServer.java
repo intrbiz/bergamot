@@ -14,7 +14,7 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 
-import java.io.File;
+import java.io.FileReader;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.util.Collection;
@@ -87,8 +87,8 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         {
             String pass = "abc123";
             // create the keystore
-            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, new File(this.configuration.getKeyFile()), new File(this.configuration.getCertificateFile()), new File(this.configuration.getCaCertificateFile()));
-            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(new File(this.configuration.getCaCertificateFile()));
+            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, this.configuration.getKeyTrimmed(), this.configuration.getCertificateTrimmed(), this.configuration.getCaCertificateTrimmed());
+            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(this.configuration.getCaCertificateTrimmed());
             // the key manager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(sks, pass.toCharArray());
@@ -102,7 +102,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Failed to init SSLContext");
+            throw new RuntimeException("Failed to init SSLContext", e);
         }
     }
     
@@ -139,7 +139,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             logger.debug("Registered agents:");
             for (BergamotAgentServerHandler ag : this.agents.values())
             {
-                logger.info("  Agent: " + ag.getHello().getHostId() + " " + ag.getHello().getHostName() + " :: " + ag.getHello().getServiceId() + " " + ag.getHello().getServiceName());
+                logger.info("Agent: " + ag.getHello().getHostId() + " " + ag.getHello().getHostName() + " :: " + ag.getHello().getServiceId() + " " + ag.getHello().getServiceName());
             }
         }
         // fire the agent register hook
@@ -165,7 +165,11 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     
     public void setOnAgentRegisterHandler(Consumer<BergamotAgentServerHandler> onAgentRegister)
     {
-        this.onAgentRegister = onAgentRegister;
+        synchronized (this)
+        {
+            // set the handler or chain them
+            this.onAgentRegister = this.onAgentRegister == null ? onAgentRegister : this.onAgentRegister.andThen(onAgentRegister);
+        }
     }
     
     public Consumer<BergamotAgentServerHandler> getOnAgentRegister()
@@ -234,12 +238,8 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         //  the configuration
-        BergamotAgentServerCfg cfg = new BergamotAgentServerCfg();
-        cfg.setCaCertificateFile("ca.crt");
-        cfg.setKeyFile("hub.bergamot.local.key");
-        cfg.setCertificateFile("hub.bergamot.local.crt");
-        cfg.setPort(8081);
-        cfg.setRequireMatchingCertificate(true);
+        BergamotAgentServerCfg cfg = BergamotAgentServerCfg.read(BergamotAgentServerCfg.class, new FileReader("agent-server.xml"));
+        System.out.println(cfg);
         // setup the server
         BergamotAgentServer server = new BergamotAgentServer();
         server.configure(cfg);

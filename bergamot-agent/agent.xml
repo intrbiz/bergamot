@@ -1,4 +1,4 @@
-<bergamot-agent server="wss://hub.bergamot.local:8081/agent">
+<bergamot-agent server="wss://hub.bergamot.local:15443/agent">
 	<ca-certificate>
 		-----BEGIN CERTIFICATE-----
 		MIIFrTCCA5WgAwIBAgIJANFTjfB9GS9aMA0GCSqGSIb3DQEBBQUAMG0xCzAJBgNV
