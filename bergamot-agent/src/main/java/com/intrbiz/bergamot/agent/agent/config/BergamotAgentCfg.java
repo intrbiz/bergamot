@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.agent.agent.config;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -18,17 +19,43 @@ public class BergamotAgentCfg extends Configuration
 {
     private static final long serialVersionUID = 1L;
 
+    private UUID hostId;
+
+    private String hostName;
+
     private String server;
-    
+
     private String caCertificate;
-    
+
     private String key;
-    
+
     private String certificate;
-    
+
     public BergamotAgentCfg()
     {
         super();
+    }
+
+    @XmlAttribute(name = "host-id")
+    public UUID getHostId()
+    {
+        return hostId;
+    }
+
+    public void setHostId(UUID hostId)
+    {
+        this.hostId = hostId;
+    }
+
+    @XmlAttribute(name = "host-name")
+    public String getHostName()
+    {
+        return hostName;
+    }
+
+    public void setHostName(String hostName)
+    {
+        this.hostName = hostName;
     }
 
     @XmlElement(name = "ca-certificate")
@@ -36,7 +63,7 @@ public class BergamotAgentCfg extends Configuration
     {
         return caCertificate;
     }
-    
+
     public String getCaCertificateTrimmed()
     {
         return trim(this.getCaCertificate());
@@ -52,7 +79,7 @@ public class BergamotAgentCfg extends Configuration
     {
         return key;
     }
-    
+
     public String getKeyTrimmed()
     {
         return trim(this.getKey());
@@ -68,7 +95,7 @@ public class BergamotAgentCfg extends Configuration
     {
         return certificate;
     }
-    
+
     public String getCertificateTrimmed()
     {
         return trim(this.getCertificate());
@@ -89,7 +116,7 @@ public class BergamotAgentCfg extends Configuration
     {
         this.server = server;
     }
-    
+
     private static String trim(String in)
     {
         if (Util.isEmpty(in)) return null;
@@ -99,7 +126,7 @@ public class BergamotAgentCfg extends Configuration
             String l;
             while ((l = r.readLine()) != null)
             {
-                if (! Util.isEmpty(l)) out.append(l.trim()).append("\r\n");
+                if (!Util.isEmpty(l)) out.append(l.trim()).append("\r\n");
             }
         }
         catch (IOException e)
