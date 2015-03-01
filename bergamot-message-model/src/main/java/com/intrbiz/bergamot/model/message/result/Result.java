@@ -242,6 +242,19 @@ public class Result extends Message
     }
     
     @JsonIgnore
+    public Result passive(UUID checkId)
+    {
+        this.setId(UUID.randomUUID());
+        this.setCheckType(null);
+        this.setCheckId(checkId);
+        this.setSiteId(new UUID((checkId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L));
+        this.setProcessingPool(0);
+        this.setCheck(null);
+        this.setExecuted(System.currentTimeMillis());
+        return this;
+    }
+    
+    @JsonIgnore
     public Result pending(String output)
     {
         this.setOk(true);
