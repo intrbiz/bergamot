@@ -1,4 +1,4 @@
-<bergamot-agent server="wss://hub.bergamot.local:15443/agent" host-id="6fcbc110-bf61-11e4-91ae-675fd4a624a5" host-name="agent.cellis.intrbiz.net">
+<bergamot-agent server="wss://hub.bergamot.local:15443/agent" host-id="90947610-44bc-45d7-abb4-d43e4ac751ce" host-name="cellis.intrbiz.net">
 	<ca-certificate>
 		-----BEGIN CERTIFICATE-----
 		MIIFrTCCA5WgAwIBAgIJANFTjfB9GS9aMA0GCSqGSIb3DQEBBQUAMG0xCzAJBgNV
