@@ -43,7 +43,6 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
-import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.configuration.Configurable;
 
 public class BergamotAgentServer implements Runnable, Configurable<BergamotAgentServerCfg>
@@ -59,6 +58,8 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     private ConcurrentMap<UUID, BergamotAgentServerHandler> agents = new ConcurrentHashMap<UUID, BergamotAgentServerHandler>();
     
     private Consumer<BergamotAgentServerHandler> onAgentRegister;
+    
+    private Consumer<BergamotAgentServerHandler> onAgentUnregister = null;
     
     private SSLContext sslContext;
     
@@ -131,8 +132,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     public void registerAgent(BergamotAgentServerHandler agent)
     {
         // register the agent
-        AgentHello hello = agent.getHello();
-        this.agents.put(hello.getHostId(), agent);
+        this.agents.put(agent.getHello().getHostId(), agent);
         // list registered agents for debugging
         if (logger.isDebugEnabled())
         {
@@ -149,8 +149,9 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     public void unregisterAgent(BergamotAgentServerHandler agent)
     {
         logger.debug("Agent unregister!");
-        AgentHello hello = agent.getHello();
-        this.agents.remove(hello.getHostId());
+        this.agents.remove(agent.getHello().getHostId());
+        // fire the event
+        if (this.onAgentUnregister != null) this.onAgentUnregister.accept(agent);
     }
     
     public BergamotAgentServerHandler getRegisteredAgent(UUID id)
@@ -172,6 +173,15 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         }
     }
     
+    public void setOnAgentUnregisterHandler(Consumer<BergamotAgentServerHandler> onAgentUnregister)
+    {
+        synchronized (this)
+        {
+            // set the handler or chain them
+            this.onAgentUnregister = this.onAgentUnregister == null ? onAgentUnregister : this.onAgentUnregister.andThen(onAgentUnregister);
+        }
+    }
+    
     public Consumer<BergamotAgentServerHandler> getOnAgentRegister()
     {
         return this.onAgentRegister;
@@ -188,8 +198,6 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         workerGroup = new NioEventLoopGroup();
         try
         {
-            SSLEngine engine = createSSLEngine();
-            //
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup);
             b.channel(NioServerSocketChannel.class);
@@ -198,6 +206,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception
                 {
+                    SSLEngine engine = createSSLEngine();
                     ChannelPipeline pipeline = ch.pipeline();
                     pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  30 /* seconds */ )); 
                     pipeline.addLast("write-timeout", new WriteTimeoutHandler( 30 /* seconds */ ));
@@ -210,8 +219,10 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             //
             Channel ch = b.bind(this.configuration.getPort()).sync().channel();
             logger.info("Web socket server started at port " + this.configuration.getPort() + '.');
-            //
+            // await the server to stop
             ch.closeFuture().sync();
+            // log
+            logger.info("Agent server has shutdown");
         }
         catch (Exception e)
         {
