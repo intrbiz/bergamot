@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.configuration.Configurable;
 
 /**
@@ -24,6 +25,11 @@ public interface Executor<T extends Engine> extends Configurable<ExecutorCfg>
      * Execute the check
      */
     void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter);
+    
+    /**
+     * Publish a result out of band
+     */
+    void publishResult(ResultKey key, Result result);
     
     void start() throws Exception;
 }

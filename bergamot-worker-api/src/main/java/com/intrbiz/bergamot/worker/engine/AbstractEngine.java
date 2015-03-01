@@ -97,12 +97,20 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     }
     
     @Override
+    public void publishResult(ResultKey key, Result result)
+    {
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
+        }
+        this.resultProducer.publish(key, result);
+    }
+    
+    @Override
     public void execute(ExecuteCheck task)
     {
         this.execute(task, (result) -> {
-            if (logger.isTraceEnabled()) 
-                logger.trace("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
-            this.resultProducer.publish(new ResultKey(task.getSiteId(), task.getProcessingPool()), result);
+            this.publishResult(new ResultKey(task.getSiteId(), task.getProcessingPool()), result);
         });
     }
     

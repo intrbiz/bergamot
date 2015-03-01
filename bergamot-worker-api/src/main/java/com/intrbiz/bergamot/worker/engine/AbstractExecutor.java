@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.worker.engine;
 
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.queue.key.ResultKey;
 
 public abstract class AbstractExecutor<T extends Engine> implements Executor<T>
 {
@@ -52,5 +54,11 @@ public abstract class AbstractExecutor<T extends Engine> implements Executor<T>
     public boolean accept(ExecuteCheck task)
     {
         return task instanceof ExecuteCheck;
+    }
+
+    @Override
+    public void publishResult(ResultKey key, Result result)
+    {
+        this.getEngine().publishResult(key, result);
     }
 }
