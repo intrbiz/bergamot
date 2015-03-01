@@ -51,10 +51,18 @@ public class DeregisterPoolTask implements ClusterMigration
     {
         Logger logger = Logger.getLogger(DeregisterPoolTask.class);
         logger.info("Deregistering Pool " + this.site + "." + this.pool + " on member " + clusterManager.getLocalMemberUUID());
-        // tell the processor we are registering this  pool with it
-        clusterManager.getResultProcessor().disownPool(this.getSite(), this.getPool());
-        // tell the scheduler we are registering this pool with it
-        clusterManager.getScheduler().disownPool(this.getSite(), this.getPool());
+        // unsetup result processing
+        if (!Boolean.getBoolean("bergamot.ui.resultprocessor.off"))
+        {
+            // tell the processor we are registering this  pool with it
+            clusterManager.getResultProcessor().disownPool(this.getSite(), this.getPool());
+        }
+        // unsetup scheduling
+        if (!Boolean.getBoolean("bergamot.ui.scheduler.off"))
+        {
+            // tell the scheduler we are registering this pool with it
+            clusterManager.getScheduler().disownPool(this.getSite(), this.getPool());
+        }
         return true;
     }
     

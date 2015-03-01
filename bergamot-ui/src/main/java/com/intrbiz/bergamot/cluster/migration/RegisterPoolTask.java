@@ -55,21 +55,29 @@ public class RegisterPoolTask implements ClusterMigration
     {
         Logger logger = Logger.getLogger(RegisterPoolTask.class);
         logger.info("Registering Pool " + this.site + "." + this.pool + " on member " + clusterManager.getLocalMemberUUID());
-        // tell the processor we are registering this  pool with it
-        clusterManager.getResultProcessor().ownPool(this.getSite(), this.getPool());
-        // tell the scheduler we are registering this pool with it
-        clusterManager.getScheduler().ownPool(this.getSite(), this.getPool());
-        // register all hosts and services with the scheduler
-        Scheduler scheduler = clusterManager.getScheduler();
-        try (BergamotDB db = BergamotDB.connect())
+        // setup result processing
+        if (!Boolean.getBoolean("bergamot.ui.resultprocessor.off"))
         {
-            for (Host host : db.listHostsInPool(this.getSite(), this.getPool()))
+            // tell the processor we are registering this  pool with it
+            clusterManager.getResultProcessor().ownPool(this.getSite(), this.getPool());
+        }
+        // setup scheduling
+        if (!Boolean.getBoolean("bergamot.ui.scheduler.off"))
+        {
+            // tell the scheduler we are registering this pool with it
+            clusterManager.getScheduler().ownPool(this.getSite(), this.getPool());
+            // register all hosts and services with the scheduler
+            Scheduler scheduler = clusterManager.getScheduler();
+            try (BergamotDB db = BergamotDB.connect())
             {
-                scheduler.schedule(host);
-            }
-            for (Service service : db.listServicesInPool(this.getSite(), this.getPool()))
-            {
-                scheduler.schedule(service);
+                for (Host host : db.listHostsInPool(this.getSite(), this.getPool()))
+                {
+                    scheduler.schedule(host);
+                }
+                for (Service service : db.listServicesInPool(this.getSite(), this.getPool()))
+                {
+                    scheduler.schedule(service);
+                }
             }
         }
         return true;
