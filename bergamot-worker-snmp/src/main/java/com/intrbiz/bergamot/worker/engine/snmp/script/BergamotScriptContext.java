@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 
 public class BergamotScriptContext
@@ -30,37 +31,37 @@ public class BergamotScriptContext
     
     public void ok(String message)
     {
-        this.publish(new Result().fromCheck(this.executeCheck).ok(message));
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).ok(message));
     }
     
     public void warning(String message)
     {
-        this.publish(new Result().fromCheck(this.executeCheck).warning(message));
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).warning(message));
     }
     
     public void critical(String message)
     {
-        this.publish(new Result().fromCheck(this.executeCheck).critical(message));
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).critical(message));
     }
     
     public void unknown(String message)
     {
-        this.publish(new Result().fromCheck(this.executeCheck).unknown(message));
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).unknown(message));
     }
     
     public void error(String message)
     {
-        this.publish(new Result().fromCheck(this.executeCheck).error(message));
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).error(message));
     }
     
     public void error(Throwable error)
     {
-        this.publish(new Result().fromCheck(this.executeCheck).error(error));
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).error(error));
     }
     
     public void timeout(String message)
     {
-        this.publish(new Result().fromCheck(this.executeCheck).timeout(message));
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).timeout(message));
     }
     
     public void publish(Result result)
@@ -70,7 +71,7 @@ public class BergamotScriptContext
     
     public Result createResult()
     {
-        return new Result().fromCheck(this.getCheck());
+        return new ActiveResultMO().fromCheck(this.getCheck());
     }
     
     public void require(String parameterName)

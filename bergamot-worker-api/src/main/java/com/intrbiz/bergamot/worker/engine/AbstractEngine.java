@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ResultKey;
@@ -125,7 +126,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
                 return;
             }
         }
-        onResult.accept(new Result().fromCheck(task).error("No executor found to execute check"));
+        onResult.accept(new ActiveResultMO().fromCheck(task).error("No executor found to execute check"));
     }
 
     @Override

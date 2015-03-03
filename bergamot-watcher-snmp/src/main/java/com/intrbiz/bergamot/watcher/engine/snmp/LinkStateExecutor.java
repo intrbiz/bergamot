@@ -10,6 +10,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.SNMPContextId;
@@ -57,7 +58,7 @@ public class LinkStateExecutor extends AbstractSNMPExecutor
                 if (trap != null)
                 {
                     logger.debug("Mapped to trap: " + linkEvent.getDescription() + " => " + trap.check.getCheckType() + " " + trap.check.getCheckId());
-                    Result result = new Result().fromCheck(trap.check);
+                    Result result = new ActiveResultMO().fromCheck(trap.check);
                     // is the link ok or not?
                     if (linkEvent.getAdminState() == linkEvent.getOperationalState())
                     {
@@ -80,7 +81,7 @@ public class LinkStateExecutor extends AbstractSNMPExecutor
         catch (Exception e)
         {
             logger.error("Failed to register check for " + check.getCheckType() + " " + check.getCheckId(), e);
-            resultConsumer.accept(new Result().fromCheck(check).error(e));
+            resultConsumer.accept(new ActiveResultMO().fromCheck(check).error(e));
         }
     }
 

@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.TrapMO;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -69,7 +70,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
         Trap trap = db.getTrap(id);
         if (trap == null) return null;
         // the result
-        Result result = new Result();
+        Result result = new ActiveResultMO();
         result.setId(UUID.randomUUID());
         result.setCheckType(trap.getType());
         result.setCheckId(trap.getId());

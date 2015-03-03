@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.crypto.util.CertInfo;
 import com.intrbiz.bergamot.crypto.util.TLSInfo;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -89,7 +90,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
             check.execute((response) -> {
                 logger.info("Got response for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                Result result = new Result().fromCheck(executeCheck);
+                Result result = new ActiveResultMO().fromCheck(executeCheck);
                 // check the response
                 TLSInfo tls = response.getTlsInfo();
                 CertInfo serverCert = tls.getServerCertInfo();
@@ -126,7 +127,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
                 tctx.stop();
                 failedRequests.inc();
                 logger.error("Error for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
-                resultSubmitter.accept(new Result().fromCheck(executeCheck).error(error));
+                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(error));
             });
         }
         catch (Exception e)
@@ -134,7 +135,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
             logger.error("Failed to execute TLS Certificate check", e);
             tctx.stop();
             this.failedRequests.inc();
-            resultSubmitter.accept(new Result().fromCheck(executeCheck).error(e));
+            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }        
     }
 

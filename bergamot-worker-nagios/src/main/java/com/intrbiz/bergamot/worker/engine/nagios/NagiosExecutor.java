@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
@@ -66,7 +67,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     public void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
     {
         logger.debug("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
-        Result result = new Result().fromCheck(executeCheck);
+        Result result = new ActiveResultMO().fromCheck(executeCheck);
         try
         {
             // validate the command line

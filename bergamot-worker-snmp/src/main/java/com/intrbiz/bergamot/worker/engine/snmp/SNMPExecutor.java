@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.snmp.script.BergamotScriptContext;
@@ -55,7 +56,7 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
             // open the context
             SNMPContext<?> agent = this.openContext(executeCheck);
             // setup wrapped context
-            SNMPContext<?> wrapped = agent.with((error) -> { resultSubmitter.accept(new Result().error(error)); });
+            SNMPContext<?> wrapped = agent.with((error) -> { resultSubmitter.accept(new ActiveResultMO().error(error)); });
             // setup the script engine
             ScriptEngine script = factory.getEngineByName("nashorn");
             SimpleBindings bindings = new SimpleBindings();
@@ -69,7 +70,7 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
         catch (Exception e)
         {
             logger.error("Error executing check", e);
-            resultSubmitter.accept(new Result().fromCheck(executeCheck).error(e));
+            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
     

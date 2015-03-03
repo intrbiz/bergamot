@@ -8,6 +8,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -60,7 +61,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             this.getEngine().getPoller().command(
                 host, 5666, 5,  60, 
                 (response) -> {
-                    Result result = new Result().fromCheck(executeCheck);
+                    Result result = new ActiveResultMO().fromCheck(executeCheck);
                     result.setOk(response.toOk());
                     result.setStatus(response.toStatus());
                     result.setOutput(response.getOutput());
@@ -71,7 +72,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                 (exception) -> {
                     tctx.stop();
                     failedRequests.inc();
-                    resultSubmitter.accept(new Result().fromCheck(executeCheck).error(exception));
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(exception));
                 },
                 command
             );
@@ -81,7 +82,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             logger.error("Failed to execute NRPE check", e);
             tctx.stop();
             this.failedRequests.inc();
-            resultSubmitter.accept(new Result().fromCheck(executeCheck).error(e));
+            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }        
     }
 }

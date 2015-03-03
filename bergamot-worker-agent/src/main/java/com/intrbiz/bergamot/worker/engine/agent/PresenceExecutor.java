@@ -8,6 +8,8 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
@@ -40,7 +42,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     {
         logger.debug("Checking Bergamot Agent presence");
         // check the host presence
-        Result result = new Result().fromCheck(executeCheck);
+        Result result = new ActiveResultMO().fromCheck(executeCheck);
         // lookup the agent
         BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(executeCheck.getCheckId());
         if (agent != null)
@@ -72,7 +74,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             // debug log
             logger.debug("Got agent connection: " + hostName + " " + hostId);
             // submit a passive result for the host
-            this.publishResult(new ResultKey(hostId), new Result().passive(hostId).ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected"));
+            this.publishResult(new ResultKey(hostId), new PassiveResultMO().passive(hostId).ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected"));
         });
         // on disconnection
         this.getEngine().getAgentServer().setOnAgentUnregisterHandler((handler) -> {
@@ -83,7 +85,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             // debug log
             logger.debug("Got agent disconnection: " + hostName + " " + hostId);
             // submit a passive result for the host
-            this.publishResult(new ResultKey(hostId), new Result().passive(hostId).critical("Bergamot Agent disconnected"));
+            this.publishResult(new ResultKey(hostId), new PassiveResultMO().passive(hostId).critical("Bergamot Agent disconnected"));
         });
     }
 }

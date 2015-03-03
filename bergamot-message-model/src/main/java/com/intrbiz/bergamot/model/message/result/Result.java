@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
@@ -15,8 +14,7 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 /**
  * The result of a check
  */
-@JsonTypeName("bergamot.result")
-public class Result extends Message
+public abstract class Result extends Message
 {
     @JsonProperty("check_type")
     private String checkType;

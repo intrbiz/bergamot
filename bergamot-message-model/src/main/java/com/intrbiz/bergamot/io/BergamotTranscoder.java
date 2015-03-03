@@ -55,7 +55,8 @@ import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.PauseScheduler;
@@ -101,7 +102,8 @@ public class BergamotTranscoder
         // messages
         // check
         ExecuteCheck.class,
-        Result.class,
+        ActiveResultMO.class,
+        PassiveResultMO.class,
         // notifications
         SendAlert.class,
         SendRecovery.class,

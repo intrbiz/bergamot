@@ -23,6 +23,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.Result;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.model.state.CheckState;
@@ -44,7 +45,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // we failed to execute the given check in time, oops!
         logger.warn("Failed to execute check, workers aren't working hard enough: " + check.getId() + "\r\n" + check);
         // fake a timeout result and submit it
-        this.processExecuted(new Result().fromCheck(check).timeout("Worker timeout whilst executing check"));
+        this.processExecuted(new ActiveResultMO().fromCheck(check).timeout("Worker timeout whilst executing check"));
     }
 
     @Override
