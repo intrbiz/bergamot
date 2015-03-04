@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.ui.action;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.metadata.Action;
@@ -14,7 +14,7 @@ public class DispatchResultAction
     
     private WorkerQueue queue;
     
-    private RoutedProducer<Result, ResultKey> resultProducer;
+    private RoutedProducer<ResultMO, ResultKey> resultProducer;
     
     public DispatchResultAction()
     {
@@ -23,14 +23,14 @@ public class DispatchResultAction
     }
     
     @Action("dispatch-result")
-    public void dispatchResult(Result result)
+    public void dispatchResult(ResultMO resultMO)
     {
         // fire off the result
-        if (logger.isTraceEnabled()) logger.trace("Dispatching result:\r\n" + result);
+        if (logger.isTraceEnabled()) logger.trace("Dispatching result:\r\n" + resultMO);
         // TODO
         synchronized (this)
         {
-            this.resultProducer.publish(new ResultKey(result.getSiteId(), result.getProcessingPool()), result);
+            this.resultProducer.publish(new ResultKey(resultMO.getSiteId(), resultMO.getProcessingPool()), resultMO);
         }
     }
 }

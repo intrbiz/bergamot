@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
  * The result of a active check
  */
 @JsonTypeName("bergamot.result.active")
-public class ActiveResultMO extends Result
+public class ActiveResultMO extends ResultMO
 {
 
     public ActiveResultMO()

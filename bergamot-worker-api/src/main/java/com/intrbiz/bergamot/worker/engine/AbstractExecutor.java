@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.worker.engine;
 
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 
 public abstract class AbstractExecutor<T extends Engine> implements Executor<T>
@@ -57,8 +57,8 @@ public abstract class AbstractExecutor<T extends Engine> implements Executor<T>
     }
 
     @Override
-    public void publishResult(ResultKey key, Result result)
+    public void publishResult(ResultKey key, ResultMO resultMO)
     {
-        this.getEngine().publishResult(key, result);
+        this.getEngine().publishResult(key, resultMO);
     }
 }

@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.snmp.script.BergamotScriptContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
@@ -46,7 +46,7 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
         logger.debug("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         try

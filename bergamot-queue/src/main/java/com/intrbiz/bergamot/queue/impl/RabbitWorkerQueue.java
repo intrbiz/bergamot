@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
@@ -126,9 +126,9 @@ public class RabbitWorkerQueue extends WorkerQueue
     }
 
     @Override
-    public RoutedProducer<Result, ResultKey> publishResults(ResultKey defaultKey)
+    public RoutedProducer<ResultMO, ResultKey> publishResults(ResultKey defaultKey)
     {
-        return new RabbitProducer<Result, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), defaultKey, this.source.getRegistry().timer("publish-result"))
+        return new RabbitProducer<ResultMO, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), defaultKey, this.source.getRegistry().timer("publish-result"))
         {
             protected String setupExchange(Channel on) throws IOException
             {
@@ -144,9 +144,9 @@ public class RabbitWorkerQueue extends WorkerQueue
     }
 
     @Override
-    public Consumer<Result, ResultKey> consumeResults(DeliveryHandler<Result> handler, String instance)
+    public Consumer<ResultMO, ResultKey> consumeResults(DeliveryHandler<ResultMO> handler, String instance)
     {
-        return new RabbitConsumer<Result, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), handler, this.source.getRegistry().timer("consume-result"))
+        return new RabbitConsumer<ResultMO, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"))
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -180,9 +180,9 @@ public class RabbitWorkerQueue extends WorkerQueue
     }
     
     @Override
-    public Consumer<Result, ResultKey> consumeFallbackResults(DeliveryHandler<Result> handler)
+    public Consumer<ResultMO, ResultKey> consumeFallbackResults(DeliveryHandler<ResultMO> handler)
     {
-        return new RabbitConsumer<Result, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(Result.class), handler, this.source.getRegistry().timer("consume-fallback-result"))
+        return new RabbitConsumer<ResultMO, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-fallback-result"))
         {
             public String setupQueue(Channel on) throws IOException
             {

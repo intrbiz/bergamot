@@ -6,7 +6,7 @@ import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.configuration.Configurable;
 
 /**
@@ -20,7 +20,7 @@ public interface Executor<T extends Engine> extends Configurable<ExecutorCfg>
     
     boolean accept(CheckEvent check);
     
-    void register(RegisterCheck check, Consumer<Result> resultConsumer);
+    void register(RegisterCheck check, Consumer<ResultMO> resultConsumer);
     
     void unregister(UnregisterCheck check);
     

@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -70,20 +70,20 @@ public class TrapAPIRouter extends Router<BergamotApp>
         Trap trap = db.getTrap(id);
         if (trap == null) return null;
         // the result
-        Result result = new ActiveResultMO();
-        result.setId(UUID.randomUUID());
-        result.setCheckType(trap.getType());
-        result.setCheckId(trap.getId());
-        result.setSiteId(trap.getSiteId());
-        result.setProcessingPool(trap.getPool());
-        result.setStatus(status);
-        result.setOk("OK".equalsIgnoreCase(status));
-        result.setOutput(output);
-        result.setExecuted(0);
-        result.setRuntime(0);
-        result.setParameter("bergamot.ui.instance", this.app().getInstanceName());
+        ResultMO resultMO = new ActiveResultMO();
+        resultMO.setId(UUID.randomUUID());
+        resultMO.setCheckType(trap.getType());
+        resultMO.setCheckId(trap.getId());
+        resultMO.setSiteId(trap.getSiteId());
+        resultMO.setProcessingPool(trap.getPool());
+        resultMO.setStatus(status);
+        resultMO.setOk("OK".equalsIgnoreCase(status));
+        resultMO.setOutput(output);
+        resultMO.setExecuted(0);
+        resultMO.setRuntime(0);
+        resultMO.setParameter("bergamot.ui.instance", this.app().getInstanceName());
         // dispatch the result for processing
-        action("dispatch-result", result);
+        action("dispatch-result", resultMO);
         return "Accepted";
     }
     

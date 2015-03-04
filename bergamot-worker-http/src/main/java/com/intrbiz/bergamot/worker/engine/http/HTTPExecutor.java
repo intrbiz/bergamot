@@ -15,7 +15,7 @@ import com.intrbiz.bergamot.check.http.HTTPCheckResponse;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -55,7 +55,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
     }
     
     @Override
-    public void execute(final ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
+    public void execute(final ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
         logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getExecutor() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         // time it
@@ -88,16 +88,16 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             check.execute((response) -> {
                 logger.info("Got response for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                Result result = new ActiveResultMO().fromCheck(executeCheck);           
+                ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);           
                 // check the response
-                boolean   cont = checkStatus(executeCheck, response, result);
-                if (cont) cont = checkRuntime(executeCheck, response, result);
-                if (cont) cont = checkLength(executeCheck, response, result);
-                if (cont) cont = checkContent(executeCheck, response, result);
+                boolean   cont = checkStatus(executeCheck, response, resultMO);
+                if (cont) cont = checkRuntime(executeCheck, response, resultMO);
+                if (cont) cont = checkLength(executeCheck, response, resultMO);
+                if (cont) cont = checkContent(executeCheck, response, resultMO);
                 // submit the result
-                result.setRuntime(response.getRuntime());
+                resultMO.setRuntime(response.getRuntime());
                 tctx.stop();
-                resultSubmitter.accept(result); 
+                resultSubmitter.accept(resultMO); 
             }, 
             (error) -> {
                 tctx.stop();
@@ -115,18 +115,18 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
         }        
     }
     
-    protected boolean checkStatus(ExecuteCheck check, HTTPCheckResponse response, Result result)
+    protected boolean checkStatus(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
     {
         if (check.getIntParameterCSV("status", "200, 301, 302, 304").stream().anyMatch((stat) -> { return response.getResponse().getStatus().code() == stat; }))
         {
-            result.ok("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
+            resultMO.ok("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
             return true;
         }
-        result.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
+        resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
         return false;
     }
     
-    protected boolean checkRuntime(ExecuteCheck check, HTTPCheckResponse response, Result result)
+    protected boolean checkRuntime(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
     {
         if (check.containsParameter("critical_response_time"))
         {
@@ -135,7 +135,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             {
                 if (response.getRuntime() > criticalResponseTime)
                 {
-                    result.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + criticalResponseTime + "ms)");
+                    resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + criticalResponseTime + "ms)");
                     return false;
                 }
             }
@@ -147,7 +147,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             {
                 if (response.getRuntime() > warningResponseTime)
                 {
-                    result.warning("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + warningResponseTime + "ms)");
+                    resultMO.warning("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + warningResponseTime + "ms)");
                     return false;
                 }
             }
@@ -155,7 +155,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
         return true;
     }
     
-    protected boolean checkLength(ExecuteCheck check, HTTPCheckResponse response, Result result)
+    protected boolean checkLength(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
     {
         if (check.containsParameter("length"))
         {
@@ -165,7 +165,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 int contentLength = response.getResponse().content().capacity();
                 if (contentLength < length)
                 {
-                    result.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content length " + contentLength + " < " + length + "')");
+                    resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content length " + contentLength + " < " + length + "')");
                     return false;
                 }
             }
@@ -173,7 +173,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
         return true;
     }
     
-    protected boolean checkContent(ExecuteCheck check, HTTPCheckResponse response, Result result)
+    protected boolean checkContent(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
     {
         if (check.containsParameter("contains"))
         {
@@ -184,7 +184,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             // check we contain the given string
             if (! content.contains(contains))
             {
-                result.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content does not contain: '" + contains + "')");
+                resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content does not contain: '" + contains + "')");
                 return false;
             }
         }

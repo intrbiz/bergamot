@@ -14,7 +14,7 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 /**
  * The result of a check
  */
-public abstract class Result extends Message
+public abstract class ResultMO extends Message
 {
     @JsonProperty("check_type")
     private String checkType;
@@ -52,7 +52,7 @@ public abstract class Result extends Message
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
 
-    public Result()
+    public ResultMO()
     {
         super();
     }
@@ -227,7 +227,7 @@ public abstract class Result extends Message
      * @return
      */
     @JsonIgnore
-    public Result fromCheck(CheckEvent check)
+    public ResultMO fromCheck(CheckEvent check)
     {
         this.setId(check.getId());
         this.setCheckType(check.getCheckType());
@@ -240,7 +240,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result passive(UUID checkId)
+    public ResultMO passive(UUID checkId)
     {
         this.setId(UUID.randomUUID());
         this.setCheckType(null);
@@ -253,7 +253,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result pending(String output)
+    public ResultMO pending(String output)
     {
         this.setOk(true);
         this.setStatus("PENDING");
@@ -263,7 +263,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result ok(String output)
+    public ResultMO ok(String output)
     {
         this.setOk(true);
         this.setStatus("OK");
@@ -273,7 +273,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result warning(String output)
+    public ResultMO warning(String output)
     {
         this.setOk(false);
         this.setStatus("WARNING");
@@ -283,7 +283,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result critical(String output)
+    public ResultMO critical(String output)
     {
         this.setOk(false);
         this.setStatus("CRITICAL");
@@ -293,7 +293,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result unknown(String output)
+    public ResultMO unknown(String output)
     {
         this.setOk(false);
         this.setStatus("UNKNOWN");
@@ -308,7 +308,7 @@ public abstract class Result extends Message
      * @return
      */
     @JsonIgnore
-    public Result error(Throwable t)
+    public ResultMO error(Throwable t)
     {
         this.setOk(false);
         this.setStatus("ERROR");
@@ -318,7 +318,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result error(String message)
+    public ResultMO error(String message)
     {
         this.setOk(false);
         this.setStatus("ERROR");
@@ -328,7 +328,7 @@ public abstract class Result extends Message
     }
     
     @JsonIgnore
-    public Result timeout(String message)
+    public ResultMO timeout(String message)
     {
         this.setOk(false);
         this.setStatus("TIMEOUT");

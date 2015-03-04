@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
@@ -38,11 +38,11 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
         logger.debug("Checking Bergamot Agent presence");
         // check the host presence
-        Result result = new ActiveResultMO().fromCheck(executeCheck);
+        ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
         // lookup the agent
         BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(executeCheck.getCheckId());
         if (agent != null)
@@ -50,14 +50,14 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             AgentHello hello = agent.getHello();
             String hostName = hello.getHostName();
             String tlsName  = agent.getClientCertificateInfo().getSubject().getCommonName();
-            result.ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected");
+            resultMO.ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected");
         }
         else
         {
-            result.ok("Bergamot Agent disconnected");
+            resultMO.ok("Bergamot Agent disconnected");
         }
         // submit
-        resultSubmitter.accept(result);
+        resultSubmitter.accept(resultMO);
     }
     
     @Override

@@ -11,7 +11,7 @@ import org.junit.Test;
 import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 
 public class TestHTTPEngine
 {
@@ -44,7 +44,7 @@ public class TestHTTPEngine
         // execute
         // multi-threaded so we need to wait
         final Object lock = new Object();
-        final Result[] results = new Result[1];
+        final ResultMO[] results = new ResultMO[1];
         this.engine.execute(check, (result) -> {
             // ok we got a result
             results[0] = result;
@@ -63,8 +63,8 @@ public class TestHTTPEngine
             }
         }
         // check
-        Result result = results[0];
-        System.out.println("Got result: " + result);
+        ResultMO resultMO = results[0];
+        System.out.println("Got result: " + resultMO);
     }
     
     @Test
@@ -86,7 +86,7 @@ public class TestHTTPEngine
         // execute
         // multi-threaded so we need to wait
         final Object lock = new Object();
-        final Result[] results = new Result[1];
+        final ResultMO[] results = new ResultMO[1];
         this.engine.execute(check, (result) -> {
             // ok we got a result
             results[0] = result;
@@ -105,8 +105,8 @@ public class TestHTTPEngine
             }
         }
         // check
-        Result result = results[0];
-        System.out.println("Got result: " + result);
+        ResultMO resultMO = results[0];
+        System.out.println("Got result: " + resultMO);
     }
     
     @Test
@@ -125,7 +125,7 @@ public class TestHTTPEngine
         // execute
         // multi-threaded so we need to wait
         final Object lock = new Object();
-        final Result[] results = new Result[1];
+        final ResultMO[] results = new ResultMO[1];
         this.engine.execute(check, (result) -> {
             System.out.println("Got result: " + result);
             // ok we got a result
@@ -145,7 +145,7 @@ public class TestHTTPEngine
             }
         }
         // check
-        Result result = results[0];
-        System.out.println("Got result: " + result);
+        ResultMO resultMO = results[0];
+        System.out.println("Got result: " + resultMO);
     }
 }

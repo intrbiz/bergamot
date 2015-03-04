@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
@@ -36,7 +36,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
 
     private List<Consumer<ExecuteCheck, WorkerKey>> consumers = new LinkedList<Consumer<ExecuteCheck, WorkerKey>>();
     
-    protected RoutedProducer<Result, ResultKey> resultProducer;
+    protected RoutedProducer<ResultMO, ResultKey> resultProducer;
 
     public AbstractEngine(final String name)
     {
@@ -98,13 +98,13 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     }
     
     @Override
-    public void publishResult(ResultKey key, Result result)
+    public void publishResult(ResultKey key, ResultMO resultMO)
     {
         if (logger.isTraceEnabled())
         {
-            logger.trace("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
+            logger.trace("Publishing result: " + resultMO.getId() + " " + resultMO.isOk() + " " + resultMO.getStatus() + " " + resultMO.getOutput());
         }
-        this.resultProducer.publish(key, result);
+        this.resultProducer.publish(key, resultMO);
     }
     
     @Override
@@ -116,7 +116,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     }
     
     @Override
-    public void execute(ExecuteCheck task, java.util.function.Consumer<Result> onResult)
+    public void execute(ExecuteCheck task, java.util.function.Consumer<ResultMO> onResult)
     {
         for (Executor<?> executor : this.executors)
         {

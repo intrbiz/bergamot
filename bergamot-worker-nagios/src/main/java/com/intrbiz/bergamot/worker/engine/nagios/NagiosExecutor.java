@@ -9,7 +9,7 @@ import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
@@ -64,10 +64,10 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
         logger.debug("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
-        Result result = new ActiveResultMO().fromCheck(executeCheck);
+        ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
         try
         {
             // validate the command line
@@ -78,10 +78,10 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             try
             {
                 NagiosResult response = this.executor.execute(commandLine);
-                result.setOk(response.toOk());
-                result.setStatus(response.toStatus());
-                result.setOutput(response.getOutput());
-                result.setRuntime(response.getRuntime());
+                resultMO.setOk(response.toOk());
+                resultMO.setStatus(response.toStatus());
+                resultMO.setOutput(response.getOutput());
+                resultMO.setRuntime(response.getRuntime());
             }
             finally
             {
@@ -91,8 +91,8 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
         catch (IOException | InterruptedException e)
         {
             logger.error("Failed to execute nagios check command", e);
-            result.error(e);
+            resultMO.error(e);
         }
-        resultSubmitter.accept(result);
+        resultSubmitter.accept(resultMO);
     }
 }

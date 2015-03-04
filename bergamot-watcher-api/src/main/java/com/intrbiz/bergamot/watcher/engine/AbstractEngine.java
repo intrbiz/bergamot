@@ -14,7 +14,7 @@ import com.intrbiz.bergamot.model.message.event.control.ControlEvent;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.ControlQueue;
 import com.intrbiz.bergamot.queue.WatcherQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
@@ -48,7 +48,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<CheckEvent>
     
     protected Producer<ControlEvent> controlEventProducer;
     
-    private RoutedProducer<Result, ResultKey> resultProducer;
+    private RoutedProducer<ResultMO, ResultKey> resultProducer;
 
     public AbstractEngine(final String name)
     {

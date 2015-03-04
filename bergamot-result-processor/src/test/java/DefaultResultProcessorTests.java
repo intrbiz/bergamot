@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 
@@ -34,13 +34,13 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
         return state;
     }
     
-    private Result newResult(boolean ok, String status, String output)
+    private ResultMO newResult(boolean ok, String status, String output)
     {
-        Result result = new ActiveResultMO();
-        result.setOk(ok);
-        result.setStatus(status);
-        result.setOutput(output);
-        return result;
+        ResultMO resultMO = new ActiveResultMO();
+        resultMO.setOk(ok);
+        resultMO.setStatus(status);
+        resultMO.setOutput(output);
+        return resultMO;
     }
     
     private RealCheck<?, ?> newCheck(int alertThreshold, int recoveryThreshold)

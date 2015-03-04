@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
  * The result of a passive check
  */
 @JsonTypeName("bergamot.result.passive")
-public class PassiveResultMO extends Result
+public class PassiveResultMO extends ResultMO
 {
     public PassiveResultMO()
     {

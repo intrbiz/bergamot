@@ -24,7 +24,7 @@ import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
@@ -49,32 +49,32 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     }
 
     @Override
-    public void processExecuted(Result result)
+    public void processExecuted(ResultMO resultMO)
     {
-        logger.info("Got result " + result.getId() + " for '" + result.getCheckType() + "' " + result.getCheckId() + " [" + (result.getCheck() == null ? "" : result.getCheck().getName()) + "] => " + result.isOk() + " " + result.getStatus() + " " + result.getOutput() + " took " + result.getRuntime() + " ms.");
+        logger.info("Got result " + resultMO.getId() + " for '" + resultMO.getCheckType() + "' " + resultMO.getCheckId() + " [" + (resultMO.getCheck() == null ? "" : resultMO.getCheck().getName()) + "] => " + resultMO.isOk() + " " + resultMO.getStatus() + " " + resultMO.getOutput() + " took " + resultMO.getRuntime() + " ms.");
         // stamp in processed time
-        result.setProcessed(System.currentTimeMillis());
+        resultMO.setProcessed(System.currentTimeMillis());
         // start the transaction
         try (BergamotDB db = BergamotDB.connect())
         {
             db.execute(() -> {
                 // update the state
-                Check<?, ?> check = db.getCheck(result.getCheckId());
+                Check<?, ?> check = db.getCheck(resultMO.getCheckId());
                 if (check instanceof RealCheck)
                 {
                     // should be process this result?
                     if (!check.isEnabled())
                     {
-                        logger.warn("Discarding result " + result.getId() + " for " + result.getCheckType() + "::" + result.getCheckId() + " because it is disabled.");
+                        logger.warn("Discarding result " + resultMO.getId() + " for " + resultMO.getCheckType() + "::" + resultMO.getCheckId() + " because it is disabled.");
                         return;
                     }
                     // apply the result
-                    Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), result);
-                    logger.info("State change for " + result.getCheckType() + "::" + result.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
+                    Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
+                    logger.info("State change for " + resultMO.getCheckType() + "::" + resultMO.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
                     // log the transition
-                    db.logCheckTransition(transition.toCheckTransition(result.getId(), check.getId(), new Timestamp(result.getProcessed())));
+                    db.logCheckTransition(transition.toCheckTransition(resultMO.getId(), check.getId(), new Timestamp(resultMO.getProcessed())));
                     // compute the check stats
-                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), result);
+                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), resultMO);
                     // update the check state
                     db.setCheckState(transition.nextState);
                     db.setCheckStats(stats);
@@ -99,11 +99,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                         this.sendRecovery(check, db);
                     }
                     // update any virtual checks
-                    this.updateVirtualChecks(check, transition, result, db);
+                    this.updateVirtualChecks(check, transition, resultMO, db);
                 }
                 else
                 {
-                    logger.warn("Could not find " + result.getCheckType() + " " + result.getCheckId() + " for result " + result.getId());
+                    logger.warn("Could not find " + resultMO.getCheckType() + " " + resultMO.getCheckId() + " for result " + resultMO.getId());
                 }
             });
         }
@@ -201,22 +201,22 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
     
-    protected Transition computeResultTransition(RealCheck<?,?> check, CheckState currentState, Result result)
+    protected Transition computeResultTransition(RealCheck<?,?> check, CheckState currentState, ResultMO resultMO)
     {
         // validate that status matches ok
-        Status resultStatus = Status.parse(result.getStatus());
-        if (result.isOk() != resultStatus.isOk())
+        Status resultStatus = Status.parse(resultMO.getStatus());
+        if (resultMO.isOk() != resultStatus.isOk())
         {
-            result.setOk(resultStatus.isOk());
+            resultMO.setOk(resultStatus.isOk());
         }
         // the next state
         CheckState nextState = currentState.clone();
         // apply the result to the next state
-        nextState.setOk(result.isOk());
-        nextState.pushOkHistory(result.isOk());
+        nextState.setOk(resultMO.isOk());
+        nextState.pushOkHistory(resultMO.isOk());
         nextState.setStatus(resultStatus);
-        nextState.setOutput(result.getOutput());
-        nextState.setLastCheckTime(new Timestamp(result.getExecuted()));
+        nextState.setOutput(resultMO.getOutput());
+        nextState.setLastCheckTime(new Timestamp(resultMO.getExecuted()));
         // compute the transition
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
@@ -276,7 +276,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
 
     // virtual check handling
 
-    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, Result result, BergamotDB db)
+    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, ResultMO resultMO, BergamotDB db)
     {
         for (VirtualCheck<?, ?> referencedBy : check.getReferencedBy())
         {
@@ -287,7 +287,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             boolean ok = referencedBy.getCondition().computeOk();
             Status status = referencedBy.getCondition().computeStatus();
             // update the check
-            boolean isStateChange = this.applyVirtualResult(referencedBy, referencedByState, ok, status, result);
+            boolean isStateChange = this.applyVirtualResult(referencedBy, referencedByState, ok, status, resultMO);
             logger.info("State change for virtual check " + referencedBy + " to " + check.getState().isOk() + " " + check.getState().getStatus() + " caused by " + check);
             // update the state
             db.setCheckState(referencedByState);
@@ -312,7 +312,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
 
-    protected boolean applyVirtualResult(VirtualCheck<?, ?> check, CheckState state, boolean ok, Status status, Result cause)
+    protected boolean applyVirtualResult(VirtualCheck<?, ?> check, CheckState state, boolean ok, Status status, ResultMO cause)
     {
         boolean isStateChange = state.isOk() ^ ok;
         // always in a hard state
@@ -342,17 +342,17 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         return isStateChange;
     }
     
-    protected CheckStats computeStats(CheckStats stats, Result result)
+    protected CheckStats computeStats(CheckStats stats, ResultMO resultMO)
     {
         CheckStats nextStats = stats.clone();
         // compute the stats
-        nextStats.setLastRuntime(result.getRuntime());
+        nextStats.setLastRuntime(resultMO.getRuntime());
         nextStats.setAverageRuntime(stats.getAverageRuntime() == 0 ? stats.getLastRuntime() : ((stats.getLastRuntime() + stats.getAverageRuntime()) / 2D));
         // check latencies
-        if (result.getCheck() != null && result.getCheck() instanceof ExecuteCheck)
+        if (resultMO.getCheck() != null && resultMO.getCheck() instanceof ExecuteCheck)
         {
-            nextStats.setLastCheckProcessingLatency(result.getProcessed() - ((ExecuteCheck) result.getCheck()).getScheduled());
-            nextStats.setLastCheckExecutionLatency( result.getExecuted()  - ((ExecuteCheck) result.getCheck()).getScheduled());
+            nextStats.setLastCheckProcessingLatency(resultMO.getProcessed() - ((ExecuteCheck) resultMO.getCheck()).getScheduled());
+            nextStats.setLastCheckExecutionLatency( resultMO.getExecuted()  - ((ExecuteCheck) resultMO.getCheck()).getScheduled());
             // moving average
             nextStats.setAverageCheckExecutionLatency( stats.getAverageCheckExecutionLatency()  == 0 ? stats.getLastCheckExecutionLatency()  : ((stats.getAverageCheckExecutionLatency()  + stats.getLastCheckExecutionLatency())  / 2D));
             nextStats.setAverageCheckProcessingLatency(stats.getAverageCheckProcessingLatency() == 0 ? stats.getLastCheckProcessingLatency() : ((stats.getAverageCheckProcessingLatency() + stats.getLastCheckProcessingLatency()) / 2D));

@@ -5,15 +5,15 @@ import java.util.function.Consumer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 
 public class BergamotScriptContext
 {
     private final ExecuteCheck executeCheck;
     
-    private final Consumer<Result> publishResult;
+    private final Consumer<ResultMO> publishResult;
     
-    public BergamotScriptContext(ExecuteCheck executeCheck, Consumer<Result> publishResult)
+    public BergamotScriptContext(ExecuteCheck executeCheck, Consumer<ResultMO> publishResult)
     {
         this.executeCheck = executeCheck;
         this.publishResult = publishResult;
@@ -64,12 +64,12 @@ public class BergamotScriptContext
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).timeout(message));
     }
     
-    public void publish(Result result)
+    public void publish(ResultMO resultMO)
     {
-        this.publishResult.accept(result);
+        this.publishResult.accept(resultMO);
     }
     
-    public Result createResult()
+    public ResultMO createResult()
     {
         return new ActiveResultMO().fromCheck(this.getCheck());
     }

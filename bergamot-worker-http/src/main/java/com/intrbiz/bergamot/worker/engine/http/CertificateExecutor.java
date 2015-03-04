@@ -16,7 +16,7 @@ import com.intrbiz.bergamot.crypto.util.TLSInfo;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -56,7 +56,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
     }
     
     @Override
-    public void execute(final ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
+    public void execute(final ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
         logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getExecutor() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         // time it
@@ -90,7 +90,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
             check.execute((response) -> {
                 logger.info("Got response for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                Result result = new ActiveResultMO().fromCheck(executeCheck);
+                ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
                 // check the response
                 TLSInfo tls = response.getTlsInfo();
                 CertInfo serverCert = tls.getServerCertInfo();
@@ -102,26 +102,26 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
                     // check how long till the certificate expires
                     if (tillExpiry <= 7)
                     {
-                        result.critical("TLS certificate is valid but expires in " + tillExpiry + " days");
+                        resultMO.critical("TLS certificate is valid but expires in " + tillExpiry + " days");
                     }
                     else if (tillExpiry <= 28)
                     {
-                        result.warning("TLS certificate is valid but expires in " + tillExpiry + " days");
+                        resultMO.warning("TLS certificate is valid but expires in " + tillExpiry + " days");
                     }
                     else
                     {
-                        result.ok("TLS certificate is valid and expires in " + tillExpiry + " days");
+                        resultMO.ok("TLS certificate is valid and expires in " + tillExpiry + " days");
                     }
                 }
                 else
                 {
                     // well, little point in going further, the certificate is crap
-                    result.critical("TLS certificate is not valid: " + Util.coalesceEmpty(Util.nullable(tls.getCertificateValidationError(), Throwable::getMessage), " for some reason") + ".");
+                    resultMO.critical("TLS certificate is not valid: " + Util.coalesceEmpty(Util.nullable(tls.getCertificateValidationError(), Throwable::getMessage), " for some reason") + ".");
                 }
                 // submit the result
-                result.setRuntime(response.getRuntime());
+                resultMO.setRuntime(response.getRuntime());
                 tctx.stop();
-                resultSubmitter.accept(result); 
+                resultSubmitter.accept(resultMO); 
             }, 
             (error) -> {
                 tctx.stop();

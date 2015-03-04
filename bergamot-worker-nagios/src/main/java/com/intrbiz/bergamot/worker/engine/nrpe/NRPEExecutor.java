@@ -9,7 +9,7 @@ import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -44,7 +44,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
     }
     
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<Result> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
         logger.info("Executing NRPE check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Timer.Context tctx = this.nrpeRequestTimer.time();
@@ -61,13 +61,13 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             this.getEngine().getPoller().command(
                 host, 5666, 5,  60, 
                 (response) -> {
-                    Result result = new ActiveResultMO().fromCheck(executeCheck);
-                    result.setOk(response.toOk());
-                    result.setStatus(response.toStatus());
-                    result.setOutput(response.getOutput());
-                    result.setRuntime(response.getRuntime());
+                    ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+                    resultMO.setOk(response.toOk());
+                    resultMO.setStatus(response.toStatus());
+                    resultMO.setOutput(response.getOutput());
+                    resultMO.setRuntime(response.getRuntime());
                     tctx.stop();
-                    resultSubmitter.accept(result);
+                    resultSubmitter.accept(resultMO);
                 }, 
                 (exception) -> {
                     tctx.stop();

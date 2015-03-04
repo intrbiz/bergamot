@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.SNMPContextId;
 import com.intrbiz.snmp.handler.trap.OnLinkChange;
@@ -36,7 +36,7 @@ public class LinkStateExecutor extends AbstractSNMPExecutor
     }
 
     @Override
-    public void register(RegisterCheck check, Consumer<Result> resultConsumer)
+    public void register(RegisterCheck check, Consumer<ResultMO> resultConsumer)
     {
         try
         {
@@ -58,18 +58,18 @@ public class LinkStateExecutor extends AbstractSNMPExecutor
                 if (trap != null)
                 {
                     logger.debug("Mapped to trap: " + linkEvent.getDescription() + " => " + trap.check.getCheckType() + " " + trap.check.getCheckId());
-                    Result result = new ActiveResultMO().fromCheck(trap.check);
+                    ResultMO resultMO = new ActiveResultMO().fromCheck(trap.check);
                     // is the link ok or not?
                     if (linkEvent.getAdminState() == linkEvent.getOperationalState())
                     {
-                       result.ok("Link on " + linkEvent.getDescription() + " is " + linkEvent.getOperationalState());
+                       resultMO.ok("Link on " + linkEvent.getDescription() + " is " + linkEvent.getOperationalState());
                     }
                     else
                     {
-                       result.critical("Link on " + linkEvent.getDescription() + " is " + linkEvent.getOperationalState());
+                       resultMO.critical("Link on " + linkEvent.getDescription() + " is " + linkEvent.getOperationalState());
                     }
                     // publish
-                    trap.resultConsumer.accept(result);
+                    trap.resultConsumer.accept(resultMO);
                 }
                 else
                 {
@@ -94,9 +94,9 @@ public class LinkStateExecutor extends AbstractSNMPExecutor
     {   
         public final RegisterCheck check;
         
-        public final Consumer<Result> resultConsumer;
+        public final Consumer<ResultMO> resultConsumer;
 
-        public LinkStateTrap(RegisterCheck check, Consumer<Result> resultConsumer)
+        public LinkStateTrap(RegisterCheck check, Consumer<ResultMO> resultConsumer)
         {
             super();
             this.check = check;

@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.result;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 
 
 /**
@@ -19,9 +19,9 @@ public interface ResultProcessor
     
     /**
      * Process the result of a check which executed
-     * @param result
+     * @param resultMO
      */
-    void processExecuted(Result result);
+    void processExecuted(ResultMO resultMO);
     
     /**
      * Process a check execution which has died, did not 

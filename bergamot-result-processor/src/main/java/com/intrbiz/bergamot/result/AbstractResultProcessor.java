@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.bergamot.model.message.result.Result;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.model.message.update.Update;
@@ -34,9 +34,9 @@ public abstract class AbstractResultProcessor implements ResultProcessor
 
     private WorkerQueue workerQueue;
 
-    private List<Consumer<Result, ResultKey>> resultConsumers = new LinkedList<Consumer<Result, ResultKey>>();
+    private List<Consumer<ResultMO, ResultKey>> resultConsumers = new LinkedList<Consumer<ResultMO, ResultKey>>();
     
-    private List<Consumer<Result, ResultKey>> fallbackConsumers = new LinkedList<Consumer<Result, ResultKey>>();
+    private List<Consumer<ResultMO, ResultKey>> fallbackConsumers = new LinkedList<Consumer<ResultMO, ResultKey>>();
 
     private List<Consumer<ExecuteCheck, NullKey>> deadConsumers = new LinkedList<Consumer<ExecuteCheck, NullKey>>();
 
@@ -74,12 +74,12 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     @Override
     public void ownPool(UUID site, int pool)
     {
-        for (Consumer<Result, ResultKey> consumer : this.resultConsumers)
+        for (Consumer<ResultMO, ResultKey> consumer : this.resultConsumers)
         {
             consumer.addBinding(new ResultKey(site, pool));
             break;
         }
-        for (Consumer<Result, ResultKey> consumer : this.fallbackConsumers)
+        for (Consumer<ResultMO, ResultKey> consumer : this.fallbackConsumers)
         {
             consumer.addBinding(new ResultKey(site, pool));
             break;
@@ -89,12 +89,12 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     @Override
     public void disownPool(UUID site, int pool)
     {
-        for (Consumer<Result, ResultKey> consumer : this.resultConsumers)
+        for (Consumer<ResultMO, ResultKey> consumer : this.resultConsumers)
         {
             consumer.removeBinding(new ResultKey(site, pool));
             break;
         }
-        for (Consumer<Result, ResultKey> consumer : this.fallbackConsumers)
+        for (Consumer<ResultMO, ResultKey> consumer : this.fallbackConsumers)
         {
             consumer.removeBinding(new ResultKey(site, pool));
             break;
