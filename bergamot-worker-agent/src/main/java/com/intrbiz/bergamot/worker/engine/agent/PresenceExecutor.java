@@ -54,7 +54,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         }
         else
         {
-            resultMO.ok("Bergamot Agent disconnected");
+            resultMO.critical("Bergamot Agent disconnected");
         }
         // submit
         resultSubmitter.accept(resultMO);
