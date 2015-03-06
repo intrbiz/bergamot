@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.message.agent.stat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
@@ -62,6 +63,24 @@ public class CPUStat extends AgentMessage
     public List<Double> getLoad()
     {
         return load;
+    }
+    
+    @JsonIgnore
+    public double getLoad15()
+    {
+        return this.load.get(2);
+    }
+    
+    @JsonIgnore
+    public double getLoad5()
+    {
+        return this.load.get(1);
+    }
+    
+    @JsonIgnore
+    public double getLoad1()
+    {
+        return this.load.get(0);
     }
 
     public void setLoad(List<Double> load)

@@ -29,6 +29,8 @@ public class AgentEngine extends AbstractEngine
         if (this.executors.isEmpty())
         {
             this.addExecutor(new PresenceExecutor());
+            this.addExecutor(new CPUExecutor());
+            this.addExecutor(new MemoryExecutor());
         }
     }
     

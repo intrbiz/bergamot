@@ -40,24 +40,33 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.debug("Checking Bergamot Agent presence");
-        // check the host presence
-        ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
-        // lookup the agent
-        BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(executeCheck.getCheckId());
-        if (agent != null)
+        logger.debug("Checking Bergamot Agent presence, agent id: " + executeCheck.getParameter("agent_id"));
+        try
         {
-            AgentHello hello = agent.getHello();
-            String hostName = hello.getHostName();
-            String tlsName  = agent.getClientCertificateInfo().getSubject().getCommonName();
-            resultMO.ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected");
+            // get the agent id
+            UUID agentId = UUID.fromString(executeCheck.getParameter("agent_id"));
+            // check the host presence
+            ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+            // lookup the agent
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            if (agent != null)
+            {
+                AgentHello hello = agent.getHello();
+                String hostName = hello.getHostName();
+                String tlsName  = agent.getClientCertificateInfo().getSubject().getCommonName();
+                resultMO.ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected");
+            }
+            else
+            {
+                resultMO.critical("Bergamot Agent disconnected");
+            }
+            // submit
+            resultSubmitter.accept(resultMO);
         }
-        else
+        catch (Exception e)
         {
-            resultMO.critical("Bergamot Agent disconnected");
+            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
-        // submit
-        resultSubmitter.accept(resultMO);
     }
     
     @Override
