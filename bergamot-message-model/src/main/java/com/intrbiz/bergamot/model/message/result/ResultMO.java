@@ -336,4 +336,60 @@ public abstract class ResultMO extends Message
         this.setRuntime(0);
         return this;
     }
+    
+    /**
+     * Apply a warning / critical threshold to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the value and 
+     * thresholds
+     * 
+     * @param value the value to check
+     * @param warning the warning threshold
+     * @param critical the critical threshold
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyThreshold(double value, double warning, double critical, String message)
+    {
+        if (value > critical)
+        {
+            this.critical(message);
+        }
+        else if (value > warning)
+        {
+            this.warning(message);
+        }
+        else
+        {
+            this.ok(message);
+        }
+        return this;
+    }
+    
+    /**
+     * Apply a warning / critical threshold to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the value and 
+     * thresholds
+     * 
+     * @param value the value to check
+     * @param warning the warning threshold
+     * @param critical the critical threshold
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyThreshold(long value, long warning, long critical, String message)
+    {
+        if (value > critical)
+        {
+            this.critical(message);
+        }
+        else if (value > warning)
+        {
+            this.warning(message);
+        }
+        else
+        {
+            this.ok(message);
+        }
+        return this;
+    }
 }

@@ -76,4 +76,16 @@ public class ActiveResultMO extends ResultMO
     {
         return (ActiveResultMO) super.timeout(message);
     }
+
+    @Override
+    public ActiveResultMO applyThreshold(double value, double warning, double critical, String message)
+    {
+        return (ActiveResultMO) super.applyThreshold(value, warning, critical, message);
+    }
+
+    @Override
+    public ActiveResultMO applyThreshold(long value, long warning, long critical, String message)
+    {
+        return (ActiveResultMO) super.applyThreshold(value, warning, critical, message);
+    }
 }

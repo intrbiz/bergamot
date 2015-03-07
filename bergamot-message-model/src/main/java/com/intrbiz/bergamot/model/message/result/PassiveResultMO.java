@@ -75,4 +75,16 @@ public class PassiveResultMO extends ResultMO
     {
         return (PassiveResultMO) super.timeout(message);
     }
+    
+    @Override
+    public PassiveResultMO applyThreshold(double value, double warning, double critical, String message)
+    {
+        return (PassiveResultMO) super.applyThreshold(value, warning, critical, message);
+    }
+
+    @Override
+    public PassiveResultMO applyThreshold(long value, long warning, long critical, String message)
+    {
+        return (PassiveResultMO) super.applyThreshold(value, warning, critical, message);
+    }
 }
