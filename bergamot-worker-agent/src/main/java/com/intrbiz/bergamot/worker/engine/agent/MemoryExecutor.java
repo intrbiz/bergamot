@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.MemStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
 /**
@@ -56,12 +57,13 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                 agent.sendMessageToAgent(new CheckMem(), (response) -> {
                     MemStat stat = (MemStat) response;
                     logger.trace("Got Memory usage: " + stat);
-                    // compute the result
-                    ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
                     // check
-                    result.ok("Memory: " + (stat.getActualUsedMemory() / (1024L * 1024L)) + " MiB of " + (stat.getTotalMemory() / (1024L * 1024L)) + " MiB (" + DFMT.format((((double) stat.getActualUsedMemory()) / ((double) stat.getTotalMemory())) * 100) + "%) used");
-                    // submit
-                    resultSubmitter.accept(result);
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                            UnitUtil.toRatio((executeCheck.getBooleanParameter("ignore_caches", true) ? stat.getActualUsedMemory() : stat.getUsedMemory()), stat.getTotalMemory()),
+                            executeCheck.getPercentParameter("warning", 0.8F), 
+                            executeCheck.getPercentParameter("critical", 0.9F),
+                            "Memory: " + (stat.getActualUsedMemory() / UnitUtil.Mi) + " MiB of " + (stat.getTotalMemory() / UnitUtil.Mi) + " MiB (" + DFMT.format(UnitUtil.toPercent(stat.getActualUsedMemory(), stat.getTotalMemory())) + "%) used " + ((stat.getUsedMemory() - stat.getActualUsedMemory()) / UnitUtil.Mi) + " MiB caches"
+                    ));
                 });
             }
             else

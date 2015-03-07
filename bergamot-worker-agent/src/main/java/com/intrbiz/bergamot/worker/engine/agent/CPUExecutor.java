@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
 /**
@@ -56,12 +57,13 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                 agent.sendMessageToAgent(new CheckCPU(), (response) -> {
                     CPUStat stat = (CPUStat) response;
                     logger.trace("Got CPU usage: " + stat);
-                    // compute the result
-                    ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
-                    // check
-                    result.ok("Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(stat.getTotalUsage().getTotal() * 100) + "%");
-                    // submit
-                    resultSubmitter.accept(result);
+                    // apply the check
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                            stat.getTotalUsage().getTotal(), 
+                            executeCheck.getPercentParameter("cpu_warning", 0.8F), 
+                            executeCheck.getPercentParameter("cpu_critical", 0.9F), 
+                            "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "%"
+                    ));
                 });
             }
             else
