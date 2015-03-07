@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.ControlQueue;
 import com.intrbiz.bergamot.queue.WatcherQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.ActiveResultKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WatcherKey;
 import com.intrbiz.bergamot.watcher.Watcher;
@@ -154,8 +155,11 @@ public class AbstractEngine implements Engine, DeliveryHandler<CheckEvent>
             {
                 executor.register(check, (result) -> {
                     if (logger.isTraceEnabled())
+                    {
                         logger.trace("Publishing result: " + result.getId() + " " + result.isOk() + " " + result.getStatus() + " " + result.getOutput());
-                    this.resultProducer.publish(new ResultKey(check.getSiteId(), check.getProcessingPool()), result);
+                    }
+                    // Note: using an ActiveResultKey here as we know the pool id
+                    this.resultProducer.publish(new ActiveResultKey(check.getSiteId(), check.getProcessingPool()), result);
                 });
                 return;
             }

@@ -18,7 +18,9 @@ import com.intrbiz.bergamot.queue.NotificationQueue;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.ActiveResultKey;
 import com.intrbiz.bergamot.queue.key.NotificationKey;
+import com.intrbiz.bergamot.queue.key.PassiveResultKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.bergamot.queue.key.UpdateKey;
@@ -74,14 +76,14 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     @Override
     public void ownPool(UUID site, int pool)
     {
+        /*
+         * Own a pool by adding bindings to our queue 
+         */
         for (Consumer<ResultMO, ResultKey> consumer : this.resultConsumers)
         {
-            consumer.addBinding(new ResultKey(site, pool));
-            break;
-        }
-        for (Consumer<ResultMO, ResultKey> consumer : this.fallbackConsumers)
-        {
-            consumer.addBinding(new ResultKey(site, pool));
+            consumer.addBinding(new ActiveResultKey(site, pool));
+            consumer.addBinding(new PassiveResultKey(site));
+            // Note: we only need to update the queue once, so break
             break;
         }
     }
@@ -89,14 +91,14 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     @Override
     public void disownPool(UUID site, int pool)
     {
+        /*
+         * Disown a pool by removing bindings from our queue
+         */
         for (Consumer<ResultMO, ResultKey> consumer : this.resultConsumers)
         {
-            consumer.removeBinding(new ResultKey(site, pool));
-            break;
-        }
-        for (Consumer<ResultMO, ResultKey> consumer : this.fallbackConsumers)
-        {
-            consumer.removeBinding(new ResultKey(site, pool));
+            consumer.removeBinding(new ActiveResultKey(site, pool));
+            consumer.removeBinding(new PassiveResultKey(site));
+            // Note: we only need to update the queue once, so break
             break;
         }
     }
@@ -112,12 +114,12 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         {
             // consume results, currently for all sites
             this.resultConsumers.add(this.workerQueue.consumeResults((r) -> {
-                logger.trace("Processing pooled result");
+                logger.trace("Processing pooled/site result");
                 processExecuted(r);
             }, this.instanceId.toString()));
             // consume results, currently for all sites
             this.fallbackConsumers.add(this.workerQueue.consumeFallbackResults((r) -> {
-                logger.trace("Processing fallback result");
+                logger.debug("Processing fallback result");
                 processExecuted(r);
             }));
             // consume dead checks, currently for all sites

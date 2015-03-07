@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.ActiveResultKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.metadata.Action;
 import com.intrbiz.queue.RoutedProducer;
@@ -30,7 +31,7 @@ public class DispatchResultAction
         // TODO
         synchronized (this)
         {
-            this.resultProducer.publish(new ResultKey(resultMO.getSiteId(), resultMO.getProcessingPool()), resultMO);
+            this.resultProducer.publish(new ActiveResultKey(resultMO.getSiteId(), resultMO.getProcessingPool()), resultMO);
         }
     }
 }

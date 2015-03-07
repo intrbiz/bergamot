@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.ActiveResultKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.bergamot.worker.Worker;
@@ -111,7 +112,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     public void execute(ExecuteCheck task)
     {
         this.execute(task, (result) -> {
-            this.publishResult(new ResultKey(task.getSiteId(), task.getProcessingPool()), result);
+            this.publishResult(new ActiveResultKey(task.getSiteId(), task.getProcessingPool()), result);
         });
     }
     

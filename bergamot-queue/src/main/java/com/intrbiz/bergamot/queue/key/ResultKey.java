@@ -4,21 +4,26 @@ import java.util.UUID;
 
 import com.intrbiz.queue.name.GenericKey;
 
-public class ResultKey extends GenericKey
+/**
+ * A key used to route results
+ */
+public abstract class ResultKey extends GenericKey
 {    
-    public ResultKey(UUID site, int pool)
+    protected ResultKey(String key)
     {
-        super(site + "." + pool);
+        super(key);
     }
     
     /**
-     * Create a ResultKey from just the check id.
+     * For a given id mask down to only the site id.
      * 
-     * Note this always sends the result to processing 
-     * pool 0.
+     * Note: toSiteId(site_id) == site_id
+     * 
+     * @param id the id to mask
+     * @return the site id
      */
-    public ResultKey(UUID objectId)
+    public static UUID toSiteId(UUID id)
     {
-        this(new UUID((objectId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L), 0);
+        return new UUID((id.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L);
     }
 }
