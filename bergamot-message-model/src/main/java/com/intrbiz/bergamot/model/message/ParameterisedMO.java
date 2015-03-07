@@ -136,6 +136,28 @@ public interface ParameterisedMO
                 .orElse(defaultValue);        
     }
     
+    default float getPercentParameter(String name)
+    {
+        return this.getFloatParameter(name, -1);
+    }
+    
+    /**
+     * Get a normalised percentage, in the range of 0 to 1 by dividing the parameter by 100
+     * @param name the parameter name
+     * @param defaultValue (in the range 0 to 1)
+     * @return the normalised percentage value of the parameter
+     */
+    default float getPercentParameter(String name, float defaultValue)
+    {
+        return this.getParameters().stream()
+                .filter((p) -> {return name.equals(p.getName());})
+                .findFirst()
+                .map(ParameterMO::getValue)
+                .map(Float::parseFloat)
+                .map((v) -> { return v / 100F; })
+                .orElse(defaultValue);
+    }
+    
     default boolean getBooleanParameter(String name)
     {
         return this.getBooleanParameter(name, false);
