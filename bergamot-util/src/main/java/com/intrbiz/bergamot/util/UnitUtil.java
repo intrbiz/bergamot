@@ -1,7 +1,7 @@
 package com.intrbiz.bergamot.util;
 
 /**
- * Handle processing on SI prefixes such as: k,M,G,T,kiB,MiB,GiB,TiB
+ * Helper methods for working with various units
  */
 public class UnitUtil
 {
@@ -187,5 +187,58 @@ public class UnitUtil
         {
             return defaultValue;
         }
+    }
+    
+    /**
+     * Convert the given value in range 0 to 1 to a percentage of range 0 - 100
+     */
+    public static double toPercent(double value)
+    {
+        return value * 100D;
+    }
+    
+    /**
+     * Convert the given value within the given scale to a percentage, ie: (value / scale) * 100
+     */
+    public static double toPercent(double value, double scale)
+    {
+        return (value / scale) * 100D;
+    }
+    
+    /**
+     * Convert the given value within the given scale to a percentage, ie: (value / scale) * 100
+     */
+    public static double toPercent(long value, long scale)
+    {
+        return (((double) value) / ((double) scale)) * 100D;
+    }
+    
+    /**
+     * Convert the given percentage in range 0 to 100 to a value of range 0 - 1
+     */
+    public static double fromPercent(double value)
+    {
+        return value / 100D;
+    }
+    
+    public static double fromPercent(long value)
+    {
+        return ((double) value) / 100D;
+    }
+    
+    /**
+     * Convert the given value within the given scale to a ratio, ie: (value / scale)
+     */
+    public static double toRatio(double value, double scale)
+    {
+        return (value / scale) * 100D;
+    }
+    
+    /**
+     * Convert the given value within the given scale to a ratio, ie: (value / scale)
+     */
+    public static double toRatio(long value, long scale)
+    {
+        return (((double) value) / ((double) scale)) * 100D;
     }
 }
