@@ -42,11 +42,12 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.debug("Checking Bergamot Agent Memory Usage, for agent: " + executeCheck.getParameter("agent_id"));
+        logger.debug("Checking Bergamot Agent Memory Usage");
         try
         {
             // check the host presence
-            UUID agentId = UUID.fromString(executeCheck.getParameter("agent_id"));
+            UUID agentId = executeCheck.getUUIDParameter("agent_id");
+            if (agentId == null) throw new RuntimeException("No agent_id parameter was given");
             // lookup the agent
             BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
             if (agent != null)

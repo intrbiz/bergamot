@@ -40,11 +40,12 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.debug("Checking Bergamot Agent presence, agent id: " + executeCheck.getParameter("agent_id"));
+        logger.debug("Checking Bergamot Agent presence");
         try
         {
             // get the agent id
-            UUID agentId = UUID.fromString(executeCheck.getParameter("agent_id"));
+            UUID agentId = executeCheck.getUUIDParameter("agent_id");
+            if (agentId == null) throw new RuntimeException("No agent_id parameter was given");
             // check the host presence
             ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
             // lookup the agent

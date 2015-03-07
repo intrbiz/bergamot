@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.message;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
@@ -150,6 +151,20 @@ public interface ParameterisedMO
                 .orElse(defaultValue);        
     }
     
+    default UUID getUUIDParameter(String name)
+    {
+        return this.getUUIDParameter(name, null);
+    }
+
+    default UUID getUUIDParameter(String name, UUID defaultValue)
+    {
+        return this.getParameters().stream()
+                .filter((p) -> {return name.equals(p.getName());})
+                .findFirst()
+                .map(ParameterMO::getValue)
+                .map(UUID::fromString)
+                .orElse(defaultValue);        
+    }
     
     default Set<String> getParameterCSV(String name)
     {
