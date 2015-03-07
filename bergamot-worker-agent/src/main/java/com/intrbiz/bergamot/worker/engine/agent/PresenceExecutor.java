@@ -40,7 +40,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.debug("Checking Bergamot Agent presence");
+        logger.trace("Checking Bergamot Agent presence");
         try
         {
             // get the agent id
@@ -82,7 +82,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             String hostName = hello.getHostName();
             String tlsName  = handler.getClientCertificateInfo().getSubject().getCommonName();
             // debug log
-            logger.debug("Got agent connection: " + hostName + " " + hostId);
+            logger.trace("Got agent connection: " + hostName + " " + hostId);
             // submit a passive result for the host
             this.publishResult(new ResultKey(hostId), new PassiveResultMO().passive(hostId).ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected"));
         });
@@ -93,7 +93,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             UUID hostId = hello.getHostId();
             String hostName = hello.getHostName();
             // debug log
-            logger.debug("Got agent disconnection: " + hostName + " " + hostId);
+            logger.trace("Got agent disconnection: " + hostName + " " + hostId);
             // submit a passive result for the host
             this.publishResult(new ResultKey(hostId), new PassiveResultMO().passive(hostId).critical("Bergamot Agent disconnected"));
         });

@@ -42,7 +42,7 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.debug("Checking Bergamot Agent CPU Usage");
+        logger.trace("Checking Bergamot Agent CPU Usage");
         try
         {
             // check the host presence
@@ -55,7 +55,7 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                 // get the CPU stats
                 agent.sendMessageToAgent(new CheckCPU(), (response) -> {
                     CPUStat stat = (CPUStat) response;
-                    logger.debug("Got CPU usage: " + stat);
+                    logger.trace("Got CPU usage: " + stat);
                     // compute the result
                     ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
                     // check

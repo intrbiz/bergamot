@@ -42,7 +42,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.debug("Checking Bergamot Agent Memory Usage");
+        logger.trace("Checking Bergamot Agent Memory Usage");
         try
         {
             // check the host presence
@@ -55,7 +55,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                 // get the CPU stats
                 agent.sendMessageToAgent(new CheckMem(), (response) -> {
                     MemStat stat = (MemStat) response;
-                    logger.debug("Got Memory usage: " + stat);
+                    logger.trace("Got Memory usage: " + stat);
                     // compute the result
                     ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
                     // check
