@@ -78,6 +78,12 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     {
         this.agentId = agentId;
     }
+    
+    @Override
+    public UUID resolveAgentId()
+    {
+        return this.getAgentId();
+    }
 
     // services
 

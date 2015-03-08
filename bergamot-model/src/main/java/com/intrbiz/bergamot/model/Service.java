@@ -49,6 +49,13 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
         this.hostId = hostId;
     }
     
+    @Override
+    public UUID resolveAgentId()
+    {
+        Host host = this.getHost();
+        return host == null ? null : host.getAgentId();
+    }
+    
     public Host getHost()
     {
         try (BergamotDB db = BergamotDB.connect())

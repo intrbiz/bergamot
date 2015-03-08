@@ -152,6 +152,8 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     }
 
     public abstract String resolveWorkerPool();
+    
+    public abstract UUID resolveAgentId();
 
     /**
      * Construct the routing key which should be used to route this execute check message
@@ -189,12 +191,14 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         ExecuteCheck executeCheck = new ExecuteCheck();
         executeCheck.setId(UUID.randomUUID());
         executeCheck.setSiteId(this.getSiteId());
+        executeCheck.setAgentId(this.resolveAgentId());
         executeCheck.setCheckType(this.getType());
         executeCheck.setCheckId(this.getId());
         executeCheck.setProcessingPool(this.getPool());
         executeCheck.setEngine(command.getEngine());
         executeCheck.setExecutor(command.getExecutor());
         executeCheck.setName(command.getName());
+        // eval parameters
         ExpressContext context = new DefaultContext(new BergamotEntityResolver());
         // configured parameters
         for (Parameter parameter : checkCommand.resolveCheckParameters())
