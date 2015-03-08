@@ -47,11 +47,11 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     }
 
     @Override
-    public void configure(HostCfg cfg, HostCfg rcfg)
+    public void configure(HostCfg configuration, HostCfg resolvedConfiguration)
     {
-        super.configure(cfg, rcfg);
-        this.address = Util.coalesceEmpty(rcfg.getAddress(), this.name);
-        this.agentId = rcfg.getAgentId();
+        super.configure(configuration, resolvedConfiguration);
+        this.address = Util.coalesceEmpty(resolvedConfiguration.getAddress(), this.name);
+        this.agentId = resolvedConfiguration.getAgentId();
     }
 
     public final String getType()
