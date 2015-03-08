@@ -246,6 +246,8 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
         this.traps.addAll(other.getTraps());
         this.resources.addAll(other.getResources());
         this.clusters.addAll(other.getClusters());
+        // merge in parameters
+        this.getParameters().addAll(other.getParameters());
         // update the index
         this.index(true);
     }
