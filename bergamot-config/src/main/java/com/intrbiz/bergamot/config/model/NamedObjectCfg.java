@@ -7,12 +7,14 @@ import java.util.UUID;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeListUnique;
 import com.intrbiz.configuration.CfgParameter;
+import com.intrbiz.util.uuid.UUIDAdapter;
 
 public abstract class NamedObjectCfg<P extends NamedObjectCfg<P>> extends TemplatedObjectCfg<P>
 {
@@ -32,6 +34,7 @@ public abstract class NamedObjectCfg<P extends NamedObjectCfg<P>> extends Templa
     }
 
     @XmlAttribute(name = "id")
+    @XmlJavaTypeAdapter(UUIDAdapter.class)
     @ResolveWith(Coalesce.class)
     public UUID getId()
     {
