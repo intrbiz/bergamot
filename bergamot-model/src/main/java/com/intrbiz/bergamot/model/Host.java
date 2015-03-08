@@ -23,11 +23,23 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
 {
     private static final long serialVersionUID = 1L;
     
+    /**
+     * The IP address of this host, this might be an IP address or a DNS name
+     */
     @SQLColumn(index = 1, name = "address", since = @SQLVersion({ 1, 0, 0 }))
     private String address;
 
+    /**
+     * The ID of the location which this host is physically located in
+     */
     @SQLColumn(index = 2, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID locationId;
+    
+    /**
+     * The UUID of the agent that might be used for this host
+     */
+    @SQLColumn(index = 3, name = "agent_id", since = @SQLVersion({ 1, 9, 0 }))
+    private UUID agentId;
 
     public Host()
     {
@@ -54,6 +66,16 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     public void setAddress(String address)
     {
         this.address = address;
+    }
+
+    public UUID getAgentId()
+    {
+        return agentId;
+    }
+
+    public void setAgentId(UUID agentId)
+    {
+        this.agentId = agentId;
     }
 
     // services
