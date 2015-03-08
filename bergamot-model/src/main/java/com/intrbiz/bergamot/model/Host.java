@@ -51,6 +51,7 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     {
         super.configure(cfg, rcfg);
         this.address = Util.coalesceEmpty(rcfg.getAddress(), this.name);
+        this.agentId = rcfg.getAgentId();
     }
 
     public final String getType()
