@@ -21,6 +21,89 @@ public class UnitUtil
     
     public static long T = 1000L * G;
     
+    public static double toTi(double value)
+    {
+        return value / Ti;
+    }
+    
+    public static double toTi(long value)
+    {
+        return ((double) value) / Ti;
+    }
+    
+    
+    public static double toGi(double value)
+    {
+        return value / Gi;
+    }
+    
+    public static double toGi(long value)
+    {
+        return ((double) value) / Gi;
+    }
+    
+    public static double toMi(double value)
+    {
+        return value / Mi;
+    }
+    
+    public static double toMi(long value)
+    {
+        return ((double) value) / Mi;
+    }
+    
+    public static double toki(double value)
+    {
+        return value / ki;
+    }
+    
+    public static double toki(long value)
+    {
+        return ((double) value) / ki;
+    }
+    
+    
+    public static double toT(double value)
+    {
+        return value / T;
+    }
+    
+    public static double toT(long value)
+    {
+        return ((double) value) / T;
+    }
+    
+    
+    public static double toG(double value)
+    {
+        return value / G;
+    }
+    
+    public static double toG(long value)
+    {
+        return ((double) value) / G;
+    }
+    
+    public static double toM(double value)
+    {
+        return value / M;
+    }
+    
+    public static double toM(long value)
+    {
+        return ((double) value) / M;
+    }
+    
+    public static double tok(double value)
+    {
+        return value / k;
+    }
+    
+    public static double tok(long value)
+    {
+        return ((double) value) / k;
+    }
+    
     /**
      * Parse an integer value respecting the SI prefix
      * @param value
@@ -231,7 +314,7 @@ public class UnitUtil
      */
     public static double toRatio(double value, double scale)
     {
-        return (value / scale) * 100D;
+        return value / scale;
     }
     
     /**
@@ -239,6 +322,6 @@ public class UnitUtil
      */
     public static double toRatio(long value, long scale)
     {
-        return (((double) value) / ((double) scale)) * 100D;
+        return ((double) value) / ((double) scale);
     }
 }
