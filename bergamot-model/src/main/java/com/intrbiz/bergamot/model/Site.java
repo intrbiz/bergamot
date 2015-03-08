@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.adapter.ParametersAdapter;
 import com.intrbiz.bergamot.model.message.SiteMO;
+import com.intrbiz.bergamot.model.util.Parameter;
+import com.intrbiz.bergamot.model.util.Parameterised;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -17,7 +20,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A monitoring 'site'
  */
 @SQLTable(schema = BergamotDB.class, name = "site", since = @SQLVersion({ 1, 0, 0 }))
-public final class Site extends BergamotObject<SiteMO> implements Serializable
+public final class Site extends BergamotObject<SiteMO> implements Serializable, Parameterised
 {
     private static final long serialVersionUID = 1L;
 
@@ -40,6 +43,12 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
 
     @SQLColumn(index = 6, name = "pool_count", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected int poolCount = 4;
+    
+    /**
+     * Arbitrary parameters of an object
+     */
+    @SQLColumn(index = 7, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 2, 0, 0 }))
+    private List<Parameter> parameters = new LinkedList<Parameter>();
 
     public Site()
     {
@@ -116,6 +125,18 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable
     public void setPoolCount(int poolCount)
     {
         this.poolCount = poolCount;
+    }
+    
+    @Override
+    public List<Parameter> getParameters()
+    {
+        return parameters;
+    }
+
+    @Override
+    public void setParameters(List<Parameter> parameters)
+    {
+        this.parameters = parameters;
     }
 
     public SiteMO toMO(boolean stub)
