@@ -10,6 +10,7 @@ import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.worker.engine.agent.AgentEngine;
 import com.intrbiz.bergamot.worker.engine.agent.CPUExecutor;
+import com.intrbiz.bergamot.worker.engine.agent.DiskExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.MemoryExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.PresenceExecutor;
 
@@ -41,7 +42,7 @@ public class AgentWorkerCfg extends WorkerCfg
     public void applyDefaults()
     {
         // add our default engines to avoid needing to configure them
-        this.getEngines().add(new EngineCfg(AgentEngine.class, new ExecutorCfg(PresenceExecutor.class), new ExecutorCfg(CPUExecutor.class), new ExecutorCfg(MemoryExecutor.class)));
+        this.getEngines().add(new EngineCfg(AgentEngine.class, new ExecutorCfg(PresenceExecutor.class), new ExecutorCfg(CPUExecutor.class), new ExecutorCfg(MemoryExecutor.class), new ExecutorCfg(DiskExecutor.class)));
         // apply defaults from super class
         super.applyDefaults();
     }
