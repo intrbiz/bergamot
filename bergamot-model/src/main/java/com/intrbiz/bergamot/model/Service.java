@@ -29,9 +29,9 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     }
 
     @Override
-    public void configure(ServiceCfg cfg, ServiceCfg rcfg)
+    public void configure(ServiceCfg configuration, ServiceCfg resolvedConfiguration)
     {
-        super.configure(cfg, rcfg);
+        super.configure(configuration, resolvedConfiguration);
     }
 
     public final String getType()
