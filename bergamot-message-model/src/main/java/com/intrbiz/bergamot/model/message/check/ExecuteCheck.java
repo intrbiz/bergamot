@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model.message.check;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
@@ -15,6 +17,9 @@ public class ExecuteCheck extends CheckEvent
 
     @JsonProperty("scheduled")
     private long scheduled;
+    
+    @JsonProperty("agent-id")
+    private UUID agentId;
 
     public ExecuteCheck()
     {
@@ -39,5 +44,15 @@ public class ExecuteCheck extends CheckEvent
     public void setScheduled(long scheduled)
     {
         this.scheduled = scheduled;
+    }
+
+    public UUID getAgentId()
+    {
+        return agentId;
+    }
+
+    public void setAgentId(UUID agentId)
+    {
+        this.agentId = agentId;
     }
 }
