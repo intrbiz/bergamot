@@ -60,9 +60,9 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                     // apply the check
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
                             stat.getTotalUsage().getTotal(), 
-                            executeCheck.getPercentParameter("cpu_warning", 0.8F), 
-                            executeCheck.getPercentParameter("cpu_critical", 0.9F), 
-                            "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "%"
+                            executeCheck.getPercentParameter("cpu_warning", 0.8F) * ((double) stat.getCpuCount()), 
+                            executeCheck.getPercentParameter("cpu_critical", 0.9F) * ((double) stat.getCpuCount()), 
+                            "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
                     ));
                 });
             }
