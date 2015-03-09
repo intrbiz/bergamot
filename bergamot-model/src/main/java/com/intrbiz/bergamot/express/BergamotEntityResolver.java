@@ -2,8 +2,10 @@ package com.intrbiz.bergamot.express;
 
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Host;
+import com.intrbiz.bergamot.model.NamedObject;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Service;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.converter.Converter;
@@ -41,6 +43,11 @@ public class BergamotEntityResolver extends ExpressEntityResolver
             if (source instanceof Trap)
                 return source;
         }
+        else if ("site".equals(name))
+        {
+            if (source instanceof NamedObject)
+                return ((NamedObject<?,?>) source).getSite();
+        }
         else if ("nagios".equals(name))
         {
             return new DynamicEntity()
@@ -48,9 +55,43 @@ public class BergamotEntityResolver extends ExpressEntityResolver
                 @Override
                 public Object get(String name, ExpressContext context, Object source) throws ExpressException
                 {
-                    if ("path".equals(name))
-                        return "/usr/lib/nagios/plugins";
+                    // lookup the value as a site parameter
+                    Site site = ((NamedObject<?,?>) source).getSite();
+                    if (site == null) return null;
+                    String value = site.getParameter("nagios." + name);
+                    if (value != null) return value;
+                    return site.getParameter(name);
+                }
+
+                @Override
+                public void set(String name, Object value, ExpressContext context, Object source) throws ExpressException
+                {
+                }
+
+                @Override
+                public Converter<?> getConverter(String name, ExpressContext context, Object source) throws ExpressException
+                {
                     return null;
+                }
+
+                @Override
+                public Validator<?> getValidator(String name, ExpressContext context, Object source) throws ExpressException
+                {
+                    return null;
+                }
+            };
+        }
+        else if ("global".equals(name))
+        {
+            return new DynamicEntity()
+            {
+                @Override
+                public Object get(String name, ExpressContext context, Object source) throws ExpressException
+                {
+                    // lookup the value as a site parameter
+                    Site site = ((NamedObject<?,?>) source).getSite();
+                    if (site == null) return null;
+                    return site.getParameter(name);
                 }
 
                 @Override
