@@ -71,6 +71,7 @@ import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParser;
+import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataException;
 import com.intrbiz.queue.RoutedProducer;
@@ -203,6 +204,15 @@ public class BergamotConfigImporter
                 this.report.error("Site '" + this.config.getSite() + "' does not exist and cannot be created, aborting!");
                 throw new RuntimeException("Site '" + this.config.getSite() + "' does not exist and cannot be created, aborting!");
             }
+        }
+        // update any parameters
+        if (! this.config.getParameters().isEmpty())
+        {
+            for (CfgParameter parameter : this.config.getParameters())
+            {
+                this.site.setParameter(parameter.getName(), parameter.getValueOrText());
+            }
+            db.setSite(site);
         }
     }
     
