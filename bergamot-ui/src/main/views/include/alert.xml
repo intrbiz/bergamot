@@ -48,7 +48,7 @@
 		    </p>
 	    </div>
 	    <div class="col4 dash_icon alert">
-	    	<h3>Comments</h3>
+	    	<h4>Comments</h4>
 	    	<ul>
 		    	<data-set var="comment" value="#{alert.comments}">
 		    		<li>
