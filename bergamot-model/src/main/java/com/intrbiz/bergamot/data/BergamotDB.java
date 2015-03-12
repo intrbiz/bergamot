@@ -65,7 +65,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({2, 0, 0}),
+        version = @SQLVersion({2, 1, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -868,6 +868,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract Host getHostByAddress(@SQLParam("site_id") UUID siteId, @SQLParam("address") String address);
     
     @Cacheable
+    @SQLGetter(table = Host.class, name = "get_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    public abstract Host getHostByExternalRef(@SQLParam("site_id") UUID siteId, @SQLParam("external_ref") String externalRef);
+    
+    @Cacheable
     @SQLGetter(table = Host.class, name = "get_hosts_in_location", since = @SQLVersion({1, 0, 0}))
     public abstract List<Host> getHostsInLocation(@SQLParam("location_id") UUID locationId);
     
@@ -952,6 +956,9 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLGetter(table = Service.class, name = "get_service_on_host", since = @SQLVersion({1, 0, 0}))
     public abstract Service getServiceOnHost(@SQLParam("host_id") UUID hostId, @SQLParam("name") String name);
     
+    @SQLGetter(table = Service.class, name = "get_service_on_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    public abstract Service getServiceOnHostByExternalRef(@SQLParam("host_id") UUID hostId, @SQLParam("external_ref") String externalRef);
+    
     @SQLGetter(table = Service.class, name = "get_service_on_host_by_name", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.service WHERE host_id = (SELECT h.id FROM bergamot.host h WHERE h.site_id = p_site_id AND h.name = p_host_name) AND name = p_name")
     )
@@ -1010,6 +1017,9 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = Trap.class, name = "get_trap_on_host", since = @SQLVersion({1, 0, 0}))
     public abstract Trap getTrapOnHost(@SQLParam("host_id") UUID hostId, @SQLParam("name") String name);
+    
+    @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    public abstract Trap getTrapOnHostByExternalRef(@SQLParam("host_id") UUID hostId, @SQLParam("external_ref") String externalRef);
     
     @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_name", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.trap WHERE host_id = (SELECT h.id FROM bergamot.host h WHERE h.site_id = p_site_id AND h.name = p_host_name) AND name = p_name")
@@ -1071,6 +1081,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLGetter(table = Cluster.class, name = "get_cluster_by_name", since = @SQLVersion({1, 0, 0}))
     public abstract Cluster getClusterByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
+    
+    @Cacheable
+    @SQLGetter(table = Cluster.class, name = "get_cluster_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    public abstract Cluster getClusterByExternalRef(@SQLParam("site_id") UUID siteId, @SQLParam("external_ref") String externalRef);
     
     @Cacheable
     @SQLGetter(table = Cluster.class, name = "get_clusters_in_group", since = @SQLVersion({1, 0, 0}),
@@ -1140,6 +1154,9 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = Resource.class, name = "get_resource_on_cluster", since = @SQLVersion({1, 0, 0}))
     public abstract Resource getResourceOnCluster(@SQLParam("cluster_id") UUID clusterId, @SQLParam("name") String name);
+    
+    @SQLGetter(table = Resource.class, name = "get_resource_on_cluster_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    public abstract Resource getResourceOnClusterByExternalRef(@SQLParam("cluster_id") UUID clusterId, @SQLParam("external_ref") String externalRef);
     
     @SQLGetter(table = Resource.class, name = "get_resource_on_cluster_by_name", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.resource WHERE host_id = (SELECT c.id FROM bergamot.cluster c WHERE c.site_id = p_site_id AND c.name = p_cluster_name) AND name = p_name")

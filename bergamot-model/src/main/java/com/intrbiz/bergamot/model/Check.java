@@ -58,6 +58,9 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
      */
     @SQLColumn(index = 8, name = "pool", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected int pool = 0;
+    
+    @SQLColumn(index = 9, name = "external_ref", since = @SQLVersion({ 2, 1, 0 }))
+    protected String externalRef;
 
     public Check()
     {
@@ -347,6 +350,16 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     {
         return this.getComments(5);
     }
+    
+    public String getExternalRef()
+    {
+        return externalRef;
+    }
+
+    public void setExternalRef(String externalRef)
+    {
+        this.externalRef = externalRef;
+    }
 
     protected void toMO(CheckMO mo, boolean stub)
     {
@@ -374,5 +387,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
         // configure basic check state
         this.enabled    = resolvedConfiguration.getEnabledBooleanValue();
         this.suppressed = resolvedConfiguration.getSuppressedBooleanValue();
+        this.externalRef = resolvedConfiguration.getExternalRef();
     }
 }
