@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
+import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
 import com.intrbiz.util.uuid.UUIDAdapter;
@@ -100,7 +101,7 @@ public class HostCfg extends ActiveCheckCfg<HostCfg>
 
     @XmlAttribute(name = "agent-id")
     @XmlJavaTypeAdapter(UUIDAdapter.class)
-    @ResolveWith(CoalesceEmptyString.class)
+    @ResolveWith(Coalesce.class)
     public UUID getAgentId()
     {
         return agentId;
