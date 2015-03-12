@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -16,6 +17,7 @@ import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
+import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 public abstract class CheckCfg<P extends CheckCfg<P>> extends NamedObjectCfg<P>
 {
@@ -32,6 +34,8 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends NamedObjectCfg<P>
     private Boolean enabled;
     
     private InitiallyCfg initialState;
+    
+    private String externalRef;
 
     public CheckCfg()
     {
@@ -144,5 +148,17 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends NamedObjectCfg<P>
     public void setInitialState(InitiallyCfg initialState)
     {
         this.initialState = initialState;
+    }
+
+    @XmlElement(name = "external-ref")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getExternalRef()
+    {
+        return externalRef;
+    }
+
+    public void setExternalRef(String externalRef)
+    {
+        this.externalRef = externalRef;
     }
 }
