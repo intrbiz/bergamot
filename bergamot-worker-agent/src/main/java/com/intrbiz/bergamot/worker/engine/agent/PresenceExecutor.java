@@ -44,8 +44,8 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         try
         {
             // get the agent id
-            UUID agentId = executeCheck.getUUIDParameter("agent_id");
-            if (agentId == null) throw new RuntimeException("No agent_id parameter was given");
+            UUID agentId = executeCheck.getAgentId();
+            if (agentId == null) throw new RuntimeException("No agent id was given");
             // check the host presence
             ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
             // lookup the agent

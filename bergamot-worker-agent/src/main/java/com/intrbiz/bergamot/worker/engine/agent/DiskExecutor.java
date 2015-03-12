@@ -50,8 +50,8 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
         try
         {
             // check the host presence
-            UUID agentId = executeCheck.getUUIDParameter("agent_id");
-            if (agentId == null) throw new RuntimeException("No agent_id parameter was given");
+            UUID agentId = executeCheck.getAgentId();
+            if (agentId == null) throw new RuntimeException("No agent id was given");
             String mount = executeCheck.getParameter("mount");
             if (Util.isEmpty(mount)) throw new RuntimeException("No disk mount point was given");
             // lookup the agent

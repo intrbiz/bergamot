@@ -47,8 +47,8 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
         try
         {
             // check the host presence
-            UUID agentId = executeCheck.getUUIDParameter("agent_id");
-            if (agentId == null) throw new RuntimeException("No agent_id parameter was given");
+            UUID agentId = executeCheck.getAgentId();
+            if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
             BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
             if (agent != null)
