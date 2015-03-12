@@ -27,6 +27,8 @@ public abstract class NamedObjectCfg<P extends NamedObjectCfg<P>> extends Templa
     private String description;
     
     private List<TagCfg> tags = new LinkedList<TagCfg>();
+    
+    private String externalRef;
 
     public NamedObjectCfg()
     {
@@ -102,5 +104,17 @@ public abstract class NamedObjectCfg<P extends NamedObjectCfg<P>> extends Templa
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
     {
         return null;
+    }
+
+    @XmlElement(name = "external-ref")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getExternalRef()
+    {
+        return externalRef;
+    }
+
+    public void setExternalRef(String externalRef)
+    {
+        this.externalRef = externalRef;
     }
 }
