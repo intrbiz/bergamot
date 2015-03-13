@@ -12,7 +12,9 @@ import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.ListParam;
@@ -43,7 +45,15 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     {
         // build the entire site configuration
         BergamotCfg siteCfg = new BergamotCfg();
+        // site details
         siteCfg.setSite(site.getName());
+        siteCfg.setDescription(site.getDescription());
+        siteCfg.setSummary(site.getSummary());
+        for (Parameter parameter : site.getParameters())
+        {
+            siteCfg.addParameter(new CfgParameter(parameter.getName(), null, null, parameter.getValue()));
+        }
+        // add objects
         if (types.isEmpty())
         {
             // add all the config

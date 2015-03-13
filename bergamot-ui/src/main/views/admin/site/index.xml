@@ -1,0 +1,28 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Global Configuration">
+    
+    <div class="row">
+    	<h3>Global Parameters</h3>
+    	<p class="text-body">
+    		Global site configuration parameters, which can be 
+    		used in command definitions.
+    	</p>
+       	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Name</th>
+		    		<th>Value</th>
+	    		</tr>
+	    		<data-set var="parameter" value="#{site.parameters}">
+	    			<tr>
+	    				<td>#{parameter.name}</td>
+	    				<td><pre>#{parameter.value}</pre></td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>
