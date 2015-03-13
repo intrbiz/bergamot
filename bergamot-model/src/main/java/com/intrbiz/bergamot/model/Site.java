@@ -136,6 +136,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     @Override
     public void setParameters(List<Parameter> parameters)
     {
+        if (parameters == null) parameters = new LinkedList<Parameter>();
         this.parameters = parameters;
     }
 

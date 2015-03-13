@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.adapter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -28,7 +29,9 @@ public class ParametersAdapter implements DBTypeAdapter<String, List<Parameter>>
     @Override
     public String toDB(List<Parameter> value)
     {
-        if (value == null) return null;
+        // default to an empty list
+        if (value == null) return "[]";
+        // encode
         StringWriter sw = new StringWriter();
         try (JsonGenerator g = this.factory.getFactory().createGenerator(sw))
         {
@@ -49,10 +52,13 @@ public class ParametersAdapter implements DBTypeAdapter<String, List<Parameter>>
     @Override
     public List<Parameter> fromDB(String value)
     {
-        if (value == null) return null;
+        // default to an empty list
+        if (value == null) return new LinkedList<Parameter>();
+        // decode
         try (JsonParser p = this.factory.getFactory().createParser(new StringReader(value)))
         {
-            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, Parameter.class));
+            List<Parameter> params = this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, Parameter.class));
+            return params == null ? new LinkedList<Parameter>() : params;
         }
         catch (IOException e)
         {

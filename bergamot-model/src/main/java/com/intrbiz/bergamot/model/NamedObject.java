@@ -189,6 +189,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
     @Override
     public void setParameters(List<Parameter> parameters)
     {
+        if (parameters == null) parameters = new LinkedList<Parameter>();
         this.parameters = parameters;
     }
 
