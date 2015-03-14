@@ -54,16 +54,18 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the CPU stats
+                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckMem(), (response) -> {
+                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     MemStat stat = (MemStat) response;
-                    logger.trace("Got Memory usage: " + stat);
+                    logger.trace("Got Memory usage in " + runtime + "ms: " + stat);
                     // check
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
                             UnitUtil.toRatio((executeCheck.getBooleanParameter("ignore_caches", true) ? stat.getActualUsedMemory() : stat.getUsedMemory()), stat.getTotalMemory()),
                             executeCheck.getPercentParameter("warning", 0.8F), 
                             executeCheck.getPercentParameter("critical", 0.9F),
                             "Memory: " + (stat.getActualUsedMemory() / UnitUtil.Mi) + " MiB of " + (stat.getTotalMemory() / UnitUtil.Mi) + " MiB (" + DFMT.format(UnitUtil.toPercent(stat.getActualUsedMemory(), stat.getTotalMemory())) + "%) used " + ((stat.getUsedMemory() - stat.getActualUsedMemory()) / UnitUtil.Mi) + " MiB caches"
-                    ));
+                    ).runtime(runtime));
                 });
             }
             else

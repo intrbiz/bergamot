@@ -54,16 +54,18 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the CPU stats
+                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckCPU(), (response) -> {
+                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     CPUStat stat = (CPUStat) response;
-                    logger.trace("Got CPU usage: " + stat);
+                    logger.trace("Got CPU usage in " + runtime + "ms: " + stat);
                     // apply the check
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
                             stat.getTotalUsage().getTotal(), 
                             executeCheck.getPercentParameter("cpu_warning", 0.8F) * ((double) stat.getCpuCount()), 
                             executeCheck.getPercentParameter("cpu_critical", 0.9F) * ((double) stat.getCpuCount()), 
                             "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
-                    ));
+                    ).runtime(runtime));
                 });
             }
             else

@@ -59,9 +59,11 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the CPU stats
+                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckDisk(), (response) -> {
+                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     DiskStat stat = (DiskStat) response;
-                    logger.trace("Got Disk usage: " + stat);
+                    logger.trace("Got Disk usage in + " + runtime + "ms: " + stat);
                     // find the mount
                     DiskInfo disk = stat.getDisks().stream().filter((di) -> { return mount.equals(di.getMount()); }).findFirst().orElse(null);
                     if (disk != null)
@@ -72,11 +74,11 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
                                 executeCheck.getPercentParameter("warning", 0.8F),
                                 executeCheck.getPercentParameter("critical", 0.9F),
                                 "Disk: " + disk.getMount() + " " + disk.getType() + " on " + disk.getDevice() +" " + DFMT.format(toG(disk.getUsed())) + " GB of " + DFMT.format(toG(disk.getSize())) + " GB (" + DFMT.format(disk.getUsedPercent()) + " %) used" 
-                        ));
+                        ).runtime(runtime));
                     }
                     else
                     {
-                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error("No such mount point: " + mount));
+                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error("No such mount point: " + mount).runtime(runtime));
                     }
                 });
             }
