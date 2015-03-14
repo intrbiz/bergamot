@@ -9,10 +9,13 @@
     		Global site configuration parameters, which can be 
     		used in command definitions.
     	</p>
+    	<p>
+    		<a href="/admin/configchange/add/site-parameters" class="pull-right">Change global parameters</a>
+    	</p>
        	<div class="col12">
-	    	<table>
+	    	<table style="width: 100%;">
 	    		<tr>
-		    		<th>Name</th>
+		    		<th style="width: 33%;">Name</th>
 		    		<th>Value</th>
 	    		</tr>
 	    		<data-set var="parameter" value="#{site.parameters}">

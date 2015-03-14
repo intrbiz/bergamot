@@ -22,7 +22,9 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsUUID;
@@ -111,6 +113,27 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         ((NamedObjectCfg<?>) cfg).setId(null);
         // add the object
         ((BergamotCfg) change.getConfiguration()).addObject(cfg);
+        // update
+        db.setConfigChange(change);
+        // edit
+        redirect(path("/admin/configchange/edit/id/" + change.getId()));
+    }
+    
+    @Any("/add/site-parameters")
+    @WithDataAdapter(BergamotDB.class)
+    public void add(BergamotDB db, @SessionVar("site") Site site) throws IOException
+    {
+        // make sure we have a fresh copy of the site
+        site = db.getSite(site.getId());
+        // update the change
+        UUID currentChangeId = sessionVar("current_change");
+        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), new BergamotCfg(site.getName(), "Edit site parameters", null)) : db.getConfigChange(currentChangeId);
+        // copy the site parameters into the config change
+        BergamotCfg cfg = ((BergamotCfg) change.getConfiguration());
+        for (Parameter param : site.getParameters())
+        {
+            cfg.addParameter(new CfgParameter(param.getName(), null, null, param.getValue()));
+        }
         // update
         db.setConfigChange(change);
         // edit
