@@ -76,6 +76,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         // setup event handlers
         // on connection
         this.getEngine().getAgentServer().setOnAgentRegisterHandler((handler) -> {
+            // publish a passive result for the presence of this host
             // info we need
             AgentHello hello = handler.getHello();
             UUID hostId = hello.getHostId();
@@ -88,6 +89,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         });
         // on disconnection
         this.getEngine().getAgentServer().setOnAgentUnregisterHandler((handler) -> {
+            // publish a passive result for the presence of this host
             // info we need
             AgentHello hello = handler.getHello();
             UUID hostId = hello.getHostId();
