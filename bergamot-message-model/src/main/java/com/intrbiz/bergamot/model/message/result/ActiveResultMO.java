@@ -88,4 +88,10 @@ public class ActiveResultMO extends ResultMO
     {
         return (ActiveResultMO) super.applyThreshold(value, warning, critical, message);
     }
+
+    @Override
+    public ActiveResultMO runtime(double runtime)
+    {
+        return (ActiveResultMO) super.runtime(runtime);
+    }
 }

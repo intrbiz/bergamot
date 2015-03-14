@@ -392,4 +392,10 @@ public abstract class ResultMO extends Message
         }
         return this;
     }
+    
+    public ResultMO runtime(double runtime)
+    {
+        this.runtime = runtime;
+        return this;
+    }
 }

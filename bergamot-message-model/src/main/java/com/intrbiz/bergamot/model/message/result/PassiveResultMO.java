@@ -87,4 +87,10 @@ public class PassiveResultMO extends ResultMO
     {
         return (PassiveResultMO) super.applyThreshold(value, warning, critical, message);
     }
+    
+    @Override
+    public PassiveResultMO runtime(double runtime)
+    {
+        return (PassiveResultMO) super.runtime(runtime);
+    }
 }
