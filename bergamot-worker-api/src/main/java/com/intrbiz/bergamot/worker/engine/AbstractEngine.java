@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -14,6 +15,7 @@ import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ActiveResultKey;
+import com.intrbiz.bergamot.queue.key.AgentBinding;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.bergamot.worker.Worker;
@@ -56,6 +58,12 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     public EngineCfg getConfiguration()
     {
         return this.config;
+    }
+    
+    @Override
+    public boolean isAgentRouted()
+    {
+        return false;
     }
 
     protected void configure() throws Exception
@@ -146,7 +154,29 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
         for (int i = 0; i < this.getWorker().getConfiguration().getThreads(); i ++)
         {
             logger.trace("Creating consumer " + i);
-            this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName()));
+            this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName(), this.isAgentRouted(), this.getWorker().getId()));
+        }
+    }
+    
+    @Override
+    public void bindAgent(UUID agentId)
+    {
+        logger.trace("Binding agent " + agentId + " to worker " + this.getWorker().getId());
+        for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
+        {
+            consumer.addBinding(new AgentBinding(agentId));
+            break; // shared queue so only need to update bindings once
+        }
+    }
+    
+    @Override
+    public void unbindAgent(UUID agentId)
+    {
+        logger.trace("Unbinding agent " + agentId + " to worker " + this.getWorker().getId());
+        for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
+        {
+            consumer.removeBinding(new AgentBinding(agentId));
+            break; // shared queue so only need to update bindings once
         }
     }
 

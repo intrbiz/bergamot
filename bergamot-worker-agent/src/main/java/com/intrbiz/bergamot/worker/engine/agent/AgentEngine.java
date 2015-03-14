@@ -20,6 +20,12 @@ public class AgentEngine extends AbstractEngine
     {
         super(NAME);
     }
+    
+    @Override
+    public boolean isAgentRouted()
+    {
+        return true;
+    }
 
     @Override
     protected void configure() throws Exception
@@ -43,6 +49,14 @@ public class AgentEngine extends AbstractEngine
         Logger.getLogger(AgentEngine.class).info("Listening for Bergamot Agent connections on port: " + serverCfg.getPort());
         this.agentServer = new BergamotAgentServer();
         this.agentServer.configure(serverCfg);
+        // handle binding / unbinding agent routes when an agent connects and disconnects
+        this.agentServer.setOnAgentRegisterHandler((handler) -> {
+            this.bindAgent(handler.getHello().getHostId());
+        });
+        this.agentServer.setOnAgentUnregisterHandler((handler) -> {
+            // unbind the agent from this worker so that active checks will not be routed to us
+            this.unbindAgent(handler.getHello().getHostId());
+        });
         // setup queues etc
         super.start();
         // start the agent server

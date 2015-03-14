@@ -18,6 +18,8 @@ public abstract class AbstractWorker implements Worker
     private Map<String, Engine> engines = new TreeMap<String, Engine>();
 
     private UUID site;
+    
+    private UUID id = UUID.randomUUID();
 
     private String workerPool;
 
@@ -45,6 +47,12 @@ public abstract class AbstractWorker implements Worker
     public final UUID getSite()
     {
         return this.site;
+    }
+    
+    @Override
+    public final UUID getId()
+    {
+        return this.id;
     }
 
     @Override

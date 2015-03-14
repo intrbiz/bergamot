@@ -18,6 +18,8 @@ public interface Worker extends Configurable<WorkerCfg>
 {
     UUID getSite();
     
+    UUID getId();
+    
     String getWorkerPool();
     
     Collection<Engine> getEngines();

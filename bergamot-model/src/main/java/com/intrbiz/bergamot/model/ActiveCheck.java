@@ -165,7 +165,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         Command command = Util.nullable(this.getCheckCommand(), CheckCommand::getCommand);
         if (command == null) return null;
         // the key
-        return new WorkerKey(this.getSiteId(), this.resolveWorkerPool(), command.getEngine());
+        return new WorkerKey(this.getSiteId(), this.resolveWorkerPool(), command.getEngine(), this.resolveAgentId());
     }
     /**
      * Get the TTL in ms for the execute check message

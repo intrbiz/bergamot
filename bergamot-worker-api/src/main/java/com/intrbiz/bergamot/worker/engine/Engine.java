@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.worker.engine;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.config.EngineCfg;
@@ -22,6 +23,8 @@ public interface Engine extends Configurable<EngineCfg>
     
     void execute(ExecuteCheck task);
     
+    boolean isAgentRouted();
+    
     /**
      * For testing
      */
@@ -31,6 +34,10 @@ public interface Engine extends Configurable<EngineCfg>
      * Publish a result out of band
      */
     void publishResult(ResultKey key, ResultMO resultMO);
+    
+    void bindAgent(UUID agentId);
+    
+    void unbindAgent(UUID agentId);
     
     void start() throws Exception;
 }

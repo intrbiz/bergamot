@@ -60,10 +60,15 @@ public class RabbitWorkerQueue extends WorkerQueue
     }
 
     @Override
-    public Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String theWorkerPool, String engine)
+    public Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String theWorkerPool, String engine, boolean agentRouting, UUID workerId)
     {
+        // validate arguments
         final String workerPool = Util.isEmpty(theWorkerPool) ? null : theWorkerPool;
-        if (Util.isEmpty(engine)) throw new IllegalArgumentException("The parameter: engine must be given");
+        if (Util.isEmpty(engine)) throw new IllegalArgumentException("Engine name must be given!");
+        if (agentRouting && workerId == null) throw new IllegalArgumentException("For agent routing an worker id must be given");
+        // the engine exchange
+        final String engineExchangeName = "bergamot.check.engine." + Util.coalesce(site, "default") + "." + Util.coalesce(workerPool, "any") + "." + engine;
+        // create the consumer
         return new RabbitConsumer<ExecuteCheck, WorkerKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-check"))
         {
             public String setupQueue(Channel on) throws IOException
@@ -72,10 +77,20 @@ public class RabbitWorkerQueue extends WorkerQueue
                 on.queueDeclare("bergamot.dead_check_queue", true, false, false, null);
                 on.exchangeDeclare("bergamot.dead_check", "fanout", true);
                 on.queueBind("bergamot.dead_check_queue", "bergamot.dead_check", "");
-                // the check queue
-                String queueName = "bergamot.check." + (site == null ? "default" : site.toString()) + "." + Util.coalesceEmpty(workerPool, "default") + "." + engine;
-                // setup the queue
-                on.queueDeclare(queueName, true, false, false, args("x-dead-letter-exchange", "bergamot.dead_check"));
+                // setup our worker queue
+                String queueName = null;
+                if (agentRouting)
+                {
+                    // for agent routed check, we use a transient queue
+                    queueName = "bergamot.check." + Util.coalesce(site, "default") + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine + "." + workerId;
+                    on.queueDeclare(queueName, false, true, true, args("x-dead-letter-exchange", "bergamot.dead_check"));
+                }
+                else
+                {
+                    // for non agent routed checks we use a shared queue
+                    queueName = "bergamot.check." + Util.coalesce(site, "default") + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine;
+                    on.queueDeclare(queueName, true, false, false, args("x-dead-letter-exchange", "bergamot.dead_check"));
+                }
                 // common exchanges
                 on.exchangeDeclare("bergamot.check", "topic", true, false, args("alternate-exchange", "bergamot.check.site.default"));
                 // default exchanges
@@ -87,25 +102,44 @@ public class RabbitWorkerQueue extends WorkerQueue
                     on.exchangeDeclare("bergamot.check.site." + site, "topic", true, false, args("alternate-exchange", "bergamot.check.worker_pool." + site + ".any"));
                     on.exchangeDeclare("bergamot.check.worker_pool." + site + ".any", "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
                     // bind the site to check exchange
-                    on.exchangeBind("bergamot.check.site." + site, "bergamot.check", site + ".*.*");
+                    on.exchangeBind("bergamot.check.site." + site, "bergamot.check", site + ".*.*.*");
                 }
                 // worker pool default exchanges
                 if (workerPool != null)
                 {
                     on.exchangeDeclare("bergamot.check.worker_pool.default." + workerPool, "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
                     // bind the worker pool to default site exchange
-                    on.exchangeBind("bergamot.check.site.default", "bergamot.check.worker_pool.default." + workerPool, "*." + workerPool + ".*");
+                    on.exchangeBind("bergamot.check.site.default", "bergamot.check.worker_pool.default." + workerPool, "*." + workerPool + ".*.*");
                 }
                 // specific exchanges
                 if (site != null && workerPool != null)
                 {
                     on.exchangeDeclare("bergamot.check.worker_pool." + site + "." + workerPool, "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
                     // bind the worker pool exchange to the site exchange
-                    on.exchangeBind("bergamot.check.worker_pool." + site + "." + workerPool, "bergamot.check.site." + site, "*." + workerPool + ".*");
+                    on.exchangeBind("bergamot.check.worker_pool." + site + "." + workerPool, "bergamot.check.site." + site, "*." + workerPool + ".*.*");
                 }
-                // bind the queue
-                on.queueBind(queueName, "bergamot.check.worker_pool." + (site == null ? "default" : site) + "." + (workerPool == null ? "any" : workerPool), "*.*." + engine);
+                on.exchangeDeclare(engineExchangeName, "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
+                // bind the engine exchange to our worker pool
+                on.exchangeBind(engineExchangeName, "bergamot.check.worker_pool." + Util.coalesce(site, "default") + "." + Util.coalesce(workerPool, "any"), "*.*." + engine + ".*");                
+                // bind our queue to the engine exchange
+                if (! agentRouting)
+                {
+                    // for agent routing we bind when an agent connects rather than now
+                    on.queueBind(queueName, engineExchangeName, "*.*.*.*");
+                }
                 return queueName;
+            }
+            
+            @Override
+            protected void addQueueBinding(Channel on, String binding) throws IOException
+            {
+                on.queueBind(this.queue, engineExchangeName, binding);
+            }
+            
+            @Override
+            protected void removeQueueBinding(Channel on, String binding) throws IOException
+            {
+                on.queueUnbind(this.queue, engineExchangeName, binding);
             }
         };
     }

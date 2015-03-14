@@ -6,14 +6,19 @@ import com.intrbiz.Util;
 import com.intrbiz.queue.name.GenericKey;
 
 public class WorkerKey extends GenericKey
-{    
-    public WorkerKey(UUID siteId, String workerPool, String engine)
+{   
+    protected WorkerKey(String key)
     {
-        super(siteId + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine);
+        super(key);
+    }
+    
+    public WorkerKey(UUID siteId, String workerPool, String engine, UUID agent)
+    {
+        super(siteId + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine + "." + Util.coalesce(agent, "any"));
     }
     
     public WorkerKey(UUID siteId, String engine)
     {
-        this(siteId, null, engine);
+        this(siteId, null, engine, null);
     }
 }
