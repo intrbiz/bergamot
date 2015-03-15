@@ -39,6 +39,13 @@ import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
+import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.GetRootCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.GetSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.AgentManagerError;
+import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
 import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
@@ -139,7 +146,15 @@ public class BergamotTranscoder
         AuthTokenMO.class,
         // stats
         CheckStatsMO.class,
-        CheckTransitionMO.class
+        CheckTransitionMO.class,
+        // bergamot agent manager
+        CreateSiteCA.class,
+        CreatedSiteCA.class,
+        GetSiteCA.class,
+        GotSiteCA.class,
+        GetRootCA.class,
+        GotRootCA.class,
+        AgentManagerError.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();
