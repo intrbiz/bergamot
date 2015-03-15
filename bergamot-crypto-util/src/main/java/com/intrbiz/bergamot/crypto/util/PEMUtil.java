@@ -17,6 +17,7 @@ import java.security.cert.Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERObjectIdentifier;
@@ -181,5 +182,60 @@ public class PEMUtil
     public static CertificateRequest loadCertificateRequest(String data) throws IOException
     {
         return loadCertificateRequest(new StringReader(data));
+    }
+    
+    public static String savePublicKey(PublicKey key) throws IOException
+    {
+        StringWriter sw = new StringWriter();
+        try (PEMWriter pw = new PEMWriter(sw))
+        {
+            pw.writeObject(key);
+        }
+        return sw.toString();
+    }
+    
+    public static void savePublicKey(PublicKey key, Writer to) throws IOException
+    {
+        try (PEMWriter pw = new PEMWriter(to))
+        {
+            pw.writeObject(key);
+        }
+    }
+    
+    public static void savePublicKey(PublicKey key, File to) throws IOException
+    {
+        savePublicKey(key, new FileWriter(to));
+    }
+    
+    public static PublicKey loadPublicKey(Reader from) throws IOException
+    {
+        try
+        {
+            // need to use some BC classes to parse PEM files
+            // fecking Java, POS at times
+            try (PemReader pr = new PemReader(from))
+            {
+                // System.out.println(pr.readPemObject().getType());
+                
+                PemObject obj = pr.readPemObject();
+                KeyFactory kf = KeyFactory.getInstance("RSA");
+                PublicKey key = kf.generatePublic(new X509EncodedKeySpec(obj.getContent()));
+                return key;
+            }
+        }
+        catch (Exception e)
+        {
+            throw new IOException("Error loading key", e);
+        }
+    }
+    
+    public static PublicKey loadPublicKey(String data) throws IOException
+    {
+        return loadPublicKey(new StringReader(data));
+    }
+    
+    public static PublicKey loadPublicKey(File data) throws IOException
+    {
+        return loadPublicKey(new FileReader(data));
     }
 }
