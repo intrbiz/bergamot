@@ -94,6 +94,7 @@
     <module>bergamot-crypto-util</module>
     <module>bergamot-nagios</module>
     <module>bergamot-worker-agent</module>
+    <module>bergamot-agent-manager</module>
   </modules>
   
   <dependencyManagement>
