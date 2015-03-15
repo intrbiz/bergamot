@@ -116,6 +116,6 @@ public final class SerialNum
     
     public static SerialNum randomSerialNum()
     {
-        return new SerialNum(UUID.randomUUID(), 0);
+        return new SerialNum(UUID.randomUUID(), 1);
     }
 }
