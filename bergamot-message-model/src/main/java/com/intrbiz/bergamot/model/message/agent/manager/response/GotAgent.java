@@ -4,18 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 
-@JsonTypeName("bergamot.agent.manager.got_root_ca")
-public class GotRootCA extends AgentManagerResponse
+@JsonTypeName("bergamot.agent.manager.got_agent")
+public class GotAgent extends AgentManagerResponse
 {
     @JsonProperty("certificate_pem")
     private String certificatePEM;
     
-    public GotRootCA()
+    public GotAgent()
     {
         super();
     }
     
-    public GotRootCA(String certificatePEM)
+    public GotAgent(String certificatePEM)
     {
         this.certificatePEM = certificatePEM;
     }

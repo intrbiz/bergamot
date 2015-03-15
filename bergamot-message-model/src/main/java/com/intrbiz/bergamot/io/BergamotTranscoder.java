@@ -40,12 +40,20 @@ import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.GetAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetRootCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.GetServer;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.SignAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.request.SignServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.AgentManagerError;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.GotAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.GotServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
 import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
@@ -154,6 +162,14 @@ public class BergamotTranscoder
         GotSiteCA.class,
         GetRootCA.class,
         GotRootCA.class,
+        GetAgent.class,
+        GotAgent.class,
+        GetServer.class,
+        GotServer.class,
+        SignAgent.class,
+        SignedAgent.class,
+        SignServer.class,
+        SignedServer.class,
         AgentManagerError.class
     };
     

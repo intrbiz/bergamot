@@ -6,25 +6,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 
-@JsonTypeName("bergamot.agent.manager.create_site_ca")
-public class CreateSiteCA extends AgentManagerRequest
+@JsonTypeName("bergamot.agent.manager.get_agent")
+public class GetServer extends AgentManagerRequest
 {
     @JsonProperty("site_id")
     private UUID siteId;
     
-    @JsonProperty("site_name")
-    private String siteName;
+    @JsonProperty("common_name")
+    private String commonName;
     
-    public CreateSiteCA()
+    public GetServer()
     {
         super();
     }
     
-    public CreateSiteCA(UUID siteId, String siteName)
+    public GetServer(UUID siteId, String commonName)
     {
         super();
         this.siteId = siteId;
-        this.siteName = siteName;
+        this.commonName = commonName;
     }
 
     public UUID getSiteId()
@@ -37,13 +37,13 @@ public class CreateSiteCA extends AgentManagerRequest
         this.siteId = siteId;
     }
 
-    public String getSiteName()
+    public String getCommonName()
     {
-        return siteName;
+        return commonName;
     }
 
-    public void setSiteName(String siteName)
+    public void setCommonName(String commonName)
     {
-        this.siteName = siteName;
+        this.commonName = commonName;
     }
 }

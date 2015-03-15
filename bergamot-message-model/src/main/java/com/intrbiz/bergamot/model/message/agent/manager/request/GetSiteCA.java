@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 
-@JsonTypeName("bergamot.agent.manager.get-site-ca")
+@JsonTypeName("bergamot.agent.manager.get_site_ca")
 public class GetSiteCA extends AgentManagerRequest
 {
     @JsonProperty("site_id")
