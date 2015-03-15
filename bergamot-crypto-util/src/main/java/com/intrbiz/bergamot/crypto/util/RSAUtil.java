@@ -1,14 +1,11 @@
 package com.intrbiz.bergamot.crypto.util;
 
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
-import java.util.UUID;
 
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
@@ -52,22 +49,6 @@ public class RSAUtil
         }
     }
     
-    public static BigInteger UUIDtoBigInteger(UUID serial)
-    {
-        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
-        bb.putLong(serial.getMostSignificantBits());
-        bb.putLong(serial.getLeastSignificantBits());
-        BigInteger bi = new BigInteger(1, bb.array());
-        return bi;
-    }
-    
-    public static UUID UUIDfromBigInteger(BigInteger bint)
-    {
-        ByteBuffer bb = ByteBuffer.wrap(bint.toByteArray());
-        bb.position(bb.capacity() - 16);
-        return new UUID(bb.getLong(), bb.getLong());
-    }
-    
     public static String buildDN(String country, String state, String locality, String org, String orgUnit, String commonName)
     {
         StringBuilder sb = new StringBuilder();
@@ -80,7 +61,7 @@ public class RSAUtil
         return sb.toString();
     }
     
-    public static CertificatePair generateCertificate(String DN, UUID serial, int days, int keySize, KeyType type, CertificatePair issuer) throws Exception
+    public static CertificatePair generateCertificate(String DN, SerialNum serial, int days, int keySize, KeyType type, CertificatePair issuer) throws Exception
     {
         // validate
         if ((KeyType.INTERMEDIATE == type || KeyType.CLIENT == type || KeyType.SERVER == type) && issuer == null) throw new IllegalArgumentException("Issue must be given to sign requested key type"); 
@@ -93,7 +74,7 @@ public class RSAUtil
         // generate the certificate
         X509Name subject = new X509Name(DN);
         X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-        certGen.setSerialNumber(UUIDtoBigInteger(serial));
+        certGen.setSerialNumber(serial.toBigInt());
         certGen.setIssuerDN(issuer == null ? subject : ((X509Principal) issuer.getCertificate().getSubjectDN()));
         certGen.setNotBefore(now.getTime());
         certGen.setNotAfter(expiry.getTime());
