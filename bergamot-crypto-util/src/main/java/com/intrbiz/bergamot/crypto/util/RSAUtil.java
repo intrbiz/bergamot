@@ -1,0 +1,136 @@
+package com.intrbiz.bergamot.crypto.util;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.Calendar;
+import java.util.UUID;
+
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.jce.X509Principal;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
+import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
+
+@SuppressWarnings("deprecation")
+public class RSAUtil
+{   
+    public enum KeyType {
+        CA,
+        INTERMEDIATE,
+        SERVER,
+        CLIENT
+    }
+    
+    public static KeyPair generateRSAKeyPair()
+    {
+        return generateRSAKeyPair(2048);
+    }
+    
+    public static KeyPair generateRSAKeyPair(int size)
+    {
+        try
+        {
+            KeyPairGenerator jenny = KeyPairGenerator.getInstance("RSA");
+            jenny.initialize(size, new SecureRandom());
+            // generate the pair
+            KeyPair pair = jenny.generateKeyPair();
+            return pair;
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static BigInteger UUIDtoBigInteger(UUID serial)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+        bb.putLong(serial.getMostSignificantBits());
+        bb.putLong(serial.getLeastSignificantBits());
+        BigInteger bi = new BigInteger(1, bb.array());
+        return bi;
+    }
+    
+    public static UUID UUIDfromBigInteger(BigInteger bint)
+    {
+        ByteBuffer bb = ByteBuffer.wrap(bint.toByteArray());
+        bb.position(bb.capacity() - 16);
+        return new UUID(bb.getLong(), bb.getLong());
+    }
+    
+    public static String buildDN(String country, String state, String locality, String org, String orgUnit, String commonName)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("C=").append(country).append(", ");
+        sb.append("ST=").append(state).append(", ");
+        sb.append("L=").append(locality).append(", ");
+        sb.append("O=").append(org).append(", ");
+        if (orgUnit != null) sb.append("OU=").append(orgUnit).append(", ");
+        sb.append("CN=").append(commonName);
+        return sb.toString();
+    }
+    
+    public static CertificatePair generateCertificate(String DN, UUID serial, int days, int keySize, KeyType type, CertificatePair issuer) throws Exception
+    {
+        // validate
+        if ((KeyType.INTERMEDIATE == type || KeyType.CLIENT == type || KeyType.SERVER == type) && issuer == null) throw new IllegalArgumentException("Issue must be given to sign requested key type"); 
+        // generate the key pair
+        KeyPair key = generateRSAKeyPair(keySize);
+        // expiry time
+        Calendar now = Calendar.getInstance();
+        Calendar expiry = Calendar.getInstance();
+        expiry.add(Calendar.DAY_OF_YEAR, days);
+        // generate the certificate
+        X509Name subject = new X509Name(DN);
+        X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+        certGen.setSerialNumber(UUIDtoBigInteger(serial));
+        certGen.setIssuerDN(issuer == null ? subject : ((X509Principal) issuer.getCertificate().getSubjectDN()));
+        certGen.setNotBefore(now.getTime());
+        certGen.setNotAfter(expiry.getTime());
+        certGen.setSubjectDN(subject);
+        certGen.setPublicKey(key.getPublic());
+        certGen.setSignatureAlgorithm("SHA256WithRSA");
+        // set extensions
+        certGen.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(key.getPublic()));
+        if (issuer == null)
+        {
+            certGen.addExtension(X509Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(key.getPublic()));
+        }
+        else
+        {
+            certGen.addExtension(X509Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(issuer.getCertificate()));
+        }
+        if (KeyType.CA == type || KeyType.INTERMEDIATE == type)
+        {
+            certGen.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(true));
+            certGen.addExtension(X509Extension.keyUsage, true, new KeyUsage(KeyUsage.keyEncipherment | KeyUsage.cRLSign | KeyUsage.dataEncipherment | KeyUsage.digitalSignature | KeyUsage.keyCertSign));
+            certGen.addExtension(X509Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.anyExtendedKeyUsage));
+        }
+        else if (KeyType.SERVER == type)
+        {
+            certGen.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(false));
+            certGen.addExtension(X509Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
+        }
+        else if (KeyType.CLIENT == type)
+        {
+            certGen.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(false));
+            certGen.addExtension(X509Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth));
+        }
+        // go go go
+        X509Certificate theCert = certGen.generate(issuer == null ? key.getPrivate() : issuer.getKey());
+        // check
+        theCert.verify(issuer == null ? key.getPublic() : issuer.getCertificate().getPublicKey());
+        // encode
+        return new CertificatePair(theCert, key.getPrivate());
+    }
+}
