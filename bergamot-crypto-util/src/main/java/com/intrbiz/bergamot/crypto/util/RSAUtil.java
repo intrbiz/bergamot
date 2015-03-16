@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.crypto.util;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
@@ -63,10 +64,21 @@ public class RSAUtil
     
     public static CertificatePair generateCertificate(String DN, SerialNum serial, int days, int keySize, KeyType type, CertificatePair issuer) throws Exception
     {
+        return generateCertificate(DN, serial, days, keySize, type, null, issuer);
+    }
+    
+    public static CertificatePair generateCertificate(String DN, SerialNum serial, int days, int keySize, KeyType type, PublicKey key, CertificatePair issuer) throws Exception
+    {
         // validate
-        if ((KeyType.INTERMEDIATE == type || KeyType.CLIENT == type || KeyType.SERVER == type) && issuer == null) throw new IllegalArgumentException("Issue must be given to sign requested key type"); 
+        if ((KeyType.INTERMEDIATE == type || KeyType.CLIENT == type || KeyType.SERVER == type) && issuer == null) throw new IllegalArgumentException("Issue must be given to sign requested key type");
+        if (issuer == null && key != null) throw new IllegalArgumentException("When signing a given public key, an issuer must be given");
         // generate the key pair
-        KeyPair key = generateRSAKeyPair(keySize);
+        KeyPair pair = null;
+        if (key == null)
+        {
+            pair = generateRSAKeyPair(keySize);
+            key = pair.getPublic();
+        }
         // expiry time
         Calendar now = Calendar.getInstance();
         Calendar expiry = Calendar.getInstance();
@@ -79,13 +91,13 @@ public class RSAUtil
         certGen.setNotBefore(now.getTime());
         certGen.setNotAfter(expiry.getTime());
         certGen.setSubjectDN(subject);
-        certGen.setPublicKey(key.getPublic());
+        certGen.setPublicKey(key);
         certGen.setSignatureAlgorithm("SHA256WithRSA");
         // set extensions
-        certGen.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(key.getPublic()));
+        certGen.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(key));
         if (issuer == null)
         {
-            certGen.addExtension(X509Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(key.getPublic()));
+            certGen.addExtension(X509Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(key));
         }
         else
         {
@@ -108,10 +120,10 @@ public class RSAUtil
             certGen.addExtension(X509Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth));
         }
         // go go go
-        X509Certificate theCert = certGen.generate(issuer == null ? key.getPrivate() : issuer.getKey());
+        X509Certificate theCert = certGen.generate(issuer == null ? pair.getPrivate() : issuer.getKey());
         // check
-        theCert.verify(issuer == null ? key.getPublic() : issuer.getCertificate().getPublicKey());
+        theCert.verify(issuer == null ? key : issuer.getCertificate().getPublicKey());
         // encode
-        return new CertificatePair(theCert, key.getPrivate());
+        return new CertificatePair(theCert, pair == null ? null : pair.getPrivate());
     }
 }

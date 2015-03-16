@@ -29,6 +29,18 @@ public final class CertificatePair
         this.certificate = (X509Certificate) PEMUtil.loadCertificate(certificate);
         this.key = PEMUtil.loadKey(key);
     }
+    
+    public CertificatePair(String certificate) throws IOException
+    {
+        this.certificate = (X509Certificate) PEMUtil.loadCertificate(certificate);
+        this.key = null;
+    }
+    
+    public CertificatePair(File certificate) throws IOException
+    {
+        this.certificate = (X509Certificate) PEMUtil.loadCertificate(certificate);
+        this.key = null;
+    }
 
     public X509Certificate getCertificate()
     {
