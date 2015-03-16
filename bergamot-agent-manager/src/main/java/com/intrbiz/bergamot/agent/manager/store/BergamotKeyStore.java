@@ -39,4 +39,34 @@ public interface BergamotKeyStore
      * Store the given certificate pair as the CA for the given site
      */
     void storeSiteCA(UUID siteId, CertificatePair pair);
+    
+    /**
+     * Do we have an agent stored for the given site and id
+     */
+    boolean hasAgent(UUID siteId, UUID agentId);
+    
+    /**
+     * Load the agent certificate, private key is optional
+     */
+    CertificatePair loadAgent(UUID siteId, UUID agentId);
+    
+    /**
+     * Store the given agent certificate, private key is optional
+     */
+    void storeAgent(UUID siteId, UUID agentId, CertificatePair pair);
+    
+    /**
+     * Do we have a server stored for the given site and name
+     */
+    boolean hasServer(UUID siteId, String commonName);
+    
+    /**
+     * Load the server certificate, private key is optional
+     */
+    CertificatePair loadServer(UUID siteId, String commonName);
+    
+    /**
+     * Store the given server certificate, private key is optional
+     */
+    void storeServer(UUID siteId, String commonName, CertificatePair pair);
 }

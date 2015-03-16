@@ -18,12 +18,19 @@ import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.GetAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetRootCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.GetServer;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.request.SignAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.request.SignServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.AgentManagerError;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.GotAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.configuration.Configurable;
 import com.intrbiz.configuration.Configuration;
@@ -93,21 +100,44 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
             {
                 return new GotRootCA(PEMUtil.saveCertificate(this.keyStore.loadRootCA().getCertificate()));
             }
-            if (event instanceof GetSiteCA)
+            else if (event instanceof GetSiteCA)
             {
                 return new GotSiteCA(PEMUtil.saveCertificate(this.keyStore.loadSiteCA(((GetSiteCA) event).getSiteId()).getCertificate()));
+            }
+            else if (event instanceof GetAgent)
+            {
+                GetAgent agent = (GetAgent) event;
+                return new GotAgent(PEMUtil.saveCertificate(this.keyStore.loadAgent(agent.getSiteId(), agent.getId()).getCertificate()));
+            }
+            else if (event instanceof GetServer)
+            {
+                GetServer server = (GetServer) event;
+                return new GotAgent(PEMUtil.saveCertificate(this.keyStore.loadServer(server.getSiteId(), server.getCommonName()).getCertificate()));
             }
             else if (event instanceof CreateSiteCA)
             {
                 CreateSiteCA createSite = (CreateSiteCA) event;
-                if (createSite.getSiteId() == null || Util.isEmpty(createSite.getSiteName()))
-                {
-                    return new AgentManagerError("Invalid request");
-                }
+                if (createSite.getSiteId() == null || Util.isEmpty(createSite.getSiteName())) return new AgentManagerError("Invalid request");
                 // create a site CA
                 Certificate cert = this.certificateManager.generateSiteCA(createSite.getSiteId(), createSite.getSiteName());
                 // respond
                 return new CreatedSiteCA(PEMUtil.saveCertificate(cert));
+            }
+            else if (event instanceof SignAgent)
+            {
+                SignAgent sign = (SignAgent) event;
+                // sign the agent 
+                Certificate cert = this.certificateManager.signAgent(sign.getSiteId(), sign.getId(), sign.getCommonName(), PEMUtil.loadPublicKey(sign.getPublicKeyPEM()));
+                // respond
+                return new SignedAgent(PEMUtil.saveCertificate(cert));
+            }
+            else if (event instanceof SignServer)
+            {
+                SignServer sign = (SignServer) event;
+                // sign the agent 
+                Certificate cert = this.certificateManager.signServer(sign.getSiteId(), sign.getCommonName(), PEMUtil.loadPublicKey(sign.getPublicKeyPEM()));
+                // respond
+                return new SignedServer(PEMUtil.saveCertificate(cert));
             }
         }
         catch (Exception e)

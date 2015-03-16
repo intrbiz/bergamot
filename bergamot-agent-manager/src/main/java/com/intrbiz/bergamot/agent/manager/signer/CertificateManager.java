@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.agent.manager.signer;
 
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.UUID;
 
@@ -84,7 +85,7 @@ public class CertificateManager
         try
         {
             logger.info("Generating Site CA: " + this.buildSiteCADN(siteName));
-            // generate the root CA
+            // generate the site CA
             CertificatePair site = RSAUtil.generateCertificate(this.buildSiteCADN(siteName), new SerialNum(siteId, 1), 365 * 10, 2048, KeyType.INTERMEDIATE, root);
             // store
             this.keyStore.storeSiteCA(siteId, site);
@@ -94,6 +95,52 @@ public class CertificateManager
         catch (Exception e)
         {
             throw new RuntimeException("Failed to generate Site CA", e);
+        }
+    }
+    
+    public Certificate signAgent(UUID siteId, UUID agentId, String commonName, PublicKey key)
+    {
+        if (! this.keyStore.hasSiteCA(siteId)) throw new RuntimeException("No certificate exists for site: " + siteId);
+        if (this.keyStore.hasAgent(siteId, agentId)) throw new RuntimeException("Certificate already exists for agent " + siteId + "::" + agentId);
+        // first we need the root CA
+        CertificatePair site = this.keyStore.loadSiteCA(siteId);
+        // sign the agent cert
+        try
+        {
+            logger.info("Signing Agent: " + siteId + "::" + agentId + " " + this.buildDN(commonName));
+            // sign the agent
+            CertificatePair agent = RSAUtil.generateCertificate(this.buildDN(commonName), new SerialNum(agentId, 1), 365 * 5, 2048, KeyType.CLIENT, key, site);
+            // store
+            this.keyStore.storeAgent(siteId, agentId, agent);
+            // return the cert
+            return agent.getCertificate();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to sign agent", e);
+        }
+    }
+    
+    public Certificate signServer(UUID siteId, String commonName, PublicKey key)
+    {
+        if (! this.keyStore.hasSiteCA(siteId)) throw new RuntimeException("No certificate exists for site: " + siteId);
+        if (this.keyStore.hasServer(siteId, commonName)) throw new RuntimeException("Certificate already exists for server " + siteId + "::" + commonName);
+        // first we need the root CA
+        CertificatePair site = this.keyStore.loadSiteCA(siteId);
+        // sign the agent cert
+        try
+        {
+            logger.info("Signing Server: " + siteId + "::" + commonName + " " + this.buildDN(commonName));
+            // sign the agent
+            CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), SerialNum.randomSerialNum(), 365 * 5, 2048, KeyType.SERVER, key, site);
+            // store
+            this.keyStore.storeServer(siteId, commonName, server);
+            // return the cert
+            return server.getCertificate();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to sign agent", e);
         }
     }
 }
