@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.validator.BergamotConfigResolver;
 import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.model.APIToken;
+import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
@@ -65,7 +66,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({2, 1, 0}),
+        version = @SQLVersion({2, 2, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -91,7 +92,8 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
             APIToken.class,
             ConfigChange.class,
             CheckStats.class,
-            CheckTransition.class
+            CheckTransition.class,
+            AgentRegistration.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -1289,6 +1291,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLRemove(table = CheckTransition.class, name = "remove_check_Transition", since = @SQLVersion({1, 3, 0}))
     public abstract void removeCheckTransition(@SQLParam("id") UUID id);
+    
+    // agent
+    
+    @SQLSetter(table = AgentRegistration.class, name = "set_agent_registration", since = @SQLVersion({2, 2, 0}))
+    public abstract void setAgentRegistration(AgentRegistration reg);
+    
+    @SQLGetter(table = AgentRegistration.class, name = "get_agent_registration", since = @SQLVersion({2, 2, 0}))
+    public abstract AgentRegistration getAgentRegistration(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = AgentRegistration.class, name ="get_agent_registration_by_name", since = @SQLVersion({2, 2, 0}))
+    public abstract AgentRegistration getAgentRegistrationByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
+    
+    @SQLRemove(table = AgentRegistration.class, name = "remove_agent_registration", since = @SQLVersion({2, 2, 0}))
+    public abstract void removeAgentRegistration(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = AgentRegistration.class, name = "list_agent_registrations", since = @SQLVersion({2, 2, 0}))
+    public abstract List<AgentRegistration> listAgentRegistrations(@SQLParam("site_id") UUID siteId);
     
     // generic
     
