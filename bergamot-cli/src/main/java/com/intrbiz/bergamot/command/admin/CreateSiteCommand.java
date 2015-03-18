@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
@@ -18,7 +20,16 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
+import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
+import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
+import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.data.DataManager;
+import com.intrbiz.queue.QueueManager;
+import com.intrbiz.queue.RPCClient;
+import com.intrbiz.queue.name.RoutingKey;
+import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
 
 public class CreateSiteCommand extends BergamotCLICommand
@@ -65,7 +76,8 @@ public class CreateSiteCommand extends BergamotCLICommand
     {
         if (args.size() < 2) throw new BergamotCLIException("No site name or summary given");
         // the site name
-        String siteName = args.remove(0);
+        UUID   siteId      = Site.randomSiteId();
+        String siteName    = args.remove(0);
         String siteSummary = args.remove(0);
         // check for site config
         File siteConfigDir = new File(new File(System.getProperty("bergamot.site.config.base", "/etc/bergamot/config/")), siteName);
@@ -77,6 +89,8 @@ public class CreateSiteCommand extends BergamotCLICommand
         UICfg config = UICfg.loadConfiguration();
         // setup the data manager
         DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());
+        // setup the queue manager
+        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
         // ensure the DB schema is installed
         BergamotDB.install();
         // now check that we can create the site and it's aliases
@@ -117,7 +131,7 @@ public class CreateSiteCommand extends BergamotCLICommand
         try (BergamotDB db = BergamotDB.connect())
         {
             // create it
-            Site site = new Site(Site.randomSiteId(), siteName, siteSummary);
+            Site site = new Site(siteId, siteName, siteSummary);
             // aliases
             for (String alias : args)
             {
@@ -131,6 +145,24 @@ public class CreateSiteCommand extends BergamotCLICommand
         {
             BergamotImportReport report = new BergamotConfigImporter(vbcfg).resetState(true).importConfiguration();
             System.out.println(report.toString());
+        }
+        // create the Site CA
+        try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
+        {
+            try (RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client = queue.createBergamotAgentManagerRPCClient())
+            {
+                try
+                {
+                    AgentManagerResponse response = client.publish(new CreateSiteCA(siteId, siteName)).get(5, TimeUnit.SECONDS);
+                    if (response instanceof CreatedSiteCA)
+                    {
+                        System.out.println("Created Bergamot Agent site Certificate Authority");
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
         }
         // all done
         System.out.println("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
