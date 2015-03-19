@@ -20,9 +20,11 @@ import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetRootCA;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.request.SignAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.request.SignServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.metadata.Action;
 import com.intrbiz.queue.RPCClient;
@@ -40,6 +42,28 @@ public class BergamotAgentActions
     {
         this.queue = BergamotAgentManagerQueue.open();
         this.client = this.queue.createBergamotAgentManagerRPCClient();
+    }
+    
+    @Action("sign-server")
+    public Certificate signServer(String certificateRequest)
+    {
+        try
+        {
+            // parse the certificate request
+            CertificateRequest req = PEMUtil.loadCertificateRequest(certificateRequest);
+            // sign the cert
+            logger.info("Signing Bergamot Agent request for: " + req.getCommonName());
+            AgentManagerResponse response = this.client.publish(new SignServer(req.getCommonName(), PEMUtil.savePublicKey(req.getKey()))).get(10, TimeUnit.SECONDS);
+            if (response instanceof SignedServer)
+            {
+                return PEMUtil.loadCertificate(((SignedServer) response).getCertificatePEM());
+            }
+            throw new RuntimeException("Failed to sign server");
+        }
+        catch (IOException | InterruptedException | ExecutionException | TimeoutException e)
+        {
+            throw new RuntimeException("Failed to sign server", e);
+        }
     }
     
     @Action("sign-agent")
