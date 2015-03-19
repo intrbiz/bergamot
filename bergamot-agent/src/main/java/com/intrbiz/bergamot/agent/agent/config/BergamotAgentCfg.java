@@ -26,6 +26,8 @@ public class BergamotAgentCfg extends Configuration
     private String server;
 
     private String caCertificate;
+    
+    private String siteCaCertificate;
 
     private String key;
 
@@ -72,6 +74,22 @@ public class BergamotAgentCfg extends Configuration
     public void setCaCertificate(String caCertificate)
     {
         this.caCertificate = caCertificate;
+    }
+    
+    @XmlElement(name = "site-ca-certificate")
+    public String getSiteCaCertificate()
+    {
+        return siteCaCertificate;
+    }
+
+    public String getSiteCaCertificateTrimmed()
+    {
+        return trim(this.getSiteCaCertificate());
+    }
+
+    public void setSiteCaCertificate(String siteCaCertificate)
+    {
+        this.siteCaCertificate = siteCaCertificate;
     }
 
     @XmlElement(name = "key")
