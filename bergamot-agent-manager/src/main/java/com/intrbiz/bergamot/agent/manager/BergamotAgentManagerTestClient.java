@@ -39,9 +39,11 @@ public class BergamotAgentManagerTestClient
         // get root
         System.out.println(client.publish(new GetRootCA()).get());
         // create a site
-        UUID siteId = UUID.randomUUID();
-        System.out.println(client.publish(new CreateSiteCA(siteId, "Test Site")).get());
+        UUID siteId = UUID.fromString("90947610-44bc-4000-8000-000000000000");
+        System.out.println(client.publish(new CreateSiteCA(siteId, "bergamot.local")).get());
         System.out.println(client.publish(new GetSiteCA(siteId)).get());
+        //
+        System.exit(1);
         // agent
         KeyPair pair = RSAUtil.generateRSAKeyPair(2048);
         SignedAgent signed = (SignedAgent) client.publish(new SignAgent(siteId, UUID.randomUUID(), "test.client", PEMUtil.savePublicKey(pair.getPublic()))).get();
