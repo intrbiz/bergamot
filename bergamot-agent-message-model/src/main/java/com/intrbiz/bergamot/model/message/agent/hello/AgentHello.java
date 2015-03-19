@@ -9,12 +9,6 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 @JsonTypeName("bergamot.agent.hello")
 public class AgentHello extends AgentMessage
 {
-    @JsonProperty("host_id")
-    private UUID hostId;
-
-    @JsonProperty("host_name")
-    private String hostName;
-
     @JsonProperty("service_id")
     private UUID serviceId;
 
@@ -52,26 +46,6 @@ public class AgentHello extends AgentMessage
     public AgentHello(String id)
     {
         super(id);
-    }
-
-    public UUID getHostId()
-    {
-        return hostId;
-    }
-
-    public void setHostId(UUID hostId)
-    {
-        this.hostId = hostId;
-    }
-
-    public String getHostName()
-    {
-        return hostName;
-    }
-
-    public void setHostName(String hostName)
-    {
-        this.hostName = hostName;
     }
 
     public UUID getServiceId()

@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
-import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
@@ -52,10 +51,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
             if (agent != null)
             {
-                AgentHello hello = agent.getHello();
-                String hostName = hello.getHostName();
-                String tlsName  = agent.getClientCertificateInfo().getSubject().getCommonName();
-                resultMO.ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected");
+                resultMO.ok("Bergamot Agent " + agent.getAgentName() + " connected");
             }
             else
             {
@@ -77,27 +73,17 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         // on connection
         this.getEngine().getAgentServer().setOnAgentRegisterHandler((handler) -> {
             // publish a passive result for the presence of this host
-            // info we need
-            AgentHello hello = handler.getHello();
-            UUID hostId = hello.getHostId();
-            String hostName = hello.getHostName();
-            String tlsName  = handler.getClientCertificateInfo().getSubject().getCommonName();
-            // debug log
-            logger.trace("Got agent connection: " + hostName + " " + hostId);
+            logger.trace("Got agent connection: " + handler.getAgentName() + " " + handler.getAgentId());
             // submit a passive result for the host
-            this.publishResult(new PassiveResultKey(hostId), new PassiveResultMO().passive(hostId).ok("Bergamot Agent " + hostName + " (" + tlsName + ") connected"));
+            this.publishResult(new PassiveResultKey(handler.getAgentId()), new PassiveResultMO().passive(handler.getAgentId()).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
         });
         // on disconnection
         this.getEngine().getAgentServer().setOnAgentUnregisterHandler((handler) -> {
             // publish a passive result for the presence of this host
-            // info we need
-            AgentHello hello = handler.getHello();
-            UUID hostId = hello.getHostId();
-            String hostName = hello.getHostName();
             // debug log
-            logger.trace("Got agent disconnection: " + hostName + " " + hostId);
+            logger.trace("Got agent disconnection: " + handler.getAgentName() + " " + handler.getAgentId());
             // submit a passive result for the host
-            this.publishResult(new PassiveResultKey(hostId), new PassiveResultMO().passive(hostId).critical("Bergamot Agent disconnected"));
+            this.publishResult(new PassiveResultKey(handler.getAgentId()), new PassiveResultMO().passive(handler.getAgentId()).critical("Bergamot Agent disconnected"));
         });
     }
 }

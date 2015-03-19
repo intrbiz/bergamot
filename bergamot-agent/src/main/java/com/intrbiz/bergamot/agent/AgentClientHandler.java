@@ -58,8 +58,6 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
         if (this.hello == null)
         {
             this.hello = new AgentHello(UUID.randomUUID().toString());
-            hello.setHostId(this.node.getHostId());
-            hello.setHostName(this.node.getHostName());
             hello.setServiceId(this.node.getServiceId());
             hello.setServiceName(this.node.getServiceName());
             hello.setAgentName("BergamotAgent");

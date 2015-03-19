@@ -26,6 +26,7 @@ import io.netty.util.CharsetUtil;
 import java.net.SocketAddress;
 import java.security.Principal;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,6 +37,7 @@ import javax.net.ssl.SSLEngine;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.crypto.util.CertInfo;
+import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
@@ -66,11 +68,17 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     
     private final SSLEngine engine;
     
-    private Certificate clientCertificate;
+    private Certificate agentCertificate;
     
-    private CertInfo clientCertificateInfo;
+    private CertInfo agentCertificateInfo;
     
-    private boolean clientCertificateMatch = false;
+    private Certificate siteCertificate;
+    
+    private CertInfo siteCertificateInfo;
+    
+    private UUID agentId;
+    
+    private UUID siteId;
     
     public BergamotAgentServerHandler(BergamotAgentServer server, SSLEngine engine)
     {
@@ -79,14 +87,35 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         this.engine = engine;
     }
     
-    public CertInfo getClientCertificateInfo()
+    /**
+     * The Agent Id as extracted from the certificate
+     */
+    public UUID getAgentId()
     {
-        return this.clientCertificateInfo;
+        return this.agentId;
     }
     
-    public boolean isClientCertificateMatch()
+    /**
+     * The Site Id as extracted from the site certificate
+     */
+    public UUID getSiteId()
     {
-        return this.clientCertificateMatch;
+        return this.siteId;
+    }
+    
+    public CertInfo getAgentCertificateInfo()
+    {
+        return this.agentCertificateInfo;
+    }
+    
+    public String getAgentName()
+    {
+        return this.agentCertificateInfo.getSubject().getCommonName();
+    }
+    
+    public CertInfo getSiteCertificateInfo()
+    {
+        return this.siteCertificateInfo;
     }
     
     public AgentHello getHello()
@@ -157,7 +186,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             return;
         }
         // validate the certificate
-        if (this.validateClientCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()))
+        if (this.validateAgentCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()))
         {
             // got a good client certificate, start the WS handshake
             logger.trace("Handshaking websocket request url: " + req.getUri());
@@ -215,18 +244,9 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         {
             this.hello = (AgentHello) request;
             this.remoteAddress = ctx.channel().remoteAddress();
-            logger.info("Got hello from " + this.remoteAddress + " " + this.hello.toString());
-            // compare the hello with the certificate
-            if (this.validateHelloMatchesCertificate() || (! this.server.isRequireMatchingCertificate()))
-            {
-                // register ourselves
-                this.server.registerAgent(this);
-            }
-            else
-            {
-                // reject this connection
-                this.writeMessageAndClose(ctx, new GeneralError("The client certificate name does not match the host name."));
-            }
+            logger.info("Got hello from " + this.remoteAddress + " " + this.agentId + " " + this.agentCertificateInfo.getSubject().getCommonName());
+            // register ourselves
+            this.server.registerAgent(this);
         }
         else if (request instanceof AgentPing)
         {
@@ -257,26 +277,10 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message)));
     }
     
-    private void writeMessageAndClose(final ChannelHandlerContext ctx, final AgentMessage message) throws Exception
+    /*private void writeMessageAndClose(final ChannelHandlerContext ctx, final AgentMessage message) throws Exception
     {
         ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message))).addListener(ChannelFutureListener.CLOSE);
-    }
-    
-    private boolean validateHelloMatchesCertificate()
-    {
-        logger.debug("Check agent name matches certificate: " + this.hello.getHostName() + " == " + this.clientCertificateInfo.getSubject().getCommonName());
-        if (this.clientCertificateInfo.getSubject().getCommonName().equals(this.getHello().getHostName()))
-        {
-            logger.info("Agent hello host name matches certificate");
-            this.clientCertificateMatch = true;
-        }
-        else
-        {
-            logger.warn("Agent hello host name does not match certificate, possible certificate reuse!");
-            this.clientCertificateMatch = false;
-        }
-        return this.clientCertificateMatch;
-    }
+    }*/
 
     private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res)
     {
@@ -296,20 +300,45 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         }
     }
     
-    private boolean validateClientCertificate(Principal clientPrincipal, Certificate[] clientCertificates)
+    /**
+     * Validate the agent client auth certificate.
+     * 
+     * The Bergamot Agent encodes and signs important information 
+     * into the certificate:
+     * 
+     * 1) The Agent UUID - encoded in the agent certificate serial number
+     * 2) The Agent common name - the common name of the agent certificate
+     * 3) The Site  UUID - encoded in the site CA certificate serial number
+     * 
+     * @param clientPrincipal
+     * @param clientCertificates
+     */
+    private boolean validateAgentCertificate(Principal clientPrincipal, Certificate[] clientCertificates)
     {
         // assert that we have a certificate
-        if (clientPrincipal == null || clientCertificates == null || clientCertificates.length == 0)
+        if (clientPrincipal == null || clientCertificates == null || clientCertificates.length < 2)
         {
-            logger.debug("No client certificate provided, cannot validate");
+            logger.debug("Invalid agent certificate chain, not valid!");
             return false;
         }
         try
         {
-            // get easy to use information about the client from the certificate
-            this.clientCertificate = clientCertificates[0];
-            this.clientCertificateInfo = CertInfo.fromCertificate(this.clientCertificate); 
-            logger.info("Connection from client: " + this.clientCertificateInfo.getSubject().getCommonName());
+            // the client auth certificte chain will be:
+            // 0 - agent certificate
+            // 1 - site authority certificate
+            // 2 - root authority certificate
+            // agent cert
+            this.agentCertificate = clientCertificates[0];
+            this.agentCertificateInfo = CertInfo.fromCertificate(this.agentCertificate);
+            // site CA cert
+            this.siteCertificate = clientCertificates[1];
+            this.siteCertificateInfo = CertInfo.fromCertificate(this.siteCertificate);
+            // check the serial numbers
+            this.agentId = SerialNum.fromBigInt(((X509Certificate) this.agentCertificate).getSerialNumber()).getId();
+            this.siteId  = SerialNum.fromBigInt(((X509Certificate) this.siteCertificate).getSerialNumber()).getId();
+            // TODO: validate that the Agent Id is masked by the Site Id
+            // log
+            logger.info("Connection from client: " + this.agentCertificateInfo.getSubject().getCommonName() + " of site " + this.siteCertificateInfo.getSubject().getCommonName());
             return true;
         }
         catch (Exception e)

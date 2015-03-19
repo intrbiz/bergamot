@@ -132,14 +132,14 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     public void registerAgent(BergamotAgentServerHandler agent)
     {
         // register the agent
-        this.agents.put(agent.getHello().getHostId(), agent);
+        this.agents.put(agent.getAgentId(), agent);
         // list registered agents for debugging
         if (logger.isDebugEnabled())
         {
             logger.debug("Registered agents:");
             for (BergamotAgentServerHandler ag : this.agents.values())
             {
-                logger.info("Agent: " + ag.getHello().getHostId() + " " + ag.getHello().getHostName() + " :: " + ag.getHello().getServiceId() + " " + ag.getHello().getServiceName());
+                logger.info("Agent: " + ag.getAgentId() + " " + ag.getAgentName() + " / " + ag.getHello().getServiceId() + " " + ag.getHello().getServiceName());
             }
         }
         // fire the agent register hook
@@ -149,7 +149,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     public void unregisterAgent(BergamotAgentServerHandler agent)
     {
         logger.debug("Agent unregister!");
-        this.agents.remove(agent.getHello().getHostId());
+        this.agents.remove(agent.getAgentId());
         // fire the event
         if (this.onAgentUnregister != null) this.onAgentUnregister.accept(agent);
     }

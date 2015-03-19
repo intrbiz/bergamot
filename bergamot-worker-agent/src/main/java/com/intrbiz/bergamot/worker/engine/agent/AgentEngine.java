@@ -51,11 +51,11 @@ public class AgentEngine extends AbstractEngine
         this.agentServer.configure(serverCfg);
         // handle binding / unbinding agent routes when an agent connects and disconnects
         this.agentServer.setOnAgentRegisterHandler((handler) -> {
-            this.bindAgent(handler.getHello().getHostId());
+            this.bindAgent(handler.getAgentId());
         });
         this.agentServer.setOnAgentUnregisterHandler((handler) -> {
             // unbind the agent from this worker so that active checks will not be routed to us
-            this.unbindAgent(handler.getHello().getHostId());
+            this.unbindAgent(handler.getAgentId());
         });
         // setup queues etc
         super.start();
