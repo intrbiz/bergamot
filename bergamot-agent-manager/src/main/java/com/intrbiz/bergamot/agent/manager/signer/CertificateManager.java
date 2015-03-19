@@ -121,20 +121,19 @@ public class CertificateManager
         }
     }
     
-    public Certificate signServer(UUID siteId, String commonName, PublicKey key)
+    public Certificate signServer(String commonName, PublicKey key)
     {
-        if (! this.keyStore.hasSiteCA(siteId)) throw new RuntimeException("No certificate exists for site: " + siteId);
-        if (this.keyStore.hasServer(siteId, commonName)) throw new RuntimeException("Certificate already exists for server " + siteId + "::" + commonName);
+        if (this.keyStore.hasServer(commonName)) throw new RuntimeException("Certificate already exists for server " + commonName);
         // first we need the root CA
-        CertificatePair site = this.keyStore.loadSiteCA(siteId);
-        // sign the agent cert
+        CertificatePair root = this.keyStore.loadRootCA();
+        // sign the server cert
         try
         {
-            logger.info("Signing Server: " + siteId + "::" + commonName + " " + this.buildDN(commonName));
+            logger.info("Signing Server: " + commonName + " " + this.buildDN(commonName));
             // sign the agent
-            CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), SerialNum.randomSerialNum(), 365 * 5, 2048, KeyType.SERVER, key, site);
+            CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), SerialNum.randomSerialNum(), 365 * 5, 2048, KeyType.SERVER, key, root);
             // store
-            this.keyStore.storeServer(siteId, commonName, server);
+            this.keyStore.storeServer(commonName, server);
             // return the cert
             return server.getCertificate();
         }

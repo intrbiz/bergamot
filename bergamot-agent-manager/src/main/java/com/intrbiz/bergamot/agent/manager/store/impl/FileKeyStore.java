@@ -162,46 +162,45 @@ public class FileKeyStore implements BergamotKeyStore
     }
 
     @Override
-    public boolean hasServer(UUID siteId, String commonName)
+    public boolean hasServer(String commonName)
     {
-        return new File(new File(this.server, siteId.toString()), commonName + ".crt").exists();
+        return new File(this.server, commonName + ".crt").exists();
     }
 
     @Override
-    public CertificatePair loadServer(UUID siteId, String commonName)
+    public CertificatePair loadServer(String commonName)
     {
         try
         {
-            if (new File(new File(this.server, siteId.toString()), commonName + ".key").exists())
+            if (new File(this.server, commonName + ".key").exists())
             {
-                return new CertificatePair(new File(new File(this.server, siteId.toString()), commonName + ".crt"), new File(new File(this.server, siteId.toString()), commonName + ".key"));
+                return new CertificatePair(new File(this.server, commonName + ".crt"), new File(this.server, commonName + ".key"));
             }
             else
             {
-                return new CertificatePair(new File(new File(this.server, siteId.toString()), commonName + ".crt"), null);
+                return new CertificatePair(new File(this.server, commonName + ".crt"), null);
             }
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Failed to load certificate for server: " + siteId + "::" + commonName, e);
+            throw new RuntimeException("Failed to load certificate for server: " + commonName, e);
         }
     }
 
     @Override
-    public void storeServer(UUID siteId, String commonName, CertificatePair pair)
+    public void storeServer(String commonName, CertificatePair pair)
     {
         synchronized (this)
         {
-            if (this.hasServer(siteId, commonName)) throw new RuntimeException("Server certificate already exists for server " + siteId + "::" + commonName);
-            new File(this.server, siteId.toString()).mkdirs();
+            if (this.hasServer(commonName)) throw new RuntimeException("Server certificate already exists for server " + commonName);
             try
             {
-                pair.saveCertificate(new File(new File(this.server, siteId.toString()), commonName + ".crt"));
-                if (pair.getKey() != null) pair.saveKey(new File(new File(this.server, siteId.toString()), commonName + ".key"));
+                pair.saveCertificate(new File(this.server, commonName + ".crt"));
+                if (pair.getKey() != null) pair.saveKey(new File(this.server, commonName + ".key"));
             }
             catch (Exception e)
             {
-                throw new RuntimeException("Failed to store server certificate: " + siteId + "::" + commonName, e);
+                throw new RuntimeException("Failed to store server certificate: " + commonName, e);
             }
         }
     }

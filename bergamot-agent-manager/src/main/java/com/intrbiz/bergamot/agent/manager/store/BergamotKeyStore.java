@@ -58,15 +58,15 @@ public interface BergamotKeyStore
     /**
      * Do we have a server stored for the given site and name
      */
-    boolean hasServer(UUID siteId, String commonName);
+    boolean hasServer(String commonName);
     
     /**
      * Load the server certificate, private key is optional
      */
-    CertificatePair loadServer(UUID siteId, String commonName);
+    CertificatePair loadServer(String commonName);
     
     /**
      * Store the given server certificate, private key is optional
      */
-    void storeServer(UUID siteId, String commonName, CertificatePair pair);
+    void storeServer(String commonName, CertificatePair pair);
 }

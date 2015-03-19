@@ -51,7 +51,7 @@ public class BergamotAgentManagerTestClient
         System.out.println(PEMUtil.saveKey(pair.getPrivate()));
         // server
         KeyPair pair1 = RSAUtil.generateRSAKeyPair(2048);
-        SignedServer signed1 = (SignedServer) client.publish(new SignServer(siteId, "test.server", PEMUtil.savePublicKey(pair1.getPublic()))).get();
+        SignedServer signed1 = (SignedServer) client.publish(new SignServer("test.server", PEMUtil.savePublicKey(pair1.getPublic()))).get();
         System.out.println(signed1);
         System.out.println(PEMUtil.saveKey(pair1.getPrivate()));
     }

@@ -112,7 +112,7 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
             else if (event instanceof GetServer)
             {
                 GetServer server = (GetServer) event;
-                return new GotAgent(PEMUtil.saveCertificate(this.keyStore.loadServer(server.getSiteId(), server.getCommonName()).getCertificate()));
+                return new GotAgent(PEMUtil.saveCertificate(this.keyStore.loadServer(server.getCommonName()).getCertificate()));
             }
             else if (event instanceof CreateSiteCA)
             {
@@ -135,7 +135,7 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
             {
                 SignServer sign = (SignServer) event;
                 // sign the agent 
-                Certificate cert = this.certificateManager.signServer(sign.getSiteId(), sign.getCommonName(), PEMUtil.loadPublicKey(sign.getPublicKeyPEM()));
+                Certificate cert = this.certificateManager.signServer(sign.getCommonName(), PEMUtil.loadPublicKey(sign.getPublicKeyPEM()));
                 // respond
                 return new SignedServer(PEMUtil.saveCertificate(cert));
             }
