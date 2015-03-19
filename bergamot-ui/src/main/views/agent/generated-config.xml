@@ -1,0 +1,17 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Bergamot Agent Manager">
+
+    <div clas="row">
+    	<h3>Agent Configuration</h3>
+    	<p>
+    		The generated agent configuration is below, this includes 
+    		the TLS certificates and private keys.
+    	</p>
+    	<div class="col12">
+    		<pre>#{agentConfig}</pre>
+    	</div>
+    </div>
+    
+</fragment>

@@ -30,6 +30,21 @@
     <!-- Admin Menu -->
     <container rendered="#{Balsa().permission('ui.admin')}">
         <div class="menu-group">
+            <h4><a href="/agent/">Bergamot Agent Manager</a></h4>
+            <ul>
+	            <li>
+                    <a href="/agent/sign">Sign Agent Certificate</a>
+                </li>
+                <li>
+                    <a href="/agent/generate-config">Generate Agent Config</a>
+                </li>
+            </ul>
+        </div>
+    </container>
+    
+    <!-- Admin Menu -->
+    <container rendered="#{Balsa().permission('ui.admin')}">
+        <div class="menu-group">
             <h4><a href="/admin/">Admin</a></h4>
             <ul>
                 <li>

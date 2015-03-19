@@ -10,6 +10,7 @@ import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.ui.action.BergamotAgentActions;
 import com.intrbiz.bergamot.ui.action.CheckActions;
 import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
 import com.intrbiz.bergamot.ui.action.ContactActions;
@@ -68,6 +69,7 @@ import com.intrbiz.bergamot.ui.router.admin.SiteAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TeamAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TimePeriodAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TrapAdminRouter;
+import com.intrbiz.bergamot.ui.router.agent.AgentRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
 import com.intrbiz.configuration.Configurable;
@@ -151,6 +153,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new ContactActions());
         action(new ConfigChangeActions());
         action(new CheckActions());
+        action(new BergamotAgentActions());
         // Setup the application routers
         router(new LoginRouter());
         router(new DashboardRouter());
@@ -166,6 +169,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new TimePeriodRouter());
         router(new ProfileRouter());
         router(new StatsRouter());
+        // Agent
+        router(new AgentRouter());
         // Admin
         router(new AdminRouter());
         router(new ContactAdminRouter());

@@ -1,0 +1,33 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Bergamot Agent Manager">
+
+    <div clas="row">
+    	<p class="pull-right">
+    		<a style="margin-left: 15px;" href="/agent/sign">Sign Agent Certificate</a>
+	    	<a style="margin-left: 15px;" href="/agent/generate-config">Generate Agent Configuration</a>
+    	</p>
+    	<p class="text-body">
+			
+    	</p>
+    	<div class="col12">
+	    	<table>
+	    		<tr>
+	    			<th>Agent Id</th>
+	    			<th>Common Name</th>
+	    			<th>Serial</th>
+	    			<th></th>
+	    		</tr>
+	    		<data-set var="agent" value="#{agents}">
+	    			<tr>
+	    				<td>#{agent.id}</td>
+	    				<td>#{agent.name}</td>
+	    				<td>#{agent.serial}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>
