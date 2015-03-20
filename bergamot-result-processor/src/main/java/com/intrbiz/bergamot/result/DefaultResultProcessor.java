@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.ActiveCheck;
@@ -24,15 +25,20 @@ import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.CheckTransition;
+import com.intrbiz.bergamot.result.matcher.Matcher;
+import com.intrbiz.bergamot.result.matcher.Matchers;
 
 public class DefaultResultProcessor extends AbstractResultProcessor
 {
     private Logger logger = Logger.getLogger(DefaultResultProcessor.class);
+    
+    private Matchers matchers = new Matchers();
 
     public DefaultResultProcessor()
     {
@@ -47,64 +53,103 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // fake a timeout result and submit it
         this.processExecuted(new ActiveResultMO().fromCheck(check).timeout("Worker timeout whilst executing check"));
     }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected Check<?, ?> matchCheck(BergamotDB db, ResultMO resultMO)
+    {
+        if (resultMO instanceof ActiveResultMO)
+        {
+            ActiveResultMO activeResult = (ActiveResultMO) resultMO;
+            logger.debug("Matching active result for check: " + activeResult.getCheckType() + "::" + activeResult.getCheckId());
+            if (Util.isEmpty(activeResult.getCheckType()))
+            {
+                if ("host".equalsIgnoreCase(activeResult.getCheckType()))
+                {
+                    return db.getHost(activeResult.getCheckId());
+                }
+                else if ("service".equalsIgnoreCase(activeResult.getCheckType()))
+                {
+                    return db.getService(activeResult.getCheckId());
+                }
+                else
+                {
+                    return db.getCheck(activeResult.getCheckId());    
+                }
+            }
+            else
+            {
+                return db.getCheck(activeResult.getCheckId());
+            }
+        }
+        else if (resultMO instanceof PassiveResultMO)
+        {
+            PassiveResultMO passiveResult = (PassiveResultMO) resultMO;
+            // use the match engine to find the result
+            Matcher<?> matcher = this.matchers.buildMatcher(passiveResult.getMatchOn());
+            if (matcher == null) return null;
+            logger.debug("Built matcher: " + matcher + " for passive result match on: " + passiveResult.getMatchOn());
+            return ((Matcher) matcher).match(db, passiveResult.getMatchOn(), passiveResult);
+        }
+        return null;
+    }
 
     @Override
     public void processExecuted(ResultMO resultMO)
     {
-        logger.info("Got result " + resultMO.getId() + " for '" + resultMO.getCheckType() + "' " + resultMO.getCheckId() + " [" + (resultMO.getCheck() == null ? "" : resultMO.getCheck().getName()) + "] => " + resultMO.isOk() + " " + resultMO.getStatus() + " " + resultMO.getOutput() + " took " + resultMO.getRuntime() + " ms.");
         // stamp in processed time
         resultMO.setProcessed(System.currentTimeMillis());
         // start the transaction
         try (BergamotDB db = BergamotDB.connect())
         {
             db.execute(() -> {
+                Check<?, ?> check = this.matchCheck(db, resultMO);
+                // should be process this result?
+                if (! (check instanceof RealCheck))
+                {
+                    logger.warn("Failed to match result to a real check: " + resultMO.getId() + ", discarding!");
+                    return;
+                }
+                if (!check.isEnabled())
+                {
+                    logger.warn("Discarding result " + resultMO.getId() + " for " + check.getType() + "::" + check.getId() + " because it is disabled.");
+                    return;
+                }
                 // update the state
-                Check<?, ?> check = db.getCheck(resultMO.getCheckId());
-                if (check instanceof RealCheck)
+                // apply the result
+                Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
+                logger.info("State change for " + check.getType() + "::" + check.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
+                // log the transition
+                db.logCheckTransition(transition.toCheckTransition(resultMO.getId(), check.getId(), new Timestamp(resultMO.getProcessed())));
+                // update the check state
+                db.setCheckState(transition.nextState);
+                // compute the check stats
+                if (resultMO instanceof ActiveResultMO)
                 {
-                    // should be process this result?
-                    if (!check.isEnabled())
-                    {
-                        logger.warn("Discarding result " + resultMO.getId() + " for " + resultMO.getCheckType() + "::" + resultMO.getCheckId() + " because it is disabled.");
-                        return;
-                    }
-                    // apply the result
-                    Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
-                    logger.info("State change for " + resultMO.getCheckType() + "::" + resultMO.getCheckId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
-                    // log the transition
-                    db.logCheckTransition(transition.toCheckTransition(resultMO.getId(), check.getId(), new Timestamp(resultMO.getProcessed())));
-                    // compute the check stats
-                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), resultMO);
-                    // update the check state
-                    db.setCheckState(transition.nextState);
+                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), (ActiveResultMO) resultMO);
                     db.setCheckStats(stats);
-                    db.commit();
-                    // reschedule active checks if we have changed state at all
-                    if ((check instanceof ActiveCheck) && (transition.stateChange || transition.hardChange))
-                    {
-                        // inform the scheduler to reschedule this check
-                        long interval = ((ActiveCheck<?,?>) check).computeCurrentInterval(transition.nextState);
-                        logger.info("Sending reschedule for " + check.getType() + "::" + check.getId() + "[" + check.getName() + "]");
-                        this.rescheduleCheck((ActiveCheck<?,?>) check, interval);
-                    }
-                    // send the general state update notifications
-                    this.sendStateUpdate(check);
-                    // send notifications
-                    if (transition.alert)
-                    {
-                        this.sendAlert(check, db);
-                    }
-                    else if (transition.recovery)
-                    {
-                        this.sendRecovery(check, db);
-                    }
-                    // update any virtual checks
-                    this.updateVirtualChecks(check, transition, resultMO, db);
                 }
-                else
+                db.commit();
+                // reschedule active checks if we have changed state at all
+                if ((check instanceof ActiveCheck) && (transition.stateChange || transition.hardChange))
                 {
-                    logger.warn("Could not find " + resultMO.getCheckType() + " " + resultMO.getCheckId() + " for result " + resultMO.getId());
+                    // inform the scheduler to reschedule this check
+                    long interval = ((ActiveCheck<?,?>) check).computeCurrentInterval(transition.nextState);
+                    logger.info("Sending reschedule for " + check.getType() + "::" + check.getId() + "[" + check.getName() + "]");
+                    this.rescheduleCheck((ActiveCheck<?,?>) check, interval);
                 }
+                // send the general state update notifications
+                this.sendStateUpdate(check);
+                // send notifications
+                if (transition.alert)
+                {
+                    this.sendAlert(check, db);
+                }
+                else if (transition.recovery)
+                {
+                    this.sendRecovery(check, db);
+                }
+                // update any virtual checks
+                this.updateVirtualChecks(check, transition, resultMO, db);
             });
         }
     }
@@ -342,7 +387,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         return isStateChange;
     }
     
-    protected CheckStats computeStats(CheckStats stats, ResultMO resultMO)
+    protected CheckStats computeStats(CheckStats stats, ActiveResultMO resultMO)
     {
         CheckStats nextStats = stats.clone();
         // compute the stats

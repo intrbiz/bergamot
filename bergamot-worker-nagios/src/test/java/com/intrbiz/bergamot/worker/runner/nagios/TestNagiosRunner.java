@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 
 public class TestNagiosRunner
@@ -60,7 +61,8 @@ public class TestNagiosRunner
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
         this.runner.execute(
             executeCheck, 
-            (result) -> {
+            (res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -82,7 +84,8 @@ public class TestNagiosRunner
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 1 Test");
         this.runner.execute(
             executeCheck,
-            (result) -> {
+            (res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -104,7 +107,8 @@ public class TestNagiosRunner
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 2 Test");
         this.runner.execute(
             executeCheck,
-            (result) -> {
+            (res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -126,7 +130,8 @@ public class TestNagiosRunner
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 3 Test");
         this.runner.execute(
             executeCheck,
-            (result) -> {
+            (res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -148,7 +153,8 @@ public class TestNagiosRunner
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_missing");
         this.runner.execute(
             executeCheck,
-            (result) -> {
+            (res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -171,7 +177,8 @@ public class TestNagiosRunner
         ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H 127.0.0.1 -p 35666 -t 15 -c check_load");
         this.runner.execute(
             executeCheck,
-            (result) -> {
+            (res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -193,7 +200,8 @@ public class TestNagiosRunner
         ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H 127.0.0.1 -t 15 -c check_load");
         this.runner.execute(
             executeCheck,
-            (result) -> {
+            (res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));

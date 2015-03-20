@@ -71,6 +71,11 @@ import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
+import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
+import com.intrbiz.bergamot.model.message.result.MatchOnHostAddress;
+import com.intrbiz.bergamot.model.message.result.MatchOnHostName;
+import com.intrbiz.bergamot.model.message.result.MatchOnServiceName;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
@@ -119,6 +124,11 @@ public class BergamotTranscoder
         ExecuteCheck.class,
         ActiveResultMO.class,
         PassiveResultMO.class,
+        MatchOnAgentId.class,
+        MatchOnCheckId.class,
+        MatchOnHostAddress.class,
+        MatchOnHostName.class,
+        MatchOnServiceName.class,
         // notifications
         SendAlert.class,
         SendRecovery.class,

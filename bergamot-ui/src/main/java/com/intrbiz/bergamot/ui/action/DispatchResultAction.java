@@ -2,9 +2,10 @@ package com.intrbiz.bergamot.ui.action;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
-import com.intrbiz.bergamot.queue.key.ActiveResultKey;
+import com.intrbiz.bergamot.queue.key.PassiveResultKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.metadata.Action;
 import com.intrbiz.queue.RoutedProducer;
@@ -24,14 +25,17 @@ public class DispatchResultAction
     }
     
     @Action("dispatch-result")
-    public void dispatchResult(ResultMO resultMO)
+    public void dispatchResult(PassiveResultMO resultMO)
     {
         // fire off the result
-        if (logger.isTraceEnabled()) logger.trace("Dispatching result:\r\n" + resultMO);
+        if (logger.isTraceEnabled()) logger.trace("Publishing passive result:\r\n" + resultMO);
         // TODO
         synchronized (this)
         {
-            this.resultProducer.publish(new ActiveResultKey(resultMO.getSiteId(), resultMO.getProcessingPool()), resultMO);
+            this.resultProducer.publish(
+                    resultMO.getSiteId() == null ? new PassiveResultKey() : new PassiveResultKey(resultMO.getSiteId()), 
+                    resultMO
+            );
         }
     }
 }

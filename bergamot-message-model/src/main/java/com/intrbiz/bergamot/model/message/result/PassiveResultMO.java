@@ -2,8 +2,9 @@ package com.intrbiz.bergamot.model.message.result;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 
 /**
  * The result of a passive check
@@ -11,21 +12,46 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 @JsonTypeName("bergamot.result.passive")
 public class PassiveResultMO extends ResultMO
 {
+    @JsonProperty("site_id")
+    private UUID siteId;
+
+    @JsonProperty("match_on")
+    private MatchOn matchOn;
+
     public PassiveResultMO()
     {
         super();
     }
 
-    @Override
-    public PassiveResultMO fromCheck(CheckEvent check)
+    public UUID getSiteId()
     {
-        return (PassiveResultMO) super.fromCheck(check);
+        return siteId;
     }
 
-    @Override
-    public PassiveResultMO passive(UUID checkId)
+    public void setSiteId(UUID siteId)
     {
-        return (PassiveResultMO) super.passive(checkId);
+        this.siteId = siteId;
+    }
+
+    public MatchOn getMatchOn()
+    {
+        return matchOn;
+    }
+
+    public void setMatchOn(MatchOn matchOn)
+    {
+        this.matchOn = matchOn;
+    }
+
+    @JsonIgnore
+    public PassiveResultMO passive(UUID siteId, MatchOn matchCriteria)
+    {
+        this.setSiteId(siteId);
+        this.setMatchOn(matchCriteria);
+        this.setId(UUID.randomUUID());
+        this.setExecuted(System.currentTimeMillis());
+        this.setRuntime(0);
+        return this;
     }
 
     @Override
@@ -75,7 +101,7 @@ public class PassiveResultMO extends ResultMO
     {
         return (PassiveResultMO) super.timeout(message);
     }
-    
+
     @Override
     public PassiveResultMO applyThreshold(double value, double warning, double critical, String message)
     {
@@ -87,7 +113,7 @@ public class PassiveResultMO extends ResultMO
     {
         return (PassiveResultMO) super.applyThreshold(value, warning, critical, message);
     }
-    
+
     @Override
     public PassiveResultMO runtime(double runtime)
     {

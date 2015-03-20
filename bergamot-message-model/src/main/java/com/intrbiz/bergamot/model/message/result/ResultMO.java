@@ -3,34 +3,17 @@ package com.intrbiz.bergamot.model.message.result;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
-import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 
 /**
  * The result of a check
  */
 public abstract class ResultMO extends Message
 {
-    @JsonProperty("check_type")
-    private String checkType;
-
-    @JsonProperty("check_id")
-    private UUID checkId;
-
-    @JsonProperty("site_id")
-    private UUID siteId;
-    
-    @JsonProperty("processing_pool")
-    private int processingPool;
-
-    @JsonProperty("check")
-    private CheckEvent check;
-
     @JsonProperty("ok")
     private boolean ok;
 
@@ -55,36 +38,6 @@ public abstract class ResultMO extends Message
     public ResultMO()
     {
         super();
-    }
-
-    public String getCheckType()
-    {
-        return checkType;
-    }
-
-    public void setCheckType(String checkType)
-    {
-        this.checkType = checkType;
-    }
-
-    public UUID getCheckId()
-    {
-        return checkId;
-    }
-
-    public void setCheckId(UUID checkId)
-    {
-        this.checkId = checkId;
-    }
-
-    public CheckEvent getCheck()
-    {
-        return check;
-    }
-
-    public void setCheck(CheckEvent check)
-    {
-        this.check = check;
     }
 
     public boolean isOk()
@@ -199,58 +152,7 @@ public abstract class ResultMO extends Message
         return defaultValue;
     }
     
-    public UUID getSiteId()
-    {
-        return siteId;
-    }
-
-    public void setSiteId(UUID siteId)
-    {
-        this.siteId = siteId;
-    }
-
-    public int getProcessingPool()
-    {
-        return processingPool;
-    }
-
-    public void setProcessingPool(int processingPool)
-    {
-        this.processingPool = processingPool;
-    }
-    
     // constructor helpers
-
-    /**
-     * Create a Result with the details of this check
-     * 
-     * @return
-     */
-    @JsonIgnore
-    public ResultMO fromCheck(CheckEvent check)
-    {
-        this.setId(check.getId());
-        this.setCheckType(check.getCheckType());
-        this.setCheckId(check.getCheckId());
-        this.setSiteId(check.getSiteId());
-        this.setProcessingPool(check.getProcessingPool());
-        this.setCheck(check);
-        this.setExecuted(System.currentTimeMillis());
-        return this;
-    }
-    
-    @JsonIgnore
-    public ResultMO passive(UUID checkId)
-    {
-        this.setId(UUID.randomUUID());
-        this.setCheckType(null);
-        this.setCheckId(checkId);
-        this.setSiteId(new UUID((checkId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L));
-        this.setProcessingPool(0);
-        this.setCheck(null);
-        this.setExecuted(System.currentTimeMillis());
-        return this;
-    }
     
     @JsonIgnore
     public ResultMO pending(String output)

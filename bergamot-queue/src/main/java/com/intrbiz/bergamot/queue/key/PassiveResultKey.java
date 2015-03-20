@@ -14,7 +14,7 @@ public class PassiveResultKey extends ResultKey
      */
     public PassiveResultKey(UUID id)
     {
-        super(toSiteId(id).toString());
+        super(id == null ? "" : toSiteId(id).toString());
     }
     
     /**

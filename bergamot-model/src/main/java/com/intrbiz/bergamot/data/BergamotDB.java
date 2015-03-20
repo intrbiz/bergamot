@@ -66,7 +66,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({2, 2, 0}),
+        version = @SQLVersion({2, 3, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -853,7 +853,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     // host
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_host_by_name.#{site_id}.*", "get_host_by_address.#{site_id}.*"})
+    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_host_by_name.#{site_id}.*", "get_host_by_address.#{site_id}.*", "get_host_by_external_ref.#{site_id}.*", "get_host_by_agent_id.#{site_id}.*"})
     @SQLSetter(table = Host.class, name = "set_host", since = @SQLVersion({1, 0, 0}))
     public abstract void setHost(Host host);
     
@@ -872,6 +872,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLGetter(table = Host.class, name = "get_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
     public abstract Host getHostByExternalRef(@SQLParam("site_id") UUID siteId, @SQLParam("external_ref") String externalRef);
+    
+    @Cacheable
+    @SQLGetter(table = Host.class, name = "get_host_by_agent_id", since = @SQLVersion({2, 3, 0}))
+    public abstract Host getHostByAgentId(@SQLParam("site_id") UUID siteId, @SQLParam("agent_id") UUID agentId);
     
     @Cacheable
     @SQLGetter(table = Host.class, name = "get_hosts_in_location", since = @SQLVersion({1, 0, 0}))

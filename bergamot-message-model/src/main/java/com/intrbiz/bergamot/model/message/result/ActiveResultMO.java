@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.model.message.result;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 
@@ -11,22 +13,94 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 @JsonTypeName("bergamot.result.active")
 public class ActiveResultMO extends ResultMO
 {
+    @JsonProperty("check_type")
+    private String checkType;
+
+    @JsonProperty("check_id")
+    private UUID checkId;
+
+    @JsonProperty("site_id")
+    private UUID siteId;
+    
+    @JsonProperty("processing_pool")
+    private int processingPool;
+
+    @JsonProperty("check")
+    private CheckEvent check;
 
     public ActiveResultMO()
     {
         super();
     }
-
-    @Override
-    public ActiveResultMO fromCheck(CheckEvent check)
+    
+    public String getCheckType()
     {
-        return (ActiveResultMO) super.fromCheck(check);
+        return checkType;
     }
 
-    @Override
-    public ActiveResultMO passive(UUID checkId)
+    public void setCheckType(String checkType)
     {
-        return (ActiveResultMO) super.passive(checkId);
+        this.checkType = checkType;
+    }
+
+    public UUID getCheckId()
+    {
+        return checkId;
+    }
+
+    public void setCheckId(UUID checkId)
+    {
+        this.checkId = checkId;
+    }
+
+    public CheckEvent getCheck()
+    {
+        return check;
+    }
+
+    public void setCheck(CheckEvent check)
+    {
+        this.check = check;
+    }
+    
+    
+    public UUID getSiteId()
+    {
+        return siteId;
+    }
+
+    public void setSiteId(UUID siteId)
+    {
+        this.siteId = siteId;
+    }
+
+    public int getProcessingPool()
+    {
+        return processingPool;
+    }
+
+    public void setProcessingPool(int processingPool)
+    {
+        this.processingPool = processingPool;
+    }
+    
+
+    /**
+     * Create a Result with the details of this check
+     * 
+     * @return
+     */
+    @JsonIgnore
+    public ActiveResultMO fromCheck(CheckEvent check)
+    {
+        this.setId(check.getId());
+        this.setCheckType(check.getCheckType());
+        this.setCheckId(check.getCheckId());
+        this.setSiteId(check.getSiteId());
+        this.setProcessingPool(check.getProcessingPool());
+        this.setCheck(check);
+        this.setExecuted(System.currentTimeMillis());
+        return this;
     }
 
     @Override

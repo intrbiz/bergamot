@@ -11,8 +11,8 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.TrapMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
+import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -65,21 +65,19 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Any("/id/:id/submit")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public String getServiceState(BergamotDB db, @AsUUID() UUID id, @Param("status") String status, @Param("output") String output)
+    public String getServiceState(BergamotDB db, @Var("site") Site site, @AsUUID() UUID id, @Param("status") String status, @Param("output") String output)
     {   
         Trap trap = db.getTrap(id);
         if (trap == null) return null;
         // the result
-        ResultMO resultMO = new ActiveResultMO();
+        PassiveResultMO resultMO = new PassiveResultMO();
         resultMO.setId(UUID.randomUUID());
-        resultMO.setCheckType(trap.getType());
-        resultMO.setCheckId(trap.getId());
-        resultMO.setSiteId(trap.getSiteId());
-        resultMO.setProcessingPool(trap.getPool());
+        resultMO.setSiteId(site.getId());
+        resultMO.setMatchOn(new MatchOnCheckId(id));
         resultMO.setStatus(status);
-        resultMO.setOk("OK".equalsIgnoreCase(status));
+        resultMO.setOk("OK".equalsIgnoreCase(status) || "PENDING".equalsIgnoreCase(status));
         resultMO.setOutput(output);
-        resultMO.setExecuted(0);
+        resultMO.setExecuted(System.currentTimeMillis());
         resultMO.setRuntime(0);
         resultMO.setParameter("bergamot.ui.instance", this.app().getInstanceName());
         // dispatch the result for processing
