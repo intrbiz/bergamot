@@ -27,7 +27,6 @@ import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.util.AgentUtil;
-import com.intrbiz.gerald.polyakov.Node;
 
 public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
 {
@@ -39,15 +38,12 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
     
     private final BergamotAgentTranscoder transcoder = BergamotAgentTranscoder.getDefaultInstance();
     
-    private final Node node;
-    
     private AgentHello hello;
 
-    public AgentClientHandler(Timer timer, URI server, Node node)
+    public AgentClientHandler(Timer timer, URI server)
     {
         super();
         this.timer = timer;
-        this.node = node;
         HttpHeaders headers = new DefaultHttpHeaders();
         headers.set(HttpHeaders.Names.USER_AGENT, "BergamotAgent/1.0.0 (Java)");
         this.handshaker = WebSocketClientHandshakerFactory.newHandshaker(server, WebSocketVersion.V13, null, false, headers);
@@ -58,8 +54,6 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
         if (this.hello == null)
         {
             this.hello = new AgentHello(UUID.randomUUID().toString());
-            hello.setServiceId(this.node.getServiceId());
-            hello.setServiceName(this.node.getServiceName());
             hello.setAgentName("BergamotAgent");
             hello.setAgentVariant("Java");
             hello.setAgentVersion("1.0.0");

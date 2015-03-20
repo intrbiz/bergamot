@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.model.message.agent.hello;
 
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
@@ -9,12 +7,6 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 @JsonTypeName("bergamot.agent.hello")
 public class AgentHello extends AgentMessage
 {
-    @JsonProperty("service_id")
-    private UUID serviceId;
-
-    @JsonProperty("service_name")
-    private String serviceName;
-
     @JsonProperty("agent_name")
     private String agentName;
 
@@ -46,26 +38,6 @@ public class AgentHello extends AgentMessage
     public AgentHello(String id)
     {
         super(id);
-    }
-
-    public UUID getServiceId()
-    {
-        return serviceId;
-    }
-
-    public void setServiceId(UUID serviceId)
-    {
-        this.serviceId = serviceId;
-    }
-
-    public String getServiceName()
-    {
-        return serviceName;
-    }
-
-    public void setServiceName(String serviceName)
-    {
-        this.serviceName = serviceName;
     }
 
     public String getAgentName()

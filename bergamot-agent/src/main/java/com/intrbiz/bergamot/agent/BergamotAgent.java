@@ -41,7 +41,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
@@ -57,7 +56,6 @@ import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 import com.intrbiz.configuration.Configurable;
-import com.intrbiz.gerald.polyakov.Node;
 import com.intrbiz.util.IBThreadFactory;
 
 /**
@@ -71,8 +69,6 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     private EventLoopGroup eventLoop;
     
     private Timer timer;
-    
-    private Node node;
     
     private ConcurrentMap<Class<?>, AgentHandler> handlers = new ConcurrentHashMap<Class<?>, AgentHandler>();
     
@@ -132,19 +128,9 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     public void configure(BergamotAgentCfg cfg) throws Exception
     {
         this.configuration = cfg;
-        // if the host-id and host-name are set in the config, set them as system properties
-        if (cfg.getHostId() != null)
-        {
-            System.setProperty("gerald.host.id", cfg.getHostId().toString());
-        }
-        if (! Util.isEmpty(cfg.getHostName()))
-        {
-            System.setProperty("gerald.host.name", cfg.getHostName());
-        }
         // configure this agent
         this.server = new URI(cfg.getServer());
-        this.node = Node.service("BergamotAgent");
-        logger.info("Bergamot Agent " + this.node.toString() + " connecting to " + this.server + " configured");
+        logger.info("Bergamot Agent, connecting to " + this.server + " configured");
         this.eventLoop = new NioEventLoopGroup(1, new IBThreadFactory("bergamot-agent", false));
         this.sslContext = this.createContext();
     }
@@ -191,11 +177,6 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         {
             throw new RuntimeException("Failed to init SSLEngine", e);
         }
-    }
-    
-    public Node getNode()
-    {
-        return this.node;
     }
     
     public URI getServer()
@@ -246,7 +227,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 pipeline.addLast("ssl",           new SslHandler(engine));
                 pipeline.addLast("codec",         new HttpClientCodec()); 
                 pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
-                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.node)
+                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server)
                 {
                     @Override
                     protected AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)

@@ -37,10 +37,6 @@
 			<artifactId>bergamot-agent-message-model</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.intrbiz.gerald</groupId>
-			<artifactId>polyakov-model</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.intrbiz.3p.sigar</groupId>
 			<artifactId>sigar</artifactId>
 		</dependency>

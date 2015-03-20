@@ -141,7 +141,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             logger.debug("Registered agents:");
             for (BergamotAgentServerHandler ag : this.agents.values())
             {
-                logger.info("Agent: " + ag.getAgentId() + " " + ag.getAgentName() + " / " + ag.getHello().getServiceId() + " " + ag.getHello().getServiceName());
+                logger.info("Agent: " + ag.getAgentId() + " " + ag.getAgentName());
             }
         }
         // fire the agent register hook

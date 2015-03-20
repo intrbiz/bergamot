@@ -68,8 +68,6 @@ public class AgentRouter extends Router<BergamotApp>
         cfg.setSiteCaCertificate(padCert(PEMUtil.saveCertificate(siteCert)));
         cfg.setCertificate(padCert(pair.getCertificateAsPEM()));
         cfg.setKey(padCert(pair.getKeyAsPEM()));
-        cfg.setHostName(commonName);
-        cfg.setHostId(agentId);
         var("agentConfig", cfg.toString());
         encode("agent/generated-config");
     }

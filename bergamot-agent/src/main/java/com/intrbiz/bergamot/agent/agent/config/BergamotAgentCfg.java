@@ -19,10 +19,6 @@ public class BergamotAgentCfg extends Configuration
 {
     private static final long serialVersionUID = 1L;
 
-    private UUID hostId;
-
-    private String hostName;
-
     private String server;
 
     private String caCertificate;
@@ -36,28 +32,6 @@ public class BergamotAgentCfg extends Configuration
     public BergamotAgentCfg()
     {
         super();
-    }
-
-    @XmlAttribute(name = "host-id")
-    public UUID getHostId()
-    {
-        return hostId;
-    }
-
-    public void setHostId(UUID hostId)
-    {
-        this.hostId = hostId;
-    }
-
-    @XmlAttribute(name = "host-name")
-    public String getHostName()
-    {
-        return hostName;
-    }
-
-    public void setHostName(String hostName)
-    {
-        this.hostName = hostName;
     }
 
     @XmlElement(name = "ca-certificate")
