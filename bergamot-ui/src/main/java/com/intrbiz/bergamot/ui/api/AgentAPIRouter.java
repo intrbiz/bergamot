@@ -26,7 +26,7 @@ import com.intrbiz.metadata.Var;
 public class AgentAPIRouter extends Router<BergamotApp>
 {    
     /**
-     * Sign an agent key
+     * Sign an agent certificate request
      */
     @Any("/sign-agent")
     @JSON
@@ -49,6 +49,28 @@ public class AgentAPIRouter extends Router<BergamotApp>
         return Arrays.asList(new String[] {
                 PEMUtil.saveCertificate(agentCrt),
                 PEMUtil.saveCertificate(siteCrt),
+                PEMUtil.saveCertificate(rootCrt),
+        });
+    }
+    
+    /**
+     * Sign an server certificate request
+     */
+    @Any("/sign-server")
+    @JSON
+    @WithDataAdapter(BergamotDB.class)
+    public List<String> signServer(
+            BergamotDB db, 
+            @Param("certificate-request") @CheckStringLength(min = 1, max = 4096, mandatory = true) String certReq
+    )
+    {
+        // get the Root CA Certificate
+        Certificate rootCrt  = action("get-root-ca");
+        // ok, actually sign the agent certificate
+        Certificate agentCrt = action("sign-server", certReq);
+        // return the certificate chain
+        return Arrays.asList(new String[] {
+                PEMUtil.saveCertificate(agentCrt),
                 PEMUtil.saveCertificate(rootCrt),
         });
     }
