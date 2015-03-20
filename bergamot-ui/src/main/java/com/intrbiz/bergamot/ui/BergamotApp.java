@@ -20,6 +20,7 @@ import com.intrbiz.bergamot.ui.action.SchedulerActions;
 import com.intrbiz.bergamot.ui.action.TeamActions;
 import com.intrbiz.bergamot.ui.action.TimePeriodActions;
 import com.intrbiz.bergamot.ui.api.APIRouter;
+import com.intrbiz.bergamot.ui.api.AgentAPIRouter;
 import com.intrbiz.bergamot.ui.api.AlertsAPIRouter;
 import com.intrbiz.bergamot.ui.api.ClusterAPIRouter;
 import com.intrbiz.bergamot.ui.api.CommandAPIRouter;
@@ -208,6 +209,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new ConfigAPIRouter());
         router(new StatsAPIRouter());
         router(new UtilAPIRouter());
+        router(new AgentAPIRouter());
     }
     
     @Override
