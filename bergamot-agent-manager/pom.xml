@@ -36,4 +36,25 @@
     	<artifactId>bergamot-daemon-config</artifactId>
     </dependency>
   </dependencies>
+  	<build>
+		<finalName>bergamot-agent-manager</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.intrbiz.util</groupId>
+				<artifactId>packaging</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<configuration>
+					<appClass>com.intrbiz.bergamot.agent.manager.BergamotAgentManager</appClass>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>intrbiz-package</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
