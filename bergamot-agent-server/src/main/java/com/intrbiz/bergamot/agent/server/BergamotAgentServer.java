@@ -209,11 +209,6 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         return this.onAgentPing;
     }
 
-    public boolean isRequireMatchingCertificate()
-    {
-        return this.configuration.isRequireMatchingCertificate();
-    }
-
     public void run()
     {
         bossGroup = new NioEventLoopGroup(1);

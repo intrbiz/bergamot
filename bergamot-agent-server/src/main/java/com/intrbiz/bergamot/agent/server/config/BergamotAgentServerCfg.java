@@ -24,9 +24,7 @@ public class BergamotAgentServerCfg extends Configuration
     
     private String certificate;
     
-    private boolean requireMatchingCertificate = true;
-    
-    private int port = 8080;
+    private int port = 15443;
     
     public BergamotAgentServerCfg()
     {
@@ -79,17 +77,6 @@ public class BergamotAgentServerCfg extends Configuration
     public void setCertificate(String certificate)
     {
         this.certificate = certificate;
-    }
-
-    @XmlAttribute(name = "require-matching-certificate")
-    public boolean isRequireMatchingCertificate()
-    {
-        return requireMatchingCertificate;
-    }
-
-    public void setRequireMatchingCertificate(boolean requireMatchingCertificate)
-    {
-        this.requireMatchingCertificate = requireMatchingCertificate;
     }
 
     @XmlAttribute(name = "port")
