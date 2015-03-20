@@ -251,6 +251,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         else if (request instanceof AgentPing)
         {
             logger.debug("Got ping from agent");
+            this.server.fireAgentPing(this);
             writeMessage(ctx, new AgentPong(UUID.randomUUID().toString()));
         }
         else if (request instanceof AgentPong)

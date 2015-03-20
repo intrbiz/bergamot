@@ -102,7 +102,7 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
                     this.cancel();
                 }
             }
-        }, 15_000L, 15_000L);
+        }, 30_000L, 30_000L);
     }
 
     @Override

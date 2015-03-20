@@ -61,6 +61,8 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     
     private Consumer<BergamotAgentServerHandler> onAgentUnregister = null;
     
+    private Consumer<BergamotAgentServerHandler> onAgentPing;
+    
     private SSLContext sslContext;
     
     private BergamotAgentServerCfg configuration;
@@ -146,6 +148,12 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         if (this.onAgentRegister != null) this.onAgentRegister.accept(agent);
     }
     
+    public void fireAgentPing(BergamotAgentServerHandler agent)
+    {
+        // fire the agent ping hook
+        if (this.onAgentPing != null) this.onAgentPing.accept(agent);
+    }
+    
     public void unregisterAgent(BergamotAgentServerHandler agent)
     {
         logger.debug("Agent unregister!");
@@ -173,6 +181,15 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         }
     }
     
+    public void setOnAgentPingHandler(Consumer<BergamotAgentServerHandler> onAgentPing)
+    {
+        synchronized (this)
+        {
+            // set the handler or chain them
+            this.onAgentPing = this.onAgentPing == null ? onAgentPing : this.onAgentPing.andThen(onAgentPing);
+        }
+    }
+    
     public void setOnAgentUnregisterHandler(Consumer<BergamotAgentServerHandler> onAgentUnregister)
     {
         synchronized (this)
@@ -185,6 +202,11 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     public Consumer<BergamotAgentServerHandler> getOnAgentRegister()
     {
         return this.onAgentRegister;
+    }
+    
+    public Consumer<BergamotAgentServerHandler> getOnAgentPing()
+    {
+        return this.onAgentPing;
     }
 
     public boolean isRequireMatchingCertificate()
@@ -208,8 +230,8 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
                 {
                     SSLEngine engine = createSSLEngine();
                     ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  30 /* seconds */ )); 
-                    pipeline.addLast("write-timeout", new WriteTimeoutHandler( 30 /* seconds */ ));
+                    pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  90 /* seconds */ )); 
+                    pipeline.addLast("write-timeout", new WriteTimeoutHandler( 90 /* seconds */ ));
                     pipeline.addLast("ssl",           new SslHandler(engine));
                     pipeline.addLast("codec-http",    new HttpServerCodec());
                     pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));

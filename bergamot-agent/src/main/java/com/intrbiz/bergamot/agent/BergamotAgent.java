@@ -241,8 +241,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             {
                 // HTTP handling
                 ChannelPipeline pipeline = ch.pipeline();
-                pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  30 /* seconds */ )); 
-                pipeline.addLast("write-timeout", new WriteTimeoutHandler( 30 /* seconds */ ));
+                pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  90 /* seconds */ )); 
+                pipeline.addLast("write-timeout", new WriteTimeoutHandler( 90 /* seconds */ ));
                 pipeline.addLast("ssl",           new SslHandler(engine));
                 pipeline.addLast("codec",         new HttpClientCodec()); 
                 pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));

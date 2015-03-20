@@ -86,5 +86,12 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             // submit a passive result for the host
             this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).critical("Bergamot Agent disconnected"));
         });
+        // on ping
+        this.getEngine().getAgentServer().setOnAgentPingHandler((handler) -> {
+            // publish a passive result for the presence of this host
+            logger.trace("Got agent ping: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
+            // submit a passive result for the host
+            this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
+        });
     }
 }
