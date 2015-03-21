@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.call.contact;
 
 import java.io.IOException;
 
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
@@ -29,7 +28,7 @@ public class GetContactByEmailCall extends BergamotAPICall<ContactMO>
     {
         try
         {
-            Response response = Request.Get(url("/contact/email/", this.email)).addHeader(authHeader()).execute();
+            Response response = execute(get(url("/contact/email/", this.email)).addHeader(authHeader()));
             return transcoder().decodeFromString(response.returnContent().asString(), ContactMO.class);
         }
         catch (IOException e)

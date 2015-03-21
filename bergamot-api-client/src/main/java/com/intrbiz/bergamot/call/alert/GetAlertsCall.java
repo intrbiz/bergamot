@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.call.alert;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
@@ -22,7 +21,7 @@ public class GetAlertsCall extends BergamotAPICall<List<AlertMO>>
     {
         try
         {
-            Response response = Request.Get(url("/alert/")).addHeader(authHeader()).execute();
+            Response response = execute(get(url("/alert/")).addHeader(authHeader()));
             return transcoder().decodeListFromString(response.returnContent().asString(), AlertMO.class);
         }
         catch (IOException e)

@@ -31,5 +31,9 @@
     	<groupId>org.apache.httpcomponents</groupId>
     	<artifactId>fluent-hc</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.bergamot</groupId>
+    	<artifactId>bergamot-crypto-util</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.call.contact;
 
 import java.io.IOException;
 
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
@@ -29,7 +28,7 @@ public class GetContactConfigByNameCall extends BergamotAPICall<ContactCfg>
     {
         try
         {
-            Response response = Request.Get(url("/contact/name/", this.name, "/config.xml")).addHeader(authHeader()).execute();
+            Response response = execute(get(url("/contact/name/", this.name, "/config.xml")).addHeader(authHeader()));
             return ContactCfg.fromString(ContactCfg.class, response.returnContent().asString());
         }
         catch (IOException e)

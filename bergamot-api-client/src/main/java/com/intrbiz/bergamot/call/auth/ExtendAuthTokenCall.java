@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.call.auth;
 import java.io.IOException;
 
 import org.apache.http.client.fluent.Form;
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
@@ -30,9 +29,9 @@ public class ExtendAuthTokenCall extends BergamotAPICall<AuthTokenMO>
     {
         try
         {
-            Response response = Request.Post(url("/extend-auth-token"))
+            Response response = execute(post(url("/extend-auth-token"))
                                  .bodyForm(Form.form().add("auth-token", this.token).build())
-                                 .execute();
+                                );
             return transcoder().decodeFromString(response.returnContent().asString(), AuthTokenMO.class);
         }
         catch (IOException e)

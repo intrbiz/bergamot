@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.call.contact;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
@@ -30,7 +29,7 @@ public class GetContactCall extends BergamotAPICall<ContactMO>
     {
         try
         {
-            Response response = Request.Get(url("/contact/id/", this.id.toString())).addHeader(authHeader()).execute();
+            Response response = execute(get(url("/contact/id/", this.id.toString())).addHeader(authHeader()));
             return transcoder().decodeFromString(response.returnContent().asString(), ContactMO.class);
         }
         catch (IOException e)

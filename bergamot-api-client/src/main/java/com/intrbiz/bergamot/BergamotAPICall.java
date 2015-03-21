@@ -1,7 +1,12 @@
 package com.intrbiz.bergamot;
 
+import java.io.IOException;
+
 import org.apache.http.Header;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
 import org.apache.http.message.BasicHeader;
 
 import com.intrbiz.bergamot.io.BergamotTranscoder;
@@ -48,6 +53,31 @@ public abstract class BergamotAPICall<T>
     protected Header authHeader()
     {
         return new BasicHeader("X-Bergamot-Auth", this.authToken());
+    }
+    
+    protected Response execute(Request request) throws ClientProtocolException, IOException
+    {
+        return this.client.executor().execute(request);
+    }
+    
+    protected Request get(String url)
+    {
+        return Request.Get(url);
+    }
+    
+    protected Request post(String url)
+    {
+        return Request.Post(url);
+    }
+    
+    protected Request put(String url)
+    {
+        return Request.Put(url);
+    }
+    
+    protected Request delte(String url)
+    {
+        return Request.Delete(url);
     }
     
     /**

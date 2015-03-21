@@ -10,24 +10,32 @@ import com.intrbiz.bergamot.BergamotAPIException;
 import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 
-public class AuthTokenCall extends BergamotAPICall<AuthTokenMO>
+public class AppAuthTokenCall extends BergamotAPICall<AuthTokenMO>
 {
+    private String app;
+    
     private String username;
     
     private String password;
     
-    public AuthTokenCall(BergamotClient client)
+    public AppAuthTokenCall(BergamotClient client)
     {
         super(client);
     }
     
-    public AuthTokenCall username(String username)
+    public AppAuthTokenCall app(String app)
+    {
+        this.app = app;
+        return this;
+    }
+    
+    public AppAuthTokenCall username(String username)
     {
         this.username = username;
         return this;
     }
     
-    public AuthTokenCall password(String password)
+    public AppAuthTokenCall password(String password)
     {
         this.password = password;
         return this;
@@ -37,8 +45,8 @@ public class AuthTokenCall extends BergamotAPICall<AuthTokenMO>
     {
         try
         {
-            Response response = execute(post(url("/auth-token"))
-                                 .bodyForm(Form.form().add("username", this.username).add("password", this.password).build())
+            Response response = execute(post(url("/app/auth-token"))
+                                 .bodyForm(Form.form().add("app", this.app).add("username", this.username).add("password", this.password).build())
                                 );
             return transcoder().decodeFromString(response.returnContent().asString(), AuthTokenMO.class);
         }

@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.call.test;
 
 import java.io.IOException;
 
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
@@ -20,7 +19,7 @@ public class LookingForSomethingCall extends BergamotAPICall<String>
     {
         try
         {
-            Response response = Request.Get(url("/test/looking/for/something")).addHeader(authHeader()).execute();
+            Response response = execute(get(url("/test/looking/for/something")).addHeader(authHeader()));
             return transcoder().decodeFromString(response.returnContent().asString(), String.class);
         }
         catch (IOException e)

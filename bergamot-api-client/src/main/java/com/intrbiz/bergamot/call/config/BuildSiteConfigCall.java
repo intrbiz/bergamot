@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -35,7 +34,7 @@ public class BuildSiteConfigCall extends BergamotAPICall<BergamotCfg>
     {
         try
         {
-            Response response = Request.Get(appendQuery(url("/config/site.xml"), types.stream().map((e) -> { return new BasicNameValuePair("type", Configuration.getRootElement(e));}).collect(Collectors.toList()))).addHeader(authHeader()).execute();
+            Response response = execute(get(appendQuery(url("/config/site.xml"), types.stream().map((e) -> { return new BasicNameValuePair("type", Configuration.getRootElement(e));}).collect(Collectors.toList()))).addHeader(authHeader()));
             return BergamotCfg.fromString(BergamotCfg.class, response.returnContent().asString());
         }
         catch (IOException e)
