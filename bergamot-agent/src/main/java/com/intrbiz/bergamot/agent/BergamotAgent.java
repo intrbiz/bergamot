@@ -40,6 +40,8 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.hyperic.sigar.Humidor;
+import org.hyperic.sigar.SigarException;
 
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
@@ -205,6 +207,17 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     public void start()
     {
+        // init Sigar early on
+        try
+        {
+            logger.info("Bergamot Agent starting on: " + Humidor.getInstance().getSigar().getFQDN());
+        }
+        catch (SigarException e)
+        {
+            logger.error("Failed to setup Sigar!", e);
+            throw new RuntimeException("Failed to setup Sigar, aborting!", e);
+        }
+        // start the connection process
         this.connect();
     }
 
