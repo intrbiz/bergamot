@@ -5,8 +5,10 @@ import java.util.List;
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
+import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
+import com.intrbiz.bergamot.model.message.AuthTokenMO;
 
 public class ConfigCommand extends BergamotCLICommand
 {
@@ -60,9 +62,16 @@ public class ConfigCommand extends BergamotCLICommand
                 String url = args.remove(0);
                 String username = args.remove(0);
                 String password = args.remove(0);
-                //
+                // talk to the API
+                BergamotClient client = new BergamotClient(url);
+                String hello = client.helloWorld().execute();
+                System.out.println("Successfully connected to " + name + " (" + url + ") => " + hello);
+                // auth
+                AuthTokenMO token = client.appAuthToken().app("Bergamot CLI").username(username).password(password).execute();
+                System.out.println("Sucessfully authenticated with " + name);
+                // add the config
                 CLICfg cfg = CLICfg.loadConfiguration();
-                cfg.setSite(new CLISiteCfg(name, url, username, password));
+                cfg.setSite(new CLISiteCfg(name, url, token.getToken()));
                 cfg.saveConfiguration();
                 System.out.println(cfg);
             }

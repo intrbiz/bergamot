@@ -54,7 +54,7 @@ public class AlertsCommand extends BergamotCLICommand
         CLISiteCfg site = CLICfg.loadConfiguration().getSite(siteName);
         if (site == null) throw new BergamotCLIException("No site configured with the name '" + siteName + "'");
         // connect to the API
-        BergamotClient client = new BergamotClient(site.getUrl(), site.getUsername(), site.getPassword());
+        BergamotClient client = new BergamotClient(site.getUrl(), site.getAuthToken());
         // call the hello world test
         for (AlertMO alert : client.getAlerts().execute())
         {

@@ -14,22 +14,19 @@ public class CLISiteCfg extends Configuration
 
     private String url;
 
-    private String username;
-
-    private String password;
+    private String authToken;
 
     public CLISiteCfg()
     {
         super();
     }
 
-    public CLISiteCfg(String name, String url, String username, String password)
+    public CLISiteCfg(String name, String url, String authToken)
     {
         super();
         this.setName(name);
         this.url = url;
-        this.username = username;
-        this.password = password;
+        this.authToken = authToken;
     }
 
     @Override
@@ -48,25 +45,14 @@ public class CLISiteCfg extends Configuration
         this.url = url;
     }
 
-    @XmlAttribute(name = "username")
-    public String getUsername()
+    @XmlAttribute(name = "auth-token")
+    public String getAuthToken()
     {
-        return username;
+        return authToken;
     }
 
-    public void setUsername(String username)
+    public void setAuthToken(String authToken)
     {
-        this.username = username;
-    }
-
-    @XmlAttribute(name = "password")
-    public String getPassword()
-    {
-        return password;
-    }
-
-    public void setPassword(String password)
-    {
-        this.password = password;
+        this.authToken = authToken;
     }
 }
