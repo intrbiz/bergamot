@@ -96,6 +96,7 @@
     <module>bergamot-worker-agent</module>
     <module>bergamot-agent-manager</module>
     <module>bergamot-agent-config</module>
+    <module>bergamot-agent-server-config</module>
   </modules>
   
   <dependencyManagement>
@@ -388,6 +389,11 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-config-converter</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-agent-server-config</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   	</dependencies>

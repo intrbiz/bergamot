@@ -40,5 +40,9 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-crypto-util</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-agent-server-config</artifactId>
+		</dependency>
 	</dependencies>
 </project>
