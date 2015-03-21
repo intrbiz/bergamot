@@ -47,6 +47,11 @@
 			<artifactId>bergamot-config-converter</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-agent</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-cli</finalName>
