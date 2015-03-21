@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
-import com.intrbiz.bergamot.agent.agent.config.BergamotAgentCfg;
+import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.crypto.util.CertificatePair;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.data.BergamotDB;

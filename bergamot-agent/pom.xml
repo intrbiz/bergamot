@@ -52,6 +52,10 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-nagios</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-agent-config</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-agent</finalName>

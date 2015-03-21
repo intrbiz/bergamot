@@ -66,8 +66,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-agent</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>bergamot-agent-config</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

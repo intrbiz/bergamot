@@ -41,7 +41,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.agent.agent.config.BergamotAgentCfg;
+import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;

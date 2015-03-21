@@ -1,9 +1,8 @@
-package com.intrbiz.bergamot.agent.agent.config;
+package com.intrbiz.bergamot.agent.config;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
