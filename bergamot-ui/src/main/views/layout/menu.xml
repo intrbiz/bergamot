@@ -36,9 +36,6 @@
                     <a href="/agent/sign">Sign Agent Certificate</a>
                 </li>
                 <li>
-                    <a href="/agent/server/sign">Sign Server Certificate</a>
-                </li>
-                <li>
                     <a href="/agent/generate-config">Generate Agent Config</a>
                 </li>
             </ul>

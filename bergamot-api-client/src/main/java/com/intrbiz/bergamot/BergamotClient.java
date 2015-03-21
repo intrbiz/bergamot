@@ -20,7 +20,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.call.agent.SignAgentKey;
-import com.intrbiz.bergamot.call.agent.SignServerKey;
 import com.intrbiz.bergamot.call.alert.GetAlertsCall;
 import com.intrbiz.bergamot.call.auth.AppAuthTokenCall;
 import com.intrbiz.bergamot.call.auth.AuthTokenCall;
@@ -302,10 +301,5 @@ public class BergamotClient
     public SignAgentKey signAgentKey()
     {
         return new SignAgentKey(this);
-    }
-    
-    public SignServerKey signServerKey()
-    {
-        return new SignServerKey(this);
     }
 }

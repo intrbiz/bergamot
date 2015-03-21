@@ -5,7 +5,6 @@
 
     <div clas="row">
     	<p class="pull-right">
-    		<a style="margin-left: 15px;" href="/agent/server/sign">Sign Server Certificate</a>
     		<a style="margin-left: 15px;" href="/agent/sign">Sign Agent Certificate</a>
 	    	<a style="margin-left: 15px;" href="/agent/generate-config">Generate Agent Configuration</a>
     	</p>

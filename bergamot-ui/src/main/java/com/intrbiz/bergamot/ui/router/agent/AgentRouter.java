@@ -46,12 +46,6 @@ public class AgentRouter extends Router<BergamotApp>
         encode("agent/sign-agent");
     }
     
-    @Get("/server/sign")
-    public void showSignServerConfig()
-    {
-        encode("agent/sign-server");
-    }
-    
     @Post("/generate-config")
     @WithDataAdapter(BergamotDB.class)
     public void generateAgentConfig(BergamotDB db, @SessionVar("site") Site site, @Param("common-name") @CheckStringLength(min = 1, max = 255, mandatory = true) String commonName)
@@ -85,18 +79,6 @@ public class AgentRouter extends Router<BergamotApp>
         var("siteCaCrt", PEMUtil.saveCertificate(siteCrt));
         var("caCrt",     PEMUtil.saveCertificate(rootCrt));
         encode("agent/signed-agent");
-    }
-    
-    @Post("/server/sign")
-    @WithDataAdapter(BergamotDB.class)
-    public void signServer(BergamotDB db, @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq)
-    {
-        // sign
-        Certificate rootCrt   = action("get-root-ca");
-        Certificate serverCrt = action("sign-server", certReq);
-        var("serverCrt", PEMUtil.saveCertificate(serverCrt));
-        var("caCrt",     PEMUtil.saveCertificate(rootCrt));
-        encode("agent/signed-server");
     }
     
     private static String padCert(String cert)
