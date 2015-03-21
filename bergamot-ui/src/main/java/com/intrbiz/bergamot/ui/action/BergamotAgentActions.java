@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.ui.action;
 
 import java.io.IOException;
 import java.security.KeyPair;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.UUID;
@@ -66,6 +67,26 @@ public class BergamotAgentActions
         }
     }
     
+    @Action("sign-server-key")
+    public Certificate signServerKey(String commonName, PublicKey key)
+    {
+        try
+        {
+            // sign the cert
+            logger.info("Signing Bergamot Agent request for: " + commonName);
+            AgentManagerResponse response = this.client.publish(new SignServer(commonName, PEMUtil.savePublicKey(key))).get(10, TimeUnit.SECONDS);
+            if (response instanceof SignedServer)
+            {
+                return PEMUtil.loadCertificate(((SignedServer) response).getCertificatePEM());
+            }
+            throw new RuntimeException("Failed to sign server key");
+        }
+        catch (IOException | InterruptedException | ExecutionException | TimeoutException e)
+        {
+            throw new RuntimeException("Failed to sign server key", e);
+        }
+    }
+    
     @Action("sign-agent")
     public Certificate signAgent(UUID siteId, UUID agentId, String certificateRequest)
     {
@@ -85,6 +106,26 @@ public class BergamotAgentActions
         catch (IOException | InterruptedException | ExecutionException | TimeoutException e)
         {
             throw new RuntimeException("Failed to sign agent", e);
+        }
+    }
+    
+    @Action("sign-agent-key")
+    public Certificate signAgentKey(UUID siteId, UUID agentId, String commonName, PublicKey key)
+    {
+        try
+        {
+            // sign the cert
+            logger.info("Signing Bergamot Agent request for: " + commonName);
+            AgentManagerResponse response = this.client.publish(new SignAgent(siteId, agentId, commonName, PEMUtil.savePublicKey(key))).get(10, TimeUnit.SECONDS);
+            if (response instanceof SignedAgent)
+            {
+                return PEMUtil.loadCertificate(((SignedAgent) response).getCertificatePEM());
+            }
+            throw new RuntimeException("Failed to sign agent key");
+        }
+        catch (IOException | InterruptedException | ExecutionException | TimeoutException e)
+        {
+            throw new RuntimeException("Failed to sign agent key", e);
         }
     }
     

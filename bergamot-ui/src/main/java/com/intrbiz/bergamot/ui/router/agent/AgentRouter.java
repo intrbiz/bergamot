@@ -74,7 +74,7 @@ public class AgentRouter extends Router<BergamotApp>
     
     @Post("/sign")
     @WithDataAdapter(BergamotDB.class)
-    public void signAgent(BergamotDB db, @SessionVar("site") Site site, @Param("certificate-request") @CheckStringLength(min = 1, max = 4096, mandatory = true) String certReq)
+    public void signAgent(BergamotDB db, @SessionVar("site") Site site, @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq)
     {
         UUID agentId = var("agentId", Site.randomId(site.getId()));
         // sign
@@ -89,7 +89,7 @@ public class AgentRouter extends Router<BergamotApp>
     
     @Post("/server/sign")
     @WithDataAdapter(BergamotDB.class)
-    public void signServer(BergamotDB db, @Param("certificate-request") @CheckStringLength(min = 1, max = 4096, mandatory = true) String certReq)
+    public void signServer(BergamotDB db, @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq)
     {
         // sign
         Certificate rootCrt   = action("get-root-ca");
