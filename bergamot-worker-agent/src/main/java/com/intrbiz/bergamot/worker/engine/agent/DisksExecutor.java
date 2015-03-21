@@ -1,12 +1,14 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
+import static com.intrbiz.bergamot.util.UnitUtil.*;
+
 import java.text.DecimalFormat;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskStat;
@@ -14,22 +16,23 @@ import com.intrbiz.bergamot.model.message.agent.stat.disk.DiskInfo;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
-import static com.intrbiz.bergamot.util.UnitUtil.*;
+
 
 /**
- * Check the disk usage of a mount point on a Bergamot Agent
+ * Check the disk usage of a Bergamot Agent
  */
-public class DiskExecutor extends AbstractExecutor<AgentEngine>
+public class DisksExecutor extends AbstractExecutor<AgentEngine>
 {
-    public static final String NAME = "disk";
+    public static final String NAME = "disks";
     
-    private Logger logger = Logger.getLogger(DiskExecutor.class);
+    private Logger logger = Logger.getLogger(DisksExecutor.class);
     
     private static final DecimalFormat DFMT = new DecimalFormat("0.00");
 
-    public DiskExecutor()
+    public DisksExecutor()
     {
         super();
     }
@@ -46,14 +49,12 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.trace("Checking Bergamot Agent Disk Usage");
+        logger.trace("Checking Bergamot Agent Disks Usage");
         try
         {
             // check the host presence
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
-            String mount = executeCheck.getParameter("mount");
-            if (Util.isEmpty(mount)) throw new RuntimeException("No disk mount point was given");
             // lookup the agent
             BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
             if (agent != null)
@@ -64,22 +65,15 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     DiskStat stat = (DiskStat) response;
                     logger.trace("Got Disk usage in + " + runtime + "ms: " + stat);
-                    // find the mount
-                    DiskInfo disk = stat.getDisks().stream().filter((di) -> { return mount.equals(di.getMount()); }).findFirst().orElse(null);
-                    if (disk != null)
-                    {
-                        // apply the check
-                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
-                                fromPercent(disk.getUsedPercent()), 
-                                executeCheck.getPercentParameter("warning", 0.8F),
-                                executeCheck.getPercentParameter("critical", 0.9F),
-                                "Disk: " + disk.getMount() + " " + disk.getType() + " on " + disk.getDevice() +" " + DFMT.format(toG(disk.getUsed())) + " GB of " + DFMT.format(toG(disk.getSize())) + " GB (" + DFMT.format(disk.getUsedPercent()) + " %) used" 
-                        ).runtime(runtime));
-                    }
-                    else
-                    {
-                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error("No such mount point: " + mount).runtime(runtime));
-                    }
+                    // apply the check
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                            stat.getDisks().stream().map(DiskInfo::getUsedPercent).map(UnitUtil::fromPercent).collect(Collectors.toList()),
+                            executeCheck.getPercentParameter("warning", 0.8F),
+                            executeCheck.getPercentParameter("critical", 0.9F),
+                            "Disks: " + stat.getDisks().stream().map((disk)-> {
+                                return "" + disk.getMount() + " " + DFMT.format(toG(disk.getUsed())) + " GB of " + DFMT.format(toG(disk.getSize())) + " GB (" + DFMT.format(disk.getUsedPercent()) + " %) used";
+                            }).collect(Collectors.joining("; "))
+                    ).runtime(runtime));
                 });
             }
             else
