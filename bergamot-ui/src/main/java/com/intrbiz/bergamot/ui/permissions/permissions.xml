@@ -35,7 +35,18 @@
 		<summary>Allow access to add check downtime</summary>
 		<description>A contact must be granted this permission in order to be able to add downtime to a check</description>
 	</permission>
-	<!-- API -->
+	<!--  Agent -->
+	<permission name="ui.sign.agent">
+		<summary>Allow signing of Bergamot Agent certificates</summary>
+		<description>A contact must be granted this permission in order to be able to sign Bergamot Agent certificates</description>
+	</permission>
+	<permission name="ui.generate.agent">
+		<summary>Allow generation of Bergamot Agent configuration</summary>
+		<description>A contact must be granted this permission in order to be able to generate Bergamot Agent configuration</description>
+	</permission>
+	<!----------------------------------------------------------- 
+		API Specific Permissions
+	------------------------------------------------------------->
 	<permission name="api.access">
 		<summary>Allow API access</summary>
 		<description>A contact must be granted this permission in order to be able to utilise the API</description>
@@ -120,5 +131,16 @@
 	<permission name="api.read.comment">
 		<summary>Allow reading of comments</summary>
 		<description>A contact must be granted this permission in order to be able to read comments</description>
+	</permission>
+	<!-- Agent -->
+	<permission name="api.sign.agent">
+		<summary>Allow signing of Bergamot Agent certificates</summary>
+		<description>A contact must be granted this permission in order to be able to sign Bergamot Agent certificates</description>
+	</permission>
+	<!-- Global permissions -->
+	<!-- Agent -->
+	<permission name="sign.agent">
+		<summary>Allow signing of Bergamot Agent certificates</summary>
+		<description>A contact must be granted this permission in order to be able to sign Bergamot Agent certificates</description>
 	</permission>
 </permissions>

@@ -28,14 +28,14 @@
     </div>
     
     <!-- Admin Menu -->
-    <container rendered="#{Balsa().permission('ui.admin')}">
+    <container rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
         <div class="menu-group">
             <h4><a href="/agent/">Bergamot Agent Manager</a></h4>
             <ul>
 	            <li>
                     <a href="/agent/sign">Sign Agent Certificate</a>
                 </li>
-                <li>
+                <li rendered="#{Balsa().permission('ui.generate.agent')}">
                     <a href="/agent/generate-config">Generate Agent Config</a>
                 </li>
             </ul>

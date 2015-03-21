@@ -18,6 +18,7 @@ import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 
@@ -25,6 +26,8 @@ import com.intrbiz.metadata.Var;
 
 @Prefix("/api/agent")
 @RequireValidPrincipal()
+@RequirePermission("api.sign.agent")
+@RequirePermission("sign.agent")
 public class AgentAPIRouter extends Router<BergamotApp>
 {    
     /**

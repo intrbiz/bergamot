@@ -11,12 +11,14 @@ import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
@@ -24,6 +26,8 @@ import com.intrbiz.metadata.Template;
 @Prefix("/agent")
 @Template("layout/main")
 @RequireValidPrincipal()
+@RequirePermission("ui.sign.agent")
+@RequirePermission("sign.agent")
 public class AgentRouter extends Router<BergamotApp>
 {    
     @Any("/")
@@ -35,6 +39,7 @@ public class AgentRouter extends Router<BergamotApp>
     }
     
     @Get("/generate-config")
+    @RequirePermission("ui.generate.agent")
     public void showGenerateAgentConfig()
     {
         encode("agent/generate-config");
@@ -47,6 +52,7 @@ public class AgentRouter extends Router<BergamotApp>
     }
     
     @Post("/generate-config")
+    @RequirePermission("ui.generate.agent")
     @WithDataAdapter(BergamotDB.class)
     public void generateAgentConfig(BergamotDB db, @SessionVar("site") Site site, @Param("common-name") @CheckStringLength(min = 1, max = 255, mandatory = true) String commonName)
     {
@@ -62,7 +68,10 @@ public class AgentRouter extends Router<BergamotApp>
         cfg.setSiteCaCertificate(padCert(PEMUtil.saveCertificate(siteCert)));
         cfg.setCertificate(padCert(pair.getCertificateAsPEM()));
         cfg.setKey(padCert(pair.getKeyAsPEM()));
-        var("agentConfig", cfg.toString());
+        cfg.setName(commonName);
+        cfg.addParameter(new CfgParameter("agent-id", null, null, agentId.toString()));
+        System.out.println(cfg.toString());
+        var("agentConfig", cfg.toString() + "\n<!-- Agent: UUID=" + agentId + " CN=" + commonName + " -->");
         encode("agent/generated-config");
     }
     
