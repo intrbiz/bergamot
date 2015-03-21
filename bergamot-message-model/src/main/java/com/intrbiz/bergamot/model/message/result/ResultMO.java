@@ -295,6 +295,96 @@ public abstract class ResultMO extends Message
         return this;
     }
     
+    /**
+     * Apply a warning / critical threshold to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the values and 
+     * thresholds.
+     * 
+     * This applies a threshold check to a collection of values, with the worst status 
+     * being the status of this result.
+     * 
+     * @param values the values to check
+     * @param warning the warning threshold
+     * @param critical the critical threshold
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyThreshold(Iterable<Long> values, long warning, long critical, String message)
+    {
+        int state = 0;
+        for (long value : values)
+        {
+            if (value > critical)
+            {
+                state = Math.max(state, 2);
+            }
+            else if (value > warning)
+            {
+                state = Math.max(state, 1);
+            }
+            else
+            {
+                state = Math.max(state, 0);
+            }
+        }
+        switch (state)
+        {
+            case 0:
+                this.ok(message);
+                break;
+            case 1:
+                this.warning(message);
+            case 2:
+                this.critical(message);
+        }
+        return this;
+    }
+    
+    /**
+     * Apply a warning / critical threshold to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the values and 
+     * thresholds.
+     * 
+     * This applies a threshold check to a collection of values, with the worst status 
+     * being the status of this result.
+     * 
+     * @param values the values to check
+     * @param warning the warning threshold
+     * @param critical the critical threshold
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyThreshold(Iterable<Double> values, double warning, double critical, String message)
+    {
+        int state = 0;
+        for (double value : values)
+        {
+            if (value > critical)
+            {
+                state = Math.max(state, 2);
+            }
+            else if (value > warning)
+            {
+                state = Math.max(state, 1);
+            }
+            else
+            {
+                state = Math.max(state, 0);
+            }
+        }
+        switch (state)
+        {
+            case 0:
+                this.ok(message);
+                break;
+            case 1:
+                this.warning(message);
+            case 2:
+                this.critical(message);
+        }
+        return this;
+    }
+    
     public ResultMO runtime(double runtime)
     {
         this.runtime = runtime;

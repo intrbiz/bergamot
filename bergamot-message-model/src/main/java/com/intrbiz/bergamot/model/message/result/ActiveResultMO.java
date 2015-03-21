@@ -162,6 +162,18 @@ public class ActiveResultMO extends ResultMO
     {
         return (ActiveResultMO) super.applyThreshold(value, warning, critical, message);
     }
+    
+    @Override
+    public ActiveResultMO applyThreshold(Iterable<Double> values, double warning, double critical, String message)
+    {
+        return (ActiveResultMO) super.applyThreshold(values, warning, critical, message);
+    }
+    
+    @Override
+    public ActiveResultMO applyThreshold(Iterable<Long> values, long warning, long critical, String message)
+    {
+        return (ActiveResultMO) super.applyThreshold(values, warning, critical, message);
+    }
 
     @Override
     public ActiveResultMO runtime(double runtime)
