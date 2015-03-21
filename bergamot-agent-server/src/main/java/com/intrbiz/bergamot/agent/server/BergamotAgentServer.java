@@ -243,7 +243,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         }
         catch (Exception e)
         {
-            logger.error("Update server broke", e);
+            logger.error("Agent server broke", e);
         }
         finally
         {
