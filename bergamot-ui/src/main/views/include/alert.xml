@@ -50,7 +50,7 @@
 	    <div class="col4 dash_icon alert">
 	    	<h4>Comments</h4>
 	    	<ul>
-		    	<data-set var="comment" value="#{alert.comments}">
+		    	<data-set var="comment" value="#{alert.getComments()}">
 		    		<li>
 		    			<a href="#show-comment" data-comment-id="#{comment.id}">#{comment.summary} by #{comment.author.summary} at #{dateformat('HH:mm:ss', comment.updated)} on #{dateformat('EEEE dd/MM/yyyy', comment.updated)}</a>
 		    		</li>
