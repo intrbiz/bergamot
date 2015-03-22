@@ -1,14 +1,19 @@
 package com.intrbiz.bergamot.ui.router.agent;
 
+import java.io.IOException;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.crypto.util.CertificatePair;
+import com.intrbiz.bergamot.crypto.util.CertificateRequest;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
+import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.CfgParameter;
@@ -56,6 +61,10 @@ public class AgentRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void generateAgentConfig(BergamotDB db, @SessionVar("site") Site site, @Param("common-name") @CheckStringLength(min = 1, max = 255, mandatory = true) String commonName)
     {
+        // is an agent already registered
+        AgentRegistration agentReg = db.getAgentRegistrationByName(site.getId(), commonName);
+        if (agentReg != null) throw new RuntimeException("Cannot generate configuration for an agent which already exists!");
+        // assign id
         UUID agentId = var("agentId", Site.randomId(site.getId()));
         var("commonName", commonName);
         // generate
@@ -70,20 +79,31 @@ public class AgentRouter extends Router<BergamotApp>
         cfg.setKey(padCert(pair.getKeyAsPEM()));
         cfg.setName(commonName);
         cfg.addParameter(new CfgParameter("agent-id", null, null, agentId.toString()));
-        System.out.println(cfg.toString());
+        // store the agent registration
+        db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, commonName, SerialNum.fromBigInt(pair.getCertificate().getSerialNumber()).toString()));
+        // display
         var("agentConfig", cfg.toString() + "\n<!-- Agent: UUID=" + agentId + " CN=" + commonName + " -->");
         encode("agent/generated-config");
     }
     
     @Post("/sign")
     @WithDataAdapter(BergamotDB.class)
-    public void signAgent(BergamotDB db, @SessionVar("site") Site site, @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq)
+    public void signAgent(BergamotDB db, @SessionVar("site") Site site, @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq) throws IOException
     {
+        // parse the certificate request
+        CertificateRequest req = PEMUtil.loadCertificateRequest(certReq);
+        // is an agent already registered
+        AgentRegistration agentReg = db.getAgentRegistrationByName(site.getId(), req.getCommonName());
+        if (agentReg != null) throw new RuntimeException("Cannot generate configuration for an agent which already exists!");
+        // generate agent it
         UUID agentId = var("agentId", Site.randomId(site.getId()));
         // sign
         Certificate rootCrt  = action("get-root-ca");
         Certificate siteCrt  = action("get-site-ca", site.getId());
-        Certificate agentCrt = action("sign-agent", site.getId(), agentId, certReq);
+        Certificate agentCrt = action("sign-agent", site.getId(), agentId, req);
+        // store the registration
+        db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, req.getCommonName(), SerialNum.fromBigInt(((X509Certificate) agentCrt).getSerialNumber()).toString()));
+        // display
         var("agentCrt",  PEMUtil.saveCertificate(agentCrt));
         var("siteCaCrt", PEMUtil.saveCertificate(siteCrt));
         var("caCrt",     PEMUtil.saveCertificate(rootCrt));

@@ -3,14 +3,18 @@ package com.intrbiz.bergamot.ui.api;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.crypto.util.CertificateRequest;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
+import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -40,8 +44,13 @@ public class AgentAPIRouter extends Router<BergamotApp>
             BergamotDB db, 
             @Var("site") Site site, 
             @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq
-    )
+    ) throws IOException
     {
+        // parse the certificate request
+        CertificateRequest req = PEMUtil.loadCertificateRequest(certReq);
+        // is an agent already registered
+        AgentRegistration agentReg = db.getAgentRegistrationByName(site.getId(), req.getCommonName());
+        if (agentReg != null) throw new RuntimeException("Cannot generate configuration for an agent which already exists!");
         // assign the agent UUID
         UUID agentId = Site.randomId(site.getId());
         // get the Root CA Certificate
@@ -49,7 +58,9 @@ public class AgentAPIRouter extends Router<BergamotApp>
         // get the Site CA Certificate
         Certificate siteCrt  = action("get-site-ca", site.getId());
         // ok, actually sign the agent certificate
-        Certificate agentCrt = action("sign-agent", site.getId(), agentId, certReq);
+        Certificate agentCrt = action("sign-agent", site.getId(), agentId, req);
+        // store the registration
+        db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, req.getCommonName(), SerialNum.fromBigInt(((X509Certificate) agentCrt).getSerialNumber()).toString()));
         // return the certificate chain
         return Arrays.asList(new String[] {
                 PEMUtil.saveCertificate(agentCrt),
@@ -71,6 +82,9 @@ public class AgentAPIRouter extends Router<BergamotApp>
             @Param("public-key")  @CheckStringLength(min = 1, max = 16384, mandatory = true) String publicKey
     ) throws IOException
     {
+        // is an agent already registered
+        AgentRegistration agentReg = db.getAgentRegistrationByName(site.getId(), commonName);
+        if (agentReg != null) throw new RuntimeException("Cannot generate configuration for an agent which already exists!");
         // decode the key
         PublicKey key = PEMUtil.loadPublicKey(publicKey);
         // assign the agent UUID
@@ -81,6 +95,8 @@ public class AgentAPIRouter extends Router<BergamotApp>
         Certificate siteCrt  = action("get-site-ca", site.getId());
         // ok, actually sign the agent certificate
         Certificate agentCrt = action("sign-agent-key", site.getId(), agentId, commonName, key);
+        // store the registration
+        db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, commonName, SerialNum.fromBigInt(((X509Certificate) agentCrt).getSerialNumber()).toString()));
         // return the certificate chain
         return Arrays.asList(new String[] {
                 PEMUtil.saveCertificate(agentCrt),

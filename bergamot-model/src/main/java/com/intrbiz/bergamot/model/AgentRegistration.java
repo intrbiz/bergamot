@@ -65,6 +65,17 @@ public class AgentRegistration implements Serializable
     {
         super();
     }
+    
+    public AgentRegistration(UUID siteId, UUID agentId, String commonName, String serial)
+    {
+        this.siteId = siteId;
+        this.id = agentId;
+        this.name = commonName;
+        this.summary = commonName;
+        this.certificateSerial = serial;
+        this.revoked = false;
+        this.revokedOn = null;
+    }
 
     public UUID getId()
     {

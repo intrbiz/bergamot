@@ -14,16 +14,19 @@
     	<div class="col12">
 	    	<table>
 	    		<tr>
+		    		<th>Name</th>
 	    			<th>Agent Id</th>
-	    			<th>Common Name</th>
 	    			<th>Serial</th>
-	    			<th></th>
+	    			<th>Signed</th>
+	    			<th>Revoked</th>
 	    		</tr>
 	    		<data-set var="agent" value="#{agents}">
 	    			<tr>
-	    				<td>#{agent.id}</td>
 	    				<td>#{agent.name}</td>
-	    				<td>#{agent.serial}</td>
+	    				<td>#{agent.id}</td>
+	    				<td>#{agent.certificateSerial}</td>
+	    				<td>#{dateformat('HH:mm:ss', agent.created)} on #{dateformat('EEEE dd/MM/yyyy', agent.created)}</td>
+	    				<td>#{if(agent.revoked, dateformat('HH:mm:ss', agent.revokedOn) + ' on ' + dateformat('EEEE dd/MM/yyyy', agent.revokedOn), 'no')}</td>
 	    			</tr>
 	    		</data-set>
 	    	</table>

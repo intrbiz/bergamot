@@ -44,12 +44,10 @@ public class BergamotAgentActions
     }
     
     @Action("sign-agent")
-    public Certificate signAgent(UUID siteId, UUID agentId, String certificateRequest)
+    public Certificate signAgent(UUID siteId, UUID agentId, CertificateRequest req)
     {
         try
         {
-            // parse the certificate request
-            CertificateRequest req = PEMUtil.loadCertificateRequest(certificateRequest);
             // sign the cert
             logger.info("Signing Bergamot Agent request for: " + req.getCommonName());
             AgentManagerResponse response = this.client.publish(new SignAgent(siteId, agentId, req.getCommonName(), PEMUtil.savePublicKey(req.getKey()))).get(10, TimeUnit.SECONDS);
