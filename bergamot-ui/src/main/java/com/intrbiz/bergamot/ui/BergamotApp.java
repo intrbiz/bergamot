@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.ui;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
@@ -120,8 +119,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void setup() throws Exception
     {
+        // TODO: Don't bother sending metric yet
         // Setup Gerald - Service name: Bergamot.UI, send every minute
-        Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
+        // Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
         // task engine
         /*
          * TODO: disable the shared task engine as we are getting issues with 
