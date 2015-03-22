@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
@@ -107,5 +108,14 @@ public class UICfg extends Configuration
         }
         config.applyDefaults();
         return config;
+    }
+    
+    /**
+     * Save the UI configuration, either to the default config file, the specified config file.
+     */
+    public void saveConfiguration() throws Exception
+    {
+        File configFile = new File(System.getProperty("bergamot.config", "/etc/bergamot/ui/default.xml"));
+        Configuration.write(UICfg.class, this, new FileOutputStream(configFile));
     }
 }
