@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.scheduler;
 
 import java.security.SecureRandom;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -74,6 +76,8 @@ public class WheelScheduler extends AbstractScheduler
 
     private SecureRandom initialDelay = new SecureRandom();
     
+    // watch dog
+    private Timer watchDog = new Timer();
 
     public WheelScheduler()
     {
@@ -100,7 +104,7 @@ public class WheelScheduler extends AbstractScheduler
         this.tick = (this.tick + 1) % this.orange.length;
         this.tickTime = System.currentTimeMillis();
         this.tickCalendar.setTimeInMillis(this.tickTime);
-        logger.trace("Tick " + this.tick + " at " + this.tickTime);
+        if (logger.isTraceEnabled()) logger.trace("Tick " + this.tick + " at " + this.tickTime);
         // process any jobs in the current segment
         if (this.schedulerEnabled)
         {
@@ -110,12 +114,12 @@ public class WheelScheduler extends AbstractScheduler
 
     protected void processSegment(Segment current)
     {
-        logger.trace("Processing " + current.jobs.size() + " jobs");
+        if (logger.isTraceEnabled()) logger.trace("Processing " + current.jobs.size() + " jobs");
         for (Job job : current.jobs.values())
         {
             if (job.enabled)
             {
-                logger.trace("Job " + job.id + " expires at " + job.expires + " <= " + this.tickTime);
+                if (logger.isTraceEnabled()) logger.trace("Job " + job.id + " expires at " + job.expires + " <= " + this.tickTime);
                 if (job.expires <= this.tickTime)
                 {
                     // compute the next expiry time
@@ -124,18 +128,18 @@ public class WheelScheduler extends AbstractScheduler
                     // check the time period
                     if (job.timeRange == null || this.isInTimeRange(job.timeRange, this.tickCalendar))
                     {
-                        logger.trace("Job " + job.id + " expired, executing. Next expires at " + job.expires);
+                        if (logger.isTraceEnabled()) logger.trace("Job " + job.id + " expired, executing. Next expires at " + job.expires);
                         this.runJob(job);
                     }
                     else
                     {
-                        logger.trace("Job " + job.id + " is not in time period, skiping this check");
+                        if (logger.isTraceEnabled()) logger.trace("Job " + job.id + " is not in time period, skiping this check");
                     }
                 }
             }
             else
             {
-                logger.trace("Skipping disabled job " + job.id);
+                if (logger.isTraceEnabled()) logger.trace("Skipping disabled job " + job.id);
             }
         }
     }
@@ -145,13 +149,13 @@ public class WheelScheduler extends AbstractScheduler
         long s = System.nanoTime();
         boolean res = range.isInTimeRange(calendar);
         long e = System.nanoTime();
-        logger.trace("Is in time range check: " + (((double) (e - s)) / 1000D) + "us");
+        if (logger.isTraceEnabled()) logger.trace("Is in time range check: " + (((double) (e - s)) / 1000D) + "us");
         return res;
     }
 
     protected void runJob(Job job)
     {
-        // TODO run in a thread pool ?
+        // TODO run in a thread pool?
         try
         {
             job.command.run();
@@ -172,13 +176,13 @@ public class WheelScheduler extends AbstractScheduler
             this.jobs.put(job.id, job);
             // pick the segment based on the initial delay
             int segmentIdx = ((int) ((initialDelay / this.tickPeriod) % this.orange.length));
-            logger.trace("Adding job " + job.id + " to segment: " + segmentIdx + " with interval " + interval + "ms and initial delay " + initialDelay + "ms");
+            if (logger.isTraceEnabled()) logger.trace("Adding job " + job.id + " to segment: " + segmentIdx + " with interval " + interval + "ms and initial delay " + initialDelay + "ms");
             Segment segment = this.orange[segmentIdx];
             segment.jobs.put(job.id, job);
         }
         else
         {
-            logger.trace("Job " + id + " is already scheduled, not adding it again.");
+            logger.warn("Job " + id + " is already scheduled, not adding it again.");
         }
     }
 
@@ -193,13 +197,13 @@ public class WheelScheduler extends AbstractScheduler
             // compute the new expiry
             job.expires = job.lastExpires + newInterval;
             job.enabled = true;
-            logger.trace("Rescheduled job " + job.id + ", new expiry: " + job.expires);
+            if (logger.isTraceEnabled()) logger.trace("Rescheduled job " + job.id + ", new expiry: " + job.expires);
         }
     }
     
     protected void removeJob(UUID id)
     {
-        logger.trace("Removing job " + id + " from scheduling");
+        if (logger.isTraceEnabled()) logger.trace("Removing job " + id + " from scheduling");
         // ensure the given job is removed
         this.jobs.remove(id);
         for (Segment segment : this.orange)
@@ -218,7 +222,7 @@ public class WheelScheduler extends AbstractScheduler
             {
                 if (site.equals(job.site) && pool == job.pool)
                 {
-                    logger.trace("Removing job " + job.id + " from scheduling as it is part of pool " + site + "." + pool);
+                    if (logger.isTraceEnabled()) logger.trace("Removing job " + job.id + " from scheduling as it is part of pool " + site + "." + pool);
                     segment.jobs.remove(job.id);
                     this.jobs.remove(job.id);
                 }
@@ -267,48 +271,69 @@ public class WheelScheduler extends AbstractScheduler
     @Override
     public void pause()
     {
-        this.pauseScheduler();
+        synchronized (this)
+        {
+            this.pauseScheduler();
+        }
     }
 
     @Override
     public void resume()
     {
-        this.resumeScheduler();
+        synchronized (this)
+        {
+            this.resumeScheduler();
+        }
     }
 
     @Override
     public void enable(UUID check)
     {
-        this.enableJob(check);
+        synchronized (this)
+        {
+            this.enableJob(check);
+        }
     }
 
     @Override
     public void disable(UUID check)
     {
-        this.disableJob(check);
+        synchronized (this)
+        {
+            this.disableJob(check);
+        }
     }
     
     @Override
     public void unschedule(UUID check)
     {
-        this.removeJob(check);
+        synchronized (this)
+        {
+            this.removeJob(check);
+        }
     }
 
     @Override
     public void schedule(ActiveCheck<?,?> check)
     {
-        // randomly distribute the initial delay
-        long initialDelay = (long) (this.initialDelay.nextDouble() * ((double) check.getCurrentInterval()));
-        logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval() + " and initial delay " + initialDelay);
-        this.scheduleJob(check.getId(), check.getSiteId(), check.getPool(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
+        synchronized (this)
+        {
+            // randomly distribute the initial delay
+            long initialDelay = (long) (this.initialDelay.nextDouble() * ((double) check.getCurrentInterval()));
+            logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval() + " and initial delay " + initialDelay);
+            this.scheduleJob(check.getId(), check.getSiteId(), check.getPool(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
+        }
     }
 
     @Override
     public void reschedule(ActiveCheck<?,?> check, long interval)
     {
-        interval = interval > 0 ? interval : check.getCurrentInterval();
-        logger.info("Rescheduling " + check + " with interval " + interval);
-        this.rescheduleJob(check.getId(), interval, check.getTimePeriod());
+        synchronized (this)
+        {
+            interval = interval > 0 ? interval : check.getCurrentInterval();
+            logger.info("Rescheduling " + check + " with interval " + interval);
+            this.rescheduleJob(check.getId(), interval, check.getTimePeriod());
+        }
     }
 
     @Override
@@ -323,6 +348,24 @@ public class WheelScheduler extends AbstractScheduler
             this.ticker = new Thread(new Ticker(), "WheelScheduler-Ticker");
             this.ticker.start();
         }
+        // setup a watch dog task to check that the scheduler is working correctly
+        this.watchDog.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run()
+            {
+                boolean enabled = WheelScheduler.this.schedulerEnabled;
+                if (enabled)
+                {
+                    long lastTick = WheelScheduler.this.tickTime;
+                    long delay = System.currentTimeMillis() - lastTick;
+                    if (delay >= 60_000L)
+                    {
+                        // last tick was over a minute ago !!!
+                        logger.fatal("Last tick was over a minute ago, delay: " + delay + "ms");
+                    }
+                }
+            }
+        }, 60_000L, 60_000L);
     }
 
     /**
@@ -339,7 +382,7 @@ public class WheelScheduler extends AbstractScheduler
                 tick();
                 long tickEnd = System.currentTimeMillis();
                 long sleepDuration = tickPeriod - (tickEnd - tickStart);
-                logger.trace("Tick took " + (tickEnd - tickStart) + "ms to run, sleeping for " + sleepDuration + "ms");
+                if (logger.isTraceEnabled()) logger.trace("Tick took " + (tickEnd - tickStart) + "ms to run, sleeping for " + sleepDuration + "ms");
                 if (sleepDuration > 0)
                 {
                     try
