@@ -36,6 +36,12 @@ public class GroupStateMO extends MessageObject
 
     @JsonProperty("suppressed_count")
     private int suppressedCount = 0;
+    
+    @JsonProperty("info_count")
+    private int infoCount = 0;
+    
+    @JsonProperty("action_count")
+    private int actionCount = 0;
 
     public GroupStateMO()
     {
@@ -140,5 +146,25 @@ public class GroupStateMO extends MessageObject
     public void setSuppressedCount(int suppressedCount)
     {
         this.suppressedCount = suppressedCount;
+    }
+
+    public int getInfoCount()
+    {
+        return infoCount;
+    }
+
+    public void setInfoCount(int infoCount)
+    {
+        this.infoCount = infoCount;
+    }
+
+    public int getActionCount()
+    {
+        return actionCount;
+    }
+
+    public void setActionCount(int actionCount)
+    {
+        this.actionCount = actionCount;
     }
 }

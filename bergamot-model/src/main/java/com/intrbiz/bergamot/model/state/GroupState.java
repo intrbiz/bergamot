@@ -51,13 +51,19 @@ public class GroupState extends BergamotObject<GroupStateMO>
 
     @SQLColumn(index = 11, name = "suppressed_count", since = @SQLVersion({ 1, 0, 0 }))
     private int suppressedCount = 0;
+    
+    @SQLColumn(index = 12, name = "info_count", since = @SQLVersion({ 2, 4, 0 }))
+    private int infoCount = 0;
+    
+    @SQLColumn(index = 13, name = "action_count", since = @SQLVersion({ 2, 4, 0 }))
+    private int actionCount = 0;
 
     public GroupState()
     {
         super();
     }
 
-    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int errorCount)
+    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int errorCount, int infoCount, int actionCount)
     {
         super();
         this.ok = ok;
@@ -68,6 +74,8 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.unknownCount = unknownCount;
         this.timeoutCount = timeoutCount;
         this.errorCount = errorCount;
+        this.infoCount = infoCount;
+        this.actionCount = actionCount;
     }
 
     public UUID getGroupId()
@@ -180,10 +188,25 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.suppressedCount = suppressedCount;
     }
 
-    /*
-     * public static <T> GroupState compute(Collection<? extends Check<?,?>> checks, Collection<T> groups, Function<T,GroupState> groupStateAccessor) { GroupState state = new GroupState(); for (Check<?,?> check : checks) { if (!check.isSuppressed()) { if (check.getState().isHard()) { state.ok = state.ok && check.getState().isOk(); state.status = Status.worst(state.status, check.getState().getStatus()); } switch (check.getState().getStatus()) { case PENDING: state.pendingCount++; break; case OK: state.okCount++; break; case WARNING: state.warningCount++; break; case CRITICAL: state.criticalCount++; break; case UNKNOWN: state.unknownCount++; break; case TIMEOUT: state.timeoutCount++; break; case ERROR: state.errorCount++; break; } } else { state.suppressedCount++; } } if (groups != null) { for (T group : groups) { GroupState gstate = groupStateAccessor.apply(group); // state.ok = state.ok & gstate.isOk(); state.status = Status.worst(state.status, gstate.getStatus()); state.pendingCount
-     * += gstate.pendingCount; state.okCount += gstate.okCount; state.warningCount += gstate.warningCount; state.criticalCount += gstate.criticalCount; state.timeoutCount += gstate.timeoutCount; state.errorCount += gstate.errorCount; state.suppressedCount += gstate.suppressedCount; } } return state; }
-     */
+    public int getInfoCount()
+    {
+        return infoCount;
+    }
+
+    public void setInfoCount(int infoCount)
+    {
+        this.infoCount = infoCount;
+    }
+
+    public int getActionCount()
+    {
+        return actionCount;
+    }
+
+    public void setActionCount(int actionCount)
+    {
+        this.actionCount = actionCount;
+    }
 
     @Override
     public GroupStateMO toMO(boolean stub)
@@ -199,6 +222,8 @@ public class GroupState extends BergamotObject<GroupStateMO>
         mo.setErrorCount(this.errorCount);
         mo.setTimeoutCount(this.timeoutCount);
         mo.setSuppressedCount(this.suppressedCount);
+        mo.setInfoCount(this.infoCount);
+        mo.setActionCount(this.actionCount);
         return mo;
     }
 }

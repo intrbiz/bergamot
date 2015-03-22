@@ -66,7 +66,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({2, 3, 0}),
+        version = @SQLVersion({2, 4, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -774,13 +774,15 @@ public abstract class BergamotDB extends DatabaseAdapter
                               "  bool_and(s.ok OR q.suppressed) AS ok, " + 
                               "  max(CASE WHEN q.suppressed THEN 0 ELSE s.status END)::INTEGER AS status, "+
                               "  count(CASE WHEN s.status = 0 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS pending_count, "+ 
-                              "  count(CASE WHEN s.status = 1 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS ok_count, "+
-                              "  count(CASE WHEN s.status = 2 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS warning_count, "+
-                              "  count(CASE WHEN s.status = 3 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS critical_count, "+
-                              "  count(CASE WHEN s.status = 4 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS unknown_count, "+
-                              "  count(CASE WHEN s.status = 5 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS timeout_count, "+
-                              "  count(CASE WHEN s.status = 6 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS error_count, "+
-                              "  count(CASE WHEN q.suppressed                      THEN 1 ELSE NULL END)::INTEGER AS suppressed_count "+
+                              "  count(CASE WHEN s.status = 2 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS ok_count, "+
+                              "  count(CASE WHEN s.status = 3 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS warning_count, "+
+                              "  count(CASE WHEN s.status = 4 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS critical_count, "+
+                              "  count(CASE WHEN s.status = 5 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS unknown_count, "+
+                              "  count(CASE WHEN s.status = 6 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS timeout_count, "+
+                              "  count(CASE WHEN s.status = 7 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS error_count, "+
+                              "  count(CASE WHEN q.suppressed                      THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, "+
+                              "  count(CASE WHEN s.status = 1 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS info_count, "+
+                              "  count(CASE WHEN s.status = 8 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS action_count "+
                               "FROM bergamot.check_state s " +
                               "JOIN ( " +
                               "    SELECT id, suppressed, group_ids FROM bergamot.host " +
@@ -821,13 +823,15 @@ public abstract class BergamotDB extends DatabaseAdapter
                               "  bool_and(s.ok OR h.suppressed) AS ok, "+ 
                               "  max(CASE WHEN h.suppressed THEN 0 ELSE s.status END)::INTEGER AS status, "+
                               "  count(CASE WHEN s.status = 0 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS pending_count, "+ 
-                              "  count(CASE WHEN s.status = 1 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS ok_count, "+
-                              "  count(CASE WHEN s.status = 2 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS warning_count, "+
-                              "  count(CASE WHEN s.status = 3 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS critical_count, "+
-                              "  count(CASE WHEN s.status = 4 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS unknown_count, "+
-                              "  count(CASE WHEN s.status = 5 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS timeout_count, "+
-                              "  count(CASE WHEN s.status = 6 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS error_count, "+
-                              "  count(CASE WHEN h.suppressed                      THEN 1 ELSE NULL END)::INTEGER AS suppressed_count "+
+                              "  count(CASE WHEN s.status = 2 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS ok_count, "+
+                              "  count(CASE WHEN s.status = 3 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS warning_count, "+
+                              "  count(CASE WHEN s.status = 4 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS critical_count, "+
+                              "  count(CASE WHEN s.status = 5 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS unknown_count, "+
+                              "  count(CASE WHEN s.status = 6 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS timeout_count, "+
+                              "  count(CASE WHEN s.status = 7 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS error_count, "+
+                              "  count(CASE WHEN h.suppressed                      THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, "+
+                              "  count(CASE WHEN s.status = 1 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS info_count, "+
+                              "  count(CASE WHEN s.status = 8 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS action_count "+
                               "FROM bergamot.check_state s "+
                               "JOIN bergamot.host h "+
                               "ON (s.check_id = h.id) "+
@@ -1645,6 +1649,30 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new SQLScript(
                 "CREATE INDEX \"site_aliases_idx\" ON bergamot.site USING gin (aliases)"
+        );
+    }
+    
+    @SQLPatch(name = "add_info_and_action_statuses", index = 6, type = ScriptType.UPGRADE, version = @SQLVersion({2, 4, 0}), skip = false)
+    public static SQLScript addInfoAndActionStatuses()
+    {
+        return new SQLScript(
+                // check state
+                "UPDATE bergamot.check_state " +
+                "SET " +
+                " status=(CASE WHEN status = 0 THEN 0 ELSE status + 1 END), " +
+                " last_hard_status=(CASE WHEN last_hard_status = 0 THEN 0 ELSE last_hard_status + 1 END) ",
+                // check transitions
+                "UPDATE bergamot.check_transition " +
+                "SET " +
+                " previous_status=(CASE WHEN previous_status = 0 THEN 0 ELSE previous_status + 1 END), " +
+                " previous_last_hard_status=(CASE WHEN previous_last_hard_status = 0 THEN 0 ELSE previous_last_hard_status + 1 END), " +
+                " next_status=(CASE WHEN next_status = 0 THEN 0 ELSE next_status + 1 END), " +
+                " next_last_hard_status=(CASE WHEN next_last_hard_status = 0 THEN 0 ELSE next_last_hard_status + 1 END)",
+                // alerts
+                "UPDATE bergamot.alert "+
+                "SET " +
+                " status=(CASE WHEN status = 0 THEN 0 ELSE status + 1 END), " +
+                " last_hard_status=(CASE WHEN last_hard_status = 0 THEN 0 ELSE last_hard_status + 1 END) "
         );
     }
     

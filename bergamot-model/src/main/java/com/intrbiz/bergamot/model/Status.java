@@ -12,6 +12,10 @@ public enum Status
      */
     PENDING(true),
     /**
+     * The check result is merely informational
+     */
+    INFO(true), 
+    /**
      * The check is all ok, yay!
      */
     OK(true), 
@@ -34,7 +38,11 @@ public enum Status
     /**
      * Some Bergamot internal error happened, go look at the logs
      */
-    ERROR(false);
+    ERROR(false),
+    /**
+     * The result of the check will require manual intervention
+     */
+    ACTION(false);
     
     private final boolean ok;
     
