@@ -186,7 +186,7 @@ public class WheelScheduler extends AbstractScheduler
         }
     }
 
-    protected void rescheduleJob(UUID id, long newInterval, TimeRange timeRange)
+    protected void rescheduleJob(UUID id, long newInterval, TimeRange timeRange, Runnable command)
     {
         newInterval = this.validateInterval(newInterval);
         Job job = this.jobs.get(id);
@@ -194,6 +194,7 @@ public class WheelScheduler extends AbstractScheduler
         {
             job.interval = newInterval;
             job.timeRange = timeRange;
+            job.command = command;
             // compute the new expiry
             job.expires = job.lastExpires + newInterval;
             job.enabled = true;
@@ -332,7 +333,7 @@ public class WheelScheduler extends AbstractScheduler
         {
             interval = interval > 0 ? interval : check.getCurrentInterval();
             logger.info("Rescheduling " + check + " with interval " + interval);
-            this.rescheduleJob(check.getId(), interval, check.getTimePeriod());
+            this.rescheduleJob(check.getId(), interval, check.getTimePeriod(), new CheckRunner(check));
         }
     }
 
@@ -427,7 +428,7 @@ public class WheelScheduler extends AbstractScheduler
         
         public final int pool;
 
-        public final Runnable command;
+        public volatile Runnable command;
 
         public volatile boolean enabled = true;
 
