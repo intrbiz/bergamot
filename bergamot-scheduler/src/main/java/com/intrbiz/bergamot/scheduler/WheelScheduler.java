@@ -176,7 +176,7 @@ public class WheelScheduler extends AbstractScheduler
             this.jobs.put(job.id, job);
             // pick the segment based on the initial delay
             int segmentIdx = ((int) ((initialDelay / this.tickPeriod) % this.orange.length));
-            if (logger.isTraceEnabled()) logger.trace("Adding job " + job.id + " to segment: " + segmentIdx + " with interval " + interval + "ms and initial delay " + initialDelay + "ms");
+            logger.info("Adding job " + job.id + " to segment: " + segmentIdx + " with interval " + interval + "ms and initial delay " + initialDelay + "ms");
             Segment segment = this.orange[segmentIdx];
             segment.jobs.put(job.id, job);
         }
@@ -198,13 +198,13 @@ public class WheelScheduler extends AbstractScheduler
             // compute the new expiry
             job.expires = job.lastExpires + newInterval;
             job.enabled = true;
-            if (logger.isTraceEnabled()) logger.trace("Rescheduled job " + job.id + ", new expiry: " + job.expires);
+            logger.info("Rescheduled job " + job.id + ", new expiry: " + job.expires);
         }
     }
     
     protected void removeJob(UUID id)
     {
-        if (logger.isTraceEnabled()) logger.trace("Removing job " + id + " from scheduling");
+        logger.info("Removing job " + id + " from scheduling");
         // ensure the given job is removed
         this.jobs.remove(id);
         for (Segment segment : this.orange)
@@ -223,7 +223,7 @@ public class WheelScheduler extends AbstractScheduler
             {
                 if (site.equals(job.site) && pool == job.pool)
                 {
-                    if (logger.isTraceEnabled()) logger.trace("Removing job " + job.id + " from scheduling as it is part of pool " + site + "." + pool);
+                    logger.info("Removing job " + job.id + " from scheduling as it is part of pool " + site + "." + pool);
                     segment.jobs.remove(job.id);
                     this.jobs.remove(job.id);
                 }
