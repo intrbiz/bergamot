@@ -40,6 +40,10 @@ public enum Status
      */
     ERROR(false),
     /**
+     * The Bergamot Agent which the check is executed via is not currently connected
+     */
+    DISCONNECTED(false),
+    /**
      * The result of the check will require manual intervention
      */
     ACTION(false);
