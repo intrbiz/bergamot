@@ -1147,11 +1147,13 @@ public class BergamotConfigImporter
         // schedule
         if (newService)
         {
+            // schedule this new check
             this.scheduleCheck(service);
         }
         else
         {
-            this.unscheduleCheck(service);
+            // reschedule this reconfigured check
+            this.rescheduleCheck(service);
         }
     }
     
@@ -1345,19 +1347,21 @@ public class BergamotConfigImporter
     
     private void scheduleCheck(ActiveCheck<?,?> check)
     {
+        this.report.info("Sscheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
         this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new ScheduleCheck(check.getId())));
         this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new EnableCheck(check.getId())));
     }
     
     private void rescheduleCheck(ActiveCheck<?,?> check)
     {
+        this.report.info("Rescheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
         this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new RescheduleCheck(check.getId())));
-        // ensure the check is enabled
         this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new EnableCheck(check.getId())));
     }
     
     private void unscheduleCheck(ActiveCheck<?,?> check)
-    {    
+    {
+        this.report.info("Unscheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
         this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new UnscheduleCheck(check.getId())));
     }
     
