@@ -13,7 +13,7 @@ import com.intrbiz.bergamot.model.message.ParameterMO;
  * The result of a check
  */
 public abstract class ResultMO extends Message
-{
+{    
     @JsonProperty("ok")
     private boolean ok;
 
@@ -164,6 +164,17 @@ public abstract class ResultMO extends Message
         return this;
     }
     
+    
+    @JsonIgnore
+    public ResultMO info(String message)
+    {
+        this.setOk(true);
+        this.setStatus("INFO");
+        this.setOutput(message);
+        this.setRuntime(0);
+        return this;
+    }
+    
     @JsonIgnore
     public ResultMO ok(String output)
     {
@@ -234,6 +245,26 @@ public abstract class ResultMO extends Message
     {
         this.setOk(false);
         this.setStatus("TIMEOUT");
+        this.setOutput(message);
+        this.setRuntime(0);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO disconnected(String message)
+    {
+        this.setOk(false);
+        this.setStatus("DISCONNECTED");
+        this.setOutput(message);
+        this.setRuntime(0);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO action(String message)
+    {
+        this.setOk(false);
+        this.setStatus("ACTION");
         this.setOutput(message);
         this.setRuntime(0);
         return this;

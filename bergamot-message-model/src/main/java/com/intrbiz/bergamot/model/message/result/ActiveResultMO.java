@@ -106,78 +106,112 @@ public class ActiveResultMO extends ResultMO
     @Override
     public ActiveResultMO pending(String output)
     {
-        return (ActiveResultMO) super.pending(output);
+        super.pending(output);
+        return this;
+    }
+    
+    @Override
+    public ActiveResultMO info(String output)
+    {
+        super.info(output);
+        return this;
     }
 
     @Override
     public ActiveResultMO ok(String output)
     {
-        return (ActiveResultMO) super.ok(output);
+        super.ok(output);
+        return this;
     }
 
     @Override
     public ActiveResultMO warning(String output)
     {
-        return (ActiveResultMO) super.warning(output);
+        super.warning(output);
+        return this;
     }
 
     @Override
     public ActiveResultMO critical(String output)
     {
-        return (ActiveResultMO) super.critical(output);
+        super.critical(output);
+        return this;
     }
 
     @Override
     public ActiveResultMO unknown(String output)
     {
-        return (ActiveResultMO) super.unknown(output);
+        super.unknown(output);
+        return this;
     }
 
     @Override
     public ActiveResultMO error(Throwable t)
     {
-        return (ActiveResultMO) super.error(t);
+        super.error(t);
+        return this;
     }
 
     @Override
     public ActiveResultMO error(String message)
     {
-        return (ActiveResultMO) super.error(message);
+        super.error(message);
+        return this;
     }
 
     @Override
     public ActiveResultMO timeout(String message)
     {
-        return (ActiveResultMO) super.timeout(message);
+        super.timeout(message);
+        return this;
+    }
+    
+    @Override
+    public ActiveResultMO disconnected(String message)
+    {
+        super.disconnected(message);
+        return this;
+    }
+    
+    @Override
+    public ActiveResultMO action(String message)
+    {
+        super.action(message);
+        return this;
     }
 
     @Override
     public ActiveResultMO applyThreshold(double value, double warning, double critical, String message)
     {
-        return (ActiveResultMO) super.applyThreshold(value, warning, critical, message);
+        super.applyThreshold(value, warning, critical, message);
+        return this;
     }
 
     @Override
     public ActiveResultMO applyThreshold(long value, long warning, long critical, String message)
     {
-        return (ActiveResultMO) super.applyThreshold(value, warning, critical, message);
+        super.applyThreshold(value, warning, critical, message);
+        return this;
     }
     
     @Override
     public ActiveResultMO applyThreshold(Iterable<Double> values, double warning, double critical, String message)
     {
-        return (ActiveResultMO) super.applyThreshold(values, warning, critical, message);
+        super.applyThreshold(values, warning, critical, message);
+        return this;
     }
     
     @Override
     public ActiveResultMO applyThreshold(Iterable<Long> values, long warning, long critical, String message)
     {
-        return (ActiveResultMO) super.applyThreshold(values, warning, critical, message);
+        super.applyThreshold(values, warning, critical, message);
+        return this;
     }
 
     @Override
     public ActiveResultMO runtime(double runtime)
     {
-        return (ActiveResultMO) super.runtime(runtime);
+        super.runtime(runtime);
+        return this;
     }
 }

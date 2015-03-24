@@ -57,78 +57,112 @@ public class PassiveResultMO extends ResultMO
     @Override
     public PassiveResultMO pending(String output)
     {
-        return (PassiveResultMO) super.pending(output);
+        super.pending(output);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO info(String output)
+    {
+        super.info(output);
+        return this;
     }
 
     @Override
     public PassiveResultMO ok(String output)
     {
-        return (PassiveResultMO) super.ok(output);
+        super.ok(output);
+        return this;
     }
 
     @Override
     public PassiveResultMO warning(String output)
     {
-        return (PassiveResultMO) super.warning(output);
+        super.warning(output);
+        return this;
     }
 
     @Override
     public PassiveResultMO critical(String output)
     {
-        return (PassiveResultMO) super.critical(output);
+        super.critical(output);
+        return this;
     }
 
     @Override
     public PassiveResultMO unknown(String output)
     {
-        return (PassiveResultMO) super.unknown(output);
+        super.unknown(output);
+        return this;
     }
 
     @Override
     public PassiveResultMO error(Throwable t)
     {
-        return (PassiveResultMO) super.error(t);
+        super.error(t);
+        return this;
     }
 
     @Override
     public PassiveResultMO error(String message)
     {
-        return (PassiveResultMO) super.error(message);
+        super.error(message);
+        return this;
     }
 
     @Override
     public PassiveResultMO timeout(String message)
     {
-        return (PassiveResultMO) super.timeout(message);
+        super.timeout(message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO disconnected(String message)
+    {
+        super.disconnected(message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO action(String message)
+    {
+        super.action(message);
+        return this;
     }
 
     @Override
     public PassiveResultMO applyThreshold(double value, double warning, double critical, String message)
     {
-        return (PassiveResultMO) super.applyThreshold(value, warning, critical, message);
+        super.applyThreshold(value, warning, critical, message);
+        return this;
     }
 
     @Override
     public PassiveResultMO applyThreshold(long value, long warning, long critical, String message)
     {
-        return (PassiveResultMO) super.applyThreshold(value, warning, critical, message);
+        super.applyThreshold(value, warning, critical, message);
+        return this;
     }
     
     @Override
     public PassiveResultMO applyThreshold(Iterable<Double> values, double warning, double critical, String message)
     {
-        return (PassiveResultMO) super.applyThreshold(values, warning, critical, message);
+        super.applyThreshold(values, warning, critical, message);
+        return this;
     }
     
     @Override
     public PassiveResultMO applyThreshold(Iterable<Long> values, long warning, long critical, String message)
     {
-        return (PassiveResultMO) super.applyThreshold(values, warning, critical, message);
+        super.applyThreshold(values, warning, critical, message);
+        return this;
     }
 
     @Override
     public PassiveResultMO runtime(double runtime)
     {
-        return (PassiveResultMO) super.runtime(runtime);
+        super.runtime(runtime);
+        return this;
     }
 }
