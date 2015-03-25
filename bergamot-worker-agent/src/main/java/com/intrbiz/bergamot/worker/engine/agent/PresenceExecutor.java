@@ -40,7 +40,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.trace("Checking Bergamot Agent presence");
+        if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent presence");
         try
         {
             // get the agent id
@@ -56,7 +56,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             }
             else
             {
-                resultMO.critical("Bergamot Agent disconnected");
+                resultMO.disconnected("Bergamot Agent disconnected");
             }
             // submit
             resultSubmitter.accept(resultMO);
@@ -74,7 +74,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         // on connection
         this.getEngine().getAgentServer().setOnAgentRegisterHandler((handler) -> {
             // publish a passive result for the presence of this host
-            logger.trace("Got agent connection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
+            if (logger.isTraceEnabled()) logger.trace("Got agent connection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
             // submit a passive result for the host
             this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
         });
@@ -82,16 +82,20 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         this.getEngine().getAgentServer().setOnAgentUnregisterHandler((handler) -> {
             // publish a passive result for the presence of this host
             // debug log
-            logger.trace("Got agent disconnection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
+            if (logger.isTraceEnabled()) logger.trace("Got agent disconnection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
             // submit a passive result for the host
-            this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).critical("Bergamot Agent disconnected"));
+            this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).disconnected("Bergamot Agent disconnected"));
         });
-        // on ping
-        this.getEngine().getAgentServer().setOnAgentPingHandler((handler) -> {
-            // publish a passive result for the presence of this host
-            logger.trace("Got agent ping: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
-            // submit a passive result for the host
-            this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
-        });
+        // on ping?
+        // disabled by default as this will send a result every 30 seconds
+        if (Boolean.getBoolean("bergamot.agent.passive-result-on-ping"))
+        {
+            this.getEngine().getAgentServer().setOnAgentPingHandler((handler) -> {
+                // publish a passive result for the presence of this host
+                if (logger.isTraceEnabled()) logger.trace("Got agent ping: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
+                // submit a passive result for the host
+                this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
+            });
+        }
     }
 }

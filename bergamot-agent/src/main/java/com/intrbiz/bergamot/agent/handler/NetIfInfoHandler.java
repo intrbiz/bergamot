@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.agent.handler;
 import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.NetInterfaceConfig;
 import org.hyperic.sigar.NetInterfaceStat;
+import org.hyperic.sigar.NetRoute;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
@@ -12,6 +13,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.NetIfStat;
 import com.intrbiz.bergamot.model.message.agent.stat.netif.NetIfInfo;
+import com.intrbiz.bergamot.model.message.agent.stat.netif.NetRouteInfo;
 
 public class NetIfInfoHandler implements AgentHandler
 {
@@ -36,7 +38,21 @@ public class NetIfInfoHandler implements AgentHandler
         try
         {
             NetIfStat stat = new NetIfStat(request);
+            // host name
             stat.setHostname(this.sigar.getFQDN());
+            // routes
+            for (NetRoute route : this.sigar.getNetRouteList())
+            {
+                NetRouteInfo info = new NetRouteInfo();
+                info.setDestination(route.getDestination());
+                info.setMask(route.getMask());
+                info.setGateway(route.getGateway());
+                info.setInterface(route.getIfname());
+                info.setMetric(route.getMetric());
+                info.setMtu(route.getMtu());
+                stat.getRoutes().add(info);
+            }
+            // interface stats
             for (String iface : this.sigar.getNetInterfaceList())
             {
                 NetIfInfo info = new NetIfInfo();

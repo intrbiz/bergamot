@@ -1,32 +1,28 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
-import java.text.DecimalFormat;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
-import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
-import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
+import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
+import com.intrbiz.bergamot.model.message.agent.stat.OSStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
 /**
- * Check the cpu usage of a Bergamot Agent
+ * Display the OS an Agent is running
  */
-public class CPUExecutor extends AbstractExecutor<AgentEngine>
+public class OSExecutor extends AbstractExecutor<AgentEngine>
 {
-    public static final String NAME = "cpu";
+    public static final String NAME = "os";
     
-    private static final DecimalFormat DFMT = new DecimalFormat("0.00");
-    
-    private Logger logger = Logger.getLogger(CPUExecutor.class);
+    private Logger logger = Logger.getLogger(OSExecutor.class);
 
-    public CPUExecutor()
+    public OSExecutor()
     {
         super();
     }
@@ -43,7 +39,7 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent CPU Usage");
+        if (logger.isTraceEnabled()) logger.trace("Getting Bergamot Agent OS information");
         try
         {
             // check the host presence
@@ -55,17 +51,14 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
             {
                 // get the CPU stats
                 long sent = System.nanoTime();
-                agent.sendMessageToAgent(new CheckCPU(), (response) -> {
+                agent.sendMessageToAgent(new CheckOS(), (response) -> {
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
-                    CPUStat stat = (CPUStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got CPU usage in " + runtime + "ms: " + stat);
-                    // apply the check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
-                            stat.getTotalUsage().getTotal(), 
-                            executeCheck.getPercentParameter("cpu_warning", 0.8F), 
-                            executeCheck.getPercentParameter("cpu_critical", 0.9F), 
-                            "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
-                    ).runtime(runtime));
+                    OSStat stat = (OSStat) response;
+                    if (logger.isTraceEnabled()) logger.trace("Got OS info in " + runtime + "ms: " + stat);
+                    // display the info
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).info(
+                            "OS: " + stat.getVendor() + " " + stat.getVendorVersion() + ", " + stat.getName() + " " + stat.getVersion() + " (" + stat.getMachine() + ")"
+                    ));
                 });
             }
             else

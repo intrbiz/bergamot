@@ -260,15 +260,22 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         }
         else
         {
-            // do we have a callback to invoke
-            Consumer<AgentMessage> callback = this.pendingRequests.remove(request.getId());
-            if (callback != null)
+            if (request.getId() != null)
             {
-                callback.accept(request);
+                // do we have a callback to invoke
+                Consumer<AgentMessage> callback = this.pendingRequests.remove(request.getId());
+                if (callback != null)
+                {
+                    callback.accept(request);
+                }
+                else
+                {
+                    logger.warn("Unhandled message: " + request);
+                }
             }
             else
             {
-                logger.warn("Unhandled message: " + request);
+                logger.warn("Unhandled message, no request id: " + request);
             }
         }
     }

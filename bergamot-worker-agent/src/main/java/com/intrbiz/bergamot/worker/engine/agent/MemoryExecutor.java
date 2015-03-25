@@ -43,7 +43,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.trace("Checking Bergamot Agent Memory Usage");
+        if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent Memory Usage");
         try
         {
             // check the host presence
@@ -58,7 +58,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                 agent.sendMessageToAgent(new CheckMem(), (response) -> {
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     MemStat stat = (MemStat) response;
-                    logger.trace("Got Memory usage in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got Memory usage in " + runtime + "ms: " + stat);
                     // check
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
                             UnitUtil.toRatio((executeCheck.getBooleanParameter("ignore_caches", true) ? stat.getActualUsedMemory() : stat.getUsedMemory()), stat.getTotalMemory()),
@@ -71,7 +71,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error("Bergamot Agent disconnected"));
+                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)

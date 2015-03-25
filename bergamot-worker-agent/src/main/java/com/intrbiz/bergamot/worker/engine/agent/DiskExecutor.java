@@ -46,7 +46,7 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.trace("Checking Bergamot Agent Disk Usage");
+        if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent Disk Usage");
         try
         {
             // check the host presence
@@ -63,7 +63,7 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
                 agent.sendMessageToAgent(new CheckDisk(), (response) -> {
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     DiskStat stat = (DiskStat) response;
-                    logger.trace("Got Disk usage in + " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got Disk usage in + " + runtime + "ms: " + stat);
                     // find the mount
                     DiskInfo disk = stat.getDisks().stream().filter((di) -> { return mount.equals(di.getMount()); }).findFirst().orElse(null);
                     if (disk != null)
@@ -85,7 +85,7 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error("Bergamot Agent disconnected"));
+                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)

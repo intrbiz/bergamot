@@ -1,32 +1,30 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
-import java.text.DecimalFormat;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
-import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
-import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
+import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
+import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
-/**
- * Check the cpu usage of a Bergamot Agent
- */
-public class CPUExecutor extends AbstractExecutor<AgentEngine>
-{
-    public static final String NAME = "cpu";
-    
-    private static final DecimalFormat DFMT = new DecimalFormat("0.00");
-    
-    private Logger logger = Logger.getLogger(CPUExecutor.class);
 
-    public CPUExecutor()
+/**
+ * Execute a Nagios plugin via the Bergamot Agent
+ */
+public class NagiosExecutor extends AbstractExecutor<AgentEngine>
+{
+    public static final String NAME = "nagios";
+    
+    private Logger logger = Logger.getLogger(NagiosExecutor.class);
+
+    public NagiosExecutor()
     {
         super();
     }
@@ -43,29 +41,36 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent CPU Usage");
+        if (logger.isTraceEnabled()) logger.trace("Executing Nagios plugin via Bergamot Agent");
         try
         {
             // check the host presence
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
+            // command line
+            String commandLine = executeCheck.getParameter("command_line");
+            if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
             // lookup the agent
             BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
             if (agent != null)
             {
-                // get the CPU stats
+                ExecCheck check = new ExecCheck();
+                check.setName(executeCheck.getName());
+                check.setEngine("nagios");
+                check.addParameter("command_line", commandLine);
+                // exec the check
                 long sent = System.nanoTime();
-                agent.sendMessageToAgent(new CheckCPU(), (response) -> {
+                agent.sendMessageToAgent(check, (response) -> {
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
-                    CPUStat stat = (CPUStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got CPU usage in " + runtime + "ms: " + stat);
-                    // apply the check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
-                            stat.getTotalUsage().getTotal(), 
-                            executeCheck.getPercentParameter("cpu_warning", 0.8F), 
-                            executeCheck.getPercentParameter("cpu_critical", 0.9F), 
-                            "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
-                    ).runtime(runtime));
+                    ExecStat stat = (ExecStat) response;
+                    if (logger.isTraceEnabled()) logger.trace("Executed check " + runtime + "ms: " + stat);
+                    // submit the result
+                    ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
+                    result.setOk(stat.isOk());
+                    result.setStatus(stat.getStatus());
+                    result.setOutput(stat.getOutput());
+                    result.runtime(runtime);
+                    resultSubmitter.accept(result);
                 });
             }
             else

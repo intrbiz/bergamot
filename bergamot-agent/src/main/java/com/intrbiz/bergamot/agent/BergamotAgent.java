@@ -49,9 +49,12 @@ import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ExecHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
+import com.intrbiz.bergamot.agent.handler.NetConInfoHandler;
 import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
 import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
+import com.intrbiz.bergamot.agent.handler.ProcessInfoHandler;
 import com.intrbiz.bergamot.agent.handler.UptimeInfoHandler;
+import com.intrbiz.bergamot.agent.handler.WhoInfoHandler;
 import com.intrbiz.bergamot.crypto.util.KeyStoreUtil;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
@@ -107,6 +110,9 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new UptimeInfoHandler());
         this.registerHandler(new NetIfInfoHandler());
         this.registerHandler(new ExecHandler());
+        this.registerHandler(new ProcessInfoHandler());
+        this.registerHandler(new WhoInfoHandler());
+        this.registerHandler(new NetConInfoHandler());
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

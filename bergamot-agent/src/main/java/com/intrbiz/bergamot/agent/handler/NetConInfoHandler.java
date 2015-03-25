@@ -1,0 +1,67 @@
+package com.intrbiz.bergamot.agent.handler;
+
+import org.hyperic.sigar.Humidor;
+import org.hyperic.sigar.NetConnection;
+import org.hyperic.sigar.NetFlags;
+import org.hyperic.sigar.SigarException;
+import org.hyperic.sigar.SigarProxy;
+
+import com.intrbiz.bergamot.agent.AgentHandler;
+import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
+import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
+import com.intrbiz.bergamot.model.message.agent.stat.NetConStat;
+import com.intrbiz.bergamot.model.message.agent.stat.netcon.NetConInfo;
+
+public class NetConInfoHandler implements AgentHandler
+{    
+    private SigarProxy sigar = Humidor.getInstance().getSigar();
+
+    public NetConInfoHandler()
+    {
+        super();
+    }
+    
+    @Override
+    public Class<?>[] getMessages()
+    {
+        return new Class[] {
+                CheckNetCon.class
+        };
+    }
+
+    @Override
+    public AgentMessage handle(AgentMessage request)
+    {
+        CheckNetCon check = (CheckNetCon) request;
+        try
+        {
+            // flags
+            int flags = 0;
+            if (check.isClient()) flags |= NetFlags.CONN_CLIENT;
+            if (check.isServer()) flags |= NetFlags.CONN_SERVER;
+            if (check.isTcp()) flags |= NetFlags.CONN_TCP;
+            if (check.isUdp()) flags |= NetFlags.CONN_UDP;
+            if (check.isUnix()) flags |= NetFlags.CONN_UNIX;
+            if (check.isRaw()) flags |= NetFlags.CONN_RAW;
+            // get the stats
+            NetConStat stat = new NetConStat(request);
+            for (NetConnection con : this.sigar.getNetConnectionList(flags))
+            {
+                NetConInfo info = new NetConInfo();
+                info.setProtocol(con.getTypeString());
+                info.setState(con.getStateString());
+                info.setLocalAddress(con.getLocalAddress());
+                info.setLocalPort((int) con.getLocalPort());
+                info.setRemoteAddress(con.getRemoteAddress());
+                info.setRemotePort((int) con.getRemotePort());
+                stat.getConnections().add(info);
+            }
+            return stat;
+        }
+        catch (SigarException e)
+        {
+            return new GeneralError(e.getMessage());
+        }
+    }
+}

@@ -39,9 +39,12 @@ import com.intrbiz.bergamot.crypto.util.TLSConstants;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
+import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
+import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
+import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.configuration.Configurable;
 
@@ -305,6 +308,18 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             exec.addParameter("command_line", "/usr/lib/nagios/plugins/check_mem -u -C -w 80 -c 90");
             agent.sendMessageToAgent(exec, (response) -> {
                 System.out.println("Got Exec result: " + response);
+            });
+            // check process
+            agent.sendMessageToAgent(new CheckProcess(), (response) -> {
+                System.out.println("Got Process Info: " + response);
+            });
+            // check who
+            agent.sendMessageToAgent(new CheckWho(), (response) -> {
+                System.out.println("Got Who Info: " + response);
+            });
+            // check net con
+            agent.sendMessageToAgent(new CheckNetCon(), (response) -> {
+                System.out.println("Got NetCon Info: " + response);
             });
         });
         // go go go
