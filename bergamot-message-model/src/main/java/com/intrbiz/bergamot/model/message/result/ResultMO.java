@@ -421,4 +421,116 @@ public abstract class ResultMO extends Message
         this.runtime = runtime;
         return this;
     }
+    
+    /**
+     * Apply a warning / critical range to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the value and 
+     * ranges
+     * 
+     * @param value the value to check
+     * @param warning the warning range
+     * @param critical the critical range
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyRange(long value, long[] warning, long[] critical, String message)
+    {
+        if (value < critical[0] || value > critical[1])
+        {
+            this.critical(message);
+        }
+        else if (value < warning[0] || value > warning[1])
+        {
+            this.warning(message);
+        }
+        else
+        {
+            this.ok(message);
+        }
+        return this;
+    }
+    
+    /**
+     * Apply a warning / critical range to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the value and 
+     * ranges
+     * 
+     * @param value the value to check
+     * @param warning the warning range
+     * @param critical the critical range
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyRange(int value, int[] warning, int[] critical, String message)
+    {
+        if (value < critical[0] || value > critical[1])
+        {
+            this.critical(message);
+        }
+        else if (value < warning[0] || value > warning[1])
+        {
+            this.warning(message);
+        }
+        else
+        {
+            this.ok(message);
+        }
+        return this;
+    }
+    
+    /**
+     * Apply a warning / critical range to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the value and 
+     * ranges
+     * 
+     * @param value the value to check
+     * @param warning the warning range
+     * @param critical the critical range
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyRange(float value, float[] warning, float[] critical, String message)
+    {
+        if (value < critical[0] || value > critical[1])
+        {
+            this.critical(message);
+        }
+        else if (value < warning[0] || value > warning[1])
+        {
+            this.warning(message);
+        }
+        else
+        {
+            this.ok(message);
+        }
+        return this;
+    }
+    
+    /**
+     * Apply a warning / critical range to determine the result state, this will 
+     * result in either a ok, warning or critical state depending on the value and 
+     * ranges
+     * 
+     * @param value the value to check
+     * @param warning the warning range
+     * @param critical the critical range
+     * @param message the check output
+     */
+    @JsonIgnore
+    public ResultMO applyRange(double value, double[] warning, double[] critical, String message)
+    {
+        if (value < critical[0] || value > critical[1])
+        {
+            this.critical(message);
+        }
+        else if (value < warning[0] || value > warning[1])
+        {
+            this.warning(message);
+        }
+        else
+        {
+            this.ok(message);
+        }
+        return this;
+    }
 }

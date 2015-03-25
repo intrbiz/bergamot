@@ -165,4 +165,32 @@ public class PassiveResultMO extends ResultMO
         super.runtime(runtime);
         return this;
     }
+    
+    @Override
+    public PassiveResultMO applyRange(int value, int[] warning, int[] critical, String message)
+    {
+        super.applyRange(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO applyRange(long value, long[] warning, long[] critical, String message)
+    {
+        super.applyRange(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO applyRange(float value, float[] warning, float[] critical, String message)
+    {
+        super.applyRange(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO applyRange(double value, double[] warning, double[] critical, String message)
+    {
+        super.applyRange(value, warning, critical, message);
+        return this;
+    }
 }
