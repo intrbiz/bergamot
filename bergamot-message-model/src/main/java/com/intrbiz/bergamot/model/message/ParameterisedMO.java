@@ -260,4 +260,52 @@ public interface ParameterisedMO
                 .map(Float::parseFloat)
                 .collect(LinkedHashSet::new, Set::add, Set::addAll);
     }
+    
+    /**
+     * Get a range parameter, eg: '0:10' for 0 to 10
+     */
+    default int[] getIntRangeParameter(String name, int[] defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
+        String[] values = value.split(":");
+        if (values.length != 2) return defaultValue;
+        return new int[] { Integer.parseInt(values[0]), Integer.parseInt(values[1]), };
+    }
+    
+    /**
+     * Get a range parameter, eg: '0:10' for 0 to 10
+     */
+    default long[] getLongRangeParameter(String name, long[] defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
+        String[] values = value.split(":");
+        if (values.length != 2) return defaultValue;
+        return new long[] { Long.parseLong(values[0]), Long.parseLong(values[1]), };
+    }
+    
+    /**
+     * Get a range parameter, eg: '0:10' for 0 to 10
+     */
+    default float[] getFloatRangeParameter(String name, float[] defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
+        String[] values = value.split(":");
+        if (values.length != 2) return defaultValue;
+        return new float[] { Float.parseFloat(values[0]), Float.parseFloat(values[1]), };
+    }
+    
+    /**
+     * Get a range parameter, eg: '0:10' for 0 to 10
+     */
+    default double[] getDoubleRangeParameter(String name, double[] defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
+        String[] values = value.split(":");
+        if (values.length != 2) return defaultValue;
+        return new double[] { Double.parseDouble(values[0]), Double.parseDouble(values[1]), };
+    }
 }
