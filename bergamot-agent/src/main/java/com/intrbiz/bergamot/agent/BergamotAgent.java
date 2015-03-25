@@ -44,6 +44,7 @@ import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
+import com.intrbiz.bergamot.agent.handler.AgentInfoHandler;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
@@ -113,6 +114,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new ProcessInfoHandler());
         this.registerHandler(new WhoInfoHandler());
         this.registerHandler(new NetConInfoHandler());
+        this.registerHandler(new AgentInfoHandler());
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

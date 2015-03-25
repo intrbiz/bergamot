@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrbiz.bergamot.model.message.agent.check.CheckAgent;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
@@ -34,6 +35,7 @@ import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.bergamot.model.message.agent.stat.AgentStat;
 import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskStat;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
@@ -108,7 +110,10 @@ public class BergamotAgentTranscoder
         // net con
         NetConInfo.class,
         CheckNetCon.class,
-        NetConStat.class
+        NetConStat.class,
+        // agent
+        CheckAgent.class,
+        AgentStat.class
     };
     
     private static final BergamotAgentTranscoder US = new BergamotAgentTranscoder();
