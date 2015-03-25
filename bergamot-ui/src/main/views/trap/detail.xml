@@ -13,7 +13,7 @@
 	<div class="row">
 		<div class="col4 dash_icon check" data-check-id="#{trap.id}">
 			<h3>
-				<span class="dash_img #{trap.state.status.toString().toLowerCase()}" title="The trap is #{trap.state.status.toString().toLowerCase()}">
+				<span class="dash_img status_#{trap.state.status.toString().toLowerCase()}" title="The trap is #{trap.state.status.toString().toLowerCase()}">
 					<img src="/trap-icon.png" />
 				</span>
 				<span class="name">#{trap.summary}</span>

@@ -14,7 +14,7 @@
 	<div class="row">
 		<div class="col4 dash_icon check" data-check-id="#{host.id}">
 		    <h3>
-				<span class="dash_img #{host.state.status.toString().toLowerCase()}" title="The check is #{host.state.status.toString().toLowerCase()}">
+				<span class="dash_img status_#{host.state.status.toString().toLowerCase()}" title="The check is #{host.state.status.toString().toLowerCase()}">
 					<img src="/host-icon.png" />
 				</span>
 				<span class="name">#{host.summary}</span>

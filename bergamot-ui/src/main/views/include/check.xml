@@ -5,7 +5,7 @@
 	<a href="/#{check.type}/id/#{check.id}">
 		<div class="col3 dash_icon check" data-check-id="#{check.id}">
 			<h3>
-				<span class="dash_img #{check.state.status.toString().toLowerCase()}" title="The check is #{check.state.status.toString().toLowerCase()}">
+				<span class="dash_img status_#{check.state.status.toString().toLowerCase()}" title="The check is #{check.state.status.toString().toLowerCase()}">
 					<img src="/#{check.type}-icon.png" />
 				</span>
 				<span class="name">#{check.summary}</span>
