@@ -242,4 +242,32 @@ public class ActiveResultMO extends ResultMO
         super.applyRange(value, warning, critical, message);
         return this;
     }
+    
+    @Override
+    public ActiveResultMO applyLessThanThreshold(double value, double warning, double critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public ActiveResultMO applyLessThanThreshold(long value, long warning, long critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public ActiveResultMO applyLessThanThreshold(Iterable<Double> value, double warning, double critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public ActiveResultMO applyLessThanThreshold(Iterable<Long> value, long warning, long critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
 }

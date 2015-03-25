@@ -193,4 +193,32 @@ public class PassiveResultMO extends ResultMO
         super.applyRange(value, warning, critical, message);
         return this;
     }
+    
+    @Override
+    public PassiveResultMO applyLessThanThreshold(double value, double warning, double critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO applyLessThanThreshold(long value, long warning, long critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO applyLessThanThreshold(Iterable<Double> value, double warning, double critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO applyLessThanThreshold(Iterable<Long> value, long warning, long critical, String message)
+    {
+        super.applyLessThanThreshold(value, warning, critical, message);
+        return this;
+    }
 }
