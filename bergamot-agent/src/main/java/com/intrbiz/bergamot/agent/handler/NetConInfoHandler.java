@@ -55,9 +55,9 @@ public class NetConInfoHandler implements AgentHandler
                     info.setProtocol(con.getTypeString());
                     info.setState(con.getStateString());
                     info.setLocalAddress(con.getLocalAddress());
-                    info.setLocalPort((int) con.getLocalPort());
+                    info.setLocalPort(con.getLocalPort());
                     info.setRemoteAddress(con.getRemoteAddress());
-                    info.setRemotePort((int) con.getRemotePort());
+                    info.setRemotePort(con.getRemotePort());
                     stat.getConnections().add(info);
                 }
             }

@@ -17,13 +17,13 @@ public class NetConInfo extends AgentType
     private String localAddress;
     
     @JsonProperty("local_port")
-    private int localPort;
+    private long localPort;
     
     @JsonProperty("remote_address")
     private String remoteAddress;
     
     @JsonProperty("remote_port")
-    private int remotePort;
+    private long remotePort;
     
     public NetConInfo()
     {
@@ -60,12 +60,12 @@ public class NetConInfo extends AgentType
         this.localAddress = localAddress;
     }
 
-    public int getLocalPort()
+    public long getLocalPort()
     {
         return localPort;
     }
 
-    public void setLocalPort(int localPort)
+    public void setLocalPort(long localPort)
     {
         this.localPort = localPort;
     }
@@ -80,12 +80,12 @@ public class NetConInfo extends AgentType
         this.remoteAddress = remoteAddress;
     }
 
-    public int getRemotePort()
+    public long getRemotePort()
     {
         return remotePort;
     }
 
-    public void setRemotePort(int remotePort)
+    public void setRemotePort(long remotePort)
     {
         this.remotePort = remotePort;
     }
