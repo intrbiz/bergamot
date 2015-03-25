@@ -48,6 +48,8 @@ public abstract class WorkerQueue extends QueueAdapter
     
     public abstract Consumer<ExecuteCheck, NullKey> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler);
     
+    public abstract Consumer<ExecuteCheck, NullKey> consumeDeadAgentChecks(DeliveryHandler<ExecuteCheck> handler);
+    
     // result
     
     public abstract RoutedProducer<ResultMO, ResultKey> publishResults(ResultKey defaultKey);

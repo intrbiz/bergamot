@@ -77,6 +77,10 @@ public class RabbitWorkerQueue extends WorkerQueue
                 on.queueDeclare("bergamot.dead_check_queue", true, false, false, null);
                 on.exchangeDeclare("bergamot.dead_check", "fanout", true);
                 on.queueBind("bergamot.dead_check_queue", "bergamot.dead_check", "");
+                // the dead agent check queue
+                on.queueDeclare("bergamot.dead_agent_check_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.dead_agent_check", "fanout", true);
+                on.queueBind("bergamot.dead_agent_check_queue", "bergamot.dead_agent_check", "");
                 // setup our worker queue
                 String queueName = null;
                 if (agentRouting)
@@ -118,7 +122,9 @@ public class RabbitWorkerQueue extends WorkerQueue
                     // bind the worker pool exchange to the site exchange
                     on.exchangeBind("bergamot.check.worker_pool." + site + "." + workerPool, "bergamot.check.site." + site, "*." + workerPool + ".*.*");
                 }
-                on.exchangeDeclare(engineExchangeName, "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
+                // declare the engine exchange
+                // the engine exchange dead checks to the dead agent check exchange
+                on.exchangeDeclare(engineExchangeName, "topic", true, false, args("alternate-exchange", "bergamot.dead_agent_check"));
                 // bind the engine exchange to our worker pool
                 on.exchangeBind(engineExchangeName, "bergamot.check.worker_pool." + Util.coalesce(site, "default") + "." + Util.coalesce(workerPool, "any"), "*.*." + engine + ".*");                
                 // bind our queue to the engine exchange
@@ -155,6 +161,21 @@ public class RabbitWorkerQueue extends WorkerQueue
                 on.exchangeDeclare("bergamot.dead_check", "fanout", true);
                 on.queueBind("bergamot.dead_check_queue", "bergamot.dead_check", "");
                 return "bergamot.dead_check_queue";
+            }
+        };
+    }
+    
+    @Override
+    public Consumer<ExecuteCheck, NullKey> consumeDeadAgentChecks(DeliveryHandler<ExecuteCheck> handler)
+    {
+        return new RabbitConsumer<ExecuteCheck, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-dead-check"))
+        {
+            public String setupQueue(Channel on) throws IOException
+            {
+                on.queueDeclare("bergamot.dead_agent_check_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.dead_agent_check", "fanout", true);
+                on.queueBind("bergamot.dead_agent_check_queue", "bergamot.dead_agent_check", "");
+                return "bergamot.dead_agent_check_queue";
             }
         };
     }
