@@ -41,6 +41,8 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     private List<Consumer<ResultMO, ResultKey>> fallbackConsumers = new LinkedList<Consumer<ResultMO, ResultKey>>();
 
     private List<Consumer<ExecuteCheck, NullKey>> deadConsumers = new LinkedList<Consumer<ExecuteCheck, NullKey>>();
+    
+    private List<Consumer<ExecuteCheck, NullKey>> deadAgentConsumers = new LinkedList<Consumer<ExecuteCheck, NullKey>>();
 
     private SchedulerQueue schedulerQueue;
 
@@ -125,6 +127,10 @@ public abstract class AbstractResultProcessor implements ResultProcessor
             // consume dead checks, currently for all sites
             this.deadConsumers.add(this.workerQueue.consumeDeadChecks((e) -> {
                 processDead(e);
+            }));
+            // consume dead agent checks, currently for all sites
+            this.deadAgentConsumers.add(this.workerQueue.consumeDeadAgentChecks((e) -> {
+                processDeadAgent(e);
             }));
         }
         // scheduler queue

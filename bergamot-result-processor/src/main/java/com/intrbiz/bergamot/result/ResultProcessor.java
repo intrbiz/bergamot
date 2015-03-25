@@ -31,6 +31,13 @@ public interface ResultProcessor
     void processDead(ExecuteCheck check);
     
     /**
+     * Process a check execution which was aborted as the 
+     * agent is not connected.
+     * @param check
+     */
+    void processDeadAgent(ExecuteCheck check);
+    
+    /**
      * Make this result processor responsible for the given pool
      * @param site the site id
      * @param pool the per site pool id

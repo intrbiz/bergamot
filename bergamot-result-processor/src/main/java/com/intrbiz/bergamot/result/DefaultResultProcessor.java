@@ -54,6 +54,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         this.processExecuted(new ActiveResultMO().fromCheck(check).timeout("Worker timeout whilst executing check"));
     }
     
+    @Override
+    public void processDeadAgent(ExecuteCheck check)
+    {
+        // submit a disconnected result
+        this.processExecuted(new ActiveResultMO().fromCheck(check).disconnected("Bergamot Agent disconnected"));
+    }
+    
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Check<?, ?> matchCheck(BergamotDB db, ResultMO resultMO)
     {
