@@ -16,7 +16,10 @@ import com.intrbiz.bergamot.worker.engine.agent.MemoryExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.NagiosExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.OSExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.PresenceExecutor;
+import com.intrbiz.bergamot.worker.engine.agent.ProcessStatsExecutor;
+import com.intrbiz.bergamot.worker.engine.agent.ProcessesExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.UptimeExecutor;
+import com.intrbiz.bergamot.worker.engine.agent.UsersExecutor;
 
 @XmlType(name = "worker")
 @XmlRootElement(name = "worker")
@@ -55,7 +58,10 @@ public class AgentWorkerCfg extends WorkerCfg
                         new ExecutorCfg(DisksExecutor.class),
                         new ExecutorCfg(OSExecutor.class),
                         new ExecutorCfg(UptimeExecutor.class),
-                        new ExecutorCfg(NagiosExecutor.class)
+                        new ExecutorCfg(NagiosExecutor.class),
+                        new ExecutorCfg(UsersExecutor.class),
+                        new ExecutorCfg(ProcessesExecutor.class),
+                        new ExecutorCfg(ProcessStatsExecutor.class)
                 ));
         // apply defaults from super class
         super.applyDefaults();

@@ -140,6 +140,24 @@ public class ProcessInfoHandler implements AgentHandler
             if (! isStateInList(check.getState(), new String(new char[] { state.getState() })))
                 return false;
         }
+        // process title
+        if (! Util.isEmpty(check.getTitle()))
+        {
+            String title = state.getName();
+            // regex?
+            if (check.isRegex())
+            {
+                Pattern pattern = Pattern.compile(check.getTitle());
+                Matcher matcher = pattern.matcher(title);
+                if (! matcher.find())
+                    return false;
+            }
+            else
+            {
+                if (! title.contains(check.getTitle()))
+                    return false;
+            }
+        }
         // command name
         if (! Util.isEmpty(check.getCommand()))
         {
@@ -160,6 +178,40 @@ public class ProcessInfoHandler implements AgentHandler
                 if (! command.contains(check.getCommand()))
                     return false;
             }
+        }
+        // arguments
+        if (check.getArguments() != null && check.getArguments().size() > 0)
+        {
+            // match each argument against the command line arguments
+            int matched = 0;
+            for (String argument : check.getArguments())
+            {
+                for (int i = 0; i < commandLine.size(); i++)
+                {
+                    String processArgument = commandLine.get(i);
+                    if (check.isRegex())
+                    {
+                        Pattern pattern = Pattern.compile(argument);
+                        Matcher matcher = pattern.matcher(processArgument);
+                        if (matcher.find())
+                        {
+                            matched++;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (processArgument.contains(argument))
+                        {
+                            matched ++;
+                            break;
+                        }
+                    }
+                }
+            }
+            // did we match each required argument
+            if (matched != check.getArguments().size())
+                return false;
         }
         return true;
     }

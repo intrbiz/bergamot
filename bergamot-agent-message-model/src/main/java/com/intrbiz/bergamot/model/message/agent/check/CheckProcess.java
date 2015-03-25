@@ -28,6 +28,12 @@ public class CheckProcess extends AgentMessage
     private boolean flattenCommand = false;
     
     /**
+     * Optional arguments to filter on
+     */
+    @JsonProperty("arguments")
+    private List<String> arguments = new LinkedList<String>();
+    
+    /**
      * Regex match the filters
      */
     @JsonProperty("regex")
@@ -50,6 +56,12 @@ public class CheckProcess extends AgentMessage
      */
     @JsonProperty("group")
     private String group;
+    
+    /**
+     * Optional process title filter on
+     */
+    @JsonProperty("title")
+    private String title;
     
     public CheckProcess()
     {
@@ -134,5 +146,25 @@ public class CheckProcess extends AgentMessage
     public void setRegex(boolean regex)
     {
         this.regex = regex;
+    }
+
+    public List<String> getArguments()
+    {
+        return arguments;
+    }
+
+    public void setArguments(List<String> arguments)
+    {
+        this.arguments = arguments;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
     }
 }
