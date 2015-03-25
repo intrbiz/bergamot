@@ -18,6 +18,26 @@ public class CheckNetCon extends AgentMessage
     
     private boolean raw = false;
     
+    /**
+     * Optionally filter on the local port;
+     */
+    private int localPort = 0;
+    
+    /**
+     * Optionally filter on the remote port;
+     */
+    private int remotePort = 0;
+    
+    /**
+     * Optionally filter on the local address;
+     */
+    private String localAddress;
+    
+    /**
+     * Optionally filter on the remote address;
+     */
+    private String remoteAddress;
+    
     public CheckNetCon()
     {
         super();
@@ -91,5 +111,45 @@ public class CheckNetCon extends AgentMessage
     public void setRaw(boolean raw)
     {
         this.raw = raw;
+    }
+
+    public int getLocalPort()
+    {
+        return localPort;
+    }
+
+    public void setLocalPort(int localPort)
+    {
+        this.localPort = localPort;
+    }
+
+    public int getRemotePort()
+    {
+        return remotePort;
+    }
+
+    public void setRemotePort(int remotePort)
+    {
+        this.remotePort = remotePort;
+    }
+
+    public String getLocalAddress()
+    {
+        return localAddress;
+    }
+
+    public void setLocalAddress(String localAddress)
+    {
+        this.localAddress = localAddress;
+    }
+
+    public String getRemoteAddress()
+    {
+        return remoteAddress;
+    }
+
+    public void setRemoteAddress(String remoteAddress)
+    {
+        this.remoteAddress = remoteAddress;
     }
 }

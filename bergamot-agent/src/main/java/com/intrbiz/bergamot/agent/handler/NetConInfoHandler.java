@@ -6,6 +6,7 @@ import org.hyperic.sigar.NetFlags;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
@@ -48,14 +49,17 @@ public class NetConInfoHandler implements AgentHandler
             NetConStat stat = new NetConStat(request);
             for (NetConnection con : this.sigar.getNetConnectionList(flags))
             {
-                NetConInfo info = new NetConInfo();
-                info.setProtocol(con.getTypeString());
-                info.setState(con.getStateString());
-                info.setLocalAddress(con.getLocalAddress());
-                info.setLocalPort((int) con.getLocalPort());
-                info.setRemoteAddress(con.getRemoteAddress());
-                info.setRemotePort((int) con.getRemotePort());
-                stat.getConnections().add(info);
+                if (matchesFilter(check, con))
+                {
+                    NetConInfo info = new NetConInfo();
+                    info.setProtocol(con.getTypeString());
+                    info.setState(con.getStateString());
+                    info.setLocalAddress(con.getLocalAddress());
+                    info.setLocalPort((int) con.getLocalPort());
+                    info.setRemoteAddress(con.getRemoteAddress());
+                    info.setRemotePort((int) con.getRemotePort());
+                    stat.getConnections().add(info);
+                }
             }
             return stat;
         }
@@ -63,5 +67,34 @@ public class NetConInfoHandler implements AgentHandler
         {
             return new GeneralError(e.getMessage());
         }
+    }
+    
+    private static boolean matchesFilter(CheckNetCon check, NetConnection con)
+    {
+        // local port
+        if (check.getLocalPort() > 0)
+        {
+            if (con.getLocalPort() != check.getLocalPort())
+                return false;
+        }
+        // remote port
+        if (check.getRemotePort() > 0)
+        {
+            if (con.getRemotePort() != check.getRemotePort())
+                return false;
+        }
+        // local address
+        if (! Util.isEmpty(check.getLocalAddress()))
+        {
+            if (! check.getLocalAddress().equalsIgnoreCase(con.getLocalAddress()))
+                return false;
+        }
+        // remote address
+        if (! Util.isEmpty(check.getRemoteAddress()))
+        {
+            if (! check.getRemoteAddress().equalsIgnoreCase(con.getRemoteAddress()))
+                return false;
+        }
+        return true;
     }
 }
