@@ -1,0 +1,23 @@
+{
+  "name": "bergamot-ui",
+  "version": "1.0.0",
+  "authors": [
+    "Chris Ellis"
+  ],
+  "moduleType": [
+    "amd"
+  ],
+  "license": "LGPL",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "flight": "~1.1.3",
+    "requirejs": "~2.1.11"
+  }
+}
