@@ -37,22 +37,31 @@ public abstract class AbstractScheduler implements Scheduler
         super();
     }
     
-    public void start() throws Exception
+    protected void startQueues() throws Exception
     {
         this.workerQueue = WorkerQueue.open();
         this.executeCheckProducer = this.workerQueue.publishChecks();
         this.schedulerQueue = SchedulerQueue.open();
         // TODO scheduler names
         this.schedulerActionConsumer = this.schedulerQueue.consumeSchedulerActions((a) -> { executeAction(a); });
-        
     }
     
-    public void shutdown()
+    public void start() throws Exception
+    {
+        this.startQueues();
+    }
+    
+    protected void shutdownQueues()
     {
         this.schedulerActionConsumer.close();
         this.schedulerQueue.close();
         this.executeCheckProducer.close();
         this.workerQueue.close();
+    }
+    
+    public void shutdown()
+    {
+        this.shutdownQueues();
     }
     
     @Override
