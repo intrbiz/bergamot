@@ -86,50 +86,47 @@ public abstract class AbstractScheduler implements Scheduler
     
     protected void executeAction(SchedulerAction action)
     {
-        synchronized (this)
+        if (action instanceof PauseScheduler)
         {
-            if (action instanceof PauseScheduler)
+            this.pause();
+        }
+        else if (action instanceof ResumeScheduler)
+        {
+            this.resume();
+        }
+        else if (action instanceof ScheduleCheck)
+        {
+            try (BergamotDB db = BergamotDB.connect())
             {
-                this.pause();
-            }
-            else if (action instanceof ResumeScheduler)
-            {
-                this.resume();
-            }
-            else if (action instanceof ScheduleCheck)
-            {
-                try (BergamotDB db = BergamotDB.connect())
+                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((ScheduleCheck) action).getCheck());
+                if (check != null)
                 {
-                    ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((ScheduleCheck) action).getCheck());
-                    if (check != null)
-                    {
-                        this.schedule(check);
-                    }
+                    this.schedule(check);
                 }
             }
-            else if (action instanceof RescheduleCheck)
+        }
+        else if (action instanceof RescheduleCheck)
+        {
+            try (BergamotDB db = BergamotDB.connect())
             {
-                try (BergamotDB db = BergamotDB.connect())
+                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((RescheduleCheck) action).getCheck());
+                if (check != null)
                 {
-                    ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((RescheduleCheck) action).getCheck());
-                    if (check != null)
-                    {
-                        this.reschedule(check, ((RescheduleCheck) action).getInterval());
-                    }
+                    this.reschedule(check, ((RescheduleCheck) action).getInterval());
                 }
             }
-            else if (action instanceof EnableCheck)
-            {
-                this.enable(((EnableCheck) action).getCheck());
-            }
-            else if (action instanceof DisableCheck)
-            {
-                this.disable(((DisableCheck) action).getCheck());
-            }
-            else if (action instanceof UnscheduleCheck)
-            {
-                this.unschedule(((UnscheduleCheck) action).getCheck());
-            }
+        }
+        else if (action instanceof EnableCheck)
+        {
+            this.enable(((EnableCheck) action).getCheck());
+        }
+        else if (action instanceof DisableCheck)
+        {
+            this.disable(((DisableCheck) action).getCheck());
+        }
+        else if (action instanceof UnscheduleCheck)
+        {
+            this.unschedule(((UnscheduleCheck) action).getCheck());
         }
     }
 }

@@ -290,69 +290,48 @@ public class WheelScheduler extends AbstractScheduler
     @Override
     public void pause()
     {
-        synchronized (this)
-        {
-            this.pauseScheduler();
-        }
+        this.pauseScheduler();
     }
 
     @Override
     public void resume()
     {
-        synchronized (this)
-        {
-            this.resumeScheduler();
-        }
+        this.resumeScheduler();
     }
 
     @Override
     public void enable(UUID check)
     {
-        synchronized (this)
-        {
-            this.enableJob(check);
-        }
+        this.enableJob(check);
     }
 
     @Override
     public void disable(UUID check)
     {
-        synchronized (this)
-        {
-            this.disableJob(check);
-        }
+        this.disableJob(check);
     }
     
     @Override
     public void unschedule(UUID check)
     {
-        synchronized (this)
-        {
-            this.removeJob(check);
-        }
+        this.removeJob(check);
     }
 
     @Override
     public void schedule(ActiveCheck<?,?> check)
     {
-        synchronized (this)
-        {
-            // randomly distribute the initial delay
-            long initialDelay = (long) (this.initialDelay.nextDouble() * ((double) check.getCurrentInterval()));
-            logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval() + " and initial delay " + initialDelay);
-            this.scheduleJob(check.getId(), check.getSiteId(), check.getPool(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
-        }
+        // randomly distribute the initial delay
+        long initialDelay = (long) (this.initialDelay.nextDouble() * ((double) check.getCurrentInterval()));
+        logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval() + " and initial delay " + initialDelay);
+        this.scheduleJob(check.getId(), check.getSiteId(), check.getPool(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
     }
 
     @Override
     public void reschedule(ActiveCheck<?,?> check, long interval)
     {
-        synchronized (this)
-        {
-            interval = interval > 0 ? interval : check.getCurrentInterval();
-            logger.info("Rescheduling " + check + " with interval " + interval);
-            this.rescheduleJob(check.getId(), interval, check.getTimePeriod(), new CheckRunner(check));
-        }
+        interval = interval > 0 ? interval : check.getCurrentInterval();
+        logger.info("Rescheduling " + check + " with interval " + interval);
+        this.rescheduleJob(check.getId(), interval, check.getTimePeriod(), new CheckRunner(check));
     }
 
     @Override
