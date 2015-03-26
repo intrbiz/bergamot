@@ -7,12 +7,15 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
+import com.intrbiz.util.IBThreadFactory;
 
 /**
  * A tick-wheel based scheduler for scheduling checks.
@@ -78,11 +81,21 @@ public class WheelScheduler extends AbstractScheduler
     
     // watch dog
     private Timer watchDog = new Timer();
+    
+    // task executor
+    
+    private ExecutorService taskExecutor;
 
     public WheelScheduler()
     {
         super();
+        // setup the wheel structure
         this.setupWheel(1_000L, 60);
+        // create our task executor
+        this.taskExecutor = Executors.newFixedThreadPool(
+                Integer.getInteger("bergamot.scheduler.task.threads", Runtime.getRuntime().availableProcessors()),
+                new IBThreadFactory("bergamot-scheduler-task", true)
+        );
     }
 
     private void setupWheel(long tickPeriod, int segments)
@@ -153,17 +166,22 @@ public class WheelScheduler extends AbstractScheduler
         return res;
     }
 
-    protected void runJob(Job job)
+    protected void runJob(final Job job)
     {
-        // TODO run in a thread pool?
-        try
-        {
-            job.command.run();
-        }
-        catch (Exception e)
-        {
-            logger.error("Error executing scheduled job " + job.id);
-        }
+        // execute the actual task out of the scheduling thread
+        this.taskExecutor.execute(new Runnable() {
+            public void run()
+            {
+                try
+                {
+                    job.command.run();
+                }
+                catch (Exception e)
+                {
+                    logger.error("Error executing scheduled job " + job.id, e);
+                }
+            }
+        });
     }
 
     protected void scheduleJob(UUID id, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
