@@ -40,6 +40,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 
@@ -340,23 +341,21 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         {
         }
     }
-
-    public static void main(String[] args) throws Exception
-    {
-        // setup loggiing
-        setupLogging();
-        // load our config
-        BergamotAgentCfg config = readConfig();
-        // start the agent
-        BergamotAgent agent = new BergamotAgent();
-        agent.configure(config);
-        agent.start();
-    }
     
-    private static void setupLogging()
+    private static void configureLogging() throws Exception
     {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.TRACE);
+        String logging = System.getProperty("bergamot.logging", "console");
+        if ("console".equals(logging))
+        {
+            // configure logging to terminal
+            BasicConfigurator.configure();
+            Logger.getRootLogger().setLevel(Level.toLevel(System.getProperty("bergamot.logging.level", "info").toUpperCase()));
+        }
+        else
+        {
+            // configure from file
+            PropertyConfigurator.configure(new File(logging).getAbsolutePath());
+        }
     }
     
     private static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
@@ -365,5 +364,18 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         {
             return BergamotAgentCfg.read(BergamotAgentCfg.class, input);
         }
+    }
+    
+
+    public static void main(String[] args) throws Exception
+    {
+        // setup loggiing
+        configureLogging();
+        // load our config
+        BergamotAgentCfg config = readConfig();
+        // start the agent
+        BergamotAgent agent = new BergamotAgent();
+        agent.configure(config);
+        agent.start();
     }
 }
