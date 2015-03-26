@@ -5,7 +5,7 @@
 	<a href="/group/id/#{group.id}">
 		<div class="col3 dash_icon">
 		    <h3>
-				<span class="dash_img #{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">
+				<span class="dash_img status_#{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">
 					<img src="/group-icon.png" />
 				</span>
 				<span class="name">#{group.summary}</span>

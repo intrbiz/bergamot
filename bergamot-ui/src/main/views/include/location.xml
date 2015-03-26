@@ -5,7 +5,7 @@
 	<a href="/location/id/#{location.id}">
 		<div class="col3 dash_icon">
 		    <h3>
-				<span class="dash_img #{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
+				<span class="dash_img status_#{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
 					<img src="/location-icon.png" />
 				</span>
 				<span class="name">#{location.summary}</span>
