@@ -90,4 +90,9 @@
         </div>
     </container>
     
+    <!-- About -->
+    <div class="menu-group">
+        <h4><a href="/about/">About Bergamot Monitoring</a></h4>
+    </div>
+    
 </fragment>

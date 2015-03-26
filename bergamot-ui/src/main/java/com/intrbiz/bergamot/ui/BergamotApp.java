@@ -41,6 +41,7 @@ import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.api.UtilAPIRouter;
 import com.intrbiz.bergamot.ui.express.BergamotUpdateURL;
 import com.intrbiz.bergamot.ui.login.LoginRouter;
+import com.intrbiz.bergamot.ui.router.AboutRouter;
 import com.intrbiz.bergamot.ui.router.ClusterRouter;
 import com.intrbiz.bergamot.ui.router.ContactRouter;
 import com.intrbiz.bergamot.ui.router.DashboardRouter;
@@ -86,6 +87,13 @@ import com.intrbiz.util.pool.database.DatabasePool;
  */
 public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
 {   
+    public static final class VERSION
+    {
+        public static final String NUMBER = "1.0.0-RC1";
+        
+        public static final String CODE_NAME = "Violet Club";
+    }
+    
     private UICfg config;
     
     private ClusterManager clusterManager;
@@ -172,6 +180,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new StatsRouter());
         // Agent
         router(new AgentRouter());
+        // About
+        router(new AboutRouter());
         // Admin
         router(new AdminRouter());
         router(new ContactAdminRouter());
