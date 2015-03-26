@@ -1,10 +1,9 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="About Bergamot">
+<fragment xmlns="com.intrbiz.balsa" title="About Bergamot Monitoring">
 
     <div clas="row">
-   		<h2>About Bergamot Monitoring</h2>
    		<h4>Version #{bergamot_version} (#{bergamot_codename})</h4>
    	    <p class="text-body">
    	    	Bergamot Monitoring is an Open Source distributed monitoring system, 
