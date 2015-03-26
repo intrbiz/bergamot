@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.worker.engine.agent.MemoryExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.NagiosExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.NetConExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.OSExecutor;
+import com.intrbiz.bergamot.worker.engine.agent.PortListenerExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.PresenceExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.ProcessStatsExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.ProcessesExecutor;
@@ -67,7 +68,8 @@ public class AgentWorkerCfg extends WorkerCfg
                         new ExecutorCfg(ProcessStatsExecutor.class),
                         new ExecutorCfg(AgentExecutor.class),
                         new ExecutorCfg(AgentMemoryExecutor.class),
-                        new ExecutorCfg(NetConExecutor.class)
+                        new ExecutorCfg(NetConExecutor.class),
+                        new ExecutorCfg(PortListenerExecutor.class)
                 ));
         // apply defaults from super class
         super.applyDefaults();
