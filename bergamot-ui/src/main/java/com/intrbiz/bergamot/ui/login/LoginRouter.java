@@ -248,7 +248,7 @@ public class LoginRouter extends Router<BergamotApp>
     }
     
     @Catch(BalsaSecurityException.class)
-    @Order(Order.LAST)
+    @Order(Order.LAST - 10)
     @Any("/**")
     public void forceLogin(@Param("redirect") String redirect) throws IOException
     {
