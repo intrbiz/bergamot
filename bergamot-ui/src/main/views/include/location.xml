@@ -6,7 +6,7 @@
 		<div class="col3 dash_icon">
 		    <h3>
 				<span class="dash_img status_#{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
-					<img src="/location-icon.png" />
+					<img src="#{public('/images/icons/64/location.png')}" />
 				</span>
 				<span class="name">#{location.summary}</span>
 		    </h3>

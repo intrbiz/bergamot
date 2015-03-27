@@ -15,7 +15,7 @@
 		<div class="col4 dash_icon check" data-check-id="#{service.id}">
 			<h3>
 				<span class="dash_img status_#{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
-					<img src="/service-icon.png" />
+					<img src="#{public('/images/icons/64/service.png')}" />
 				</span>
 				<span class="name">#{service.summary}</span>
 		    </h3>

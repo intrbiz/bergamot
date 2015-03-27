@@ -6,7 +6,7 @@
 		<div class="col3 dash_icon check" data-check-id="#{check.id}">
 			<h3>
 				<span class="dash_img status_#{check.state.status.toString().toLowerCase()}" title="The check is #{check.state.status.toString().toLowerCase()}">
-					<img src="/#{check.type}-icon.png" />
+					<img src="#{public('/images/icons/64/' + if(alert, 'alert.png', check.type + '.png'))}" />
 				</span>
 				<span class="name">#{check.summary}</span>
 		    </h3>

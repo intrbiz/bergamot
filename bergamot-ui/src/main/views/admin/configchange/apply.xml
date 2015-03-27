@@ -4,7 +4,7 @@
     <div class="row">
 		<h3 id="report_title">The minions are busy applying this configuration change, please be patient</h3>
 		<p class="text-body">#{coalesce(change.description, '')}</p>
-		<img src="#{public('apply_change.gif')}" id="loader"/>
+		<img src="#{public('/images/admin/apply_change.gif')}" id="loader"/>
 		<pre id="report">Applying change...</pre>
 		<script type="text/javascript">
 			$(document).ready(function() {

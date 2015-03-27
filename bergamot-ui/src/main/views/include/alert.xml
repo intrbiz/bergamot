@@ -8,7 +8,7 @@
 	    <div class="col4 dash_icon alert">
 			<h3>
 				<span class="dash_img status_#{alert.status.toString().toLowerCase()}" title="The check is #{alert.status.toString().toLowerCase()}">
-					<img src="#{public('/dialog-information.png')}" />
+					<img src="#{public('/images/icons/64/alert.png')}" />
 				</span>
 				<span class="name">#{alert.check.summary}</span>
 		    </h3>

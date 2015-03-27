@@ -6,7 +6,7 @@
 		<div class="col3 dash_icon">
 		    <h3>
 				<span class="dash_img status_#{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">
-					<img src="/group-icon.png" />
+					<img src="#{public('/images/icons/64/group.png')}" />
 				</span>
 				<span class="name">#{group.summary}</span>
 		    </h3>

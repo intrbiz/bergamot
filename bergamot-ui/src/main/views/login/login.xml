@@ -7,13 +7,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.3.0/style.css')}" />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/style.css')}" />
 	</head>
 	<body>
 		<div id="content">
 			<div class="container">			
 				<div id="login-box">
-                    <img src="#{public('/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+                    <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
 					<h4 class="centre">Please login to continue</h4>
 					<p rendered="#{error == 'invalid'}" class="error centre">
                     	The username or password you entered was incorrect, please try again.

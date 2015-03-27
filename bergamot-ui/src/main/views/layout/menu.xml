@@ -36,7 +36,7 @@
                     <a href="/agent/sign">Sign Agent Certificate</a>
                 </li>
                 <li rendered="#{Balsa().permission('ui.generate.agent')}">
-                    <a href="/agent/generate-config">Generate Agent Config</a>
+                    <a href="/agent/generate-config">Generate Agent Configuration</a>
                 </li>
             </ul>
         </div>

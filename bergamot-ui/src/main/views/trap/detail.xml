@@ -14,7 +14,7 @@
 		<div class="col4 dash_icon check" data-check-id="#{trap.id}">
 			<h3>
 				<span class="dash_img status_#{trap.state.status.toString().toLowerCase()}" title="The trap is #{trap.state.status.toString().toLowerCase()}">
-					<img src="/trap-icon.png" />
+					<img src="#{public('/images/icons/64/trap.png')}" />
 				</span>
 				<span class="name">#{trap.summary}</span>
 		    </h3>

@@ -14,7 +14,7 @@
 		<div class="col4 dash_icon check"  data-check-id="#{cluster.id}">
 		    <h3>
 				<span class="dash_img status_#{cluster.state.status.toString().toLowerCase()}" title="The cluster is #{cluster.state.status.toString().toLowerCase()}">
-					<img src="/host-icon.png" />
+					<img src="#{public('/images/icons/64/cluster.png')}" />
 				</span>
 				<span class="name">#{cluster.summary}</span>
 		    </h3>

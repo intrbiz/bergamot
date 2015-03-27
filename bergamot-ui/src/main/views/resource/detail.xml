@@ -14,7 +14,7 @@
 		<div class="col4 dash_icon check" data-check-id="#{resource.id}">
 			<h3>
 				<span class="dash_img status_#{resource.state.status.toString().toLowerCase()}" title="The resource is #{resource.state.status.toString().toLowerCase()}">
-					<img src="/resource-icon.png" />
+					<img src="#{public('/images/icons/64/resource.png')}" />
 				</span>
 				<span class="name">#{resource.summary}</span>
 		    </h3>

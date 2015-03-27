@@ -7,9 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.3.0/style.css')}" />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.3.0/plugins/reveal.css')}" />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.3.0/plugins/jquery.simple-dtpicker.css')}" />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/style.css')}" />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/plugins/reveal.css')}" />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/plugins/jquery.simple-dtpicker.css')}" />
 		<!-- Scripts -->
 		<script src="#{public('/js/v1.2.0/bower_components/requirejs/require.js')}"></script>
     	<script src="#{public('/js/v1.2.0/bower_components/jquery/dist/jquery.js')}"></script>
@@ -53,7 +53,7 @@
 			<div class="container">
 				<div id="logo">
 					<a href="/">
-                        <img src="#{public('/bergamot_7_h50.png')}" alt="Bergamot Monitoring"/>
+                        <img src="#{public('/images/logo/bergamot_7_h50.png')}" alt="Bergamot Monitoring"/>
 					</a>
 				</div>
                 <a id="show-menu" href="#menu" title="Show Menu">Menu</a>
