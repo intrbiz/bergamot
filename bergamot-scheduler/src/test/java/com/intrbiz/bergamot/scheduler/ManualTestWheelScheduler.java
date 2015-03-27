@@ -21,13 +21,37 @@ public class ManualTestWheelScheduler extends WheelScheduler
         //
         ManualTestWheelScheduler sch = new ManualTestWheelScheduler();
         //
-        sch.scheduleJob(UUID.randomUUID(), UUID.randomUUID(), 1, 60_000L, 0L, new TimePeriod(), new Runnable() {
+        UUID j1 = UUID.randomUUID();
+        sch.scheduleJob(j1, UUID.randomUUID(), 1, 10_000L, sch.initialDelay.nextInt(10_000), new TimePeriod(), new Runnable() {
+            public void run()
+            {
+                System.out.println("Run: " + System.currentTimeMillis());
+            }
+        });
+        UUID j2 = UUID.randomUUID();
+        sch.scheduleJob(j2, UUID.randomUUID(), 1, 60_000L, sch.initialDelay.nextInt(60_000), new TimePeriod(), new Runnable() {
+            public void run()
+            {
+                System.out.println("Run: " + System.currentTimeMillis());
+            }
+        });
+        UUID j3 = UUID.randomUUID();
+        sch.scheduleJob(j3, UUID.randomUUID(), 1, 300_000L, sch.initialDelay.nextInt(300_000), new TimePeriod(), new Runnable() {
             public void run()
             {
                 System.out.println("Run: " + System.currentTimeMillis());
             }
         });
         //
-        sch.start();
+        sch.rescheduleJob(j3, 5_000L, null, null);
+        sch.rescheduleJob(j3, 300_000L, null, null);
+        //
+        sch.rescheduleJob(j1, 1_000L, null, null);
+        sch.rescheduleJob(j1, 30_000L, null, null);
+        //
+        sch.rescheduleJob(j2, 193_000L, null, null);
+        sch.rescheduleJob(j2, 3_000L, null, null);
+        //
+        //sch.start();
     }
 }

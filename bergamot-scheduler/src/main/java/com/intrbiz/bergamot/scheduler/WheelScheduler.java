@@ -38,9 +38,6 @@ import com.intrbiz.util.IBThreadFactory;
  * be more accurate than the tickPeriod. Currently this implementation 
  * can never be more accurate than the rotation period.
  * 
- * TODO list: 
- * 1. Support intervals < rotationPeriod
- * 
  * @author Chris Ellis
  * 
  */
@@ -49,42 +46,42 @@ public class WheelScheduler extends AbstractScheduler
     private Logger logger = Logger.getLogger(WheelScheduler.class);
 
     // ticker
-    private volatile boolean run = true;
+    protected volatile boolean run = true;
 
-    private final Object tickerWaitLock = new Object();
+    protected final Object tickerWaitLock = new Object();
 
-    private Thread ticker;
+    protected Thread ticker;
 
     // state
 
-    private volatile boolean schedulerEnabled = true;
+    protected volatile boolean schedulerEnabled = true;
 
     // wheel
 
-    private ConcurrentMap<UUID, Job> jobs;
+    protected ConcurrentMap<UUID, Job> jobs;
 
-    private Segment[] orange;
+    protected Segment[] orange;
 
-    private long tickPeriod;
+    protected long tickPeriod;
 
-    private long orangePeriod;
+    protected long orangePeriod;
 
-    private volatile int tick = -1;
+    protected volatile int tick = -1;
 
-    private volatile long tickTime = System.currentTimeMillis();
+    protected volatile long tickTime = System.currentTimeMillis();
 
-    private volatile Calendar tickCalendar = Calendar.getInstance();
+    protected volatile Calendar tickCalendar = Calendar.getInstance();
 
     // initial delay allocation
 
-    private SecureRandom initialDelay = new SecureRandom();
+    protected SecureRandom initialDelay = new SecureRandom();
     
     // watch dog
-    private Timer watchDog = new Timer();
+    protected Timer watchDog = new Timer();
     
     // task executor
     
-    private ExecutorService taskExecutor;
+    protected ExecutorService taskExecutor;
 
     public WheelScheduler()
     {
@@ -105,7 +102,7 @@ public class WheelScheduler extends AbstractScheduler
         this.orangePeriod = this.orange.length * this.tickPeriod;
         for (int i = 0; i < orange.length; i++)
         {
-            this.orange[i] = new Segment();
+            this.orange[i] = new Segment(i);
         }
         this.jobs = new ConcurrentHashMap<UUID, Job>();
         logger.debug("Initalised wheel with " + this.orange.length + " segments, rotation period: " + this.orangePeriod);
@@ -184,23 +181,62 @@ public class WheelScheduler extends AbstractScheduler
         });
     }
 
+    protected long validateInterval(long interval)
+    {
+        if (interval < this.tickPeriod)
+        {
+            logger.warn("Currently jobs cannot be scheduled more frequently than every " + this.tickPeriod + " ms, rounding up.");
+            interval = this.tickPeriod;
+        }
+        return interval;
+    }
+    
+    protected boolean isMultiSegment(long interval)
+    {
+        return interval < this.orangePeriod;
+    }
+    
+    protected void addJobToSegments(Job job, long interval, long initialDelay)
+    {
+        // pick the initial segment
+        int segmentStart = ((int) ((initialDelay / this.tickPeriod) % this.orange.length));
+        if (logger.isTraceEnabled())logger.trace("Scheduling job " + job.id + " with initial segment " + segmentStart);
+        // how many segments should this check be placed into
+        int segmentCount = (int) Math.min(isMultiSegment(interval) ? (this.orangePeriod / interval) : 1, this.orange.length);
+        if (logger.isTraceEnabled())logger.trace("Scheduling job " + job.id + " into " + segmentCount + " segments");
+        for (int i = 0; i < segmentCount; i++)
+        {
+            int segmentIdx = (segmentStart + (i * (this.orange.length / segmentCount))) % this.orange.length;
+            if (logger.isTraceEnabled()) logger.trace("Adding job " + job.id + " to segment: " + segmentIdx + " with interval " + interval + "ms");
+            this.orange[segmentIdx].jobs.put(job.id, job);
+        }
+    }
+    
+    protected void removeJobFromSegments(UUID id)
+    {
+        for (Segment segment : this.orange)
+        {
+            Job removed = segment.jobs.remove(id);
+            if (logger.isTraceEnabled() && removed != null) logger.trace("Removed job " + id + " from segment " + segment.id);
+        }
+    }
+
     protected void scheduleJob(UUID id, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
     {
         if (!this.jobs.containsKey(id))
         {
+            // validate the interval
             interval = this.validateInterval(interval);
+            logger.info("Scheduling job " + id + " with interval " + interval + "ms and initial delay " + initialDelay + " ms");
             // the job
             Job job = new Job(id, site, pool, interval, initialDelay, timeRange, command);
             this.jobs.put(job.id, job);
-            // pick the segment based on the initial delay
-            int segmentIdx = ((int) ((initialDelay / this.tickPeriod) % this.orange.length));
-            logger.info("Adding job " + job.id + " to segment: " + segmentIdx + " with interval " + interval + "ms and initial delay " + initialDelay + "ms");
-            Segment segment = this.orange[segmentIdx];
-            segment.jobs.put(job.id, job);
+            // place the job into segments
+            this.addJobToSegments(job, interval, initialDelay);
         }
         else
         {
-            logger.warn("Job " + id + " is already scheduled, not adding it again.");
+            this.rescheduleJob(id, interval, timeRange, command);
         }
     }
 
@@ -211,12 +247,17 @@ public class WheelScheduler extends AbstractScheduler
         if (job != null)
         {
             job.interval = newInterval;
-            job.timeRange = timeRange;
-            job.command = command;
+            if (timeRange != null) job.timeRange = timeRange;
+            if (command != null)   job.command = command;
             // compute the new expiry
             job.expires = job.lastExpires + newInterval;
             job.enabled = true;
             logger.info("Rescheduled job " + job.id + ", new expiry: " + job.expires);
+            // move the job between segments
+            // remove the job from all segments
+            this.removeJobFromSegments(id);
+            // add the job to segments
+            this.addJobToSegments(job, newInterval, job.initialDelay);
         }
     }
     
@@ -225,10 +266,8 @@ public class WheelScheduler extends AbstractScheduler
         logger.info("Removing job " + id + " from scheduling");
         // ensure the given job is removed
         this.jobs.remove(id);
-        for (Segment segment : this.orange)
-        {
-            segment.jobs.remove(id);
-        }
+        // remove the job from all segments
+        this.removeJobFromSegments(id);
     }
     
     @Override
@@ -265,16 +304,6 @@ public class WheelScheduler extends AbstractScheduler
         {
             job.enabled = false;
         }
-    }
-
-    protected long validateInterval(long interval)
-    {
-        if (interval < this.orangePeriod)
-        {
-            logger.warn("Currently jobs cannot be scheduled more frequently than every " + this.orangePeriod + " ms, rounding up.");
-            interval = orangePeriod;
-        }
-        return interval;
     }
 
     protected void pauseScheduler()
@@ -404,11 +433,14 @@ public class WheelScheduler extends AbstractScheduler
      */
     private class Segment
     {
+        public final int id;
+        
         public final ConcurrentMap<UUID, Job> jobs = new ConcurrentHashMap<UUID, Job>();
 
-        public Segment()
+        public Segment(int id)
         {
             super();
+            this.id = id;
         }
     }
 
@@ -436,6 +468,8 @@ public class WheelScheduler extends AbstractScheduler
         public volatile long expires;
 
         public volatile long lastExpires;
+        
+        public long initialDelay;
 
         public Job(UUID id, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
         {
@@ -446,6 +480,7 @@ public class WheelScheduler extends AbstractScheduler
             this.interval = interval;
             this.timeRange = timeRange;
             this.command = command;
+            this.initialDelay  = initialDelay;
             // compute the expiry time
             this.lastExpires = this.expires = System.currentTimeMillis() + initialDelay;
         }
