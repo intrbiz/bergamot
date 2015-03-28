@@ -43,6 +43,26 @@ public final class TimeInterval
         return this.unit.toMillis(this.value);
     }
     
+    public static TimeInterval milliseconds(long value)
+    {
+        return new TimeInterval(value, TimeUnit.MILLISECONDS);
+    }
+    
+    public static TimeInterval seconds(long value)
+    {
+        return new TimeInterval(value, TimeUnit.SECONDS);
+    }
+    
+    public static TimeInterval minutes(long value)
+    {
+        return new TimeInterval(value, TimeUnit.MINUTES);
+    }
+    
+    public static TimeInterval hours(long value)
+    {
+        return new TimeInterval(value, TimeUnit.HOURS);
+    }
+    
     public static TimeInterval fromString(String time)
     {
         if (time.endsWith("ms") || time.endsWith("MS"))
