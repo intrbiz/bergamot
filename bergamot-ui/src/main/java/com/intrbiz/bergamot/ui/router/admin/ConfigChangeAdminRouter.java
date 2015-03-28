@@ -1,12 +1,15 @@
 package com.intrbiz.bergamot.ui.router.admin;
 
 import static com.intrbiz.Util.*;
+import static com.intrbiz.balsa.BalsaContext.*;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
+
+import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.Util;
@@ -44,6 +47,8 @@ import com.intrbiz.metadata.Template;
 @RequirePermission("ui.admin")
 public class ConfigChangeAdminRouter extends Router<BergamotApp>
 {
+    private Logger logger = Logger.getLogger(ConfigChangeAdminRouter.class);
+    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db, @SessionVar("site") Site site)
@@ -200,8 +205,10 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         sessionVar("current_change", null);
         // get the change
         ConfigChange change = var("change", db.getConfigChange(id));
-        //
-        String taskId = deferredActionWithId(id.toString(), "apply-config-change", site.getId(), id);
+        // compute the reset url we need for registrations
+        final String resetUrl = Balsa().url(Balsa().path("/reset"));
+        // apply the change
+        String taskId = deferredActionWithId(id.toString(), "apply-config-change", site.getId(), id, resetUrl);
         //
         var("change", change);
         var("taskid", taskId);
@@ -236,10 +243,11 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
                 }
                 catch (Exception e)
                 {
+                    logger.error("Error polling config change state", e);
                     json.writeFieldName("stat");
                     json.writeString("error");
                     json.writeFieldName("message");
-                    json.writeString(e.getMessage());        
+                    json.writeString(e.getMessage());      
                 }
             }
             else

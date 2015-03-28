@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
+import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.ExpressEntityResolver;
@@ -154,6 +155,10 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
                         if (notification instanceof PasswordResetNotification)
                         {
                             return ((PasswordResetNotification) notification).getContact();
+                        }
+                        else if (notification instanceof RegisterContactNotification)
+                        {
+                            return ((RegisterContactNotification) notification).getContact();
                         }
                         return null;
                     }

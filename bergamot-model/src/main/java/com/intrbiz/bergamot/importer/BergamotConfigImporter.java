@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -60,6 +61,8 @@ import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
+import com.intrbiz.bergamot.model.message.notification.Notification;
+import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
@@ -68,7 +71,9 @@ import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
+import com.intrbiz.bergamot.queue.NotificationQueue;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
+import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParser;
 import com.intrbiz.configuration.CfgParameter;
@@ -96,6 +101,10 @@ public class BergamotConfigImporter
     
     private List<DelayedSchedulerAction> delayedSchedulerActions = new LinkedList<DelayedSchedulerAction>();
     
+    private List<Contact> delayedContactRegistrations = new LinkedList<Contact>();
+    
+    private Function<Contact, String> registrationURLSupplier;
+    
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
         if (! validated.getReport().isValid()) throw new RuntimeException("Cannot import invalid configuration");
@@ -117,6 +126,12 @@ public class BergamotConfigImporter
     public BergamotConfigImporter online(boolean online)
     {
         this.online = online;
+        return this;
+    }
+    
+    public BergamotConfigImporter registrationURLSupplier(Function<Contact, String> registrationURLSupplier)
+    {
+        this.registrationURLSupplier = registrationURLSupplier;
         return this;
     }
     
@@ -157,18 +172,44 @@ public class BergamotConfigImporter
                     // note: when clearing the cahce, that should propagate to all nodes
                     this.report.info("Clearing all caches");
                     db.cacheClear();
-                }
-                // we must publish any scheduling changes after we have committed the transaction
-                // publish all scheduling changes
-                if (this.online)
-                {
-                    try (SchedulerQueue queue = SchedulerQueue.open())
+                    // delayed actions
+                    if (this.online)
                     {
-                        try (RoutedProducer<SchedulerAction, SchedulerKey> producer = queue.publishSchedulerActions())
+                        // we must publish any scheduling changes after we have committed the transaction
+                        // publish all scheduling changes
+                        try (SchedulerQueue queue = SchedulerQueue.open())
                         {
-                            for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
+                            try (RoutedProducer<SchedulerAction, SchedulerKey> producer = queue.publishSchedulerActions())
                             {
-                                producer.publish(delayedAction.key, delayedAction.action);
+                                for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
+                                {
+                                    producer.publish(delayedAction.key, delayedAction.action);
+                                }
+                            }
+                        }
+                        // we must publish and contact registration notifications
+                        try (NotificationQueue notificationQueue = NotificationQueue.open())
+                        {
+                            try (RoutedProducer<Notification, NotificationKey> notificationsProducer = notificationQueue.publishNotifications())
+                            {
+                                for (Contact contact : this.delayedContactRegistrations)
+                                {
+                                    try
+                                    {
+                                        // get the registration url
+                                        String url = this.registrationURLSupplier.apply(contact);
+                                        // send a notification, only via email
+                                        notificationsProducer.publish(
+                                                new NotificationKey(contact.getSite().getId()),
+                                                new RegisterContactNotification(contact.getSite().toMO(), contact.toMO().addEngine("email"), url) 
+                                        );
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Logger.getLogger(BergamotConfigImporter.class).error("Failed to send registration notification", e);
+                                        throw e;
+                                    }
+                                }
                             }
                         }
                     }
@@ -788,11 +829,29 @@ public class BergamotConfigImporter
         {
             configuration.setId(this.site.randomObjectId());
             contact = new Contact();
-            // set a default password
-            // TODO 
-            contact.hashPassword("bergamot");
-            contact.setForcePasswordChange(true);
-            this.report.info("Configuring new contact: " + configuration.resolve().getName());
+            // handle the password
+            if (this.online)
+            {
+                /*
+                 * We are in online mode, ie: running from within the UI, 
+                 * as such send a registration notification email.
+                 */
+                contact.resetPassword();
+                this.registerContact(contact);
+                this.report.info("Sending registration notification to " + resolvedConfiguration.getName() + " (" + resolvedConfiguration.getEmail() + ")");
+            }
+            else
+            {
+                /*
+                 * We are in offline mode, ie: running an import from the CLI, 
+                 * so simply set a default password of 'bergamot' for any users,
+                 * created.
+                 */
+                contact.hashPassword("bergamot");
+                contact.setForcePasswordChange(true);
+                this.report.info("Setting default password for user " + resolvedConfiguration.getName() + " (" + resolvedConfiguration.getEmail() + ") to 'bergamot', please login and change it!");
+            }
+            this.report.info("Configuring new contact: " + resolvedConfiguration.getName() + " (" + resolvedConfiguration.getEmail() + ")");
         }
         else
         {
@@ -1343,6 +1402,14 @@ public class BergamotConfigImporter
         this.loadVirtualCheck(resource, resolvedConfiguration, db);
         // add
         db.setResource(resource);
+    }
+    
+    /**
+     * Queue the given contact to have a registration email sent
+     */
+    private void registerContact(Contact contact)
+    {
+        this.delayedContactRegistrations.add(contact);
     }
     
     private void scheduleCheck(ActiveCheck<?,?> check)

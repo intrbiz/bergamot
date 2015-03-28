@@ -349,6 +349,15 @@ public class EmailEngine extends AbstractNotificationEngine
         templates.put("password_reset.subject", "Password reset for #{contact.name} at #{coalesce(site.summary, site.name)}");
         templates.put("password_reset.content", "Hello #{coalesce(contact.summary, contact.name)}\r\n"
                 + "\r\n"
+                + "To reset your password on #{coalesce(site.summary, site.name)}, please follow the link below:\r\n"
+                + "\r\n"
+                + "#{notification.url}\r\n"
+                + "\r\n"
+                + "Thank you, Bergamot");
+        // register_contact
+        templates.put("register_contact.subject", "Welcome #{contact.name} to Bergamot Monitoring");
+        templates.put("register_contact.content", "Hello #{coalesce(contact.summary, contact.name)}\r\n"
+                + "\r\n"
                 + "Welcome to Bergamot Monitoring.  To activate your account on #{coalesce(site.summary, site.name)}, please follow the link below:\r\n"
                 + "\r\n"
                 + "#{notification.url}\r\n"

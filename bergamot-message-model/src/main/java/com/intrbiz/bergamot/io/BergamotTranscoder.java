@@ -68,6 +68,7 @@ import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
+import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
@@ -141,6 +142,7 @@ public class BergamotTranscoder
         SendAlert.class,
         SendRecovery.class,
         PasswordResetNotification.class,
+        RegisterContactNotification.class,
         // updates
         Update.class,
         // scheduler
