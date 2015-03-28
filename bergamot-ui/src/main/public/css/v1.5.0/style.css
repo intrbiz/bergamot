@@ -679,7 +679,7 @@ form p.field textarea {
 /* Common action styling */
 
 a.add {
-    background: transparent url('../../images/admin/add_filled.png') top left no-repeat;
+    background: transparent url('../../images/admin/add_outline.png') top left no-repeat;
     height: 24px;
     text-indent: 27px;
     line-height: 24px;
@@ -690,7 +690,7 @@ a.add {
 }
 
 a.remove {
-    background: transparent url('../../images/admin/remove_filled.png') top left no-repeat;
+    background: transparent url('../../images/admin/remove_outline.png') top left no-repeat;
     height: 24px;
     text-indent: 27px;
     line-height: 24px;
@@ -698,6 +698,14 @@ a.remove {
     display: block;
     float: left;
     margin: 10px;
+}
+
+a.add:hover {
+    background: transparent url('../../images/admin/add_filled.png') top left no-repeat;
+}
+
+a.remove:hover {
+    background: transparent url('../../images/admin/remove_filled.png') top left no-repeat;
 }
 
 /* Resizing */
