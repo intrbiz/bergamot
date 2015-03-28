@@ -77,7 +77,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         this.description = Util.coalesceEmpty(resolvedConfiguration.getDescription(), "");
         // copy the parameters
         this.parameters.clear();
-        for (CfgParameter param : configuration.getParameters())
+        for (CfgParameter param : resolvedConfiguration.getParameters())
         {
             this.parameters.add(new Parameter(param.getName(), param.getValueOrText()));
         }
