@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.command.NagiosCommandString;
@@ -32,6 +33,7 @@ import com.intrbiz.bergamot.config.model.StateCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.timerange.TimeRangeParser;
+import com.intrbiz.bergamot.util.TimeInterval;
 import com.intrbiz.configuration.CfgParameter;
 
 public class NagiosConfigConverter
@@ -390,8 +392,8 @@ public class NagiosConfigConverter
             if (cfg.getCheckInterval() != null || cfg.getRetryInterval() != null)
             {
                 service.setSchedule(new ScheduleCfg());
-                service.getSchedule().setEvery(cfg.getCheckInterval());
-                service.getSchedule().setRetryEvery(cfg.getRetryInterval());
+                service.getSchedule().setEvery(new TimeInterval(cfg.getCheckInterval(), TimeUnit.MINUTES).toString());
+                service.getSchedule().setRetryEvery(new TimeInterval(cfg.getRetryInterval(), TimeUnit.MINUTES).toString());
                 if (cfg.getCheckPeriod() != null)
                 {
                     service.getSchedule().setTimePeriod(cfg.getCheckPeriod());
@@ -477,8 +479,8 @@ public class NagiosConfigConverter
             if (cfg.getCheckInterval() != null || cfg.getRetryInterval() != null)
             {
                 host.setSchedule(new ScheduleCfg());
-                host.getSchedule().setEvery(cfg.getCheckInterval());
-                host.getSchedule().setRetryEvery(cfg.getRetryInterval());
+                host.getSchedule().setEvery(new TimeInterval(cfg.getCheckInterval(), TimeUnit.MINUTES).toString());
+                host.getSchedule().setRetryEvery(new TimeInterval(cfg.getRetryInterval(), TimeUnit.MINUTES).toString());
                 if (cfg.getCheckPeriod() != null)
                 {
                     host.getSchedule().setTimePeriod(cfg.getCheckPeriod());

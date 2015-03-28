@@ -6,9 +6,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
+import com.intrbiz.bergamot.util.TimeInterval;
 
 @XmlType(name = "schedule")
 @XmlRootElement(name = "schedule")
@@ -16,11 +18,11 @@ public class ScheduleCfg implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    private Long every;
+    private String every;
 
-    private Long retryEvery;
+    private String retryEvery;
     
-    private Long changingEvery;
+    private String changingEvery;
     
     private String timePeriod;
 
@@ -35,14 +37,24 @@ public class ScheduleCfg implements Serializable
      */
     @XmlAttribute(name = "every")
     @ResolveWith(Coalesce.class)
-    public Long getEvery()
+    public String getEvery()
     {
         return every;
     }
 
-    public void setEvery(Long every)
+    public void setEvery(String every)
     {
         this.every = every;
+    }
+    
+    public TimeInterval getEveryTimeInterval()
+    {
+        return this.every == null ? null : TimeInterval.fromString(this.every);
+    }
+    
+    public TimeInterval getEveryTimeInterval(TimeInterval defaultValue)
+    {
+        return Util.coalesce(this.getEveryTimeInterval(), defaultValue);
     }
 
     /**
@@ -50,14 +62,24 @@ public class ScheduleCfg implements Serializable
      */
     @XmlAttribute(name = "retry-every")
     @ResolveWith(Coalesce.class)
-    public Long getRetryEvery()
+    public String getRetryEvery()
     {
         return retryEvery;
     }
 
-    public void setRetryEvery(Long retryEvery)
+    public void setRetryEvery(String retryEvery)
     {
         this.retryEvery = retryEvery;
+    }
+    
+    public TimeInterval getRetryEveryTimeInterval()
+    {
+        return this.retryEvery == null ? null : TimeInterval.fromString(this.retryEvery);
+    }
+    
+    public TimeInterval getRetryEveryTimeInterval(TimeInterval defaultValue)
+    {
+        return Util.coalesce(this.getRetryEveryTimeInterval(), defaultValue);
     }
 
     /**
@@ -66,14 +88,24 @@ public class ScheduleCfg implements Serializable
      */
     @XmlAttribute(name = "changing-every")
     @ResolveWith(Coalesce.class)
-    public Long getChangingEvery()
+    public String getChangingEvery()
     {
         return changingEvery;
     }
 
-    public void setChangingEvery(Long changingEvery)
+    public void setChangingEvery(String changingEvery)
     {
         this.changingEvery = changingEvery;
+    }
+    
+    public TimeInterval getChangingEveryTimeInterval()
+    {
+        return this.changingEvery == null ? null : TimeInterval.fromString(this.changingEvery);
+    }
+    
+    public TimeInterval getChangingEveryTimeInterval(TimeInterval defaultValue)
+    {
+        return Util.coalesce(this.getChangingEveryTimeInterval(), defaultValue);
     }
 
     @XmlAttribute(name="time-period")

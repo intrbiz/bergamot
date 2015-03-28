@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
+import com.intrbiz.bergamot.util.TimeInterval;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
@@ -239,9 +240,9 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         // scheduling
         if (resolvedConfiguration.getSchedule() != null)
         {
-            this.checkInterval    = TimeUnit.MINUTES.toMillis(resolvedConfiguration.getSchedule().getEvery());
-            this.retryInterval    = TimeUnit.MINUTES.toMillis(resolvedConfiguration.getSchedule().getRetryEvery());
-            this.changingInterval = TimeUnit.MINUTES.toMillis(Util.coalesce(resolvedConfiguration.getSchedule().getChangingEvery(), resolvedConfiguration.getSchedule().getRetryEvery()));
+            this.checkInterval    = resolvedConfiguration.getSchedule().getEveryTimeInterval(TimeInterval.minutes(5)).toMillis();
+            this.retryInterval    = resolvedConfiguration.getSchedule().getRetryEveryTimeInterval(TimeInterval.minutes(1)).toMillis();
+            this.changingInterval = resolvedConfiguration.getSchedule().getChangingEveryTimeInterval(resolvedConfiguration.getSchedule().getRetryEveryTimeInterval(TimeInterval.minutes(1))).toMillis();
         }
     }
 }

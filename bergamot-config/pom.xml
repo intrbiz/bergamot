@@ -31,5 +31,9 @@
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.bergamot</groupId>
+    	<artifactId>bergamot-util</artifactId>
+    </dependency>
   </dependencies>
 </project>
