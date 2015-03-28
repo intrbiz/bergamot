@@ -76,7 +76,7 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
                     }
                     else
                     {
-                        result.ok("Uptime: " + formatUptime(stat.getUptime()));
+                        result.ok("Up " + formatUptime(stat.getUptime()));
                     }
                     // submit
                     result.runtime(runtime);
@@ -100,9 +100,9 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
         long uptime  = (long) uptimeDouble;
         long seconds = uptime % 60L;
         long minutes = (uptime / 60L) % 60L;
-        long hours   = (uptime / 3600L) % 60L;
+        long hours   = (uptime / 3600L) % 24L;
         long days    = uptime / 86400L;
         //
-        return days + ", " + hours + ":" + minutes + ":" + seconds + " (" + DFMT.format(uptimeDouble) + ")"; 
+        return days + " day" + (days > 1 ? "s" : "") + ", " + hours + ":" + minutes + ":" + seconds + " (" + DFMT.format(uptimeDouble) + ")"; 
     }
 }
