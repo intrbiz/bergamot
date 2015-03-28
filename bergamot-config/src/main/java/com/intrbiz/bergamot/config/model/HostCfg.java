@@ -2,19 +2,15 @@ package com.intrbiz.bergamot.config.model;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
-import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
-import com.intrbiz.util.uuid.UUIDAdapter;
 
 @XmlType(name = "host")
 @XmlRootElement(name = "host")
@@ -29,8 +25,6 @@ public class HostCfg extends ActiveCheckCfg<HostCfg>
     private String location;
 
     private String address;
-
-    private UUID agentId;
 
     public HostCfg()
     {
@@ -99,36 +93,13 @@ public class HostCfg extends ActiveCheckCfg<HostCfg>
         this.address = address;
     }
 
-    @XmlAttribute(name = "agent-id")
-    @XmlJavaTypeAdapter(UUIDAdapter.class)
-    @ResolveWith(Coalesce.class)
-    public UUID getAgentId()
-    {
-        return agentId;
-    }
-
-    public void setAgentId(UUID agentId)
-    {
-        this.agentId = agentId;
-    }
-
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
     {
         List<TemplatedObjectCfg<?>> r = super.getTemplatedChildObjects();
-        if (this.services != null)
-        {
-            for (ServiceCfg service : this.services)
-            {
-                r.add(service);
-            }
-        }
-        if (this.traps != null)
-        {
-            for (TrapCfg trap : this.traps)
-            {
-                r.add(trap);
-            }
-        }
+        if (this.services != null) 
+            r.addAll(this.services);
+        if (this.traps != null) 
+            r.addAll(this.traps);
         return r;
     }
 }
