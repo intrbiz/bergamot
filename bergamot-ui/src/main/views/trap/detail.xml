@@ -24,7 +24,7 @@
 		    </p>
 		    <p class="field-host">
 			    <span class="label wide">Host: </span>
-			    <a href="/host/name/#{trap.host.name}">
+			    <a href="/host/id/#{trap.hostId}">
 				    <span class="value">#{trap.host.summary}</span>
 				</a>
 		    </p>

@@ -25,7 +25,7 @@
 		    </p>
 		    <p class="field-host">
 			    <span class="label wide">Host: </span>
-			    <a href="/host/name/#{service.host.name}">
+			    <a href="/host/id/#{service.hostId}">
 				    <span class="value">#{service.host.summary}</span>
 				</a>
 		    </p>

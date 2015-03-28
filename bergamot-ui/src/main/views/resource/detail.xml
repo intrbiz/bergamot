@@ -24,7 +24,7 @@
 		    </p>
 		    <p class="field-cluster">
 			    <span class="label wide">Cluster: </span>
-			    <a href="/cluster/name/#{resource.cluster.name}">
+			    <a href="/cluster/id/#{resource.clusterId}">
 				    <span class="value">#{resource.cluster.summary}</span>
 				</a>
 		    </p>
