@@ -1,0 +1,18 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- A template applied to single pages, eg: login, change password, etc -->
+<html xmlns="com.intrbiz.balsa">
+	<head>
+		<title>Bergamot Monitoring - #{title()}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans:400,700|Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.5.0/style.css')}" />
+	</head>
+	<body>
+		<div id="content">
+			<div class="container">
+				<content/>
+			</div>
+		</div>
+	</body>
+</html>

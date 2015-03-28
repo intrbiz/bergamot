@@ -1,15 +1,14 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
-<!-- A template view, applied to all views -->
+<!-- A template applied to the main interfaces, ie: after login -->
 <html xmlns="com.intrbiz.balsa">
 	<head>
 		<title>Bergamot Monitoring - #{title()}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
-		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/style.css')}" />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/plugins/reveal.css')}" />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/plugins/jquery.simple-dtpicker.css')}" />
+		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans:400,700|Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.5.0/style.css')}" />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.5.0/plugins/reveal.css')}" />
+		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.5.0/plugins/jquery.simple-dtpicker.css')}" />
 		<!-- Scripts -->
 		<script src="#{public('/js/v1.2.0/bower_components/requirejs/require.js')}"></script>
     	<script src="#{public('/js/v1.2.0/bower_components/jquery/dist/jquery.js')}"></script>
@@ -72,8 +71,8 @@
 			<![CDATA[
 			/* setup common javascript components */
 			require(["bergamot/lib/util/console-log", "bergamot/lib/ui/web-notify", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_web_notify, bergamot_api_driver)
-			{			
-				bergamot_console_log.attachTo(document);
+			{
+				/* bergamot_console_log.attachTo(document); */
 			
 			    bergamot_ui_web_notify.attachTo(document, {
 			    	site_id: #{'"' + site.id + '"'}

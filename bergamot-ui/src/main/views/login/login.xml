@@ -1,45 +1,31 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
-<!-- A template view, applied to all views -->
-<html xmlns="com.intrbiz.balsa">
-	<head>
-		<title>Bergamot Monitoring - Login</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
-		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/style.css')}" />
-	</head>
-	<body>
-		<div id="content">
-			<div class="container">			
-				<div id="login-box">
-                    <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
-					<h4 class="centre">Please login to continue</h4>
-					<p rendered="#{error == 'invalid'}" class="error centre">
-                    	The username or password you entered was incorrect, please try again.
-                    </p>
-					<form method="post" action="#{path('/login')}">
-						<p>
-							<input type="text" id="username" name="username" placeholder="Enter your username" value="#{coalesce(username, '')}" title="Enter your username or email address"/>
-						</p>
-						<p>
-							<input type="password" id="password" name="password" placeholder="Enter your password"/>
-						</p>
-                        <p>
-                            <input type="checkbox" id="remember_me" name="remember_me" value="yes"/>
-                            <label for="remember_me">Remember me on this computer</label>
-                        </p>
-						<p>
-							<access-token-for-url path="#{path('/login')}"/>
-							<input type="hidden" id="redirect" name="redirect" value="#{coalesce(redirect,'')}" />
-							<input type="submit" id="login"    name="login"    value="Login"/>
-						</p>
-					</form>
-					<p rendered="#{error == 'invalid'}" class="error">
-                    	<a href="/reset-password?username=#{urlencode(coalesce(username, ''))}" class="error">Forgotten your password?</a>
-                    </p>
-				</div>
-			</div>
-		</div>
-	</body>
-</html>
+<fragment xmlns="com.intrbiz.balsa" title="Login">
+	<div id="login-box">
+                 <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Please login to continue</h4>
+		<p rendered="#{error == 'invalid'}" class="error centre">
+                 	The username or password you entered was incorrect, please try again.
+                 </p>
+		<form method="post" action="#{path('/login')}">
+			<p>
+				<input type="text" id="username" name="username" placeholder="Enter your username" value="#{coalesce(username, '')}" title="Enter your username or email address"/>
+			</p>
+			<p>
+				<input type="password" id="password" name="password" placeholder="Enter your password"/>
+			</p>
+                     <p>
+                         <input type="checkbox" id="remember_me" name="remember_me" value="yes"/>
+                         <label for="remember_me">Remember me on this computer</label>
+                     </p>
+			<p>
+				<access-token-for-url path="#{path('/login')}"/>
+				<input type="hidden" id="redirect" name="redirect" value="#{coalesce(redirect,'')}" />
+				<input type="submit" id="login"    name="login"    value="Login"/>
+			</p>
+		</form>
+		<p rendered="#{error == 'invalid'}" class="error">
+        	<a href="/reset-password?username=#{urlencode(coalesce(username, ''))}" class="error">Forgotten your password?</a>
+        </p>
+	</div>
+</fragment>

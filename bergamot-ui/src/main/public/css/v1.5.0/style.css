@@ -498,9 +498,6 @@ input[type=submit].danger, input[type=submit].remove, input[type=button].remove 
 	color: #E85752;
 }
 
-/* Admin */
-/******************************************************************************/
-
 /* Common form styling */
 
 form p {
@@ -582,36 +579,6 @@ form p.field textarea {
     height: 40px;
 }
 
-#notify_teams .add,
-#teams .add,
-#inherits .add,
-#excludes .add, 
-#parent_groups .add {
-    background: transparent url('../../list-add.png') top left no-repeat;
-    height: 22px;
-    text-indent: 27px;
-    line-height: 22px;
-    overflow: hidden;
-    display: block;
-    float: right;
-    margin-top: 10px;
-}
-
-#notify_teams .remove,
-#teams .remove,
-#inherits .remove,
-#excludes .remove, 
-#parent_groups .remove {
-    background: transparent url('../../edit-delete.png') top left no-repeat;
-    width: 22px;
-    height: 22px;
-    text-indent: 10000px;
-    overflow: hidden;
-    display: block;
-    float: right;
-    margin-top: 10px;
-}
-
 #add_notify_team_row,
 #add_notification_engine_row,
 #add_timerange_row,
@@ -662,31 +629,6 @@ form p.field textarea {
     width: 657px;
 }
 
-#check_command_parameters .add,
-#notification_engines .add,
-#parameters .add {
-    background: transparent url('../../list-add.png') top left no-repeat;
-    height: 22px;
-    text-indent: 27px;
-    line-height: 22px;
-    overflow: hidden;
-    display: block;
-    margin: 10px;
-}
-
-#check_command_parameters .remove,
-#notification_engines .remove,
-#parameters .remove {
-    background: transparent url('../../edit-delete.png') top left no-repeat;
-    width: 22px;
-    height: 22px;
-    text-indent: 10000px;
-    overflow: hidden;
-    display: block;
-    float: right;
-    margin: 0 10px 10px 0;
-}
-
 #check_command_parameters li#add_check_command_parameter_row,
 #notification_engines li#add_parameter_row,
 #parameters li#add_parameter_row {
@@ -715,28 +657,6 @@ form p.field textarea {
     width: 400px;
 }
 
-#grants .add, #revokes .add {
-    background: transparent url('../../list-add.png') top left no-repeat;
-    height: 22px;
-    text-indent: 27px;
-    line-height: 22px;
-    overflow: hidden;
-    display: block;
-    float: left;
-    margin-top: 10px;
-}
-    
-#grants .remove, #revokes .remove {
-    background: transparent url('../../edit-delete.png') top left no-repeat;
-    width: 22px;
-    height: 22px;
-    text-indent: 10000px;
-    overflow: hidden;
-    display: block;
-    float: right;
-    margin-top: 10px;
-}
-
 /* Time Period Styling */
 
 #timeranges {
@@ -756,37 +676,13 @@ form p.field textarea {
     width: 400px;
 }
 
-#timeranges .add {
-    background: transparent url('../../list-add.png') top left no-repeat;
-    height: 22px;
-    text-indent: 27px;
-    line-height: 22px;
-    overflow: hidden;
-    display: block;
-    float: left;
-    margin-top: 10px;
-}
-    
-#timeranges .remove {
-    background: transparent url('../../edit-delete.png') top left no-repeat;
-    width: 22px;
-    height: 22px;
-    text-indent: 10000px;
-    overflow: hidden;
-    display: block;
-    float: right;
-    margin-top: 10px;
-}
-
-/******************************************************************************/
-
-/* */
+/* Common action styling */
 
 a.add {
-    background: transparent url('../../list-add.png') top left no-repeat;
-    height: 22px;
+    background: transparent url('../../images/admin/add_filled.png') top left no-repeat;
+    height: 24px;
     text-indent: 27px;
-    line-height: 22px;
+    line-height: 24px;
     overflow: hidden;
     display: block;
     float: left;
@@ -794,17 +690,15 @@ a.add {
 }
 
 a.remove {
-    background: transparent url('../../edit-delete.png') top left no-repeat;
-    height: 22px;
+    background: transparent url('../../images/admin/remove_filled.png') top left no-repeat;
+    height: 24px;
     text-indent: 27px;
-    line-height: 22px;
+    line-height: 24px;
     overflow: hidden;
     display: block;
     float: left;
     margin: 10px;
 }
-
-/* */
 
 /* Resizing */
 

@@ -2,7 +2,6 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Overview">
-
 		<!-- Alerts -->
 		<div class="row" rendered="#{! alerts.isEmpty()}">
 			<h2>Alerts</h2>

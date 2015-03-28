@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.ui.login;
+package com.intrbiz.bergamot.ui.router;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -33,8 +33,10 @@ import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.Template;
 
 @Prefix("/")
+@Template("layout/single")
 public class LoginRouter extends Router<BergamotApp>
 {   
     private Logger logger = Logger.getLogger(LoginRouter.class);
@@ -61,7 +63,7 @@ public class LoginRouter extends Router<BergamotApp>
                 {
                     var("redirect", redirect);
                     var("forced", true);
-                    encodeOnly("login/force_change_password");
+                    encode("login/force_change_password");
                 }
                 else
                 {
@@ -74,7 +76,7 @@ public class LoginRouter extends Router<BergamotApp>
         // show the login page
         var("redirect", redirect);
         var("username", cookie("bergamot.username"));
-        encodeOnly("login/login");
+        encode("login/login");
     }
 
     @Post("/login")
@@ -96,7 +98,7 @@ public class LoginRouter extends Router<BergamotApp>
         {
             var("redirect", redirect);
             var("forced", true);
-            encodeOnly("login/force_change_password");
+            encode("login/force_change_password");
         }
         else
         {
@@ -130,7 +132,7 @@ public class LoginRouter extends Router<BergamotApp>
     {
         var("redirect", redirect);
         var("forced", false);
-        encodeOnly("login/force_change_password");
+        encode("login/force_change_password");
     }
     
     @Post("/force-change-password")
@@ -165,7 +167,7 @@ public class LoginRouter extends Router<BergamotApp>
             var("redirect", redirect);
             var("forced", true);
             var("error", e.getMessage());
-            encodeOnly("login/force_change_password");
+            encode("login/force_change_password");
         }
     }
     
@@ -180,7 +182,7 @@ public class LoginRouter extends Router<BergamotApp>
         var("redirect", redirect);
         var("forced", true);
         var("error", "validation");
-        encodeOnly("login/force_change_password");
+        encode("login/force_change_password");
     }
 
     @Get("/logout")
@@ -231,7 +233,7 @@ public class LoginRouter extends Router<BergamotApp>
         sessionVar("site", contact.getSite());
         // force password change
         var("forced", true);
-        encodeOnly("login/force_change_password");
+        encode("login/force_change_password");
     }
     
     @Catch(BalsaSecurityException.class)
@@ -244,7 +246,7 @@ public class LoginRouter extends Router<BergamotApp>
         var("redirect", redirect);
         var("username", cookie("bergamot.username"));
         // encode login page
-        encodeOnly("login/login");
+        encode("login/login");
     }
     
     @Catch(BalsaSecurityException.class)
@@ -260,7 +262,7 @@ public class LoginRouter extends Router<BergamotApp>
     public void resetPassword(@Param("username") String username) throws IOException
     {
         var("username", Util.coalesceEmpty(username, cookie("bergamot.username"), null));
-        encodeOnly("login/reset_password");
+        encode("login/reset_password");
     }
     
     @Post("/reset-password")
@@ -289,6 +291,6 @@ public class LoginRouter extends Router<BergamotApp>
             var("error", "no-such-site");
             logger.info("Got password reset for a site I don't know: '" + request().getServerName() + "'");
         }
-        encodeOnly("login/reset_password_sent");
+        encode("login/reset_password_sent");
     }
 }
