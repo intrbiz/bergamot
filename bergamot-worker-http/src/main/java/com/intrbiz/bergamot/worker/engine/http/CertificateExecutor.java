@@ -100,13 +100,9 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
                     // check the expiry date, if it is close raise an error
                     long tillExpiry = (serverCert.getNotAfter().getTime() - System.currentTimeMillis()) / (1000 * 60 * 60 * 24); /* days */
                     // check how long till the certificate expires
-                    if (tillExpiry <= 7)
+                    if (tillExpiry <= executeCheck.getIntParameter("expires_in", 28))
                     {
-                        resultMO.critical("TLS certificate is valid but expires in " + tillExpiry + " days");
-                    }
-                    else if (tillExpiry <= 28)
-                    {
-                        resultMO.warning("TLS certificate is valid but expires in " + tillExpiry + " days");
+                        resultMO.action("TLS certificate is valid but expires in " + tillExpiry + " days!");
                     }
                     else
                     {
