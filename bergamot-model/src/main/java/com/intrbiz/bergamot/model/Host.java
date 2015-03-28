@@ -118,6 +118,14 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
             db.removeServiceFromHost(this, service);
         }
     }
+    
+    public Service getServiceByExternalRef(String externalref)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getServiceOnHostByExternalRef(this.getId(), externalRef);
+        }
+    }
 
     // traps
 
@@ -150,6 +158,14 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         try (BergamotDB db = BergamotDB.connect())
         {
             return db.getTrapOnHost(this.getId(), name);
+        }
+    }
+    
+    public Trap getTrapByExternalRef(String externalRef)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getTrapOnHostByExternalRef(this.getId(), externalRef);
         }
     }
 
