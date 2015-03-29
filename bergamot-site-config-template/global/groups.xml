@@ -11,6 +11,7 @@
     
     <group name="network-services" groups="services">
         <summary>Network Services</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
     <group name="vm-host-services" groups="linux-services">
@@ -19,6 +20,7 @@
     
     <group name="web-services" groups="services">
         <summary>Web Services</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
     </group>
     
     <group name="db-services" groups="services">
@@ -35,10 +37,12 @@
     
     <group name="routers" groups="network-devices">
         <summary>Routers</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
     <group name="switches" groups="network-devices">
         <summary>Switches</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
     <group name="linux-servers" groups="hosts">
@@ -51,6 +55,7 @@
     
     <group name="web-servers" groups="hosts">
         <summary>Web Servers</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
     </group>
     
     <group name="db-servers" groups="hosts">
@@ -59,6 +64,7 @@
     
     <group name="websites">
         <summary>Websites</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
     </group>
     
 </bergamot>
