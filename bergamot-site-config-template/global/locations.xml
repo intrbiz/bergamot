@@ -2,46 +2,61 @@
     
     <location name="aws">
         <summary>Amazon Web Services</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
 
     <location name="aws-eu-ireland" location="aws">
         <summary>Amazon Web Services - EU (Ireland)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
     <location name="aws-us-east-n-virginia" location="aws">
         <summary>Amazon Web Services - US East (N. Virginia)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
     <location name="aws-us-west-oregon" location="aws">
         <summary>Amazon Web Services - US West (Oregon)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
     <location name="aws-us-west-n-california" location="aws">
         <summary>Amazon Web Services - US West (N. California)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
     <location name="aws-asia-pacific-singapore" location="aws">
         <summary>Amazon Web Services - Asia Pacific (Singapore)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
     <location name="aws-asia-pacific-tokyo" location="aws">
         <summary>Amazon Web Services - Asia Pacific (Tokyo)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
     <location name="aws-asia-pacific-sydney" location="aws">
         <summary>Amazon Web Services - Asia Pacific (Sydney)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
     <location name="aws-south-america-sao-paulo" location="aws">
         <summary>Amazon Web Services - South America (Sao Paulo)</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
 
     <location name="main-data-centre">
         <summary>Main Data Centre</summary>
     </location>
+    
+    <location name="the-office">
+        <summary>The Office</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/office.png</parameter>
+    </location>
 
     <location name="remote">
         <summary>Remote</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/globe.png</parameter>
     </location>
 
 </bergamot>
