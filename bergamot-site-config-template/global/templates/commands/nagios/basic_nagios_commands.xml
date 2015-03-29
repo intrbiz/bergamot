@@ -3,14 +3,17 @@
     
     <command name="check-host-alive" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_ping -H #{host.address} -w 3000.0,80% -c 5000.0,100% -p 5</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
     <command name="check_local_disk" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_disk -w #{arg1} -c #{arg2} -p #{arg3}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
     </command>
     
     <command name="check_local_load" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_load -w #{arg1} -c #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
     </command>
     
     <command name="check_local_procs" extends="check-nagios">
@@ -19,6 +22,7 @@
     
     <command name="check_local_users" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_users -w #{arg1} -c #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/users.png</parameter>
     </command>
     
     <command name="check_local_swap" extends="check-nagios">
@@ -39,14 +43,17 @@
     
     <command name="check_snmp" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_snmp -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
     <command name="check_snmp_v2_public" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_snmp -P 2c -C public -H #{host.address} -o #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
     <command name="check_http" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_http -I #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
     </command>
     
     <command name="check_ssh" extends="check-nagios">
@@ -63,26 +70,32 @@
     
     <command name="check_ping" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_ping -H #{host.address} -w #{arg1} -c #{arg2} -p 5</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
     <command name="check_pop" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_pop -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
     </command>
     
     <command name="check_imap" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_imap -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
     </command>
     
     <command name="check_smtp" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_smtp -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
     </command>
     
     <command name="check_tcp" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_tcp -H #{host.address} -p #{arg1} #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
     <command name="check_udp" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_udp -H #{host.address} -p #{arg1} #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
     <command name="check_nt" extends="check-nagios">

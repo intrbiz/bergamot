@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command engine="agent" executor="network-connection" extends="check_agent" name="check_agent_network_connection">
+        <parameter description="Warning range" name="warning">1:1</parameter>
+        <parameter description="Critical range" name="critical">1:1</parameter>
+        <parameter description="Server sockets" name="server">yes</parameter>
+        <parameter description="Client sockets" name="client">no</parameter>
+        <parameter description="TCP sockets" name="tcp">yes</parameter>
+        <parameter description="UDP sockets" name="udp">yes</parameter>
+        <parameter description="Unix Domain sockets" name="unix">no</parameter>
+        <parameter description="Raw sockets" name="raw">no</parameter>
+        <parameter description="Local port number" name="local_port"></parameter>
+        <parameter description="Remote port number" name="remote_port"></parameter>
+        <parameter description="Local address" name="local_address"></parameter>
+        <parameter description="Remote address" name="remote_address"></parameter>
+        <summary>Bergamot Agent: Network Connections</summary>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command engine="agent" executor="port-listener" extends="check_agent" name="check_agent_port_listener">
+        <parameter description="Warning range" name="warning">1:1</parameter>
+        <parameter description="Critical range" name="critical">1:1</parameter>
+        <parameter description="TCP sockets" name="tcp">yes</parameter>
+        <parameter description="UDP sockets" name="udp">yes</parameter>
+        <parameter description="Unix Domain sockets" name="unix">yes</parameter>
+        <parameter description="Raw sockets" name="raw">yes</parameter>
+        <parameter description="Local port number" name="local_port"></parameter>
+        <parameter description="Local address" name="local_address"></parameter>
+        <summary>Bergamot Agent: Listening Port</summary>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
+    </command>
+    
+</bergamot>

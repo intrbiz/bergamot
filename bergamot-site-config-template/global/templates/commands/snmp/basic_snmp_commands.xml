@@ -3,18 +3,22 @@
     
     <command engine="snmp" name="check_snmp_description" extends="snmp_get_check">
         <parameter name="oid">1.3.6.1.2.1.1.1.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
     </command>
     
     <command engine="snmp" name="check_snmp_contact" extends="snmp_get_check">
         <parameter name="oid">1.3.6.1.2.1.1.4.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
     </command>
     
     <command engine="snmp" name="check_snmp_name" extends="snmp_get_check">
         <parameter name="oid">1.3.6.1.2.1.1.5.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
     </command>
     
     <command engine="snmp" name="check_snmp_location" extends="snmp_get_check">
         <parameter name="oid">1.3.6.1.2.1.1.6.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
     </command>
     
     <command engine="snmp" name="check_snmp_uptime" extends="snmp_check">
@@ -42,6 +46,7 @@
             });
             ]]>
         </parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
     </command>
     
 </bergamot>
