@@ -21,6 +21,10 @@
 					<span class="label wide">Retry interval</span>
 					<span class="value">#{check.retryInterval / 1000}s</span>
 				</p>
+				<p>
+					<span class="label wide">Changing interval</span>
+					<span class="value">#{check.changingInterval / 1000}s</span>
+				</p>
 			</div>
 			<div class="col4 dash_icon" rendered="#{check.type == 'host' or check.type == 'service' or check.type == 'trap'}">
 				<h3>State transitions</h3>
