@@ -36,6 +36,7 @@
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
         <parameter name="local_port">22</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
     <command extends="check_agent_port_listener" name="check_agent_listener_http">
@@ -43,6 +44,7 @@
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
         <parameter name="local_port">80</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
     <command extends="check_agent_port_listener" name="check_agent_listener_https">
@@ -50,6 +52,7 @@
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
         <parameter name="local_port">443</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
     <command extends="check_agent_port_listener" name="check_agent_listener_mysql">
@@ -57,6 +60,7 @@
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
         <parameter name="local_port">3306</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
     <command extends="check_agent_port_listener" name="check_agent_listener_postgresql">
@@ -64,6 +68,7 @@
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
         <parameter name="local_port">5432</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
     <command extends="check_agent_port_listener" name="check_agent_listener_rabbitmq">
@@ -71,6 +76,7 @@
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
         <parameter name="local_port">5672</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
 </bergamot>
