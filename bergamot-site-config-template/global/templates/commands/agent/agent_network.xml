@@ -31,4 +31,46 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
+    <command extends="check_agent_port_listener" name="check_agent_listener_ssh">
+        <summary>Bergamot Agent: Listening Port - SSH</summary>
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="local_port">22</parameter>
+    </command>
+    
+    <command extends="check_agent_port_listener" name="check_agent_listener_http">
+        <summary>Bergamot Agent: Listening Port - HTTP</summary>
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="local_port">80</parameter>
+    </command>
+    
+    <command extends="check_agent_port_listener" name="check_agent_listener_https">
+        <summary>Bergamot Agent: Listening Port - HTTPS</summary>
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="local_port">443</parameter>
+    </command>
+    
+    <command extends="check_agent_port_listener" name="check_agent_listener_mysql">
+        <summary>Bergamot Agent: Listening Port - MySQL</summary>
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="local_port">3306</parameter>
+    </command>
+    
+    <command extends="check_agent_port_listener" name="check_agent_listener_postgresql">
+        <summary>Bergamot Agent: Listening Port - PostgreSQL</summary>
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="local_port">5432</parameter>
+    </command>
+    
+    <command extends="check_agent_port_listener" name="check_agent_listener_rabbitmq">
+        <summary>Bergamot Agent: Listening Port - RabbitMQ</summary>
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="local_port">5672</parameter>
+    </command>
+    
 </bergamot>
