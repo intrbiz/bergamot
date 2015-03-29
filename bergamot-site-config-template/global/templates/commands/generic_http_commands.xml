@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
+    
     <command name="http_check" engine="http">
         <summary>HTTP Check</summary>
         <parameter name="host">#{host.address}</parameter>
@@ -15,7 +16,9 @@
         <parameter name="warning_response_time">1000</parameter>
         <parameter name="length"></parameter>
         <parameter name="contains"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
     </command>
+    
     <command name="https_check" engine="http">
         <summary>HTTPS Check</summary>
         <parameter name="host">#{host.address}</parameter>
@@ -31,7 +34,9 @@
         <parameter name="warning_response_time">1000</parameter>
         <parameter name="length"></parameter>
         <parameter name="contains"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
     </command>
+    
     <command name="certificate_check" engine="http" executor="certificate">
         <summary>HTTPS Check</summary>
         <parameter name="host">#{host.address}</parameter>
@@ -40,5 +45,8 @@
         <parameter name="version"></parameter>
         <parameter name="method"></parameter>
         <parameter name="path"></parameter>
+        <parameter name="expires_in">28</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/security.png</parameter>
     </command>
+    
 </bergamot>
