@@ -15,23 +15,23 @@
         <summary>Administrators</summary>
     </team>
     
-    <team name="linux-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="linux-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
         <summary>Linux Administrators</summary>
     </team>
     
-    <team name="network-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="network-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
         <summary>Network Administrators</summary>
     </team>
     
-    <team name="web-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="web-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
         <summary>Web Administrators</summary>
     </team>
     
-    <team name="db-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="db-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
         <summary>DB Administrators</summary>
     </team>
     
-    <team name="bergamot-admins" teams="admins" grants="ui.*, api.*">
+    <team name="bergamot-admins" teams="admins" grants="ui.*, api.*, sign.agent">
         <summary>Bergamot Administrators</summary>
     </team>
     
