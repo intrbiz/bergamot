@@ -1,40 +1,62 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command name="check_nrpe_process_bergamot_nginx" extends="check_nrpe">
-        <parameter name="command">check_process_bergamot_nginx</parameter>
+    <command name="check_agent_process_bergamot_ui" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-ui</parameter>
     </command>
     
-    <command name="check_nrpe_process_bergamot_ui" extends="check_nrpe">
-        <parameter name="command">check_process_bergamot_ui</parameter>
+    <command name="check_agent_process_bergamot_notifier_email" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-notifier-email</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
     </command>
     
-    <command name="check_nrpe_process_bergamot_notifier_email" extends="check_nrpe">
-        <parameter name="command">check_process_bergamot_notifier_email</parameter>
+    <command name="check_agent_process_bergamot_notifier_sms" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-notifier-sms</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/message.png</parameter>
     </command>
     
-    <command name="check_nrpe_process_bergamot_notifier_sms" extends="check_nrpe">
-        <parameter name="command">check_process_bergamot_notifier_sms</parameter>
+    <command name="check_agent_process_bergamot_worker_nagios" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-worker-nagios</parameter>
     </command>
     
-    <command name="check_nrpe_process_bergamot_worker_nagios" extends="check_nrpe">
-        <parameter name="command">check_process_bergamot_worker_nagios</parameter>
+    <command name="check_agent_process_bergamot_worker_snmp" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-worker-snmp</parameter>
     </command>
     
-    <command name="check_nrpe_process_bergamot_worker_snmp" extends="check_nrpe">
-        <parameter name="command">check_process_bergamot_worker_snmp</parameter>
+    <command name="check_agent_process_bergamot_worker_http" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-worker-http</parameter>
     </command>
     
-    <command name="check_nrpe_process_bergamot_watcher_snmp" extends="check_nrpe">
-        <parameter name="command">check_process_bergamot_watcher_snmp</parameter>
+    <command name="check_agent_process_bergamot_worker_agent" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-worker-agent</parameter>
     </command>
     
-    <command name="check_nrpe_service_rabbitmq_server" extends="check_nrpe">
-        <parameter name="command">check_service_rabbitmq_server</parameter>
-    </command>
-    
-    <command name="check_nrpe_service_postgresql" extends="check_nrpe">
-        <parameter name="command">check_service_postgresql</parameter>
+    <command name="check_agent_process_bergamot_agent_manager" extends="check_agent_processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-agent-manager</parameter>
     </command>
     
 </bergamot>

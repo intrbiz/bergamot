@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <host name="localhost" address="127.0.0.1" location="main-data-centre" extends="bergamot_ui_server, bergamot_notifier_email_server, bergamot_notifier_sms_server, bergamot_worker_nagios_server, bergamot_worker_snmp_server, bergamot_watcher_snmp_server, bergamot_rabbitmq_server, bergamot_postgresql_server">
-        <summary>Bergamot Monitoring Server</summary>
-    </host>
+    <!--
+        <host name="localhost" address="127.0.0.1" location="main-data-centre" extends="bergamot_master_server, bergamot_worker_server">
+            <summary>Bergamot Monitoring Server</summary>
+        </host>
+    -->
     
 </bergamot>

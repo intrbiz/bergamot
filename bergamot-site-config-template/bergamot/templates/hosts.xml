@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
     
-    <host name="bergamot-server" extends="linux-server" template="yes" groups="bergamot-servers">
+    <host name="bergamot-server" extends="generic-host" groups="bergamot-servers" template="yes">
         <summary>A generic Bergamot Monitoring server</summary>
         <notify teams="bergamot-admins"/>
-        
-        <service extends="memory, bergamot-service"/>
-        
-        <service extends="load, bergamot-service"/>
-        
-        <service extends="ping, bergamot-service"/>
-        
     </host>
     
     <host name="bergamot_ui_server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring UI server</summary>
         
-        <service name="bergamot-bergamot-nginx" template="yes" extends="bergamot-service">
+        <service name="bergamot-nginx" extends="bergamot-service">
             <summary>Nginx Web Server</summary>
-            <check-command command="check_nrpe_process_bergamot_nginx" />
+            <check-command command="check_agent_process_nginx" />
         </service>
         
-        <service name="bergamot_bergamot_ui" template="yes" extends="bergamot-service">
+        <service name="bergamot_bergamot_ui" extends="bergamot-service">
             <summary>Bergamot Monitoring UI Daemon</summary>
-            <check-command command="check_nrpe_process_bergamot_ui" />
+            <check-command command="check_agent_process_bergamot_ui" />
+        </service>
+        
+        <service name="bergamot-nginx" extends="bergamot-service">
+            <summary>Port Listener: HTTPS</summary>
+            <check-command command="check_agent_listener_https"/>
         </service>
         
     </host>
@@ -31,9 +29,9 @@
     <host name="bergamot_notifier_email_server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring Email Notifier server</summary>
         
-        <service name="bergamot-bergamot-notifier-email" template="yes" extends="bergamot-service">
+        <service name="bergamot-notifier-email" extends="bergamot-service">
             <summary>Bergamot Monitoring Email Notifier Daemon</summary>
-            <check-command command="check_nrpe_process_bergamot_notifier_email" />
+            <check-command command="check_agent_process_bergamot_notifier_email"/>
         </service>
         
     </host>
@@ -41,9 +39,9 @@
     <host name="bergamot_notifier_sms_server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring SMS Notifier server</summary>
         
-        <service name="bergamot-bergamot-notifier-sms" template="yes" extends="bergamot-service">
+        <service name="bergamot-notifier-sms" extends="bergamot-service">
             <summary>Bergamot Monitoring SMS Notifier Daemon</summary>
-            <check-command command="check_nrpe_process_bergamot_notifier_sms" />
+            <check-command command="check_agent_process_bergamot_notifier_sms"/>
         </service>
         
     </host>
@@ -51,9 +49,9 @@
     <host name="bergamot_worker_nagios_server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring Nagios Worker server</summary>
         
-        <service name="bergamot-bergamot-worker-nagios" template="yes" extends="bergamot-service">
+        <service name="bergamot-worker-nagios" extends="bergamot-service">
             <summary>Bergamot Monitoring Nagios Worker Daemon</summary>
-            <check-command command="check_nrpe_process_bergamot_worker_nagios" />
+            <check-command command="check_agent_process_bergamot_worker_nagios"/>
         </service>
         
     </host>
@@ -61,27 +59,47 @@
     <host name="bergamot_worker_snmp_server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring SNMP Worker server</summary>
 
-        <service name="bergamot-bergamot-worker-snmp" template="yes" extends="bergamot-service">
+        <service name="bergamot-worker-snmp" extends="bergamot-service">
             <summary>Bergamot Monitoring SNMP Worker Daemon</summary>
-            <check-command command="check_nrpe_process_bergamot_worker_snmp" />
+            <check-command command="check_agent_process_bergamot_worker_snmp" />
         </service>
 
     </host>
     
-    <host name="bergamot_watcher_snmp_server" extends="bergamot-server" template="yes">
-        <summary>A Bergamot Monitoring SNMP Watcher server</summary>
-        
-        <service name="bergamot-bergamot-watcher-snmp" template="yes" extends="bergamot-service">
-            <summary>Bergamot Monitoring SNMP Watcher Daemon</summary>
-            <check-command command="check_nrpe_process_bergamot_watcher_snmp"/>
+    <host name="bergamot_worker_agent_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring Agent Worker server</summary>
+
+        <service name="bergamot-worker-agent" extends="bergamot-service">
+            <summary>Bergamot Monitoring Agent Worker Daemon</summary>
+            <check-command command="check_agent_process_bergamot_worker_agent" />
         </service>
-        
+
+    </host>
+    
+    <host name="bergamot_worker_http_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring HTTP Worker server</summary>
+
+        <service name="bergamot-worker-http" extends="bergamot-service">
+            <summary>Bergamot Monitoring HTTP Worker Daemon</summary>
+            <check-command command="check_agent_process_bergamot_worker_http" />
+        </service>
+
+    </host>
+    
+    <host name="bergamot_agent_manager_server" extends="bergamot-server" template="yes">
+        <summary>A Bergamot Monitoring Agent Manager server</summary>
+
+        <service name="bergamot-agent-manager" extends="bergamot-service">
+            <summary>Bergamot Monitoring Agent Manager Daemon</summary>
+            <check-command command="check_agent_process_bergamot_agent_manager" />
+        </service>
+
     </host>
     
     <host name="bergamot_rabbitmq_server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring RabbitMQ server</summary>
         
-        <service name="bergamot-rabbitmq" template="yes" extends="bergamot-service">
+        <service name="bergamot-rabbitmq" extends="bergamot-service">
             <summary>RabbitMQ Server</summary>
             <check-command command="check_nrpe_service_rabbitmq_server" />
         </service>
@@ -91,11 +109,19 @@
     <host name="bergamot_postgresql_server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring PostgreSQL server</summary>
         
-        <service name="bergamot-postgresql" template="yes" extends="bergamot-service">
+        <service name="bergamot-postgresql" extends="bergamot-service">
             <summary>PostgreSQL Server</summary>
             <check-command command="check_nrpe_service_postgresql" />
         </service>
         
+    </host>
+    
+    <host name="bergamot_master_server" extends="bergamot_ui_server, bergamot_notifier_email_server, bergamot_notifier_sms_server, bergamot_rabbitmq_server, bergamot_postgresql_server, bergamot_agent_manager_server" template="yes">
+        <summary>A Bergamot Monitoring Master Server</summary>
+    </host>
+    
+    <host name="bergamot_worker_server" extends="bergamot_worker_nagios_server, bergamot_worker_snmp_server, bergamot_worker_agent_server, bergamot_worker_http_server" template="yes">
+        <summary>A Bergamot Monitoring Worker Server</summary>
     </host>
     
 </bergamot>
