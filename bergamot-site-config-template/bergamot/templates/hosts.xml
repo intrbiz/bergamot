@@ -101,7 +101,12 @@
         
         <service name="bergamot-rabbitmq" extends="bergamot-service">
             <summary>RabbitMQ Server</summary>
-            <check-command command="check_nrpe_service_rabbitmq_server" />
+            <check-command command="check_agent_process_rabbitmq" />
+        </service>
+        
+        <service name="bergamot-rabbitmq-listener" extends="bergamot-service">
+            <summary>Port Listener:  RabbitMQ</summary>
+            <check-command command="check_agent_listener_rabbitmq" />
         </service>
         
     </host>
@@ -111,7 +116,12 @@
         
         <service name="bergamot-postgresql" extends="bergamot-service">
             <summary>PostgreSQL Server</summary>
-            <check-command command="check_nrpe_service_postgresql" />
+            <check-command command="check_agent_process_postgresql" />
+        </service>
+        
+        <service name="bergamot-postgresql-listener" extends="bergamot-service">
+            <summary>Port Listener: PostgreSQL</summary>
+            <check-command command="check_agent_listener_postgresql" />
         </service>
         
     </host>
