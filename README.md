@@ -2,7 +2,7 @@ Bergamot Monitoring
 ===================
 Bergamot is a simple, clean room, Nagios compatible monitoring system
 
-See http://intrbiz.github.io/bergamot/ for more information on the project.
+See https://bergamot-monitoring.org/ for more information on the project.
 
 License
 -------
