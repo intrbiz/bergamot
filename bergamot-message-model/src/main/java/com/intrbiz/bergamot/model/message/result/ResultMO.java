@@ -365,8 +365,10 @@ public abstract class ResultMO extends Message
                 break;
             case 1:
                 this.warning(message);
+                break;
             case 2:
                 this.critical(message);
+                break;
         }
         return this;
     }
@@ -410,8 +412,10 @@ public abstract class ResultMO extends Message
                 break;
             case 1:
                 this.warning(message);
+                break;
             case 2:
                 this.critical(message);
+                break;
         }
         return this;
     }
@@ -629,8 +633,10 @@ public abstract class ResultMO extends Message
                 break;
             case 1:
                 this.warning(message);
+                break;
             case 2:
                 this.critical(message);
+                break;
         }
         return this;
     }
@@ -674,8 +680,10 @@ public abstract class ResultMO extends Message
                 break;
             case 1:
                 this.warning(message);
+                break;
             case 2:
                 this.critical(message);
+                break;
         }
         return this;
     }
