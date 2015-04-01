@@ -4,6 +4,7 @@
     <host name="bergamot-server" extends="generic-host" groups="bergamot-servers" template="yes">
         <summary>A generic Bergamot Monitoring server</summary>
         <notify teams="bergamot-admins"/>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </host>
     
     <host name="bergamot_ui_server" extends="bergamot-server" template="yes">

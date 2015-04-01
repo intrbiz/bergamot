@@ -3,6 +3,7 @@
     
     <service name="bergamot-service" template="yes" extends="generic-service" groups="bergamot-services">
         <notify teams="bergamot-admins"/>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </service>
 
 </bergamot>

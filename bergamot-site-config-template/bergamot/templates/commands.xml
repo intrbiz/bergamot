@@ -6,6 +6,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-ui</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
     <command name="check_agent_process_bergamot_notifier_email" extends="check_agent_processes">
@@ -13,7 +14,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-notifier-email</parameter>
-        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
     <command name="check_agent_process_bergamot_notifier_sms" extends="check_agent_processes">
@@ -21,7 +22,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-notifier-sms</parameter>
-        <parameter description="UI Icon" name="ui-icon">/images/icons/64/message.png</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
     <command name="check_agent_process_bergamot_worker_nagios" extends="check_agent_processes">
@@ -29,6 +30,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-worker-nagios</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
     <command name="check_agent_process_bergamot_worker_snmp" extends="check_agent_processes">
@@ -36,6 +38,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-worker-snmp</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
     <command name="check_agent_process_bergamot_worker_http" extends="check_agent_processes">
@@ -43,6 +46,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-worker-http</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
     <command name="check_agent_process_bergamot_worker_agent" extends="check_agent_processes">
@@ -50,6 +54,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-worker-agent</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
     <command name="check_agent_process_bergamot_agent_manager" extends="check_agent_processes">
@@ -57,6 +62,7 @@
         <parameter name="critical">1:2</parameter>
         <parameter name="command">java</parameter>
         <parameter name="argument">bergamot-agent-manager</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </command>
     
 </bergamot>
