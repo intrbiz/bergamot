@@ -5,6 +5,7 @@
 
     <div clas="row">
    		<h4>Version #{bergamot_version} (#{bergamot_codename})</h4>
+   		<p id="version_check"></p>
    	    <p class="text-body">
    	    	Bergamot Monitoring is an Open Source distributed monitoring system, 
    	    	you can find out more at <a href="https://bergamot-monitoring.org">bergamot-monitoring.org</a>
@@ -32,5 +33,29 @@
    			<li><a href="https://github.com/google/material-design-icons">Google Material Design Icons - Icon Set</a></li>
    		</ul>
     </div>
+    
+    <script type="text/javascript">
+    	<![CDATA[
+    	$(document).ready(function() {
+    		$.getJSON("https://bergamot-monitoring.org/api/version/check?version=#{bergamot_version}&site=#{urlencode(site.name)}", function(data) {
+    			if (data.stat == 'OK')
+    			{
+    				if (data.upto_date)
+    				{
+    					$('#version_check').text("Bergamot Monitoring installation is upto date :)");
+    				}
+    				else
+    				{
+    					$('#version_check').text("There is a newer version of Bergamot Monitoring available, please upgrade to version " + data.current_version);
+    				}
+    			}
+    			else
+   				{
+   					$('#version_check').text("Failed to check if this Bergamot Monitoring installation is upto date");
+   				}
+    		})
+    	});
+    	]]>
+    </script>
     
 </fragment>
