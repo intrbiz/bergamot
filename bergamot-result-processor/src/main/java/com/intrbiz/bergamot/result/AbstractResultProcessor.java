@@ -9,11 +9,15 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
+import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
+import com.intrbiz.bergamot.model.message.update.CheckUpdate;
+import com.intrbiz.bergamot.model.message.update.GroupUpdate;
+import com.intrbiz.bergamot.model.message.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.queue.NotificationQueue;
 import com.intrbiz.bergamot.queue.SchedulerQueue;
@@ -157,15 +161,21 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         this.notificationsProducer.publish(new NotificationKey(check.getSiteId()), notification);
     }
 
-    protected void publishCheckUpdate(Check<?, ?> check, Update update)
+    protected void publishCheckUpdate(Check<?, ?> check, CheckUpdate update)
     {
         if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
         this.updateProducer.publish(new UpdateKey(check.getSiteId(), check.getId()), update);
     }
     
-    protected void publishGroupUpdate(Group group, Update update)
+    protected void publishGroupUpdate(Group group, GroupUpdate update)
     {
         if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
         this.updateProducer.publish(new UpdateKey(group.getSiteId(), group.getId()), update);
+    }
+    
+    protected void publishLocationUpdate(Location location, LocationUpdate update)
+    {
+        if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
+        this.updateProducer.publish(new UpdateKey(location.getSiteId(), location.getId()), update);
     }
 }

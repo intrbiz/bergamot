@@ -18,6 +18,8 @@ import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
+import com.intrbiz.bergamot.model.Host;
+import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationType;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Status;
@@ -32,10 +34,10 @@ import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.message.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.update.GroupUpdate;
+import com.intrbiz.bergamot.model.message.update.LocationUpdate;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.CheckTransition;
-import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 
@@ -154,7 +156,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // send group updates
                 if (transition.stateChange || transition.hardChange || transition.alert || transition.recovery || (! transition.nextState.getStatus().equals(transition.previousState.getStatus())))
                 {
+                    // group update
                     this.sendGroupStateUpdate(db, check, transition);
+                    // location update
+                    if (check instanceof Host)
+                    {
+                        this.sendLocationStateUpdate(db, (Host) check, transition);
+                    }
                 }
                 // send notifications
                 if (transition.alert)
@@ -176,13 +184,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
      */
     protected void sendCheckStateUpdate(BergamotDB db, Check<?, ?> check, Transition transition)
     {
-        if (logger.isDebugEnabled())
-        {
-            CheckState state = check.getState();
-            logger.debug("State update for check " + check.getName() + " (" + check.getId() + ") is " + state.isOk() + " " + state.isHard() + " " + state.getStatus() + " " + state.getOutput());
-        }
         // send the update
-        this.publishCheckUpdate(check, new CheckUpdate(check.toMO()));
+        this.publishCheckUpdate(check, new CheckUpdate(check.toStubMO()));
     }
     
     /**
@@ -197,18 +200,36 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         while (! groups.empty())
         {
             Group group = groups.pop();
-            if (! updated.contains(group))
+            if (! updated.contains(group.getId()))
             {
                 updated.add(group.getId());
                 // send update for group
-                if (logger.isDebugEnabled())
-                {
-                    GroupState state = db.computeGroupState(group.getId());
-                    logger.debug("Sending update for group " + group.getName() + " (" + group.getId() + ") is " + state.isOk());
-                }
-                this.publishGroupUpdate(group, new GroupUpdate(group.toMO()));
+                this.publishGroupUpdate(group, new GroupUpdate(group.toStubMO()));
                 // recurse up the chain
                 groups.addAll(group.getGroups());
+            }
+        }
+    }
+    
+    /**
+     * Update listeners as to the changed state of the locations the given host is a member of
+     */
+    protected void sendLocationStateUpdate(BergamotDB db, Host check, Transition transition)
+    {
+        // send updates for all locations this check is in
+        Set<UUID> updated = new HashSet<UUID>();
+        Stack<Location> locations = new Stack<Location>();
+        if (check.getLocation() != null) locations.add(check.getLocation());
+        while (! locations.empty())
+        {
+            Location location = locations.pop();
+            if (! updated.contains(location.getId()))
+            {
+                updated.add(location.getId());
+                // send update for location
+                this.publishLocationUpdate(location, new LocationUpdate(location.toStubMO()));
+                // recurse up the chain
+                if (location.getLocation() != null) locations.add(location.getLocation());
             }
         }
     }

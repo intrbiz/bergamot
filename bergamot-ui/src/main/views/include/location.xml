@@ -3,7 +3,7 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
 	<a href="/location/id/#{location.id}">
-		<div class="col3 dash_icon">
+		<div class="col3 dash_icon location" data-location-id="#{location.id}">
 		    <h3>
 				<span class="dash_img status_#{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
 					<img src="#{public(coalesce(location.getParameter('ui-icon'), '/images/icons/64/location.png'))}" />
@@ -12,15 +12,15 @@
 		    </h3>
 		    <p>
 			    <span class="label">OK: </span>
-			    <span class="value">#{location.state.okCount}</span>
+			    <span class="value" data-bind="ok_count">#{location.state.okCount}</span>
 		    </p>
 		    <p>
 			    <span class="label">Warning: </span>
-			    <span class="value">#{location.state.warningCount}</span>
+			    <span class="value" data-bind="warning_count">#{location.state.warningCount}</span>
 		    </p>
 		    <p>
 			    <span class="label">Critical: </span>
-			    <span class="value">#{location.state.criticalCount}</span>
+			    <span class="value" data-bind="critical_count">#{location.state.criticalCount}</span>
 		    </p>
 		</div>
 	</a>

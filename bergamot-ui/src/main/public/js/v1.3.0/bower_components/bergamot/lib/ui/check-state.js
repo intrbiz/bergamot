@@ -65,7 +65,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	this.onUpdate = function(/*Event*/ ev, /*Object*/ data)
 	{
 	    this.log_debug("Got server notification: " + data.update);
-	    if (data.update.check.id == this.attr.check_id)
+	    if (data.update.check && data.update.check.id == this.attr.check_id)
 	    {
 		this.updateCheck(data.update.check);
 	    }

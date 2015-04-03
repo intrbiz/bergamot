@@ -24,8 +24,12 @@
 	
 	<script type="text/javascript">
 		<![CDATA[
-		require(["bergamot/lib/ui/check-state"], function(bergamot_ui_server_state) {
-		    bergamot_ui_server_state.attachTo("div.check");
+		require(["bergamot/lib/ui/check-state"], function(bergamot_ui_check_state) {
+		    bergamot_ui_check_state.attachTo("div.check");
+		});
+		
+		require(["bergamot/lib/ui/location-state"], function(bergamot_ui_location_state) {
+		    bergamot_ui_location_state.attachTo("div[data-location-id]");
 		});
 		
 		// execute all hosts

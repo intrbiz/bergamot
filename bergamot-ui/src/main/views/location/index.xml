@@ -8,10 +8,8 @@
 		</data-set>
 	</div>
 	<script type="text/javascript">
-		$(document).ready(function(){
-			setTimeout(function(){
-				window.location = window.location;
-			}, 30000);
+		require(["bergamot/lib/ui/location-state"], function(bergamot_ui_location_state) {
+		    bergamot_ui_location_state.attachTo("div[data-location-id]");
 		});
 	</script>
 </fragment>

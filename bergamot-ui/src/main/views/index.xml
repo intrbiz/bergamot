@@ -27,10 +27,13 @@
 			</data-set>
 		</div>
 		
-		<!-- Hard refresh -->
+		<!-- Status updates -->
 		<script type="text/javascript">
 			require(["bergamot/lib/ui/group-state"], function(bergamot_ui_group_state) {
 			    bergamot_ui_group_state.attachTo("div.group");
+			});
+			require(["bergamot/lib/ui/location-state"], function(bergamot_ui_location_state) {
+		    	bergamot_ui_location_state.attachTo("div[data-location-id]");
 			});
 		</script>
 </fragment>

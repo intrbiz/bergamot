@@ -45,7 +45,7 @@ public class LocationRouter extends Router<BergamotApp>
         Location location = model("location", db.getLocationByName(site.getId(), name));
         model("hosts", orderHostsByStatus(location.getHosts()));
         model("locations", orderLocationsByStatus(location.getChildren()));
-        encode("location/hosts");
+        encode("location/location");
     }
     
     @Any("/location/id/:id")
@@ -55,7 +55,7 @@ public class LocationRouter extends Router<BergamotApp>
         Location location = model("location", db.getLocation(id));
         model("hosts", orderHostsByStatus(location.getHosts()));
         model("locations", orderLocationsByStatus(location.getChildren()));
-        encode("location/hosts");
+        encode("location/location");
     }
     
     @Any("/location/id/:id/execute-all-hosts")
@@ -66,6 +66,6 @@ public class LocationRouter extends Router<BergamotApp>
         {
             action("execute-check", host);
         }
-        redirect("/group/id/" + id);
+        redirect("/location/id/" + id);
     }
 }

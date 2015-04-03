@@ -95,6 +95,7 @@ import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 import com.intrbiz.bergamot.model.message.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.update.GroupUpdate;
+import com.intrbiz.bergamot.model.message.update.LocationUpdate;
 import com.intrbiz.queue.QueueEventTranscoder;
 import com.intrbiz.queue.QueueException;
 
@@ -147,6 +148,7 @@ public class BergamotTranscoder
         // updates
         CheckUpdate.class,
         GroupUpdate.class,
+        LocationUpdate.class,
         // scheduler
         EnableCheck.class,
         DisableCheck.class,

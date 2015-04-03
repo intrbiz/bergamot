@@ -12,15 +12,15 @@
 		    </h3>
 		    <p>
 			    <span class="label">OK: </span>
-			    <span class="value">#{group.state.okCount}</span>
+			    <span class="value" data-bind="ok_count">#{group.state.okCount}</span>
 		    </p>
 		    <p>
 			    <span class="label">Warning: </span>
-			    <span class="value">#{group.state.warningCount}</span>
+			    <span class="value" data-bind="warning_count">#{group.state.warningCount}</span>
 		    </p>
 		    <p>
 			    <span class="label">Critical: </span>
-			    <span class="value">#{group.state.criticalCount}</span>
+			    <span class="value" data-bind="critical_count">#{group.state.criticalCount}</span>
 		    </p>
 		</div>
 	</a>
