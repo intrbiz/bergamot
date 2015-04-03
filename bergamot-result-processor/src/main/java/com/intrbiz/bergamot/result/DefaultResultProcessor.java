@@ -152,7 +152,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // send the general state update notifications
                 this.sendCheckStateUpdate(db, check, transition);
                 // send group updates
-                if (transition.stateChange || transition.hardChange)
+                if (transition.stateChange || transition.hardChange || transition.alert || transition.recovery || (! transition.nextState.getStatus().equals(transition.previousState.getStatus())))
                 {
                     this.sendGroupStateUpdate(db, check, transition);
                 }
