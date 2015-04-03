@@ -33,7 +33,7 @@
 		});
 		
 		require(["bergamot/lib/ui/group-state"], function(bergamot_ui_group_state) {
-		    bergamot_ui_group_state.attachTo("div.group");
+		    bergamot_ui_group_state.attachTo("div[data-group-id]");
 		});
 		
 		// execute all checks
