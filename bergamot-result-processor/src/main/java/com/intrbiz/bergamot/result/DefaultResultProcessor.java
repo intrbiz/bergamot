@@ -2,7 +2,9 @@ package com.intrbiz.bergamot.result;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.Stack;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.NotificationType;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Status;
@@ -27,10 +30,12 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.model.message.update.Update;
+import com.intrbiz.bergamot.model.message.update.CheckUpdate;
+import com.intrbiz.bergamot.model.message.update.GroupUpdate;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.CheckTransition;
+import com.intrbiz.bergamot.model.state.GroupState;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 
@@ -145,7 +150,12 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     this.rescheduleCheck((ActiveCheck<?,?>) check, interval);
                 }
                 // send the general state update notifications
-                this.sendStateUpdate(check);
+                this.sendCheckStateUpdate(db, check, transition);
+                // send group updates
+                if (transition.stateChange || transition.hardChange)
+                {
+                    this.sendGroupStateUpdate(db, check, transition);
+                }
                 // send notifications
                 if (transition.alert)
                 {
@@ -161,12 +171,46 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
 
-    protected void sendStateUpdate(Check<?, ?> check)
+    /**
+     * Update listeners as to the recent state change for the given check
+     */
+    protected void sendCheckStateUpdate(BergamotDB db, Check<?, ?> check, Transition transition)
     {
-        CheckState state = check.getState();
-        logger.info("State update " + check + " is " + state.isOk() + " " + state.isHard() + " " + state.getStatus() + " " + state.getOutput());
+        if (logger.isDebugEnabled())
+        {
+            CheckState state = check.getState();
+            logger.debug("State update for check " + check.getName() + " (" + check.getId() + ") is " + state.isOk() + " " + state.isHard() + " " + state.getStatus() + " " + state.getOutput());
+        }
         // send the update
-        this.publishUpdate(check, new Update(check.toMO()));
+        this.publishCheckUpdate(check, new CheckUpdate(check.toMO()));
+    }
+    
+    /**
+     * Update listeners as to the changed state of the groups the given check is a member of
+     */
+    protected void sendGroupStateUpdate(BergamotDB db, Check<?, ?> check, Transition transition)
+    {
+        // send updates for all groups this check is in
+        Set<UUID> updated = new HashSet<UUID>();
+        Stack<Group> groups = new Stack<Group>();
+        groups.addAll(check.getGroups());
+        while (! groups.empty())
+        {
+            Group group = groups.pop();
+            if (! updated.contains(group))
+            {
+                updated.add(group.getId());
+                // send update for group
+                if (logger.isDebugEnabled())
+                {
+                    GroupState state = db.computeGroupState(group.getId());
+                    logger.debug("Sending update for group " + group.getName() + " (" + group.getId() + ") is " + state.isOk());
+                }
+                this.publishGroupUpdate(group, new GroupUpdate(group.toMO()));
+                // recurse up the chain
+                groups.addAll(group.getGroups());
+            }
+        }
     }
 
     protected <T extends CheckNotification> T createNotification(Check<?, ?> check, Alert alertRecord, Calendar now, NotificationType type, Supplier<T> ctor)
@@ -345,7 +389,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             db.setCheckState(referencedByState);
             db.commit();
             // send the general state update notifications
-            this.sendStateUpdate(referencedBy);
+            this.sendCheckStateUpdate(db, referencedBy, null);
             // send notifications
             // only send notifications when a dependent check has reached a hard state change
             if (isStateChange && transition.hardChange)

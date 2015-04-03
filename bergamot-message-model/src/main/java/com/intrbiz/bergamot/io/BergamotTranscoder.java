@@ -93,7 +93,8 @@ import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
-import com.intrbiz.bergamot.model.message.update.Update;
+import com.intrbiz.bergamot.model.message.update.CheckUpdate;
+import com.intrbiz.bergamot.model.message.update.GroupUpdate;
 import com.intrbiz.queue.QueueEventTranscoder;
 import com.intrbiz.queue.QueueException;
 
@@ -144,7 +145,8 @@ public class BergamotTranscoder
         PasswordResetNotification.class,
         RegisterContactNotification.class,
         // updates
-        Update.class,
+        CheckUpdate.class,
+        GroupUpdate.class,
         // scheduler
         EnableCheck.class,
         DisableCheck.class,

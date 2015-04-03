@@ -28,8 +28,12 @@
 	
 	<script type="text/javascript">
 		<![CDATA[
-		require(["bergamot/lib/ui/check-state"], function(bergamot_ui_server_state) {
-		    bergamot_ui_server_state.attachTo("div.check");
+		require(["bergamot/lib/ui/check-state"], function(bergamot_ui_check_state) {
+		    bergamot_ui_check_state.attachTo("div.check");
+		});
+		
+		require(["bergamot/lib/ui/group-state"], function(bergamot_ui_group_state) {
+		    bergamot_ui_group_state.attachTo("div.group");
 		});
 		
 		// execute all checks

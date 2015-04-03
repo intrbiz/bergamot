@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
@@ -156,9 +157,15 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         this.notificationsProducer.publish(new NotificationKey(check.getSiteId()), notification);
     }
 
-    protected void publishUpdate(Check<?, ?> check, Update update)
+    protected void publishCheckUpdate(Check<?, ?> check, Update update)
     {
         if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
         this.updateProducer.publish(new UpdateKey(check.getSiteId(), check.getId()), update);
+    }
+    
+    protected void publishGroupUpdate(Group group, Update update)
+    {
+        if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
+        this.updateProducer.publish(new UpdateKey(group.getSiteId(), group.getId()), update);
     }
 }

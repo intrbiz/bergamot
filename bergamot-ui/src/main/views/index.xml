@@ -29,10 +29,8 @@
 		
 		<!-- Hard refresh -->
 		<script type="text/javascript">
-			$(document).ready(function(){
-				setTimeout(function(){
-					window.location = window.location;
-				}, 30000);
+			require(["bergamot/lib/ui/group-state"], function(bergamot_ui_group_state) {
+			    bergamot_ui_group_state.attachTo("div.group");
 			});
 		</script>
 </fragment>

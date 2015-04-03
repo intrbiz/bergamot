@@ -17,7 +17,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	
 	this.updateCheck = function(/*Object*/ check)
 	{
-	    this.log_debug("Updating server state, to: " + check.state.ok + " " + check.state.status);
+	    this.log_debug("Updating check state, to: " + check.state.ok + " " + check.state.status);
 	    this.$node.find("h3 span.dash_img").attr("class", "dash_img status_" + check.state.status.toLowerCase());
 	    this.$node.find("h3 span.dash_img").attr("title", "The check is " + check.state.status.toLowerCase());
 	    this.$node.find("p.field-status span.value").text(check.state.status.toUpperCase().substring(0,1) + check.state.status.toLowerCase().substring(1));
