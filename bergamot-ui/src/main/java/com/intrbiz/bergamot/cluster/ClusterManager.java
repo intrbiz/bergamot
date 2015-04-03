@@ -370,7 +370,7 @@ public class ClusterManager
      */
     private void registerPools(Collection<ProcessingPool> pools, Set<Member> memberSet)
     {
-        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> { return m.getUuid(); }, (m) -> { return m; }));
+        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> m.getUuid(), (m) -> m));
         for (ProcessingPool pool : pools)
         {
             this.sendMigration(members.get(pool.getOwner()), new RegisterPoolTask(pool.getSite(), pool.getPool()));
@@ -382,7 +382,7 @@ public class ClusterManager
      */
     private void deregisterPools(Collection<ProcessingPool> pools, Set<Member> memberSet)
     {
-        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> { return m.getUuid(); }, (m) -> { return m; }));
+        Map<String, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> m.getUuid(), (m) -> m));
         for (ProcessingPool pool : pools)
         {
             this.sendMigration(members.get(pool.getPreviousOwner()), new DeregisterPoolTask(pool.getSite(), pool.getPool()));
