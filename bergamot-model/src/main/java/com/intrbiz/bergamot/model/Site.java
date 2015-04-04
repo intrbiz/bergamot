@@ -192,6 +192,16 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     {
         return ((int) (objectId.getLeastSignificantBits() & 0xFFL)) % this.getPoolCount();
     }
+    
+    /**
+     * Check if the given object id correctly has this sites id mask
+     * @param objectId - the object id to validate
+     * @return true if the given object id is valid for this site
+     */
+    public boolean isValidObjectId(UUID objectId)
+    {
+        return this.id.equals(getSiteId(objectId));
+    }
 
     public String toString()
     {
