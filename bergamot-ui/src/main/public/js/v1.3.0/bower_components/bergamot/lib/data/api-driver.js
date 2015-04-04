@@ -36,7 +36,9 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
 	    // setup internal on connected handler
 	    this.on('bergamot-api-connected', this.pingOnConnected);
 	    // connect the websocket
-	    this.connectWebSocket();
+	    $(document).ready((function() {
+	    	this.connectWebSocket();
+	    }).bind(this));
 	    // scheduled task, every 5 seconds
 	    var comp = this;
 	    setInterval(function() { comp.doScheduledTasks() }, 5000);
