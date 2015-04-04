@@ -6,11 +6,11 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -32,7 +32,7 @@ public class TrapRouter extends Router<BergamotApp>
     
     @Any("/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void trap(BergamotDB db, @AsUUID UUID id)
+    public void trap(BergamotDB db, @IsaObjectId UUID id)
     {
         model("trap", db.getTrap(id));
         model("alerts", db.getAllAlertsForCheck(id));
@@ -41,7 +41,7 @@ public class TrapRouter extends Router<BergamotApp>
     
     @Any("/enable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void enableTrap(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void enableTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Trap trap = db.getTrap(id);
         if (trap != null)
@@ -54,7 +54,7 @@ public class TrapRouter extends Router<BergamotApp>
     
     @Any("/disable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void disableTrap(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void disableTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Trap trap = db.getTrap(id);
         if (trap != null)
@@ -67,7 +67,7 @@ public class TrapRouter extends Router<BergamotApp>
     
     @Any("/suppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void suppressTrap(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void suppressTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Trap trap = db.getTrap(id);
         if (trap != null)
@@ -79,7 +79,7 @@ public class TrapRouter extends Router<BergamotApp>
     
     @Any("/unsuppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void unsuppressTrap(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void unsuppressTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Trap trap = db.getTrap(id);
         if (trap != null)

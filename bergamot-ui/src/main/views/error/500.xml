@@ -1,31 +1,18 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- A template view, applied to all views -->
-<html xmlns="com.intrbiz.balsa">
-	<head>
-		<title>Bergamot Monitoring - Internal Error</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
-		<link href='#{balsa().request.requestScheme}://fonts.googleapis.com/css?family=Merriweather+Sans:400,700' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.4.0/style.css')}" />
-	</head>
-	<body>
-		<div id="content">
-			<div class="container">			
-				<div id="login-box">
-                    <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
-					<h4 class="centre">Oops, something went a bit wrong</h4>
-					<p class="error centre">
-                    	Something rather unexpected went wrong, what happened has been logged and will be investigated by our support team.
-                    </p>
-                    <p class="error centre">
-                    	Please attempt the request again, should you see this message again, you might wish to contact our support team.
-                    </p>
-                    <p class="error centre">
-                    	Error: #{'"' + Balsa().getException().getMessage() + '"'}
-                    </p>
-				</div>
-			</div>
-		</div>
-	</body>
-</html>
+<fragment xmlns="com.intrbiz.balsa" title="Internal Error">
+	<div id="login-box">
+        <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Oops, something went a bit wrong</h4>
+		<p class="error centre">
+	    	Something rather unexpected went wrong, what happened has been logged and will be investigated by our support team.
+	    </p>
+	    <p class="error centre">
+	    	Please attempt the request again, should you see this message again, you might wish to contact our support team.
+	    </p>
+	    <p class="error centre">
+	    	Error: #{'"' + Balsa().getException().getMessage() + '"'}
+	    </p>
+	</div>
+</fragment>

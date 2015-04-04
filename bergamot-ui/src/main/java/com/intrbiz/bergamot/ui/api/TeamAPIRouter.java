@@ -9,13 +9,13 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -69,7 +69,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
-    public TeamMO getTeam(BergamotDB db, @AsUUID UUID id)
+    public TeamMO getTeam(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTeam(id), Team::toMO);
     }
@@ -78,7 +78,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
-    public List<TeamMO> getTeamChildren(BergamotDB db, @AsUUID UUID id)
+    public List<TeamMO> getTeamChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTeam(id), (e)->{return e.getChildren().stream().map(Team::toMO).collect(Collectors.toList());});
     }
@@ -87,7 +87,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @RequirePermission("api.read.team")
     @WithDataAdapter(BergamotDB.class)
-    public List<ContactMO> getTeamContacts(BergamotDB db, @AsUUID UUID id)
+    public List<ContactMO> getTeamContacts(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTeam(id), (e)->{return e.getContacts().stream().map(Contact::toMO).collect(Collectors.toList());});
     }
@@ -105,7 +105,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @RequirePermission("api.read.team.config")
     @WithDataAdapter(BergamotDB.class)
-    public TeamCfg getTeamConfig(BergamotDB db, @AsUUID UUID id)
+    public TeamCfg getTeamConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTeam(id), Team::getConfiguration);
     }

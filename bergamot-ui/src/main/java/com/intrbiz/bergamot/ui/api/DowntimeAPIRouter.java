@@ -11,13 +11,13 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.message.DowntimeMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsDate;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
@@ -35,7 +35,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public DowntimeMO getComment(BergamotDB db, @AsUUID UUID id)
+    public DowntimeMO getComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getDowntime(id), Downtime::toMO);
     }
@@ -43,7 +43,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/remove")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public Boolean removeDowntime(BergamotDB db, @AsUUID UUID id)
+    public Boolean removeDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         db.removeDowntime(id);
         return true;
@@ -54,7 +54,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<DowntimeMO> getDowntimeForObject(
             BergamotDB db, 
-            @AsUUID UUID id, 
+            @IsaObjectId(session = false) UUID id, 
             @Param("past") @IsaInt(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer pastDays, 
             @Param("future") @IsaInt(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer futureDays
     )
@@ -67,7 +67,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public DowntimeMO addDowntimeToCheck(
             BergamotDB db, 
-            @AsUUID UUID id,
+            @IsaObjectId(session = false) UUID id,
             @Param("starts") @AsDate("yyyy-MM-dd HH:mm") Date startTime,
             @Param("ends") @AsDate("yyyy-MM-dd HH:mm") Date endTime,
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary,
@@ -89,7 +89,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/render")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String renderDowntime(BergamotDB db, @AsUUID UUID id)
+    public String renderDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return var("downtime", db.getDowntime(id)) == null ? null : encodeBuffered("include/downtime");
     }

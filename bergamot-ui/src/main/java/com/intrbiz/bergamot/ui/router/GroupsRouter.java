@@ -8,13 +8,13 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -51,7 +51,7 @@ public class GroupsRouter extends Router<BergamotApp>
     
     @Any("/group/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void showHostGroupByName(BergamotDB db, @AsUUID() UUID id)
+    public void showHostGroupByName(BergamotDB db, @IsaObjectId UUID id)
     {
         Group group = model("group", db.getGroup(id));
         model("checks", orderCheckByStatus(group.getChecks()));
@@ -61,7 +61,7 @@ public class GroupsRouter extends Router<BergamotApp>
     
     @Any("/group/execute-all-checks/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void executeChecksInGroup(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void executeChecksInGroup(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         for (Check<?,?> check : db.getChecksInGroup(id))
         {

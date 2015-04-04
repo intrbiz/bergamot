@@ -10,6 +10,7 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
@@ -18,7 +19,6 @@ import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -58,7 +58,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ClusterMO getCluster(BergamotDB db, @AsUUID UUID id)
+    public ClusterMO getCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCluster(id), Cluster::toMO);
     }
@@ -66,7 +66,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getClusterState(BergamotDB db, @AsUUID UUID id)
+    public CheckStateMO getClusterState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCluster(id), (h)->{return h.getState().toMO();});
     }
@@ -82,7 +82,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/resources")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public List<ResourceMO> getClusterResources(BergamotDB db, @AsUUID UUID id)
+    public List<ResourceMO> getClusterResources(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCluster(id), (e)->{return e.getResources().stream().map(Resource::toMO).collect(Collectors.toList());});
     }
@@ -98,7 +98,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/references")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public List<CheckMO> getClusterReferences(BergamotDB db, @AsUUID UUID id)
+    public List<CheckMO> getClusterReferences(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCluster(id), (e)->{return e.getReferences().stream().map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());});
     }
@@ -114,7 +114,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ClusterCfg getClusterConfig(BergamotDB db, @AsUUID UUID id)
+    public ClusterCfg getClusterConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCluster(id), Cluster::getConfiguration);
     }
@@ -122,7 +122,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressCluster(BergamotDB db, @AsUUID UUID id)
+    public String suppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Cluster cluster = db.getCluster(id);
         if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");
@@ -133,7 +133,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressCluster(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Cluster cluster = db.getCluster(id);
         if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");
@@ -144,7 +144,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-resources")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressResourcesOnCluster(BergamotDB db, @AsUUID UUID id)
+    public String suppressResourcesOnCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Cluster cluster = db.getCluster(id);
         if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");
@@ -160,7 +160,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress-resources")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressResourcesOnCluster(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressResourcesOnCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Cluster cluster = db.getCluster(id);
         if (cluster == null) throw new BalsaNotFound("No cluster with id '" + id + "' exists.");

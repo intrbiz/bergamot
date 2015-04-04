@@ -6,11 +6,11 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -32,7 +32,7 @@ public class ServiceRouter extends Router<BergamotApp>
     
     @Any("/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void service(BergamotDB db, @AsUUID UUID id)
+    public void service(BergamotDB db, @IsaObjectId UUID id)
     {
         model("service", db.getService(id));
         model("alerts", db.getAllAlertsForCheck(id));
@@ -41,7 +41,7 @@ public class ServiceRouter extends Router<BergamotApp>
     
     @Any("/execute/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void executeService(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void executeService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Service service = db.getService(id);
         if (service != null)
@@ -53,7 +53,7 @@ public class ServiceRouter extends Router<BergamotApp>
     
     @Any("/enable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void enableService(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void enableService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Service service = db.getService(id);
         if (service != null)
@@ -67,7 +67,7 @@ public class ServiceRouter extends Router<BergamotApp>
     
     @Any("/disable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void disableService(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void disableService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Service service = db.getService(id);
         if (service != null)
@@ -81,7 +81,7 @@ public class ServiceRouter extends Router<BergamotApp>
     
     @Any("/suppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void suppressService(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void suppressService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Service service = db.getService(id);
         if (service != null)
@@ -93,7 +93,7 @@ public class ServiceRouter extends Router<BergamotApp>
     
     @Any("/unsuppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void unsuppressService(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void unsuppressService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Service service = db.getService(id);
         if (service != null)

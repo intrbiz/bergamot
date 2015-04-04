@@ -9,11 +9,11 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -45,7 +45,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CommandMO getCommand(BergamotDB db, @AsUUID UUID id)
+    public CommandMO getCommand(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCommand(id), Command::toMO);
     }
@@ -61,7 +61,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CommandCfg getCommandConfig(BergamotDB db, @AsUUID UUID id)
+    public CommandCfg getCommandConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCommand(id), Command::getConfiguration);
     }

@@ -8,12 +8,12 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -37,7 +37,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ServiceMO getService(BergamotDB db, @AsUUID UUID id)
+    public ServiceMO getService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getService(id), Service::toMO);
     }
@@ -45,7 +45,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getServiceState(BergamotDB db, @AsUUID UUID id)
+    public CheckStateMO getServiceState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getService(id), (s)->{return s.getState().toMO();});
     }
@@ -61,7 +61,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeService(BergamotDB db, @AsUUID UUID id)
+    public String executeService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Service service = db.getService(id);
         if (service == null) throw new BalsaNotFound("No service with id '" + id + "' exists.");
@@ -72,7 +72,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressService(BergamotDB db, @AsUUID UUID id)
+    public String suppressService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Service service = db.getService(id);
         if (service == null) throw new BalsaNotFound("No service with id '" + id + "' exists.");
@@ -83,7 +83,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressService(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Service service = db.getService(id);
         if (service == null) throw new BalsaNotFound("No service with id '" + id + "' exists.");
@@ -102,7 +102,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ServiceCfg getServiceConfig(BergamotDB db, @AsUUID UUID id)
+    public ServiceCfg getServiceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getService(id), Service::getConfiguration);
     }

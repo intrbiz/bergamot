@@ -6,12 +6,12 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -33,7 +33,7 @@ public class ClusterRouter extends Router<BergamotApp>
     
     @Any("/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void showClusterById(BergamotDB db, @AsUUID UUID id)
+    public void showClusterById(BergamotDB db, @IsaObjectId UUID id)
     {
         model("cluster", db.getCheck(id));
         model("alerts", db.getAllAlertsForCheck(id));
@@ -42,7 +42,7 @@ public class ClusterRouter extends Router<BergamotApp>
     
     @Any("/enable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void enableCluster(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void enableCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Cluster cluster = db.getCluster(id);
         if (cluster != null)
@@ -55,7 +55,7 @@ public class ClusterRouter extends Router<BergamotApp>
     
     @Any("/disable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void disableCluster(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void disableCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Cluster cluster = db.getCluster(id);
         if (cluster != null)
@@ -68,7 +68,7 @@ public class ClusterRouter extends Router<BergamotApp>
     
     @Any("/suppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void suppressCluster(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void suppressCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Cluster cluster = db.getCluster(id);
         if (cluster != null)
@@ -80,7 +80,7 @@ public class ClusterRouter extends Router<BergamotApp>
     
     @Any("/unsuppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void unsuppressCluster(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void unsuppressCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Cluster cluster = db.getCluster(id);
         if (cluster != null)
@@ -92,7 +92,7 @@ public class ClusterRouter extends Router<BergamotApp>
     
     @Any("/suppress-resource/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void suppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void suppressServicesOnHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         for (Resource resource : db.getResourcesOnCluster(id))
         {
@@ -103,7 +103,7 @@ public class ClusterRouter extends Router<BergamotApp>
     
     @Any("/unsuppress-resource/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void unsuppressServicesOnHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         for (Resource resource : db.getResourcesOnCluster(id))
         {

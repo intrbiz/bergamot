@@ -1,0 +1,17 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- A template view, applied to all views -->
+<fragment xmlns="com.intrbiz.balsa" title="Bad Request">
+	<div id="login-box">
+        <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Oops, that's a bad request</h4>
+		<p class="error centre">
+	    	The request you've made was bad, either malformed or contained unexpected data.
+	    </p>
+	    <data-set var="error" value="#{balsa().getValidationErrors()}">
+		    <p class="error centre">
+		    	Error: #{'"' + error.getMessage() + '"'}
+		    </p>
+	    </data-set>
+	</div>
+</fragment>

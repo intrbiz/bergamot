@@ -6,13 +6,13 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -34,7 +34,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void host(BergamotDB db, @AsUUID UUID id)
+    public void host(BergamotDB db, @IsaObjectId UUID id)
     {
         model("host", db.getHost(id));
         model("alerts", db.getAllAlertsForCheck(id));
@@ -43,7 +43,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/execute/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void executeHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void executeHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Host host = db.getHost(id);
         if (host != null)
@@ -55,7 +55,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/enable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void enableHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void enableHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Host host = db.getHost(id);
         if (host != null)
@@ -69,7 +69,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/disable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void disableHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void disableHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Host host = db.getHost(id);
         if (host != null)
@@ -83,7 +83,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/suppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void suppressHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void suppressHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Host host = db.getHost(id);
         if (host != null)
@@ -96,7 +96,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/unsuppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void unsuppressHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void unsuppressHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Host host = db.getHost(id);
         if (host != null)
@@ -109,7 +109,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/execute-services/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void executeServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void executeServicesOnHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         for (Service service : db.getServicesOnHost(id))
         {
@@ -120,7 +120,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/suppress-all/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void suppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void suppressServicesOnHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         for (Service service : db.getServicesOnHost(id))
         {
@@ -135,7 +135,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/unsuppress-all/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void unsuppressServicesOnHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         for (Service service : db.getServicesOnHost(id))
         {

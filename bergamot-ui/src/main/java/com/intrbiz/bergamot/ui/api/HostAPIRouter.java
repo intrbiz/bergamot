@@ -10,6 +10,7 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
@@ -19,7 +20,6 @@ import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -59,7 +59,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public HostMO getHost(BergamotDB db, @AsUUID UUID id)
+    public HostMO getHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getHost(id), Host::toMO);
     }
@@ -67,7 +67,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getHostState(BergamotDB db, @AsUUID UUID id)
+    public CheckStateMO getHostState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getHost(id), (h)->{return h.getState().toMO();});
     }
@@ -83,7 +83,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/services")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public List<ServiceMO> getHostServices(BergamotDB db, @AsUUID UUID id)
+    public List<ServiceMO> getHostServices(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getHost(id), (e)->{return e.getServices().stream().map(Service::toMO).collect(Collectors.toList());});
     }
@@ -99,7 +99,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/traps")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public List<TrapMO> getHostTraps(BergamotDB db, @AsUUID UUID id)
+    public List<TrapMO> getHostTraps(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getHost(id), (e)->{return e.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
     }
@@ -107,7 +107,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeHost(BergamotDB db, @AsUUID UUID id)
+    public String executeHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -118,7 +118,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppress(BergamotDB db, @AsUUID UUID id)
+    public String suppress(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -129,7 +129,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppress(BergamotDB db, @AsUUID UUID id)
+    public String unsuppress(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -140,7 +140,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    public String executeServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -156,7 +156,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    public String suppressServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -172,7 +172,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressServicesOnHost(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -188,7 +188,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-traps")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressTrapsOnHost(BergamotDB db, @AsUUID UUID id)
+    public String suppressTrapsOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -204,7 +204,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress-traps")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressTrapsOnHost(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressTrapsOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -220,7 +220,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-all")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressAllOnHost(BergamotDB db, @AsUUID UUID id)
+    public String suppressAllOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -241,7 +241,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress-all")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressAllOnHost(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressAllOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Host host = db.getHost(id);
         if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
@@ -270,7 +270,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public HostCfg getHostConfig(BergamotDB db, @AsUUID UUID id)
+    public HostCfg getHostConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getHost(id), Host::getConfiguration);
     }

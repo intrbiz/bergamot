@@ -6,11 +6,11 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -32,7 +32,7 @@ public class ResourceRouter extends Router<BergamotApp>
     
     @Any("/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void showResourceById(BergamotDB db, @AsUUID UUID id)
+    public void showResourceById(BergamotDB db, @IsaObjectId UUID id)
     {
         model("resource", db.getResource(id));
         model("alerts", db.getAllAlertsForCheck(id));
@@ -41,7 +41,7 @@ public class ResourceRouter extends Router<BergamotApp>
     
     @Any("/enable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void enableResource(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void enableResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Resource resource = db.getResource(id);
         if (resource != null)
@@ -54,7 +54,7 @@ public class ResourceRouter extends Router<BergamotApp>
     
     @Any("/disable/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void disableResource(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void disableResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Resource resource = db.getResource(id);
         if (resource != null)
@@ -67,7 +67,7 @@ public class ResourceRouter extends Router<BergamotApp>
     
     @Any("/suppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void suppressResource(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void suppressResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Resource resource = db.getResource(id);
         if (resource != null)
@@ -79,7 +79,7 @@ public class ResourceRouter extends Router<BergamotApp>
     
     @Any("/unsuppress/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void unsuppressResource(BergamotDB db, @AsUUID UUID id) throws IOException
+    public void unsuppressResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Resource resource = db.getResource(id);
         if (resource != null)

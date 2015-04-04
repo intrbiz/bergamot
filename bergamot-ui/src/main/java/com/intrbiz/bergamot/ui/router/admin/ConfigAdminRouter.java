@@ -5,9 +5,9 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
@@ -24,7 +24,7 @@ public class ConfigAdminRouter extends Router<BergamotApp>
 {        
     @Get("/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void showConfigure(BergamotDB db, @AsUUID UUID id, @SessionVar("site") Site site)
+    public void showConfigure(BergamotDB db, @IsaObjectId UUID id, @SessionVar("site") Site site)
     {
         var("config", db.getConfig(id));
         encode("admin/config/view");

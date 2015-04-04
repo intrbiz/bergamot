@@ -9,11 +9,11 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -49,7 +49,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @RequirePermission("api.read.time-period")
     @WithDataAdapter(BergamotDB.class)
-    public TimePeriodMO getTimePeriod(BergamotDB db, @AsUUID UUID id)
+    public TimePeriodMO getTimePeriod(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTimePeriod(id), TimePeriod::toMO);
     }
@@ -67,7 +67,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @RequirePermission("api.read.time-period.config")
     @WithDataAdapter(BergamotDB.class)
-    public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @AsUUID UUID id)
+    public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTimePeriod(id), TimePeriod::getConfiguration);
     }

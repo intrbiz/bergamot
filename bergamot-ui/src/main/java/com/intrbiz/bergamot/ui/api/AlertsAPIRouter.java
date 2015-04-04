@@ -9,6 +9,7 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.Contact;
@@ -16,7 +17,6 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
@@ -42,7 +42,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public AlertMO getAlert(BergamotDB db, @AsUUID UUID id)
+    public AlertMO getAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getAlert(id), Alert::toMO);
     }
@@ -50,7 +50,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/for-check/id/:id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public List<AlertMO> getAlertsForCheck(BergamotDB db, @AsUUID UUID id)
+    public List<AlertMO> getAlertsForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return db.getAlertsForCheck(id).stream().map(Alert::toMO).collect(Collectors.toList());
     }
@@ -58,7 +58,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/current/for-check/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public AlertMO getCurrentAlertForCheck(BergamotDB db, @AsUUID UUID id)
+    public AlertMO getCurrentAlertForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getCurrentAlertForCheck(id), Alert::toMO);
     }
@@ -68,7 +68,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public AlertMO acknowledgeAlert(
             BergamotDB db, 
-            @AsUUID UUID id,
+            @IsaObjectId(session = false) UUID id,
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
             @Param("comment") @CheckStringLength(min = 0, max = 4096, mandatory = false) String comment
     )
@@ -96,7 +96,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/render")
     @JSON
     @WithDataAdapter(BergamotDB.class)
-    public String renderAlert(BergamotDB db, @AsUUID UUID id)
+    public String renderAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Alert alert = var("alert", db.getAlert(id));
         return alert == null ? null : encodeBuffered("include/alert");
@@ -105,7 +105,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/dashboard/render")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String renderComment(BergamotDB db, @AsUUID UUID id)
+    public String renderComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Alert alert = db.getAlert(id);
         if (alert == null) return null;

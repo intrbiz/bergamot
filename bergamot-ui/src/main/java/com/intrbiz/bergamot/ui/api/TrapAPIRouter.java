@@ -8,6 +8,7 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.TrapMO;
@@ -16,7 +17,6 @@ import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
@@ -41,7 +41,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public TrapMO getTrap(BergamotDB db, @AsUUID UUID id)
+    public TrapMO getTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTrap(id), Trap::toMO);
     }
@@ -49,7 +49,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getTrapState(BergamotDB db, @AsUUID UUID id)
+    public CheckStateMO getTrapState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTrap(id), (t)->{return t.getState().toMO();});
     }
@@ -65,7 +65,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Any("/id/:id/submit")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public String getServiceState(BergamotDB db, @Var("site") Site site, @AsUUID() UUID id, @Param("status") String status, @Param("output") String output)
+    public String getServiceState(BergamotDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id, @Param("status") String status, @Param("output") String output)
     {   
         Trap trap = db.getTrap(id);
         if (trap == null) return null;
@@ -88,7 +88,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressTrap(BergamotDB db, @AsUUID UUID id)
+    public String suppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Trap trap = db.getTrap(id);
         if (trap == null) throw new BalsaNotFound("No trap with id '" + id + "' exists.");
@@ -99,7 +99,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressTrap(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Trap trap = db.getTrap(id);
         if (trap == null) throw new BalsaNotFound("No trap with id '" + id + "' exists.");
@@ -118,7 +118,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public TrapCfg getTrapConfig(BergamotDB db, @AsUUID UUID id)
+    public TrapCfg getTrapConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getTrap(id), Trap::getConfiguration);
     }

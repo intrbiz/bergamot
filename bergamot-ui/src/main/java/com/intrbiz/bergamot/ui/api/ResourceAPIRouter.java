@@ -8,12 +8,12 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -37,7 +37,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ResourceMO getResource(BergamotDB db, @AsUUID UUID id)
+    public ResourceMO getResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getResource(id), Resource::toMO);
     }
@@ -45,7 +45,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getResourceState(BergamotDB db, @AsUUID UUID id)
+    public CheckStateMO getResourceState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getResource(id), (r)->{return r.getState().toMO();});
     }
@@ -69,7 +69,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ResourceCfg getResourceConfig(BergamotDB db, @AsUUID UUID id)
+    public ResourceCfg getResourceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getResource(id), Resource::getConfiguration);
     }
@@ -77,7 +77,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressResource(BergamotDB db, @AsUUID UUID id)
+    public String suppressResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Resource resource = db.getResource(id);
         if (resource == null) throw new BalsaNotFound("No resource with id '" + id + "' exists.");
@@ -88,7 +88,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressCluster(BergamotDB db, @AsUUID UUID id)
+    public String unsuppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Resource resource = db.getResource(id);
         if (resource == null) throw new BalsaNotFound("No resource with id '" + id + "' exists.");

@@ -7,11 +7,11 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.IsaUUID;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
@@ -37,7 +37,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     
     @Any("/lock")
     @WithDataAdapter(BergamotDB.class)
-    public void lock(BergamotDB db, @Param("id") @IsaUUID(mandatory = true) UUID contactId) throws IOException
+    public void lock(BergamotDB db, @Param("id") @IsaObjectId UUID contactId) throws IOException
     {
         action("lock-password", db.getContact(contactId));
         redirect(path("/admin/contact/"));
@@ -45,7 +45,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     
     @Any("/unlock")
     @WithDataAdapter(BergamotDB.class)
-    public void unlock(BergamotDB db, @Param("id") @IsaUUID(mandatory = true) UUID contactId) throws IOException
+    public void unlock(BergamotDB db, @Param("id") @IsaObjectId UUID contactId) throws IOException
     {
         action("unlock-password", db.getContact(contactId));
         redirect(path("/admin/contact/"));
@@ -53,7 +53,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     
     @Any("/reset")
     @WithDataAdapter(BergamotDB.class)
-    public void reset(BergamotDB db, @Param("id") @IsaUUID(mandatory = true) UUID contactId) throws IOException
+    public void reset(BergamotDB db, @Param("id") @IsaObjectId UUID contactId) throws IOException
     {
         action("reset-password", db.getContact(contactId));
         redirect(path("/admin/contact/"));

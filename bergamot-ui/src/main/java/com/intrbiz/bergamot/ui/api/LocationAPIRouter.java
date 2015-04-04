@@ -10,13 +10,13 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.LocationMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -73,7 +73,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public LocationMO getLocation(BergamotDB db, @AsUUID() UUID id)
+    public LocationMO getLocation(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getLocation(id), Location::toMO);
     }
@@ -81,7 +81,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/children")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public List<LocationMO> getLocationChildren(BergamotDB db, @AsUUID() UUID id)
+    public List<LocationMO> getLocationChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getLocation(id), (e)->{return e.getChildren().stream().map(Location::toMO).collect(Collectors.toList());});
     }
@@ -89,7 +89,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/hosts")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public List<HostMO> getLocationHosts(BergamotDB db, @AsUUID() UUID id)
+    public List<HostMO> getLocationHosts(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getLocation(id), (e)->{return e.getHosts().stream().map(Host::toMO).collect(Collectors.toList());});
     }
@@ -97,7 +97,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute-all-hosts")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeHostsInLocation(BergamotDB db, @AsUUID UUID id)
+    public String executeHostsInLocation(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Location location = db.getLocation(id);
         if (location == null) throw new BalsaNotFound("No location with id '" + id + "' exists.");
@@ -121,7 +121,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public LocationCfg getLocationConfig(BergamotDB db, @AsUUID UUID id)
+    public LocationCfg getLocationConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getLocation(id), Location::getConfiguration);
     }

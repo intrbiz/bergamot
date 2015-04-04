@@ -10,11 +10,11 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.AsUUID;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
@@ -52,7 +52,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @RequirePermission("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
-    public ContactMO getContact(BergamotDB db, @AsUUID UUID id)
+    public ContactMO getContact(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getContact(id), Contact::toMO);
     }
@@ -88,7 +88,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @RequirePermission("api.read.contact.config")
     @WithDataAdapter(BergamotDB.class)
-    public ContactCfg getContactConfig(BergamotDB db, @AsUUID UUID id)
+    public ContactCfg getContactConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         return Util.nullable(db.getContact(id), Contact::getConfiguration);
     }
@@ -97,7 +97,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @JSON()
     @RequirePermission("api.write.contact.set-password")
     @WithDataAdapter(BergamotDB.class)
-    public Boolean setPassword(BergamotDB db, @AsUUID UUID id, @Param("password") @CheckStringLength(min = 1, max = 80, mandatory = true) String password)
+    public Boolean setPassword(BergamotDB db, @IsaObjectId(session = false) UUID id, @Param("password") @CheckStringLength(min = 1, max = 80, mandatory = true) String password)
     {
         Contact contact = db.getContact(id);
         if (contact == null) throw new BalsaNotFound("No contact with the id: " + id);
