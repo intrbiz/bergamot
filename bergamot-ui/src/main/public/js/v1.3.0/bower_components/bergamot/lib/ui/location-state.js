@@ -17,7 +17,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	
 	this.updateLocation = function(/*Object*/ location)
 	{
-	    this.log_debug("Updating location state, to: " + location.state.ok + " " + location.state.status);
+	    // this.log_debug("Updating location state, to: " + location.state.ok + " " + location.state.status);
 	    this.$node.find("h3 span.dash_img").attr("class", "dash_img status_" + location.state.status.toLowerCase());
 	    this.$node.find("h3 span.dash_img").attr("title", "The location is " + location.state.status.toLowerCase());
 	    this.$node.find("p.field-status span.value").text(location.state.status.toUpperCase().substring(0,1) + location.state.status.toLowerCase().substring(1));
@@ -38,20 +38,19 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    
 	this.onUpdate = function(/*Event*/ ev, /*Object*/ data)
 	{
-	    this.log_debug("Got server notification: " + data.update);
+	    // this.log_debug("Got server notification: " + data.update);
 	    if (data.update.location && data.update.location.id == this.attr.location_id)
 	    {
-	    	this.log_debug("Updating location state");
 	    	this.updateLocation(data.update.location);
 	    }
 	};
 	
 	this.onConnected = function(/*Event*/ ev)
 	{
-	    this.log_debug("Registering for updates, location id: " + this.attr.location_id);
+	    // this.log_debug("Registering for updates, location id: " + this.attr.location_id);
 	    this.registerForUpdates([ this.attr.location_id ], function(message)
 	    {
-	    	this.log_debug("Registered for updates: " + message.stat);
+	    	// this.log_debug("Registered for updates: " + message.stat);
 	    }, 
 	    function(message)
 	    {

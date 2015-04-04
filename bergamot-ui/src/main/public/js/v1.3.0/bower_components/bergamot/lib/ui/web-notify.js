@@ -18,7 +18,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
             
         this.onNotification = function(/*Event*/ ev, /*Object*/ data)
         {
-            this.log_debug("Got server notification: " + JSON.stringify(data.notification));
+            // this.log_debug("Got server notification: " + JSON.stringify(data.notification));
             // raise desktop notification
             if (("Notification" in window) && Notification.permission === "granted")
             {
@@ -27,8 +27,8 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
                 var id    = data.notification.alert_id;
                 var text  = data.notification.check.state.status + ": " + data.notification.check.state.output;
                 // raise
-                this.log_debug("Raising desktop notification: " + title + " ==> " + url);
-                var notification = new Notification(title, { tag:  id, body: text, icon: "/dialog-information.png" });
+                // this.log_debug("Raising desktop notification: " + title + " ==> " + url);
+                var notification = new Notification(title, { tag:  id, body: text, icon: "/images/icons/64/alert.png" });
                 $(notification).click(function(ev) {
                     window.location = url;
                 });
@@ -69,12 +69,12 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
         
         this.onConnected = function(/*Event*/ ev)
         {
-            this.log_debug("Registering for notifications, site id: " + this.attr.site_id);
+            // this.log_debug("Registering for notifications, site id: " + this.attr.site_id);
             this.registerForNotifications(
                 this.attr.site_id, 
                 function(message)
                 {
-                    this.log_debug("Registered for notifications: " + message.stat);
+                    // this.log_debug("Registered for notifications: " + message.stat);
                 }, 
                 function(message)
                 {

@@ -17,7 +17,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	
 	this.updateGroup = function(/*Object*/ group)
 	{
-	    this.log_debug("Updating group state, to: " + group.state.ok + " " + group.state.status);
+	    // this.log_debug("Updating group state, to: " + group.state.ok + " " + group.state.status);
 	    this.$node.find("h3 span.dash_img").attr("class", "dash_img status_" + group.state.status.toLowerCase());
 	    this.$node.find("h3 span.dash_img").attr("title", "The group is " + group.state.status.toLowerCase());
 	    this.$node.find("p.field-status span.value").text(group.state.status.toUpperCase().substring(0,1) + group.state.status.toLowerCase().substring(1));
@@ -38,7 +38,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    
 	this.onUpdate = function(/*Event*/ ev, /*Object*/ data)
 	{
-	    this.log_debug("Got server notification: " + data.update);
+	    // this.log_debug("Got server notification: " + data.update);
 	    if (data.update.group && data.update.group.id == this.attr.group_id)
 	    {
 	    	this.updateGroup(data.update.group);
@@ -47,10 +47,10 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	
 	this.onConnected = function(/*Event*/ ev)
 	{
-	    this.log_debug("Registering for updates, group id: " + this.attr.group_id);
+	    // this.log_debug("Registering for updates, group id: " + this.attr.group_id);
 	    this.registerForUpdates([ this.attr.group_id ], function(message)
 	    {
-	    	this.log_debug("Registered for updates: " + message.stat);
+	    	// this.log_debug("Registered for updates: " + message.stat);
 	    }, 
 	    function(message)
 	    {

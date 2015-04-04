@@ -7,7 +7,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    // get the check id
 	    if (! this.attr.check_id)
 	    {
-		this.attr.check_id = this.$node.attr("data-check-id");
+	    	this.attr.check_id = this.$node.attr("data-check-id");
 	    }
 	    // handle the on connected event
 	    this.on(document, "bergamot-api-connected", this.onConnected);
@@ -17,7 +17,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	
 	this.updateCheck = function(/*Object*/ check)
 	{
-	    this.log_debug("Updating check state, to: " + check.state.ok + " " + check.state.status);
+	    // this.log_debug("Updating check state, to: " + check.state.ok + " " + check.state.status);
 	    this.$node.find("h3 span.dash_img").attr("class", "dash_img status_" + check.state.status.toLowerCase());
 	    this.$node.find("h3 span.dash_img").attr("title", "The check is " + check.state.status.toLowerCase());
 	    this.$node.find("p.field-status span.value").text(check.state.status.toUpperCase().substring(0,1) + check.state.status.toLowerCase().substring(1));
@@ -34,7 +34,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    $(attempt_flag_span).text(check.state.hard ? "Steady" : "Changing");
 	    this.$node.find("p.field-attempt span.value").html([attempt_span, attempt_flag_span]);
 	    // animate the update
-	    var $fadeNode = this.$node;/*.find("h3 span.dash_img");*/
+	    var $fadeNode = this.$node;
 	    $fadeNode.fadeTo(800, 0.2, function() { 
 	    	$fadeNode.fadeTo(600, 0.8, function() {
 	    		$fadeNode.fadeTo(600, 0.2, function() { 
@@ -64,23 +64,23 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    
 	this.onUpdate = function(/*Event*/ ev, /*Object*/ data)
 	{
-	    this.log_debug("Got server notification: " + data.update);
+	    // this.log_debug("Got server notification: " + data.update);
 	    if (data.update.check && data.update.check.id == this.attr.check_id)
 	    {
-		this.updateCheck(data.update.check);
+	    	this.updateCheck(data.update.check);
 	    }
 	};
 	
 	this.onConnected = function(/*Event*/ ev)
 	{
-	    this.log_debug("Registering for updates, check id: " + this.attr.check_id);
+	    // this.log_debug("Registering for updates, check id: " + this.attr.check_id);
 	    this.registerForUpdates([ this.attr.check_id ], function(message)
 	    {
-		this.log_debug("Registered for updates: " + message.stat);
+	    	//	this.log_debug("Registered for updates: " + message.stat);
 	    }, 
 	    function(message)
 	    {
-		this.log_debug("Failed to register for updates: " + message.stat + " " + message.message);
+	    	this.log_debug("Failed to register for updates: " + message.stat + " " + message.message);
 	    });
 	};
 	

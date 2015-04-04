@@ -3,7 +3,7 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Overview">
 		<!-- Alerts -->
-		<div class="row" rendered="#{! alerts.isEmpty()}">
+		<div class="row" rendered="#{! alerts.isEmpty()}" id="alerts">
 			<h2>Alerts</h2>
 			<data-set var="check" value="#{alerts}">
 				<include view="include/check" data-alert="#{true}"/>
@@ -35,5 +35,14 @@
 			require(["bergamot/lib/ui/location-state"], function(bergamot_ui_location_state) {
 		    	bergamot_ui_location_state.attachTo("div[data-location-id]");
 			});
+			require(["bergamot/lib/ui/dash_alerts"], function(bergamot_ui_dash_alerts) {
+			    bergamot_ui_dash_alerts.attachTo(document, {
+			    	site_id: #{'"' + site.id + '"'},
+			    	api_path: #{'"' + path('/api/') + '"'}
+			    });
+			});
+			require(["bergamot/lib/ui/check-state"], function(bergamot_ui_check_state) {
+		    	bergamot_ui_check_state.attachTo("div[data-check-id]");
+			})
 		</script>
 </fragment>

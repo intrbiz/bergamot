@@ -101,4 +101,16 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         Alert alert = var("alert", db.getAlert(id));
         return alert == null ? null : encodeBuffered("include/alert");
     }
+    
+    @Get("/id/:id/dashboard/render")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public String renderComment(BergamotDB db, @AsUUID UUID id)
+    {
+        Alert alert = db.getAlert(id);
+        if (alert == null) return null;
+        var("check", alert.getCheck());
+        var("alert", true);
+        return encodeBuffered("include/check");
+    }
 }
