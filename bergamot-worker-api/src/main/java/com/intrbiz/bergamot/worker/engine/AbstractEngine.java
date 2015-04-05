@@ -21,6 +21,7 @@ import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.bergamot.worker.Worker;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
+import com.intrbiz.queue.QueueException;
 import com.intrbiz.queue.RoutedProducer;
 
 public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
@@ -162,10 +163,17 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     public void bindAgent(UUID agentId)
     {
         logger.trace("Binding agent " + agentId + " to worker " + this.getWorker().getId());
-        for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
+        try
         {
-            consumer.addBinding(new AgentBinding(agentId));
-            break; // shared queue so only need to update bindings once
+            for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
+            {
+                consumer.addBinding(new AgentBinding(agentId));
+                break; // shared queue so only need to update bindings once
+            }
+        }
+        catch (QueueException e)
+        {
+            logger.debug("Error binding agent", e);
         }
     }
     
@@ -173,10 +181,17 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     public void unbindAgent(UUID agentId)
     {
         logger.trace("Unbinding agent " + agentId + " to worker " + this.getWorker().getId());
-        for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
+        try
         {
-            consumer.removeBinding(new AgentBinding(agentId));
-            break; // shared queue so only need to update bindings once
+            for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
+            {
+                consumer.removeBinding(new AgentBinding(agentId));
+                break; // shared queue so only need to update bindings once
+            }
+        }
+        catch (QueueException e)
+        {
+            logger.debug("Error binding agent", e);
         }
     }
 
