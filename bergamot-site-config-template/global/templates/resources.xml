@@ -2,8 +2,10 @@
 <bergamot site="bergamot.template">
     
     <resource template="yes" name="generic-resource">
+        <summary>Generic Resource</summary>
         <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
         <notify teams="admins"/>
+        <description>A generic resource template</description>
     </resource>
     
 </bergamot>

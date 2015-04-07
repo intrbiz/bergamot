@@ -2,8 +2,10 @@
 <bergamot site="bergamot.template">
     
     <cluster template="yes" name="generic-cluster">
+        <summary>Generic Cluster</summary>
         <notifications time-period="24x7"/>
         <notify teams="admins"/>
+        <description>A generic cluster template</description>
     </cluster>
     
 </bergamot>
