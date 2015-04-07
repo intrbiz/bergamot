@@ -2,10 +2,12 @@
 <bergamot site="bergamot.template">
     
     <service template="yes" name="generic-service">
+        <summary>Generic Service</summary>
         <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
         <notify teams="admins"/>
         <state failed-after="4" recovers-after="10"/>
         <schedule every="5" retry-every="1" time-period="24x7"/>
+        <description>A generic service template</description>
     </service>
     
     <service name="linux-service" groups="linux-services" extends="generic-service" template="yes">

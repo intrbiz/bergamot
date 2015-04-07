@@ -2,10 +2,12 @@
 <bergamot site="bergamot.template">
     
     <trap template="yes" name="generic-trap">
+        <summary>Generic Trap</summary>
         <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
         <notify teams="admins"/>
         <state failed-after="1" recovers-after="1"/>
         <initially status="ok" output="OK"/>
+        <description>A generic trap template</description>
     </trap>
     
     <trap name="network-trap" extends="generic-trap" template="yes">
