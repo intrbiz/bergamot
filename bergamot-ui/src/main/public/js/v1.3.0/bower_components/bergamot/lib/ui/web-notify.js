@@ -25,7 +25,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
                 var title = this.getNotificationTitle(data.notification);
                 var url   = this.getCheckUrl(data.notification.check);
                 var id    = data.notification.alert_id;
-                var text  = data.notification.check.state.status + ": " + data.notification.check.state.output;
+                var text  = (!! data.notification.check.state.output) ? (data.notification.check.state.status + ": " + data.notification.check.state.output) : data.notification.check.state.status;
                 // raise
                 // this.log_debug("Raising desktop notification: " + title + " ==> " + url);
                 var notification = new Notification(title, { tag:  id, body: text, icon: "/images/icons/64/alert.png" });

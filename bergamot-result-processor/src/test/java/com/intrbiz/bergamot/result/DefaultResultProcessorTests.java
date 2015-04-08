@@ -1,3 +1,4 @@
+package com.intrbiz.bergamot.result;
 import static org.junit.Assert.*;
 
 import java.sql.Timestamp;

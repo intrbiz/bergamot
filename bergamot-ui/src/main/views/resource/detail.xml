@@ -28,6 +28,13 @@
 				    <span class="value">#{resource.cluster.summary}</span>
 				</a>
 		    </p>
+		    <p class="field-attempt">
+			    <span class="label wide">State: </span>
+			    <span class="value">
+			    	<span class="info" rendered="#{cluster.state.transitioning}" title="The check is changing state">Changing</span>
+			    	<span class="info" rendered="#{cluster.state.hard}" title="The check is in a steady state">Steady</span>
+			    </span>
+		    </p>
 		    <p>
 			    <span class="label wide">Suppressed: </span>
 			    <span class="value">#{if(resource.suppressed, 'yes', 'no')}</span>
@@ -73,6 +80,9 @@
 	
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{resource}"/>
+	
+	<!-- Stats -->
+	<include view="include/check_stats" data-check="#{resource}"/>
 	
 	<!-- Configuration -->
 	<include view="include/check_configuration" data-check="#{resource}"/>

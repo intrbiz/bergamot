@@ -133,7 +133,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
                 logger.info("State change for " + check.getType() + "::" + check.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
                 // log the transition
-                db.logCheckTransition(transition.toCheckTransition(resultMO.getId(), check.getId(), new Timestamp(resultMO.getProcessed())));
+                db.logCheckTransition(transition.toCheckTransition(check.getSite().randomObjectId(), check.getId(), new Timestamp(resultMO.getProcessed())));
                 // update the check state
                 db.setCheckState(transition.nextState);
                 // compute the check stats
@@ -154,7 +154,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // send the general state update notifications
                 this.sendCheckStateUpdate(db, check, transition);
                 // send group updates
-                if (transition.stateChange || transition.hardChange || transition.alert || transition.recovery || (! transition.nextState.getStatus().equals(transition.previousState.getStatus())))
+                if (transition.stateChange || transition.hardChange || transition.alert || transition.recovery || transition.nextState.getStatus() != transition.previousState.getStatus())
                 {
                     // group update
                     this.sendGroupStateUpdate(db, check, transition);
@@ -267,24 +267,27 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         {
             // get the current alert for this check
             Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
-            alertRecord.setRecovered(true);
-            alertRecord.setRecoveredAt(new Timestamp(System.currentTimeMillis()));
-            alertRecord.setRecoveredBy(check.getState().getLastCheckId());
-            db.setAlert(alertRecord);
-            // send notifications?
-            Calendar now = Calendar.getInstance();
-            // send?
-            if (check.getNotifications().isEnabledAt(NotificationType.RECOVERY, check.getState().getStatus(), now))
+            if (alertRecord != null)
             {
-                SendRecovery recovery = this.createNotification(check, alertRecord, now, NotificationType.RECOVERY, SendRecovery::new);
-                if (!recovery.getTo().isEmpty())
+                alertRecord.setRecovered(true);
+                alertRecord.setRecoveredAt(new Timestamp(System.currentTimeMillis()));
+                alertRecord.setRecoveredBy(check.getState().getLastCheckId());
+                db.setAlert(alertRecord);
+                // send notifications?
+                Calendar now = Calendar.getInstance();
+                // send?
+                if (check.getNotifications().isEnabledAt(NotificationType.RECOVERY, check.getState().getStatus(), now))
                 {
-                    logger.warn("Sending recovery for " + check);
-                    this.publishNotification(check, recovery);
-                }
-                else
-                {
-                    logger.warn("Not sending recovery for " + check + " no contacts configured.");
+                    SendRecovery recovery = this.createNotification(check, alertRecord, now, NotificationType.RECOVERY, SendRecovery::new);
+                    if (!recovery.getTo().isEmpty())
+                    {
+                        logger.warn("Sending recovery for " + check);
+                        this.publishNotification(check, recovery);
+                    }
+                    else
+                    {
+                        logger.warn("Not sending recovery for " + check + " no contacts configured.");
+                    }
                 }
             }
         }
@@ -362,7 +365,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
                 return new Transition(currentState, nextState, true, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
             }
         }
@@ -381,7 +383,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
                 return new Transition(currentState, nextState, false, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
             }
             else
@@ -392,71 +393,115 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     }
 
     // virtual check handling
-
     protected void updateVirtualChecks(Check<?, ?> check, Transition transition, ResultMO resultMO, BergamotDB db)
+    {
+        this.updateVirtualChecks(check, transition, resultMO, db, new HashSet<UUID>());
+    }
+    
+    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, ResultMO resultMO, BergamotDB db, Set<UUID> processedVirtualChecks)
     {
         for (VirtualCheck<?, ?> referencedBy : check.getReferencedBy())
         {
-            logger.info("Propagating result to check " + referencedBy);
-            // get the state
-            CheckState referencedByState = referencedBy.getState();
+            // cycle handling
+            if (processedVirtualChecks.contains(referencedBy.getId()))
+            {
+                // we've already processed this virtual check, skip it
+                continue;
+            }
+            processedVirtualChecks.add(referencedBy.getId());
             // update the status of the check
             boolean ok = referencedBy.getCondition().computeOk();
             Status status = referencedBy.getCondition().computeStatus();
+            boolean allHard = referencedBy.getCondition().isAllDependenciesHard();
             // update the check
-            boolean isStateChange = this.applyVirtualResult(referencedBy, referencedByState, ok, status, resultMO);
-            logger.info("State change for virtual check " + referencedBy + " to " + check.getState().isOk() + " " + check.getState().getStatus() + " caused by " + check);
+            Transition virtualTransition = this.applyVirtualResult(referencedBy, referencedBy.getState(), ok, status, allHard, resultMO);
+            logger.info("Virtual state change for " + referencedBy.getType() + "::" + referencedBy.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange + " triggered by " + check.getType() + "::" + check.getId());
             // update the state
-            db.setCheckState(referencedByState);
+            db.logCheckTransition(virtualTransition.toCheckTransition(referencedBy.getSite().randomObjectId(), referencedBy.getId(), new Timestamp(resultMO.getProcessed())));
+            db.setCheckState(virtualTransition.nextState);
             db.commit();
             // send the general state update notifications
-            this.sendCheckStateUpdate(db, referencedBy, null);
-            // send notifications
-            // only send notifications when a dependent check has reached a hard state change
-            if (isStateChange && transition.hardChange)
+            this.sendCheckStateUpdate(db, referencedBy, virtualTransition);
+            // send group state updates
+            if (virtualTransition.stateChange || virtualTransition.hardChange || virtualTransition.alert || virtualTransition.recovery || virtualTransition.nextState.getStatus() != virtualTransition.previousState.getStatus())
             {
-                if (referencedBy.getState().isOk())
-                {
-                    // send recovery
-                    this.sendRecovery(referencedBy, db);
-                }
-                else
-                {
-                    // send alert
-                    this.sendAlert(referencedBy, db);
-                }
+                this.sendGroupStateUpdate(db, referencedBy, virtualTransition);
             }
+            // send notifications
+            if (virtualTransition.alert)
+            {
+                this.sendAlert(referencedBy, db);
+            }
+            if (virtualTransition.recovery)
+            {
+                this.sendRecovery(referencedBy, db);
+            }
+            // recurse
+            this.updateVirtualChecks(referencedBy, virtualTransition, resultMO, db, processedVirtualChecks);
         }
     }
 
-    protected boolean applyVirtualResult(VirtualCheck<?, ?> check, CheckState state, boolean ok, Status status, ResultMO cause)
+    protected Transition applyVirtualResult(VirtualCheck<?, ?> check, CheckState currentState, boolean ok, Status status, boolean allHard, ResultMO cause)
     {
-        boolean isStateChange = state.isOk() ^ ok;
-        // always in a hard state
-        // as the hard / soft state logic has already happened
-        state.setHard(true);
-        state.setAttempt(0);
-        state.setTransitioning(false);
-        state.setFlapping(false);
-        // is it a state change
-        if (isStateChange)
+     // the next state
+        CheckState nextState = currentState.clone();
+        // apply the result to the next state
+        nextState.setOk(ok);
+        nextState.pushOkHistory(ok);
+        nextState.setStatus(status);
+        nextState.setOutput(null);
+        nextState.setLastCheckTime(new Timestamp(cause.getExecuted()));
+        // compute the transition
+        // do we have a state change
+        if (currentState.isOk() ^ nextState.isOk())
         {
-            state.setLastStateChange(new Timestamp(System.currentTimeMillis()));
-            // copy the last hard state
-            state.setLastHardOk(state.isOk());
-            state.setLastHardStatus(state.getStatus());
-            state.setLastHardOutput(state.getOutput());
+            // if the previous state was a hard state, update the last known hard state as we've now left that state
+            if (currentState.isHard())
+            {
+                nextState.setLastHardOk(currentState.isOk());
+                nextState.setLastHardStatus(currentState.getStatus());
+                nextState.setLastHardOutput(currentState.getOutput());
+            }
+            // we've changed state
+            nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
+            // begin or immediately transition
+            if (! allHard)
+            {
+                // start the transition, until all dependent checks reach a hard state
+                nextState.setHard(false);
+                nextState.setTransitioning(true);
+                nextState.setAttempt(0);               
+                return new Transition(currentState, nextState, true, false, false, false);
+            }
+            else
+            {
+                // immediately enter hard state as all dependent checks are in a hard state
+                nextState.setHard(true);
+                nextState.setTransitioning(false);
+                nextState.setAttempt(0);
+                return new Transition(currentState, nextState, true, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
+            }
         }
-        // update the state
-        state.setLastCheckId(cause.getId());
-        state.setLastCheckTime(new Timestamp(cause.getExecuted()));
-        state.setOk(ok);
-        state.pushOkHistory(ok);
-        state.setStatus(status);
-        // no output
-        state.setOutput(null);
-        // is state change
-        return isStateChange;
+        else if (currentState.isHard())
+        {
+            // steady state
+            return new Transition(currentState, nextState, false, false, false, false);
+        }
+        else
+        {
+            // have we reached a hard state
+            if (allHard)
+            {
+                nextState.setHard(true);
+                nextState.setTransitioning(false);
+                nextState.setAttempt(0);
+                return new Transition(currentState, nextState, false, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
+            }
+            else
+            {
+                return new Transition(currentState, nextState, false, false, false, false);
+            }
+        }
     }
     
     protected CheckStats computeStats(CheckStats stats, ActiveResultMO resultMO)

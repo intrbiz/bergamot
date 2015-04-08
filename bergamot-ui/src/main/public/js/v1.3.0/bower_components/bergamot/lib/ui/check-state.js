@@ -27,7 +27,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    // attempt
 	    // build each element to avoid XSS
 	    var attempt_span = document.createElement("span");
-	    $(attempt_span).text(check.state.attempt + " of " + check.current_attempt_threshold + " ");
+	    if (check.current_attempt_threshold) $(attempt_span).text(check.state.attempt + " of " + check.current_attempt_threshold + " ");
 	    var attempt_flag_span = document.createElement("span");
 	    $(attempt_flag_span).attr("class", "info")
 	    $(attempt_flag_span).attr("title", check.state.hard ? "The host is in a steady state" : "The check is changing state")

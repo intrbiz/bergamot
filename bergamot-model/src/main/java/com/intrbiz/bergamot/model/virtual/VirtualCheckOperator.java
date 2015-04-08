@@ -22,5 +22,19 @@ public abstract class VirtualCheckOperator implements Serializable
         return checks;
     }
     
+    
+    /**
+     * Are all dependent checks in a hard state?
+     */
+    public boolean isAllDependenciesHard()
+    {
+        for (Check<?, ?> check : this.computeDependencies())
+        {
+            if (! check.getState().isHard())
+                return false;
+        }
+        return true;
+    }
+    
     public abstract void computeDependencies(Set<Check<?,?>> checks);
 }

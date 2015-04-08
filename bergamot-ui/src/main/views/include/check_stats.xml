@@ -1,42 +1,44 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
-	<container rendered="#{check.stats != null and Balsa().permission('ui.view.stats')}">
+	<container rendered="#{Balsa().permission('ui.view.stats')}">
 		<h2>Statistics</h2>
 		<div class="row">
 			<div class="submenu pull-right" rendered="#{Balsa().permission('ui.view.stats.transitions')}">
 				<a href="/stats/transitions/check/id/#{check.id}">View check transitions</a>
 			</div>
-			<div class="col4 dash_icon">
-				<p>
-					<span class="label wide">Last runtime: </span>
-					<span class="value">#{decimalformat('0.000', check.stats.lastRuntime / 1000.0)} s</span>
-				</p>
-				<p>
-					<span class="label wide">Average runtime: </span>
-					<span class="value">#{decimalformat('0.000', check.stats.averageRuntime / 1000.0)} s</span>
-				</p>
-			</div>
-			<div class="col4 dash_icon">
-				<p>
-					<span class="label wide">Last processing latency: </span>
-					<span class="value">#{decimalformat('0.000', check.stats.lastCheckProcessingLatency / 1000.0)} s</span>
-				</p>
-				<p>
-					<span class="label wide">Average processing latency: </span>
-					<span class="value">#{decimalformat('0.000', check.stats.averageCheckProcessingLatency / 1000.0)} s</span>
-				</p>
-			</div>
-			<div class="col4 dash_icon">
-				<p>
-					<span class="label wide">Last execution latency: </span>
-					<span class="value">#{decimalformat('0.000', check.stats.lastCheckExecutionLatency / 1000.0)} s</span>
-				</p>
-				<p>
-					<span class="label wide">Average execution latency: </span>
-					<span class="value">#{decimalformat('0.000', check.stats.averageCheckExecutionLatency / 1000.0)} s</span>
-				</p>
-			</div>
+			<container rendered="#{check.stats != null}">
+				<div class="col4 dash_icon">
+					<p>
+						<span class="label wide">Last runtime: </span>
+						<span class="value">#{decimalformat('0.000', check.stats.lastRuntime / 1000.0)} s</span>
+					</p>
+					<p>
+						<span class="label wide">Average runtime: </span>
+						<span class="value">#{decimalformat('0.000', check.stats.averageRuntime / 1000.0)} s</span>
+					</p>
+				</div>
+				<div class="col4 dash_icon">
+					<p>
+						<span class="label wide">Last processing latency: </span>
+						<span class="value">#{decimalformat('0.000', check.stats.lastCheckProcessingLatency / 1000.0)} s</span>
+					</p>
+					<p>
+						<span class="label wide">Average processing latency: </span>
+						<span class="value">#{decimalformat('0.000', check.stats.averageCheckProcessingLatency / 1000.0)} s</span>
+					</p>
+				</div>
+				<div class="col4 dash_icon">
+					<p>
+						<span class="label wide">Last execution latency: </span>
+						<span class="value">#{decimalformat('0.000', check.stats.lastCheckExecutionLatency / 1000.0)} s</span>
+					</p>
+					<p>
+						<span class="label wide">Average execution latency: </span>
+						<span class="value">#{decimalformat('0.000', check.stats.averageCheckExecutionLatency / 1000.0)} s</span>
+					</p>
+				</div>
+			</container>
 		</div>
 	</container>
 </fragment>
