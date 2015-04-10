@@ -109,6 +109,7 @@ public class BergamotConfigWriter
         // write
         for (Entry<File, BergamotCfg> configFile : configFiles.entrySet())
         {
+            configFile.getKey().getParentFile().mkdirs();
             try (FileOutputStream out = new FileOutputStream(configFile.getKey()))
             {
                 BergamotCfg.write(BergamotCfg.class, configFile.getValue(), out);
