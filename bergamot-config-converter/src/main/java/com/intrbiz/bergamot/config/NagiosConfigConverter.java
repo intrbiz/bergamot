@@ -1,10 +1,12 @@
 package com.intrbiz.bergamot.config;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.compat.command.NagiosCommandString;
@@ -38,14 +40,42 @@ import com.intrbiz.configuration.CfgParameter;
 
 public class NagiosConfigConverter
 {
+    private boolean withDebug = false;
+    
     private BergamotCfg config;
 
     private NagiosConfigBuilder nagiosConfig;
+    
+    /**
+     * Host templates of services applied by host group
+     */
+    private Map<String, HostCfg> hostgroupTemplates = new HashMap<String, HostCfg>();
+
+    /**
+     * Short names for host templates
+     */
+    private AtomicInteger hostTemplateId = new AtomicInteger();
+    
+    /**
+     * A mapping of flattened hosts to host template
+     */
+    private Map<String, String> hostsToHostTemplate = new HashMap<String, String>();
+    
+    /**
+     * Host templates of services applied by host
+     */
+    private Map<String, HostCfg> hostTemplates = new HashMap<String, HostCfg>();
     
     private File baseDir;
 
     public NagiosConfigConverter()
     {
+    }
+    
+    public NagiosConfigConverter debugOn()
+    {
+        this.withDebug = true;
+        return this;
     }
 
     public NagiosConfigConverter site(String site)
@@ -350,94 +380,149 @@ public class NagiosConfigConverter
 
     private void convertServices()
     {
-        /*
-         * TODO: Add trap handling
-         * TODO: We can be smarter about how we map services, 
-         *       for example, where a service is applied to a host group, 
-         *       we can create a host template for that group
-         */
         for (NagiosServiceCfg cfg : this.nagiosConfig.getServices())
         {
-            // convert
-            ServiceCfg service = new ServiceCfg();
-            service.setLoadedFrom(convertFile(cfg.getLoadedFrom()));
-            service.setTemplate(true);
-            service.setName(computeServiceName(cfg));
-            service.setSummary(cfg.getServiceDescription());
-            if (cfg.getInherits() != null) service.getInheritedTemplates().addAll(cfg.getInherits());
-            // notifications
-            if (cfg.isNotificationsEnabled() != null || cfg.getNotificationPeriod() != null)
+            if (cfg.isRegister() != null && cfg.isRegister() == false)
             {
-                service.setNotifications(new NotificationsCfg());
-                service.getNotifications().setEnabled(cfg.isNotificationsEnabled());
-                if (cfg.getNotificationPeriod() != null)
+                // convert the service template
+                this.config.getServices().add(this.convertService(cfg));
+            }
+            else
+            {
+                // build host templates
+                // by host group
+                if (cfg.getHostgroupName() != null)
                 {
-                    service.getNotifications().setNotificationPeriod(Util.coalesce(cfg.getNotificationPeriod(), "24x7"));
+                    for (String hostgroup : cfg.getHostgroupName())
+                    {
+                        // get the template
+                        HostCfg template = this.hostgroupTemplates.get(hostgroup);
+                        if (template == null)
+                        {
+                            template = new HostCfg();
+                            template.setName(hostgroup + "-template");
+                            template.setSummary("Generic template for " + hostgroup);
+                            template.setTemplate(true);
+                            template.setLoadedFrom(new File(new File(this.baseDir, "templates"), "bergamot_host_" + hostgroup + "_template.xml"));
+                            this.hostgroupTemplates.put(hostgroup, template);
+                            this.config.addObject(template);
+                        }
+                        // add the service
+                        template.getServices().add(this.convertService(cfg));
+                    }
+                }
+                // by host
+                if (cfg.getHostName() != null && (! cfg.getHostName().isEmpty()))
+                {
+                    // get a flat hosts name
+                    String hosts = cfg.getHostName().stream().sorted().collect(Collectors.joining("_"));
+                    // map to a short template name
+                    String templateName = this.hostsToHostTemplate.get(hosts);
+                    if (templateName == null)
+                    {
+                        templateName = "host-template-" + this.hostTemplateId.incrementAndGet();
+                        this.hostsToHostTemplate.put(hosts, templateName);
+                    }
+                    // get the template
+                    HostCfg template = this.hostTemplates.get(templateName);
+                    if (template == null)
+                    {
+                        template = new HostCfg();
+                        template.setName(templateName);
+                        template.setSummary("Generic template for " + cfg.getHostName().stream().sorted().collect(Collectors.joining(", ")));
+                        template.setTemplate(true);
+                        template.setLoadedFrom(new File(new File(this.baseDir, "templates"), "bergamot_host_" + templateName + "_template.xml"));
+                        this.hostTemplates.put(templateName, template);
+                        this.config.addObject(template);
+                    }
+                    template.getServices().add(this.convertService(cfg));
                 }
             }
-            // notify
-            if ((cfg.getContactGroups() != null && (!cfg.getContactGroups().isEmpty())) || (cfg.getContacts() != null && (!cfg.getContacts().isEmpty())))
+        }
+    }
+    
+    private ServiceCfg convertService(NagiosServiceCfg cfg)
+    {
+        // convert
+        ServiceCfg service = new ServiceCfg();
+        service.setLoadedFrom(convertFile(cfg.getLoadedFrom()));
+        service.setTemplate(cfg.isRegister() == null || cfg.isRegister() == false ? true : null);
+        service.setName(cfg.getName());
+        service.setSummary(cfg.getServiceDescription());
+        if (cfg.getInherits() != null) service.getInheritedTemplates().addAll(cfg.getInherits());
+        // notifications
+        if (cfg.isNotificationsEnabled() != null || cfg.getNotificationPeriod() != null)
+        {
+            service.setNotifications(new NotificationsCfg());
+            service.getNotifications().setEnabled(cfg.isNotificationsEnabled());
+            if (cfg.getNotificationPeriod() != null)
             {
-                service.setNotify(new NotifyCfg());
-                if (cfg.getContactGroups() != null && (!cfg.getContactGroups().isEmpty()))
-                {
-                    service.getNotify().getTeams().addAll(cfg.getContactGroups());
-                }
-                if (cfg.getContacts() != null && (!cfg.getContacts().isEmpty()))
-                {
-                    service.getNotify().getContacts().addAll(cfg.getContacts());
-                }
+                service.getNotifications().setNotificationPeriod(Util.coalesce(cfg.getNotificationPeriod(), "24x7"));
             }
-            // schedule
-            if (cfg.getCheckInterval() != null || cfg.getRetryInterval() != null)
+        }
+        // notify
+        if ((cfg.getContactGroups() != null && (!cfg.getContactGroups().isEmpty())) || (cfg.getContacts() != null && (!cfg.getContacts().isEmpty())))
+        {
+            service.setNotify(new NotifyCfg());
+            if (cfg.getContactGroups() != null && (!cfg.getContactGroups().isEmpty()))
             {
-                service.setSchedule(new ScheduleCfg());
-                service.getSchedule().setEvery(new TimeInterval(cfg.getCheckInterval(), TimeUnit.MINUTES).toString());
-                service.getSchedule().setRetryEvery(new TimeInterval(cfg.getRetryInterval(), TimeUnit.MINUTES).toString());
-                if (cfg.getCheckPeriod() != null)
-                {
-                    service.getSchedule().setTimePeriod(cfg.getCheckPeriod());
-                }
+                service.getNotify().getTeams().addAll(cfg.getContactGroups());
             }
-            // state
-            if (cfg.getMaxCheckAttempts() != null)
+            if (cfg.getContacts() != null && (!cfg.getContacts().isEmpty()))
             {
-                service.setState(new StateCfg());
-                service.getState().setFailedAfter(cfg.getMaxCheckAttempts());
-                service.getState().setRecoversAfter(cfg.getMaxCheckAttempts());
+                service.getNotify().getContacts().addAll(cfg.getContacts());
             }
-            // groups
-            if (cfg.getServicegroups() != null)
+        }
+        // schedule
+        if (cfg.getCheckInterval() != null || cfg.getRetryInterval() != null)
+        {
+            service.setSchedule(new ScheduleCfg());
+            service.getSchedule().setEvery(new TimeInterval(cfg.getCheckInterval(), TimeUnit.MINUTES).toString());
+            service.getSchedule().setRetryEvery(new TimeInterval(cfg.getRetryInterval(), TimeUnit.MINUTES).toString());
+            if (cfg.getCheckPeriod() != null)
             {
-                service.getGroups().addAll(cfg.getServicegroups());
+                service.getSchedule().setTimePeriod(cfg.getCheckPeriod());
             }
-            // for debugging parameters for hostgroups and hosts
+        }
+        // state
+        if (cfg.getMaxCheckAttempts() != null)
+        {
+            service.setState(new StateCfg());
+            service.getState().setFailedAfter(cfg.getMaxCheckAttempts());
+            service.getState().setRecoversAfter(cfg.getMaxCheckAttempts());
+        }
+        // groups
+        if (cfg.getServicegroups() != null)
+        {
+            service.getGroups().addAll(cfg.getServicegroups());
+        }
+        // for debugging parameters for hostgroups and hosts
+        if (this.withDebug)
+        {
             if (cfg.getHostgroupName() != null && (!cfg.getHostgroupName().isEmpty()))
             {
-                service.addParameter(new CfgParameter("hostgroups", null, null, Util.join(", ", cfg.getHostgroupName())));
+                service.addParameter(new CfgParameter("nagios.hostgroups", null, null, Util.join(", ", cfg.getHostgroupName())));
             }
             if (cfg.getHostName() != null && (!cfg.getHostName().isEmpty()))
             {
-                service.addParameter(new CfgParameter("hosts", null, null, Util.join(", ", cfg.getHostName())));
+                service.addParameter(new CfgParameter("nagios.hosts", null, null, Util.join(", ", cfg.getHostName())));
             }
-            // check command
-            if (cfg.getCheckCommand() != null)
-            {
-                // parse the check command
-                NagiosCommandString command = NagiosCommandString.parse(cfg.getCheckCommand());
-                service.setCheckCommand(new CheckCommandCfg());
-                service.getCheckCommand().setCommand(command.getCommandName());
-                // parameters
-                int i = 1;
-                for (String arg : command.getArguments())
-                {
-                    // System.out.println("Adding arg: " + arg);
-                    service.getCheckCommand().addParameter(new CfgParameter("arg" + i++, null, null, arg));
-                }
-            }
-            // add
-            this.config.getServices().add(service);
         }
+        // check command
+        if (cfg.getCheckCommand() != null)
+        {
+            // parse the check command
+            NagiosCommandString command = NagiosCommandString.parse(cfg.getCheckCommand());
+            service.setCheckCommand(new CheckCommandCfg());
+            service.getCheckCommand().setCommand(command.getCommandName());
+            // parameters
+            int i = 1;
+            for (String arg : command.getArguments())
+            {
+                service.getCheckCommand().addParameter(new CfgParameter("arg" + i++, null, null, arg));
+            }
+        }
+        return service;
     }
 
     private void convertHosts()
@@ -521,35 +606,39 @@ public class NagiosConfigConverter
     {
         for (NagiosServiceCfg cfg : this.nagiosConfig.getServices())
         {
-            List<HostCfg> hosts = new LinkedList<HostCfg>();
-            // build the hosts to add the
-            if (cfg.getHostName() != null)
-            {
-                for (String hostName : cfg.getHostName())
+            if (cfg.isRegister() == null || cfg.isRegister() == true)
+            {             
+                // by host group
+                if (cfg.getHostgroupName() != null)
                 {
-                    HostCfg host = this.config.lookup(HostCfg.class, hostName);
-                    if (host != null)
+                    for (String hostgroupName : cfg.getHostgroupName())
                     {
-                        hosts.add(host);
+                        for (HostCfg host : this.config.getHosts())
+                        {
+                            if (host.containsGroup(hostgroupName))
+                            {
+                                host.getInheritedTemplates().add(hostgroupName + "-template");
+                            }
+                        }
                     }
                 }
-            }
-            if (cfg.getHostgroupName() != null)
-            {
-                for (String hostgroupName : cfg.getHostgroupName())
+                // by host
+                if (cfg.getHostName() != null && (! cfg.getHostName().isEmpty()))
                 {
-                    for (HostCfg host : this.config.getHosts())
+                    // get the template name
+                    String hosts = cfg.getHostName().stream().sorted().collect(Collectors.joining("_"));
+                    // map to a short template name
+                    String templateName = this.hostsToHostTemplate.get(hosts);
+                    // add
+                    for (String hostName : cfg.getHostName())
                     {
-                        if (host.containsGroup(hostgroupName)) hosts.add(host);
+                        HostCfg host = this.config.lookup(HostCfg.class, hostName);
+                        if (host != null)
+                        {
+                            host.getInheritedTemplates().add(templateName);
+                        }
                     }
                 }
-            }
-            // add the services
-            for (HostCfg host : hosts)
-            {
-                ServiceCfg service = new ServiceCfg();
-                service.getInheritedTemplates().add(computeServiceName(cfg));
-                host.getServices().add(service);
             }
         }
     }
@@ -560,28 +649,5 @@ public class NagiosConfigConverter
         name = name.substring(0, name.length() - 4);
         name += ".xml";
         return new File(orig.getParentFile(), name);
-    }
-
-    private static String computeServiceName(NagiosServiceCfg cfg)
-    {
-        if (cfg.isRegister() == null || cfg.isRegister() == false)
-        {
-            return cfg.getName();
-        }
-        else
-        {
-            StringBuilder sb = new StringBuilder();
-            if (cfg.getHostgroupName() != null && (!cfg.getHostgroupName().isEmpty()))
-            {
-                sb.append(Util.join("_", cfg.getHostgroupName()));
-            }
-            if (cfg.getHostName() != null && (!cfg.getHostName().isEmpty()))
-            {
-                sb.append(Util.join("_", cfg.getHostName()));
-            }
-            sb.append("_");
-            sb.append(cfg.getServiceDescription());
-            return sb.toString().toLowerCase().replace(" ", "_").replace(":", "").replace(";", "").replace("[", "").replace("]", "").replace("{", "").replace("}", "");
-        }
     }
 }
