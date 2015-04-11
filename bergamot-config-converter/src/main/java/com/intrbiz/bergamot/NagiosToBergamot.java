@@ -19,7 +19,11 @@ public class NagiosToBergamot
         ValidatedBergamotConfiguration validated = cfg.validate();
         System.out.println(validated.getReport().toString());
         // write
-        new BergamotConfigWriter().keepFileStructure(true).config(cfg).write();
-        System.exit(0);
+        new BergamotConfigWriter().baseDir(nagiosCfg).keepFileStructure(true).config(cfg).write();
+    }
+    
+    public static void main(String[] args) throws Exception
+    {
+        NagiosToBergamot.convert(new File(args[0]));
     }
 }

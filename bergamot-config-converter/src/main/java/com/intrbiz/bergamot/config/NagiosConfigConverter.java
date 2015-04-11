@@ -2,8 +2,10 @@ package com.intrbiz.bergamot.config;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -66,10 +68,40 @@ public class NagiosConfigConverter
      */
     private Map<String, HostCfg> hostTemplates = new HashMap<String, HostCfg>();
     
+    /**
+     * Site parameters in use we need to add
+     */
+    private Set<String> siteParameters = new HashSet<String>();
+    
+    /**
+     * MacroFrame used to translate command lines
+     */
+    private MacroFrame macroFrame;
+    
     private File baseDir;
 
     public NagiosConfigConverter()
     {
+        // setup the macro frame we will use to translate commands
+        this.macroFrame = new MacroFrame();
+        this.macroFrame.clearPrototypes();
+        // we don't parse resources.cfg
+        // map user macros to site parameters
+        // assume that USER1 == plugin path
+        this.macroFrame.put("USER1", "#{nagios.path}");
+        for (int i = 2; i < 257; i++)
+        {
+            this.macroFrame.put("USER" + i, "#{nagios.user" + i + "}");
+        }
+        // default stuff
+        this.macroFrame.put("HOSTADDRESS", "#{host.address}");
+        this.macroFrame.put("HOSTNAME", "#{host.name}");
+        this.macroFrame.put("SERVICEDESCRIPTION", "#{service.name}");
+        // args
+        for (int i = 1; i < 33; i++)
+        {
+            this.macroFrame.put("ARG" + i, "#{arg" + i + "}");
+        }
     }
     
     public NagiosConfigConverter debugOn()
@@ -118,6 +150,12 @@ public class NagiosConfigConverter
         this.linkServices();
         this.linkHostgroups();
         this.linkServicegroups();
+        // handle site parameters
+        this.config.addParameter(new CfgParameter("nagios.path", null, null, "/usr/lib/nagios/plugins"));
+        for (String parameter : this.siteParameters)
+        {
+            this.config.addParameter(new CfgParameter(parameter, null, null, ""));
+        }
         //
         return this.config;
     }
@@ -295,27 +333,25 @@ public class NagiosConfigConverter
             String commandLine = cfg.getCommandLine();
             if (commandLine != null)
             {
-                // convert the macros
-                MacroFrame frame = new MacroFrame();
-                frame.clearPrototypes();
-                // resources
-                frame.put("USER1", "#{nagios.path}");
-                for (int i = 2; i < 33; i++)
-                {
-                    frame.put("USER" + i, "#{nagios.user" + i + "}");
-                }
-                // default stuff
-                frame.put("HOSTADDRESS", "#{host.address}");
-                frame.put("HOSTNAME", "#{host.name}");
-                frame.put("SERVICEDESCRIPTION", "#{service.name}");
-                // args
-                for (int i = 1; i < 17; i++)
-                {
-                    frame.put("ARG" + i, "#{arg" + i + "}");
-                }
-                commandLine = MacroProcessor.applyMacros(commandLine, frame);
+                // extract the macros used
+                Set<String> macros = MacroProcessor.extractMacros(commandLine);
+                // apply the macros to convert the Nagios expression to a Bergamot expression
+                commandLine = MacroProcessor.applyMacros(commandLine, this.macroFrame);
                 // add the param
-                command.addParameter(new CfgParameter("command_line", null, null, commandLine));
+                command.addParameter(new CfgParameter("command_line", null, null, Util.coalesce(commandLine, "")));
+                // add any args we found as parameters
+                // collate any site parameters we need
+                for (String macro : macros)
+                {
+                    if (macro.startsWith("ARG"))
+                    {
+                        command.addParameter(new CfgParameter(macro.toLowerCase(), null, null, ""));        
+                    }
+                    else if (macro.startsWith("USER") && (! "USER1".equals(macro)))
+                    {
+                        this.siteParameters.add("nagios." + macro.toLowerCase());
+                    }
+                }
             }
             // add
             this.config.getCommands().add(command);
