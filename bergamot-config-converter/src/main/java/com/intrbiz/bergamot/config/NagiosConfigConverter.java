@@ -335,10 +335,6 @@ public class NagiosConfigConverter
             {
                 // extract the macros used
                 Set<String> macros = MacroProcessor.extractMacros(commandLine);
-                // apply the macros to convert the Nagios expression to a Bergamot expression
-                commandLine = MacroProcessor.applyMacros(commandLine, this.macroFrame);
-                // add the param
-                command.addParameter(new CfgParameter("command_line", null, null, Util.coalesce(commandLine, "")));
                 // add any args we found as parameters
                 // collate any site parameters we need
                 for (String macro : macros)
@@ -352,6 +348,11 @@ public class NagiosConfigConverter
                         this.siteParameters.add("nagios." + macro.toLowerCase());
                     }
                 }
+                // build the command line
+                // apply the macros to convert the Nagios expression to a Bergamot expression
+                commandLine = MacroProcessor.applyMacros(commandLine, this.macroFrame);
+                // add the param
+                command.addParameter(new CfgParameter("command_line", null, null, Util.coalesce(commandLine, "")));
             }
             // add
             this.config.getCommands().add(command);
