@@ -97,6 +97,7 @@
     <module>bergamot-agent-manager</module>
     <module>bergamot-agent-config</module>
     <module>bergamot-agent-server-config</module>
+    <module>bergamot-worker-dummy</module>
   </modules>
   
   <dependencyManagement>

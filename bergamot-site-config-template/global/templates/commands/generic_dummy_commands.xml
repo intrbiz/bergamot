@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command engine="dummy" name="dummy_check" template="yes">
+        <summary>Dummy check</summary>
+        <description>A generic dummy check</description>
+    </command>
+    
+    <command name="dummy_static_check" executor="static" extends="dummy_check">
+        <summary>A static dummy check</summary>
+        <description>A static dummy check which always returns the same state</description>
+        <parameter description="Check ok" name="ok">yes</parameter>
+        <parameter description="Check status" name="status">OK</parameter>
+        <parameter description="Check output" name="output">Everything is OK, nothing to see here</parameter>
+    </command>
+    
+    <command name="dummy_random_check" executor="random" extends="dummy_check">
+        <summary>A random dummy check</summary>
+        <description>A random dummy check which will randomly change state</description>
+        <parameter description="Warning"  name="warning">0.7</parameter>
+        <parameter description="Critical" name="critical">0.9</parameter>
+        <parameter description="Check output" name="output">Look at me, I'm random</parameter>
+    </command>
+    
+    <command name="dummy_timed_check" executor="timed" extends="dummy_check">
+        <summary>A timed dummy check</summary>
+        <description>A timed dummy check which will change state based on time</description>
+        <parameter description="Warning"   name="warning">01:00-02:00, 05:00-06:00, 08:00-09:00, 11:00-12:00, 14:00-15:00, 17:00-18:00, 20:00-21:00, 23:00-24:00</parameter>
+        <parameter description="Critical" name="critical">02:00-03:00, 06:00-07:00, 09:00-10:00, 12:00-13:00, 15:00-16:00, 18:00-19:00, 21:00-22:00</parameter>
+        <parameter description="Check output" name="output">Different hour, different mood</parameter>
+    </command>
+    
+</bergamot>
