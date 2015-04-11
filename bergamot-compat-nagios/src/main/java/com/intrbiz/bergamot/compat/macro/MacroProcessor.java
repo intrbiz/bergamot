@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.compat.macro;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
@@ -72,5 +75,51 @@ public class MacroProcessor
             throw new RuntimeException("Failed to apply macros to '" + expression + "', macro was not terminated!");
         }
         return result.toString();
+    }
+    
+    public static Set<String> extractMacros(String expression)
+    {
+        Set<String> macros = new TreeSet<String>();
+        // state
+        boolean inMacro = false;
+        StringBuilder macroNameBuffer = null;
+        // parse the expression
+        for (char c : expression.toCharArray())
+        {
+            if (inMacro)
+            {
+                if (c == '$')
+                {
+                    // end of macro
+                    String macroName = macroNameBuffer.toString();
+                    if (! Util.isEmpty(macroName))
+                    {
+                        macros.add(macroName);
+                    }
+                    // reset state
+                    inMacro = false;
+                    macroNameBuffer = null;
+                }
+                else
+                {
+                    macroNameBuffer.append(c);
+                }
+            }
+            else
+            {
+                if (c == '$')
+                {
+                    // start of macro
+                    inMacro = true;
+                    macroNameBuffer = new StringBuilder();
+                }
+            }
+        }
+        // sanity check
+        if (inMacro)
+        {
+            throw new RuntimeException("Failed to extract macros to '" + expression + "', macro was not terminated!");
+        }
+        return macros;
     }
 }
