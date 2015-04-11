@@ -77,6 +77,8 @@ public class BergamotConfigWriter
             this.writeTimePeriods();
             this.writeClusters();
             this.writeHosts();
+            // site parameters
+            this.writeParameters();
         }
     }
     
@@ -114,6 +116,19 @@ public class BergamotConfigWriter
             {
                 BergamotCfg.write(BergamotCfg.class, configFile.getValue(), out);
             }
+        }
+        // site parameters
+        this.writeParameters();
+    }
+    
+    private void writeParameters() throws FileNotFoundException, IOException, JAXBException
+    {
+        BergamotCfg cfg = new BergamotCfg();
+        cfg.setSite(this.config.getSite());
+        cfg.getParameters().addAll(this.config.getParameters());
+        try (FileOutputStream out = new FileOutputStream(new File(this.baseDir, "parameters.xml")))
+        {
+            BergamotCfg.write(BergamotCfg.class, cfg, out);
         }
     }
 
