@@ -17,13 +17,13 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarPermissionDeniedException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
 import com.intrbiz.bergamot.model.message.agent.stat.process.ProcessInfo;
+import com.intrbiz.bergamot.util.AgentUtil;
 
 public class ProcessInfoHandler implements AgentHandler
 {
@@ -123,13 +123,13 @@ public class ProcessInfoHandler implements AgentHandler
     private static boolean matchesFilter(CheckProcess check, ProcState state, ProcCredName creds, List<String> commandLine)
     {
         // user
-        if (! Util.isEmpty(check.getUser()))
+        if (! AgentUtil.isEmpty(check.getUser()))
         {
             if (creds.getUser() != null && (! creds.getUser().equalsIgnoreCase(check.getUser())))
                 return false;
         }
         // group
-        if (! Util.isEmpty(check.getGroup()))
+        if (! AgentUtil.isEmpty(check.getGroup()))
         {
             if (creds.getGroup() != null && (! creds.getGroup().equalsIgnoreCase(check.getGroup())))
                 return false;
@@ -141,7 +141,7 @@ public class ProcessInfoHandler implements AgentHandler
                 return false;
         }
         // process title
-        if (! Util.isEmpty(check.getTitle()))
+        if (! AgentUtil.isEmpty(check.getTitle()))
         {
             String title = state.getName();
             // regex?
@@ -159,7 +159,7 @@ public class ProcessInfoHandler implements AgentHandler
             }
         }
         // command name
-        if (! Util.isEmpty(check.getCommand()))
+        if (! AgentUtil.isEmpty(check.getCommand()))
         {
             if (commandLine.size() == 0)
                 return false;

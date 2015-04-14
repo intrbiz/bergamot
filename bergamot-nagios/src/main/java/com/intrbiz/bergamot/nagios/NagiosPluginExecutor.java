@@ -74,7 +74,7 @@ public class NagiosPluginExecutor
             InputStream stdOut = process.getInputStream();
             int exitCode = process.waitFor();
             long end = System.nanoTime();
-            double runtime = (((double) (end - start)) / 1_000_000D);
+            double runtime = (((double) (end - start)) / 1000000D);
             // process the output
             NagiosResult result = new NagiosResult();
             result.parseNagiosOutput(stdOut, exitCode, runtime);

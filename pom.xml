@@ -200,27 +200,27 @@
   		<dependency>
   			<groupId>com.intrbiz.core</groupId>
   			<artifactId>core</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.express</groupId>
   			<artifactId>express</artifactId>
-  			<version>4.0.0</version>
+  			<version>[4.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-core</artifactId>
-  			<version>4.0.0</version>
+  			<version>[4.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-data</artifactId>
-  			<version>4.0.0</version>
+  			<version>[4.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-hazelcast</artifactId>
-  			<version>4.0.0</version>
+  			<version>[4.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.gerald</groupId>
@@ -240,42 +240,42 @@
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-annotations</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-manager</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-database-adapter-compiler</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>cache-hazelcast</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>queue</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>crypto</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>scripting</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>bootstrap</artifactId>
-  			<version>1.0.0</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.3p.sigar</groupId>
@@ -299,38 +299,20 @@
   		</dependency>
   		<dependency>
   			<groupId>junit</groupId>
-  			<artifactId>junit-dep</artifactId>
-  			<version>4.10</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>junit</groupId>
   			<artifactId>junit</artifactId>
-  			<version>4.10</version>
+  			<version>4.11</version>
+  			<scope>test</scope>
   		</dependency>
   		<dependency>
   			<groupId>org.hamcrest</groupId>
   			<artifactId>hamcrest-all</artifactId>
-  			<version>1.1</version>
+  			<version>1.3</version>
+  			<scope>test</scope>
   		</dependency>
   		<dependency>
   			<groupId>log4j</groupId>
   			<artifactId>log4j</artifactId>
   			<version>1.2.14</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>org.hamcrest</groupId>
-  			<artifactId>hamcrest-library</artifactId>
-  			<version>1.1</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>org.hamcrest</groupId>
-  			<artifactId>hamcrest-integration</artifactId>
-  			<version>1.1</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>org.hamcrest</groupId>
-  			<artifactId>hamcrest-core</artifactId>
-  			<version>1.1</version>
   		</dependency>
   		<dependency>
   			<groupId>io.netty</groupId>

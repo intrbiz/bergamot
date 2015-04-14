@@ -46,6 +46,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
+import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.configuration.Configurable;
 
 public class BergamotAgentServer implements Runnable, Configurable<BergamotAgentServerCfg>
@@ -305,7 +306,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             ExecCheck exec = new ExecCheck();
             exec.setEngine("nagios");
             exec.setName("check_mem");
-            exec.addParameter("command_line", "/usr/lib/nagios/plugins/check_mem -u -C -w 80 -c 90");
+            exec.getParameters().add(new Parameter("command_line", "/usr/lib/nagios/plugins/check_mem -u -C -w 80 -c 90"));
             agent.sendMessageToAgent(exec, (response) -> {
                 System.out.println("Got Exec result: " + response);
             });

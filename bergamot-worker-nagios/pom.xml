@@ -33,22 +33,12 @@
 	</dependency>
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
+      <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
     	<groupId>org.hamcrest</groupId>
-    	<artifactId>hamcrest-library</artifactId>
-    	<scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>org.hamcrest</groupId>
-    	<artifactId>hamcrest-integration</artifactId>
-    	<scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>org.hamcrest</groupId>
-    	<artifactId>hamcrest-core</artifactId>
+    	<artifactId>hamcrest-all</artifactId>
     	<scope>test</scope>
     </dependency>
 	</dependencies>

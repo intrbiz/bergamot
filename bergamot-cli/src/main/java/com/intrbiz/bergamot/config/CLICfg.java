@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.configuration.Configuration;
+import com.intrbiz.bergamot.agent.config.Configuration;
 
 @XmlType(name = "bergamot-cli")
 @XmlRootElement(name = "bergamot-cli")

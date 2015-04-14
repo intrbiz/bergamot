@@ -29,10 +29,6 @@
 			<artifactId>netty-all</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.intrbiz.core</groupId>
-			<artifactId>core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-agent-message-model</artifactId>
 		</dependency>
@@ -44,10 +40,10 @@
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>bootstrap</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-crypto-util</artifactId>
-		</dependency>
+	    <dependency>
+	    	<groupId>org.bouncycastle</groupId>
+	    	<artifactId>bcprov-jdk16</artifactId>
+	    </dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-nagios</artifactId>
@@ -60,6 +56,15 @@
 	<build>
 		<finalName>bergamot-agent</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>packaging</artifactId>

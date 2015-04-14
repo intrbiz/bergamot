@@ -10,12 +10,12 @@ import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
 import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
+import com.intrbiz.bergamot.agent.config.CfgParameter;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.RSAUtil;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
-import com.intrbiz.configuration.CfgParameter;
 
 public class AgentCommand extends BergamotCLICommand
 {

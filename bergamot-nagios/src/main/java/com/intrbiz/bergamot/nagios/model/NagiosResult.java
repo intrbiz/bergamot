@@ -178,7 +178,8 @@ public class NagiosResult
         this.responseCode = exitCode;
         this.runtime = runtime;
         // parse the output buffer
-        try (BufferedReader br = new BufferedReader(stream))
+        BufferedReader br = new BufferedReader(stream);
+        try
         {
             // parse the first line
             String outputLine  = br.readLine();
@@ -220,6 +221,10 @@ public class NagiosResult
                     }
                 }
             }
+        }
+        finally
+        {
+            br.close();
         }
         return this;
     }

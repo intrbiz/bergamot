@@ -7,13 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
-import com.intrbiz.bergamot.model.message.agent.util.Parameterised;
 
 /**
  * Execute a server defined check
  */
 @JsonTypeName("bergamot.agent.check.exec")
-public class ExecCheck extends AgentMessage implements Parameterised
+public class ExecCheck extends AgentMessage
 {
     @JsonProperty("engine")
     private String engine;

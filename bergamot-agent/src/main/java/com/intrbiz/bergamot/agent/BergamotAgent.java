@@ -45,6 +45,7 @@ import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
+import com.intrbiz.bergamot.agent.config.Configurable;
 import com.intrbiz.bergamot.agent.handler.AgentInfoHandler;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
@@ -57,13 +58,10 @@ import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ProcessInfoHandler;
 import com.intrbiz.bergamot.agent.handler.UptimeInfoHandler;
 import com.intrbiz.bergamot.agent.handler.WhoInfoHandler;
-import com.intrbiz.bergamot.crypto.util.KeyStoreUtil;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
-import com.intrbiz.configuration.Configurable;
-import com.intrbiz.util.IBThreadFactory;
 
 /**
  */
@@ -102,7 +100,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 Runtime rt = Runtime.getRuntime();
                 logger.debug("Memory: " + rt.freeMemory() + " " + rt.totalMemory() + " " + rt.maxMemory());
             }
-        }, 30_000L, 30_000L);
+        }, 30000L, 30000L);
         // handlers
         this.setDefaultHandler(new DefaultHandler());
         this.registerHandler(new CPUInfoHandler());
@@ -142,7 +140,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         // configure this agent
         this.server = new URI(cfg.getServer());
         logger.info("Bergamot Agent, connecting to " + this.server + " configured");
-        this.eventLoop = new NioEventLoopGroup(1, new IBThreadFactory("bergamot-agent", false));
+        this.eventLoop = new NioEventLoopGroup(1);
         this.sslContext = this.createContext();
     }
     
@@ -179,7 +177,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             sslEngine.setUseClientMode(true);
             sslEngine.setNeedClientAuth(true);
             SSLParameters params = new SSLParameters();
-            params.setEndpointIdentificationAlgorithm("HTTPS");
+            // can't do this in JDK 6
+            // params.setEndpointIdentificationAlgorithm("HTTPS");
             params.setNeedClientAuth(true);
             sslEngine.setSSLParameters(params);
             return sslEngine;
@@ -232,7 +231,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
 
     private void connect()
     {
-        SSLEngine engine = createSSLEngine(this.server.getHost(), this.server.getPort());
+        final SSLEngine engine = createSSLEngine(this.server.getHost(), this.server.getPort());
         // configure the client
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
@@ -328,7 +327,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                     BergamotAgent.this.scheduleReconnect();
                 }
             }
-        }, 15_000L);
+        }, 15000L);
     }
 
     public void shutdown()
@@ -360,9 +359,14 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     private static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
     {
-        try (FileInputStream input = new FileInputStream(new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml"))))
+        FileInputStream input = new FileInputStream(new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml")));
+        try
         {
             return BergamotAgentCfg.read(BergamotAgentCfg.class, input);
+        }
+        finally
+        {
+            input.close();
         }
     }
     

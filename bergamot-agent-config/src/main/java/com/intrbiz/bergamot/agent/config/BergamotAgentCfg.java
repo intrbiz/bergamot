@@ -9,9 +9,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.Util;
-import com.intrbiz.configuration.Configuration;
-
 @XmlRootElement(name = "bergamot-agent")
 @XmlType(name = "bergamot-agent")
 public class BergamotAgentCfg extends Configuration
@@ -110,20 +107,28 @@ public class BergamotAgentCfg extends Configuration
 
     private static String trim(String in)
     {
-        if (Util.isEmpty(in)) return null;
+        if (in == null || in.length() == 0) return null;
         StringBuilder out = new StringBuilder();
-        try (BufferedReader r = new BufferedReader(new StringReader(in)))
+        try
         {
-            String l;
-            while ((l = r.readLine()) != null)
+            BufferedReader r = new BufferedReader(new StringReader(in));
+            try
             {
-                if (!Util.isEmpty(l)) out.append(l.trim()).append("\r\n");
+                String l;
+                while ((l = r.readLine()) != null)
+                {
+                    if (!(l == null || l.length() == 0)) out.append(l.trim()).append("\r\n");
+                }
+            }
+            finally
+            {
+                r.close();
             }
         }
         catch (IOException e)
         {
         }
         String trimmed = out.toString();
-        return Util.isEmpty(trimmed) ? null : trimmed;
+        return(trimmed == null || trimmed.length() == 0) ? null : trimmed;
     }
 }

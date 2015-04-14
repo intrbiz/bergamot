@@ -8,13 +8,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
-import com.intrbiz.bergamot.model.message.agent.util.Parameterised;
 
 /**
  * Result of executing a server defined check
  */
 @JsonTypeName("bergamot.agent.stat.exec")
-public class ExecStat extends AgentMessage implements Parameterised
+public class ExecStat extends AgentMessage
 {
     @JsonProperty("ok")
     private boolean ok;

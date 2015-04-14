@@ -6,13 +6,13 @@ import org.hyperic.sigar.NetFlags;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.NetConStat;
 import com.intrbiz.bergamot.model.message.agent.stat.netcon.NetConInfo;
+import com.intrbiz.bergamot.util.AgentUtil;
 
 public class NetConInfoHandler implements AgentHandler
 {    
@@ -84,13 +84,13 @@ public class NetConInfoHandler implements AgentHandler
                 return false;
         }
         // local address
-        if (! Util.isEmpty(check.getLocalAddress()))
+        if (! AgentUtil.isEmpty(check.getLocalAddress()))
         {
             if (! check.getLocalAddress().equalsIgnoreCase(con.getLocalAddress()))
                 return false;
         }
         // remote address
-        if (! Util.isEmpty(check.getRemoteAddress()))
+        if (! AgentUtil.isEmpty(check.getRemoteAddress()))
         {
             if (! check.getRemoteAddress().equalsIgnoreCase(con.getRemoteAddress()))
                 return false;

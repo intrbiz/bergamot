@@ -80,7 +80,7 @@ public class BergamotClient
         {
             // custom TLS handling
             SSLContext ctx = SSLContext.getInstance("TLS");
-            ctx.init(null, new TrustManager[] { new BergamotTrustManager(true) }, new SecureRandom());
+            ctx.init(null, new TrustManager[] { new BergamotTrustManager(Boolean.getBoolean("bergamot.api.allow-invalid-certs")) }, new SecureRandom());
             // scheme registry
             this.schemeRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
              .register("http",  PlainConnectionSocketFactory.getSocketFactory())

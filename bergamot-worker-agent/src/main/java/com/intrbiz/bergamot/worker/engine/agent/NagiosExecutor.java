@@ -9,6 +9,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
+import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
@@ -57,7 +58,7 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
                 ExecCheck check = new ExecCheck();
                 check.setName(executeCheck.getName());
                 check.setEngine("nagios");
-                check.addParameter("command_line", commandLine);
+                check.getParameters().add(new Parameter("command_line", commandLine));
                 // exec the check
                 long sent = System.nanoTime();
                 agent.sendMessageToAgent(check, (response) -> {

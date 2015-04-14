@@ -157,9 +157,17 @@ public class BergamotAgentTranscoder
     
     public void encode(Object event, OutputStream to)
     {
-        try (JsonGenerator g = this.factory.getFactory().createGenerator(to))
+        try
         {
-            this.factory.writeValue(g, event);
+            JsonGenerator g = this.factory.getFactory().createGenerator(to);
+            try
+            {
+                this.factory.writeValue(g, event);
+            }
+            finally
+            {
+                g.close();
+            }
         }
         catch (IOException e)
         {
@@ -169,9 +177,17 @@ public class BergamotAgentTranscoder
     
     public void encode(Object event, Writer to)
     {
-        try (JsonGenerator g = this.factory.getFactory().createGenerator(to))
+        try
         {
-            this.factory.writeValue(g, event);
+            JsonGenerator g = this.factory.getFactory().createGenerator(to);
+            try
+            {
+                this.factory.writeValue(g, event);
+            }
+            finally
+            {
+                g.close();
+            }
         }
         catch (IOException e)
         {
@@ -196,9 +212,17 @@ public class BergamotAgentTranscoder
     public void encode(Object event, File file)
     {
         file.getParentFile().mkdirs();
-        try (FileWriter fw = new FileWriter(file))
+        try
         {
-            this.encode(event, fw);
+            FileWriter fw = new FileWriter(file);
+            try
+            {
+                this.encode(event, fw);
+            }
+            finally
+            {
+                fw.close();
+            }
         }
         catch (IOException e)
         {
@@ -208,9 +232,17 @@ public class BergamotAgentTranscoder
     
     public <T> T decode(InputStream from, JavaType type)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return this.factory.readValue(p, type);
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return this.factory.readValue(p, type);
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
@@ -220,9 +252,17 @@ public class BergamotAgentTranscoder
     
     public <T> T decode(InputStream from, Class<T> type)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return (T) this.factory.readValue(p, type);
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return this.factory.readValue(p, type);
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
@@ -232,9 +272,17 @@ public class BergamotAgentTranscoder
     
     public <T> List<T> decodeList(InputStream from, Class<T> elementType)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, elementType));
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, elementType));
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
@@ -244,21 +292,38 @@ public class BergamotAgentTranscoder
     
     public <T> Set<T> decodeSet(InputStream from, Class<T> elementType)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(Set.class, elementType));
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(Set.class, elementType));
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
             throw new RuntimeException("Failed to decode event", e);
         }
+        
     }
     
     public <T> T decode(Reader from, Class<T> type)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return (T) this.factory.readValue(p, type);
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return (T) this.factory.readValue(p, type);
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
@@ -268,9 +333,17 @@ public class BergamotAgentTranscoder
     
     public <T> T decode(Reader from, JavaType type)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return this.factory.readValue(p, type);
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return this.factory.readValue(p, type);
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
@@ -280,9 +353,17 @@ public class BergamotAgentTranscoder
     
     public <T> List<T> decodeList(Reader from, Class<T> elementType)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, elementType));
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, elementType));
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
@@ -292,9 +373,17 @@ public class BergamotAgentTranscoder
     
     public <T> Set<T> decodeSet(Reader from, Class<T> elementType)
     {
-        try (JsonParser p = this.factory.getFactory().createParser(from))
+        try
         {
-            return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(Set.class, elementType));
+            JsonParser p = this.factory.getFactory().createParser(from);
+            try
+            {
+                return this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(Set.class, elementType));
+            }
+            finally
+            {
+                p.close();
+            }
         }
         catch (IOException e)
         {
@@ -344,9 +433,17 @@ public class BergamotAgentTranscoder
     
     public <T> T decode(File event, Class<T> type)
     {
-        try (FileReader fr = new FileReader(event))
+        try
         {
-            return this.decode(fr, type);
+            FileReader fr = new FileReader(event);
+            try
+            {
+                return this.decode(fr, type);
+            }
+            finally
+            {
+                fr.close();
+            }
         }
         catch (IOException e)
         {
@@ -356,9 +453,17 @@ public class BergamotAgentTranscoder
     
     public <T> T decode(File event, JavaType type)
     {
-        try (FileReader fr = new FileReader(event))
+        try
         {
-            return this.decode(fr, type);
+            FileReader fr = new FileReader(event);
+            try
+            {
+                return this.decode(fr, type);
+            }
+            finally
+            {
+                fr.close();
+            }
         }
         catch (IOException e)
         {
@@ -368,9 +473,17 @@ public class BergamotAgentTranscoder
     
     public <T> List<T> decodeList(File event, Class<T> elementType)
     {
-        try (FileReader fr = new FileReader(event))
+        try
         {
-            return this.decodeList(fr, elementType);
+            FileReader fr = new FileReader(event);
+            try
+            {
+                return this.decodeList(fr, elementType);
+            }
+            finally
+            {
+                fr.close();
+            }
         }
         catch (IOException e)
         {
@@ -380,9 +493,17 @@ public class BergamotAgentTranscoder
     
     public <T> Set<T> decodeSet(File event, Class<T> elementType)
     {
-        try (FileReader fr = new FileReader(event))
+        try
         {
-            return this.decodeSet(fr, elementType);
+            FileReader fr = new FileReader(event);
+            try
+            {
+                return this.decodeSet(fr, elementType);
+            }
+            finally
+            {
+                fr.close();
+            }
         }
         catch (IOException e)
         {
