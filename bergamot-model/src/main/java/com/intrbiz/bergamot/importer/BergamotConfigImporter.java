@@ -1032,27 +1032,27 @@ public class BergamotConfigImporter
             this.rescheduleCheck(host);
         }
         // add services
-        for (ServiceCfg sconfiguration : resolvedConfiguration.getServices())
+        for (ServiceCfg serviceConfiguration : resolvedConfiguration.getServices())
         {
-            if (ObjectState.isRemove(configuration.getObjectState()))
+            if (ObjectState.isRemove(serviceConfiguration.getObjectState()))
             {
-                this.removeService(host, sconfiguration, db);
+                this.removeService(host, serviceConfiguration, db);
             }
             else
             {
-                this.loadService(host, sconfiguration, db);
+                this.loadService(host, serviceConfiguration, db);
             }
         }
         // add traps
-        for (TrapCfg tconfiguration : resolvedConfiguration.getTraps())
+        for (TrapCfg trapConfiguration : resolvedConfiguration.getTraps())
         {
-            if (ObjectState.isRemove(configuration.getObjectState()))
+            if (ObjectState.isRemove(trapConfiguration.getObjectState()))
             {
-                this.removeTrap(host, tconfiguration, db);
+                this.removeTrap(host, trapConfiguration, db);
             }
             else
             {
-                this.loadTrap(host, tconfiguration, db);
+                this.loadTrap(host, trapConfiguration, db);
             }
         }
     }
@@ -1355,15 +1355,15 @@ public class BergamotConfigImporter
         db.setCluster(cluster);
         this.loadedObjects.add("cluster:" + configuration.getName());
         // add resources
-        for (ResourceCfg sconfiguration : resolvedConfiguration.getResources())
+        for (ResourceCfg resourceConfiguration : resolvedConfiguration.getResources())
         {
-            if (ObjectState.isRemove(sconfiguration.getObjectState()))
+            if (ObjectState.isRemove(resourceConfiguration.getObjectState()))
             {
-                this.removeResource(cluster, sconfiguration, db);
+                this.removeResource(cluster, resourceConfiguration, db);
             }
             else
             {
-                this.loadResource(cluster, sconfiguration, db);
+                this.loadResource(cluster, resourceConfiguration, db);
             }
         }
     }
