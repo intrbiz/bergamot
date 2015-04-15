@@ -27,6 +27,10 @@
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-timerange</artifactId>
     </dependency>
+    <dependency>
+        <groupId>com.intrbiz.util</groupId>
+        <artifactId>bootstrap</artifactId>
+    </dependency>
   </dependencies>
     <build>
         <finalName>bergamot-worker-dummy</finalName>
