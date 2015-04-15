@@ -40,7 +40,7 @@ public class DiskInfoHandler implements AgentHandler
             for (FileSystem fs : fileSystems)
             {
                 // TODO: bug in Sigar relating to BTRFS
-                if (fs.getType() == 2 || "btrfs".equalsIgnoreCase(fs.getTypeName()))
+                if (fs.getType() == 2 || "btrfs".equalsIgnoreCase(fs.getSysTypeName()))
                 {
                     DiskInfo disk = new DiskInfo();
                     disk.setMount(fs.getDirName());
