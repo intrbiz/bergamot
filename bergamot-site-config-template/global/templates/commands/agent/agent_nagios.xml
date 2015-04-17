@@ -4,7 +4,7 @@
     <command engine="agent" executor="nagios" extends="check_agent" name="check_agent_nagios">
         <parameter description="Nagios Command Prefix" name="command_prefix">/usr/lib/nagios/plugins</parameter>
         <parameter description="Nagios Command" name="command"></parameter>
-        <parameter description="Nagios Command Line" name="command_line">#{command_line_prefix}/#{command}</parameter>
+        <parameter description="Nagios Command Line" name="command_line">#{command_prefix}/#{command}</parameter>
         <summary>Bergamot Agent: Nagios Plugin</summary>
     </command>
     
