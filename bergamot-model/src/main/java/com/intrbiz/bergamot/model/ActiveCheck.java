@@ -188,7 +188,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         if (checkCommand == null) return null;
         Command command = checkCommand.getCommand();
         if (command == null) return null;
-        if (logger.isTraceEnabled()) logger.trace("Executing check of " + this.getId() + " " + this.getName() + " with command " + command);
+        if (logger.isTraceEnabled()) logger.trace("Executing check of " + this.getType() + "::" + this.getId() + " " + this.getName() + " with command " + command);
         ExecuteCheck executeCheck = new ExecuteCheck();
         executeCheck.setId(UUID.randomUUID());
         executeCheck.setSiteId(this.getSiteId());
@@ -204,9 +204,16 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         // configured parameters
         for (Parameter parameter : checkCommand.resolveCheckParameters())
         {
-            ValueExpression vexp = new ValueExpression(context, parameter.getValue());
-            String value = Util.nullable(vexp.get(context, this), Object::toString);
-            if (! Util.isEmpty(value)) executeCheck.setParameter(parameter.getName(), value);
+            try
+            {
+                ValueExpression vexp = new ValueExpression(context, parameter.getValue());
+                String value = Util.nullable(vexp.get(context, this), Object::toString);
+                if (! Util.isEmpty(value)) executeCheck.setParameter(parameter.getName(), value);
+            }
+            catch (Exception e)
+            {
+                logger.error("Error computing parameter value, for check: " + this.getType() + "::" + this.getId() + " " + this.getName() , e);
+            }
         }
         executeCheck.setTimeout(30_000L);
         executeCheck.setScheduled(System.currentTimeMillis());
