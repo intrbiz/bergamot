@@ -205,20 +205,12 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         for (Parameter parameter : checkCommand.resolveCheckParameters())
         {
             ValueExpression vexp = new ValueExpression(context, parameter.getValue());
-            String value = (String) vexp.get(context, this);
-            if (!Util.isEmpty(value))
-            {
-                if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
-                executeCheck.setParameter(parameter.getName(), value);
-            }
-            else
-            {
-                if (logger.isTraceEnabled()) logger.trace("Skipping null parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
-            }
+            String value = Util.nullable(vexp.get(context, this), Object::toString);
+            if (! Util.isEmpty(value)) executeCheck.setParameter(parameter.getName(), value);
         }
         executeCheck.setTimeout(30_000L);
         executeCheck.setScheduled(System.currentTimeMillis());
-        if (logger.isTraceEnabled()) logger.trace("Executing check: " + new BergamotTranscoder().encodeAsString(executeCheck));
+        if (logger.isTraceEnabled())logger.trace("Executing check: " + new BergamotTranscoder().encodeAsString(executeCheck));
         return executeCheck;
     }
 
