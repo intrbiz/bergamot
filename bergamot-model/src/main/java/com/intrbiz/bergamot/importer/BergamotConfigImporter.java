@@ -148,6 +148,8 @@ public class BergamotConfigImporter
                     db.execute(()-> {
                         // setup the site
                         this.loadSite(db);
+                        // compute any cascading changes
+                        this.computeCascade(db);
                         // templates
                         this.loadTemplates(db);
                         // load the commands
@@ -266,33 +268,70 @@ public class BergamotConfigImporter
                 if (object.getTemplateBooleanValue() && object instanceof NamedObjectCfg)
                 {
                     String type = Configuration.getRootElement(((NamedObjectCfg<?>) object).getClass());
-                    //
                     Config conf = db.getConfigByName(this.site.getId(), type, object.getName());
                     if (conf == null)
                     {
                         conf =  new Config(this.site.randomObjectId(), this.site.getId(), (NamedObjectCfg<?>) object);
                         this.report.info("Configuring new " + type + " template: " + object.getName());
+                        db.setConfig(conf);
                     }
                     else
                     {
                         if (ObjectState.isRemove(object.getObjectState()))
                         {
-                            // TODO: we currently don't cope with deleting templates
-                            throw new RuntimeException("Removing template is not currently supported!");
+                            if (conf.listAllDependentsObjects().isEmpty())
+                            {
+                                // nothing is using this template, so remove it
+                                this.report.info("Removing existing " + type + " template: " + object.getName() + " (" + conf.getId() + ")");
+                                db.removeConfig(conf.getId());
+                            }
+                            else
+                            {
+                                // we cannot remove this template, it is in use
+                                throw new RuntimeException("The " + type + " template " + conf.getName() + " cannot be removed as it is in use.");
+                            }
                         }
                         else
                         {
                             conf.fromConfiguration((NamedObjectCfg<?>) object);
                             this.report.info("Reconfiguring existing " + type + " template: " + object.getName() + " (" + conf.getId() + ")");
-                            // cascade - note this recursively queries for all objects affected by a change to this template
-                            for (Config config : conf.listAllDependentsObjects())
-                            {
-                                this.report.info("  Change cascades to: " + config.getType() + ":" + config.getName());
-                                this.cascadedChanges.put(config.getQualifiedName(), new CascadedChange(object, conf, config));
-                            }
+                            db.setConfig(conf);
                         }
                     }
-                    db.setConfig(conf);
+                }
+            }
+        }
+    }
+    
+    private void computeCascade(BergamotDB db)
+    {
+        for (List<? extends TemplatedObjectCfg<?>> objects : this.config.getAllObjects())
+        {
+            for (TemplatedObjectCfg<?> object : objects)
+            {
+                String type = Configuration.getRootElement(((NamedObjectCfg<?>) object).getClass());
+                Config conf = db.getConfigByName(this.site.getId(), type, object.getName());
+                if (conf != null)
+                {
+                    List<Config> dependents = conf.listAllDependentsObjects();
+                    if (ObjectState.isRemove(object.getObjectState()))
+                    {
+                        if (! dependents.isEmpty())
+                        {
+                            // currently we restrict cascading removal
+                            throw new RuntimeException("The " + type + " " + conf.getName() + " cannot be removed as it is in use by: " + dependents.stream().map((c) -> c.getType() + " " + c.getName()).collect(Collectors.joining(", ")));
+                        }
+                    }
+                    else
+                    {
+                        this.report.info("  Change to " + type + ":" + conf.getName());
+                        // cascade - note this recursively queries for all objects affected by a change to this template
+                        for (Config config : dependents)
+                        {
+                            this.report.info("  cascades to: " + config.getType() + ":" + config.getName());
+                            this.cascadedChanges.put(config.getQualifiedName(), new CascadedChange(object, conf, config));
+                        }
+                    }
                 }
             }
         }
