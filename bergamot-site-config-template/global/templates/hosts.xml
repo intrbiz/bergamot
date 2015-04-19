@@ -313,12 +313,12 @@
         </service>
         
         <service name="snmp_location" extends="network-service" template="yes">
-            <summary>Device Name</summary>
+            <summary>Device Location</summary>
             <check-command command="check_snmp_location"/>
         </service>
         
         <service name="snmp_contact" extends="network-service" template="yes">
-            <summary>Device Name</summary>
+            <summary>Device Contact</summary>
             <check-command command="check_snmp_contact"/>
         </service>
         
