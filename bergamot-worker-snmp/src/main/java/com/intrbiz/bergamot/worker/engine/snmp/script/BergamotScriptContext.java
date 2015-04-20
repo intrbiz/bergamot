@@ -29,6 +29,11 @@ public class BergamotScriptContext
         return executeCheck;
     }
     
+    public void info(String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).info(message));
+    }
+    
     public void ok(String message)
     {
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).ok(message));
@@ -62,6 +67,16 @@ public class BergamotScriptContext
     public void timeout(String message)
     {
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).timeout(message));
+    }
+    
+    public void disconnected(String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).disconnected(message));
+    }
+    
+    public void action(String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).action(message));
     }
     
     public void publish(ResultMO resultMO)
