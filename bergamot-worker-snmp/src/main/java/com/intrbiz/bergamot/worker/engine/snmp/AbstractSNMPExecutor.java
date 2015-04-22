@@ -3,11 +3,6 @@ package com.intrbiz.bergamot.worker.engine.snmp;
 import java.net.UnknownHostException;
 import java.util.function.Consumer;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleBindings;
-
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
@@ -15,23 +10,19 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
-import com.intrbiz.bergamot.worker.engine.snmp.script.BergamotScriptContext;
-import com.intrbiz.scripting.RestrictedScriptEngineManager;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.SNMPVersion;
 import com.intrbiz.snmp.security.SNMPAuthMode;
 import com.intrbiz.snmp.security.SNMPPrivMode;
 
 /**
- * Execute SNMP checks
+ * Generic SNMP check handling
  */
-public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
+public abstract class AbstractSNMPExecutor extends AbstractExecutor<SNMPEngine>
 {
-    private Logger logger = Logger.getLogger(SNMPExecutor.class);
-    
-    private ScriptEngineManager factory = new RestrictedScriptEngineManager();
+    private Logger logger = Logger.getLogger(AbstractSNMPExecutor.class);
 
-    public SNMPExecutor()
+    public AbstractSNMPExecutor()
     {
         super();
     }
@@ -44,28 +35,21 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
     {
         return super.accept(task) && "snmp".equals(task.getEngine());
     }
+    
+    protected abstract void executeSNMP(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter, SNMPContext<?> agent) throws Exception;
 
     @Override
     public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
     {
-        logger.debug("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
+        if (logger.isDebugEnabled()) logger.debug("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         try
         {
             // validate parameters
             this.validate(executeCheck);
             // open the context
             SNMPContext<?> agent = this.openContext(executeCheck);
-            // setup wrapped context
-            SNMPContext<?> wrapped = agent.with((error) -> { resultSubmitter.accept(new ActiveResultMO().error(error)); });
-            // setup the script engine
-            ScriptEngine script = factory.getEngineByName("nashorn");
-            SimpleBindings bindings = new SimpleBindings();
-            bindings.put("check", executeCheck);
-            bindings.put("agent", wrapped);
-            bindings.put("bergamot", new BergamotScriptContext(executeCheck, resultSubmitter));
-            script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-            // execute
-            script.eval(executeCheck.getParameter("script"));
+            // invoke the specifics of the SNMP check
+            this.executeSNMP(executeCheck, resultSubmitter, agent);
         }
         catch (Exception e)
         {
@@ -74,10 +58,9 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
         }
     }
     
-    private void validate(ExecuteCheck executeCheck)
+    protected void validate(ExecuteCheck executeCheck)
     {
         if (Util.isEmpty(executeCheck.getParameter("host"))) throw new RuntimeException("The host must be defined!");
-        if (Util.isEmpty(executeCheck.getParameter("script"))) throw new RuntimeException("The script must be defined!");
         if (Util.isEmpty(executeCheck.getParameter("snmp-version"))) throw new RuntimeException("The snmp-version must be defined!");
         SNMPVersion version = SNMPVersion.parse(executeCheck.getParameter("snmp-version"));
         if (version == null) throw new RuntimeException("The snmp-version must be one of: '1', '2c', '3'");
@@ -96,9 +79,13 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
             // for now require the SNMP engine id for V3
             if (Util.isEmpty(executeCheck.getParameter("snmp-engine-id"))) throw new RuntimeException("The snmp-engine-id must be defined!");
         }
+        else
+        {
+            throw new RuntimeException("Unexpected SNMP version");
+        }
     }
     
-    private synchronized SNMPContext<?> openContext(ExecuteCheck executeCheck) throws UnknownHostException
+    protected synchronized SNMPContext<?> openContext(ExecuteCheck executeCheck) throws UnknownHostException
     {
         SNMPVersion version = SNMPVersion.parse(executeCheck.getParameter("snmp-version"));
         String host = executeCheck.getParameter("host");
@@ -122,7 +109,7 @@ public class SNMPExecutor extends AbstractExecutor<SNMPEngine>
         }
         else
         {
-            throw new RuntimeException("Invalid SNMP version");
+            throw new RuntimeException("Unexpected SNMP version");
         }
     }
 }
