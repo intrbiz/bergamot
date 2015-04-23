@@ -21,7 +21,7 @@
             bergamot.require('oid');
             /* Get the system oid */
             agent.getValue(bergamot.check.getParameter('oid'), function(varbind) { 
-                bergamot.info(varbind.valueToString()); 
+                bergamot.info(varbind.valueToString());
             });
             ]]>
         </parameter>

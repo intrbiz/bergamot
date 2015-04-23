@@ -28,6 +28,7 @@ public class SNMPEngine extends AbstractEngine
         if (this.executors.isEmpty())
         {
             this.addExecutor(new ScriptedSNMPExecutor());
+            this.addExecutor(new GetSNMPExecutor());
         }
     }
     
