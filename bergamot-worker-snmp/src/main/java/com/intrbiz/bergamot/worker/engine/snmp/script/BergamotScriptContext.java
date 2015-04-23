@@ -13,6 +13,8 @@ public class BergamotScriptContext
     
     private final Consumer<ResultMO> publishResult;
     
+    private final long start = System.currentTimeMillis();
+    
     public BergamotScriptContext(ExecuteCheck executeCheck, Consumer<ResultMO> publishResult)
     {
         this.executeCheck = executeCheck;
@@ -81,6 +83,7 @@ public class BergamotScriptContext
     
     public void publish(ResultMO resultMO)
     {
+        resultMO.runtime(System.currentTimeMillis() - this.start);
         this.publishResult.accept(resultMO);
     }
     
