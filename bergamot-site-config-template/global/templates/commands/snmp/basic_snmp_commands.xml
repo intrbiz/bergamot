@@ -30,20 +30,26 @@
             bergamot.require('warning');
             bergamot.require('critical');
             /* Get the system uptime */
-            agent.getValue('1.3.6.1.2.1.1.3.0', function(varbind) { 
-                if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('critical') * 60 * 1000))
-                {
-                    bergamot.critical('Up ' + varbind.getTimeTicksValue().getTicksMillis() + 'ms');
+            agent.getValue(
+                '1.3.6.1.2.1.1.3.0', 
+                function(varbind) { 
+                    if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('critical') * 60 * 1000))
+                    {
+                        bergamot.critical('Up ' + varbind.getTimeTicksValue().toInterval());
+                    }
+                    else if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('warning') * 60 * 1000))
+                    {
+                        bergamot.warning('Up ' + varbind.getTimeTicksValue().toInterval());
+                    }
+                    else
+                    {
+                        bergamot.ok('Up ' + varbind.getTimeTicksValue().toInterval());
+                    }
+                },
+                function(exception) {
+                    bergamot.error(exception);
                 }
-                else if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('warning') * 60 * 1000))
-                {
-                    bergamot.warning('Up ' + varbind.getTimeTicksValue().getTicksMillis() + 'ms');
-                }
-                else
-                {
-                    bergamot.ok('Up ' + varbind.getTimeTicksValue().getTicksMillis() + 'ms');
-                }
-            });
+            );
             ]]>
         </parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
