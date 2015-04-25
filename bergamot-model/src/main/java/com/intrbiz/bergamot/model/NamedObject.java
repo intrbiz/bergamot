@@ -79,7 +79,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         this.parameters.clear();
         for (CfgParameter param : resolvedConfiguration.getParameters())
         {
-            this.parameters.add(new Parameter(param.getName(), param.getValueOrText()));
+            this.parameters.add(new Parameter(param.getName(), param.getDescription(), param.getValueOrText()));
         }
         // store the config
         this.setConfiguration(configuration);

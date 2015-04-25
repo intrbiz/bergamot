@@ -16,6 +16,9 @@ public class Parameter extends BergamotObject<ParameterMO>
     
     @JsonProperty("name")
     private String name;
+    
+    @JsonProperty("description")
+    private String description;
 
     @JsonProperty("value")
     private String value;
@@ -31,6 +34,14 @@ public class Parameter extends BergamotObject<ParameterMO>
         this.name = name;
         this.value = value;
     }
+    
+    public Parameter(String name, String description, String value)
+    {
+        super();
+        this.name = name;
+        this.description = description;
+        this.value = value;
+    }
 
     public String getName()
     {
@@ -40,6 +51,16 @@ public class Parameter extends BergamotObject<ParameterMO>
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     public String getValue()
@@ -79,7 +100,7 @@ public class Parameter extends BergamotObject<ParameterMO>
     @Override
     public ParameterMO toMO(boolean stub)
     {
-        return new ParameterMO(this.getName(), this.getValue());
+        return new ParameterMO(this.getName(), (stub ? this.getDescription() : null), this.getValue());
     }
 
     public String toString()

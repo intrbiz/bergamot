@@ -8,19 +8,30 @@ public class ParameterMO extends MessageObject
 {
     @JsonProperty("name")
     private String name;
-    
+
+    @JsonProperty("description")
+    private String description;
+
     @JsonProperty("value")
     private String value;
-    
+
     public ParameterMO()
     {
         super();
     }
-    
+
     public ParameterMO(String name, String value)
     {
         super();
         this.name = name;
+        this.value = value;
+    }
+    
+    public ParameterMO(String name, String description, String value)
+    {
+        super();
+        this.name = name;
+        this.description = description;
         this.value = value;
     }
 
@@ -32,6 +43,16 @@ public class ParameterMO extends MessageObject
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     public String getValue()
