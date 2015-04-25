@@ -10,8 +10,17 @@
 			    <span class="value">#{timeperiod.name}</span>
 		    </p>
 		</div>
-		<div class="col4" rendered="#{! timeperiod.excludes.isEmpty()}">
-			<h3>Excludes</h3>
+		<div class="col4 dash_icon">
+			<h4>Description</h4>
+			<p class="description">
+			    #{coalesce(timeperiod.description, '')}
+		    </p>
+		</div>
+	</div>
+	
+	<div class="row" rendered="#{! timeperiod.excludes.isEmpty()}">
+		<div class="col4">
+			<h4>Excludes</h4>
 			<data-set var="exclude" value="#{timeperiod.excludes}">
 				<p>
 					<span class="value single">
@@ -24,7 +33,7 @@
 	
 	<div class="row">
 		<div class="col4 dash_icon">
-			<h3>Time Ranges</h3>
+			<h4>Time Ranges</h4>
 			<data-set var="range" value="#{timeperiod.ranges}">
 				<p>
 					<span class="value single">#{range}</span>

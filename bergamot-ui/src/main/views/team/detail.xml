@@ -9,7 +9,10 @@
 			    <span class="label">Name: </span>
 			    <span class="value">#{team.name}</span>
 		    </p>
-		    <p class="description">
+		</div>
+		<div class="col4 dash_icon">
+			<h4>Description</h4>
+			<p class="description">
 			    #{coalesce(team.description, '')}
 		    </p>
 		</div>
@@ -19,7 +22,7 @@
 	
 	<div class="row">
 		<div class="col4">
-			<h3>Contacts</h3>
+			<h4>Contacts</h4>
 			<data-set var="contact" value="#{team.contacts}">
 				<p>
 					<a href="/contact/id/#{contact.id}">#{contact.summary}</a>
