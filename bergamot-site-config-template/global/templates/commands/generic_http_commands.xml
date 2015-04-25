@@ -17,6 +17,7 @@
         <parameter name="length"></parameter>
         <parameter name="contains"></parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+        <description>Make a HTTP request and check the response</description>
     </command>
     
     <command name="https_check" engine="http">
@@ -35,6 +36,7 @@
         <parameter name="length"></parameter>
         <parameter name="contains"></parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+        <description>Make a HTTPS request and check the response</description>
     </command>
     
     <command name="certificate_check" engine="http" executor="certificate">
@@ -47,6 +49,7 @@
         <parameter name="path"></parameter>
         <parameter name="expires_in">28</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/security.png</parameter>
+        <description>Check the validity of a TLS certificate presented</description>
     </command>
     
 </bergamot>

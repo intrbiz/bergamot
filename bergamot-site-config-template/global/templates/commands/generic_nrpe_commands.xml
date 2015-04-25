@@ -5,6 +5,7 @@
         <summary>Check NRPE</summary>
         <parameter description="The NRPE command name" name="command">#{arg1}</parameter>
         <parameter description="The NRPE host" name="host">#{host.address}</parameter>
+        <description>Execute the command via the Nagios Remote Plugin Executor</description>
     </command>
     
 </bergamot>

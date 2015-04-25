@@ -3,6 +3,7 @@
     
     <command engine="nagios" name="check-nagios" template="yes">
         <parameter description="The Nagios plugin command line to execute" name="command_line"></parameter>
+        <description>Execute the given Nagios plugin</description>
     </command>
     
 </bergamot>
