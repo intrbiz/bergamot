@@ -110,6 +110,7 @@ public class ProcessInfoHandler implements AgentHandler
                     {
                         // quite often get errors for short lived PIDs, so ignore, 
                         // a specific exception class would be nice
+                        if (logger.isDebugEnabled()) logger.debug("Cannot get process information", e);
                     }
                 }
             }
