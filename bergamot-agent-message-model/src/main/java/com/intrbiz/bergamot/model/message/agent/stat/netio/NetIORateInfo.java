@@ -19,17 +19,31 @@ public class NetIORateInfo extends AgentType
      */
     @JsonProperty("rx-rate")
     private double rxRate;
+    
+    /**
+     * Peak Transmit rate in B/s
+     */
+    @JsonProperty("tx-peak-rate")
+    private double txPeakRate;
+
+    /**
+     * Peak Receive rate in B/s
+     */
+    @JsonProperty("rx-peak-rate")
+    private double rxPeakRate;
 
     public NetIORateInfo()
     {
         super();
     }
     
-    public NetIORateInfo(double txRate, double rxRate)
+    public NetIORateInfo(double txRate, double rxRate, double txPeakRate, double rxPeakRate)
     {
         super();
         this.txRate = txRate;
         this.rxRate = rxRate;
+        this.txPeakRate = txPeakRate;
+        this.rxPeakRate = rxPeakRate;
     }
 
     public double getTxRate()
@@ -126,5 +140,83 @@ public class NetIORateInfo extends AgentType
     public double getRxRatebps()
     {
         return this.rxRate * 10D;
+    }
+    
+    // Peak
+    
+    // TX
+    
+    @JsonIgnore
+    public double getTxPeakRateMBps()
+    {
+        return this.txPeakRate / 1000000D;
+    }
+    
+    @JsonIgnore
+    public double getTxPeakRatekBps()
+    {
+        return this.txPeakRate / 1000D;
+    }
+    
+    @JsonIgnore
+    public double getTxPeakRateBps()
+    {
+        return this.txPeakRate;
+    }
+    
+    @JsonIgnore
+    public double getTxPeakRateMbps()
+    {
+        return this.txPeakRate / 100000D;
+    }
+    
+    @JsonIgnore
+    public double getTxPeakRatekbps()
+    {
+        return this.txPeakRate / 100D;
+    }
+    
+    @JsonIgnore
+    public double getTxPeakRatebps()
+    {
+        return this.txPeakRate * 10D;
+    }
+    
+    // RX
+    
+    @JsonIgnore
+    public double getRxPeakRateMBps()
+    {
+        return this.rxPeakRate / 1000000D;
+    }
+    
+    @JsonIgnore
+    public double getRxPeakRatekBps()
+    {
+        return this.rxPeakRate / 1000D;
+    }
+    
+    @JsonIgnore
+    public double getRxPeakRateBps()
+    {
+        return this.rxPeakRate;
+    }
+    
+    @JsonIgnore
+    public double getRxPeakRateMbps()
+    {
+        return this.rxPeakRate / 100000D;
+    }
+    
+    @JsonIgnore
+    public double getRxPeakRatekbps()
+    {
+        return this.rxPeakRate / 100D;
+    }
+    
+    @JsonIgnore
+    public double getRxPeakRatebps()
+    {
+        return this.rxPeakRate * 10D;
     }
 }

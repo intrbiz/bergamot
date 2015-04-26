@@ -196,10 +196,23 @@ public class NetIOHandler implements AgentHandler
             synchronized (this)
             {
                 if (this.samples.size() < 2) return null;
-                // most recent sample
-                NetIOSample last   = this.samples.get(this.samples.size() - 1);
-                NetIOSample oldest = this.samples.get(Math.max((this.samples.size() - 1) - (int)(unit.toMillis(interval) / this.sampleInterval), 0));
-                return last.computeRate(oldest);
+                // indexes
+                int oldestIndex = Math.max((this.samples.size() - 1) - (int)(unit.toMillis(interval) / this.sampleInterval), 0);
+                int latestIndex = this.samples.size() - 1;
+                // compute the average rate
+                NetIOSample latest = this.samples.get(latestIndex);
+                NetIOSample oldest = this.samples.get(oldestIndex);
+                NetIORate rate = latest.computeRate(oldest);
+                // compute the peak rate
+                for (int i = latestIndex; i > oldestIndex; i--)
+                {
+                    oldest = this.samples.get(i -1);
+                    latest = this.samples.get(i);
+                    NetIORate peak = latest.computeRate(oldest);
+                    rate.txPeakRate = Math.max(rate.txPeakRate, peak.txRate);
+                    rate.rxPeakRate = Math.max(rate.rxPeakRate, peak.rxRate);
+                }
+                return rate;
             }
         }
 
@@ -255,10 +268,18 @@ public class NetIOHandler implements AgentHandler
         /** Rate is B/s */
         public final double rxRate;
         
+        /** Rate is B/s */
+        public double txPeakRate;
+        
+        /** Rate is B/s */
+        public double rxPeakRate;
+        
         public NetIORate(double txRate, double rxRate)
         {
             this.txRate = txRate;
             this.rxRate = rxRate;
+            this.txPeakRate = txRate;
+            this.rxPeakRate = rxRate;
         }
         
         public static NetIORate average(NetIORate a, NetIORate b)
@@ -330,14 +351,82 @@ public class NetIOHandler implements AgentHandler
             return this.rxRate * 10D;
         }
         
+        // Peak
+        
+        // TX
+        
+        public double getTxPeakRateMBps()
+        {
+            return this.txPeakRate / 1000000D;
+        }
+        
+        public double getTxPeakRatekBps()
+        {
+            return this.txPeakRate / 1000D;
+        }
+        
+        public double getTxPeakRateBps()
+        {
+            return this.txPeakRate;
+        }
+        
+        public double getTxPeakRateMbps()
+        {
+            return this.txPeakRate / 100000D;
+        }
+        
+        public double getTxPeakRatekbps()
+        {
+            return this.txPeakRate / 100D;
+        }
+        
+        public double getTxPeakRatebps()
+        {
+            return this.txPeakRate * 10D;
+        }
+        
+        // RX
+        
+        public double getRxPeakRateMBps()
+        {
+            return this.rxPeakRate / 1000000D;
+        }
+        
+        public double getRxPeakRatekBps()
+        {
+            return this.rxPeakRate / 1000D;
+        }
+        
+        public double getRxPeakRateBps()
+        {
+            return this.rxPeakRate;
+        }
+        
+        public double getRxPeakRateMbps()
+        {
+            return this.rxPeakRate / 100000D;
+        }
+        
+        public double getRxPeakRatekbps()
+        {
+            return this.rxPeakRate / 100D;
+        }
+        
+        public double getRxPeakRatebps()
+        {
+            return this.rxPeakRate * 10D;
+        }
+        
+        // Util
+        
         public NetIORateInfo toInfo()
         {
-            return new NetIORateInfo(this.txRate, this.rxRate);
+            return new NetIORateInfo(this.txRate, this.rxRate, this.txPeakRate, this.rxPeakRate);
         }
         
         public String toString()
         {
-            return "Tx: " + this.getTxRateMbps() + "Mb/s, Rx: " + this.getRxRateMbps() + "Mb/s";
+            return "Tx: " + this.getTxRateMbps() + "(" + this.getTxPeakRateMbps() + ")Mb/s, Rx: " + this.getRxRateMbps() + "(" + this.getRxPeakRateMbps() + ")Mb/s";
         }
     }
     

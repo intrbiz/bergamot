@@ -67,12 +67,17 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
                     NetIOStat stat = (NetIOStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got NetIOStat in " + runtime + "ms: " + stat);
                     // apply the check
+                    boolean peak = executeCheck.getBooleanParameter("peak", false);
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
                             stat.getIfaces(),
-                            (v, t) -> v.getFiveMinuteRate().getTxRateMbps() > t || v.getFiveMinuteRate().getTxRateMbps() > t,
+                            (v, t) -> (peak ? v.getFiveMinuteRate().getTxPeakRateMbps(): v.getFiveMinuteRate().getTxRateMbps()) > t || (peak ? v.getFiveMinuteRate().getRxPeakRateMbps(): v.getFiveMinuteRate().getRxRateMbps()) > t,
                             executeCheck.getDoubleParameter("warning",  50), 
                             executeCheck.getDoubleParameter("critical", 75), 
-                            stat.getIfaces().stream().map((n) -> n.getName() + " Tx: " + DFMT.format(n.getFiveMinuteRate().getTxRateMbps()) + "Mb/s, Rx: " + DFMT.format(n.getFiveMinuteRate().getRxRateMbps()) + "Mb/s").collect(Collectors.joining("; "))
+                            stat.getIfaces().stream().map((n) -> 
+                                n.getName() + 
+                                " Tx: " + DFMT.format(n.getFiveMinuteRate().getTxRateMbps()) + "Mb/s (" + DFMT.format(n.getFiveMinuteRate().getTxPeakRateMbps()) + "Mb/s Peak)" + 
+                                " Rx: " + DFMT.format(n.getFiveMinuteRate().getRxRateMbps()) + "Mb/s (" + DFMT.format(n.getFiveMinuteRate().getRxPeakRateMbps()) + "Mb/s Peak)"
+                            ).collect(Collectors.joining("; "))
                     ).runtime(runtime));
                 });
             }

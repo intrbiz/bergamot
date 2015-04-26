@@ -21,6 +21,7 @@
     <command engine="agent" executor="network-io" extends="check_agent" name="check_agent_network_io">
         <parameter description="Warning (Mb/s)" name="warning">50</parameter>
         <parameter description="Critical (Mb/s)" name="critical">75</parameter>
+        <parameter description="Check peak rate" name="peak">no</parameter>
         <parameter description="Network Interface Name" name="interface"></parameter>
         <summary>Bergamot Agent: Network IO</summary>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
