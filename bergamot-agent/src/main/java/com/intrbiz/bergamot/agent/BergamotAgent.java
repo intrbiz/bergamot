@@ -24,8 +24,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -53,6 +56,7 @@ import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ExecHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
 import com.intrbiz.bergamot.agent.handler.NetConInfoHandler;
+import com.intrbiz.bergamot.agent.handler.NetIOHandler;
 import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
 import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ProcessInfoHandler;
@@ -114,6 +118,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new WhoInfoHandler());
         this.registerHandler(new NetConInfoHandler());
         this.registerHandler(new AgentInfoHandler());
+        this.registerHandler(new NetIOHandler());
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -176,6 +181,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             SSLEngine sslEngine = this.sslContext.createSSLEngine(host, port);
             sslEngine.setUseClientMode(true);
             sslEngine.setNeedClientAuth(true);
+            // set TLS protocols
+            sslEngine.setEnabledProtocols(TLSUtils.computeSupportedProtocols(sslEngine, TLSUtils.PROTOCOLS.SAFE_PROTOCOLS));
             SSLParameters params = new SSLParameters();
             // can't do this in JDK 6
             // params.setEndpointIdentificationAlgorithm("HTTPS");

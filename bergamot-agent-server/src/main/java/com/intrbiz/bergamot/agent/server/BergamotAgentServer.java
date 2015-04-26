@@ -40,6 +40,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
+import com.intrbiz.bergamot.model.message.agent.check.CheckNetIO;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
@@ -321,6 +322,12 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             // check net con
             agent.sendMessageToAgent(new CheckNetCon(), (response) -> {
                 System.out.println("Got NetCon Info: " + response);
+            });
+            //
+            try { Thread.sleep(20_000L); } catch (Exception e) {}
+            // check net IO
+            agent.sendMessageToAgent(new CheckNetIO(), (response) -> {
+                System.out.println("Got NetIO Info: " + response);
             });
         });
         // go go go
