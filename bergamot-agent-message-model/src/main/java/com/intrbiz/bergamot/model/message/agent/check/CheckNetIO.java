@@ -29,18 +29,18 @@ public class CheckNetIO extends AgentMessage
         super(id);
     }
     
-    public CheckNetIO(String id, String... interfaces)
+    public CheckNetIO(String... interfaces)
     {
-        super(id);
+        super();
         for (String name : interfaces)
         {
             this.interfaces.add(name);
         }
     }
     
-    public CheckNetIO(String id, Collection<String> interfaces)
+    public CheckNetIO(Collection<String> interfaces)
     {
-        super(id);
+        super();
         this.interfaces.addAll(interfaces);
     }
 
