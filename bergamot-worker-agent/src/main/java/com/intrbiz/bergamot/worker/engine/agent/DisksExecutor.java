@@ -66,7 +66,7 @@ public class DisksExecutor extends AbstractExecutor<AgentEngine>
                     DiskStat stat = (DiskStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got Disk usage in + " + runtime + "ms: " + stat);
                     // apply the check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThresholds(
                             stat.getDisks().stream().map(DiskInfo::getUsedPercent).map(UnitUtil::fromPercent).collect(Collectors.toList()),
                             executeCheck.getPercentParameter("warning", 0.8F),
                             executeCheck.getPercentParameter("critical", 0.9F),

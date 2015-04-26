@@ -98,10 +98,10 @@ public class ProcessStatsExecutor extends AbstractExecutor<AgentEngine>
                         message = count + " total processes, " + stat.getThreads() + " total threads";
                     }
                     // apply the check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             count, 
-                            executeCheck.getIntParameter("warning",  150), 
-                            executeCheck.getIntParameter("critical", 200), 
+                            executeCheck.getLongParameter("warning",  150), 
+                            executeCheck.getLongParameter("critical", 200), 
                             message
                     ).runtime(runtime));
                 });

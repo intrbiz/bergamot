@@ -60,7 +60,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                     MemStat stat = (MemStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got Memory usage in " + runtime + "ms: " + stat);
                     // check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             UnitUtil.toRatio((executeCheck.getBooleanParameter("ignore_caches", true) ? stat.getActualUsedMemory() : stat.getUsedMemory()), stat.getTotalMemory()),
                             executeCheck.getPercentParameter("warning", 0.8F), 
                             executeCheck.getPercentParameter("critical", 0.9F),

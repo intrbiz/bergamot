@@ -73,8 +73,8 @@ public class PortListenerExecutor extends AbstractExecutor<AgentEngine>
                     // apply the check
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyRange(
                             stat.getConnections().size(),
-                            executeCheck.getIntRangeParameter("warning",  new int[] {1, 1}), 
-                            executeCheck.getIntRangeParameter("critical", new int[] {1, 1}), 
+                            executeCheck.getIntRangeParameter("warning",  new Integer[] {1, 1}), 
+                            executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
                             "found " + stat.getConnections().size() + " listeners: " + stat.getConnections().stream().map((nc) -> nc.getProtocol() + " " + nc.getLocalAddress() + ":" + nc.getLocalPort()).collect(Collectors.joining(", "))
                     ).runtime(runtime));
                 });

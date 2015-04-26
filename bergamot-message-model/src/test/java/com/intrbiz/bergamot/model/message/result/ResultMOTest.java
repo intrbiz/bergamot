@@ -125,10 +125,10 @@ public class ResultMOTest
     public void testApplyThresholdsOkDouble()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
-                Arrays.asList(0.1, 0.3, 0.2, 0.65, 0.5, 0.75), 
-                0.8, 
-                0.9,
+        result.applyGreaterThanThresholds(
+                Arrays.asList(0.1D, 0.3D, 0.2D, 0.65D, 0.5D, 0.75D), 
+                0.8D, 
+                0.9D,
                 "Test"
         );
         assertThat(result.isOk(), is(equalTo(true)));
@@ -140,10 +140,10 @@ public class ResultMOTest
     public void testApplyThresholdsOkDouble1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
-                Arrays.asList(0.1), 
-                0.8, 
-                0.9,
+        result.applyGreaterThanThresholds(
+                Arrays.asList(0.1D), 
+                0.8D, 
+                0.9D,
                 "Test"
         );
         assertThat(result.isOk(), is(equalTo(true)));
@@ -155,7 +155,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningDouble()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(0.1, 0.3, 0.2, 0.82, 0.65, 0.5, 0.75), 
                 0.8, 
                 0.9,
@@ -170,7 +170,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningDouble1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(0.1, 0.3, 0.2, 0.82, 0.65, 0.5, 0.75, 0.8), 
                 0.8, 
                 0.9,
@@ -185,7 +185,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningDouble2()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(0.89), 
                 0.8, 
                 0.9,
@@ -200,7 +200,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningDouble3()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(0.9), 
                 0.8, 
                 0.9,
@@ -215,7 +215,7 @@ public class ResultMOTest
     public void testApplyThresholdsCriticalDouble()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(0.1, 0.3, 0.2, 0.82, 0.65, 0.5, 0.75, 0.98, 0.92), 
                 0.8, 
                 0.9,
@@ -230,7 +230,7 @@ public class ResultMOTest
     public void testApplyThresholdsCriticalDouble1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(0.91), 
                 0.8, 
                 0.9,
@@ -245,7 +245,7 @@ public class ResultMOTest
     public void testApplyThresholdsCriticalDouble2()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(0.9, 0.91, 0.92), 
                 0.8, 
                 0.9,
@@ -260,7 +260,7 @@ public class ResultMOTest
     public void testApplyThresholdsOkLong()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(10L, 30L, 20L, 65L, 50L, 75L), 
                 80L, 
                 90L,
@@ -275,7 +275,7 @@ public class ResultMOTest
     public void testApplyThresholdsOkLong1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(10L), 
                 80L, 
                 90L,
@@ -290,7 +290,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningLong()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(10L, 30L, 20L, 82L, 65L, 50L, 75L), 
                 80L, 
                 90L,
@@ -305,7 +305,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningLong1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(10L, 30L, 20L, 82L, 65L, 50L, 75L, 80L), 
                 80L, 
                 90L,
@@ -320,7 +320,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningLong2()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(89L), 
                 80L, 
                 90L,
@@ -335,7 +335,7 @@ public class ResultMOTest
     public void testApplyThresholdsWarningLong3()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(90L), 
                 80L, 
                 90L,
@@ -350,7 +350,7 @@ public class ResultMOTest
     public void testApplyThresholdsCriticalLong()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(10L, 30L, 20L, 82L, 65L, 50L, 75L, 98L, 92L), 
                 80L, 
                 90L,
@@ -365,7 +365,7 @@ public class ResultMOTest
     public void testApplyThresholdsCriticalLong1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(91L), 
                 80L, 
                 90L,
@@ -380,7 +380,7 @@ public class ResultMOTest
     public void testApplyThresholdsCriticalLong2()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThresholds(
                 Arrays.asList(90L, 91L, 92L), 
                 80L, 
                 90L,
@@ -397,7 +397,7 @@ public class ResultMOTest
     public void testApplyThresholdOkDouble()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 0.5, 
                 0.8, 
                 0.9,
@@ -412,7 +412,7 @@ public class ResultMOTest
     public void testApplyThresholdOkDouble1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 0.8, 
                 0.8, 
                 0.9,
@@ -427,7 +427,7 @@ public class ResultMOTest
     public void testApplyThresholdWarningDouble()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 0.85, 
                 0.8, 
                 0.9,
@@ -442,7 +442,7 @@ public class ResultMOTest
     public void testApplyThresholdWarningDouble1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 0.90, 
                 0.8, 
                 0.9,
@@ -457,7 +457,7 @@ public class ResultMOTest
     public void testApplyThresholdCriticalDouble()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 0.91, 
                 0.8, 
                 0.9,
@@ -472,7 +472,7 @@ public class ResultMOTest
     public void testApplyThresholdCriticalDouble1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 0.99, 
                 0.8, 
                 0.9,
@@ -487,7 +487,7 @@ public class ResultMOTest
     public void testApplyThresholdOkLong()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 50, 
                 80, 
                 90,
@@ -502,7 +502,7 @@ public class ResultMOTest
     public void testApplyThresholdOkLong1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 80, 
                 80, 
                 90,
@@ -517,7 +517,7 @@ public class ResultMOTest
     public void testApplyThresholdWarningLong()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 85, 
                 80, 
                 90,
@@ -532,7 +532,7 @@ public class ResultMOTest
     public void testApplyThresholdWarningLong1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 90, 
                 80, 
                 90,
@@ -547,7 +547,7 @@ public class ResultMOTest
     public void testApplyThresholdCriticalLong()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 91, 
                 80, 
                 90,
@@ -562,7 +562,7 @@ public class ResultMOTest
     public void testApplyThresholdCriticalLong1()
     {
         ActiveResultMO result = new ActiveResultMO();
-        result.applyThreshold(
+        result.applyGreaterThanThreshold(
                 99, 
                 80, 
                 90,

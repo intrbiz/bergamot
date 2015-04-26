@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.message.result;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -154,6 +155,12 @@ public abstract class ResultMO extends Message
     
     // constructor helpers
     
+    public ResultMO runtime(double runtime)
+    {
+        this.runtime = runtime;
+        return this;
+    }
+    
     @JsonIgnore
     public ResultMO pending(String output)
     {
@@ -276,46 +283,19 @@ public abstract class ResultMO extends Message
      * thresholds
      * 
      * @param value the value to check
+     * @param match the BiPredicate which will apply the threshold comparison, EG: (v,t) -> v > t
      * @param warning the warning threshold
      * @param critical the critical threshold
      * @param message the check output
      */
     @JsonIgnore
-    public ResultMO applyThreshold(double value, double warning, double critical, String message)
+    public <T> ResultMO applyThreshold(T value, BiPredicate<T,T> match, T warning, T critical, String message)
     {
-        if (value > critical)
+        if ( match.test(value, critical))
         {
             this.critical(message);
         }
-        else if (value > warning)
-        {
-            this.warning(message);
-        }
-        else
-        {
-            this.ok(message);
-        }
-        return this;
-    }
-    
-    /**
-     * Apply a warning / critical threshold to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the value and 
-     * thresholds
-     * 
-     * @param value the value to check
-     * @param warning the warning threshold
-     * @param critical the critical threshold
-     * @param message the check output
-     */
-    @JsonIgnore
-    public ResultMO applyThreshold(long value, long warning, long critical, String message)
-    {
-        if (value > critical)
-        {
-            this.critical(message);
-        }
-        else if (value > warning)
+        else if (match.test(value, warning))
         {
             this.warning(message);
         }
@@ -335,21 +315,22 @@ public abstract class ResultMO extends Message
      * being the status of this result.
      * 
      * @param values the values to check
+     * @param match the BiPredicate which will apply the threshold comparison, EG: (v,t) -> v > t
      * @param warning the warning threshold
      * @param critical the critical threshold
      * @param message the check output
      */
     @JsonIgnore
-    public ResultMO applyThreshold(Iterable<Long> values, long warning, long critical, String message)
+    public <T> ResultMO applyThresholds(Iterable<T> values, BiPredicate<T,T> match, T warning, T critical, String message)
     {
         int state = 0;
-        for (long value : values)
+        for (T value : values)
         {
-            if (value > critical)
+            if (match.test(value, critical))
             {
                 state = Math.max(state, 2);
             }
-            else if (value > warning)
+            else if (match.test(value, warning))
             {
                 state = Math.max(state, 1);
             }
@@ -373,140 +354,115 @@ public abstract class ResultMO extends Message
         return this;
     }
     
-    /**
-     * Apply a warning / critical threshold to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the values and 
-     * thresholds.
-     * 
-     * This applies a threshold check to a collection of values, with the worst status 
-     * being the status of this result.
-     * 
-     * @param values the values to check
-     * @param warning the warning threshold
-     * @param critical the critical threshold
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyThreshold(Iterable<Double> values, double warning, double critical, String message)
+    public ResultMO applyGreaterThanThreshold(Double value, Double warning, Double critical, String message)
     {
-        int state = 0;
-        for (double value : values)
-        {
-            if (value > critical)
-            {
-                state = Math.max(state, 2);
-            }
-            else if (value > warning)
-            {
-                state = Math.max(state, 1);
-            }
-            else
-            {
-                state = Math.max(state, 0);
-            }
-        }
-        switch (state)
-        {
-            case 0:
-                this.ok(message);
-                break;
-            case 1:
-                this.warning(message);
-                break;
-            case 2:
-                this.critical(message);
-                break;
-        }
+        this.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
-    public ResultMO runtime(double runtime)
+    @JsonIgnore
+    public ResultMO applyLessThanThreshold(Double value, Double warning, Double critical, String message)
     {
-        this.runtime = runtime;
+        this.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
         return this;
     }
     
-    /**
-     * Apply a warning / critical range to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the value and 
-     * ranges
-     * 
-     * @param value the value to check
-     * @param warning the warning range
-     * @param critical the critical range
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyRange(long value, long[] warning, long[] critical, String message)
+    public ResultMO applyGreaterThanThreshold(Float value, Float warning, Float critical, String message)
     {
-        if (value < critical[0] || value > critical[1])
-        {
-            this.critical(message);
-        }
-        else if (value < warning[0] || value > warning[1])
-        {
-            this.warning(message);
-        }
-        else
-        {
-            this.ok(message);
-        }
+        this.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
-    /**
-     * Apply a warning / critical range to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the value and 
-     * ranges
-     * 
-     * @param value the value to check
-     * @param warning the warning range
-     * @param critical the critical range
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyRange(int value, int[] warning, int[] critical, String message)
+    public ResultMO applyLessThanThreshold(Float value, Float warning, Float critical, String message)
     {
-        if (value < critical[0] || value > critical[1])
-        {
-            this.critical(message);
-        }
-        else if (value < warning[0] || value > warning[1])
-        {
-            this.warning(message);
-        }
-        else
-        {
-            this.ok(message);
-        }
+        this.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
         return this;
     }
     
-    /**
-     * Apply a warning / critical range to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the value and 
-     * ranges
-     * 
-     * @param value the value to check
-     * @param warning the warning range
-     * @param critical the critical range
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyRange(float value, float[] warning, float[] critical, String message)
+    public ResultMO applyGreaterThanThreshold(Long value, Long warning, Long critical, String message)
     {
-        if (value < critical[0] || value > critical[1])
-        {
-            this.critical(message);
-        }
-        else if (value < warning[0] || value > warning[1])
-        {
-            this.warning(message);
-        }
-        else
-        {
-            this.ok(message);
-        }
+        this.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyLessThanThreshold(Long value, Long warning, Long critical, String message)
+    {
+        this.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyGreaterThanThreshold(Integer value, Integer warning, Integer critical, String message)
+    {
+        this.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyLessThanThreshold(Integer value, Integer warning, Integer critical, String message)
+    {
+        this.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyGreaterThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyLessThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyGreaterThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyLessThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyGreaterThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyLessThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyGreaterThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @JsonIgnore
+    public ResultMO applyLessThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        this.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
         return this;
     }
     
@@ -516,18 +472,20 @@ public abstract class ResultMO extends Message
      * ranges
      * 
      * @param value the value to check
+     * @param lowerMatch the BiPredicate which will apply the range lower comparison, eg: (v,t) -> v < t
+     * @param upperMatch the BiPredicate which will apply the range upper comparison, eg: (v,t) -> v > t
      * @param warning the warning range
      * @param critical the critical range
      * @param message the check output
      */
     @JsonIgnore
-    public ResultMO applyRange(double value, double[] warning, double[] critical, String message)
+    public <T> ResultMO applyRange(T value, BiPredicate<T,T> lowerMatch, BiPredicate<T,T> upperMatch, T[] warning, T[] critical, String message)
     {
-        if (value < critical[0] || value > critical[1])
+        if (lowerMatch.test(value, critical[0]) || upperMatch.test(value, critical[1]))
         {
             this.critical(message);
         }
-        else if (value < warning[0] || value > warning[1])
+        else if (lowerMatch.test(value, warning[0]) || upperMatch.test(value, warning[1]))
         {
             this.warning(message);
         }
@@ -538,153 +496,31 @@ public abstract class ResultMO extends Message
         return this;
     }
     
-    /**
-     * Apply a warning / critical threshold to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the value and 
-     * thresholds
-     * 
-     * @param value the value to check
-     * @param warning the warning threshold
-     * @param critical the critical threshold
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyLessThanThreshold(double value, double warning, double critical, String message)
+    public ResultMO applyRange(Long value, Long[] warning, Long[] critical, String message)
     {
-        if (value < critical)
-        {
-            this.critical(message);
-        }
-        else if (value < warning)
-        {
-            this.warning(message);
-        }
-        else
-        {
-            this.ok(message);
-        }
+        this.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
-    /**
-     * Apply a warning / critical threshold to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the value and 
-     * thresholds
-     * 
-     * @param value the value to check
-     * @param warning the warning threshold
-     * @param critical the critical threshold
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyLessThanThreshold(long value, long warning, long critical, String message)
+    public ResultMO applyRange(Integer value, Integer[] warning, Integer[] critical, String message)
     {
-        if (value < critical)
-        {
-            this.critical(message);
-        }
-        else if (value < warning)
-        {
-            this.warning(message);
-        }
-        else
-        {
-            this.ok(message);
-        }
+        this.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
-    /**
-     * Apply a warning / critical threshold to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the values and 
-     * thresholds.
-     * 
-     * This applies a threshold check to a collection of values, with the worst status 
-     * being the status of this result.
-     * 
-     * @param values the values to check
-     * @param warning the warning threshold
-     * @param critical the critical threshold
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyLessThanThreshold(Iterable<Long> values, long warning, long critical, String message)
+    public ResultMO applyRange(Double value, Double[] warning, Double[] critical, String message)
     {
-        int state = 0;
-        for (long value : values)
-        {
-            if (value < critical)
-            {
-                state = Math.max(state, 2);
-            }
-            else if (value < warning)
-            {
-                state = Math.max(state, 1);
-            }
-            else
-            {
-                state = Math.max(state, 0);
-            }
-        }
-        switch (state)
-        {
-            case 0:
-                this.ok(message);
-                break;
-            case 1:
-                this.warning(message);
-                break;
-            case 2:
-                this.critical(message);
-                break;
-        }
+        this.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
-    /**
-     * Apply a warning / critical threshold to determine the result state, this will 
-     * result in either a ok, warning or critical state depending on the values and 
-     * thresholds.
-     * 
-     * This applies a threshold check to a collection of values, with the worst status 
-     * being the status of this result.
-     * 
-     * @param values the values to check
-     * @param warning the warning threshold
-     * @param critical the critical threshold
-     * @param message the check output
-     */
     @JsonIgnore
-    public ResultMO applyLessThanThreshold(Iterable<Double> values, double warning, double critical, String message)
+    public ResultMO applyRange(Float value, Float[] warning, Float[] critical, String message)
     {
-        int state = 0;
-        for (double value : values)
-        {
-            if (value < critical)
-            {
-                state = Math.max(state, 2);
-            }
-            else if (value < warning)
-            {
-                state = Math.max(state, 1);
-            }
-            else
-            {
-                state = Math.max(state, 0);
-            }
-        }
-        switch (state)
-        {
-            case 0:
-                this.ok(message);
-                break;
-            case 1:
-                this.warning(message);
-                break;
-            case 2:
-                this.critical(message);
-                break;
-        }
+        this.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
         return this;
     }
 }

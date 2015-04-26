@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model.message.result;
 
 import java.util.UUID;
+import java.util.function.BiPredicate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,6 +52,13 @@ public class PassiveResultMO extends ResultMO
         this.setId(UUID.randomUUID());
         this.setExecuted(System.currentTimeMillis());
         this.setRuntime(0);
+        return this;
+    }
+    
+    @Override
+    public PassiveResultMO runtime(double runtime)
+    {
+        super.runtime(runtime);
         return this;
     }
 
@@ -132,93 +140,186 @@ public class PassiveResultMO extends ResultMO
     }
 
     @Override
-    public PassiveResultMO applyThreshold(double value, double warning, double critical, String message)
+    @JsonIgnore
+    public <T> PassiveResultMO applyThreshold(T value, BiPredicate<T,T> match, T warning, T critical, String message)
     {
-        super.applyThreshold(value, warning, critical, message);
+        super.applyThreshold(value, match, warning, critical, message);
         return this;
     }
 
     @Override
-    public PassiveResultMO applyThreshold(long value, long warning, long critical, String message)
+    @JsonIgnore
+    public <T> PassiveResultMO applyThresholds(Iterable<T> values, BiPredicate<T,T> match, T warning, T critical, String message)
     {
-        super.applyThreshold(value, warning, critical, message);
+        super.applyThresholds(values, match, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyThreshold(Iterable<Double> values, double warning, double critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThreshold(Double value, Double warning, Double critical, String message)
     {
-        super.applyThreshold(values, warning, critical, message);
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyThreshold(Iterable<Long> values, long warning, long critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThreshold(Double value, Double warning, Double critical, String message)
     {
-        super.applyThreshold(values, warning, critical, message);
-        return this;
-    }
-
-    @Override
-    public PassiveResultMO runtime(double runtime)
-    {
-        super.runtime(runtime);
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyRange(int value, int[] warning, int[] critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThreshold(Float value, Float warning, Float critical, String message)
     {
-        super.applyRange(value, warning, critical, message);
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyRange(long value, long[] warning, long[] critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThreshold(Float value, Float warning, Float critical, String message)
     {
-        super.applyRange(value, warning, critical, message);
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyRange(float value, float[] warning, float[] critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThreshold(Long value, Long warning, Long critical, String message)
     {
-        super.applyRange(value, warning, critical, message);
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyRange(double value, double[] warning, double[] critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThreshold(Long value, Long warning, Long critical, String message)
     {
-        super.applyRange(value, warning, critical, message);
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyLessThanThreshold(double value, double warning, double critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThreshold(Integer value, Integer warning, Integer critical, String message)
     {
-        super.applyLessThanThreshold(value, warning, critical, message);
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyLessThanThreshold(long value, long warning, long critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThreshold(Integer value, Integer warning, Integer critical, String message)
     {
-        super.applyLessThanThreshold(value, warning, critical, message);
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyLessThanThreshold(Iterable<Double> value, double warning, double critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
     {
-        super.applyLessThanThreshold(value, warning, critical, message);
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
         return this;
     }
     
     @Override
-    public PassiveResultMO applyLessThanThreshold(Iterable<Long> value, long warning, long critical, String message)
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
     {
-        super.applyLessThanThreshold(value, warning, critical, message);
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyGreaterThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyLessThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public <T> PassiveResultMO applyRange(T value, BiPredicate<T,T> lowerMatch, BiPredicate<T,T> upperMatch, T[] warning, T[] critical, String message)
+    {
+        super.applyRange(value, lowerMatch, upperMatch, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyRange(Long value, Long[] warning, Long[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyRange(Integer value, Integer[] warning, Integer[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyRange(Double value, Double[] warning, Double[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public PassiveResultMO applyRange(Float value, Float[] warning, Float[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
         return this;
     }
 }

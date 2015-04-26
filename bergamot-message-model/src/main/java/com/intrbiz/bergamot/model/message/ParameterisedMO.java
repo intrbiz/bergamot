@@ -136,7 +136,7 @@ public interface ParameterisedMO
                 .orElse(defaultValue);        
     }
     
-    default float getPercentParameter(String name)
+    default double getPercentParameter(String name)
     {
         return this.getFloatParameter(name, -1);
     }
@@ -147,13 +147,13 @@ public interface ParameterisedMO
      * @param defaultValue (in the range 0 to 1)
      * @return the normalised percentage value of the parameter
      */
-    default float getPercentParameter(String name, float defaultValue)
+    default double getPercentParameter(String name, double defaultValue)
     {
         return this.getParameters().stream()
                 .filter((p) -> {return name.equals(p.getName());})
                 .findFirst()
                 .map(ParameterMO::getValue)
-                .map(Float::parseFloat)
+                .map(Double::parseDouble)
                 .map((v) -> { return v / 100F; })
                 .orElse(defaultValue);
     }
@@ -264,48 +264,48 @@ public interface ParameterisedMO
     /**
      * Get a range parameter, eg: '0:10' for 0 to 10
      */
-    default int[] getIntRangeParameter(String name, int[] defaultValue)
+    default Integer[] getIntRangeParameter(String name, Integer[] defaultValue)
     {
         String value = this.getParameter(name);
         if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
         String[] values = value.split(":");
         if (values.length != 2) return defaultValue;
-        return new int[] { Integer.parseInt(values[0]), Integer.parseInt(values[1]), };
+        return new Integer[] { Integer.parseInt(values[0]), Integer.parseInt(values[1]), };
     }
     
     /**
      * Get a range parameter, eg: '0:10' for 0 to 10
      */
-    default long[] getLongRangeParameter(String name, long[] defaultValue)
+    default Long[] getLongRangeParameter(String name, Long[] defaultValue)
     {
         String value = this.getParameter(name);
         if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
         String[] values = value.split(":");
         if (values.length != 2) return defaultValue;
-        return new long[] { Long.parseLong(values[0]), Long.parseLong(values[1]), };
+        return new Long[] { Long.parseLong(values[0]), Long.parseLong(values[1]), };
     }
     
     /**
      * Get a range parameter, eg: '0:10' for 0 to 10
      */
-    default float[] getFloatRangeParameter(String name, float[] defaultValue)
+    default Float[] getFloatRangeParameter(String name, Float[] defaultValue)
     {
         String value = this.getParameter(name);
         if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
         String[] values = value.split(":");
         if (values.length != 2) return defaultValue;
-        return new float[] { Float.parseFloat(values[0]), Float.parseFloat(values[1]), };
+        return new Float[] { Float.parseFloat(values[0]), Float.parseFloat(values[1]), };
     }
     
     /**
      * Get a range parameter, eg: '0:10' for 0 to 10
      */
-    default double[] getDoubleRangeParameter(String name, double[] defaultValue)
+    default Double[] getDoubleRangeParameter(String name, Double[] defaultValue)
     {
         String value = this.getParameter(name);
         if (value == null || value.length() == 0 || ! value.contains(":")) return defaultValue;
         String[] values = value.split(":");
         if (values.length != 2) return defaultValue;
-        return new double[] { Double.parseDouble(values[0]), Double.parseDouble(values[1]), };
+        return new Double[] { Double.parseDouble(values[0]), Double.parseDouble(values[1]), };
     }
 }

@@ -102,6 +102,13 @@ public class ActiveResultMO extends ResultMO
         this.setExecuted(System.currentTimeMillis());
         return this;
     }
+    
+    @Override
+    public ActiveResultMO runtime(double runtime)
+    {
+        super.runtime(runtime);
+        return this;
+    }
 
     @Override
     public ActiveResultMO pending(String output)
@@ -177,97 +184,6 @@ public class ActiveResultMO extends ResultMO
     public ActiveResultMO action(String message)
     {
         super.action(message);
-        return this;
-    }
-
-    @Override
-    public ActiveResultMO applyThreshold(double value, double warning, double critical, String message)
-    {
-        super.applyThreshold(value, warning, critical, message);
-        return this;
-    }
-
-    @Override
-    public ActiveResultMO applyThreshold(long value, long warning, long critical, String message)
-    {
-        super.applyThreshold(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyThreshold(Iterable<Double> values, double warning, double critical, String message)
-    {
-        super.applyThreshold(values, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyThreshold(Iterable<Long> values, long warning, long critical, String message)
-    {
-        super.applyThreshold(values, warning, critical, message);
-        return this;
-    }
-
-    @Override
-    public ActiveResultMO runtime(double runtime)
-    {
-        super.runtime(runtime);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyRange(int value, int[] warning, int[] critical, String message)
-    {
-        super.applyRange(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyRange(long value, long[] warning, long[] critical, String message)
-    {
-        super.applyRange(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyRange(float value, float[] warning, float[] critical, String message)
-    {
-        super.applyRange(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyRange(double value, double[] warning, double[] critical, String message)
-    {
-        super.applyRange(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyLessThanThreshold(double value, double warning, double critical, String message)
-    {
-        super.applyLessThanThreshold(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyLessThanThreshold(long value, long warning, long critical, String message)
-    {
-        super.applyLessThanThreshold(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyLessThanThreshold(Iterable<Double> value, double warning, double critical, String message)
-    {
-        super.applyLessThanThreshold(value, warning, critical, message);
-        return this;
-    }
-    
-    @Override
-    public ActiveResultMO applyLessThanThreshold(Iterable<Long> value, long warning, long critical, String message)
-    {
-        super.applyLessThanThreshold(value, warning, critical, message);
         return this;
     }
 }

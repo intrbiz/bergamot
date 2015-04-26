@@ -34,10 +34,10 @@ public class RandomExecutor extends AbstractExecutor<DummyEngine>
         long start = System.nanoTime();
         resultSubmitter.accept(
                 new ActiveResultMO().fromCheck(executeCheck)
-                .applyThreshold(
+                .applyGreaterThanThreshold(
                         this.random.nextDouble(), 
-                        executeCheck.getDoubleParameter("warning", 0.7), 
-                        executeCheck.getDoubleParameter("critical", 0.9), 
+                        executeCheck.getDoubleParameter("warning", 0.7D), 
+                        executeCheck.getDoubleParameter("critical", 0.9D), 
                         executeCheck.getParameter("output", "")
                 )
                 .runtime(((double)(System.nanoTime() - start)) / 1_000_000D)

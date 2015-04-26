@@ -57,7 +57,7 @@ public class UsersExecutor extends AbstractExecutor<AgentEngine>
                     WhoStat stat = (WhoStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got who in " + runtime + "ms: " + stat);
                     // apply the check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             stat.getUsers().size(), 
                             executeCheck.getIntParameter("warning",  2), 
                             executeCheck.getIntParameter("critical", 5), 

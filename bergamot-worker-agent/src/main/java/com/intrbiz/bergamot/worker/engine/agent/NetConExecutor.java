@@ -74,8 +74,8 @@ public class NetConExecutor extends AbstractExecutor<AgentEngine>
                     // apply the check
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyRange(
                             stat.getConnections().size(),
-                            executeCheck.getIntRangeParameter("warning",  new int[] {1, 1}), 
-                            executeCheck.getIntRangeParameter("critical", new int[] {1, 1}), 
+                            executeCheck.getIntRangeParameter("warning",  new Integer[] {1, 1}), 
+                            executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
                             "found " + stat.getConnections().size() + " connections"
                     ).runtime(runtime));
                 });

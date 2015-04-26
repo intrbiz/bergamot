@@ -60,10 +60,10 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                     CPUStat stat = (CPUStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got CPU usage in " + runtime + "ms: " + stat);
                     // apply the check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             stat.getTotalUsage().getTotal(), 
-                            executeCheck.getPercentParameter("cpu_warning", 0.8F), 
-                            executeCheck.getPercentParameter("cpu_critical", 0.9F), 
+                            executeCheck.getPercentParameter("cpu_warning", 0.8D), 
+                            executeCheck.getPercentParameter("cpu_critical", 0.9D), 
                             "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
                     ).runtime(runtime));
                 });

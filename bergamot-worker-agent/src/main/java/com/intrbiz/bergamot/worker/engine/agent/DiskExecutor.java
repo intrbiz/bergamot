@@ -69,10 +69,10 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
                     if (disk != null)
                     {
                         // apply the check
-                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThreshold(
+                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                                 fromPercent(disk.getUsedPercent()), 
-                                executeCheck.getPercentParameter("warning", 0.8F),
-                                executeCheck.getPercentParameter("critical", 0.9F),
+                                executeCheck.getPercentParameter("warning", 0.8D),
+                                executeCheck.getPercentParameter("critical", 0.9D),
                                 "Disk: " + disk.getMount() + " " + disk.getType() + " on " + disk.getDevice() +" " + DFMT.format(toG(disk.getUsed())) + " GB of " + DFMT.format(toG(disk.getSize())) + " GB (" + DFMT.format(disk.getUsedPercent()) + " %) used" 
                         ).runtime(runtime));
                     }
