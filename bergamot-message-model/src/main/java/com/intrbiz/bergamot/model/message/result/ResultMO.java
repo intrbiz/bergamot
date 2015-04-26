@@ -289,7 +289,7 @@ public abstract class ResultMO extends Message
      * @param message the check output
      */
     @JsonIgnore
-    public <T> ResultMO applyThreshold(T value, BiPredicate<T,T> match, T warning, T critical, String message)
+    public <V,T> ResultMO applyThreshold(V value, BiPredicate<V,T> match, T warning, T critical, String message)
     {
         if ( match.test(value, critical))
         {
@@ -321,10 +321,10 @@ public abstract class ResultMO extends Message
      * @param message the check output
      */
     @JsonIgnore
-    public <T> ResultMO applyThresholds(Iterable<T> values, BiPredicate<T,T> match, T warning, T critical, String message)
+    public <V,T> ResultMO applyThresholds(Iterable<V> values, BiPredicate<V,T> match, T warning, T critical, String message)
     {
         int state = 0;
-        for (T value : values)
+        for (V value : values)
         {
             if (match.test(value, critical))
             {
@@ -479,7 +479,7 @@ public abstract class ResultMO extends Message
      * @param message the check output
      */
     @JsonIgnore
-    public <T> ResultMO applyRange(T value, BiPredicate<T,T> lowerMatch, BiPredicate<T,T> upperMatch, T[] warning, T[] critical, String message)
+    public <V,T> ResultMO applyRange(V value, BiPredicate<V,T> lowerMatch, BiPredicate<V,T> upperMatch, T[] warning, T[] critical, String message)
     {
         if (lowerMatch.test(value, critical[0]) || upperMatch.test(value, critical[1]))
         {

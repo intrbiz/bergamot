@@ -141,7 +141,7 @@ public class PassiveResultMO extends ResultMO
 
     @Override
     @JsonIgnore
-    public <T> PassiveResultMO applyThreshold(T value, BiPredicate<T,T> match, T warning, T critical, String message)
+    public <V,T> PassiveResultMO applyThreshold(V value, BiPredicate<V,T> match, T warning, T critical, String message)
     {
         super.applyThreshold(value, match, warning, critical, message);
         return this;
@@ -149,7 +149,7 @@ public class PassiveResultMO extends ResultMO
 
     @Override
     @JsonIgnore
-    public <T> PassiveResultMO applyThresholds(Iterable<T> values, BiPredicate<T,T> match, T warning, T critical, String message)
+    public <V,T> PassiveResultMO applyThresholds(Iterable<V> values, BiPredicate<V,T> match, T warning, T critical, String message)
     {
         super.applyThresholds(values, match, warning, critical, message);
         return this;
@@ -285,7 +285,7 @@ public class PassiveResultMO extends ResultMO
     
     @Override
     @JsonIgnore
-    public <T> PassiveResultMO applyRange(T value, BiPredicate<T,T> lowerMatch, BiPredicate<T,T> upperMatch, T[] warning, T[] critical, String message)
+    public <V,T> PassiveResultMO applyRange(V value, BiPredicate<V,T> lowerMatch, BiPredicate<V,T> upperMatch, T[] warning, T[] critical, String message)
     {
         super.applyRange(value, lowerMatch, upperMatch, warning, critical, message);
         return this;

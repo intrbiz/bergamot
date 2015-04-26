@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model.message.result;
 
 import java.util.UUID;
+import java.util.function.BiPredicate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -184,6 +185,190 @@ public class ActiveResultMO extends ResultMO
     public ActiveResultMO action(String message)
     {
         super.action(message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public <V,T> ActiveResultMO applyThreshold(V value, BiPredicate<V,T> match, T warning, T critical, String message)
+    {
+        super.applyThreshold(value, match, warning, critical, message);
+        return this;
+    }
+
+    @Override
+    @JsonIgnore
+    public <V,T> ActiveResultMO applyThresholds(Iterable<V> values, BiPredicate<V,T> match, T warning, T critical, String message)
+    {
+        super.applyThresholds(values, match, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThreshold(Double value, Double warning, Double critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThreshold(Double value, Double warning, Double critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThreshold(Float value, Float warning, Float critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThreshold(Float value, Float warning, Float critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThreshold(Long value, Long warning, Long critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThreshold(Long value, Long warning, Long critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThreshold(Integer value, Integer warning, Integer critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThreshold(Integer value, Integer warning, Integer critical, String message)
+    {
+        super.applyThreshold(value, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyGreaterThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyLessThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        super.applyThresholds(values, (v,t) -> v < t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public <V,T> ActiveResultMO applyRange(V value, BiPredicate<V,T> lowerMatch, BiPredicate<V,T> upperMatch, T[] warning, T[] critical, String message)
+    {
+        super.applyRange(value, lowerMatch, upperMatch, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyRange(Long value, Long[] warning, Long[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyRange(Integer value, Integer[] warning, Integer[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyRange(Double value, Double[] warning, Double[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
+        return this;
+    }
+    
+    @Override
+    @JsonIgnore
+    public ActiveResultMO applyRange(Float value, Float[] warning, Float[] critical, String message)
+    {
+        super.applyRange(value, (v,t) -> v < t, (v,t) -> v > t, warning, critical, message);
         return this;
     }
 }
