@@ -103,7 +103,6 @@ public class DiskIOHandler implements AgentHandler
                         deviceNames.add(device.getDevName());
                         if (! this.registeredDevices.containsKey(device))
                         {
-                            System.out.println(device.getDevName() + " => " + device.getDirName() + " :: " + device.getSysTypeName());
                             // setup
                             DiskIO diskIO = new DiskIO(device.getDevName());
                             // register
@@ -249,8 +248,6 @@ public class DiskIOHandler implements AgentHandler
                              )
                      );
                  }
-                 DiskIORate rate = this.computeInstantRate();
-                 System.out.println("[" + this.device + "] rate: " + rate);
             }
             catch (SigarException e)
             {
