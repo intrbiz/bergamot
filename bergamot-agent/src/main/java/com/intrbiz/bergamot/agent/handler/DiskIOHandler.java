@@ -23,7 +23,10 @@ import org.hyperic.sigar.SigarProxy;
 
 import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.agent.stat.netio.NetIORateInfo;
+import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
+import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
+import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIOInfo;
+import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIORateInfo;
 
 public class DiskIOHandler implements AgentHandler
 {
@@ -56,13 +59,30 @@ public class DiskIOHandler implements AgentHandler
     public Class<?>[] getMessages()
     {
         return new Class[] {
+                CheckDiskIO.class
         };
     }
 
     @Override
     public AgentMessage handle(AgentMessage request)
     {
-        return null;
+        CheckDiskIO check = (CheckDiskIO) request;
+        DiskIOStat stat = new DiskIOStat(request);
+        // get stats for our disks
+        for (String name : (check.getDevices() == null || check.getDevices().isEmpty() ? this.registeredDevices.keySet() : check.getDevices()))
+        {
+            DiskIO disk = this.registeredDevices.get(name);
+            if (disk != null && disk.canComputeRates())
+            {
+                DiskIOInfo info = new DiskIOInfo(name);
+                info.setInstantRate(disk.computeInstantRate().toInfo());
+                info.setOneMinuteRate(disk.computeRate(1, TimeUnit.MINUTES).toInfo());
+                info.setFiveMinuteRate(disk.computeRate(5, TimeUnit.MINUTES).toInfo());
+                info.setFifteenMinuteRate(disk.computeRate(15, TimeUnit.MINUTES).toInfo());
+                stat.getDisks().add(info);
+            }
+        }
+        return stat;
     }
     
     protected void setupDiskSampling()
@@ -389,9 +409,9 @@ public class DiskIOHandler implements AgentHandler
         
         // Util
         
-        public NetIORateInfo toInfo()
+        public DiskIORateInfo toInfo()
         {
-            return new NetIORateInfo(this.readRate, this.writeRate, this.readPeakRate, this.writePeakRate);
+            return new DiskIORateInfo(this.readRate, this.writeRate, this.readPeakRate, this.writePeakRate, this.reads, this.writes, this.peakReads, this.peakWrites);
         }
         
         public String toString()
