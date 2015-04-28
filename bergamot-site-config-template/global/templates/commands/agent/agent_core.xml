@@ -50,4 +50,13 @@
         <summary>Bergamot Agent: Uptime</summary>
     </command>
     
+    <command engine="agent" executor="disk-io" extends="check_agent" name="check_agent_disk_io">
+        <parameter description="Disk IO Warning Threshold (MB/s)" name="warning">200</parameter>
+        <parameter description="Disk IO Critical Threshold (MB/s)" name="critical">250</parameter>
+        <parameter description="Check peak IO" name="peak">no</parameter>
+        <parameter description="Device Name" name="device">/dev/sda1</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
+        <summary>Bergamot Agent: Disk IO</summary>
+    </command>
+    
 </bergamot>
