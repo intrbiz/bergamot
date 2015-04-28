@@ -50,6 +50,7 @@ public class AgentEngine extends AbstractEngine
             this.addExecutor(new NetConExecutor());
             this.addExecutor(new PortListenerExecutor());
             this.addExecutor(new NetIOExecutor());
+            this.addExecutor(new DiskIOExecutor());
         }
     }
     
