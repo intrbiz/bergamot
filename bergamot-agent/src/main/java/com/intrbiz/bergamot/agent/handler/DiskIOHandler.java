@@ -295,14 +295,16 @@ public class DiskIOHandler implements AgentHandler
         /** Writes per second */
         public final double writes;
         
-        /** Rate is B/s */
+        /** Peak Rate is B/s */
         public double readPeakRate;
         
-        /** Rate is B/s */
+        /** Peak Rate is B/s */
         public double writePeakRate;
         
+        /** Peak Reads per second */
         public double peakReads;
         
+        /** Peak Writes per second */
         public double peakWrites;
         
         public DiskIORate(double readRate, double writeRate, double reads, double writes)
@@ -334,21 +336,6 @@ public class DiskIOHandler implements AgentHandler
             return this.readRate;
         }
         
-        public double getReadRateMbps()
-        {
-            return this.readRate / 100000D;
-        }
-        
-        public double getReadRatekbps()
-        {
-            return this.readRate / 100D;
-        }
-        
-        public double getReadRatebps()
-        {
-            return this.readRate * 10D;
-        }
-        
         // Write
         
         public double getWriteRateMBps()
@@ -364,21 +351,6 @@ public class DiskIOHandler implements AgentHandler
         public double getWriteRateBps()
         {
             return this.writeRate;
-        }
-        
-        public double getWriteRateMbps()
-        {
-            return this.writeRate / 100000D;
-        }
-        
-        public double getWriteRatekbps()
-        {
-            return this.writeRate / 100D;
-        }
-        
-        public double getWriteRatebps()
-        {
-            return this.writeRate * 10D;
         }
         
         // Peak Read
@@ -398,21 +370,6 @@ public class DiskIOHandler implements AgentHandler
             return this.readPeakRate;
         }
         
-        public double getReadPeakRateMbps()
-        {
-            return this.readPeakRate / 100000D;
-        }
-        
-        public double getReadPeakRatekbps()
-        {
-            return this.readPeakRate / 100D;
-        }
-        
-        public double getReadPeakRatebps()
-        {
-            return this.readPeakRate * 10D;
-        }
-        
         // Peak Write
         
         public double getWritePeakRateMBps()
@@ -430,21 +387,6 @@ public class DiskIOHandler implements AgentHandler
             return this.writePeakRate;
         }
         
-        public double getWritePeakRateMbps()
-        {
-            return this.writePeakRate / 100000D;
-        }
-        
-        public double getWritePeakRatekbps()
-        {
-            return this.writePeakRate / 100D;
-        }
-        
-        public double getWritePeakRatebps()
-        {
-            return this.writePeakRate * 10D;
-        }
-        
         // Util
         
         public NetIORateInfo toInfo()
@@ -454,7 +396,7 @@ public class DiskIOHandler implements AgentHandler
         
         public String toString()
         {
-            return "Read: " + this.reads + "/s " + this.getReadRateMbps() + "(" + this.getReadPeakRateMbps() + ")Mb/s, Write: " + this.writes + "/s " + this.getWriteRateMbps() + "(" + this.getWritePeakRateMbps() + ")Mb/s";
+            return "Read: " + this.reads + "/s " + this.getReadRateMBps() + "(" + this.getReadPeakRateMBps() + ")Mb/s, Write: " + this.writes + "/s " + this.getWriteRateMBps() + "(" + this.getWritePeakRateMBps() + ")Mb/s";
         }
     }
     
