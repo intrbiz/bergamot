@@ -220,8 +220,10 @@ public class DiskIOHandler implements AgentHandler
                     oldest = this.samples.get(i -1);
                     latest = this.samples.get(i);
                     DiskIORate peak = latest.computeRate(oldest);
-                    rate.readPeakRate = Math.max(rate.readPeakRate, peak.readRate);
+                    rate.readPeakRate  = Math.max(rate.readPeakRate,  peak.readRate);
                     rate.writePeakRate = Math.max(rate.writePeakRate, peak.writeRate);
+                    rate.peakReads     = Math.max(rate.peakReads,     peak.reads);
+                    rate.peakWrites    = Math.max(rate.peakWrites,    peak.writes);
                 }
                 return rate;
             }
