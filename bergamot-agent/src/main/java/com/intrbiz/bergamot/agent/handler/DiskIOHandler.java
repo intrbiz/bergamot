@@ -71,7 +71,18 @@ public class DiskIOHandler implements AgentHandler
         // get stats for our disks
         for (String name : (check.getDevices() == null || check.getDevices().isEmpty() ? this.registeredDevices.keySet() : check.getDevices()))
         {
+            // lookup by device
             DiskIO disk = this.registeredDevices.get(name);
+            // lookup by mount?
+            if (disk == null)
+            {
+                String device = this.registeredMounts.get(name);
+                if (device != null)
+                {
+                    disk = this.registeredDevices.get(device);
+                }
+            }
+            // compute
             if (disk != null && disk.canComputeRates())
             {
                 DiskIOInfo info = new DiskIOInfo(name);
