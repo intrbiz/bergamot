@@ -429,9 +429,4 @@ public class NetIOHandler implements AgentHandler
             return "Tx: " + this.getTxRateMbps() + "(" + this.getTxPeakRateMbps() + ")Mb/s, Rx: " + this.getRxRateMbps() + "(" + this.getRxPeakRateMbps() + ")Mb/s";
         }
     }
-    
-    public static void main(String[] args)
-    {
-        new NetIOHandler();
-    }
 }
