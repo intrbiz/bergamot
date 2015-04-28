@@ -24,11 +24,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -52,6 +49,7 @@ import com.intrbiz.bergamot.agent.config.Configurable;
 import com.intrbiz.bergamot.agent.handler.AgentInfoHandler;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
+import com.intrbiz.bergamot.agent.handler.DiskIOHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ExecHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
@@ -119,6 +117,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new NetConInfoHandler());
         this.registerHandler(new AgentInfoHandler());
         this.registerHandler(new NetIOHandler());
+        this.registerHandler(new DiskIOHandler());
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
