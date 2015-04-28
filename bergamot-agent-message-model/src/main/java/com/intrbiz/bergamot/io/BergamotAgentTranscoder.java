@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -151,6 +152,7 @@ public class BergamotAgentTranscoder
         this.factory.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         this.factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         this.factory.configure(SerializationFeature.INDENT_OUTPUT, true);
+        this.factory.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.sealed = sealed;
         this.factory.registerSubtypes(BergamotAgentTranscoder.CLASSES);
     }
