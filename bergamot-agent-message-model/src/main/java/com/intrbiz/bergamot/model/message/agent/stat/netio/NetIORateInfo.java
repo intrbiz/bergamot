@@ -66,8 +66,28 @@ public class NetIORateInfo extends AgentType
         this.rxRate = rxRate;
     }
     
-    // TX
+    public double getTxPeakRate()
+    {
+        return txPeakRate;
+    }
+
+    public void setTxPeakRate(double txPeakRate)
+    {
+        this.txPeakRate = txPeakRate;
+    }
+
+    public double getRxPeakRate()
+    {
+        return rxPeakRate;
+    }
+
+    public void setRxPeakRate(double rxPeakRate)
+    {
+        this.rxPeakRate = rxPeakRate;
+    }
     
+    // TX
+
     @JsonIgnore
     public double getTxRateMBps()
     {
