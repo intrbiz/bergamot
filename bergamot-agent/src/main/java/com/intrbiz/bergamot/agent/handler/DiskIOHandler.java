@@ -173,7 +173,7 @@ public class DiskIOHandler implements AgentHandler
         
         public DiskIO(String device)
         {
-            this(device, 5, TimeUnit.SECONDS, 1, TimeUnit.HOURS);
+            this(device, 10, TimeUnit.SECONDS, 15, TimeUnit.MINUTES);
         }
         
         public void addSample(DiskIOSample sample)

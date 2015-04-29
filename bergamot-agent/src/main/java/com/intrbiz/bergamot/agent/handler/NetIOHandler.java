@@ -151,7 +151,7 @@ public class NetIOHandler implements AgentHandler
         
         public NetIO(String interfaceName)
         {
-            this(interfaceName, 5, TimeUnit.SECONDS, 1, TimeUnit.HOURS);
+            this(interfaceName, 10, TimeUnit.SECONDS, 15, TimeUnit.MINUTES);
         }
         
         public void addSample(NetIOSample sample)
