@@ -191,7 +191,10 @@ public class DiskIOHandler implements AgentHandler
         
         public boolean canComputeRates()
         {
-            return this.samples.size() > 1;
+            synchronized (this)
+            {
+                return this.samples.size() > 1;
+            }
         }
         
         /**
