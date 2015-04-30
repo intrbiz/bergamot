@@ -1070,6 +1070,37 @@ public class BergamotConfigImporter
         {
             this.rescheduleCheck(host);
         }
+        // remove any services and traps which are not
+        if (! newHost)
+        {
+            // index the services we want
+            Set<String> wantedServices = resolvedConfiguration.getServices().stream().map((s) -> s.resolve().getName()).collect(Collectors.toSet());
+            // remove any unwanted services
+            for (Service service : host.getServices())
+            {
+                if (! wantedServices.contains(service.getName()))
+                {
+                    report.info("Removing service " + service.getName() + " (" + service.getId() + ") as it is no longer given for this host");
+                    // remove service
+                    this.unscheduleCheck(service);
+                    db.removeService(service.getId());
+                    db.removeConfig(service.getId());
+                }
+            }
+            // index the traps we want
+            Set<String> wantedTraps = resolvedConfiguration.getTraps().stream().map((t) -> t.resolve().getName()).collect(Collectors.toSet());
+            // remove any unwanted services
+            for (Trap trap : host.getTraps())
+            {
+                if (! wantedTraps.contains(trap.getName()))
+                {
+                    report.info("Removing trap " + trap.getName() + " (" + trap.getId() + ") as it is no longer given for this host");
+                    // remove trap
+                    db.removeTrap(trap.getId());
+                    db.removeConfig(trap.getId());
+                }
+            }
+        }
         // add services
         for (ServiceCfg serviceConfiguration : resolvedConfiguration.getServices())
         {
@@ -1376,11 +1407,13 @@ public class BergamotConfigImporter
         // resolved config
         ClusterCfg resolvedConfiguration = configuration.resolve();
         // load
+        boolean newCluster = false;
         Cluster cluster = db.getClusterByName(this.site.getId(), configuration.getName());
         if (cluster == null)
         {
             configuration.setId(this.site.randomObjectId());
             cluster = new Cluster();
+            newCluster = true;
             this.report.info("Configuring new cluster: " + configuration.resolve().getName());
         }
         else
@@ -1393,6 +1426,23 @@ public class BergamotConfigImporter
         // add the cluster
         db.setCluster(cluster);
         this.loadedObjects.add("cluster:" + configuration.getName());
+        // remove any resources which are not wanted
+        if (! newCluster)
+        {
+            // index the resource we want
+            Set<String> wantedResources = resolvedConfiguration.getResources().stream().map((r) -> r.resolve().getName()).collect(Collectors.toSet());
+            // remove any unwanted services
+            for (Resource resource : cluster.getResources())
+            {
+                if (! wantedResources.contains(resource.getName()))
+                {
+                    report.info("Removing resource " + resource.getName() + " (" + resource.getId() + ") as it is no longer given for this cluster");
+                    // remove resource
+                    db.removeResource(resource.getId());
+                    db.removeConfig(resource.getId());
+                }
+            }
+        }
         // add resources
         for (ResourceCfg resourceConfiguration : resolvedConfiguration.getResources())
         {
