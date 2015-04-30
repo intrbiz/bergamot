@@ -13,14 +13,8 @@ public class NetIOInfo extends AgentType
     @JsonProperty("instant-rate")
     private NetIORateInfo instantRate;
     
-    @JsonProperty("one-minute-rate")
-    private NetIORateInfo oneMinuteRate;
-    
     @JsonProperty("five-minute-rate")
     private NetIORateInfo fiveMinuteRate;
-    
-    @JsonProperty("fifteen-minute-rate")
-    private NetIORateInfo fifteenMinuteRate;
 
     public NetIOInfo()
     {
@@ -53,16 +47,6 @@ public class NetIOInfo extends AgentType
         this.instantRate = instantRate;
     }
 
-    public NetIORateInfo getOneMinuteRate()
-    {
-        return oneMinuteRate;
-    }
-
-    public void setOneMinuteRate(NetIORateInfo oneMinuteRate)
-    {
-        this.oneMinuteRate = oneMinuteRate;
-    }
-
     public NetIORateInfo getFiveMinuteRate()
     {
         return fiveMinuteRate;
@@ -71,15 +55,5 @@ public class NetIOInfo extends AgentType
     public void setFiveMinuteRate(NetIORateInfo fiveMinuteRate)
     {
         this.fiveMinuteRate = fiveMinuteRate;
-    }
-
-    public NetIORateInfo getFifteenMinuteRate()
-    {
-        return fifteenMinuteRate;
-    }
-
-    public void setFifteenMinuteRate(NetIORateInfo fifteenMinuteRate)
-    {
-        this.fifteenMinuteRate = fifteenMinuteRate;
     }
 }

@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.agent.handler;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,6 +21,7 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
 import com.intrbiz.bergamot.agent.AgentHandler;
+import com.intrbiz.bergamot.agent.util.SampleRingBuffer;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
@@ -83,13 +83,11 @@ public class DiskIOHandler implements AgentHandler
                 }
             }
             // compute
-            if (disk != null && disk.canComputeRates())
+            if (disk != null)
             {
                 DiskIOInfo info = new DiskIOInfo(name);
-                info.setInstantRate(disk.computeInstantRate().toInfo());
-                info.setOneMinuteRate(disk.computeRate(1, TimeUnit.MINUTES).toInfo());
-                info.setFiveMinuteRate(disk.computeRate(5, TimeUnit.MINUTES).toInfo());
-                info.setFifteenMinuteRate(disk.computeRate(15, TimeUnit.MINUTES).toInfo());
+                info.setInstantRate(disk.instantRate());
+                info.setFiveMinuteRate(disk.fiveMinuteRate());
                 stat.getDisks().add(info);
             }
         }
@@ -112,15 +110,16 @@ public class DiskIOHandler implements AgentHandler
                     if (device.getType() == 2 || "btrfs".equalsIgnoreCase(device.getSysTypeName()))
                     {
                         deviceNames.add(device.getDevName());
-                        if (! this.registeredDevices.containsKey(device))
+                        if (! this.registeredDevices.containsKey(device.getDevName()))
                         {
-                            // setup
-                            DiskIO diskIO = new DiskIO(device.getDevName());
+                            // setup - 5 minute history sampled every 5 seconds;
+                            DiskIO diskIO = new DiskIO(device.getDevName(), 60, 5L, TimeUnit.SECONDS);
                             // register
                             this.registeredDevices.put(device.getDevName(), diskIO);
                             // schedule
-                            long skew = ((long) (diskIO.sampleInterval * random.nextDouble()));
-                            this.timer.scheduleAtFixedRate(diskIO, skew, diskIO.sampleInterval);
+                            long skew = ((long) (diskIO.interval * random.nextDouble()));
+                            this.timer.scheduleAtFixedRate(diskIO, skew, diskIO.interval);
+                            logger.info("Starting sampling of disk IO for device: " + device.getDevName() + " every 5 seconds");
                         }
                         this.registeredMounts.put(device.getDirName(), device.getDevName());
                     }
@@ -136,6 +135,7 @@ public class DiskIOHandler implements AgentHandler
                         entry.getValue().cancel();
                         // remove from our registered list
                         i.remove();
+                        logger.info("Stopping sampling of disk IO for device: " + entry.getKey());
                     }
                 }
                 // clean up the timer
@@ -148,288 +148,97 @@ public class DiskIOHandler implements AgentHandler
         }
     }
     
-    protected static double round(double d)
-    {
-        return (((double) Math.round(d * 1000)) / 1000D);
-    }
-    
     private class DiskIO extends TimerTask
     {
         private final String device;
         
-        private final long sampleInterval;
+        private final long interval;
         
-        private final long sampleSize;
+        private final SampleRingBuffer readBytes;
         
-        private final ArrayList<DiskIOSample> samples;
+        private final SampleRingBuffer writeBytes;
         
-        public DiskIO(String device, long sampleInterval, TimeUnit sampleIntervalUnit, long sampleSize, TimeUnit sampleSizeUnit)
+        private final SampleRingBuffer reads;
+        
+        private final SampleRingBuffer writes;
+        
+        private int failCount = 0;
+        
+        public DiskIO(String device, int capacity, long interval, TimeUnit intervalUnit)
         {
-            this.device = device;
-            this.sampleInterval = sampleIntervalUnit.toMillis(sampleInterval);
-            this.sampleSize = sampleSizeUnit.toMillis(sampleSize) / this.sampleInterval;
-            this.samples = new ArrayList<DiskIOSample>((int) this.sampleSize + 1);
+            this.device     = device;
+            this.interval   = intervalUnit.toMillis(interval);
+            this.readBytes  = new SampleRingBuffer(capacity, interval, intervalUnit);
+            this.writeBytes = new SampleRingBuffer(capacity, interval, intervalUnit);
+            this.reads  = new SampleRingBuffer(capacity, interval, intervalUnit);
+            this.writes = new SampleRingBuffer(capacity, interval, intervalUnit);
         }
         
-        public DiskIO(String device)
-        {
-            this(device, 10, TimeUnit.SECONDS, 15, TimeUnit.MINUTES);
-        }
-        
-        public void addSample(DiskIOSample sample)
+        public void addSample(DiskUsage sample)
         {
             synchronized (this)
             {
-                // ensure we stay under the sample size
-                while (this.samples.size() >= this.sampleSize)
-                {
-                    this.samples.remove(0);
-                }
-                this.samples.add(sample);
+                this.readBytes.addSample(sample.getReadBytes());
+                this.writeBytes.addSample(sample.getWriteBytes());
+                this.reads.addSample(sample.getReads());
+                this.writes.addSample(sample.getWrites());
             }
         }
         
-        public boolean canComputeRates()
+        public DiskIORateInfo instantRate()
         {
             synchronized (this)
             {
-                return this.samples.size() > 1;
+                return new DiskIORateInfo(
+                        this.readBytes.instantRateSeconds(),
+                        this.writeBytes.instantRateSeconds(),
+                        this.readBytes.peakRateSeconds(),
+                        this.writeBytes.peakRateSeconds(),
+                        this.reads.instantRateSeconds(),
+                        this.writes.instantRateSeconds(),
+                        this.reads.peakRateSeconds(),
+                        this.writes.peakRateSeconds()
+                );
             }
         }
         
-        /**
-         * Compute the rate of the last two samples
-         */
-        public DiskIORate computeInstantRate()
+        public DiskIORateInfo fiveMinuteRate()
         {
             synchronized (this)
             {
-                if (this.samples.size() < 2) return null;
-                // compute the rate of change between the last two samples
-                DiskIOSample previous = this.samples.get(this.samples.size() - 2);
-                DiskIOSample current  = this.samples.get(this.samples.size() - 1);
-                // compute the rate
-                return current.computeRate(previous);
-            }
-        }
-        
-        /**
-         * Compute the throughput over a specific time scale (data permitting)
-         */        
-        public DiskIORate computeRate(long interval, TimeUnit unit)
-        {
-            synchronized (this)
-            {
-                if (this.samples.size() < 2) return null;
-                // indexes
-                int oldestIndex = Math.max((this.samples.size() - 1) - (int)(unit.toMillis(interval) / this.sampleInterval), 0);
-                int latestIndex = this.samples.size() - 1;
-                // compute the average rate
-                DiskIOSample latest = this.samples.get(latestIndex);
-                DiskIOSample oldest = this.samples.get(oldestIndex);
-                DiskIORate rate = latest.computeRate(oldest);
-                // compute the peak rate
-                for (int i = latestIndex; i > oldestIndex; i--)
-                {
-                    oldest = this.samples.get(i -1);
-                    latest = this.samples.get(i);
-                    DiskIORate peak = latest.computeRate(oldest);
-                    rate.readPeakRate  = Math.max(rate.readPeakRate,  peak.readRate);
-                    rate.writePeakRate = Math.max(rate.writePeakRate, peak.writeRate);
-                    rate.peakReads     = Math.max(rate.peakReads,     peak.reads);
-                    rate.peakWrites    = Math.max(rate.peakWrites,    peak.writes);
-                }
-                return rate;
+                return new DiskIORateInfo(
+                        this.readBytes.averageRateSeconds(),
+                        this.writeBytes.averageRateSeconds(),
+                        this.readBytes.peakRateSeconds(),
+                        this.writeBytes.peakRateSeconds(),
+                        this.reads.averageRateSeconds(),
+                        this.writes.averageRateSeconds(),
+                        this.reads.peakRateSeconds(),
+                        this.writes.peakRateSeconds()
+                );
             }
         }
 
         @Override
         public void run()
         {
-            // sample this interface
+            // sample this disk
             try
             {
-                 DiskUsage usage = sigar.getDiskUsage(this.device);
-                 if (usage != null)
-                 {
-                     this.addSample(
-                             new DiskIOSample(
-                                     System.currentTimeMillis(), 
-                                     usage.getReadBytes(), 
-                                     usage.getWriteBytes(),
-                                     usage.getReads(),
-                                     usage.getWrites(),
-                                     usage.getQueue(),
-                                     usage.getServiceTime()
-                             )
-                     );
-                 }
+                this.addSample(sigar.getDiskUsage(this.device));
             }
             catch (SigarException e)
             {
-                logger.warn("Error sampling block device", e);
+                this.failCount++;
+                if (this.failCount > 6)
+                {
+                    // cancel ourselves
+                    this.cancel();
+                    registeredDevices.remove(this.device);
+                    logger.warn("Error sampling block device", e);
+                    logger.info("Stopping sampling of disk IO for device: " + this.device);
+                }
             }
-        }
-    }
-    
-    public static class DiskIOSample
-    {
-        public final long sampledAt;
-        
-        public final long readBytes;
-        
-        public final long writeBytes;
-        
-        public final long reads;
-        
-        public final long writes;
-        
-        public final double queue;
-        
-        public final double serviceTime;
-        
-        public DiskIOSample(long sampledAt, long readBytes, long writeBytes, long reads, long writes, double queue, double serviceTime)
-        {
-            this.sampledAt = sampledAt;
-            this.readBytes = readBytes;
-            this.writeBytes = writeBytes;
-            this.reads = reads;
-            this.writes = writes;
-            this.queue = queue;
-            this.serviceTime = serviceTime;
-        }
-        
-        public DiskIORate computeRate(DiskIOSample previous)
-        {
-            // compute the rate
-            double interval = (double) ((this.sampledAt - previous.sampledAt) / 1000L);
-            double readDelta  = (double) (this.readBytes   - previous.readBytes);
-            double writeDelta  = (double) (this.writeBytes   - previous.writeBytes);
-            double readsDelta  = (double) (this.reads   - previous.reads);
-            double writesDelta  = (double) (this.writes   - previous.writes);
-            // validate
-            if (interval < 0 || readDelta < 0 || writeDelta < 0) return null;
-            // return
-            return new DiskIORate( readDelta / interval, writeDelta / interval, readsDelta / interval, writesDelta / interval);
-        }
-    }
-    
-    public static class DiskIORate
-    {
-        /** Rate is B/s */
-        public final double readRate;
-        
-        /** Rate is B/s */
-        public final double writeRate;
-        
-        /** Reads per second */
-        public final double reads;
-        
-        /** Writes per second */
-        public final double writes;
-        
-        /** Peak Rate is B/s */
-        public double readPeakRate;
-        
-        /** Peak Rate is B/s */
-        public double writePeakRate;
-        
-        /** Peak Reads per second */
-        public double peakReads;
-        
-        /** Peak Writes per second */
-        public double peakWrites;
-        
-        public DiskIORate(double readRate, double writeRate, double reads, double writes)
-        {
-            this.readRate = readRate;
-            this.writeRate = writeRate;
-            this.readPeakRate = readRate;
-            this.writePeakRate = writeRate;
-            this.reads = reads;
-            this.writes = writes;
-            this.peakReads = reads;
-            this.peakWrites = writes;
-        }
-        
-        // Read
-        
-        public double getReadRateMBps()
-        {
-            return this.readRate / 1000000D;
-        }
-        
-        public double getReadRatekBps()
-        {
-            return this.readRate / 1000D;
-        }
-        
-        public double getReadRateBps()
-        {
-            return this.readRate;
-        }
-        
-        // Write
-        
-        public double getWriteRateMBps()
-        {
-            return this.writeRate / 1000000D;
-        }
-        
-        public double getWriteRatekBps()
-        {
-            return this.writeRate / 1000D;
-        }
-        
-        public double getWriteRateBps()
-        {
-            return this.writeRate;
-        }
-        
-        // Peak Read
-        
-        public double getReadPeakRateMBps()
-        {
-            return this.readPeakRate / 1000000D;
-        }
-        
-        public double getReadPeakRatekBps()
-        {
-            return this.readPeakRate / 1000D;
-        }
-        
-        public double getReadPeakRateBps()
-        {
-            return this.readPeakRate;
-        }
-        
-        // Peak Write
-        
-        public double getWritePeakRateMBps()
-        {
-            return this.writePeakRate / 1000000D;
-        }
-        
-        public double getWritePeakRatekBps()
-        {
-            return this.writePeakRate / 1000D;
-        }
-        
-        public double getWritePeakRateBps()
-        {
-            return this.writePeakRate;
-        }
-        
-        // Util
-        
-        public DiskIORateInfo toInfo()
-        {
-            return new DiskIORateInfo(this.readRate, this.writeRate, this.readPeakRate, this.writePeakRate, this.reads, this.writes, this.peakReads, this.peakWrites);
-        }
-        
-        public String toString()
-        {
-            return "Read: " + this.reads + "/s " + this.getReadRateMBps() + "(" + this.getReadPeakRateMBps() + ")Mb/s, Write: " + this.writes + "/s " + this.getWriteRateMBps() + "(" + this.getWritePeakRateMBps() + ")Mb/s";
         }
     }
     

@@ -13,14 +13,8 @@ public class DiskIOInfo extends AgentType
     @JsonProperty("instant-rate")
     private DiskIORateInfo instantRate;
     
-    @JsonProperty("one-minute-rate")
-    private DiskIORateInfo oneMinuteRate;
-    
     @JsonProperty("five-minute-rate")
     private DiskIORateInfo fiveMinuteRate;
-    
-    @JsonProperty("fifteen-minute-rate")
-    private DiskIORateInfo fifteenMinuteRate;
 
     public DiskIOInfo()
     {
@@ -53,16 +47,6 @@ public class DiskIOInfo extends AgentType
         this.instantRate = instantRate;
     }
 
-    public DiskIORateInfo getOneMinuteRate()
-    {
-        return oneMinuteRate;
-    }
-
-    public void setOneMinuteRate(DiskIORateInfo oneMinuteRate)
-    {
-        this.oneMinuteRate = oneMinuteRate;
-    }
-
     public DiskIORateInfo getFiveMinuteRate()
     {
         return fiveMinuteRate;
@@ -71,15 +55,5 @@ public class DiskIOInfo extends AgentType
     public void setFiveMinuteRate(DiskIORateInfo fiveMinuteRate)
     {
         this.fiveMinuteRate = fiveMinuteRate;
-    }
-
-    public DiskIORateInfo getFifteenMinuteRate()
-    {
-        return fifteenMinuteRate;
-    }
-
-    public void setFifteenMinuteRate(DiskIORateInfo fifteenMinuteRate)
-    {
-        this.fifteenMinuteRate = fifteenMinuteRate;
     }
 }

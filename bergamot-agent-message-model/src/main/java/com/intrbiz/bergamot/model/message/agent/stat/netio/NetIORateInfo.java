@@ -109,19 +109,19 @@ public class NetIORateInfo extends AgentType
     @JsonIgnore
     public double getTxRateMbps()
     {
-        return this.txRate / 100000D;
+        return (this.txRate * 8D) / 1000000D;
     }
     
     @JsonIgnore
     public double getTxRatekbps()
     {
-        return this.txRate / 100D;
+        return (this.txRate * 8D) / 1000D;
     }
     
     @JsonIgnore
     public double getTxRatebps()
     {
-        return this.txRate * 10D;
+        return this.txRate * 8D;
     }
     
     // RX
@@ -147,19 +147,19 @@ public class NetIORateInfo extends AgentType
     @JsonIgnore
     public double getRxRateMbps()
     {
-        return this.rxRate / 100000D;
+        return (this.rxRate * 8D) / 1000000D;
     }
     
     @JsonIgnore
     public double getRxRatekbps()
     {
-        return this.rxRate / 100D;
+        return (this.rxRate * 8D) / 1000D;
     }
     
     @JsonIgnore
     public double getRxRatebps()
     {
-        return this.rxRate * 10D;
+        return this.rxRate * 8D;
     }
     
     // Peak
