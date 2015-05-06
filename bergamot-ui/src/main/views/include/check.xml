@@ -4,6 +4,9 @@
 <fragment xmlns="com.intrbiz.balsa">
 	<a href="/#{check.type}/id/#{check.id}">
 		<div class="col3 dash_icon check" data-check-id="#{check.id}">
+			<span class="suppressed" rendered="#{check.suppressed}" title="This check is suppressed, notifications will not be sent"></span>
+			<span class="downtime" rendered="#{check.isInDowntime()}" title="This check is in downtime, notifications will not be sent"></span>
+			<span class="disabled" rendered="#{! check.enabled}" title="This check is disabled and will not be actively checked"></span>
 			<h3>
 				<span class="dash_img status_#{check.state.status.toString().toLowerCase()}" title="The check is #{check.state.status.toString().toLowerCase()}">
 					<img src="#{public(if(alert, '/images/icons/64/alert.png', coalesce(check.getParameter('ui-icon'), check.getCheckCommand().getCommand().getParameter('ui-icon'), '/images/icons/64/' + check.type + '.png')))}" />

@@ -13,6 +13,9 @@
 
 	<div class="row">
 		<div class="col4 dash_icon check" data-check-id="#{service.id}">
+			<span class="suppressed" rendered="#{service.suppressed}" title="This service is suppressed, notifications will not be sent"></span>
+			<span class="downtime" rendered="#{service.isInDowntime()}" title="This service is in downtime, notifications will not be sent"></span>
+			<span class="disabled" rendered="#{! service.enabled}" title="This service is disabled and will not be actively checked"></span>
 			<h3>
 				<span class="dash_img status_#{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
 					<img src="#{public(coalesce(service.getParameter('ui-icon'), service.getCheckCommand().getCommand().getParameter('ui-icon'), '/images/icons/64/service.png'))}" />

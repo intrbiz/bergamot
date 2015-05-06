@@ -12,6 +12,9 @@
 
 	<div class="row">
 		<div class="col4 dash_icon check" data-check-id="#{trap.id}">
+			<span class="suppressed" rendered="#{trap.suppressed}" title="This trap is suppressed, notifications will not be sent"></span>
+			<span class="downtime" rendered="#{trap.isInDowntime()}" title="This trap is in downtime, notifications will not be sent"></span>
+			<span class="disabled" rendered="#{! trap.enabled}" title="This trap is disabled and will not be actively checked"></span>
 			<h3>
 				<span class="dash_img status_#{trap.state.status.toString().toLowerCase()}" title="The trap is #{trap.state.status.toString().toLowerCase()}">
 					<img src="#{public(coalesce(trap.getParameter('ui-icon'), trap.getCheckCommand().getCommand().getParameter('ui-icon'), '/images/icons/64/trap.png'))}" />

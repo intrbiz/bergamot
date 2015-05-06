@@ -708,6 +708,42 @@ a.remove:hover {
     background: transparent url('../../images/admin/remove_filled.png') top left no-repeat;
 }
 
+/* State icons */
+
+
+span.suppressed {
+    background: transparent url('../../images/icons/32/suppressed.png') top left no-repeat;
+    height: 32px;
+	width: 32px;
+    overflow: hidden;
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 0px;
+}
+
+span.downtime {
+    background: transparent url('../../images/icons/32/downtime.png') top left no-repeat;
+    height: 32px;
+	width: 32px;
+    overflow: hidden;
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 37px;
+}
+
+span.disabled {
+    background: transparent url('../../images/icons/32/disabled.png') top left no-repeat;
+    height: 32px;
+	width: 32px;
+    overflow: hidden;
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 74px;
+}
+
 /* Resizing */
 
 @media (min-width: 571px) and (max-width: 869px) {
