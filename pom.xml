@@ -210,17 +210,17 @@
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-core</artifactId>
-  			<version>4.1.0-SNAPSHOT</version>
+  			<version>[4.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-data</artifactId>
-  			<version>4.1.0-SNAPSHOT</version>
+  			<version>[4.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-hazelcast</artifactId>
-  			<version>4.1.0-SNAPSHOT</version>
+  			<version>[4.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.gerald</groupId>
@@ -240,42 +240,42 @@
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-annotations</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-manager</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-database-adapter-compiler</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>cache-hazelcast</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>queue</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>crypto</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>scripting</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>bootstrap</artifactId>
-  			<version>1.1.0-SNAPSHOT</version>
+  			<version>[1.1,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.3p.sigar</groupId>
