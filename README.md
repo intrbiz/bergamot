@@ -1,6 +1,9 @@
 Bergamot Monitoring
 ===================
-Bergamot is a simple, clean room, Nagios compatible monitoring system
+Bergamot Monitoring is an Open Source distributed monitoring system which has 
+an easy migration path from Nagios. Bergamot Monitoring has a range of 
+compelling features which making it a well suited for modern physical or cloud 
+based infrastructures.
 
 See https://bergamot-monitoring.org/ for more information on the project.
 
