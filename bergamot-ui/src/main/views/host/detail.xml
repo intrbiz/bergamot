@@ -136,7 +136,14 @@
 			$('#suppress-all').click(function(ev) {
 				ev.preventDefault();
 				var id = $(this).attr("data-host-id");
-				$.getJSON('/api/host/id/' + id + '/suppress-all', function(data) { /* all ok */ });
+				$.getJSON('/api/host/id/' + id + '/suppress-all', function(data) {
+					/* add icon to all checks */
+					$('div[data-check-id]').each(function() {
+						if (! $(this).find('span.suppressed').length) {
+							$(this).prepend('<span class="suppressed" title="This check is suppressed, notifications will not be sent"></span>');
+						}
+					});
+				});
 			});
 		});
 		// unsuppress all checks
@@ -144,7 +151,12 @@
 			$('#unsuppress-all').click(function(ev) {
 				ev.preventDefault();
 				var id = $(this).attr("data-host-id");
-				$.getJSON('/api/host/id/' + id + '/unsuppress-all', function(data) { /* all ok */ });
+				$.getJSON('/api/host/id/' + id + '/unsuppress-all', function(data) {
+					/* remove icon from all checks */
+					$('div[data-check-id]').each(function() {
+						$(this).find('span.suppressed').remove();
+					});
+				});
 			});
 		});
 		]]>
