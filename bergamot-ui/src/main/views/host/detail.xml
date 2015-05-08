@@ -140,7 +140,10 @@
 					/* add icon to all checks */
 					$('div[data-check-id]').each(function() {
 						if (! $(this).find('span.suppressed').length) {
-							$(this).prepend('<span class="suppressed" title="This check is suppressed, notifications will not be sent"></span>');
+							var el = document.createElement('span');
+							$(el).attr('class', 'suppressed');
+							$(el).attr('title', 'This check is suppressed, notifications will not be sent');
+							$(this).prepend(el);
 						}
 					});
 				});
