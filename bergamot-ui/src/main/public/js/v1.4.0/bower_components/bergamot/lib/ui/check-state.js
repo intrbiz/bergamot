@@ -33,6 +33,34 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    $(attempt_flag_span).attr("title", check.state.hard ? "The host is in a steady state" : "The check is changing state")
 	    $(attempt_flag_span).text(check.state.hard ? "Steady" : "Changing");
 	    this.$node.find("p.field-attempt span.value").html([attempt_span, attempt_flag_span]);
+	    // handle suppressed icon
+	    if (check.suppressed)
+	    {
+	    	if (! this.$node.find('span.suppressed').length) {
+				var el = document.createElement('span');
+				$(el).attr('class', 'suppressed');
+				$(el).attr('title', 'This check is suppressed, notifications will not be sent');
+				this.$node.prepend(el);
+			}
+	    }
+	    else
+	    {
+	    	this.$node.find('span.suppressed').remove();
+	    }
+	    // handle disabled icon
+	    if (check.enabled)
+	    {
+	    	this.$node.find('span.disabled').remove();
+	    }
+	    else
+	    {
+	    	if (! this.$node.find('span.disabled').length) {
+				var el = document.createElement('span');
+				$(el).attr('class', 'disabled');
+				$(el).attr('title', 'This check is disabled and will not be actively checked');
+				this.$node.prepend(el);
+			}
+	    }
 	    // animate the update
 	    var $fadeNode = this.$node;
 	    $fadeNode.fadeTo(800, 0.2, function() { 
