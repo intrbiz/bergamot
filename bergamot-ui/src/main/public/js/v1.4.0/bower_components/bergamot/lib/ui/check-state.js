@@ -61,6 +61,20 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 				this.$node.prepend(el);
 			}
 	    }
+	    // handle downtime icon
+	    if (check.in_downtime)
+	    {
+	    	if (! this.$node.find('span.downtime').length) {
+				var el = document.createElement('span');
+				$(el).attr('class', 'downtime');
+				$(el).attr('title', 'This check is in downtime, notifications will not be sent');
+				this.$node.prepend(el);
+			}
+	    }
+	    else
+	    {
+	    	this.$node.find('span.downtime').remove();
+	    }
 	    // animate the update
 	    var $fadeNode = this.$node;
 	    $fadeNode.fadeTo(800, 0.2, function() { 

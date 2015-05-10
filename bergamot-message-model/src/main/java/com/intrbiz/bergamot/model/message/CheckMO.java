@@ -18,6 +18,9 @@ public abstract class CheckMO extends NamedObjectMO implements CommentedMO
     @JsonProperty("enabled")
     protected boolean enabled;
     
+    @JsonProperty("in_downtime")
+    protected boolean inDowntime;
+    
     @JsonProperty("groups")
     protected List<GroupMO> groups = new LinkedList<GroupMO>();
     
@@ -78,6 +81,16 @@ public abstract class CheckMO extends NamedObjectMO implements CommentedMO
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;
+    }
+
+    public boolean isInDowntime()
+    {
+        return inDowntime;
+    }
+
+    public void setInDowntime(boolean inDowntime)
+    {
+        this.inDowntime = inDowntime;
     }
 
     public List<GroupMO> getGroups()
