@@ -105,7 +105,17 @@
 			$('#suppress-resources').click(function(ev) {
 				ev.preventDefault();
 				var id = $(this).attr("data-cluster-id");
-				$.getJSON('/api/cluster/id/' + id + '/suppress-resource', function(data) { /* all ok */ });
+				$.getJSON('/api/cluster/id/' + id + '/suppress-resources', function(data) {
+					/* add icon to all checks */
+					$('div[data-check-id]').each(function() {
+						if (! $(this).find('span.suppressed').length) {
+							var el = document.createElement('span');
+							$(el).attr('class', 'suppressed');
+							$(el).attr('title', 'This check is suppressed, notifications will not be sent');
+							$(this).prepend(el);
+						}
+					});
+				});
 			});
 		});
 		// unsuppress resources check
@@ -113,7 +123,12 @@
 			$('#unsuppress-resources').click(function(ev) {
 				ev.preventDefault();
 				var id = $(this).attr("data-cluster-id");
-				$.getJSON('/api/cluster/id/' + id + '/unsuppress-resource', function(data) { /* all ok */ });
+				$.getJSON('/api/cluster/id/' + id + '/unsuppress-resources', function(data) {
+					/* remove icon from all checks */
+					$('div[data-check-id]').each(function() {
+						$(this).find('span.suppressed').remove();
+					});
+				});
 			});
 		});
 		]]>
