@@ -11,7 +11,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.worker.engine.snmp.script.BergamotScriptContext;
+import com.intrbiz.bergamot.worker.engine.script.BergamotScriptContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 import com.intrbiz.snmp.SNMPContext;
 
