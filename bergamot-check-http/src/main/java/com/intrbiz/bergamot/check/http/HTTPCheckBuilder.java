@@ -7,12 +7,14 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
+import java.util.Base64;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.crypto.util.TLSConstants;
 import com.intrbiz.bergamot.crypto.util.TLSConstants.CipherInfo;
 
@@ -50,6 +52,10 @@ public abstract class HTTPCheckBuilder
     private List<String> ciphers = new LinkedList<String>();
     
     private List<String> protocols = new LinkedList<String>();
+    
+    private String username;
+    
+    private String password;
     
     public HTTPCheckBuilder()
     {
@@ -261,6 +267,13 @@ public abstract class HTTPCheckBuilder
         return this;
     }
     
+    public HTTPCheckBuilder basicAuth(String username, String password)
+    {
+        this.username = username;
+        this.password = password;
+        return this;
+    }
+    
     public HTTPCheckBuilder onResponse(Consumer<HTTPCheckResponse> responseHandler)
     {
         this.responseHandler = responseHandler;
@@ -297,6 +310,12 @@ public abstract class HTTPCheckBuilder
         else request.headers().add(HttpHeaders.Names.HOST, this.virtualHost + ":" + this.port);
         // user agent
         request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring Check HTTP 1.0.0");
+        // HTTP auth
+        if (! Util.isEmpty(this.username))
+        {
+            String encodedCredentials = new String(Base64.getEncoder().encode((this.username + ":" + Util.coalesce(this.password, "")).getBytes(Util.UTF8)), Util.UTF8);
+            request.headers().add(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
+        }
         // add headers
         for (Entry<String, String> e : this.headers)
         {
@@ -312,7 +331,7 @@ public abstract class HTTPCheckBuilder
                 this.permitInvalidCerts, 
                 this.virtualHost, 
                 this.protocols, 
-                this.ciphers, 
+                this.ciphers,
                 request, 
                 this.responseHandler, 
                 this.errorHandler
