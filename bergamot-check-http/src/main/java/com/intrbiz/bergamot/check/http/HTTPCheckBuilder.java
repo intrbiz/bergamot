@@ -255,6 +255,34 @@ public abstract class HTTPCheckBuilder
         return this;
     }
     
+    public HTTPCheckBuilder post(String path)
+    {
+        this.method = HttpMethod.POST;
+        this.path = path;
+        return this;
+    }
+    
+    public HTTPCheckBuilder post()
+    {
+        this.method = HttpMethod.POST;
+        this.path = "/";
+        return this;
+    }
+    
+    public HTTPCheckBuilder head(String path)
+    {
+        this.method = HttpMethod.HEAD;
+        this.path = path;
+        return this;
+    }
+    
+    public HTTPCheckBuilder head()
+    {
+        this.method = HttpMethod.HEAD;
+        this.path = "/";
+        return this;
+    }
+    
     public HTTPCheckBuilder host(String virtualHost)
     {
         this.virtualHost = virtualHost;

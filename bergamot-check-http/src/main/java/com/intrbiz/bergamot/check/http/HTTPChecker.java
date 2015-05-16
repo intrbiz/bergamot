@@ -245,6 +245,21 @@ public class HTTPChecker
         });
     }
     
+    public HTTPCheckBuilder get()
+    {
+        return this.check().get();
+    }
+    
+    public HTTPCheckBuilder post()
+    {
+        return this.check().post();
+    }
+    
+    public HTTPCheckBuilder head()
+    {
+        return this.check().head();
+    }
+    
     public HTTPCheckBuilder check()
     {
         return new HTTPCheckBuilder() {
