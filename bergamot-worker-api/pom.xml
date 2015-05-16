@@ -35,5 +35,9 @@
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-daemon-config</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.util</groupId>
+    	<artifactId>scripting</artifactId>
+    </dependency>
   </dependencies>
 </project>

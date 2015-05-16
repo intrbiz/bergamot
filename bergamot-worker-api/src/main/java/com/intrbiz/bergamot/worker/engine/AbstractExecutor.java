@@ -51,9 +51,9 @@ public abstract class AbstractExecutor<T extends Engine> implements Executor<T>
     }
     
     @Override
-    public boolean accept(ExecuteCheck task)
+    public boolean accept(ExecuteCheck check)
     {
-        return task instanceof ExecuteCheck;
+        return check instanceof ExecuteCheck;
     }
 
     @Override
