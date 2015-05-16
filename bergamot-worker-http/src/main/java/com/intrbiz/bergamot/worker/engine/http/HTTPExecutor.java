@@ -49,9 +49,8 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
     public boolean accept(ExecuteCheck task)
     {
         return super.accept(task) && 
-               (task instanceof ExecuteCheck) && 
-               HTTPEngine.NAME.equalsIgnoreCase(((ExecuteCheck) task).getEngine()) &&
-               (HTTPExecutor.NAME.equalsIgnoreCase(((ExecuteCheck) task).getExecutor()) || Util.isEmpty(((ExecuteCheck) task).getExecutor()));
+               HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
+               (HTTPExecutor.NAME.equalsIgnoreCase(task.getExecutor()) || Util.isEmpty(task.getExecutor()));
     }
     
     @Override
