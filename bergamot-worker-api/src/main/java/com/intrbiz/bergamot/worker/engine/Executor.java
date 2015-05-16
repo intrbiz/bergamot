@@ -19,10 +19,19 @@ public interface Executor<T extends Engine> extends Configurable<ExecutorCfg>
     
     void setEngine(T engine);
     
+    /**
+     * Should this executor be used to execute the given check
+     * @return true if this executor can execute the given check
+     */
     boolean accept(ExecuteCheck task);
     
     /**
      * Execute the check
+     * 
+     * Note: An executor must only throw an exception in the event of a transient error, 
+     * where the check is to be retried.  Ideally exceptions should be handled by the 
+     * executor by submitting an ERROR result. 
+     * 
      */
     void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter);
     
