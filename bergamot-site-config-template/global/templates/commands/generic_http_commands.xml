@@ -40,7 +40,7 @@
     </command>
     
     <command name="certificate_check" engine="http" executor="certificate">
-        <summary>HTTPS Check</summary>
+        <summary>TLS certificate Check</summary>
         <parameter name="host">#{host.address}</parameter>
         <parameter name="port"></parameter>
         <parameter name="virtual_host">#{host.name}</parameter>
@@ -50,6 +50,13 @@
         <parameter name="expires_in">28</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/security.png</parameter>
         <description>Check the validity of a TLS certificate presented</description>
+    </command>
+    
+    <command name="http_script_check" engine="http" executor="script">
+        <summary>HTTP Script Check</summary>
+	<parameter name="script"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+        <description>Check HTTP/HTTPS resources by executing a Javascript script</description>
     </command>
     
 </bergamot>
