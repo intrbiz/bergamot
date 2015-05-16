@@ -9,6 +9,7 @@ import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.worker.engine.http.CertificateExecutor;
 import com.intrbiz.bergamot.worker.engine.http.HTTPEngine;
 import com.intrbiz.bergamot.worker.engine.http.HTTPExecutor;
+import com.intrbiz.bergamot.worker.engine.http.ScriptedHTTPExecutor;
 
 @XmlType(name = "worker")
 @XmlRootElement(name = "worker")
@@ -25,7 +26,7 @@ public class HTTPWorkerCfg extends WorkerCfg
     public void applyDefaults()
     {
         // add our default engines to avoid needing to configure them
-        this.getEngines().add(new EngineCfg(HTTPEngine.class, new ExecutorCfg(HTTPExecutor.class), new ExecutorCfg(CertificateExecutor.class)));
+        this.getEngines().add(new EngineCfg(HTTPEngine.class, new ExecutorCfg(HTTPExecutor.class), new ExecutorCfg(CertificateExecutor.class), new ExecutorCfg(ScriptedHTTPExecutor.class)));
         // apply defaults from super class
         super.applyDefaults();
     }
