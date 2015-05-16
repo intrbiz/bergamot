@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.check.http;
 
 import io.netty.handler.codec.http.FullHttpResponse;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.crypto.util.TLSInfo;
 
 public class HTTPCheckResponse
@@ -23,13 +24,38 @@ public class HTTPCheckResponse
     {
         return runtime;
     }
+    
+    public long runtime()
+    {
+        return runtime;
+    }
 
     public FullHttpResponse getResponse()
     {
         return response;
     }
     
+    public FullHttpResponse response()
+    {
+        return response;
+    }
+    
+    public int status()
+    {
+        return this.getResponse().getStatus().code();
+    }
+    
+    public String content()
+    {
+        return this.getResponse().content().toString(Util.UTF8);
+    }
+    
     public TLSInfo getTlsInfo()
+    {
+        return tlsInfo;
+    }
+    
+    public TLSInfo tlsInfo()
     {
         return tlsInfo;
     }

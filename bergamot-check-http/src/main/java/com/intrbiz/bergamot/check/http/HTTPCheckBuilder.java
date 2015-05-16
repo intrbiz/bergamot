@@ -7,6 +7,7 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
+import java.net.URL;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -248,10 +249,13 @@ public abstract class HTTPCheckBuilder
         return this;
     }
     
-    public HTTPCheckBuilder get()
+    public HTTPCheckBuilder get(URL url)
     {
         this.method = HttpMethod.GET;
-        this.path = "/";
+        this.ssl = "https".equalsIgnoreCase(url.getProtocol());
+        this.address = url.getHost();
+        this.port = url.getPort();
+        this.path = url.getPath();
         return this;
     }
     
@@ -259,6 +263,16 @@ public abstract class HTTPCheckBuilder
     {
         this.method = HttpMethod.POST;
         this.path = path;
+        return this;
+    }
+    
+    public HTTPCheckBuilder post(URL url)
+    {
+        this.method = HttpMethod.POST;
+        this.ssl = "https".equalsIgnoreCase(url.getProtocol());
+        this.address = url.getHost();
+        this.port = url.getPort();
+        this.path = url.getPath();
         return this;
     }
     
@@ -273,6 +287,16 @@ public abstract class HTTPCheckBuilder
     {
         this.method = HttpMethod.HEAD;
         this.path = path;
+        return this;
+    }
+    
+    public HTTPCheckBuilder head(URL url)
+    {
+        this.method = HttpMethod.GET;
+        this.ssl = "https".equalsIgnoreCase(url.getProtocol());
+        this.address = url.getHost();
+        this.port = url.getPort();
+        this.path = url.getPath();
         return this;
     }
     

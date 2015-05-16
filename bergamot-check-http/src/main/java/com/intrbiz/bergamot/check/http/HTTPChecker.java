@@ -16,6 +16,8 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.GenericFutureListener;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Timer;
@@ -245,19 +247,19 @@ public class HTTPChecker
         });
     }
     
-    public HTTPCheckBuilder get()
+    public HTTPCheckBuilder get(String url) throws MalformedURLException
     {
-        return this.check().get();
+        return this.check().get(new URL(url));
     }
     
-    public HTTPCheckBuilder post()
+    public HTTPCheckBuilder post(String url) throws MalformedURLException
     {
-        return this.check().post();
+        return this.check().post(new URL(url));
     }
     
-    public HTTPCheckBuilder head()
+    public HTTPCheckBuilder head(String url) throws MalformedURLException
     {
-        return this.check().head();
+        return this.check().head(new URL(url));
     }
     
     public HTTPCheckBuilder check()

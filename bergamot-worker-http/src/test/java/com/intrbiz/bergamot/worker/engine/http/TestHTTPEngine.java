@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.worker.engine.http;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import java.util.UUID;
 
 import org.apache.log4j.BasicConfigurator;
@@ -24,7 +27,7 @@ public class TestHTTPEngine
         Logger.getRootLogger().setLevel(Level.TRACE);
         //
         this.engine = new HTTPEngine();
-        this.engine.configure(new EngineCfg(HTTPEngine.class, new ExecutorCfg(HTTPExecutor.class), new ExecutorCfg(CertificateExecutor.class)));
+        this.engine.configure(new EngineCfg(HTTPEngine.class, new ExecutorCfg(HTTPExecutor.class), new ExecutorCfg(CertificateExecutor.class), new ExecutorCfg(ScriptedHTTPExecutor.class)));
     }
     
     @Test
@@ -146,6 +149,60 @@ public class TestHTTPEngine
         }
         // check
         ResultMO resultMO = results[0];
+        System.out.println("Got result: " + resultMO);
+    }
+    
+    @Test
+    public void testScriptedHTTPCheck() throws Exception
+    {
+        // the check to execute
+        ExecuteCheck check = new ExecuteCheck();
+        check.setEngine("http");
+        check.setExecutor("script");
+        check.setName("check_http_script");
+        check.setCheckType("service");
+        check.setCheckId(UUID.randomUUID());
+        check.setProcessingPool(1);
+        check.setScheduled(System.currentTimeMillis());
+        // parameters
+        check.setParameter("script", "http.get('http://10.250.100.144:15672/api/overview').basicAuth('monitor', 'monitor').execute("
+                + " function(r) {"
+                + "   if (r.status() == 200) { "
+                + "     var res = JSON.parse(r.content()); "
+                + "     bergamot.info('RabbitMQ Version: ' + res.rabbitmq_version); "
+                + "   } else {"
+                + "     bergamot.error('RabbitMQ API returned: ' + r.status());"
+                + "   }"
+                + " }, "
+                + " function(e) { "
+                + "   bergamot.error(e); "
+                + " }"
+                + ");");
+        // execute
+        // multi-threaded so we need to wait
+        final Object lock = new Object();
+        final ResultMO[] results = new ResultMO[1];
+        this.engine.execute(check, (result) -> {
+            // ok we got a result
+            results[0] = result;
+            // all done
+            synchronized (lock)
+            {
+                lock.notifyAll();
+            }
+        });
+        // await execution
+        if (results[0] == null)
+        {
+            synchronized (lock)
+            {
+                lock.wait();
+            }
+        }
+        // check
+        ResultMO resultMO = results[0];
+        assertThat(resultMO, is(notNullValue()));
+        assertThat(resultMO.getStatus(), is(equalTo("INFO")));
         System.out.println("Got result: " + resultMO);
     }
 }
