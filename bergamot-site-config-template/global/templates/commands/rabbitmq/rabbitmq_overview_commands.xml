@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="rabbitmq_version_info" extends="rabbitmq_api_check">
+      <summary>RabbitMQ Version</summary>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/overview')
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content()); 
+      bergamot.info('RabbitMQ Version: ' + res.rabbitmq_version); 
+    }
+    else
+    {
+      bergamot.error('RabbitMQ API returned: ' + r.status());
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Display the RabbitMQ version information</description>
+    </command>
+
+    <command name="rabbitmq_active_connections" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Active Connections</summary>
+        <parameter description="Warning threshold" name="warning">20</parameter>
+        <parameter description="Critical threshold" name="critical">50</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('warning');
+bergamot.require('critical');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/overview')
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.publish(
+        bergamot.createResult().applyGreaterThanThreshold(
+           res.object_totals.connections,
+           check.getIntParameter('warning'),
+	   check.getIntParameter('critical'),
+	   'Active connections: ' + res.object_totals.connections
+        )
+      );
+    }
+    else
+    {
+      bergamot.error('RabbitMQ API returned: ' + r.status());
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ active connections</description>
+    </command>
+
+    <command name="rabbitmq_active_channels" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Active Channels</summary>
+        <parameter description="Warning threshold" name="warning">200</parameter>
+        <parameter description="Critical threshold" name="critical">500</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('warning');
+bergamot.require('critical');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/overview')
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.publish(
+        bergamot.createResult().applyGreaterThanThreshold(
+           res.object_totals.channels,
+           check.getIntParameter('warning'),
+	   check.getIntParameter('critical'),
+	   'Active channels: ' + res.object_totals.channels
+        )
+      );
+    }
+    else
+    {
+      bergamot.error('RabbitMQ API returned: ' + r.status());
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ active channels</description>
+    </command>
+    
+</bergamot>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+
+    <command name="rabbitmq_publish" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Publish</summary>
+        <parameter description="Warning threshold" name="warning">20</parameter>
+        <parameter description="Critical threshold" name="critical">50</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('warning');
+bergamot.require('critical');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/overview')
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.publish(
+        bergamot.createResult().applyGreaterThanThreshold(
+           res.message_stats.publish_details.rate,
+           check.getDoubleParameter('warning'),
+	   check.getDoubleParameter('critical'),
+	   'Publish: ' + res.message_stats.publish_details.rate + '/s, total: ' + res.message_stats.publish
+        )
+      );
+    }
+    else
+    {
+      bergamot.error('RabbitMQ API returned: ' + r.status());
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ Publish</description>
+    </command>
+
+    <command name="rabbitmq_deliver" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Deliver</summary>
+        <parameter description="Warning threshold" name="warning">20</parameter>
+        <parameter description="Critical threshold" name="critical">50</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('warning');
+bergamot.require('critical');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/overview')
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.publish(
+        bergamot.createResult().applyGreaterThanThreshold(
+           res.message_stats.deliver_details.rate,
+           check.getDoubleParameter('warning'),
+	   check.getDoubleParameter('critical'),
+	   'Deliver: ' + res.message_stats.deliver_details.rate + '/s, total: ' + res.message_stats.deliver
+        )
+      );
+    }
+    else
+    {
+      bergamot.error('RabbitMQ API returned: ' + r.status());
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ Deliver</description>
+    </command>
+
+    <command name="rabbitmq_ack" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Ack</summary>
+        <parameter description="Warning threshold" name="warning">20</parameter>
+        <parameter description="Critical threshold" name="critical">50</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('warning');
+bergamot.require('critical');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/overview')
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.publish(
+        bergamot.createResult().applyGreaterThanThreshold(
+           res.message_stats.ack_details.rate,
+           check.getDoubleParameter('warning'),
+	   check.getDoubleParameter('critical'),
+	   'Ack: ' + res.message_stats.ack_details.rate + '/s, total: ' + res.message_stats.ack
+        )
+      );
+    }
+    else
+    {
+      bergamot.error('RabbitMQ API returned: ' + r.status());
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ Ack</description>
+    </command>
+    
+</bergamot>

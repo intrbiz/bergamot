@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+
+    <command name="rabbitmq_aliveness_test" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Alive</summary>
+        <parameter description="Warning threshold" name="warning">200</parameter>
+        <parameter description="Critical threshold" name="critical">500</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('vhost');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/aliveness-test/' + check.getParameter('vhost'))
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.ok('RabbitMQ aliveness test passed, with ' + res.status);
+    }
+    else
+    {
+      bergamot.critical('RabbitMQ aliveness test failed, with ' + r.status());
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ aliveness test</description>
+    </command>
+    
+</bergamot>
