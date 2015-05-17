@@ -341,7 +341,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     // location
     
     @Cacheable
-    @CacheInvalidate({"get_root_locations.#{site_id}", "get_location_by_name.#{site_id}.*", "get_locations_in_location.#{id}"})
+    @CacheInvalidate({
+        "get_root_locations.#{site_id}", 
+        "get_location_by_name.#{site_id}.*", 
+        "get_locations_in_location.#{id}"
+    })
     @SQLSetter(table = Location.class, name = "set_location", since = @SQLVersion({1, 0, 0}))
     public abstract void setLocation(Location location);
     
@@ -367,10 +371,13 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Location> getRootLocations(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
-    @CacheInvalidate({"get_root_locations.#{this.getSiteId(id)}", "get_location_by_name.#{this.getSiteId(id)}.*", "get_locations_in_location.#{id}"})
+    @CacheInvalidate({
+        "get_root_locations.#{this.getSiteId(id)}", 
+        "get_location_by_name.#{this.getSiteId(id)}.*", 
+        "get_locations_in_location.#{id}"
+    })
     @SQLRemove(table = Location.class, name = "remove_location", since = @SQLVersion({1, 0, 0}))
     public abstract void removeLocation(@SQLParam("id") UUID locationId);
-    
     
     public void addLocationChild(Location parent, Location child)
     {
@@ -413,7 +420,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     // group
     
     @Cacheable
-    @CacheInvalidate({"get_group_by_name.#{site_id}.*", "get_root_groups.#{site_id}.*", "get_groups_in_group.#{id}"})
+    @CacheInvalidate({
+        "get_group_by_name.#{site_id}.*", 
+        "get_root_groups.#{site_id}.*", 
+        "get_groups_in_group.#{id}"
+    })
     @SQLSetter(table = Group.class, name = "set_group", since = @SQLVersion({1, 0, 0}))
     public abstract void setGroup(Group group);
     
@@ -441,7 +452,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Group> getGroupsInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
     
     @Cacheable
-    @CacheInvalidate({"get_group_by_name.#{this.getSiteId(id)}.*", "get_root_groups.#{this.getSiteId(id)}.*", "get_groups_in_group.#{id}"})
+    @CacheInvalidate({
+        "get_group_by_name.#{this.getSiteId(id)}.*", 
+        "get_root_groups.#{this.getSiteId(id)}.*", 
+        "get_groups_in_group.#{id}"
+    })
     @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                         "UPDATE bergamot.group SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
@@ -506,7 +521,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     // team
     
     @Cacheable
-    @CacheInvalidate({"get_team_by_name.#{site_id}.*", "get_teams_in_team.#{id}", "get_contacts_in_team.#{id}"})
+    @CacheInvalidate({
+        "get_team_by_name.#{site_id}.*", 
+        "get_teams_in_team.#{id}", 
+        "get_contacts_in_team.#{id}"
+    })
     @SQLSetter(table = Team.class, name = "set_team", since = @SQLVersion({1, 0, 0}))
     public abstract void setTeam(Team team);
     
@@ -528,7 +547,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Team> getTeamsInTeam(@SQLParam(value = "team_id", virtual = true) UUID teamId);
     
     @Cacheable
-    @CacheInvalidate({"get_team_by_name.#{this.getSiteId(id)}.*", "get_teams_in_team.#{id}", "get_contacts_in_team.#{id}"})
+    @CacheInvalidate({
+        "get_team_by_name.#{this.getSiteId(id)}.*", 
+        "get_teams_in_team.#{id}", 
+        "get_contacts_in_team.#{id}"
+    })
     @SQLRemove(table = Team.class, name = "remove_team", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                     "UPDATE bergamot.team     SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
@@ -590,7 +613,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     // contact
     
     @Cacheable
-    @CacheInvalidate({"get_contact_by_name.#{site_id}.*", "get_contact_by_email.#{site_id}.*", "get_contact_by_name_or_email.#{site_id}.*"})
+    @CacheInvalidate({
+        "get_contact_by_name.#{site_id}.*", 
+        "get_contact_by_email.#{site_id}.*", 
+        "get_contact_by_name_or_email.#{site_id}.*"
+    })
     @SQLSetter(table = Contact.class, name = "set_contact", since = @SQLVersion({1, 0, 0}))
     public abstract void setContact(Contact contact);
     
@@ -627,7 +654,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Contact> getContactsNotInATeam(@SQLParam("site_id") UUID site_id);
     
     @Cacheable
-    @CacheInvalidate({"get_contact_by_name.#{this.getSiteId(id)}.*", "get_contact_by_email.#{this.getSiteId(id)}.*", "get_contact_by_name_or_email.#{this.getSiteId(id)}.*"})
+    @CacheInvalidate({
+        "get_contact_by_name.#{this.getSiteId(id)}.*", 
+        "get_contact_by_email.#{this.getSiteId(id)}.*", 
+        "get_contact_by_name_or_email.#{this.getSiteId(id)}.*"
+    })
     @SQLRemove(table = Contact.class, name = "remove_contact", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                     "UPDATE bergamot.host     SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
@@ -710,7 +741,12 @@ public abstract class BergamotDB extends DatabaseAdapter
     // alerts
     
     @Cacheable
-    @CacheInvalidate({"get_all_alerts_for_check.#{check_id}", "get_recovered_alerts_for_check.#{check_id}", "get_alerts_for_check.#{check_id}", "get_current_alert_for_check.#{check_id}"})
+    @CacheInvalidate({
+        "get_all_alerts_for_check.#{check_id}", 
+        "get_recovered_alerts_for_check.#{check_id}", 
+        "get_alerts_for_check.#{check_id}", 
+        "get_current_alert_for_check.#{check_id}"
+    })
     @SQLSetter(table = Alert.class, name = "set_alert", since = @SQLVersion({1, 0, 0}))
     public abstract void setAlert(Alert alert);
     
@@ -719,7 +755,12 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract Alert getAlert(@SQLParam("id") UUID id);
     
     @Cacheable
-    @CacheInvalidate({"get_all_alerts_for_check.*", "get_recovered_alerts_for_check.*", "get_alerts_for_check.*", "get_current_alert_for_check.*"})
+    @CacheInvalidate({
+        "get_all_alerts_for_check.*", 
+        "get_recovered_alerts_for_check.*", 
+        "get_alerts_for_check.*", 
+        "get_current_alert_for_check.*"
+    })
     @SQLRemove(table = Alert.class, name = "remove_alert", since = @SQLVersion({1, 0, 0}))
     public abstract void removeAlert(@SQLParam("id") UUID id);
     
@@ -857,7 +898,17 @@ public abstract class BergamotDB extends DatabaseAdapter
     // host
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_host_by_name.#{site_id}.*", "get_host_by_address.#{site_id}.*", "get_host_by_external_ref.#{site_id}.*", "get_host_by_agent_id.#{site_id}.*"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}", 
+        "get_host_by_name.#{site_id}.*", 
+        "get_host_by_address.#{site_id}.*", 
+        "get_host_by_external_ref.#{site_id}.*", 
+        "get_host_by_agent_id.#{site_id}.*",
+        "get_hosts_in_location.*",
+        "get_hosts_in_group.*"
+        
+    })
     @SQLSetter(table = Host.class, name = "set_host", since = @SQLVersion({1, 0, 0}))
     public abstract void setHost(Host host);
     
@@ -903,7 +954,16 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Host> listHostsInPool(@SQLParam("site_id") UUID siteId, @SQLParam("pool") int pool);
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_host_by_name.#{this.getSiteId(id)}.*", "get_host_by_address.#{this.getSiteId(id)}.*"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}", 
+        "get_host_by_name.#{this.getSiteId(id)}.*", 
+        "get_host_by_address.#{this.getSiteId(id)}.*",
+        "get_host_by_external_ref.#{this.getSiteId(id)}.*", 
+        "get_host_by_agent_id.#{this.getSiteId(id)}.*",
+        "get_hosts_in_location.*",
+        "get_hosts_in_group.*"
+    })
     @SQLRemove(table = Host.class, name = "remove_host", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
@@ -924,34 +984,48 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         service.setHostId(host.getId());
         this.setService(service);
-        this.getAdapterCache().remove("get_services_on_host." + host.getId());
+        this.invalidateServicesOnHost(host.getId());
     }
     
     public void removeServiceFromHost(Host host, Service service)
     {
         service.setHostId(null);
         this.setService(service);
-        this.getAdapterCache().remove("get_services_on_host." + host.getId());
+        this.invalidateServicesOnHost(host.getId());
+    }
+    
+    public void invalidateServicesOnHost(UUID hostId)
+    {
+        this.getAdapterCache().remove("get_services_on_host." + hostId);
     }
     
     public void addTrapToHost(Host host, Trap trap)
     {
         trap.setHostId(host.getId());
         this.setTrap(trap);
-        this.getAdapterCache().remove("get_traps_on_host." + host.getId());
+        this.invalidateTrapsOnHost(host.getId());
     }
     
     public void removeTrapFromHost(Host host, Trap trap)
     {
         trap.setHostId(null);
         this.setTrap(trap);
-        this.getAdapterCache().remove("get_traps_on_host." + host.getId());
+        this.invalidateTrapsOnHost(host.getId());
+    }
+    
+    public void invalidateTrapsOnHost(UUID hostId)
+    {
+        this.getAdapterCache().remove("get_traps_on_host." + hostId);
     }
     
     // service
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}",
+        "get_services_on_host.#{host_id}"
+    })
     @SQLSetter(table = Service.class, name = "set_service", since = @SQLVersion({1, 0, 0}))
     public abstract void setService(Service service);
     
@@ -993,7 +1067,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Service> listServicesInPool(@SQLParam("site_id") UUID siteId, @SQLParam("pool") int pool);
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}"
+    })
     @SQLRemove(table = Service.class, name = "remove_service", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
@@ -1013,7 +1090,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     // trap
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}",
+        "get_traps_on_host.#{host_id}"
+    })
     @SQLSetter(table = Trap.class, name = "set_trap", since = @SQLVersion({1, 0, 0}))
     public abstract void setTrap(Trap trap);
     
@@ -1060,7 +1141,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Trap> listTrapsThatAreNotOk(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}"
+    })
     @SQLRemove(table = Trap.class, name = "remove_trap", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
@@ -1080,7 +1164,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     // cluster
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_cluster_by_name.#{site_id}.*"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}", 
+        "get_cluster_by_name.#{site_id}.*"
+    })
     @SQLSetter(table = Cluster.class, name = "set_cluster", since = @SQLVersion({1, 0, 0}))
     public abstract void setCluster(Cluster cluster);
     
@@ -1103,7 +1191,12 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Cluster> getClustersInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_cluster_by_name.#{this.getSiteId(id)}.*", "get_clusters_referencing_check.*"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}", 
+        "get_cluster_by_name.#{this.getSiteId(id)}.*", 
+        "get_clusters_referencing_check.*"
+    })
     @SQLRemove(table = Cluster.class, name = "remove_cluster", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
@@ -1138,20 +1231,30 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         resource.setClusterId(cluster.getId());
         this.setResource(resource);
-        this.getAdapterCache().remove("get_resources_on_cluster." + cluster.getId());
+        this.invalidateResourcesOnCluster(cluster.getId());
     }
     
     public void removeResourceFromCluster(Cluster cluster, Resource resource)
     {
         resource.setClusterId(null);
         this.setResource(resource);
-        this.getAdapterCache().remove("get_resources_on_cluster." + cluster.getId());
+        this.invalidateResourcesOnCluster(cluster.getId());
+    }
+    
+    public void invalidateResourcesOnCluster(UUID clusterId)
+    {
+        this.getAdapterCache().remove("get_resources_on_cluster." + clusterId);
     }
     
     // resources
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_resources_referencing_check.*"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}", 
+        "get_resources_referencing_check.*",
+        "get_resources_on_cluster.#{cluster_id}"
+    })
     @SQLSetter(table = Resource.class, name = "set_resource", since = @SQLVersion({1, 0, 0}))
     public abstract void setResource(Resource resource);
     
@@ -1180,7 +1283,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract List<Resource> getResourcesInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
     
     @Cacheable
-    @CacheInvalidate({"check_command.#{id}", "check_state.#{id}", "get_resources_referencing_check.*"})
+    @CacheInvalidate({
+        "check_command.#{id}", 
+        "check_state.#{id}", 
+        "get_resources_referencing_check.*"
+    })
     @SQLRemove(table = Resource.class, name = "remove_resource", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +

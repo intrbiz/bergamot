@@ -1120,6 +1120,9 @@ public class BergamotConfigImporter
                 this.loadTrap(host, trapConfiguration, db);
             }
         }
+        // cache invalidation
+        db.invalidateServicesOnHost(host.getId());
+        db.invalidateTrapsOnHost(host.getId());
     }
     
     private void loadActiveCheck(ActiveCheck<?,?> check, ActiveCheckCfg<?> resolvedConfiguration, BergamotDB db)
@@ -1450,6 +1453,8 @@ public class BergamotConfigImporter
                 this.loadResource(cluster, resourceConfiguration, db);
             }
         }
+        // cache invalidation
+        db.invalidateResourcesOnCluster(cluster.getId());
     }
     
     private void removeResource(Cluster cluster, ResourceCfg configuration, BergamotDB db)
