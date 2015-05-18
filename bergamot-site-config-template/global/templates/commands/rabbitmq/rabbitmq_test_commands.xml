@@ -3,8 +3,6 @@
 
     <command name="rabbitmq_aliveness_test" extends="rabbitmq_api_check">
         <summary>RabbitMQ Alive</summary>
-        <parameter description="Warning threshold" name="warning">200</parameter>
-        <parameter description="Critical threshold" name="critical">500</parameter>
 	<parameter name="script">
 	  <![CDATA[
 /* Validate parameters */
