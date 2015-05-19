@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+
+    <command name="rabbitmq_exchange_exists" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Exchange Exists</summary>
+        <parameter description="Exchange name" name="exchange">amq.direct</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('vhost');
+bergamot.require('exchange');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/exchanges/' + check.getParameter('vhost') + '/' + check.getParameter('exchange'))
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.ok('RabbitMQ exchange ' + res.name + ' exists');
+    }
+    else
+    {
+      bergamot.critical('RabbitMQ exchange ' + check.getParameter('exchange') + ' does not exist');
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ exchange exists</description>
+    </command>
+    
+</bergamot>
