@@ -24,11 +24,11 @@ http.check()
     if (r.status() == 200)
     { 
       var res = JSON.parse(r.content());
-      bergamot.ok('RabbitMQ exchange ' + res.name + ' exists');
+      bergamot.ok('Exchange ' + res.name + ' exists');
     }
     else
     {
-      bergamot.critical('RabbitMQ exchange ' + check.getParameter('exchange') + ' does not exist');
+      bergamot.critical('Exchange ' + check.getParameter('exchange') + ' does not exist');
     }
   }, 
   function(e) { 
