@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.script;
 
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import com.intrbiz.Util;
@@ -79,6 +80,121 @@ public class BergamotScriptContext
     public void action(String message)
     {
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).action(message));
+    }
+    
+    public <V,T> void applyThreshold(V value, BiPredicate<V,T> match, T warning, T critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyThreshold(value, match, warning, critical, message));
+    }
+
+    public <V,T> void applyThresholds(Iterable<V> values, BiPredicate<V,T> match, T warning, T critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyThresholds(values, match, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThreshold(Double value, Double warning, Double critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyLessThanThreshold(Double value, Double warning, Double critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThreshold(Float value, Float warning, Float critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyLessThanThreshold(Float value, Float warning, Float critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThreshold(Long value, Long warning, Long critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyLessThanThreshold(Long value, Long warning, Long critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThreshold(Integer value, Integer warning, Integer critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyLessThanThreshold(Integer value, Integer warning, Integer critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThreshold(value, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThresholds(values, warning, critical, message));
+    }
+    
+    public void applyLessThanThresholds(Iterable<Double> values, Double warning, Double critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThresholds(values, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThresholds(values, warning, critical, message));
+    }
+    
+    public void applyLessThanThresholds(Iterable<Float> values, Float warning, Float critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThresholds(values, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThresholds(values, warning, critical, message));
+    }
+    
+    public void applyLessThanThresholds(Iterable<Long> values, Long warning, Long critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThresholds(values, warning, critical, message));
+    }
+    
+    public void applyGreaterThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyGreaterThanThresholds(values, warning, critical, message));
+    }
+    
+    public void applyLessThanThresholds(Iterable<Integer> values, Integer warning, Integer critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyLessThanThresholds(values, warning, critical, message));
+    }
+    
+    public <V,T> void applyRange(V value, BiPredicate<V,T> lowerMatch, BiPredicate<V,T> upperMatch, T[] warning, T[] critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, lowerMatch, upperMatch, warning, critical, message));
+    }
+    
+    public void applyRange(Long value, Long[] warning, Long[] critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
+    }
+    
+    public void applyRange(Integer value, Integer[] warning, Integer[] critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
+    }
+    
+    public void applyRange(Double value, Double[] warning, Double[] critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
+    }
+    
+    public void applyRange(Float value, Float[] warning, Float[] critical, String message)
+    {
+        this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
     }
     
     public void publish(ResultMO resultMO)
