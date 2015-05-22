@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+
+    <command name="rabbitmq_queue_exists" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Queue Exists</summary>
+        <parameter description="Queue name" name="queue"></parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('vhost');
+bergamot.require('queue');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/queues/' + check.getParameter('vhost') + '/' + check.getParameter('queue'))
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.ok('Queue ' + res.name + ' exists');
+    }
+    else
+    {
+      bergamot.critical('Queue ' + check.getParameter('queue') + ' does not exist');
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ exchange exists</description>
+    </command>
+
+    <command name="rabbitmq_queue_publish" extends="rabbitmq_api_check">
+        <summary>RabbitMQ Queue Publish</summary>
+	<parameter description="Queue name" name="queue"></parameter>
+        <parameter description="Warning threshold" name="warning">20</parameter>
+        <parameter description="Critical threshold" name="critical">50</parameter>
+	<parameter name="script">
+	  <![CDATA[
+/* Validate parameters */
+bergamot.require('host');
+bergamot.require('port');
+bergamot.require('username');
+bergamot.require('password');
+bergamot.require('warning');
+bergamot.require('critical');
+bergamot.require('queue');
+/* Execute */
+http.check()
+ .connect(check.getParameter('host'))
+ .port(check.getIntParameter('port'))
+ .get('/api/queues/' + check.getParameter('vhost') + '/' + check.getParameter('queue'))
+ .basicAuth(check.getParameter('username'), check.getParameter('password'))
+ .execute(
+  function(r) {
+    if (r.status() == 200)
+    { 
+      var res = JSON.parse(r.content());
+      bergamot.publish(
+        bergamot.createResult().applyGreaterThanThreshold(
+           res.message_stats.publish_in_details.rate,
+           check.getDoubleParameter('warning'),
+	   check.getDoubleParameter('critical'),
+	   'Queue ' + check.getParameter('queue') + ' publish: ' + res.message_stats.publish_in_details.rate + '/s, total: ' + res.message_stats.publish_in
+        )
+      );
+    }
+    else
+    {
+      bergamot.critical('Queue ' + check.getParameter('queue') + ' does not exist');
+    }
+  }, 
+  function(e) { 
+    bergamot.error(e); 
+  }
+);
+	  ]]>
+	</parameter>
+        <description>Check RabbitMQ Publish</description>
+    </command>
+    
+</bergamot>
