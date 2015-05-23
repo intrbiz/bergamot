@@ -267,4 +267,12 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         }
         json.writeEndObject();
     }
+    
+    @Any("/remove/id/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void remove(BergamotDB db, @IsaObjectId UUID id) throws IOException
+    {
+        db.removeConfigChange(id);
+        redirect(path("/admin/configchange/"));
+    }
 }
