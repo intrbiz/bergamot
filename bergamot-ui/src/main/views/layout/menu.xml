@@ -86,6 +86,9 @@
                 <li>
                     <a href="/admin/configchange/">Configuration Changes</a>
                 </li>
+                <li>
+                    <a href="/admin/utils/">Utilities</a>
+                </li>                
             </ul>
         </div>
     </container>
