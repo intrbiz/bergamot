@@ -98,6 +98,7 @@
     <module>bergamot-agent-config</module>
     <module>bergamot-agent-server-config</module>
     <module>bergamot-worker-dummy</module>
+    <module>bergamot-notifier-webhook</module>
   </modules>
   
   <dependencyManagement>
