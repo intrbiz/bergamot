@@ -26,6 +26,10 @@
 		<groupId>com.intrbiz.util</groupId>
 		<artifactId>bootstrap</artifactId>
 	</dependency>
+	<dependency>
+		<groupId>com.intrbiz.bergamot</groupId>
+		<artifactId>bergamot-check-http</artifactId>
+	</dependency>
   </dependencies>
   	<build>
 		<finalName>bergamot-notifier-webhook</finalName>
