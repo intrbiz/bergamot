@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
@@ -38,6 +39,7 @@ import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
+import com.intrbiz.util.IBThreadFactory;
 
 public class WebHookEngine extends AbstractNotificationEngine
 {
@@ -74,11 +76,14 @@ public class WebHookEngine extends AbstractNotificationEngine
     protected void configure() throws Exception
     {
         super.configure();
-        logger.info("WebHook notifier configured");
         // setup our HTTP engine
         // Setup a custom SSLContext which will not validate certs
         this.sslContext = SSLContext.getInstance("TLS");
         this.sslContext.init(null, new TrustManager[] { new BergamotTrustManager(false) }, new SecureRandom());
+        // setup the Netty event loop
+        this.eventLoop = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 2, new IBThreadFactory("bergamot-http-checker", false));
+        // log
+        logger.info("WebHook notifier configured");
     }
     
     public void shutdown()
