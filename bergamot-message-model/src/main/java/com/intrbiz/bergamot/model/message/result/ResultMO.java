@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
+import com.intrbiz.gerald.polyakov.Reading;
 
 /**
  * The result of a check
@@ -35,6 +36,22 @@ public abstract class ResultMO extends Message
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
+    
+    /*
+     * Metrics associated with this check result 
+     */
+    
+    /**
+     * Metrics captured timestamp
+     */
+    @JsonProperty("captured")
+    private long captured;
+    
+    /**
+     * A collection of metric readings
+     */
+    @JsonProperty("readings")
+    private List<Reading> readings = new LinkedList<Reading>();
 
     public ResultMO()
     {
@@ -153,14 +170,45 @@ public abstract class ResultMO extends Message
         return defaultValue;
     }
     
+    // metrics
+    
+    
+    public long getCaptured()
+    {
+        return captured;
+    }
+
+    public void setCaptured(long captured)
+    {
+        this.captured = captured;
+    }
+
+    public List<Reading> getReadings()
+    {
+        return readings;
+    }
+
+    public void setReadings(List<Reading> readings)
+    {
+        this.readings = readings;
+    }
+    
+    @JsonIgnore
+    public ResultMO reading(Reading reading)
+    {
+        this.readings.add(reading);
+        return this;
+    }
+    
     // constructor helpers
     
+    @JsonIgnore
     public ResultMO runtime(double runtime)
     {
         this.runtime = runtime;
         return this;
     }
-    
+
     @JsonIgnore
     public ResultMO pending(String output)
     {

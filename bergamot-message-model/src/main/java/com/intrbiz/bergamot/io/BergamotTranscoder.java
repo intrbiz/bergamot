@@ -97,6 +97,7 @@ import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 import com.intrbiz.bergamot.model.message.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.update.GroupUpdate;
 import com.intrbiz.bergamot.model.message.update.LocationUpdate;
+import com.intrbiz.gerald.polyakov.io.PolyakovTranscoder;
 import com.intrbiz.queue.QueueEventTranscoder;
 import com.intrbiz.queue.QueueException;
 
@@ -209,6 +210,8 @@ public class BergamotTranscoder
         this.factory.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // add types
         this.addEventType(BergamotTranscoder.CLASSES);
+        // include the metric reading models from Polyakov
+        this.addEventType(PolyakovTranscoder.CLASSES);
     }
     
     public void addEventType(Class<?>... classes)

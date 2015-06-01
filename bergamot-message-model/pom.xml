@@ -44,5 +44,9 @@
     	<groupId>org.hamcrest</groupId>
     	<artifactId>hamcrest-all</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.gerald</groupId>
+    	<artifactId>polyakov-model</artifactId>
+    </dependency>
 	</dependencies>
 </project>
