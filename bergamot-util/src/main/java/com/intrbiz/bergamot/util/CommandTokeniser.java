@@ -41,7 +41,7 @@ public class CommandTokeniser
                     // token delimiter
                     if (token.length() > 0)
                     {
-                        cmd.add(token.toString());
+                        cmd.add(stripQuotes(token.toString()));
                         token = new StringBuilder();
                     }
                 }
@@ -61,7 +61,7 @@ public class CommandTokeniser
         // last token
         if (token.length() > 0)
         {
-            cmd.add(token.toString());
+            cmd.add(stripQuotes(token.toString()));
             token = new StringBuilder();
         }
         // sanity check
@@ -70,5 +70,10 @@ public class CommandTokeniser
             throw new IOException("The command '" + commandLine + "' failed to terminate a quoted token!");
         }
         return cmd;
+    }
+    
+    private static String stripQuotes(String in)
+    {
+        return ((in.startsWith("\"") || in.startsWith("'")) && in.length() > 1) ? in.substring(1, in.length() -1) : in;
     }
 }

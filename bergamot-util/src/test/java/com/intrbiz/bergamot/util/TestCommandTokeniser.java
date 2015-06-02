@@ -26,7 +26,7 @@ public class TestCommandTokeniser
     {
         List<String> command = CommandTokeniser.tokeniseCommandLine("\"Testing 123\"");
         assertThat(command.size(), is(equalTo(1)));
-        assertThat(command.get(0), is(equalTo("\"Testing 123\"")));
+        assertThat(command.get(0), is(equalTo("Testing 123")));
     }
     
     @Test
@@ -34,7 +34,7 @@ public class TestCommandTokeniser
     {
         List<String> command = CommandTokeniser.tokeniseCommandLine("'Testing 123'");
         assertThat(command.size(), is(equalTo(1)));
-        assertThat(command.get(0), is(equalTo("'Testing 123'")));
+        assertThat(command.get(0), is(equalTo("Testing 123")));
     }
     
     @Test
@@ -42,7 +42,7 @@ public class TestCommandTokeniser
     {
         List<String> command = CommandTokeniser.tokeniseCommandLine("'Testing \\' \\\" 123'");
         assertThat(command.size(), is(equalTo(1)));
-        assertThat(command.get(0), is(equalTo("'Testing \\' \\\" 123'")));
+        assertThat(command.get(0), is(equalTo("Testing \\' \\\" 123")));
     }
     
     @Test
@@ -50,7 +50,7 @@ public class TestCommandTokeniser
     {
         List<String> command = CommandTokeniser.tokeniseCommandLine("\"Testing \\' \\\" 123\"");
         assertThat(command.size(), is(equalTo(1)));
-        assertThat(command.get(0), is(equalTo("\"Testing \\' \\\" 123\"")));
+        assertThat(command.get(0), is(equalTo("Testing \\' \\\" 123")));
     }
     
     @Test
@@ -86,11 +86,11 @@ public class TestCommandTokeniser
     {
         List<String> command = CommandTokeniser.tokeniseCommandLine("\"Here\" 'is' some 'quoted' \"tokens\" to parse");
         assertThat(command.size(), is(equalTo(7)));
-        assertThat(command.get(0), is(equalTo("\"Here\"")));
-        assertThat(command.get(1), is(equalTo("'is'")));
+        assertThat(command.get(0), is(equalTo("Here")));
+        assertThat(command.get(1), is(equalTo("is")));
         assertThat(command.get(2), is(equalTo("some")));
-        assertThat(command.get(3), is(equalTo("'quoted'")));
-        assertThat(command.get(4), is(equalTo("\"tokens\"")));
+        assertThat(command.get(3), is(equalTo("quoted")));
+        assertThat(command.get(4), is(equalTo("tokens")));
         assertThat(command.get(5), is(equalTo("to")));
         assertThat(command.get(6), is(equalTo("parse")));
     }
@@ -102,6 +102,16 @@ public class TestCommandTokeniser
         assertThat(command.size(), is(equalTo(3)));
         assertThat(command.get(0), is(equalTo("/usr/lib/nagios/plugins/check_dummy")));
         assertThat(command.get(1), is(equalTo("0")));
-        assertThat(command.get(2), is(equalTo("\"Testing 123\"")));
+        assertThat(command.get(2), is(equalTo("Testing 123")));
+    }
+    
+    @Test
+    public void testComplexComand() throws Exception
+    {
+        List<String> command = CommandTokeniser.tokeniseCommandLine("/bin/sh -c 'echo H4sIAGXUbVUAA42QP2vDMBDFd32KRzBYKmlsd6xJIHTo0KHQoR2aQhRbdgWybCQ39A/57j1JtIROnR73Tve7exo+kPlZzlijrNlAlVFHZajM7+/y5GjbjWTs27GHHVuFaFy6fWoPvg/P6XE3OiWbV0SMtgrcT0bPKHa2WCaOwBcLfZ6ZA1lefyqSN69aEnmU2pBOjSBinOUFwmigiZqlZas1GQeskIe9pDQQqiXoBugOnPOIRJE2CFygKkuBDbLtw+3jc/kS78Bv9qo+C/4kndW2D7ATlPH/IVZ/iVfnxBunZ91IE5HsxCan7fzTp8uvU4wYDoudXdRMvdPHRVjNvgHrCL0BpQEAAA== | base64 -d | gunzip | perl - 66 80'");
+        assertThat(command.size(), is(equalTo(3)));
+        assertThat(command.get(0), is(equalTo("/bin/sh")));
+        assertThat(command.get(1), is(equalTo("-c")));
+        assertThat(command.get(2), is(equalTo("echo H4sIAGXUbVUAA42QP2vDMBDFd32KRzBYKmlsd6xJIHTo0KHQoR2aQhRbdgWybCQ39A/57j1JtIROnR73Tve7exo+kPlZzlijrNlAlVFHZajM7+/y5GjbjWTs27GHHVuFaFy6fWoPvg/P6XE3OiWbV0SMtgrcT0bPKHa2WCaOwBcLfZ6ZA1lefyqSN69aEnmU2pBOjSBinOUFwmigiZqlZas1GQeskIe9pDQQqiXoBugOnPOIRJE2CFygKkuBDbLtw+3jc/kS78Bv9qo+C/4kndW2D7ATlPH/IVZ/iVfnxBunZ91IE5HsxCan7fzTp8uvU4wYDoudXdRMvdPHRVjNvgHrCL0BpQEAAA== | base64 -d | gunzip | perl - 66 80")));
     }
 }
