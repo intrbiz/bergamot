@@ -29,7 +29,7 @@ public class NagiosResult
     
     private double runtime;
     
-    private List<String> perfData = new LinkedList<String>();
+    private List<NagiosPerfData> perfData = new LinkedList<NagiosPerfData>();
     
     private List<String> additionalOutput = new LinkedList<String>();
     
@@ -132,7 +132,7 @@ public class NagiosResult
     /**
      * Get the performance
      */
-    public List<String> getPerfData()
+    public List<NagiosPerfData> getPerfData()
     {
         return this.perfData;
     }
@@ -189,7 +189,15 @@ public class NagiosResult
                 if (pipe > 0 && pipe < outputLine.length())
                 {
                     this.output = outputLine.substring(0, pipe).trim();
-                    this.perfData.add(outputLine.substring(pipe + 1).trim());
+                    String perfData = outputLine.substring(pipe + 1).trim();
+                    try
+                    {
+                        this.perfData.addAll(NagiosPerfData.parsePerfData(perfData));
+                    }
+                    catch (IOException e)
+                    {
+                        Logger.getLogger(NagiosResult.class).warn("Failed to parse perfdata, ignoring: " + perfData);
+                    }
                 }
                 else
                 {
@@ -202,7 +210,15 @@ public class NagiosResult
             {
                 if (inPerfData)
                 {
-                    this.perfData.add(outputLine.trim());
+                    String perfData = outputLine.trim();
+                    try
+                    {
+                        this.perfData.addAll(NagiosPerfData.parsePerfData(perfData));
+                    }
+                    catch (IOException e)
+                    {
+                        Logger.getLogger(NagiosResult.class).warn("Failed to parse perfdata, ignoring: " + perfData);
+                    }
                 }
                 else
                 {
@@ -210,7 +226,15 @@ public class NagiosResult
                     if (pipe > 0 && pipe < outputLine.length())
                     {
                         this.additionalOutput.add(outputLine.substring(0, pipe).trim());
-                        this.perfData.add(outputLine.substring(pipe + 1).trim());
+                        String perfData = outputLine.substring(pipe + 1).trim();
+                        try
+                        {
+                            this.perfData.addAll(NagiosPerfData.parsePerfData(perfData));
+                        }
+                        catch (IOException e)
+                        {
+                            Logger.getLogger(NagiosResult.class).warn("Failed to parse perfdata, ignoring: " + perfData);
+                        }
                         // we've had start of perf data, treat any additional lines as 
                         // perf data
                         inPerfData = true;
