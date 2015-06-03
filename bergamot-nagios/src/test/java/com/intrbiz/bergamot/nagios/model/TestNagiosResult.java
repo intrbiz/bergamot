@@ -23,7 +23,6 @@ public class TestNagiosResult
         assertThat(result.getPerfData().size(), is(equalTo(3)));
         assertThat(result.getPerfData().get(0).getLabel(), is(equalTo("load1")));
         assertThat(result.getPerfData().get(0).getValue(), is(equalTo("0.490")));
-        System.out.println(result.getPerfData());
     }
     
     @Test
@@ -43,6 +42,5 @@ public class TestNagiosResult
         assertThat(result.getPerfData().get(0).getLabel(), is(equalTo("/")));
         assertThat(result.getPerfData().get(0).getValue(), is(equalTo("10181")));
         assertThat(result.getPerfData().get(0).getUnit(), is(equalTo("MB")));
-        System.out.println(result.getPerfData());
     }
 }
