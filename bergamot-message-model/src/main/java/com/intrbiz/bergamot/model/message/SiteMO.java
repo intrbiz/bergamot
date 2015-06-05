@@ -92,4 +92,27 @@ public class SiteMO extends MessageObject
     {
         this.poolCount = poolCount;
     }
+    
+    /**
+     * Get the site id for the given object id
+     * 
+     * @param objectId
+     * @return
+     */
+    public static UUID getSiteId(UUID objectId)
+    {
+        return new UUID((objectId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L);
+    }
+
+    /**
+     * Set the site id into the given object id
+     * 
+     * @param siteId
+     * @param objectId
+     * @return
+     */
+    public static UUID setSiteId(UUID siteId, UUID objectId)
+    {
+        return new UUID((siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | (objectId.getMostSignificantBits() & 0x00000000_0000FFFFL), objectId.getLeastSignificantBits());
+    }
 }
