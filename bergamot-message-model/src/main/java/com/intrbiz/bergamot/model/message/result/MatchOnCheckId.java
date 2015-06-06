@@ -29,6 +29,7 @@ public class MatchOnCheckId extends MatchOn
 
     public MatchOnCheckId(String checkType, UUID checkId)
     {
+        this.checkType = checkType;
         this.checkId = checkId;
     }
 
