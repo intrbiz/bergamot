@@ -189,11 +189,11 @@ public class NagiosPerfData
             String valueString = readValue(buffer);
             String[] values = valueString.split(";");
             // the values
-            String valueUOM = values.length > 1 ? values[0] : null;
-            String warn     = values.length > 2 ? values[1] : null;
-            String crit     = values.length > 3 ? values[2] : null;
-            String min      = values.length > 4 ? values[3] : null;
-            String max      = values.length > 5 ? values[4] : null;
+            String valueUOM = values.length > 0 ? values[0] : null;
+            String warn     = values.length > 1 ? values[1] : null;
+            String crit     = values.length > 2 ? values[2] : null;
+            String min      = values.length > 3 ? values[3] : null;
+            String max      = values.length > 4 ? values[4] : null;
             // parse the value and unit
             Matcher matcher = VALUE_UOM_PATTERN.matcher(valueUOM);
             if (matcher.matches())
@@ -228,8 +228,10 @@ public class NagiosPerfData
     {
         StringBuilder value = new StringBuilder();
         char c;
-        while ((! Character.isWhitespace((c = buffer.get()))) && buffer.hasRemaining())
+        while (buffer.hasRemaining())
         {
+            c = buffer.get();
+            if (Character.isWhitespace(c)) break;
             value.append(c);
         }
         return value.toString();
