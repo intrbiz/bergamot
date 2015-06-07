@@ -11,11 +11,13 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ActiveResultKey;
 import com.intrbiz.bergamot.queue.key.AgentBinding;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.bergamot.worker.Worker;
@@ -41,6 +43,8 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     private List<Consumer<ExecuteCheck, WorkerKey>> consumers = new LinkedList<Consumer<ExecuteCheck, WorkerKey>>();
     
     protected RoutedProducer<ResultMO, ResultKey> resultProducer;
+    
+    protected RoutedProducer<ReadingParcelMO, ReadingKey> readingProducer;
 
     public AbstractEngine(final String name)
     {
@@ -118,6 +122,16 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     }
     
     @Override
+    public void publishReading(ReadingKey key, ReadingParcelMO readingParcelMO)
+    {
+        if (logger.isTraceEnabled())
+        {
+            logger.trace("Publishing reading: " + readingParcelMO.getReadings().size() + " " + readingParcelMO.getMatchOn());
+        }
+        this.readingProducer.publish(key, readingParcelMO);
+    }
+    
+    @Override
     public void execute(ExecuteCheck task)
     {
         this.execute(task, (result) -> {
@@ -144,8 +158,10 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     {
         // open the queue
         this.queue = WorkerQueue.open();
-        // the producer
+        // the result producer
         this.resultProducer = this.queue.publishResults();
+        // the reading producer
+        this.readingProducer = this.queue.publishReadings();
         // start the executors
         for (Executor<?> ex : this.getExecutors())
         {
