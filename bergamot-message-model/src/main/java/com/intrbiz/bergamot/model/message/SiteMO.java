@@ -115,4 +115,12 @@ public class SiteMO extends MessageObject
     {
         return new UUID((siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | (objectId.getMostSignificantBits() & 0x00000000_0000FFFFL), objectId.getLeastSignificantBits());
     }
+    
+    /**
+     * Get the processing pool for a given objectId
+     */
+    public static int getProcessingPool(UUID objectId)
+    {
+        return (int) (objectId.getLeastSignificantBits() & 0xFFL);
+    }
 }
