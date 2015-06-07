@@ -8,9 +8,13 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 
@@ -68,6 +72,14 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                     resultMO.setRuntime(response.getRuntime());
                     tctx.stop();
                     resultSubmitter.accept(resultMO);
+                    // readings
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
+                    for (NagiosPerfData perfData : response.getPerfData())
+                    {
+                        Reading reading = perfData.toReading();
+                        if (reading != null) readings.reading(reading);
+                    }
+                    if (readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId()), readings);
                 }, 
                 (exception) -> {
                     tctx.stop();

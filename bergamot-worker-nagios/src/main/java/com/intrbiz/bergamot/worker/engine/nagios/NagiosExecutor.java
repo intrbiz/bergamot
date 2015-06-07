@@ -8,11 +8,15 @@ import org.apache.log4j.Logger;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
+import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 
@@ -68,6 +72,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     {
         logger.debug("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+        ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
         try
         {
             // validate the command line
@@ -82,6 +87,12 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
                 resultMO.setStatus(response.toStatus());
                 resultMO.setOutput(response.getOutput());
                 resultMO.setRuntime(response.getRuntime());
+                // readings
+                for (NagiosPerfData perfData : response.getPerfData())
+                {
+                    Reading reading = perfData.toReading();
+                    if (reading != null) readings.reading(reading);
+                }
             }
             finally
             {
@@ -94,5 +105,6 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             resultMO.error(e);
         }
         resultSubmitter.accept(resultMO);
+        if (readings != null && readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId()), readings);
     }
 }
