@@ -4,8 +4,10 @@ package com.intrbiz.bergamot.queue;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.impl.RabbitWorkerQueue;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.queue.Consumer;
@@ -69,4 +71,24 @@ public abstract class WorkerQueue extends QueueAdapter
      * @return
      */
     public abstract Consumer<ResultMO, ResultKey> consumeFallbackResults(DeliveryHandler<ResultMO> handler);
+    
+    // metrics
+    
+    public abstract RoutedProducer<ReadingParcelMO, ReadingKey> publishReadings(ReadingKey defaultKey);
+    
+    public RoutedProducer<ReadingParcelMO, ReadingKey> publishReadings()
+    {
+        return this.publishReadings(null);
+    }
+    
+    /**
+     * Consume readings targeted to a specific processor
+     */
+    public abstract Consumer<ReadingParcelMO, ReadingKey> consumeReadings(DeliveryHandler<ReadingParcelMO> handler, String instance);
+    
+    /**
+     * Consume readings which were not successfully routed to the intended processor
+     * @return
+     */
+    public abstract Consumer<ReadingParcelMO, ReadingKey> consumeFallbackReadings(DeliveryHandler<ReadingParcelMO> handler);
 }

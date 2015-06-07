@@ -6,8 +6,10 @@ import java.util.UUID;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -179,6 +181,8 @@ public class RabbitWorkerQueue extends WorkerQueue
             }
         };
     }
+    
+    // results
 
     @Override
     public RoutedProducer<ResultMO, ResultKey> publishResults(ResultKey defaultKey)
@@ -245,6 +249,77 @@ public class RabbitWorkerQueue extends WorkerQueue
                 on.exchangeDeclare("bergamot.result.fallback", "fanout", true, false, null);
                 on.queueBind("bergamot.result.fallback_queue", "bergamot.result.fallback", "");
                 return "bergamot.result.fallback_queue";
+            }
+        };
+    }
+    
+    // readings
+    
+    @Override
+    public RoutedProducer<ReadingParcelMO, ReadingKey> publishReadings(ReadingKey defaultKey)
+    {
+        return new RabbitProducer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), defaultKey, this.source.getRegistry().timer("publish-reading"))
+        {
+            protected String setupExchange(Channel on) throws IOException
+            {
+                // the fallback queue
+                on.queueDeclare("bergamot.reading.fallback_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.reading.fallback", "fanout", true, false, null);
+                on.queueBind("bergamot.reading.fallback_queue", "bergamot.reading.fallback", "");
+                // the result exchange
+                on.exchangeDeclare("bergamot.reading", "topic", true, false, args("alternate-exchange", "bergamot.reading.fallback"));
+                return "bergamot.reading";
+            }
+        };
+    }
+    
+    @Override
+    public Consumer<ReadingParcelMO, ReadingKey> consumeReadings(DeliveryHandler<ReadingParcelMO> handler, String instance)
+    {
+        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-reading"))
+        {
+            public String setupQueue(Channel on) throws IOException
+            {
+                // the fallback queue
+                on.queueDeclare("bergamot.reading.fallback_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.reading.fallback", "fanout", true, false, null);
+                on.queueBind("bergamot.reading.fallback_queue", "bergamot.reading.fallback", "");
+                // Use a transient queue since
+                // processing duties could be moved at any time
+                String queueName = "bergamot.reading.processor." + instance;
+                on.queueDeclare(queueName, false, true, true, null);
+                // the result exchange
+                on.exchangeDeclare("bergamot.reading", "topic", true, false, args("alternate-exchange", "bergamot.reading.fallback"));
+                return queueName;
+            }
+
+            @Override
+            protected void addQueueBinding(Channel on, String binding) throws IOException
+            {
+                on.queueBind(this.queue, "bergamot.reading", binding);
+            }
+
+            @Override
+            protected void removeQueueBinding(Channel on, String binding) throws IOException
+            {
+                // seems odd, but unbind is non-idempotent, binding then unbinding is a poor workaround
+                on.queueBind(this.queue, "bergamot.reading", binding);
+                on.queueUnbind(this.queue, "bergamot.reading", binding);
+            }
+        };
+    }
+    
+    @Override
+    public Consumer<ReadingParcelMO, ReadingKey> consumeFallbackReadings(DeliveryHandler<ReadingParcelMO> handler)
+    {
+        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-fallback-reading"))
+        {
+            public String setupQueue(Channel on) throws IOException
+            {
+                on.queueDeclare("bergamot.reading.fallback_queue", true, false, false, null);
+                on.exchangeDeclare("bergamot.reading.fallback", "fanout", true, false, null);
+                on.queueBind("bergamot.reading.fallback_queue", "bergamot.reading.fallback", "");
+                return "bergamot.reading.fallback_queue";
             }
         };
     }
