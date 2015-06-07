@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.intrbiz.gerald.polyakov.Reading;
+import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
+import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
+
 public class NagiosPerfData
 {
     private static final Pattern VALUE_UOM_PATTERN = Pattern.compile("\\A([-0-9.]+)(%|[num]?s|[KkMGT]i?[Bb]|c)?\\z");
@@ -124,6 +128,53 @@ public class NagiosPerfData
         if (this.max != null) sb.append(";").append(this.max);
         return sb.toString();
     }
+    
+    public Reading toReading()
+    {
+        if (this.unit == null || this.unit.length() == 0)
+        {
+            // this is a dimension-less measure, as such default to double gauge
+            DoubleGaugeReading reading = new DoubleGaugeReading();
+            reading.setName(this.label);
+            reading.setValue(Double.parseDouble(this.value));
+            if (this.warning != null && this.warning.length() > 0) reading.setWarning(Double.parseDouble(this.warning));
+            if (this.critical != null && this.critical.length() > 0) reading.setCritical(Double.parseDouble(this.critical));
+            if (this.min != null && this.min.length() > 0) reading.setMin(Double.parseDouble(this.min));
+            if (this.max != null && this.max.length() > 0) reading.setMax(Double.parseDouble(this.max));
+            return reading;
+        }
+        else
+        {
+            // look at the unit to better select the data type
+            if ("B".equals(unit) || "kB".equals(unit) || "KB".equals(unit) || "MB".equals(unit) || "GB".equals(unit) || "TB".equals(unit) || "c".equals(unit))
+            {
+                LongGaugeReading reading = new LongGaugeReading();
+                reading.setName(this.label);
+                reading.setUnit(this.unit);
+                reading.setValue(Long.parseLong(this.value));
+                if (this.warning != null && this.warning.length() > 0) reading.setWarning(Long.parseLong(this.warning));
+                if (this.critical != null && this.critical.length() > 0) reading.setCritical(Long.parseLong(this.critical));
+                if (this.min != null && this.min.length() > 0) reading.setMin(Long.parseLong(this.min));
+                if (this.max != null && this.max.length() > 0) reading.setMax(Long.parseLong(this.max));
+                return reading;
+            }
+            else if ("s".equals(unit) || "ms".equals(unit) || "us".equals(unit) || "ns".equals(unit) || "%".equals(unit))
+            {
+                DoubleGaugeReading reading = new DoubleGaugeReading();
+                reading.setName(this.label);
+                reading.setUnit(this.unit);
+                reading.setValue(Double.parseDouble(this.value));
+                if (this.warning != null && this.warning.length() > 0) reading.setWarning(Double.parseDouble(this.warning));
+                if (this.critical != null && this.critical.length() > 0) reading.setCritical(Double.parseDouble(this.critical));
+                if (this.min != null && this.min.length() > 0) reading.setMin(Double.parseDouble(this.min));
+                if (this.max != null && this.max.length() > 0) reading.setMax(Double.parseDouble(this.max));
+                return reading;
+            }
+        }
+        return null;
+    }
+    
+    // helpers
     
     public static List<NagiosPerfData> parsePerfData(String perfData) throws IOException
     {
