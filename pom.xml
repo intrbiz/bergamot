@@ -99,6 +99,7 @@
     <module>bergamot-agent-server-config</module>
     <module>bergamot-worker-dummy</module>
     <module>bergamot-notifier-webhook</module>
+    <module>lamplighter-model</module>
   </modules>
   
   <dependencyManagement>
