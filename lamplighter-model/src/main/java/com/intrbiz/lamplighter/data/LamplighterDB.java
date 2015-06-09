@@ -1,5 +1,7 @@
 package com.intrbiz.lamplighter.data;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -13,17 +15,21 @@ import com.intrbiz.data.db.DatabaseConnection;
 import com.intrbiz.data.db.compiler.DatabaseAdapterCompiler;
 import com.intrbiz.data.db.compiler.meta.SQLGetter;
 import com.intrbiz.data.db.compiler.meta.SQLParam;
-import com.intrbiz.data.db.compiler.meta.SQLRemove;
+import com.intrbiz.data.db.compiler.meta.SQLPatch;
 import com.intrbiz.data.db.compiler.meta.SQLSchema;
 import com.intrbiz.data.db.compiler.meta.SQLSetter;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
+import com.intrbiz.data.db.compiler.meta.ScriptType;
+import com.intrbiz.data.db.compiler.util.SQLScript;
 import com.intrbiz.lamplighter.model.CheckReading;
+import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
 
 @SQLSchema(
         name = "lamplighter", 
         version = @SQLVersion({1, 0, 0}),
         tables = {
-            CheckReading.class
+            CheckReading.class,
+            StoredDoubleGaugeReading.class
         }
 )
 public abstract class LamplighterDB extends DatabaseAdapter
@@ -138,9 +144,6 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     // reading metadata
     
-    @SQLSetter(table = CheckReading.class, name = "set_check_reading", since = @SQLVersion({1, 0, 0}))
-    public abstract void setCheckReading(CheckReading reading);
-    
     @SQLGetter(table = CheckReading.class, name = "get_check_reading", since = @SQLVersion({1, 0, 0}))
     public abstract CheckReading getCheckReading(@SQLParam("id") UUID id);
     
@@ -150,15 +153,118 @@ public abstract class LamplighterDB extends DatabaseAdapter
     @SQLGetter(table = CheckReading.class, name ="get_check_readings_for_check", since = @SQLVersion({1, 0, 0}))
     public abstract List<CheckReading> getCheckReadingsForCheck(@SQLParam("check_id") UUID checkId);
     
-    @SQLRemove(table = CheckReading.class, name = "remove_check_reading", since = @SQLVersion({1, 0, 0}))
-    public abstract void removeCheckReading(@SQLParam("id") UUID id);
-    
     @SQLGetter(table = CheckReading.class, name = "list_check_readings", since = @SQLVersion({1, 0, 0}))
     public abstract List<CheckReading> listCheckReadings();
     
     // reading management
     
+    public int setupSiteReadings(UUID siteId)
+    {
+        return this.use((with) -> {
+            try (PreparedStatement stmt = with.prepareStatement("SELECT lamplighter.new_site(?::UUID)"))
+            {
+              stmt.setObject(1, siteId);
+              try (ResultSet rs = stmt.executeQuery())
+              {
+                if (rs.next())
+                {
+                    return rs.getInt(1);
+                }
+              }
+            }
+            return null;
+        });
+    }
+    
+    public int setupDoubleGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit)
+    {
+        return this.use((with) -> {
+            try (PreparedStatement stmt = with.prepareStatement("SELECT lamplighter.new_reading(?, ?, ?, ?, ?, ?, ?, 'double_gauge_reading')"))
+            {
+              stmt.setObject(1, siteId);
+              stmt.setObject(2, readingId);
+              stmt.setObject(3, checkId);
+              stmt.setString(4, name);
+              stmt.setString(5, summary);
+              stmt.setString(6, description);
+              stmt.setString(7, unit);
+              try (ResultSet rs = stmt.executeQuery())
+              {
+                if (rs.next())
+                {
+                    return rs.getInt(1);
+                }
+              }
+            }
+            return null;
+        });
+    }
+    
     // gauges
     
+    @SQLSetter(table = StoredDoubleGaugeReading.class, name = "store_double_gauge_reading", upsert = false, since = @SQLVersion({1, 0, 0}))
+    public abstract void storeDoubleGaugeReading(StoredDoubleGaugeReading reading);
     
+    @SQLGetter(table = StoredDoubleGaugeReading.class, name ="get_latest_double_gauge_readings", since = @SQLVersion({1, 0, 0}))
+    public abstract List<StoredDoubleGaugeReading> getLatestDoubleGaugeReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
+    
+    // custom SQL patches
+    
+    @SQLPatch(name = "create_helper_functions", index = 1, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript createHelperFunctions()
+    {
+        return new SQLScript(
+                // get default owner for reading tables
+                "CREATE OR REPLACE FUNCTION lamplighter.get_default_owner() RETURNS TEXT LANGUAGE SQL AS $body$ SELECT 'bergamot'::TEXT; $body$;",
+                // get schema name
+                "CREATE OR REPLACE FUNCTION lamplighter.get_schema(p_site_id UUID) RETURNS TEXT LANGUAGE SQL AS $body$ SELECT ('readings_' || $1)::TEXT; $body$;",
+                // get table name
+                "CREATE OR REPLACE FUNCTION lamplighter.get_table_name(p_type TEXT, p_reading_id UUID) RETURNS TEXT LANGUAGE sql AS $body$ SELECT (CASE WHEN ($2 IS NULL) THEN $1 ELSE 'reading_' || p_reading_id END)::TEXT $body$;"
+        );
+    }
+    
+    @SQLPatch(name = "create_new_site", index = 2, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript createNewSite()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "new_site.sql");
+    }
+    
+    @SQLPatch(name = "create_create_double_gauge_reading", index = 3, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript createCreateDoubleGaugeReading()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "create_double_gauge_reading.sql");
+    }
+    
+    @SQLPatch(name = "create_new_reading", index = 4, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript createNewReading()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "new_reading.sql");
+    }
+    
+    @SQLPatch(name = "replace_store_double_gauge_reading", index = 5, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript replaceStoreDoubleGaugeReading()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "store_double_gauge_reading.sql");
+    }
+    
+    @SQLPatch(name = "replace_get_latest_double_gauge_readings", index = 6, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript replaceGetLatestDoubleGaugeReadings()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "get_latest_double_gauge_readings.sql");
+    }
+    
+    @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript setFunctionOWner()
+    {
+        return new SQLScript(
+                "ALTER FUNCTION lamplighter.get_default_owner() OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.get_schema(UUID) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.get_table_name(TEXT, UUID) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.create_double_gauge_reading(UUID, UUID) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.new_site(UUID) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.new_reading(UUID, UUID, UUID, TEXT, TEXT, TEXT, TEXT, TEXT) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.store_double_gauge_reading(UUID, UUID, TIMESTAMP WITH TIME ZONE, DOUBLE PRECISION, DOUBLE PRECISION, DOUBLE PRECISION, DOUBLE PRECISION, DOUBLE PRECISION) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.get_latest_double_gauge_readings(UUID, UUID, INTEGER) OWNER TO bergamot;"
+        );
+    }
 }
