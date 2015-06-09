@@ -11,9 +11,12 @@ import com.intrbiz.data.db.compiler.meta.SQLUnique;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 
-@SQLTable(schema = LamplighterDB.class, name = "reading", since = @SQLVersion({ 1, 0, 0 }))
+/**
+ * Readings for a check
+ */
+@SQLTable(schema = LamplighterDB.class, name = "check_reading", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "check_id", "name" })
-public class ReadingMetadata implements Serializable
+public class CheckReading implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -36,22 +39,25 @@ public class ReadingMetadata implements Serializable
     @SQLColumn(index = 6, name = "description", since = @SQLVersion({ 1, 0, 0 }))
     protected String description;
     
-    @SQLColumn(index = 7, name = "reading_type", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "unit", since = @SQLVersion({ 1, 0, 0 }))
+    protected String unit;
+    
+    @SQLColumn(index = 8, name = "reading_type", since = @SQLVersion({ 1, 0, 0 }))
     protected String readingType;
     
-    @SQLColumn(index = 8, name = "schema", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "schema", since = @SQLVersion({ 1, 0, 0 }))
     protected String schema;
     
-    @SQLColumn(index = 9, name = "table", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "table", since = @SQLVersion({ 1, 0, 0 }))
     protected String table;
     
-    @SQLColumn(index = 10, name = "created", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 11, name = "created", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
 
-    @SQLColumn(index = 11, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 12, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
     
-    public ReadingMetadata()
+    public CheckReading()
     {
         super();
     }

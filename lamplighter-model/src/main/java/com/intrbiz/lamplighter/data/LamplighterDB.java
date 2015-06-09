@@ -1,6 +1,8 @@
 package com.intrbiz.lamplighter.data;
 
+import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -9,15 +11,19 @@ import com.intrbiz.data.cache.Cache;
 import com.intrbiz.data.db.DatabaseAdapter;
 import com.intrbiz.data.db.DatabaseConnection;
 import com.intrbiz.data.db.compiler.DatabaseAdapterCompiler;
+import com.intrbiz.data.db.compiler.meta.SQLGetter;
+import com.intrbiz.data.db.compiler.meta.SQLParam;
+import com.intrbiz.data.db.compiler.meta.SQLRemove;
 import com.intrbiz.data.db.compiler.meta.SQLSchema;
+import com.intrbiz.data.db.compiler.meta.SQLSetter;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
-import com.intrbiz.lamplighter.model.ReadingMetadata;
+import com.intrbiz.lamplighter.model.CheckReading;
 
 @SQLSchema(
         name = "lamplighter", 
         version = @SQLVersion({1, 0, 0}),
         tables = {
-            ReadingMetadata.class
+            CheckReading.class
         }
 )
 public abstract class LamplighterDB extends DatabaseAdapter
@@ -129,4 +135,30 @@ public abstract class LamplighterDB extends DatabaseAdapter
             }
         }
     }
+    
+    // reading metadata
+    
+    @SQLSetter(table = CheckReading.class, name = "set_check_reading", since = @SQLVersion({1, 0, 0}))
+    public abstract void setCheckReading(CheckReading reading);
+    
+    @SQLGetter(table = CheckReading.class, name = "get_check_reading", since = @SQLVersion({1, 0, 0}))
+    public abstract CheckReading getCheckReading(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = CheckReading.class, name ="get_check_reading_by_name", since = @SQLVersion({1, 0, 0}))
+    public abstract CheckReading getCheckReadingByName(@SQLParam("check_id") UUID checkId, @SQLParam("name") String name);
+    
+    @SQLGetter(table = CheckReading.class, name ="get_check_readings_for_check", since = @SQLVersion({1, 0, 0}))
+    public abstract List<CheckReading> getCheckReadingsForCheck(@SQLParam("check_id") UUID checkId);
+    
+    @SQLRemove(table = CheckReading.class, name = "remove_check_reading", since = @SQLVersion({1, 0, 0}))
+    public abstract void removeCheckReading(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = CheckReading.class, name = "list_check_readings", since = @SQLVersion({1, 0, 0}))
+    public abstract List<CheckReading> listCheckReadings();
+    
+    // reading management
+    
+    // gauges
+    
+    
 }
