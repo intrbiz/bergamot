@@ -14,15 +14,15 @@ public abstract class StoredReading implements Serializable
     private static final long serialVersionUID = 1L;
 
     @SQLColumn(index = 1, name = "site_id", since = @SQLVersion({ 1, 0, 0 }))
-    private UUID siteId;
+    protected UUID siteId;
     
     @SQLPrimaryKey()
     @SQLColumn(index = 2, name = "reading_id", since = @SQLVersion({ 1, 0, 0 }))
-    private UUID readingId;
+    protected UUID readingId;
     
     @SQLPrimaryKey()
     @SQLColumn(index = 3, name = "collected_at", since = @SQLVersion({ 1, 0, 0 }))
-    private Timestamp collectedAt;
+    protected Timestamp collectedAt;
     
     public StoredReading()
     {
