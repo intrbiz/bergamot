@@ -9,7 +9,7 @@ BEGIN
     EXECUTE $$ CREATE TABLE $$ || v_table || $$ (
       "site_id" uuid NOT NULL,
       "reading_id" uuid NOT NULL,
-      "collected_at" timestamp without time zone NOT NULL,
+      "collected_at" timestamp with time zone NOT NULL,
       "value" double precision,
       "warning" double precision,
       "critical" double precision,
