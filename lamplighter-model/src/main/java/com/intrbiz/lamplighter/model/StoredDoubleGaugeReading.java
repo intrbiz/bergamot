@@ -1,5 +1,8 @@
 package com.intrbiz.lamplighter.model;
 
+import java.sql.Timestamp;
+import java.util.UUID;
+
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -28,6 +31,19 @@ public class StoredDoubleGaugeReading extends StoredReading
     public StoredDoubleGaugeReading()
     {
         super();
+    }
+    
+    public StoredDoubleGaugeReading(UUID siteId, UUID readingId, Timestamp collectedAt, double value, double warning, double critical, double min, double max)
+    {
+        super();
+        this.siteId = siteId;
+        this.readingId = readingId;
+        this.collectedAt = collectedAt;
+        this.value = value;
+        this.warning = warning;
+        this.critical = critical;
+        this.min = min;
+        this.max = max;
     }
 
     public double getValue()
