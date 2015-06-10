@@ -15,6 +15,10 @@ import com.intrbiz.bergamot.model.message.SiteMO;
 import com.intrbiz.bergamot.model.message.result.MatchOn;
 import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
 import com.intrbiz.gerald.polyakov.Reading;
+import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
+import com.intrbiz.gerald.polyakov.gauge.FloatGaugeReading;
+import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
+import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 /**
  * A collection of readings which related to a specific 
@@ -142,6 +146,72 @@ public class ReadingParcelMO extends Message implements ParameterisedMO
     public ReadingParcelMO reading(Reading reading)
     {
         this.getReadings().add(reading);
+        return this;
+    }
+    
+    // reading helpers
+    
+    // double
+    
+    @JsonIgnore
+    public ReadingParcelMO doubleGaugeReading(String name, String unit, Double value, Double warning, Double critical, Double min, Double max)
+    {
+        this.getReadings().add(new DoubleGaugeReading(name, unit, value, warning, critical, min, max));
+        return this;
+    }
+    
+    @JsonIgnore
+    public ReadingParcelMO doubleGaugeReading(String name, String unit, Double value)
+    {
+        this.getReadings().add(new DoubleGaugeReading(name, unit, value));
+        return this;
+    }
+    
+    // float
+    
+    @JsonIgnore
+    public ReadingParcelMO floatGaugeReading(String name, String unit, Float value, Float warning, Float critical, Float min, Float max)
+    {
+        this.getReadings().add(new FloatGaugeReading(name, unit, value, warning, critical, min, max));
+        return this;
+    }
+    
+    @JsonIgnore
+    public ReadingParcelMO floatGaugeReading(String name, String unit, Float value)
+    {
+        this.getReadings().add(new FloatGaugeReading(name, unit, value));
+        return this;
+    }
+    
+    // long
+    
+    @JsonIgnore
+    public ReadingParcelMO longGaugeReading(String name, String unit, Long value, Long warning, Long critical, Long min, Long max)
+    {
+        this.getReadings().add(new LongGaugeReading(name, unit, value, warning, critical, min, max));
+        return this;
+    }
+    
+    @JsonIgnore
+    public ReadingParcelMO longGaugeReading(String name, String unit, Long value)
+    {
+        this.getReadings().add(new LongGaugeReading(name, unit, value));
+        return this;
+    }
+    
+    // int
+    
+    @JsonIgnore
+    public ReadingParcelMO integerGaugeReading(String name, String unit, Integer value, Integer warning, Integer critical, Integer min, Integer max)
+    {
+        this.getReadings().add(new IntegerGaugeReading(name, unit, value, warning, critical, min, max));
+        return this;
+    }
+    
+    @JsonIgnore
+    public ReadingParcelMO integerGaugeReading(String name, String unit, Integer value)
+    {
+        this.getReadings().add(new IntegerGaugeReading(name, unit, value));
         return this;
     }
 }
