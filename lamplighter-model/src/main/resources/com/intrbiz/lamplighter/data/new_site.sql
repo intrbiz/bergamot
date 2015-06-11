@@ -9,6 +9,7 @@ BEGIN
     -- create the site metric tables
     PERFORM lamplighter.create_double_gauge_reading(p_site_id, NULL);
     PERFORM lamplighter.create_long_gauge_reading(p_site_id, NULL);
+    PERFORM lamplighter.create_int_gauge_reading(p_site_id, NULL);
     -- all done
     RETURN 1;
 END;

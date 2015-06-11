@@ -5,6 +5,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
+import com.intrbiz.lamplighter.model.StoredIntGaugeReading;
 import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
 import com.intrbiz.util.pool.database.DatabasePool;
 
@@ -25,11 +26,13 @@ public class ReadingsExample
        UUID checkId   = Site.randomId(siteId);
        UUID readingIdD = Site.randomId(siteId);
        UUID readingIdL = Site.randomId(siteId);
+       UUID readingIdI = Site.randomId(siteId);
        //
        db.setupSiteReadings(siteId);
        db.setupDoubleGaugeReading(siteId, readingIdD, checkId, "testd", "Test", "", "");
        db.setupLongGaugeReading(siteId, readingIdL, checkId, "testl", "Test", "", "");
-       System.out.println("Setup reading: " + siteId + "::" + readingIdD + "/" + readingIdL);
+       db.setupIntGaugeReading(siteId, readingIdI, checkId, "testi", "Test", "", "");
+       System.out.println("Setup reading: " + siteId + "::" + readingIdD + "/" + readingIdL + "/" + readingIdI);  
        //
        db.execute(() -> {
            long epoch = 1420070400000L;
@@ -38,18 +41,24 @@ public class ReadingsExample
            {
                db.storeDoubleGaugeReading(new StoredDoubleGaugeReading(siteId, readingIdD, new Timestamp(epoch), (double) i, 80D, 90D, 1D, 100D));
                db.storeLongGaugeReading(new StoredLongGaugeReading(siteId, readingIdL, new Timestamp(epoch), (long) i, 80L, 90L, 1L, 100L));
+               db.storeIntGaugeReading(new StoredIntGaugeReading(siteId, readingIdI, new Timestamp(epoch), (i % 100), 80, 90, 1, 100));
                epoch += 300_000L;
            }
            long end = System.currentTimeMillis();
-           System.out.println("Added " + ((60/5) * 24 * 365) + " reading to " + siteId + "::" + readingIdD + "/" + readingIdL + " in " + (end - start) + " ms");
+           System.out.println("Added " + (((60/5) * 24 * 365) * 3) + " readings in " + (end - start) + " ms");
        });
        //
-       for (StoredDoubleGaugeReading reading : db.getLatestDoubleGaugeReadings(siteId, readingIdD, 100))
+       for (StoredDoubleGaugeReading reading : db.getLatestDoubleGaugeReadings(siteId, readingIdD, 10))
        {
            System.out.println(reading.getCollectedAt() + " => " + reading.getValue());
        }
        //
-       for (StoredLongGaugeReading reading : db.getLatestLongGaugeReadings(siteId, readingIdL, 100))
+       for (StoredLongGaugeReading reading : db.getLatestLongGaugeReadings(siteId, readingIdL, 10))
+       {
+           System.out.println(reading.getCollectedAt() + " => " + reading.getValue());
+       }
+       //
+       for (StoredIntGaugeReading reading : db.getLatestIntGaugeReadings(siteId, readingIdI, 10))
        {
            System.out.println(reading.getCollectedAt() + " => " + reading.getValue());
        }
