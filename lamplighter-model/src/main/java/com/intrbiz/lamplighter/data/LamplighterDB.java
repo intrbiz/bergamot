@@ -2,6 +2,7 @@ package com.intrbiz.lamplighter.data;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -236,6 +237,9 @@ public abstract class LamplighterDB extends DatabaseAdapter
     @SQLGetter(table = StoredDoubleGaugeReading.class, name ="get_latest_double_gauge_readings", since = @SQLVersion({1, 0, 0}))
     public abstract List<StoredDoubleGaugeReading> getLatestDoubleGaugeReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
     
+    @SQLGetter(table = StoredDoubleGaugeReading.class, name ="get_double_gauge_readings_by_date", since = @SQLVersion({1, 0, 0}))
+    public abstract List<StoredDoubleGaugeReading> getDoubleGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
+    
     // long
     
     @SQLSetter(table = StoredLongGaugeReading.class, name = "store_long_gauge_reading", upsert = false, since = @SQLVersion({1, 0, 0}))
@@ -243,6 +247,9 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     @SQLGetter(table = StoredLongGaugeReading.class, name ="get_latest_long_gauge_readings", since = @SQLVersion({1, 0, 0}))
     public abstract List<StoredLongGaugeReading> getLatestLongGaugeReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
+    
+    @SQLGetter(table = StoredLongGaugeReading.class, name ="get_long_gauge_readings_by_date", since = @SQLVersion({1, 0, 0}))
+    public abstract List<StoredLongGaugeReading> getLatestGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
     
     // custom SQL patches
     
@@ -295,16 +302,28 @@ public abstract class LamplighterDB extends DatabaseAdapter
         return SQLScript.fromResource(LamplighterDB.class, "get_latest_double_gauge_readings.sql");
     }
     
-    @SQLPatch(name = "replace_store_long_gauge_reading", index = 8, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    @SQLPatch(name = "replace_get_double_gauge_readings_by_date", index = 8, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript replaceGetDoubleGaugeReadingsByDate()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "get_double_gauge_readings_by_date.sql");
+    }
+    
+    @SQLPatch(name = "replace_store_long_gauge_reading", index = 9, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
     protected static SQLScript replaceStoreLongGaugeReading()
     {
         return SQLScript.fromResource(LamplighterDB.class, "store_long_gauge_reading.sql");
     }
     
-    @SQLPatch(name = "replace_get_latest_long_gauge_readings", index = 9, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    @SQLPatch(name = "replace_get_latest_long_gauge_readings", index = 10, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
     protected static SQLScript replaceGetLatestLongGaugeReadings()
     {
         return SQLScript.fromResource(LamplighterDB.class, "get_latest_long_gauge_readings.sql");
+    }
+    
+    @SQLPatch(name = "replace_get_long_gauge_readings_by_date", index = 11, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript replaceGetLongGaugeReadingsByDate()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "get_long_gauge_readings_by_date.sql");
     }
     
     @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
@@ -320,7 +339,9 @@ public abstract class LamplighterDB extends DatabaseAdapter
                 "ALTER FUNCTION lamplighter.store_double_gauge_reading(UUID, UUID, TIMESTAMP WITH TIME ZONE, DOUBLE PRECISION, DOUBLE PRECISION, DOUBLE PRECISION, DOUBLE PRECISION, DOUBLE PRECISION) OWNER TO bergamot;",
                 "ALTER FUNCTION lamplighter.get_latest_double_gauge_readings(UUID, UUID, INTEGER) OWNER TO bergamot;",
                 "ALTER FUNCTION lamplighter.store_long_gauge_reading(UUID, UUID, TIMESTAMP WITH TIME ZONE, BIGINT, BIGINT, BIGINT, BIGINT, BIGINT) OWNER TO bergamot;",
-                "ALTER FUNCTION lamplighter.get_latest_long_gauge_readings(UUID, UUID, INTEGER) OWNER TO bergamot;"
+                "ALTER FUNCTION lamplighter.get_latest_long_gauge_readings(UUID, UUID, INTEGER) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.get_double_gauge_readings_by_date(UUID, UUID, TIMESTAMP WITH TIME ZONE, TIMESTAMP WITH TIME ZONE, TEXT, TEXT) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.get_long_gauge_readings_by_date(UUID, UUID, TIMESTAMP WITH TIME ZONE, TIMESTAMP WITH TIME ZONE, TEXT, TEXT) OWNER TO bergamot;"
         );
     }
 }

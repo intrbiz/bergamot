@@ -34,14 +34,14 @@ public class ReadingsExample
        db.execute(() -> {
            long epoch = 1420070400000L;
            long start = System.currentTimeMillis();
-           for (int i = 0; i < (60 * 24 * 365); i++)
+           for (int i = 0; i < ((60/5) * 24 * 365); i++)
            {
                db.storeDoubleGaugeReading(new StoredDoubleGaugeReading(siteId, readingIdD, new Timestamp(epoch), (double) i, 80D, 90D, 1D, 100D));
                db.storeLongGaugeReading(new StoredLongGaugeReading(siteId, readingIdL, new Timestamp(epoch), (long) i, 80L, 90L, 1L, 100L));
-               epoch += 60_000L;
+               epoch += 300_000L;
            }
            long end = System.currentTimeMillis();
-           System.out.println("Added " + (60 * 24 * 365) + " reading to " + siteId + "::" + readingIdD + "/" + readingIdL + " in " + (end - start) + " ms");
+           System.out.println("Added " + ((60/5) * 24 * 365) + " reading to " + siteId + "::" + readingIdD + "/" + readingIdL + " in " + (end - start) + " ms");
        });
        //
        for (StoredDoubleGaugeReading reading : db.getLatestDoubleGaugeReadings(siteId, readingIdD, 100))
