@@ -16,7 +16,7 @@ public class ReadingsExample
     public static void main(String[] args) throws Exception
     {
        // database
-       DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://127.0.0.1:5432/bergamot").username("bergamot").password("bergamot").build());
+       DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url("jdbc:postgresql://172.30.13.48:5432/bergamot").username("bergamot").password("bergamot").build());
        //
        LamplighterDB.install();
        //

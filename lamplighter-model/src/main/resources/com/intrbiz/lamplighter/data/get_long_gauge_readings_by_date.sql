@@ -6,7 +6,7 @@ DECLARE
   v_query TEXT;
 BEGIN
   v_table := quote_ident(lamplighter.get_schema(p_site_id)) || '.' || quote_ident(lamplighter.get_table_name('long_gauge_reading', p_reading_id));
-  v_query := $$SELECT site_id, reading_id, date_trunc($$ || quote_literal(p_rollup) || $$, collected_at), $$ || quote_ident(p_agg) || $$(value), max(warning), max(critical), min("min"), max("max")
+  v_query := $$SELECT site_id, reading_id, date_trunc($$ || quote_literal(p_rollup) || $$, collected_at), $$ || quote_ident(p_agg) || $$(value)::BIGINT, max(warning), max(critical), min("min"), max("max")
                 FROM $$ || v_table || $$ 
                 WHERE site_id = $1 
                  AND reading_id = $2 
