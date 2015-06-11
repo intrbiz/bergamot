@@ -24,6 +24,7 @@ import com.intrbiz.data.db.compiler.meta.ScriptType;
 import com.intrbiz.data.db.compiler.util.SQLScript;
 import com.intrbiz.lamplighter.model.CheckReading;
 import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
+import com.intrbiz.lamplighter.model.StoredFloatGaugeReading;
 import com.intrbiz.lamplighter.model.StoredIntGaugeReading;
 import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
 
@@ -34,7 +35,8 @@ import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
             CheckReading.class,
             StoredDoubleGaugeReading.class,
             StoredLongGaugeReading.class,
-            StoredIntGaugeReading.class
+            StoredIntGaugeReading.class,
+            StoredFloatGaugeReading.class
         }
 )
 public abstract class LamplighterDB extends DatabaseAdapter
@@ -253,6 +255,30 @@ public abstract class LamplighterDB extends DatabaseAdapter
         });
     }
     
+    public int setupFloatGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit)
+    {
+        return this.use((with) -> {
+            try (PreparedStatement stmt = with.prepareStatement("SELECT lamplighter.new_reading(?, ?, ?, ?, ?, ?, ?, 'float_gauge_reading')"))
+            {
+              stmt.setObject(1, siteId);
+              stmt.setObject(2, readingId);
+              stmt.setObject(3, checkId);
+              stmt.setString(4, name);
+              stmt.setString(5, summary);
+              stmt.setString(6, description);
+              stmt.setString(7, unit);
+              try (ResultSet rs = stmt.executeQuery())
+              {
+                if (rs.next())
+                {
+                    return rs.getInt(1);
+                }
+              }
+            }
+            return null;
+        });
+    }
+    
     // gauges
     
     // double
@@ -287,6 +313,17 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     @SQLGetter(table = StoredIntGaugeReading.class, name ="get_int_gauge_readings_by_date", since = @SQLVersion({1, 0, 0}))
     public abstract List<StoredIntGaugeReading> getLatestIntGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
+    
+    // float
+    
+    @SQLSetter(table = StoredFloatGaugeReading.class, name = "store_float_gauge_reading", upsert = false, since = @SQLVersion({1, 0, 0}))
+    public abstract void storeFloatGaugeReading(StoredFloatGaugeReading reading);
+    
+    @SQLGetter(table = StoredFloatGaugeReading.class, name ="get_latest_float_gauge_readings", since = @SQLVersion({1, 0, 0}))
+    public abstract List<StoredFloatGaugeReading> getLatestFloatGaugeReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
+    
+    @SQLGetter(table = StoredFloatGaugeReading.class, name ="get_float_gauge_readings_by_date", since = @SQLVersion({1, 0, 0}))
+    public abstract List<StoredFloatGaugeReading> getLatestFloatGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
     
     // custom SQL patches
     
@@ -395,6 +432,32 @@ public abstract class LamplighterDB extends DatabaseAdapter
         return SQLScript.fromResource(LamplighterDB.class, "get_int_gauge_readings_by_date.sql");
     }
     
+    // float
+    
+    @SQLPatch(name = "create_create_float_gauge_reading", index = 16, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript createCreateFloatGaugeReading()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "create_float_gauge_reading.sql");
+    }
+    
+    @SQLPatch(name = "replace_store_float_gauge_reading", index = 17, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript replaceStoreFloatGaugeReading()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "store_float_gauge_reading.sql");
+    }
+    
+    @SQLPatch(name = "replace_get_latest_float_gauge_readings", index = 18, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript replaceGetLatestFloatGaugeReadings()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "get_latest_float_gauge_readings.sql");
+    }
+    
+    @SQLPatch(name = "replace_get_float_gauge_readings_by_date", index = 19, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript replaceGetFloatGaugeReadingsByDate()
+    {
+        return SQLScript.fromResource(LamplighterDB.class, "get_float_gauge_readings_by_date.sql");
+    }
+    
     @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
     protected static SQLScript setFunctionOWner()
     {
@@ -420,7 +483,12 @@ public abstract class LamplighterDB extends DatabaseAdapter
                 "ALTER FUNCTION lamplighter.create_int_gauge_reading(UUID, UUID) OWNER TO bergamot;",
                 "ALTER FUNCTION lamplighter.store_int_gauge_reading(UUID, UUID, TIMESTAMP WITH TIME ZONE, INTEGER, INTEGER, INTEGER, INTEGER, INTEGER) OWNER TO bergamot;",
                 "ALTER FUNCTION lamplighter.get_latest_int_gauge_readings(UUID, UUID, INTEGER) OWNER TO bergamot;",
-                "ALTER FUNCTION lamplighter.get_int_gauge_readings_by_date(UUID, UUID, TIMESTAMP WITH TIME ZONE, TIMESTAMP WITH TIME ZONE, TEXT, TEXT) OWNER TO bergamot;"
+                "ALTER FUNCTION lamplighter.get_int_gauge_readings_by_date(UUID, UUID, TIMESTAMP WITH TIME ZONE, TIMESTAMP WITH TIME ZONE, TEXT, TEXT) OWNER TO bergamot;",
+                // float
+                "ALTER FUNCTION lamplighter.create_float_gauge_reading(UUID, UUID) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.store_float_gauge_reading(UUID, UUID, TIMESTAMP WITH TIME ZONE, REAL, REAL, REAL, REAL, REAL) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.get_latest_float_gauge_readings(UUID, UUID, INTEGER) OWNER TO bergamot;",
+                "ALTER FUNCTION lamplighter.get_float_gauge_readings_by_date(UUID, UUID, TIMESTAMP WITH TIME ZONE, TIMESTAMP WITH TIME ZONE, TEXT, TEXT) OWNER TO bergamot;"
         );
     }
 }

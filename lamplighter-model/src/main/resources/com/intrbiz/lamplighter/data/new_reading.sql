@@ -14,6 +14,8 @@ BEGIN
       PERFORM lamplighter.create_long_gauge_reading(p_site_id, p_reading_id);
     ELSIF (p_reading_type = 'int_gauge_reading') THEN
       PERFORM lamplighter.create_int_gauge_reading(p_site_id, p_reading_id);
+    ELSIF (p_reading_type = 'float_gauge_reading') THEN
+      PERFORM lamplighter.create_float_gauge_reading(p_site_id, p_reading_id);      
     ELSE
       RAISE EXCEPTION 'No such reading type: %', p_reading_type;
     END IF;
