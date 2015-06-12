@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.model.message.ParameterisedMO;
 import com.intrbiz.bergamot.model.message.SiteMO;
 import com.intrbiz.bergamot.model.message.result.MatchOn;
 import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
+import com.intrbiz.bergamot.model.message.result.MatchableMO;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.FloatGaugeReading;
@@ -25,7 +26,7 @@ import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
  * check
  */
 @JsonTypeName("bergamot.reading.parcel")
-public class ReadingParcelMO extends Message implements ParameterisedMO
+public class ReadingParcelMO extends Message implements MatchableMO, ParameterisedMO
 {    
     @JsonProperty("site_id")
     private UUID siteId;

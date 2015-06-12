@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * The result of a passive check
  */
 @JsonTypeName("bergamot.result.passive")
-public class PassiveResultMO extends ResultMO
+public class PassiveResultMO extends ResultMO implements MatchableMO
 {
     @JsonProperty("site_id")
     private UUID siteId;
@@ -34,11 +34,13 @@ public class PassiveResultMO extends ResultMO
         this.siteId = siteId;
     }
 
+    @Override
     public MatchOn getMatchOn()
     {
         return matchOn;
     }
 
+    @Override
     public void setMatchOn(MatchOn matchOn)
     {
         this.matchOn = matchOn;
