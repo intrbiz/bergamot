@@ -491,4 +491,12 @@ public abstract class LamplighterDB extends DatabaseAdapter
                 "ALTER FUNCTION lamplighter.get_float_gauge_readings_by_date(UUID, UUID, TIMESTAMP WITH TIME ZONE, TIMESTAMP WITH TIME ZONE, TEXT, TEXT) OWNER TO bergamot;"
         );
     }
+    
+    @SQLPatch(name = "setup_existing_sites", index = 2000, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    protected static SQLScript setup_existing_sites()
+    {
+        return new SQLScript(
+                "SELECT lamplighter.new_site(id) FROM bergamot.site"
+        );
+    }
 }
