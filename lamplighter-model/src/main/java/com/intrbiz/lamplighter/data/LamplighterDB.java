@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.Cache;
 import com.intrbiz.data.db.DatabaseAdapter;
@@ -183,6 +185,22 @@ public abstract class LamplighterDB extends DatabaseAdapter
         });
     }
     
+    public CheckReading getOrSetupDoubleGaugeReading(UUID checkId, String name, String unit)
+    {
+        // does it already exist
+        CheckReading reading = this.getCheckReadingByName(checkId, name);
+        if (reading == null)
+        {
+            UUID siteId = Site.getSiteId(checkId);
+            UUID readingId = Site.randomId(siteId);
+            // setup
+            this.setupDoubleGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            // get the metadata
+            reading = this.getCheckReading(readingId);
+        }
+        return reading;
+    }
+    
     public int setupDoubleGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit)
     {
         return this.use((with) -> {
@@ -205,6 +223,22 @@ public abstract class LamplighterDB extends DatabaseAdapter
             }
             return null;
         });
+    }
+    
+    public CheckReading getOrSetupLongGaugeReading(UUID checkId, String name, String unit)
+    {
+        // does it already exist
+        CheckReading reading = this.getCheckReadingByName(checkId, name);
+        if (reading == null)
+        {
+            UUID siteId = Site.getSiteId(checkId);
+            UUID readingId = Site.randomId(siteId);
+            // setup
+            this.setupLongGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            // get the metadata
+            reading = this.getCheckReading(readingId);
+        }
+        return reading;
     }
     
     public int setupLongGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit)
@@ -231,6 +265,22 @@ public abstract class LamplighterDB extends DatabaseAdapter
         });
     }
     
+    public CheckReading getOrSetupIntGaugeReading(UUID checkId, String name, String unit)
+    {
+        // does it already exist
+        CheckReading reading = this.getCheckReadingByName(checkId, name);
+        if (reading == null)
+        {
+            UUID siteId = Site.getSiteId(checkId);
+            UUID readingId = Site.randomId(siteId);
+            // setup
+            this.setupIntGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            // get the metadata
+            reading = this.getCheckReading(readingId);
+        }
+        return reading;
+    }
+    
     public int setupIntGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit)
     {
         return this.use((with) -> {
@@ -253,6 +303,22 @@ public abstract class LamplighterDB extends DatabaseAdapter
             }
             return null;
         });
+    }
+    
+    public CheckReading getOrSetupFloatGaugeReading(UUID checkId, String name, String unit)
+    {
+        // does it already exist
+        CheckReading reading = this.getCheckReadingByName(checkId, name);
+        if (reading == null)
+        {
+            UUID siteId = Site.getSiteId(checkId);
+            UUID readingId = Site.randomId(siteId);
+            // setup
+            this.setupFloatGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            // get the metadata
+            reading = this.getCheckReading(readingId);
+        }
+        return reading;
     }
     
     public int setupFloatGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit)
