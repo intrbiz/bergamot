@@ -5,13 +5,13 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 
-public class DefaultResultProcessor extends AbstractReadingProcessor
+public class DefaultReadingProcessor extends AbstractReadingProcessor
 {
-    private Logger logger = Logger.getLogger(DefaultResultProcessor.class);
+    private Logger logger = Logger.getLogger(DefaultReadingProcessor.class);
     
     private Matchers matchers = new Matchers();
 
-    public DefaultResultProcessor()
+    public DefaultReadingProcessor()
     {
         super();
     }
