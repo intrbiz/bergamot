@@ -105,7 +105,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 readings.longGaugeReading("response-time", "ms", response.getRuntime(), (long) executeCheck.getIntParameter("warning_response_time", 0), (long) executeCheck.getIntParameter("critical_response_time", 0), null, null);
                 readings.longGaugeReading("content-length", "B", (long) response.getResponse().content().capacity());
                 readings.integerGaugeReading("status", null, response.getResponse().getStatus().code());
-                this.publishReading(new ReadingKey(executeCheck.getCheckId()), readings);
+                this.publishReading(new ReadingKey(executeCheck.getCheckId(), executeCheck.getProcessingPool()), readings);
             }, 
             (error) -> {
                 tctx.stop();

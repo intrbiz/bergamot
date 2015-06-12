@@ -20,11 +20,6 @@ public class ReadingKey extends GenericKey
         super(SiteMO.getSiteId(siteId) + "." + pool);
     }
     
-    public ReadingKey(UUID checkId)
-    {
-        super(SiteMO.getSiteId(checkId) + "." + SiteMO.getProcessingPool(checkId));
-    }
-    
     public ReadingKey()
     {
         super("");

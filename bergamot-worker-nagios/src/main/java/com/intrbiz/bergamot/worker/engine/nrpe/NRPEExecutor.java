@@ -79,7 +79,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                         Reading reading = perfData.toReading();
                         if (reading != null) readings.reading(reading);
                     }
-                    if (readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId()), readings);
+                    if (readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId(), executeCheck.getProcessingPool()), readings);
                 }, 
                 (exception) -> {
                     tctx.stop();

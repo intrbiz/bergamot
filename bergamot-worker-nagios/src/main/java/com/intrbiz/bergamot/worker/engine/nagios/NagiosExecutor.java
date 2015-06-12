@@ -105,6 +105,6 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             resultMO.error(e);
         }
         resultSubmitter.accept(resultMO);
-        if (readings != null && readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId()), readings);
+        if (readings != null && readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId(), executeCheck.getProcessingPool()), readings);
     }
 }
