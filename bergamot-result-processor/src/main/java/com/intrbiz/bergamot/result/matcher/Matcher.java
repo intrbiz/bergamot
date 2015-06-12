@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.result.matcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.result.MatchOn;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchableMO;
 
 /**
  * Match the given passive result to a check
@@ -23,5 +23,5 @@ public interface Matcher<T extends MatchOn>
      * @param passiveResult
      * @return the check - tada!
      */
-    Check<?, ?> match(BergamotDB db, T matchOn, PassiveResultMO passiveResult);
+    Check<?, ?> match(BergamotDB db, T matchOn, MatchableMO matchable);
 }

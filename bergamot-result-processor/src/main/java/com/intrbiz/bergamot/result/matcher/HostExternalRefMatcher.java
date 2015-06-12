@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.result.matcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.result.MatchOnHostExternalRef;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchableMO;
 
 public class HostExternalRefMatcher implements Matcher<MatchOnHostExternalRef>
 {
@@ -14,8 +14,8 @@ public class HostExternalRefMatcher implements Matcher<MatchOnHostExternalRef>
     }
 
     @Override
-    public Check<?, ?> match(BergamotDB db, MatchOnHostExternalRef matchOn, PassiveResultMO passiveResult)
+    public Check<?, ?> match(BergamotDB db, MatchOnHostExternalRef matchOn, MatchableMO matchable)
     {
-        return db.getHostByExternalRef(passiveResult.getSiteId(), matchOn.getExternalRef());
+        return db.getHostByExternalRef(matchable.getSiteId(), matchOn.getExternalRef());
     }   
 }

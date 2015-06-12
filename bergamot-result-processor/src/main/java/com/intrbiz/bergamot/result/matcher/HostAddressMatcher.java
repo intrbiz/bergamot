@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.result.matcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.result.MatchOnHostAddress;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchableMO;
 
 public class HostAddressMatcher implements Matcher<MatchOnHostAddress>
 {
@@ -14,8 +14,8 @@ public class HostAddressMatcher implements Matcher<MatchOnHostAddress>
     }
 
     @Override
-    public Check<?, ?> match(BergamotDB db, MatchOnHostAddress matchOn, PassiveResultMO passiveResult)
+    public Check<?, ?> match(BergamotDB db, MatchOnHostAddress matchOn, MatchableMO matchable)
     {
-        return db.getHostByAddress(passiveResult.getSiteId(), matchOn.getHostAddress());
+        return db.getHostByAddress(matchable.getSiteId(), matchOn.getHostAddress());
     }   
 }

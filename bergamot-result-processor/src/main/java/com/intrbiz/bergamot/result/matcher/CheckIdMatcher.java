@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.result.matcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchableMO;
 
 public class CheckIdMatcher implements Matcher<MatchOnCheckId>
 {
@@ -14,7 +14,7 @@ public class CheckIdMatcher implements Matcher<MatchOnCheckId>
     }
 
     @Override
-    public Check<?, ?> match(BergamotDB db, MatchOnCheckId matchOn, PassiveResultMO passiveResult)
+    public Check<?, ?> match(BergamotDB db, MatchOnCheckId matchOn, MatchableMO matchable)
     {
         if ("host".equalsIgnoreCase(matchOn.getCheckType()))
         {

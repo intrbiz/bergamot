@@ -4,7 +4,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.message.result.MatchOnServiceExternalRef;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchableMO;
 
 public class ServiceExternalRefMatcher implements Matcher<MatchOnServiceExternalRef>
 {
@@ -19,9 +19,9 @@ public class ServiceExternalRefMatcher implements Matcher<MatchOnServiceExternal
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public Check<?, ?> match(BergamotDB db, MatchOnServiceExternalRef matchOn, PassiveResultMO passiveResult)
+    public Check<?, ?> match(BergamotDB db, MatchOnServiceExternalRef matchOn, MatchableMO matchable)
     {
-        Check<?, ?> hostCheck = ((Matcher) this.hostMatcher).match(db, matchOn.getHostMatch(), passiveResult);
+        Check<?, ?> hostCheck = ((Matcher) this.hostMatcher).match(db, matchOn.getHostMatch(), matchable);
         if (hostCheck instanceof Host)
         {
             Host host = (Host) hostCheck;

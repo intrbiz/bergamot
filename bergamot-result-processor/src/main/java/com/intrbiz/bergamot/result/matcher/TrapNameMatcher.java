@@ -4,7 +4,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.message.result.MatchOnTrapName;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
+import com.intrbiz.bergamot.model.message.result.MatchableMO;
 
 public class TrapNameMatcher implements Matcher<MatchOnTrapName>
 {
@@ -19,9 +19,9 @@ public class TrapNameMatcher implements Matcher<MatchOnTrapName>
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public Check<?, ?> match(BergamotDB db, MatchOnTrapName matchOn, PassiveResultMO passiveResult)
+    public Check<?, ?> match(BergamotDB db, MatchOnTrapName matchOn, MatchableMO matchable)
     {
-        Check<?, ?> hostCheck = ((Matcher) this.hostMatcher).match(db, matchOn.getHostMatch(), passiveResult);
+        Check<?, ?> hostCheck = ((Matcher) this.hostMatcher).match(db, matchOn.getHostMatch(), matchable);
         if (hostCheck instanceof Host)
         {
             Host host = (Host) hostCheck;
