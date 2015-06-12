@@ -68,6 +68,11 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-agent-config</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>lamplighter-reading-processor</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>

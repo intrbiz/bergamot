@@ -35,6 +35,8 @@ import com.intrbiz.bergamot.result.ResultProcessor;
 import com.intrbiz.bergamot.scheduler.Scheduler;
 import com.intrbiz.bergamot.scheduler.WheelScheduler;
 import com.intrbiz.data.DataException;
+import com.intrbiz.lamplighter.reading.DefaultReadingProcessor;
+import com.intrbiz.lamplighter.reading.ReadingProcessor;
 
 /**
  * Manage scheduling and result processing services across the cluster
@@ -95,7 +97,12 @@ public class ClusterManager
     /**
      * Our result processor
      */
-    private ResultProcessor processor;
+    private ResultProcessor resultProcessor;
+    
+    /**
+     * Our reading processor
+     */
+    private ReadingProcessor readingProcessor;
     
     /**
      * Our controller
@@ -106,7 +113,8 @@ public class ClusterManager
     {
         super();
         this.scheduler = new WheelScheduler();
-        this.processor = new DefaultResultProcessor();
+        this.resultProcessor = new DefaultResultProcessor();
+        this.readingProcessor = new DefaultReadingProcessor();
         this.controller = new BergamotController();
     }
 
@@ -117,7 +125,12 @@ public class ClusterManager
 
     public ResultProcessor getResultProcessor()
     {
-        return this.processor;
+        return this.resultProcessor;
+    }
+
+    public ReadingProcessor getReadingProcessor()
+    {
+        return readingProcessor;
     }
 
     public String getLocalMemberUUID()
@@ -207,7 +220,9 @@ public class ClusterManager
                 });
                 // start our scheduler and result processor
                 logger.info("Starting result processor");
-                this.processor.start();
+                this.resultProcessor.start();
+                logger.info("Starting reading processor");
+                this.readingProcessor.start();
                 logger.info("Starting scheduler");
                 this.scheduler.start();
                 logger.info("Starting controller");

@@ -81,6 +81,7 @@ import com.intrbiz.crypto.SecretKey;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
 import com.intrbiz.gerald.Gerald;
+import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
@@ -235,7 +236,12 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         BergamotDB.install();
         try (BergamotDB db = BergamotDB.connect())
         {
-            System.out.println("Database: " + db.getName() + " " + db.getVersion());
+            System.out.println("Database module: " + db.getName() + " " + db.getVersion());
+        }
+        LamplighterDB.install();
+        try (LamplighterDB db = LamplighterDB.connect())
+        {
+            System.out.println("Database module: " + db.getName() + " " + db.getVersion());
         }
         // don't bother starting scheduler etc on ui only nodes
         if (!Boolean.getBoolean("bergamot.ui.only"))
@@ -278,6 +284,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             // compile database
             System.out.println("Compiling DB");
             BergamotDB.load();
+            LamplighterDB.load();
             // setup the cache
             System.out.println("Setting up Hazelcast");
             DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(BergamotApp.getApplicationInstanceName()));

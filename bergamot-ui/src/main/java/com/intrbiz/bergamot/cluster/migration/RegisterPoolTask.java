@@ -61,6 +61,12 @@ public class RegisterPoolTask implements ClusterMigration
             // tell the processor we are registering this  pool with it
             clusterManager.getResultProcessor().ownPool(this.getSite(), this.getPool());
         }
+        // setup reading processing
+        if (!Boolean.getBoolean("bergamot.ui.readingprocessor.off"))
+        {
+            // tell the processor we are registering this  pool with it
+            clusterManager.getReadingProcessor().ownPool(this.getSite(), this.getPool());
+        }
         // setup scheduling
         if (!Boolean.getBoolean("bergamot.ui.scheduler.off"))
         {

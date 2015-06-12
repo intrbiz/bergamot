@@ -57,6 +57,12 @@ public class DeregisterPoolTask implements ClusterMigration
             // tell the processor we are registering this  pool with it
             clusterManager.getResultProcessor().disownPool(this.getSite(), this.getPool());
         }
+        // unsetup reading processing
+        if (!Boolean.getBoolean("bergamot.ui.readingprocessor.off"))
+        {
+            // tell the processor we are registering this  pool with it
+            clusterManager.getReadingProcessor().disownPool(this.getSite(), this.getPool());
+        }
         // unsetup scheduling
         if (!Boolean.getBoolean("bergamot.ui.scheduler.off"))
         {
