@@ -103,6 +103,9 @@
 	
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{host}"/>
+	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{host}"/>
 
 	<!-- Stats -->
 	<include view="include/check_stats" data-check="#{host}"/>

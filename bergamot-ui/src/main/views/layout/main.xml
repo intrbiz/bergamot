@@ -10,15 +10,15 @@
 		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.6.0/plugins/reveal.css')}" />
 		<link rel="stylesheet" type="text/css" href="#{public('/css/v1.6.0/plugins/jquery.simple-dtpicker.css')}" />
 		<!-- Scripts -->
-		<script src="#{public('/js/v1.4.0/bower_components/requirejs/require.js')}"></script>
-    	<script src="#{public('/js/v1.4.0/bower_components/jquery/dist/jquery.js')}"></script>
-    	<script src="#{public('/js/v1.4.0/plugins/jquery.reveal.js')}"></script>
-    	<script src="#{public('/js/v1.4.0/plugins/jquery.simple-dtpicker.js')}"></script>
+		<script src="#{public('/js/v1.5.0/bower_components/requirejs/require.js')}"></script>
+    	<script src="#{public('/js/v1.5.0/bower_components/jquery/dist/jquery.js')}"></script>
+    	<script src="#{public('/js/v1.5.0/plugins/jquery.reveal.js')}"></script>
+    	<script src="#{public('/js/v1.5.0/plugins/jquery.simple-dtpicker.js')}"></script>
     	<script type="text/javascript">
             <![CDATA[
 			/* Configure require js */
 			require.config({
-			    baseUrl: "/js/v1.4.0/bower_components",
+			    baseUrl: "/js/v1.5.0/bower_components",
 			    waitSeconds: 15
 			});
             ]]>

@@ -1,0 +1,37 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa">
+	<div id="readings" class="row" data-check-id="#{check.id}" style="display: none">
+		<H2>Readings</H2>
+		
+		<script src="#{public('/js/v1.5.0/lamplighter/base.js')}"></script>
+		<script src="#{public('/js/v1.5.0/lamplighter/chart_base.js')}"></script>
+		<script src="#{public('/js/v1.5.0/lamplighter/line_chart.js')}"></script>
+		
+		<script type="text/javascript">
+			<![CDATA[
+			$(document).ready(function() {
+				var id = $('#readings').attr("data-check-id");
+				$.getJSON('/api/lamplighter/check/id/' + id + '/readings', function(data) {
+				    if (data.length > 0) $('#readings').css("display", "block");
+					$.each(data, function (i, reading) {
+						// create the container
+						var container = document.createElement("div");
+						$(container).attr("id", "reading-" + reading.reading_id);
+						$(container).attr("class", "col12");
+						$('#readings').append(container);
+						// create the graph
+						$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/latest/101', function(data) {							
+							new com.intrbiz.jsc.chart.LineGraph("reading-" + reading.reading_id, 1280, 300, { 
+								"axis-x-sample": 25,
+								"axis-x-formater": function(i, x) { var d = new Date(x); return d.toLocaleDateString() + " " + d.toLocaleTimeString(); } 
+							}, data).load();
+						});
+					});
+				});
+			});
+			]]>
+		</script>
+		
+	</div>
+</fragment>

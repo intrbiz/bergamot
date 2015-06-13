@@ -76,6 +76,9 @@
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{service}"/>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{service}"/>
+	
 	<!-- Stats -->
 	<include view="include/check_stats" data-check="#{service}"/>
 	

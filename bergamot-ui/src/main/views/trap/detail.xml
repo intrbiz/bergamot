@@ -75,6 +75,9 @@
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{trap}"/>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{host}"/>
+	
 	<!-- Configuration -->
 	<include view="include/check_configuration" data-check="#{trap}"/>
 	
