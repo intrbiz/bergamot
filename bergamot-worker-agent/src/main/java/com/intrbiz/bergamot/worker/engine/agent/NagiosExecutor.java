@@ -11,9 +11,12 @@ import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+
 
 
 /**
@@ -72,6 +75,14 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
                     result.setOutput(stat.getOutput());
                     result.runtime(runtime);
                     resultSubmitter.accept(result);
+                    // readings
+                    if (stat.getReadings().size() > 0)
+                    {
+                        ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
+                        readings.setCaptured(System.currentTimeMillis());
+                        readings.getReadings().addAll(stat.getReadings());
+                        this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
+                    }
                 });
             }
             else
