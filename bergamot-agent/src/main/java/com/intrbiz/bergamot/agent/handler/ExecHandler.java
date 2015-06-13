@@ -11,8 +11,10 @@ import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
+import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
 import com.intrbiz.bergamot.util.AgentUtil;
+import com.intrbiz.gerald.polyakov.Reading;
 
 public class ExecHandler implements AgentHandler
 {
@@ -53,6 +55,13 @@ public class ExecHandler implements AgentHandler
                 stat.setStatus(response.toStatus());
                 stat.setOutput(response.getOutput());
                 stat.setRuntime(response.getRuntime());
+                // readings
+                stat.setCaptured(System.currentTimeMillis());
+                for (NagiosPerfData perf : response.getPerfData())
+                {
+                    Reading reading = perf.toReading();
+                    if (reading != null) stat.getReadings().add(reading);
+                }
             }
             else
             {
