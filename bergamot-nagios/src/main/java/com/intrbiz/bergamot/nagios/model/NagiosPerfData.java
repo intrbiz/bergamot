@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
-import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 public class NagiosPerfData
 {
@@ -148,14 +147,14 @@ public class NagiosPerfData
             // look at the unit to better select the data type
             if ("B".equals(unit) || "kB".equals(unit) || "KB".equals(unit) || "MB".equals(unit) || "GB".equals(unit) || "TB".equals(unit) || "c".equals(unit))
             {
-                LongGaugeReading reading = new LongGaugeReading();
+                DoubleGaugeReading reading = new DoubleGaugeReading();
                 reading.setName(this.label);
                 reading.setUnit(this.unit);
-                reading.setValue(Long.parseLong(this.value));
-                if (this.warning != null && this.warning.length() > 0) reading.setWarning(Long.parseLong(this.warning));
-                if (this.critical != null && this.critical.length() > 0) reading.setCritical(Long.parseLong(this.critical));
-                if (this.min != null && this.min.length() > 0) reading.setMin(Long.parseLong(this.min));
-                if (this.max != null && this.max.length() > 0) reading.setMax(Long.parseLong(this.max));
+                reading.setValue(Double.parseDouble(this.value));
+                if (this.warning != null && this.warning.length() > 0) reading.setWarning(Double.parseDouble(this.warning));
+                if (this.critical != null && this.critical.length() > 0) reading.setCritical(Double.parseDouble(this.critical));
+                if (this.min != null && this.min.length() > 0) reading.setMin(Double.parseDouble(this.min));
+                if (this.max != null && this.max.length() > 0) reading.setMax(Double.parseDouble(this.max));
                 return reading;
             }
             else if ("s".equals(unit) || "ms".equals(unit) || "us".equals(unit) || "ns".equals(unit) || "%".equals(unit))
