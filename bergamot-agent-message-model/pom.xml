@@ -36,6 +36,10 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.gerald</groupId>
+			<artifactId>polyakov-model</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

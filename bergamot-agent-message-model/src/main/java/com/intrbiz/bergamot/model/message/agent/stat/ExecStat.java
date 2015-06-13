@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
+import com.intrbiz.gerald.polyakov.Reading;
 
 /**
  * Result of executing a server defined check
@@ -26,6 +27,18 @@ public class ExecStat extends AgentMessage
     
     @JsonProperty("runtime")
     private double runtime;
+    
+    /**
+     * Metrics captured timestamp
+     */
+    @JsonProperty("captured")
+    private long captured;
+    
+    /**
+     * A collection of metric readings
+     */
+    @JsonProperty("readings")
+    private List<Reading> readings = new LinkedList<Reading>();
 
     @JsonProperty("parameters")
     private List<Parameter> parameters = new LinkedList<Parameter>();
@@ -95,6 +108,26 @@ public class ExecStat extends AgentMessage
         this.parameters = parameters;
     }
     
+    public long getCaptured()
+    {
+        return captured;
+    }
+
+    public void setCaptured(long captured)
+    {
+        this.captured = captured;
+    }
+
+    public List<Reading> getReadings()
+    {
+        return readings;
+    }
+
+    public void setReadings(List<Reading> readings)
+    {
+        this.readings = readings;
+    }
+
     @JsonIgnore
     public ExecStat pending(String output)
     {
