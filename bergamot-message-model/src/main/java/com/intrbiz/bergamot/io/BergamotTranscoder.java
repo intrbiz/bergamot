@@ -72,6 +72,7 @@ import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification
 import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
@@ -144,6 +145,7 @@ public class BergamotTranscoder
         MatchOnServiceExternalRef.class,
         MatchOnTrapExternalRef.class,
         ReadingParcelMO.class,
+        CheckReadingMO.class,
         // notifications
         SendAlert.class,
         SendRecovery.class,
