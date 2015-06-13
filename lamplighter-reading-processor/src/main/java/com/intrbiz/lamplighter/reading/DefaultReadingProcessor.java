@@ -50,12 +50,10 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                     // store the readings
                     for (Reading reading : readings.getReadings())
                     {
-                        // preprocess the reading
-                        reading = this.preProcessReading(reading);
-                        // store
                         if (reading instanceof DoubleGaugeReading)
                         {
                             CheckReading metadata = db.getOrSetupDoubleGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            reading = this.preProcessReading(metadata, reading);
                             db.storeDoubleGaugeReading(new StoredDoubleGaugeReading(
                                     metadata.getSiteId(),
                                     metadata.getId(),
@@ -70,6 +68,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                         else if (reading instanceof LongGaugeReading)
                         {
                             CheckReading metadata = db.getOrSetupLongGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            reading = this.preProcessReading(metadata, reading);
                             db.storeLongGaugeReading(new StoredLongGaugeReading(
                                     metadata.getSiteId(),
                                     metadata.getId(),
@@ -84,6 +83,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                         else if (reading instanceof FloatGaugeReading)
                         {
                             CheckReading metadata = db.getOrSetupFloatGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            reading = this.preProcessReading(metadata, reading);
                             db.storeFloatGaugeReading(new StoredFloatGaugeReading(
                                     metadata.getSiteId(),
                                     metadata.getId(),
@@ -98,6 +98,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                         else if (reading instanceof IntegerGaugeReading)
                         {
                             CheckReading metadata = db.getOrSetupIntGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            reading = this.preProcessReading(metadata, reading);
                             db.storeIntGaugeReading(new StoredIntGaugeReading(
                                     metadata.getSiteId(),
                                     metadata.getId(),
@@ -135,10 +136,10 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
         }
     }
     
-    protected Reading preProcessReading(Reading reading)
+    protected Reading preProcessReading(CheckReading checkReading, Reading reading)
     {
         // apply the scaling rules
-        reading = this.scalers.scale(reading);
+        reading = this.scalers.scale(reading, checkReading.getUnit());
         return reading;
     }
     

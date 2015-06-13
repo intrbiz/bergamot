@@ -31,12 +31,12 @@ public class ReadingScalers
         return this.scalers.get(unit);
     }
     
-    public Reading scale(Reading reading)
+    public Reading scale(Reading reading, String toUnit)
     {
         if (reading.getUnit() != null)
         {
             ReadingScaler scaler = this.build(reading.getUnit());
-            if (scaler != null) return scaler.scaleReading(reading);
+            if (scaler != null) return scaler.scaleReading(reading, toUnit);
         }
         return reading;
     }

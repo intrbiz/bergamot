@@ -11,152 +11,110 @@ import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
  */
 public class Base2BytesScaler implements ReadingScaler
 {
-    private static final double KiB_D = 1024D;
-    private static final double MiB_D = 1024D * 1024D;
-    private static final double GiB_D = 1024D * 1024D * 1024D;
-    private static final double TiB_D = 1024D * 1024D * 1024D * 1024D;
-    
-    private static final long KiB_L = 1024L;
-    private static final long MiB_L = 1024L * 1024L;
-    private static final long GiB_L = 1024L * 1024L * 1024L;
-    private static final long TiB_L = 1024L * 1024L * 1024L * 1024L;
-
     @Override
     public String[] getUnits()
     {
-        return new String[] { "KiB", "MiB", "GiB", "TiB" };
+        return new String[] { "B", "KiB", "MiB", "GiB", "TiB" };
+    }
+    public static double toBytes(String unit)
+    {
+        switch (unit)
+        {
+            case "B"  : return 1D;
+            case "KiB" : return 1024D;
+            case "MiB" : return 1024D * 1024D;
+            case "GiB" : return 1024D * 1024D * 1024D;
+            case "TiB" : return 1024D * 1024D * 1024D * 1024D;
+        }
+        throw new IllegalArgumentException("Unknown unit: " + unit);
     }
 
     @Override
-    public Reading scaleReading(Reading reading)
+    public Reading scaleReading(Reading reading, String toUnit)
     {
         if (reading instanceof LongGaugeReading)
         {
-            return this.scaleToBaseUnits((LongGaugeReading) reading);
+            return this.scale((LongGaugeReading) reading, toUnit);
         }
         else if (reading instanceof DoubleGaugeReading)
         {
-            return this.scaleToBaseUnits((DoubleGaugeReading) reading);
+            return this.scale((DoubleGaugeReading) reading, toUnit);
         }
         else if (reading instanceof IntegerGaugeReading)
         {
-            return this.scaleToBaseUnits((IntegerGaugeReading) reading);
+            return this.scale((IntegerGaugeReading) reading, toUnit);
         }
         else if (reading instanceof FloatGaugeReading)
         {
-            return this.scaleToBaseUnits((FloatGaugeReading) reading);
+            return this.scale((FloatGaugeReading) reading, toUnit);
         }
         return reading;
     }
     
-    protected Reading scaleToBaseUnits(FloatGaugeReading reading)
+    protected Reading scale(FloatGaugeReading reading, String toUnit)
     {
-        // promote to double
-        DoubleGaugeReading dgr = new DoubleGaugeReading();
-        dgr.setName(reading.getName());
-        dgr.setUnit(reading.getUnit());
-        dgr.setValue(reading.getValue() == null ? null : reading.getValue().doubleValue());
-        dgr.setWarning(reading.getValue() == null ? null : reading.getWarning().doubleValue());
-        dgr.setCritical(reading.getValue() == null ? null : reading.getCritical().doubleValue());
-        dgr.setMin(reading.getValue() == null ? null : reading.getMin().doubleValue());
-        dgr.setMax(reading.getValue() == null ? null : reading.getMax().doubleValue());
-        // scale
-        return this.scaleToBaseUnits(dgr);
+        if (! toUnit.equals(reading.getUnit()))
+        {
+            // work out the scale factor
+            double factor = toBytes(reading.getUnit()) / toBytes(toUnit);
+            // scale
+            reading.setUnit(toUnit);
+            if (reading.getValue() != null)    reading.setValue((float) (reading.getValue()       * factor));
+            if (reading.getWarning() != null)  reading.setWarning((float) (reading.getWarning()   * factor));
+            if (reading.getCritical() != null) reading.setCritical((float) (reading.getCritical() * factor));
+            if (reading.getMin() != null)      reading.setMin((float) (reading.getMin()           * factor));
+            if (reading.getMax() != null)      reading.setMax((float) (reading.getMax()           * factor));
+        }
+        return reading;
     }
 
-    protected Reading scaleToBaseUnits(DoubleGaugeReading reading)
+    protected Reading scale(DoubleGaugeReading reading, String toUnit)
     {
-        if ("kB".equals(reading.getUnit()) || "KB".equals(reading.getUnit()))
+        if (! toUnit.equals(reading.getUnit()))
         {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * KiB_D);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * KiB_D);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * KiB_D);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * KiB_D);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * KiB_D);
-        }
-        else if ("MB".equals(reading.getUnit()))
-        {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * MiB_D);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * MiB_D);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * MiB_D);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * MiB_D);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * MiB_D);
-        }
-        else if ("GB".equals(reading.getUnit()))
-        {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * GiB_D);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * GiB_D);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * GiB_D);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * GiB_D);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * GiB_D);
-        }
-        else if ("TB".equals(reading.getUnit()))
-        {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * TiB_D);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * TiB_D);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * TiB_D);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * TiB_D);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * TiB_D);
+            // work out the scale factor
+            double factor = toBytes(reading.getUnit()) / toBytes(toUnit);
+            // scale
+            reading.setUnit(toUnit);
+            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * factor);
+            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * factor);
+            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * factor);
+            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * factor);
+            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * factor);
         }
         return reading;
     }
     
-    protected Reading scaleToBaseUnits(IntegerGaugeReading reading)
+    protected Reading scale(IntegerGaugeReading reading, String toUnit)
     {
-        // promote to double
-        LongGaugeReading dgr = new LongGaugeReading();
-        dgr.setName(reading.getName());
-        dgr.setUnit(reading.getUnit());
-        dgr.setValue(reading.getValue() == null ? null : reading.getValue().longValue());
-        dgr.setWarning(reading.getValue() == null ? null : reading.getWarning().longValue());
-        dgr.setCritical(reading.getValue() == null ? null : reading.getCritical().longValue());
-        dgr.setMin(reading.getValue() == null ? null : reading.getMin().longValue());
-        dgr.setMax(reading.getValue() == null ? null : reading.getMax().longValue());
-        // scale
-        return this.scaleToBaseUnits(dgr);
+        if (! toUnit.equals(reading.getUnit()))
+        {
+            // work out the scale factor
+            double factor = toBytes(reading.getUnit()) / toBytes(toUnit);
+            // scale
+            reading.setUnit(toUnit);
+            if (reading.getValue() != null)    reading.setValue((int) (reading.getValue()       * factor));
+            if (reading.getWarning() != null)  reading.setWarning((int) (reading.getWarning()   * factor));
+            if (reading.getCritical() != null) reading.setCritical((int) (reading.getCritical() * factor));
+            if (reading.getMin() != null)      reading.setMin((int) (reading.getMin()           * factor));
+            if (reading.getMax() != null)      reading.setMax((int) (reading.getMax()           * factor));
+        }
+        return reading;
     }
     
-    protected Reading scaleToBaseUnits(LongGaugeReading reading)
+    protected Reading scale(LongGaugeReading reading, String toUnit)
     {
-        if ("kB".equals(reading.getUnit()) || "KB".equals(reading.getUnit()))
+        if (! toUnit.equals(reading.getUnit()))
         {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * KiB_L);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * KiB_L);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * KiB_L);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * KiB_L);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * KiB_L);
-        }
-        else if ("MB".equals(reading.getUnit()))
-        {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * MiB_L);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * MiB_L);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * MiB_L);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * MiB_L);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * MiB_L);
-        }
-        else if ("GB".equals(reading.getUnit()))
-        {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * GiB_L);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * GiB_L);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * GiB_L);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * GiB_L);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * GiB_L);
-        }
-        else if ("TB".equals(reading.getUnit()))
-        {
-            reading.setUnit("B");
-            if (reading.getValue() != null)    reading.setValue(reading.getValue()       * TiB_L);
-            if (reading.getWarning() != null)  reading.setWarning(reading.getWarning()   * TiB_L);
-            if (reading.getCritical() != null) reading.setCritical(reading.getCritical() * TiB_L);
-            if (reading.getMin() != null)      reading.setMin(reading.getMin()           * TiB_L);
-            if (reading.getMax() != null)      reading.setMax(reading.getMax()           * TiB_L);
+            // work out the scale factor
+            double factor = toBytes(reading.getUnit()) / toBytes(toUnit);
+            // scale
+            reading.setUnit(toUnit);
+            if (reading.getValue() != null)    reading.setValue((long) (reading.getValue()       * factor));
+            if (reading.getWarning() != null)  reading.setWarning((long) (reading.getWarning()   * factor));
+            if (reading.getCritical() != null) reading.setCritical((long) (reading.getCritical() * factor));
+            if (reading.getMin() != null)      reading.setMin((long) (reading.getMin()           * factor));
+            if (reading.getMax() != null)      reading.setMax((long) (reading.getMax()           * factor));
         }
         return reading;
     }
