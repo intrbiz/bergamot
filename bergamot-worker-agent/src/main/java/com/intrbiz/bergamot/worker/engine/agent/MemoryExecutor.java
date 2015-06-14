@@ -10,10 +10,13 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.stat.MemStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
  * Check the memory usage of a Bergamot Agent
@@ -66,6 +69,13 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                             executeCheck.getPercentParameter("critical", 0.9F),
                             "Memory: " + (stat.getActualUsedMemory() / UnitUtil.Mi) + " MiB of " + (stat.getTotalMemory() / UnitUtil.Mi) + " MiB (" + DFMT.format(UnitUtil.toPercent(stat.getActualUsedMemory(), stat.getTotalMemory())) + "%) used " + ((stat.getUsedMemory() - stat.getActualUsedMemory()) / UnitUtil.Mi) + " MiB caches"
                     ).runtime(runtime));
+                    // readings
+                    double warning  = (executeCheck.getPercentParameter("warning", 0.8F) * stat.getTotalMemory()) / UnitUtil.Mi;
+                    double critical = (executeCheck.getPercentParameter("critical", 0.9F) * stat.getTotalMemory()) / UnitUtil.Mi;
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getId()).captured(System.currentTimeMillis());
+                    readings.reading(new DoubleGaugeReading("actual-used", "MiB", (double) (stat.getActualUsedMemory() / UnitUtil.Mi), warning, critical, 0D, (double) (stat.getTotalMemory()  / UnitUtil.Mi)));
+                    readings.reading(new DoubleGaugeReading("used", "MiB", (double) (stat.getUsedMemory() / UnitUtil.Mi), warning, critical, 0D, (double) (stat.getTotalMemory()  / UnitUtil.Mi)));
+                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
             }
             else
