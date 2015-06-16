@@ -11,9 +11,12 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
  * Check the uptime of a Bergamot Agent
@@ -62,7 +65,6 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
                     // thresholds
                     long critical = executeCheck.getLongParameter("critical", TimeUnit.MINUTES.toSeconds(5));
                     long warning  = executeCheck.getLongParameter("warning",  TimeUnit.MINUTES.toSeconds(10));
-                    executeCheck.getPercentParameter("cpu_warning", 0.8F);
                     // the result
                     ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
                     // apply the check
@@ -81,6 +83,10 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
                     // submit
                     result.runtime(runtime);
                     resultSubmitter.accept(result);
+                    // readings
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getId()).captured(System.currentTimeMillis());
+                    readings.reading(new DoubleGaugeReading("uptime", "s", stat.getUptime()));
+                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
             }
             else
