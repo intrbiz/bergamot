@@ -10,10 +10,13 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
  * Check the cpu usage of a Bergamot Agent
@@ -66,6 +69,16 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                             executeCheck.getPercentParameter("cpu_critical", 0.9D), 
                             "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
                     ).runtime(runtime));
+                    // readings
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getId()).captured(System.currentTimeMillis());
+                    readings.reading(new DoubleGaugeReading("load-1", null, stat.getLoad1()));
+                    readings.reading(new DoubleGaugeReading("load-5", null, stat.getLoad5()));
+                    readings.reading(new DoubleGaugeReading("load-15", null, stat.getLoad15()));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-total", "%", stat.getTotalUsage().getTotal(), executeCheck.getPercentParameter("cpu_warning", 0.8D), executeCheck.getPercentParameter("cpu_critical", 0.9D), 1D, 100D));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-system", "%", stat.getTotalUsage().getSystem(), null, null, 1D, 100D));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-user", "%", stat.getTotalUsage().getUser(), null, null, 1D, 100D));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-wait", "%", stat.getTotalUsage().getWait(), null, null, 1D, 100D));
+                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
             }
             else
