@@ -23,6 +23,7 @@ import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
@@ -57,7 +58,13 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     
     @Any("/graph/reading/gauge/double/:id/latest/:limit")
     @WithDataAdapter(LamplighterDB.class)
-    public void getLatestDoubleReadings(LamplighterDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id, @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit) throws IOException
+    public void getLatestDoubleReadings(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId(session = false) UUID id, 
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @Param("series") String series
+    ) throws IOException
     {
         CheckReading checkReading = db.getCheckReading(id);
         List<StoredDoubleGaugeReading> readings = db.getLatestDoubleGaugeReadings(site.getId(), id, limit);
@@ -98,64 +105,78 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         }
         jenny.writeEndArray();
         jenny.writeEndObject();
-        /*
-        // warning
-        jenny.writeStartObject();
-        jenny.writeFieldName("title");
-        jenny.writeString("Warning");
-        jenny.writeFieldName("colour");
-        jenny.writeString("#00FF00");
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
+        // optional series
+        if (! (Util.isEmpty(series) || "none".equals(series)))
         {
-            jenny.writeNumber(reading.getWarning());
+            // warning
+            if (series.contains("warning"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Warning");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getWarning());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
+            // critical
+            if (series.contains("critical"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Critical");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getCritical());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
+            // min
+            if (series.contains("min"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Min");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getMin());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
+            // max
+            if (series.contains("max"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Max");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getMax());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
         }
-        jenny.writeEndArray();
-        jenny.writeEndObject();
-        // critical
-        jenny.writeStartObject();
-        jenny.writeFieldName("title");
-        jenny.writeString("Critical");
-        jenny.writeFieldName("colour");
-        jenny.writeString("#00FF00");
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
-        {
-            jenny.writeNumber(reading.getCritical());
-        }
-        jenny.writeEndArray();
-        jenny.writeEndObject();
-        // min
-        jenny.writeStartObject();
-        jenny.writeFieldName("title");
-        jenny.writeString("Min");
-        jenny.writeFieldName("colour");
-        jenny.writeString("#00FF00");
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
-        {
-            jenny.writeNumber(reading.getMin());
-        }
-        jenny.writeEndArray();
-        jenny.writeEndObject();
-        // max
-        jenny.writeStartObject();
-        jenny.writeFieldName("title");
-        jenny.writeString("Max");
-        jenny.writeFieldName("colour");
-        jenny.writeString("#00FF00");
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
-        {
-            jenny.writeNumber(reading.getMax());
-        }
-        jenny.writeEndArray();
-        jenny.writeEndObject();
-        */
         // end y sets
         jenny.writeEndArray();
         jenny.writeEndObject();
@@ -170,7 +191,8 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
-            @IsaLong() Long end
+            @IsaLong() Long end,
+            @Param("series") String series
     ) throws IOException
     {
         CheckReading checkReading = db.getCheckReading(id);
@@ -212,6 +234,78 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         }
         jenny.writeEndArray();
         jenny.writeEndObject();
+        // optional series
+        if (! (Util.isEmpty(series) || "none".equals(series)))
+        {
+            // warning
+            if (series.contains("warning"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Warning");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getWarning());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
+            // critical
+            if (series.contains("critical"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Critical");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getCritical());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
+            // min
+            if (series.contains("min"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Min");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getMin());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
+            // max
+            if (series.contains("max"))
+            {
+                jenny.writeStartObject();
+                jenny.writeFieldName("title");
+                jenny.writeString("Max");
+                jenny.writeFieldName("colour");
+                jenny.writeString("#00FF00");
+                jenny.writeFieldName("y");
+                jenny.writeStartArray();
+                for (StoredDoubleGaugeReading reading : readings)
+                {
+                    jenny.writeNumber(reading.getMax());
+                }
+                jenny.writeEndArray();
+                jenny.writeEndObject();
+            }
+        }
         // end y sets
         jenny.writeEndArray();
         jenny.writeEndObject();
