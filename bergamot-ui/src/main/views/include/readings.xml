@@ -21,9 +21,11 @@
 						$(container).attr("class", "col12");
 						$('#readings').append(container);
 						// create the graph
-						$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/latest/101', function(data) {							
+						var end = new Date().getTime();
+						var start = end - 86400000;
+						$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/date/hour/avg/' + start + '/' + end, function(data) {							
 							new com.intrbiz.jsc.chart.LineGraph("reading-" + reading.reading_id, 1280, 300, { 
-								"axis-x-sample": 25,
+								"axis-x-sample": 4,
 								"axis-x-formater": function(i, x) { var d = new Date(x); return d.toLocaleDateString() + " " + d.toLocaleTimeString(); } 
 							}, data).load();
 						});
