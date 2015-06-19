@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.Util;
@@ -17,6 +18,7 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.lamplighter.model.CheckReading;
 import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
+import com.intrbiz.lamplighter.model.StoredReading;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.CoalesceMode;
@@ -56,6 +58,8 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         return readings;
     }
     
+    // double gauge
+    
     @Any("/graph/reading/gauge/double/:id/latest/:limit")
     @WithDataAdapter(LamplighterDB.class)
     public void getLatestDoubleReadings(
@@ -66,120 +70,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             @Param("series") String series
     ) throws IOException
     {
+        // get the data
         CheckReading checkReading = db.getCheckReading(id);
         List<StoredDoubleGaugeReading> readings = db.getLatestDoubleGaugeReadings(site.getId(), id, limit);
-        //
+        // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        jenny.writeStartObject();
-        // title
-        jenny.writeFieldName("title");
-        jenny.writeString(checkReading.getSummary());
-        // x-title
-        jenny.writeFieldName("x-title");
-        jenny.writeString("");
-        // y-title
-        jenny.writeFieldName("y-title");
-        jenny.writeString("");
-        // x
-        jenny.writeFieldName("x");
-        jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
-        {
-            jenny.writeNumber(reading.getCollectedAt().getTime());
-        }
-        jenny.writeEndArray();
-        // y sets
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        // value
-        jenny.writeStartObject();
-        jenny.writeFieldName("title");
-        jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
-        jenny.writeFieldName("colour");
-        jenny.writeString("#FF0000");
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
-        {
-            jenny.writeNumber(reading.getValue());
-        }
-        jenny.writeEndArray();
-        jenny.writeEndObject();
-        // optional series
-        if (! (Util.isEmpty(series) || "none".equals(series)))
-        {
-            // warning
-            if (series.contains("warning"))
-            {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Warning");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
-                {
-                    jenny.writeNumber(reading.getWarning());
-                }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
-            }
-            // critical
-            if (series.contains("critical"))
-            {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Critical");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
-                {
-                    jenny.writeNumber(reading.getCritical());
-                }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
-            }
-            // min
-            if (series.contains("min"))
-            {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Min");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
-                {
-                    jenny.writeNumber(reading.getMin());
-                }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
-            }
-            // max
-            if (series.contains("max"))
-            {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Max");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
-                {
-                    jenny.writeNumber(reading.getMax());
-                }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
-            }
-        }
-        // end y sets
-        jenny.writeEndArray();
-        jenny.writeEndObject();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredDoubleGaugeReading::getValue, StoredDoubleGaugeReading::getWarning, StoredDoubleGaugeReading::getCritical, StoredDoubleGaugeReading::getMin, StoredDoubleGaugeReading::getMax);
     }
     
     @Any("/graph/reading/gauge/double/:id/date/:rollup/:agg/:start/:end")
@@ -195,24 +91,45 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             @Param("series") String series
     ) throws IOException
     {
+        // get the data
         CheckReading checkReading = db.getCheckReading(id);
         List<StoredDoubleGaugeReading> readings = db.getDoubleGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
-        //
+        // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredDoubleGaugeReading::getValue, StoredDoubleGaugeReading::getWarning, StoredDoubleGaugeReading::getCritical, StoredDoubleGaugeReading::getMin, StoredDoubleGaugeReading::getMax);
+    }
+    
+    // generic
+    
+    /**
+     * Generically output a line chart JSON data structure
+     * @param jenny the json output stream
+     * @param checkReading the check reading
+     * @param readings the data points
+     * @param series which series to output
+     * @param getValue the value accessor
+     * @param getWarning the warning accessor
+     * @param getCritical the critical accessor
+     * @param getMin the min accessor
+     * @param getMax the max accessor
+     * @throws IOException
+     */
+    private <T extends StoredReading> void writeLineChartData(JsonGenerator jenny, CheckReading checkReading, List<T> readings, String series, Function<T,Object> getValue, Function<T,Object> getWarning, Function<T,Object> getCritical, Function<T,Object> getMin, Function<T,Object> getMax) throws IOException
+    {
         jenny.writeStartObject();
         // title
         jenny.writeFieldName("title");
-        jenny.writeString(checkReading.getSummary());
+        jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
         // x-title
         jenny.writeFieldName("x-title");
         jenny.writeString("");
         // y-title
         jenny.writeFieldName("y-title");
-        jenny.writeString("");
+        jenny.writeString(Util.isEmpty(checkReading.getUnit()) ? "" : checkReading.getUnit());
         // x
         jenny.writeFieldName("x");
         jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
+        for (T reading : readings)
         {
             jenny.writeNumber(reading.getCollectedAt().getTime());
         }
@@ -225,12 +142,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         jenny.writeFieldName("title");
         jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
         jenny.writeFieldName("colour");
-        jenny.writeString("#FF0000");
+        jenny.writeString("#00BF00");
         jenny.writeFieldName("y");
         jenny.writeStartArray();
-        for (StoredDoubleGaugeReading reading : readings)
+        for (T reading : readings)
         {
-            jenny.writeNumber(reading.getValue());
+            jenny.writeObject(getValue.apply(reading));
         }
         jenny.writeEndArray();
         jenny.writeEndObject();
@@ -244,12 +161,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
                 jenny.writeFieldName("title");
                 jenny.writeString("Warning");
                 jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
+                jenny.writeString("#FFBF00");
                 jenny.writeFieldName("y");
                 jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
+                for (T reading : readings)
                 {
-                    jenny.writeNumber(reading.getWarning());
+                    jenny.writeObject(getWarning.apply(reading));
                 }
                 jenny.writeEndArray();
                 jenny.writeEndObject();
@@ -261,12 +178,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
                 jenny.writeFieldName("title");
                 jenny.writeString("Critical");
                 jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
+                jenny.writeString("#E20800");
                 jenny.writeFieldName("y");
                 jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
+                for (T reading : readings)
                 {
-                    jenny.writeNumber(reading.getCritical());
+                    jenny.writeObject(getCritical.apply(reading));
                 }
                 jenny.writeEndArray();
                 jenny.writeEndObject();
@@ -278,12 +195,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
                 jenny.writeFieldName("title");
                 jenny.writeString("Min");
                 jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
+                jenny.writeString("#A4C0E4");
                 jenny.writeFieldName("y");
                 jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
+                for (T reading : readings)
                 {
-                    jenny.writeNumber(reading.getMin());
+                    jenny.writeObject(getMin.apply(reading));
                 }
                 jenny.writeEndArray();
                 jenny.writeEndObject();
@@ -295,12 +212,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
                 jenny.writeFieldName("title");
                 jenny.writeString("Max");
                 jenny.writeFieldName("colour");
-                jenny.writeString("#00FF00");
+                jenny.writeString("#A4C0E4");
                 jenny.writeFieldName("y");
                 jenny.writeStartArray();
-                for (StoredDoubleGaugeReading reading : readings)
+                for (T reading : readings)
                 {
-                    jenny.writeNumber(reading.getMax());
+                    jenny.writeObject(getMax.apply(reading));
                 }
                 jenny.writeEndArray();
                 jenny.writeEndObject();
