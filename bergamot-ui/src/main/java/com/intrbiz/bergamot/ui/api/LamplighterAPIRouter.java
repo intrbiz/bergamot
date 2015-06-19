@@ -18,6 +18,9 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.lamplighter.model.CheckReading;
 import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
+import com.intrbiz.lamplighter.model.StoredFloatGaugeReading;
+import com.intrbiz.lamplighter.model.StoredIntGaugeReading;
+import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
 import com.intrbiz.lamplighter.model.StoredReading;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckRegEx;
@@ -97,6 +100,129 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
         this.writeLineChartData(jenny, checkReading, readings, series, StoredDoubleGaugeReading::getValue, StoredDoubleGaugeReading::getWarning, StoredDoubleGaugeReading::getCritical, StoredDoubleGaugeReading::getMin, StoredDoubleGaugeReading::getMax);
+    }
+    
+    // float gauge
+    
+    @Any("/graph/reading/gauge/float/:id/latest/:limit")
+    @WithDataAdapter(LamplighterDB.class)
+    public void getLatestFloatReadings(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId(session = false) UUID id, 
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredFloatGaugeReading> readings = db.getLatestFloatGaugeReadings(site.getId(), id, limit);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredFloatGaugeReading::getValue, StoredFloatGaugeReading::getWarning, StoredFloatGaugeReading::getCritical, StoredFloatGaugeReading::getMin, StoredFloatGaugeReading::getMax);
+    }
+    
+    @Any("/graph/reading/gauge/float/:id/date/:rollup/:agg/:start/:end")
+    @WithDataAdapter(LamplighterDB.class)
+    public void getFloatReadingsByDate(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId(session = false) UUID id, 
+            @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
+            @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
+            @IsaLong() Long start,
+            @IsaLong() Long end,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredFloatGaugeReading> readings = db.getFloatGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredFloatGaugeReading::getValue, StoredFloatGaugeReading::getWarning, StoredFloatGaugeReading::getCritical, StoredFloatGaugeReading::getMin, StoredFloatGaugeReading::getMax);
+    }
+    
+    // long gauge
+    
+    @Any("/graph/reading/gauge/long/:id/latest/:limit")
+    @WithDataAdapter(LamplighterDB.class)
+    public void getLatestLongReadings(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId(session = false) UUID id, 
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredLongGaugeReading> readings = db.getLatestLongGaugeReadings(site.getId(), id, limit);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredLongGaugeReading::getValue, StoredLongGaugeReading::getWarning, StoredLongGaugeReading::getCritical, StoredLongGaugeReading::getMin, StoredLongGaugeReading::getMax);
+    }
+    
+    @Any("/graph/reading/gauge/long/:id/date/:rollup/:agg/:start/:end")
+    @WithDataAdapter(LamplighterDB.class)
+    public void getLongReadingsByDate(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId(session = false) UUID id, 
+            @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
+            @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
+            @IsaLong() Long start,
+            @IsaLong() Long end,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredLongGaugeReading> readings = db.getLongGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredLongGaugeReading::getValue, StoredLongGaugeReading::getWarning, StoredLongGaugeReading::getCritical, StoredLongGaugeReading::getMin, StoredLongGaugeReading::getMax);
+    }
+    
+    // int gauge
+    
+    @Any("/graph/reading/gauge/int/:id/latest/:limit")
+    @WithDataAdapter(LamplighterDB.class)
+    public void getLatestIntReadings(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId(session = false) UUID id, 
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredIntGaugeReading> readings = db.getLatestIntGaugeReadings(site.getId(), id, limit);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredIntGaugeReading::getValue, StoredIntGaugeReading::getWarning, StoredIntGaugeReading::getCritical, StoredIntGaugeReading::getMin, StoredIntGaugeReading::getMax);
+    }
+    
+    @Any("/graph/reading/gauge/int/:id/date/:rollup/:agg/:start/:end")
+    @WithDataAdapter(LamplighterDB.class)
+    public void getIntReadingsByDate(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId(session = false) UUID id, 
+            @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
+            @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
+            @IsaInt() Long start,
+            @IsaInt() Long end,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredIntGaugeReading> readings = db.getIntGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeLineChartData(jenny, checkReading, readings, series, StoredIntGaugeReading::getValue, StoredIntGaugeReading::getWarning, StoredIntGaugeReading::getCritical, StoredIntGaugeReading::getMin, StoredIntGaugeReading::getMax);
     }
     
     // generic
