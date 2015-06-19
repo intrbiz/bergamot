@@ -212,8 +212,8 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             @IsaObjectId(session = false) UUID id, 
             @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
-            @IsaInt() Long start,
-            @IsaInt() Long end,
+            @IsaLong() Long start,
+            @IsaLong() Long end,
             @Param("series") String series
     ) throws IOException
     {
