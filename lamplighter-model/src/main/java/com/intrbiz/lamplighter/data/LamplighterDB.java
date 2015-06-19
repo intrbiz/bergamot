@@ -367,7 +367,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     public abstract List<StoredLongGaugeReading> getLatestLongGaugeReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
     
     @SQLGetter(table = StoredLongGaugeReading.class, name ="get_long_gauge_readings_by_date", since = @SQLVersion({1, 0, 0}))
-    public abstract List<StoredLongGaugeReading> getLatestGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
+    public abstract List<StoredLongGaugeReading> getLongGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
     
     // int
     
@@ -378,7 +378,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     public abstract List<StoredIntGaugeReading> getLatestIntGaugeReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
     
     @SQLGetter(table = StoredIntGaugeReading.class, name ="get_int_gauge_readings_by_date", since = @SQLVersion({1, 0, 0}))
-    public abstract List<StoredIntGaugeReading> getLatestIntGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
+    public abstract List<StoredIntGaugeReading> getIntGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
     
     // float
     
@@ -389,7 +389,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     public abstract List<StoredFloatGaugeReading> getLatestFloatGaugeReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
     
     @SQLGetter(table = StoredFloatGaugeReading.class, name ="get_float_gauge_readings_by_date", since = @SQLVersion({1, 0, 0}))
-    public abstract List<StoredFloatGaugeReading> getLatestFloatGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
+    public abstract List<StoredFloatGaugeReading> getFloatGaugeReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) String rollup, @SQLParam(value = "agg", virtual = true) String agg);
     
     // custom SQL patches
     
