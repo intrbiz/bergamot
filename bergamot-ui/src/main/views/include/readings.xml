@@ -18,54 +18,56 @@
 						// create the container
 						var container = document.createElement("div");
 						$(container).attr("id", "reading-" + reading.reading_id);
-						$(container).attr("class", "col12");
-						var selector = $.parseHTML('<select><option value="hours">Last 4 Hours</option><option value="day">Last Day</option><option value="week">Last Week</option><option value="month">Last Month</option></select>');
-						var chart = document.createElement("div");
-						$(chart).attr("id", "reading-" + reading.reading_id + "-chart");
-						// append
-						$(container).append(selector);
-						$(container).append(chart);
+						$(container).attr("class", "row");
 						$('#readings').append(container);
 						// create the graph
 						var end = new Date().getTime();
 						var start = end - (3600000 * 4);
-						$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/date/minute/avg/' + start + '/' + end, function(data) {							
-							new com.intrbiz.jsc.chart.LineGraph("reading-" + reading.reading_id + "-chart", 1280, 300, { 
+						$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/date/minute/avg/' + start + '/' + end, function(data) {
+							// chrome
+							var selector = $.parseHTML('<select><option value="hours">Last 4 Hours</option><option value="day">Last Day</option><option value="week">Last Week</option><option value="month">Last Month</option></select>');
+							var chart = document.createElement("div");
+							var opts = document.createElement("div");
+							$(chart).attr("id", "reading-" + reading.reading_id + "-chart");
+							$(chart).attr("class", "col8");
+							$(opts).append(selector);
+							$(opts).attr("class", "col1");
+							// append
+							$(container).append(chart, opts);
+							// chart							
+							var chart = new com.intrbiz.jsc.chart.LineGraph("reading-" + reading.reading_id + "-chart", 1140, 300, { 
 								"axis-x-sample": Math.floor(data.x.length / 4),
 								"axis-x-formater": function(x) { var d = new Date(x); return d.toLocaleTimeString() + "\n" + d.toLocaleDateString() } 
-							}, data).load();
-						});
-						// actions
-						$(selector).change(function(ev) {
-							ev.preventDefault();
-							var type = $(this).val();
-							// default to last 4 hours
-							var end = new Date().getTime();
-							var start = end - (3600000 * 4);
-							var rollup = 'minute';
-							// look at the type
-							if ('day' == type)
-							{
-								start = end - 86400000;
-								rollup = 'hour';
-							}
-							else if ('week' == type)
-							{
-								start = end - (86400000 * 7);
-								rollup = 'day';
-							}
-							else if ('month' == type)
-							{
-								start = end - (86400000 * 31);
-								rollup = 'day';
-							}
-							// go go go
-							$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/date/' + rollup + '/avg/' + start + '/' + end, function(data) {
-							    $("#reading-" + reading.reading_id + "-chart").html([]);							
-								new com.intrbiz.jsc.chart.LineGraph("reading-" + reading.reading_id + "-chart", 1280, 300, { 
-									"axis-x-sample": Math.floor(data.x.length / 4),
-									"axis-x-formater": function(x) { var d = new Date(x); return d.toLocaleTimeString() + "\n" + d.toLocaleDateString() } 
-								}, data).load();
+							}, data);
+							chart.load();
+							// actions
+							$(selector).change(function(ev) {
+								ev.preventDefault();
+								var type = $(this).val();
+								// default to last 4 hours
+								var end = new Date().getTime();
+								var start = end - (3600000 * 4);
+								var rollup = 'minute';
+								// look at the type
+								if ('day' == type)
+								{
+									start = end - 86400000;
+									rollup = 'hour';
+								}
+								else if ('week' == type)
+								{
+									start = end - (86400000 * 7);
+									rollup = 'day';
+								}
+								else if ('month' == type)
+								{
+									start = end - (86400000 * 31);
+									rollup = 'day';
+								}
+								// go go go
+								$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/date/' + rollup + '/avg/' + start + '/' + end, function(data) {
+								    chart.redraw(data);
+								});
 							});
 						});
 					});
