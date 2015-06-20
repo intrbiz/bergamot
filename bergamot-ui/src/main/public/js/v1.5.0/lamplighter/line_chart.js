@@ -99,7 +99,7 @@ com.intrbiz.jsc.chart.LineGraph = com.intrbiz.util.Class('com.intrbiz.jsc.chart.
                             label: (this.parameters["axis-x-formater"] ? this.parameters["axis-x-formater"].apply(this, [this.data.x[0]]) : this.data.x[0])
                         } );
                         // mid points
-			for (var i = this.parameters["axis-x-sample"]; i < (len -1); i+= this.parameters["axis-x-sample"])
+			for (var i = this.parameters["axis-x-sample"]; i < (len -2); i+= this.parameters["axis-x-sample"])
 			{
 				xl.push( { 
                                     position: ( this.xScale * i ), 
