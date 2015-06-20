@@ -92,13 +92,25 @@ com.intrbiz.jsc.chart.LineGraph = com.intrbiz.util.Class('com.intrbiz.jsc.chart.
 		if (this.data != null)
 		{
 			var xl = [];
-			for (var i = 0; i < this.data.x.length; i+= this.parameters["axis-x-sample"] )
-			{;
+                        var len = this.data.x.length;
+                        // ensure start
+                        xl.push( { 
+                            position: ( this.xScale * 0 ), 
+                            label: (this.parameters["axis-x-formater"] ? this.parameters["axis-x-formater"].apply(this, [this.data.x[0]]) : this.data.x[0])
+                        } );
+                        // mid points
+			for (var i = this.parameters["axis-x-sample"]; i < (len -1); i+= this.parameters["axis-x-sample"])
+			{
 				xl.push( { 
                                     position: ( this.xScale * i ), 
-                                    label: (this.parameters["axis-x-formater"] ? this.parameters["axis-x-formater"].apply(this, [ i, this.data.x[i] ]) : this.data.x[i])
+                                    label: (this.parameters["axis-x-formater"] ? this.parameters["axis-x-formater"].apply(this, [this.data.x[i]]) : this.data.x[i])
                                 } );
 			}
+			// ensure last
+			xl.push( { 
+                            position: ( this.xScale * (len -1) ), 
+                            label: (this.parameters["axis-x-formater"] ? this.parameters["axis-x-formater"].apply(this, [this.data.x[len -1]]) : this.data.x[len -1])
+                        } );
 			return xl;
 		}
 		return null;

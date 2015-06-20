@@ -116,7 +116,7 @@ com.intrbiz.jsc.chart.Chart = com.intrbiz.util.Class('com.intrbiz.jsc.chart.Char
 	
 	getBottomPadding : function()
 	{
-		return 30;
+		return 40;
 	},
 					       
 	getGraphWidth: function()
@@ -227,7 +227,7 @@ com.intrbiz.jsc.chart.Graph = com.intrbiz.util.Class('com.intrbiz.jsc.chart.Grap
 	
 	getXLabelsMargin: function()
 	{
-		return 15;
+		return 25;
 	},
 	
 	getYLabelsMargin: function()
@@ -272,7 +272,7 @@ com.intrbiz.jsc.chart.Graph = com.intrbiz.util.Class('com.intrbiz.jsc.chart.Grap
 	{
 		var min = this.getStartYAtZero() ? 0 : this.min(data);
 		var max = this.max(data);
-		return (max - min) == 0 ? (this.getGraphHeight() - 5) / (max * 2) : (this.getGraphHeight() - 5) / (max - min);
+		return (max - min) == 0 ? (this.getGraphHeight() - 5) / 10 : (this.getGraphHeight() - 5) / (max - min);
 	},
 	
 	/* Drawing functions */
