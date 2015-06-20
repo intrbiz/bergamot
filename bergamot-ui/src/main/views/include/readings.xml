@@ -22,11 +22,11 @@
 						$('#readings').append(container);
 						// create the graph
 						var end = new Date().getTime();
-						var start = end - 86400000;
-						$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/date/hour/avg/' + start + '/' + end, function(data) {							
+						var start = end - (3600000 * 4);
+						$.getJSON('/api/lamplighter/graph/reading/gauge/double/' + reading.reading_id + '/date/minute/avg/' + start + '/' + end, function(data) {							
 							new com.intrbiz.jsc.chart.LineGraph("reading-" + reading.reading_id, 1280, 300, { 
-								"axis-x-sample": 4,
-								"axis-x-formater": function(i, x) { var d = new Date(x); return d.toLocaleDateString() + " " + d.toLocaleTimeString(); } 
+								"axis-x-sample": Math.floor(data.x.length / 4),
+								"axis-x-formater": function(x) { var d = new Date(x); return d.toLocaleTimeString() + "\n" + d.toLocaleDateString() } 
 							}, data).load();
 						});
 					});
