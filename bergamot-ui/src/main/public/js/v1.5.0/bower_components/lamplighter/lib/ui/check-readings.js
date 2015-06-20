@@ -2,6 +2,12 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineC
 {
     return defineComponent(function()
     {
+		this.reading_types = {
+			"double_gauge_reading": { graph_url: 'graph/reading/gauge/double' },
+			"float_gauge_reading": { graph_url: 'graph/reading/gauge/float' },
+			"long_gauge_reading": { graph_url: 'graph/reading/gauge/long' },
+			"int_gauge_reading": { graph_url: 'graph/reading/gauge/int' },
+		};
 	
 		this.after('initialize', function() {
 			// get the check id
@@ -50,6 +56,8 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineC
 		
 		this.getDataURL = function(readingId, /*(hour|day|week|month)*/ type)
 		{
+			// get the graph url
+			var graphUrl = this.reading_types[this.readings[readingId].reading_type].graph_url;
 			// default to last 4 hours
 			var end = new Date().getTime();
 			var start = end - (3600000 * 4);
@@ -70,7 +78,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineC
 				start = end - (86400000 * 31);
 				rollup = 'day';
 			}
-			return '/api/lamplighter/graph/reading/gauge/double/' + readingId + '/date/' + rollup + '/avg/' + start + '/' + end;
+			return '/api/lamplighter/' + graphUrl + '/' + readingId + '/date/' + rollup + '/avg/' + start + '/' + end;
 		};
 		
 		this.redrawChart = function(readingId, type)
