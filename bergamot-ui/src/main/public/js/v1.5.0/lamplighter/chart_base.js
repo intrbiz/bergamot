@@ -177,8 +177,11 @@ com.intrbiz.jsc.chart.Chart = com.intrbiz.util.Class('com.intrbiz.jsc.chart.Char
 	},
 	
 	
-	redraw: function()
+	redraw: function(data)
 	{
+                if (data)
+                    this.data = data;
+                // redraw
 		this.paper.clear();
 		this.draw();
 	},
@@ -329,10 +332,15 @@ com.intrbiz.jsc.chart.Graph = com.intrbiz.util.Class('com.intrbiz.jsc.chart.Grap
 	
 	draw: function()
 	{
+                this.initDraw();
 		this.drawTitle();
 		this.drawLegend();
 		this.drawAxis(this.getXGridSpacing(), this.getYGridSpacing(), this.getXLabels(), this.getYLabels());
 		this.drawData();
+	},
+        
+        initDraw: function()
+	{
 	},
 	
 	/* functions to be extended */

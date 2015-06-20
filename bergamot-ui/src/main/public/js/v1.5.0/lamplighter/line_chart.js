@@ -53,7 +53,11 @@ com.intrbiz.jsc.chart.LineGraph = com.intrbiz.util.Class('com.intrbiz.jsc.chart.
 		this.data = data;
 		// call the super
 		com.intrbiz.util.superInit(com.intrbiz.jsc.chart.Graph,this,id, width, height, params);
-		this.calculateScale();
+	},
+        
+        initDraw: function()
+	{
+            this.calculateScale();
 	},
 	
 	calculateScale : function()
