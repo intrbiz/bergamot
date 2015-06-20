@@ -3,7 +3,6 @@
 <fragment xmlns="com.intrbiz.balsa">
 	<div id="readings" class="row" data-check-id="#{check.id}" style="display: none">
 		<H2>Readings</H2>
-		
 		<script type="text/javascript">
 			<![CDATA[
 			require(["lamplighter/lib/ui/check-readings"], function(check_readings) {
@@ -11,6 +10,5 @@
 			});
 			]]>
 		</script>
-		
 	</div>
 </fragment>
