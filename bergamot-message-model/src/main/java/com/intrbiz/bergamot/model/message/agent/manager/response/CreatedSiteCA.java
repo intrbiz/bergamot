@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 
-@JsonTypeName("bergamot.agent.manager.create_site_ca")
+@JsonTypeName("bergamot.agent.manager.created_site_ca")
 public class CreatedSiteCA extends AgentManagerResponse
 {
     @JsonProperty("certificate_pem")
