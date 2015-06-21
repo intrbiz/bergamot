@@ -84,7 +84,7 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
                     result.runtime(runtime);
                     resultSubmitter.accept(result);
                     // readings
-                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getId()).captured(System.currentTimeMillis());
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     readings.reading(new DoubleGaugeReading("uptime", "s", stat.getUptime()));
                     this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });

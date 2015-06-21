@@ -67,7 +67,7 @@ public class UsersExecutor extends AbstractExecutor<AgentEngine>
                             stat.getUsers().size() + " active users"
                     ).runtime(runtime));
                     // readings
-                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getId()).captured(System.currentTimeMillis());
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     readings.reading(new IntegerGaugeReading("active-users", null, stat.getUsers().size(), executeCheck.getIntParameter("warning",  2), executeCheck.getIntParameter("critical", 5), 0, Integer.MAX_VALUE));
                     this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
