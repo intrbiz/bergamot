@@ -65,8 +65,10 @@ import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.ClusterManagerError;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.FlushedGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
@@ -207,7 +209,9 @@ public class BergamotTranscoder
         // cluster manager
         ClusterManagerError.class,
         InitSite.class,
-        InitedSite.class
+        InitedSite.class,
+        FlushGlobalCaches.class,
+        FlushedGlobalCaches.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();
