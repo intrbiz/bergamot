@@ -143,7 +143,7 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
                 categories.put(categoryTag, category);
             }
             // by application too?
-            String applicationTag = service.getApplication();
+            String applicationTag = service.resolveApplication();
             if (applicationTag == null) category.addCheck(service);
             else category.getOrAddApplication(applicationTag).addCheck(service);
         }
@@ -206,7 +206,7 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
                 categories.put(categoryTag, category);
             }
             // by application too?
-            String applicationTag = trap.getApplication();
+            String applicationTag = trap.resolveApplication();
             if (applicationTag == null) category.addCheck(trap);
             else category.getOrAddApplication(applicationTag).addCheck(trap);
         }

@@ -86,7 +86,7 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
                 categories.put(categoryTag, category);
             }
             // by application too?
-            String applicationTag = resource.getApplication();
+            String applicationTag = resource.resolveApplication();
             if (applicationTag == null) category.addCheck(resource);
             else category.getOrAddApplication(applicationTag).addCheck(resource);
         }
