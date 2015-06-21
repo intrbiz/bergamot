@@ -9,9 +9,12 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 
 /**
@@ -58,6 +61,9 @@ public class ProcessStatsExecutor extends AbstractExecutor<AgentEngine>
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     ProcessStat stat = (ProcessStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got who in " + runtime + "ms: " + stat);
+                    // thresholds
+                    long warning = executeCheck.getLongParameter("warning",  150);
+                    long critical = executeCheck.getLongParameter("critical", 200);
                     // get the metric
                     String state = executeCheck.getParameter("state", "total").toLowerCase();
                     long count = -1;
@@ -94,16 +100,22 @@ public class ProcessStatsExecutor extends AbstractExecutor<AgentEngine>
                     }
                     else
                     {
+                        state = "total";
                         count = stat.getTotal();
                         message = count + " total processes, " + stat.getThreads() + " total threads";
                     }
                     // apply the check
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             count, 
-                            executeCheck.getLongParameter("warning",  150), 
-                            executeCheck.getLongParameter("critical", 200), 
+                            warning, 
+                            critical, 
                             message
                     ).runtime(runtime));
+                    // publish readings
+                    // readings
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
+                    readings.reading(new LongGaugeReading(state + "-processes", null, count, warning, critical, 0L, null));
+                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
             }
             else
