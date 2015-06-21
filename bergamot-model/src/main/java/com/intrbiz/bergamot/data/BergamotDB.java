@@ -166,6 +166,12 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // the schema
     
+    public void flushGlobalCaches()
+    {
+        this.getAdapterCache().removePrefix("get_site_by_name");
+        this.getAdapterCache().removePrefix("get_site");
+    }
+
     // site
     
     @Cacheable
