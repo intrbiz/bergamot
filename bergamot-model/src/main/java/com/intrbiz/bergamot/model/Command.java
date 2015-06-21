@@ -25,6 +25,12 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
 
     @SQLColumn(index = 2, name = "executor", since = @SQLVersion({ 1, 0, 0 }))
     private String executor;
+    
+    @SQLColumn(index = 3, name = "category", since = @SQLVersion({ 2, 5, 0 }))
+    private String category;
+
+    @SQLColumn(index = 4, name = "application", since = @SQLVersion({ 2, 5, 0 }))
+    private String application;
 
     public Command()
     {
@@ -37,6 +43,8 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
         super.configure(configuration, resolvedConfiguration);
         this.engine   = resolvedConfiguration.getEngine();
         this.executor = resolvedConfiguration.getExecutor();
+        this.category = resolvedConfiguration.getCategory();
+        this.application = resolvedConfiguration.getApplication();
     }
 
     public String getEngine()
@@ -57,6 +65,26 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
     public void setExecutor(String executor)
     {
         this.executor = executor;
+    }
+
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
+    public String getApplication()
+    {
+        return application;
+    }
+
+    public void setApplication(String application)
+    {
+        this.application = application;
     }
 
     @Override

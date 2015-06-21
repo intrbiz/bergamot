@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model;
 
 import java.util.UUID;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.ResourceMO;
@@ -21,6 +22,12 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
     
     @SQLColumn(index = 1, name = "cluster_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID clusterId;
+    
+    @SQLColumn(index = 2, name = "category", since = @SQLVersion({ 2, 5, 0 }))
+    private String category;
+
+    @SQLColumn(index = 3, name = "application", since = @SQLVersion({ 2, 5, 0 }))
+    private String application;
 
     public Resource()
     {
@@ -31,6 +38,8 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
     public void configure(ResourceCfg configuration, ResourceCfg resolvedConfiguration)
     {
         super.configure(configuration, resolvedConfiguration);
+        this.category = resolvedConfiguration.getCategory();
+        this.application = resolvedConfiguration.getApplication();
     }
 
     @Override
@@ -47,6 +56,46 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
     public void setClusterId(UUID clusterId)
     {
         this.clusterId = clusterId;
+    }
+    
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
+    public String getApplication()
+    {
+        return application;
+    }
+
+    public void setApplication(String application)
+    {
+        this.application = application;
+    }
+    
+    /**
+     * Resolve the category tag for this Resource
+     * @return the category tag or null is not specified
+     */
+    public String resolveCategory()
+    {
+        if (! Util.isEmpty(this.getCategory())) return this.getCategory();
+        return null;
+    }
+
+    /**
+     * Resolve the application tag for this Resource
+     * @return the application tag or null is not specified
+     */
+    public String resolveApplication()
+    {
+        if (! Util.isEmpty(this.getApplication())) return this.getApplication();
+        return null;
     }
     
     public Cluster getCluster()

@@ -66,7 +66,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({2, 4, 0}),
+        version = @SQLVersion({2, 5, 0}),
         tables = {
             Site.class,
             Location.class,

@@ -22,6 +22,12 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     
     @SQLColumn(index = 1, name = "host_id", since = @SQLVersion({ 1, 0, 0 }))
     private UUID hostId;
+    
+    @SQLColumn(index = 2, name = "category", since = @SQLVersion({ 2, 5, 0 }))
+    private String category;
+
+    @SQLColumn(index = 3, name = "application", since = @SQLVersion({ 2, 5, 0 }))
+    private String application;
 
     public Service()
     {
@@ -32,6 +38,8 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     public void configure(ServiceCfg configuration, ServiceCfg resolvedConfiguration)
     {
         super.configure(configuration, resolvedConfiguration);
+        this.category = resolvedConfiguration.getCategory();
+        this.application = resolvedConfiguration.getApplication();
     }
 
     public final String getType()
@@ -47,6 +55,58 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     public void setHostId(UUID hostId)
     {
         this.hostId = hostId;
+    }
+    
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
+    public String getApplication()
+    {
+        return application;
+    }
+
+    public void setApplication(String application)
+    {
+        this.application = application;
+    }
+    
+    /**
+     * Resolve the category tag for this Service
+     * @return the category tag or null is not specified
+     */
+    public String resolveCategory()
+    {
+        if (! Util.isEmpty(this.getCategory())) return this.getCategory();
+        CheckCommand checkCommand = this.getCheckCommand();
+        if (checkCommand != null)
+        {
+            Command command = checkCommand.getCommand();
+            if (command != null && (! Util.isEmpty(command.getCategory()))) return command.getCategory();
+        }
+        return null;
+    }
+
+    /**
+     * Resolve the application tag for this Service
+     * @return the application tag or null is not specified
+     */
+    public String resolveApplication()
+    {
+        if (! Util.isEmpty(this.getApplication())) return this.getApplication();
+        CheckCommand checkCommand = this.getCheckCommand();
+        if (checkCommand != null)
+        {
+            Command command = checkCommand.getCommand();
+            if (command != null && (! Util.isEmpty(command.getApplication()))) return command.getApplication();
+        }
+        return null;
     }
     
     @Override
