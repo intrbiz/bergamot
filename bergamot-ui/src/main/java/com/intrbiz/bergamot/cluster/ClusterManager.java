@@ -1,9 +1,11 @@
 package com.intrbiz.bergamot.cluster;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -29,7 +31,15 @@ import com.intrbiz.bergamot.cluster.migration.DeregisterPoolTask;
 import com.intrbiz.bergamot.cluster.migration.RegisterPoolTask;
 import com.intrbiz.bergamot.cluster.model.ProcessingPool;
 import com.intrbiz.bergamot.cluster.util.OwnerPredicate;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
+import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.FlushGlobalCaches;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.ClusterManagerError;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
+import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 import com.intrbiz.bergamot.result.ResultProcessor;
 import com.intrbiz.bergamot.scheduler.Scheduler;
@@ -37,6 +47,8 @@ import com.intrbiz.bergamot.scheduler.WheelScheduler;
 import com.intrbiz.data.DataException;
 import com.intrbiz.lamplighter.reading.DefaultReadingProcessor;
 import com.intrbiz.lamplighter.reading.ReadingProcessor;
+import com.intrbiz.queue.RPCHandler;
+import com.intrbiz.queue.RPCServer;
 
 /**
  * Manage scheduling and result processing services across the cluster
@@ -58,7 +70,7 @@ import com.intrbiz.lamplighter.reading.ReadingProcessor;
  * consume and apply these migration tasks
  * 
  */
-public class ClusterManager
+public class ClusterManager implements RPCHandler<ClusterManagerRequest, ClusterManagerResponse>
 {
     private Config hazelcastConfig;
 
@@ -108,6 +120,16 @@ public class ClusterManager
      * Our controller
      */
     private BergamotController controller;
+    
+    /**
+     *  Cluster manager queue
+     */
+    private BergamotClusterManagerQueue queue;
+    
+    /**
+     * Cluster manager server
+     */
+    private RPCServer<ClusterManagerRequest, ClusterManagerResponse> server;
 
     public ClusterManager()
     {
@@ -116,6 +138,8 @@ public class ClusterManager
         this.resultProcessor = new DefaultResultProcessor();
         this.readingProcessor = new DefaultReadingProcessor();
         this.controller = new BergamotController();
+        this.queue = BergamotClusterManagerQueue.open();
+        this.server = this.queue.createBergamotClusterManagerRPCServer(this);
     }
 
     public Scheduler getScheduler()
@@ -141,6 +165,12 @@ public class ClusterManager
     public void start(String instanceName)
     {
         this.start(null, instanceName);
+    }
+    
+    public void shutdown()
+    {
+        this.server.close();
+        this.queue.close();
     }
 
     public synchronized void start(Config config, String instanceName)
@@ -278,13 +308,13 @@ public class ClusterManager
     public void registerSite(Site site)
     {
         this.logger.info("Registering site " + site.getId() + " " + site.getName());
-        this.initPoolsForSite(this.cluster.getLocalMember(), this.cluster.getMembers(), site);
+        this.initPoolsForSite(this.cluster.getMembers(), site);
     }
 
     /**
      * Initially register the pools for the given site with this cluster.
      */
-    private void initPoolsForSite(Member local, Set<Member> memberSet, Site site)
+    private void initPoolsForSite(Set<Member> memberSet, Site site)
     {
         this.clusterManagerLock.lock();
         try
@@ -436,5 +466,39 @@ public class ClusterManager
     private void clearQueue(String memberUUID)
     {
         this.getMigrationQueue(memberUUID).clear();
+    }
+
+    @Override
+    public ClusterManagerResponse handleDevliery(ClusterManagerRequest event) throws IOException
+    {
+        try
+        {
+            if (event instanceof InitSite)
+            {
+                UUID siteId = ((InitSite) event).getSiteId();
+                String siteName = ((InitSite) event).getSiteName();
+                logger.info("Got request to init site: " + siteId + " - " + siteName);
+                try (BergamotDB db = BergamotDB.connect())
+                {
+                    Site site = db.getSite(siteId);
+                    if (site == null) return new ClusterManagerError("Unknown site");
+                    this.registerSite(site);
+                }
+                return new InitedSite();
+            }
+            else if (event instanceof FlushGlobalCaches)
+            {
+                try (BergamotDB db = BergamotDB.connect())
+                {
+                    db.flushGlobalCaches();
+                }
+            }
+            return new ClusterManagerError("Unknown command");
+        }
+        catch (Exception e)
+        {
+            logger.error("Failed to execute cluster manager command", e);
+            return new ClusterManagerError(e.getMessage());
+        }
     }
 }
