@@ -24,7 +24,12 @@ import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
+import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
+import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
+import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RPCClient;
@@ -157,6 +162,24 @@ public class CreateSiteCommand extends BergamotCLICommand
                     if (response instanceof CreatedSiteCA)
                     {
                         System.out.println("Created Bergamot Agent site Certificate Authority");
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        }
+        // message the UI cluster to setup the site
+        try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
+        {
+            try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
+            {
+                try
+                {
+                    ClusterManagerResponse response = client.publish(new InitSite(siteId, siteName)).get(5, TimeUnit.SECONDS);
+                    if (response instanceof InitedSite)
+                    {
+                        System.out.println("Initialised site with UI cluster");
                     }
                 }
                 catch (Exception e)
