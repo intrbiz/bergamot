@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command engine="agent" executor="cpu" extends="check_agent" name="check_agent_cpu">
+    <command category="system" engine="agent" executor="cpu" extends="check_agent" name="check_agent_cpu">
         <parameter description="CPU Usage Warning Threshold" name="cpu_warning">80</parameter>
         <parameter description="CPU Usage Critical Threshold" name="cpu_critical">90</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
         <summary>Bergamot Agent: CPU</summary>
     </command>
     
-    <command engine="agent" executor="memory" extends="check_agent" name="check_agent_memory">
+    <command category="system" engine="agent" executor="memory" extends="check_agent" name="check_agent_memory">
         <parameter description="Memory Usage Warning Threshold" name="warning">80</parameter>
         <parameter description="Memory Usage Critical Threshold" name="critical">90</parameter>
         <parameter description="Ignore caches" name="ignore_caches">yes</parameter>
@@ -16,7 +16,7 @@
         <summary>Bergamot Agent: Memory</summary>
     </command>
     
-    <command engine="agent" executor="disk" extends="check_agent" name="check_agent_disk">
+    <command category="system" engine="agent" executor="disk" extends="check_agent" name="check_agent_disk">
         <parameter description="Disk Usage Warning Threshold" name="warning">80</parameter>
         <parameter description="Disk Usage Critical Threshold" name="critical">90</parameter>
         <parameter description="Mount point" name="mount">/</parameter>
@@ -24,33 +24,33 @@
         <summary>Bergamot Agent: Disk Space</summary>
     </command>
     
-    <command engine="agent" executor="disks" extends="check_agent" name="check_agent_disks">
+    <command category="system" engine="agent" executor="disks" extends="check_agent" name="check_agent_disks">
         <parameter description="Disk Usage Warning Threshold" name="warning">80</parameter>
         <parameter description="Disk Usage Critical Threshold" name="critical">90</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
         <summary>Bergamot Agent: All Disks</summary>
     </command>
     
-    <command engine="agent" executor="os" extends="check_agent" name="check_agent_os">
+    <command category="system" engine="agent" executor="os" extends="check_agent" name="check_agent_os">
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
         <summary>Bergamot Agent: OS Info</summary>
     </command>
     
-    <command engine="agent" executor="users" extends="check_agent" name="check_agent_users">
+    <command category="system" engine="agent" executor="users" extends="check_agent" name="check_agent_users">
         <parameter description="Warning threshold" name="warning">2</parameter>
         <parameter description="Critical threshold" name="critical">5</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/users.png</parameter>
         <summary>Bergamot Agent: Active Users</summary>
     </command>
     
-    <command engine="agent" executor="uptime" extends="check_agent" name="check_agent_uptime">
+    <command category="system" engine="agent" executor="uptime" extends="check_agent" name="check_agent_uptime">
         <parameter description="Warning threshold (s)" name="warning">900</parameter>
         <parameter description="Critical threshold (s)" name="critical">300</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
         <summary>Bergamot Agent: Uptime</summary>
     </command>
     
-    <command engine="agent" executor="disk-io" extends="check_agent" name="check_agent_disk_io">
+    <command category="system" engine="agent" executor="disk-io" extends="check_agent" name="check_agent_disk_io">
         <parameter description="Disk IO Warning Threshold (MB/s)" name="warning">200</parameter>
         <parameter description="Disk IO Critical Threshold (MB/s)" name="critical">250</parameter>
         <parameter description="Check peak IO" name="peak">no</parameter>

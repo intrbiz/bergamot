@@ -8,7 +8,7 @@
         <summary>Bergamot Agent: Nagios Plugin</summary>
     </command>
     
-    <command extends="check_agent_nagios" name="check_agent_load">
+    <command category="system" extends="check_agent_nagios" name="check_agent_load">
         <parameter name="command">check_load -w 4,3,2 -c 4,3,3</parameter>
         <summary>Bergamot Agent: Load</summary>
         <description>Check the server load by executing the check_load Nagios plugin</description>

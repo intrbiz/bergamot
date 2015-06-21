@@ -18,7 +18,7 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
-    <command engine="agent" executor="network-io" extends="check_agent" name="check_agent_network_io">
+    <command category="system" engine="agent" executor="network-io" extends="check_agent" name="check_agent_network_io">
         <parameter description="Warning (Mb/s)" name="warning">50</parameter>
         <parameter description="Critical (Mb/s)" name="critical">75</parameter>
         <parameter description="Check peak rate" name="peak">no</parameter>
@@ -40,7 +40,7 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
-    <command extends="check_agent_port_listener" name="check_agent_listener_ssh">
+    <command category="system" application="ssh" extends="check_agent_port_listener" name="check_agent_listener_ssh">
         <summary>Bergamot Agent: Listening Port - SSH</summary>
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
@@ -64,7 +64,7 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
-    <command extends="check_agent_port_listener" name="check_agent_listener_mysql">
+    <command application="mysql" extends="check_agent_port_listener" name="check_agent_listener_mysql">
         <summary>Bergamot Agent: Listening Port - MySQL</summary>
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
@@ -72,7 +72,7 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
-    <command extends="check_agent_port_listener" name="check_agent_listener_postgresql">
+    <command application="postgresql" extends="check_agent_port_listener" name="check_agent_listener_postgresql">
         <summary>Bergamot Agent: Listening Port - PostgreSQL</summary>
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
@@ -80,7 +80,7 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/listener.png</parameter>
     </command>
     
-    <command extends="check_agent_port_listener" name="check_agent_listener_rabbitmq">
+    <command application="rabbitmq" extends="check_agent_port_listener" name="check_agent_listener_rabbitmq">
         <summary>Bergamot Agent: Listening Port - RabbitMQ</summary>
         <parameter name="warning">1:2</parameter>
         <parameter name="critical">1:2</parameter>
