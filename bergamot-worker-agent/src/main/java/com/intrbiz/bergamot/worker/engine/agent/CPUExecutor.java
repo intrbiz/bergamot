@@ -74,10 +74,10 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                     readings.reading(new DoubleGaugeReading("load-1", null, stat.getLoad1()));
                     readings.reading(new DoubleGaugeReading("load-5", null, stat.getLoad5()));
                     readings.reading(new DoubleGaugeReading("load-15", null, stat.getLoad15()));
-                    readings.reading(new DoubleGaugeReading("cpu-usage-total", "%", stat.getTotalUsage().getTotal(), executeCheck.getPercentParameter("cpu_warning", 0.8D), executeCheck.getPercentParameter("cpu_critical", 0.9D), 1D, 100D));
-                    readings.reading(new DoubleGaugeReading("cpu-usage-system", "%", stat.getTotalUsage().getSystem(), null, null, 1D, 100D));
-                    readings.reading(new DoubleGaugeReading("cpu-usage-user", "%", stat.getTotalUsage().getUser(), null, null, 1D, 100D));
-                    readings.reading(new DoubleGaugeReading("cpu-usage-wait", "%", stat.getTotalUsage().getWait(), null, null, 1D, 100D));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-total", "%", UnitUtil.toPercent(stat.getTotalUsage().getTotal()), UnitUtil.toPercent(executeCheck.getPercentParameter("cpu_warning", 0.8D)), UnitUtil.toPercent(executeCheck.getPercentParameter("cpu_critical", 0.9D)), 1D, 100D));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-system", "%", UnitUtil.toPercent(stat.getTotalUsage().getSystem()), null, null, 1D, 100D));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-user", "%", UnitUtil.toPercent(stat.getTotalUsage().getUser()), null, null, 1D, 100D));
+                    readings.reading(new DoubleGaugeReading("cpu-usage-wait", "%", UnitUtil.toPercent(stat.getTotalUsage().getWait()), null, null, 1D, 100D));
                     this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
             }
