@@ -194,7 +194,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID siteId = Site.getSiteId(checkId);
             UUID readingId = Site.randomId(siteId);
             // setup
-            this.setupDoubleGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            this.setupDoubleGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit);
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
@@ -234,7 +234,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID siteId = Site.getSiteId(checkId);
             UUID readingId = Site.randomId(siteId);
             // setup
-            this.setupLongGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            this.setupLongGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit);
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
@@ -274,7 +274,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID siteId = Site.getSiteId(checkId);
             UUID readingId = Site.randomId(siteId);
             // setup
-            this.setupIntGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            this.setupIntGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit);
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
@@ -314,7 +314,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID siteId = Site.getSiteId(checkId);
             UUID readingId = Site.randomId(siteId);
             // setup
-            this.setupFloatGaugeReading(siteId, readingId, checkId, name, Util.ucFirst(name), null, unit);
+            this.setupFloatGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit);
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
@@ -564,5 +564,10 @@ public abstract class LamplighterDB extends DatabaseAdapter
         return new SQLScript(
                 "SELECT lamplighter.new_site(id) FROM bergamot.site"
         );
+    }
+    
+    private static String nameToSummary(String name)
+    {
+        return Util.ucFirst(name.replace('-', ' ').replace('_', ' '));
     }
 }
