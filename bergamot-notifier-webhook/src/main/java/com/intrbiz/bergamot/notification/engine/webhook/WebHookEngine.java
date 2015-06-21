@@ -36,6 +36,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
@@ -106,57 +107,59 @@ public class WebHookEngine extends AbstractNotificationEngine
             CheckNotification checkNotification = (CheckNotification) notification;
             CheckMO check = checkNotification.getCheck();
             // the webhook URL is stored as a check parameter
-            String url = check.getParameter("webhook.url");
-            if (! Util.isEmpty(url))
+            for (ParameterMO urlParam : check.getParametersStartingWith("webhook.url"))
             {
-                try
+                if (! Util.isEmpty(urlParam.getValue()))
                 {
-                    // parse the URL
-                    URL webHookURL = new URL(url);
-                    // serialise the message to send
-                    byte[] body = this.transcoder.encodeAsBytes(checkNotification);
-                    // build the request to send
-                    FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, webHookURL.getPath(), Unpooled.wrappedBuffer(body));
-                    request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-                    request.headers().add(HttpHeaders.Names.HOST, webHookURL.getPort() == -1 ? webHookURL.getHost() : webHookURL.getHost() + ":" + webHookURL.getPort());
-                    request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring WebHook 1.1.0");
-                    request.headers().add(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8");
-                    // make a HTTP request
-                    Bootstrap b = new Bootstrap();
-                    b.group(this.eventLoop);
-                    b.channel(NioSocketChannel.class);
-                    b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) TimeUnit.SECONDS.toMillis(60));
-                    b.handler(new ChannelInitializer<SocketChannel>()
+                    try
                     {
-                        @Override
-                        public void initChannel(SocketChannel ch) throws Exception
+                        // parse the URL
+                        URL url = new URL(urlParam.getValue());
+                        // serialise the message to send
+                        byte[] body = this.transcoder.encodeAsBytes(checkNotification);
+                        // build the request to send
+                        FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, url.getPath(), Unpooled.wrappedBuffer(body));
+                        request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+                        request.headers().add(HttpHeaders.Names.HOST, url.getPort() == -1 ? url.getHost() : url.getHost() + ":" + url.getPort());
+                        request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring WebHook 1.1.0");
+                        request.headers().add(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8");
+                        // make a HTTP request
+                        Bootstrap b = new Bootstrap();
+                        b.group(this.eventLoop);
+                        b.channel(NioSocketChannel.class);
+                        b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) TimeUnit.SECONDS.toMillis(60));
+                        b.handler(new ChannelInitializer<SocketChannel>()
                         {
-                            // SSL handling
-                            SSLEngine sslEngine = null;
-                            if ("https".equalsIgnoreCase(webHookURL.getProtocol()))
+                            @Override
+                            public void initChannel(SocketChannel ch) throws Exception
                             {
-                                sslEngine = sslContext.createSSLEngine(webHookURL.getHost(), webHookURL.getPort() == -1 ? 443 : webHookURL.getPort());
-                                sslEngine.setUseClientMode(true);
-                                SSLParameters params = new SSLParameters();
-                                params.setEndpointIdentificationAlgorithm("HTTPS");
-                                sslEngine.setSSLParameters(params);
-                                ch.pipeline().addLast(new SslHandler(sslEngine));
+                                // SSL handling
+                                SSLEngine sslEngine = null;
+                                if ("https".equalsIgnoreCase(url.getProtocol()))
+                                {
+                                    sslEngine = sslContext.createSSLEngine(url.getHost(), url.getPort() == -1 ? 443 : url.getPort());
+                                    sslEngine.setUseClientMode(true);
+                                    SSLParameters params = new SSLParameters();
+                                    params.setEndpointIdentificationAlgorithm("HTTPS");
+                                    sslEngine.setSSLParameters(params);
+                                    ch.pipeline().addLast(new SslHandler(sslEngine));
+                                }
+                                // HTTP handling
+                                ch.pipeline().addLast(
+                                        new HttpClientCodec(),
+                                        new HttpContentDecompressor(),
+                                        new HttpObjectAggregator(1 * 1024 * 1024 /* 1 MiB */),
+                                        new WebHookClientHandler(timer, sslEngine, request)
+                                );
                             }
-                            // HTTP handling
-                            ch.pipeline().addLast(
-                                    new HttpClientCodec(),
-                                    new HttpContentDecompressor(),
-                                    new HttpObjectAggregator(1 * 1024 * 1024 /* 1 MiB */),
-                                    new WebHookClientHandler(timer, sslEngine, request)
-                            );
-                        }
-                    });
-                    // connect the client
-                    b.connect(webHookURL.getHost(), webHookURL.getPort() == -1 ? webHookURL.getDefaultPort() : webHookURL.getPort());
-                }
-                catch (MalformedURLException e)
-                {
-                    logger.error("Cannot send WebHook to malformed url", e);
+                        });
+                        // connect the client
+                        b.connect(url.getHost(), url.getPort() == -1 ? url.getDefaultPort() : url.getPort());
+                    }
+                    catch (MalformedURLException e)
+                    {
+                        logger.error("Cannot send WebHook to malformed url", e);
+                    }
                 }
             }
         }
