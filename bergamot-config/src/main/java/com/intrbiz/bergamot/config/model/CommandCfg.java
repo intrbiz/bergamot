@@ -19,6 +19,10 @@ public class CommandCfg extends NamedObjectCfg<CommandCfg>
     private String engine;
 
     private String executor;
+    
+    private String category;
+    
+    private String application;
 
     public CommandCfg()
     {
@@ -47,6 +51,30 @@ public class CommandCfg extends NamedObjectCfg<CommandCfg>
     public void setExecutor(String executor)
     {
         this.executor = executor;
+    }
+
+    @XmlAttribute(name = "category")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
+    @XmlAttribute(name = "application")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getApplication()
+    {
+        return application;
+    }
+
+    public void setApplication(String application)
+    {
+        this.application = application;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
