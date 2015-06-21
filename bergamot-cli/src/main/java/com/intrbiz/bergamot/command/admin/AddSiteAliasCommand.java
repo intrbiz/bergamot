@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.command.admin;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
@@ -8,7 +9,16 @@ import com.intrbiz.bergamot.BergamotCLIException;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
+import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.FlushGlobalCaches;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.FlushedGlobalCaches;
+import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.data.DataManager;
+import com.intrbiz.queue.QueueManager;
+import com.intrbiz.queue.RPCClient;
+import com.intrbiz.queue.name.RoutingKey;
+import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
 
 public class AddSiteAliasCommand extends BergamotCLICommand
@@ -59,6 +69,8 @@ public class AddSiteAliasCommand extends BergamotCLICommand
         UICfg config = UICfg.loadConfiguration();
         // setup the data manager
         DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());
+        // setup the queue manager
+        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
         // ensure the DB schema is installed
         BergamotDB.install();
         // now actually create the site
@@ -78,6 +90,24 @@ public class AddSiteAliasCommand extends BergamotCLICommand
                 site.getAliases().add(alias);
             }
             db.setSite(site);
+        }
+        // message the UI cluster to setup the site
+        try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
+        {
+            try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
+            {
+                try
+                {
+                    ClusterManagerResponse response = client.publish(new FlushGlobalCaches()).get(5, TimeUnit.SECONDS);
+                    if (response instanceof FlushedGlobalCaches)
+                    {
+                        System.out.println("Flushed UI cluster global caches");
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
         }
         // all ok
         return 0;
