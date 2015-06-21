@@ -70,7 +70,7 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                             "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
                     ).runtime(runtime));
                     // readings
-                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getId()).captured(System.currentTimeMillis());
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     readings.reading(new DoubleGaugeReading("load-1", null, stat.getLoad1()));
                     readings.reading(new DoubleGaugeReading("load-5", null, stat.getLoad5()));
                     readings.reading(new DoubleGaugeReading("load-15", null, stat.getLoad15()));
