@@ -7,20 +7,26 @@ import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 /**
- * Scale KiB, MiB, GiB, TiB to Bytes.  Note base 2.
+ * Scale B kB, MB, GB, TB, KiB, MiB, GiB, TiB
  */
-public class Base2BytesScaler implements ReadingScaler
+public class BytesScaler implements ReadingScaler
 {
     @Override
     public String[] getUnits()
     {
-        return new String[] { "B", "KiB", "MiB", "GiB", "TiB" };
+        return new String[] { "B", "kB", "KB", "MB", "GB", "TB", "KiB", "MiB", "GiB", "TiB" };
     }
+    
     public static double toBytes(String unit)
     {
         switch (unit)
         {
-            case "B"  : return 1D;
+            case "B"   : return 1D;
+            case "kB"  : return 1000D;
+            case "KB"  : return 1000D;
+            case "MB"  : return 1000D * 1000D;
+            case "GB"  : return 1000D * 1000D * 1000D;
+            case "TB"  : return 1000D * 1000D * 1000D * 1000D;
             case "KiB" : return 1024D;
             case "MiB" : return 1024D * 1024D;
             case "GiB" : return 1024D * 1024D * 1024D;

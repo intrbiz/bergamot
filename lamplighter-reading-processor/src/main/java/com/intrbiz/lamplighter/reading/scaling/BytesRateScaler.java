@@ -7,26 +7,30 @@ import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 /**
- * Scale kB, MB, GB, TB to Bytes.  Note base 10.
+ * Scale kB/s, MB/s, GB/s, TB/s, KiB/s, MiB/s, GiB/s, TiB/s
  */
-public class Base10BytesScaler implements ReadingScaler
+public class BytesRateScaler implements ReadingScaler
 {
     @Override
     public String[] getUnits()
     {
-        return new String[] { "B", "kB", "KB", "MB", "GB", "TB" };
+        return new String[] { "B/s", "kB/s", "KB/s", "MB/s", "GB/s", "TB/s", "KiB/s", "MiB/s", "GiB/s", "TiB/s" };
     }
     
     public static double toBytes(String unit)
     {
         switch (unit)
         {
-            case "B"  : return 1D;
-            case "kB" : return 1000D;
-            case "KB" : return 1000D;
-            case "MB" : return 1000D * 1000D;
-            case "GB" : return 1000D * 1000D * 1000D;
-            case "TB" : return 1000D * 1000D * 1000D * 1000D;
+            case "B/s"   : return 1D;
+            case "kB/s"  : return 1000D;
+            case "KB/s"  : return 1000D;
+            case "MB/s"  : return 1000D * 1000D;
+            case "GB/s"  : return 1000D * 1000D * 1000D;
+            case "TB/s"  : return 1000D * 1000D * 1000D * 1000D;
+            case "KiB/s" : return 1024D;
+            case "MiB/s" : return 1024D * 1024D;
+            case "GiB/s" : return 1024D * 1024D * 1024D;
+            case "TiB/s" : return 1024D * 1024D * 1024D * 1024D;
         }
         throw new IllegalArgumentException("Unknown unit: " + unit);
     }

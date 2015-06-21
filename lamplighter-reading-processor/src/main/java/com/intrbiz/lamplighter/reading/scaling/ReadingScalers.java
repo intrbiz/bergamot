@@ -13,9 +13,9 @@ public class ReadingScalers
     {
         super();
         // default scalers
-        this.registerScaler(new Base10BytesScaler());
-        this.registerScaler(new Base2BytesScaler());
+        this.registerScaler(new BytesScaler());
         this.registerScaler(new SecondsScaler());
+        this.registerScaler(new BytesRateScaler());
     }
     
     public void registerScaler(ReadingScaler scaler)
