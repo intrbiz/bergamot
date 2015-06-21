@@ -79,21 +79,47 @@
 		<a href="/host/execute-services/#{host.id}"    id="check-services-now"  data-host-id="#{host.id}">Check all now</a>
 	</div>
 
-	<div class="row hostgroup services" rendered="#{! host.services.isEmpty()}">
-		<data-set var="check" value="#{host.services}">
-			<include view="include/check"/>
-		</data-set>
-	</div>
+	<data-set var="category" value="#{host.getCategorisedServices()}">
+		<div class="row hostgroup services">
+			<h3 rendered="#{category.name != 'default'}">Category: #{ucfirst(category.name)}</h3>
+			<div class="row hostgroup services">
+				<data-set var="check" value="#{category.checks}">
+					<include view="include/check"/>
+				</data-set>
+			</div>
+			<data-set var="application" value="#{category.applications}">
+				<div class="row hostgroup services">
+					<h3>Application: #{ucfirst(application.name)}</h3>
+					<data-set var="check" value="#{application.checks}">
+						<include view="include/check"/>
+					</data-set>
+				</div>
+			</data-set>
+		</div>
+	</data-set>
 	
 	<!-- Traps -->
 	
 	<h2 rendered="#{! host.traps.isEmpty()}">Traps</h2>
-
-	<div class="row hostgroup services" rendered="#{! host.traps.isEmpty()}">
-		<data-set var="check" value="#{host.traps}">
-			<include view="include/check"/>
-		</data-set>
-	</div>
+	
+	<data-set var="category" value="#{host.getCategorisedTraps()}">
+		<div class="row hostgroup services">
+			<h3 rendered="#{category.name != 'default'}">Category: #{ucfirst(category.name)}</h3>
+			<div class="row hostgroup services">
+				<data-set var="check" value="#{category.checks}">
+					<include view="include/check"/>
+				</data-set>
+			</div>
+			<data-set var="application" value="#{category.applications}">
+				<div class="row hostgroup services">
+					<h3>Application: #{ucfirst(application.name)}</h3>
+					<data-set var="check" value="#{application.checks}">
+						<include view="include/check"/>
+					</data-set>
+				</div>
+			</data-set>
+		</div>
+	</data-set>
 	
 	<!-- Alerts -->
 	<include view="include/alerts"/>

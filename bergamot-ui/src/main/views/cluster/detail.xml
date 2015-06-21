@@ -73,12 +73,25 @@
 		<a href="/cluster/unsuppress-resource/#{host.id}" id="unsuppress-resources" data-cluster-id="#{cluster.id}">Unsuppress all</a>
 		<a href="/cluster/suppress-resource/#{host.id}"   id="suppress-resources"   data-cluster-id="#{cluster.id}">Suppress all</a>
 	</div>
-
-	<div class="row hostgroup services" rendered="#{! cluster.resources.isEmpty()}">
-		<data-set var="check" value="#{cluster.resources}">
-			<include view="include/check"/>
-		</data-set>
-	</div>
+	
+	<data-set var="category" value="#{host.getCategorisedResources()}">
+		<div class="row hostgroup services">
+			<h3 rendered="#{category.name != 'default'}">Category: #{ucfirst(category.name)}</h3>
+			<div class="row hostgroup services">
+				<data-set var="check" value="#{category.checks}">
+					<include view="include/check"/>
+				</data-set>
+			</div>
+			<data-set var="application" value="#{category.applications}">
+				<div class="row hostgroup services">
+					<h3>Application: #{ucfirst(application.name)}</h3>
+					<data-set var="check" value="#{application.checks}">
+						<include view="include/check"/>
+					</data-set>
+				</div>
+			</data-set>
+		</div>
+	</data-set>
 	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
