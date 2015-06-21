@@ -10,9 +10,12 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 
 
 
@@ -76,6 +79,10 @@ public class ProcessesExecutor extends AbstractExecutor<AgentEngine>
                             executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
                             "found " + stat.getProcesses().size() + " processes"
                     ).runtime(runtime));
+                    // readings
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
+                    readings.reading(new IntegerGaugeReading("processes", null, stat.getProcesses().size()));
+                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
             }
             else
