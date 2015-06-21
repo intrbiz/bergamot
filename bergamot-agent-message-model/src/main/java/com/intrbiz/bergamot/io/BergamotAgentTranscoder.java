@@ -65,6 +65,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.netio.NetIORateInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.process.ProcessInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.who.WhoInfo;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
+import com.intrbiz.gerald.polyakov.io.PolyakovTranscoder;
 
 /**
  * Encode and decode messages
@@ -155,6 +156,8 @@ public class BergamotAgentTranscoder
         this.factory.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.sealed = sealed;
         this.factory.registerSubtypes(BergamotAgentTranscoder.CLASSES);
+        // include the metric reading models from Polyakov
+        this.addEventType(PolyakovTranscoder.CLASSES);
     }
     
     public BergamotAgentTranscoder()
