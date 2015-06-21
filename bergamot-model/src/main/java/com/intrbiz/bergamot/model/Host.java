@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.model;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -126,6 +128,27 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
             return db.getServiceOnHostByExternalRef(this.getId(), externalRef);
         }
     }
+    
+    public Collection<Category<Service>> getCategorisedServices()
+    {
+        Map<String, Category<Service>> categories = new TreeMap<String, Category<Service>>();
+        for (Service service : this.getServices())
+        {
+            // get the category for this service
+            String categoryTag = Util.coalesceEmpty(service.resolveCategory(), "default");
+            Category<Service> category = categories.get(categoryTag);
+            if (category == null)
+            {
+                category = new Category<Service>(categoryTag);
+                categories.put(categoryTag, category);
+            }
+            // by application too?
+            String applicationTag = service.getApplication();
+            if (applicationTag == null) category.addCheck(service);
+            else category.getOrAddApplication(applicationTag).addCheck(service);
+        }
+        return categories.values();
+    }
 
     // traps
 
@@ -167,6 +190,27 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         {
             return db.getTrapOnHostByExternalRef(this.getId(), externalRef);
         }
+    }
+    
+    public Collection<Category<Trap>> getCategorisedTraps()
+    {
+        Map<String, Category<Trap>> categories = new TreeMap<String, Category<Trap>>();
+        for (Trap trap : this.getTraps())
+        {
+            // get the category for this service
+            String categoryTag = Util.coalesceEmpty(trap.resolveCategory(), "default");
+            Category<Trap> category = categories.get(categoryTag);
+            if (category == null)
+            {
+                category = new Category<Trap>(categoryTag);
+                categories.put(categoryTag, category);
+            }
+            // by application too?
+            String applicationTag = trap.getApplication();
+            if (applicationTag == null) category.addCheck(trap);
+            else category.getOrAddApplication(applicationTag).addCheck(trap);
+        }
+        return categories.values();
     }
 
     // location

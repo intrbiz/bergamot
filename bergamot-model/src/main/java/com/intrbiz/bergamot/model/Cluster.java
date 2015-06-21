@@ -1,8 +1,12 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.ClusterMO;
@@ -66,6 +70,27 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
         {
             return db.getResourceOnCluster(this.getId(), name);
         }
+    }
+    
+    public Collection<Category<Resource>> getCategorisedResources()
+    {
+        Map<String, Category<Resource>> categories = new TreeMap<String, Category<Resource>>();
+        for (Resource resource : this.getResources())
+        {
+            // get the category for this service
+            String categoryTag = Util.coalesceEmpty(resource.resolveCategory(), "default");
+            Category<Resource> category = categories.get(categoryTag);
+            if (category == null)
+            {
+                category = new Category<Resource>(categoryTag);
+                categories.put(categoryTag, category);
+            }
+            // by application too?
+            String applicationTag = resource.getApplication();
+            if (applicationTag == null) category.addCheck(resource);
+            else category.getOrAddApplication(applicationTag).addCheck(resource);
+        }
+        return categories.values();
     }
 
     @Override

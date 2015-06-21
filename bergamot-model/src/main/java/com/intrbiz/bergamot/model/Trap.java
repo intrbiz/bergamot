@@ -123,6 +123,8 @@ public class Trap extends PassiveCheck<TrapMO, TrapCfg>
     {
         TrapMO mo = new TrapMO();
         super.toMO(mo, stub);
+        mo.setCategory(this.resolveCategory());
+        mo.setApplication(this.resolveApplication());
         if (! stub)
         {
             mo.setHost(this.getHost().toStubMO());

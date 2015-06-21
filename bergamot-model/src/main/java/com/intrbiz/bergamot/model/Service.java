@@ -134,6 +134,8 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     {
         ServiceMO mo = new ServiceMO();
         super.toMO(mo, stub);
+        mo.setCategory(this.resolveCategory());
+        mo.setApplication(this.resolveApplication());
         if (! stub)
         {
             mo.setHost(this.getHost().toStubMO());

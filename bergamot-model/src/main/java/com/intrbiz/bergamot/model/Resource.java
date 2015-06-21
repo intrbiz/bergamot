@@ -116,6 +116,8 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
     {
         ResourceMO mo = new ResourceMO();
         super.toMO(mo, stub);
+        mo.setCategory(this.resolveCategory());
+        mo.setApplication(this.resolveApplication());
         if (! stub)
         {
             mo.setCluster(this.getCluster().toStubMO());
