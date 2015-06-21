@@ -9,6 +9,12 @@ public class ResourceMO extends VirtualCheckMO
     @JsonProperty("cluster")
     private ClusterMO cluster;
     
+    @JsonProperty("category")
+    private String category;
+    
+    @JsonProperty("application")
+    private String application;
+    
     public ResourceMO()
     {
         super();
@@ -27,5 +33,25 @@ public class ResourceMO extends VirtualCheckMO
     public void setCluster(ClusterMO cluster)
     {
         this.cluster = cluster;
+    }
+    
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
+    public String getApplication()
+    {
+        return application;
+    }
+
+    public void setApplication(String application)
+    {
+        this.application = application;
     }
 }
