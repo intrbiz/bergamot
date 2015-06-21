@@ -65,6 +65,9 @@ import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.ClusterManagerError;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
@@ -200,7 +203,11 @@ public class BergamotTranscoder
         SignedAgent.class,
         SignServer.class,
         SignedServer.class,
-        AgentManagerError.class
+        AgentManagerError.class,
+        // cluster manager
+        ClusterManagerError.class,
+        InitSite.class,
+        InitedSite.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();
