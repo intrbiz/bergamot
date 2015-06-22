@@ -10,10 +10,14 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIO;
 import com.intrbiz.bergamot.model.message.agent.stat.NetIOStat;
+import com.intrbiz.bergamot.model.message.agent.stat.netio.NetIOInfo;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 
 /**
@@ -66,19 +70,33 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     NetIOStat stat = (NetIOStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got NetIOStat in " + runtime + "ms: " + stat);
+                    // thresholds
+                    double warning = executeCheck.getDoubleParameter("warning",  50);
+                    double critical = executeCheck.getDoubleParameter("critical", 75);
                     // apply the check
                     boolean peak = executeCheck.getBooleanParameter("peak", false);
                     resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
                             stat.getIfaces(),
                             (v, t) -> (peak ? v.getFiveMinuteRate().getTxPeakRateMbps(): v.getFiveMinuteRate().getTxRateMbps()) > t || (peak ? v.getFiveMinuteRate().getRxPeakRateMbps(): v.getFiveMinuteRate().getRxRateMbps()) > t,
-                            executeCheck.getDoubleParameter("warning",  50), 
-                            executeCheck.getDoubleParameter("critical", 75), 
+                            warning, 
+                            critical, 
                             stat.getIfaces().stream().map((n) -> 
                                 n.getName() + 
                                 " Tx: " + DFMT.format(n.getFiveMinuteRate().getTxRateMbps()) + "Mb/s (" + DFMT.format(n.getFiveMinuteRate().getTxPeakRateMbps()) + "Mb/s Peak)" + 
                                 " Rx: " + DFMT.format(n.getFiveMinuteRate().getRxRateMbps()) + "Mb/s (" + DFMT.format(n.getFiveMinuteRate().getRxPeakRateMbps()) + "Mb/s Peak)"
                             ).collect(Collectors.joining("; "))
                     ).runtime(runtime));
+                    // readings
+                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
+                    for (NetIOInfo iface : stat.getIfaces())
+                    {
+                        // rate
+                        readings.reading(new DoubleGaugeReading("rx-rate-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getRxRateMbps(), warning, critical, null, null));
+                        readings.reading(new DoubleGaugeReading("rx-rate-peak-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getRxPeakRateMbps(), warning, critical, null, null));
+                        readings.reading(new DoubleGaugeReading("tx-rate-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getTxRateMbps(), warning, critical, null, null));
+                        readings.reading(new DoubleGaugeReading("tx-rate-peak-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getTxPeakRateMbps(), warning, critical, null, null));
+                    }
+                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
                 });
             }
             else
