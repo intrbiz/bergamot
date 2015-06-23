@@ -16,6 +16,7 @@ public class ReadingScalers
         this.registerScaler(new BytesScaler());
         this.registerScaler(new SecondsScaler());
         this.registerScaler(new BytesRateScaler());
+        this.registerScaler(new BitRateScaler());
     }
     
     public void registerScaler(ReadingScaler scaler)
