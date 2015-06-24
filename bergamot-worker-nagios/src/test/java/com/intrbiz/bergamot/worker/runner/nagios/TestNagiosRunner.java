@@ -9,7 +9,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 
 public class TestNagiosRunner
@@ -22,7 +24,13 @@ public class TestNagiosRunner
     @Before
     public void setup()
     {
-        this.runner = new NagiosExecutor();
+        this.runner = new NagiosExecutor()
+        {
+            public void publishReading(ReadingKey key, ReadingParcelMO reading)
+            {
+                // stub for now
+            }
+        };
     }
 
     /**
