@@ -49,10 +49,10 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			// setup the graph
 			$.getJSON(this.getDataURL(reading.reading_id), function(data) {
 				line_chart.attachTo("#reading-" + reading.reading_id + "-chart", {
-					"width": 1140,
+					/* "width": 1140, */
 					"height": 300,
 					"data": data,
-					"axis-x-sample": function(l) { return Math.floor(l / 8); },
+					"axis-x-sample": function(l) { return Math.floor(l / 4); },
 					"axis-x-formater": function(x) { var d = new Date(x); return d.toLocaleTimeString() + "\n" + d.toLocaleDateString() }
 				});
 			});
@@ -101,7 +101,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			// create the container
 			var container = document.createElement("div");
 			$(container).attr("id", "reading-" + readingId);
-			$(container).attr("class", "col12");
+			$(container).attr("class", "row");
 			// the chart
 			var chart = this.createChartContainer(readingId);
 			$(container).append(chart);

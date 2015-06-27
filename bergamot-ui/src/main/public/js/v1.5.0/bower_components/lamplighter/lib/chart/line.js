@@ -15,12 +15,16 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 			this.xScale = 1;
 			this.yScale = 1;
 			this.paths  = null;
+			// init width from our container
+			this.attr.width = this.$node.width();
 			// the paper
 			this.paper = Raphael(this.node, this.attr.width, this.attr.height);
 			// draw
 			this.draw();
 			// events
 			this.on('redraw', this.redraw);
+			// resize
+			this.on(window, 'resize', this.onResize);
 		});
 		
 		this.calculateScale = function()
@@ -46,10 +50,9 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 		
 		this.getXGridSpacing = function()
 		{
-			if (this.attr.data != null && this.attr.data.x != null && this.attr.data.x.length > 1)
+			if (this.attr.data != null)
 			{
-				var xSample = this.attr["axis-x-sample"].apply(this, [this.attr.data.x.length]);
-				return (this.getGraphWidth() * xSample) / this.attr.data.x.length;
+				return this.getXScale(this.attr.data.x);
 			}
 			return 40;
 		};
@@ -166,6 +169,22 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 			// redraw
 			this.paper.clear();
 			this.draw();
+		};
+		
+		this.onResize = function(/*Event*/ ev)
+		{
+			var newWidth = this.$node.width();
+			if (this.attr.width != newWidth)
+			{
+				// the new size
+				this.attr.width = newWidth;
+				// clear
+				this.paper.clear();
+				// update the size
+				this.paper.setSize(this.attr.width, this.attr.height)
+				// draw
+				this.draw();
+			}
 		};
 	
     }, graph, chart);
