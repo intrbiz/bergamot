@@ -4,7 +4,7 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
     {
 		this.defaultAttrs({
 			"line-stroke": 3,
-			"axis-x-sample": 4
+			"axis-x-sample": function() { return function(l) { return 4; }; }
 		});
 		
 		this.after('initialize', function() {
@@ -34,8 +34,7 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 				for (var i = 1, ys; i < this.attr.data.y.length; i++)
 				{
 					ys = this.getYScale(this.attr.data.y[i].y);
-					if (ys < this.yScale)
-						this.yScale = ys;
+					if (ys < this.yScale) this.yScale = ys;
 				}
 			}
 		};
@@ -47,16 +46,17 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 		
 		this.getXGridSpacing = function()
 		{
-			if (this.attr.data != null)
+			if (this.attr.data != null && this.attr.data.x != null && this.attr.data.x.length > 1)
 			{
-				return this.getXScale(this.attr.data.x);
+				var xSample = this.attr["axis-x-sample"].apply(this, [this.attr.data.x.length]);
+				return (this.getGraphWidth() * xSample) / this.attr.data.x.length;
 			}
-			return 50;
+			return 40;
 		};
 		
 		this.getYGridSpacing = function()
 		{
-			return 50;
+			return 30;
 		};
 		
 		this.getXLabels = function()
@@ -71,7 +71,8 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 					label: (this.attr["axis-x-formater"] ? this.attr["axis-x-formater"].apply(this, [this.attr.data.x[0]]) : this.attr.data.x[0])
 				} );
 				// mid points
-				for (var i = this.attr["axis-x-sample"]; i < (len -2); i+= this.attr["axis-x-sample"])
+				var xSample = this.attr["axis-x-sample"].apply(this, [this.attr.data.x.length]);
+				for (var i = xSample; i < (len - (xSample /2)); i+= xSample)
 				{
 					xl.push( { 
 						position: ( this.xScale * i ), 

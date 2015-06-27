@@ -1,4 +1,4 @@
-define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineComponent, line_chart) 
+define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api', 'bergamot/lib/util/logger'], function (defineComponent, line_chart, bergamot_api, logger) 
 {
     return defineComponent(function()
     {
@@ -16,6 +16,10 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineC
 				this.attr.check_id = this.$node.attr("data-check-id");
 			}
 			this.readings = {};
+			// handle the on connected event
+			this.on(document, "bergamot-api-connected", this.onConnected);
+			// handle server notifications
+			this.on(document, "bergamot-api-update", this.onUpdate);
 			// setup the readings for this check
 			this.setupReadings();
 		});
@@ -37,27 +41,29 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineC
 		this.setupReading = function(reading)
 		{
 			// hold onto the reading metadata
-			this.readings[reading.reading_id] = reading;
+			this.readings[reading.reading_id] = { "reading": reading, "mode": "hour" }
 			// container for the reading
 			var container = this.createReadingContainer(reading.reading_id);
 			// append the container to the page
 			this.$node.append(container);
 			// setup the graph
-			$.getJSON(this.getDataURL(reading.reading_id, 'hour'), function(data) {
+			$.getJSON(this.getDataURL(reading.reading_id), function(data) {
 				line_chart.attachTo("#reading-" + reading.reading_id + "-chart", {
 					"width": 1140,
 					"height": 300,
 					"data": data,
-					"axis-x-sample": Math.floor(data.x.length / 4),
+					"axis-x-sample": function(l) { return Math.floor(l / 8); },
 					"axis-x-formater": function(x) { var d = new Date(x); return d.toLocaleTimeString() + "\n" + d.toLocaleDateString() }
 				});
 			});
 		};
 		
-		this.getDataURL = function(readingId, /*(hour|day|week|month)*/ type)
+		this.getDataURL = function(readingId)
 		{
+			// get the current graph mode
+			var type = this.readings[readingId].mode;
 			// get the graph url
-			var graphUrl = this.reading_types[this.readings[readingId].reading_type].graph_url;
+			var graphUrl = this.reading_types[this.readings[readingId].reading.reading_type].graph_url;
 			// default to last 4 hours
 			var end = new Date().getTime();
 			var start = end - (3600000 * 4);
@@ -83,8 +89,9 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineC
 		
 		this.redrawChart = function(readingId, type)
 		{
+			if (!! type) this.readings[readingId].mode = type;
 			// get the data and redraw
-			$.getJSON(this.getDataURL(readingId, type), function(data) {
+			$.getJSON(this.getDataURL(readingId), function(data) {
 				$("#reading-" + readingId + "-chart").trigger('redraw', data);
 			});
 		};
@@ -140,6 +147,35 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line'], function (defineC
 			$(chart).attr("class", "col8");
 			return chart;
 		};
+		
+		this.onUpdate = function(/*Event*/ ev, /*Object*/ data)
+		{
+			if (data.update.check && data.update.check.id == this.attr.check_id)
+			{
+				// redraw
+				for (var readingId in this.readings)
+				{
+					if (this.readings.hasOwnProperty(readingId))
+					{
+						this.redrawChart(readingId);
+					}
+				}
+			}
+		};
+		
+		this.onConnected = function(/*Event*/ ev)
+		{
+			this.registerForUpdates(
+				[ this.attr.check_id ], 
+				function(message)
+				{
+				}, 
+				function(message)
+				{
+					this.log_debug("Failed to register for updates: " + message.stat + " " + message.message);
+				}
+			);
+		};
 	
-    });
+    }, bergamot_api, logger);
 });
