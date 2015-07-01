@@ -17,6 +17,7 @@ import com.intrbiz.data.db.DatabaseAdapter;
 import com.intrbiz.data.db.DatabaseConnection;
 import com.intrbiz.data.db.compiler.DatabaseAdapterCompiler;
 import com.intrbiz.data.db.compiler.meta.SQLGetter;
+import com.intrbiz.data.db.compiler.meta.SQLOrder;
 import com.intrbiz.data.db.compiler.meta.SQLParam;
 import com.intrbiz.data.db.compiler.meta.SQLPatch;
 import com.intrbiz.data.db.compiler.meta.SQLSchema;
@@ -156,13 +157,13 @@ public abstract class LamplighterDB extends DatabaseAdapter
     @SQLGetter(table = CheckReading.class, name = "get_check_reading", since = @SQLVersion({1, 0, 0}))
     public abstract CheckReading getCheckReading(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = CheckReading.class, name ="get_check_reading_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = CheckReading.class, name ="get_check_reading_by_name", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder("name"))
     public abstract CheckReading getCheckReadingByName(@SQLParam("check_id") UUID checkId, @SQLParam("name") String name);
     
-    @SQLGetter(table = CheckReading.class, name ="get_check_readings_for_check", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = CheckReading.class, name ="get_check_readings_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder("name"))
     public abstract List<CheckReading> getCheckReadingsForCheck(@SQLParam("check_id") UUID checkId);
     
-    @SQLGetter(table = CheckReading.class, name = "list_check_readings", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = CheckReading.class, name = "list_check_readings", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder("name"))
     public abstract List<CheckReading> listCheckReadings();
     
     // reading management

@@ -42,6 +42,12 @@ public class GroupStateMO extends MessageObject
     
     @JsonProperty("action_count")
     private int actionCount = 0;
+    
+    @JsonProperty("in_downtime_count")
+    private int inDowntimeCount = 0;
+    
+    @JsonProperty("total_checks")
+    private int totalchecks = 0;
 
     public GroupStateMO()
     {
@@ -166,5 +172,25 @@ public class GroupStateMO extends MessageObject
     public void setActionCount(int actionCount)
     {
         this.actionCount = actionCount;
+    }
+
+    public int getInDowntimeCount()
+    {
+        return inDowntimeCount;
+    }
+
+    public void setInDowntimeCount(int inDowntimeCount)
+    {
+        this.inDowntimeCount = inDowntimeCount;
+    }
+
+    public int getTotalchecks()
+    {
+        return totalchecks;
+    }
+
+    public void setTotalchecks(int totalchecks)
+    {
+        this.totalchecks = totalchecks;
     }
 }

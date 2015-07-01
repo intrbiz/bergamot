@@ -57,13 +57,19 @@ public class GroupState extends BergamotObject<GroupStateMO>
     
     @SQLColumn(index = 13, name = "action_count", since = @SQLVersion({ 2, 4, 0 }))
     private int actionCount = 0;
+    
+    @SQLColumn(index = 14, name = "in_downtime_count", since = @SQLVersion({ 2, 6, 0 }))
+    private int inDowntimeCount = 0;
+    
+    @SQLColumn(index = 15, name = "total_checks", since = @SQLVersion({ 2, 7, 0 }))
+    private int totalChecks = 0;
 
     public GroupState()
     {
         super();
     }
 
-    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int errorCount, int infoCount, int actionCount)
+    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int errorCount, int infoCount, int actionCount, int inDowntimeCount, int totalChecks)
     {
         super();
         this.ok = ok;
@@ -76,6 +82,8 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.errorCount = errorCount;
         this.infoCount = infoCount;
         this.actionCount = actionCount;
+        this.inDowntimeCount = inDowntimeCount;
+        this.totalChecks = totalChecks;
     }
 
     public UUID getGroupId()
@@ -208,6 +216,26 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.actionCount = actionCount;
     }
 
+    public int getInDowntimeCount()
+    {
+        return inDowntimeCount;
+    }
+
+    public void setInDowntimeCount(int inDowntimeCount)
+    {
+        this.inDowntimeCount = inDowntimeCount;
+    }
+
+    public int getTotalChecks()
+    {
+        return totalChecks;
+    }
+
+    public void setTotalChecks(int totalChecks)
+    {
+        this.totalChecks = totalChecks;
+    }
+
     @Override
     public GroupStateMO toMO(boolean stub)
     {
@@ -224,6 +252,8 @@ public class GroupState extends BergamotObject<GroupStateMO>
         mo.setSuppressedCount(this.suppressedCount);
         mo.setInfoCount(this.infoCount);
         mo.setActionCount(this.actionCount);
+        mo.setInDowntimeCount(this.inDowntimeCount);
+        mo.setTotalchecks(this.totalChecks);
         return mo;
     }
 }

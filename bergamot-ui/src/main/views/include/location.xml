@@ -10,17 +10,21 @@
 				</span>
 				<span class="name">#{location.summary}</span>
 		    </h3>
-		    <p>
-			    <span class="label">OK: </span>
-			    <span class="value" data-bind="ok_count">#{location.state.okCount}</span>
+		    <p style="width: 205px;">
+		    	<span class="label">OK: </span>
+		    	<span class="value" data-bind="ok_count" style="width: 60px;">#{location.state.okCount}</span>
 		    </p>
-		    <p>
-			    <span class="label">Warning: </span>
-			    <span class="value" data-bind="warning_count">#{location.state.warningCount}</span>
+		    <p style="width: 205px;">
+			    <span class="label">Total: </span>
+			    <span class="value" data-bind="total_checks" style="width: 60px;">#{location.state.totalChecks}</span>
 		    </p>
-		    <p>
-			    <span class="label">Critical: </span>
-			    <span class="value" data-bind="critical_count">#{location.state.criticalCount}</span>
+		    <p style="width: 205px;">
+			    <span class="label">In Downtime: </span>
+			    <span class="value" data-bind="in_downtime_count" style="width: 60px;">#{location.state.inDowntimeCount}</span>
+		    </p>
+		    <p style="width: 205px;">
+			    <span class="label">Suppressed: </span>
+			    <span class="value" data-bind="suppressed_count" style="width: 60px;">#{location.state.suppressedCount}</span>
 		    </p>
 		</div>
 	</a>

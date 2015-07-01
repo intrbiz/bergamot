@@ -66,7 +66,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({2, 5, 0}),
+        version = @SQLVersion({3, 1, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -818,19 +818,30 @@ public abstract class BergamotDB extends DatabaseAdapter
                               ") " +
                               "SELECT " + 
                               "  p_group_id, " +
-                              "  bool_and(s.ok OR q.suppressed) AS ok, " + 
-                              "  max(CASE WHEN q.suppressed THEN 0 ELSE s.status END)::INTEGER AS status, "+
-                              "  count(CASE WHEN s.status = 0 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS pending_count, "+ 
-                              "  count(CASE WHEN s.status = 2 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS ok_count, "+
-                              "  count(CASE WHEN s.status = 3 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS warning_count, "+
-                              "  count(CASE WHEN s.status = 4 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS critical_count, "+
-                              "  count(CASE WHEN s.status = 5 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS unknown_count, "+
-                              "  count(CASE WHEN s.status = 6 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS timeout_count, "+
-                              "  count(CASE WHEN s.status = 7 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS error_count, "+
-                              "  count(CASE WHEN q.suppressed                      THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, "+
-                              "  count(CASE WHEN s.status = 1 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS info_count, "+
-                              "  count(CASE WHEN s.status = 8 AND NOT q.suppressed THEN 1 ELSE NULL END)::INTEGER AS action_count "+
-                              "FROM bergamot.check_state s " +
+                              "  bool_and(s.ok OR q.suppressed OR s.in_downtime) AS ok, " +
+                              "  max(CASE WHEN q.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER AS status, " +
+                              "  count(CASE WHEN s.status = 0 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS pending_count, " +  
+                              "  count(CASE WHEN s.status = 2 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS ok_count, " +
+                              "  count(CASE WHEN s.status = 3 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS warning_count, " +
+                              "  count(CASE WHEN s.status = 4 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS critical_count, " +
+                              "  count(CASE WHEN s.status = 5 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, " +
+                              "  count(CASE WHEN s.status = 6 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, " +
+                              "  count(CASE WHEN s.status = 7 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS error_count, " +
+                              "  count(CASE WHEN q.suppressed                                         THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, " + 
+                              "  count(CASE WHEN s.status = 1 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, " +
+                              "  count(CASE WHEN s.status = 8 AND NOT (q.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, " +
+                              "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count, " +  
+                              "  count(s.check_id)::INTEGER                                                                          AS total_checks " +
+                              "FROM ( " +
+                              "  SELECT ss.check_id, ss.ok, ss.status, sq.in_downtime " +
+                              "  FROM bergamot.check_state ss, " +
+                              "  LATERAL ( " +
+                              "    SELECT count(now() BETWEEN d.starts AND d.ends) > 0 AS in_downtime " +
+                              "    FROM bergamot.downtime d " +
+                              "    WHERE d.check_id = ss.check_id " +
+                              "    AND now() BETWEEN d.starts AND d.ends " +
+                              "  ) sq " +
+                              ") s " +
                               "JOIN ( " +
                               "    SELECT id, suppressed, group_ids FROM bergamot.host " +
                               "  UNION " + 
@@ -867,19 +878,30 @@ public abstract class BergamotDB extends DatabaseAdapter
                               ") "+
                               "SELECT "+ 
                               "  p_location_id, "+
-                              "  bool_and(s.ok OR h.suppressed) AS ok, "+ 
-                              "  max(CASE WHEN h.suppressed THEN 0 ELSE s.status END)::INTEGER AS status, "+
-                              "  count(CASE WHEN s.status = 0 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS pending_count, "+ 
-                              "  count(CASE WHEN s.status = 2 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS ok_count, "+
-                              "  count(CASE WHEN s.status = 3 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS warning_count, "+
-                              "  count(CASE WHEN s.status = 4 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS critical_count, "+
-                              "  count(CASE WHEN s.status = 5 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS unknown_count, "+
-                              "  count(CASE WHEN s.status = 6 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS timeout_count, "+
-                              "  count(CASE WHEN s.status = 7 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS error_count, "+
-                              "  count(CASE WHEN h.suppressed                      THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, "+
-                              "  count(CASE WHEN s.status = 1 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS info_count, "+
-                              "  count(CASE WHEN s.status = 8 AND NOT h.suppressed THEN 1 ELSE NULL END)::INTEGER AS action_count "+
-                              "FROM bergamot.check_state s "+
+                              "  bool_and(s.ok OR h.suppressed OR s.in_downtime) AS ok, " +
+                              "  max(CASE WHEN h.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER AS status, " +
+                              "  count(CASE WHEN s.status = 0 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS pending_count, " +  
+                              "  count(CASE WHEN s.status = 2 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS ok_count, " +
+                              "  count(CASE WHEN s.status = 3 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS warning_count, " +
+                              "  count(CASE WHEN s.status = 4 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS critical_count, " +
+                              "  count(CASE WHEN s.status = 5 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, " +
+                              "  count(CASE WHEN s.status = 6 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, " +
+                              "  count(CASE WHEN s.status = 7 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS error_count, " +
+                              "  count(CASE WHEN h.suppressed                                         THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, " + 
+                              "  count(CASE WHEN s.status = 1 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, " +
+                              "  count(CASE WHEN s.status = 8 AND NOT (h.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, " +
+                              "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count, " +  
+                              "  count(s.check_id)::INTEGER                                                                          AS total_checks " +  
+                              "FROM ( " +
+                              "  SELECT ss.check_id, ss.ok, ss.status, sq.in_downtime " +
+                              "  FROM bergamot.check_state ss, " +
+                              "  LATERAL ( " +
+                              "    SELECT count(now() BETWEEN d.starts AND d.ends) > 0 AS in_downtime " +
+                              "    FROM bergamot.downtime d " +
+                              "    WHERE d.check_id = ss.check_id " +
+                              "    AND now() BETWEEN d.starts AND d.ends " +
+                              "  ) sq " +
+                              ") s " +
                               "JOIN bergamot.host h "+
                               "ON (s.check_id = h.id) "+
                               "JOIN location_graph lg "+
@@ -1786,6 +1808,15 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "SET " +
                 " status=(CASE WHEN status = 0 THEN 0 ELSE status + 1 END), " +
                 " last_hard_status=(CASE WHEN last_hard_status = 0 THEN 0 ELSE last_hard_status + 1 END) "
+        );
+    }
+    
+    @SQLPatch(name = "add_downtime_indexes", index = 7, type = ScriptType.BOTH, version = @SQLVersion({2, 9, 0}), skip = false)
+    public static SQLScript addDowntimeIndexes()
+    {
+        return new SQLScript(
+                "CREATE INDEX \"downtime_check_id_idx\" ON bergamot.downtime USING btree (check_id)",
+                "CREATE INDEX \"downtime_starts_ends_idx\" ON bergamot.downtime USING btree (starts, ends)"
         );
     }
     
