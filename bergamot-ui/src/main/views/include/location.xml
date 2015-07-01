@@ -3,7 +3,7 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
 	<a href="/location/id/#{location.id}">
-		<div class="col3 dash_icon location" data-location-id="#{location.id}">
+		<div class="col3 dash_icon location" data-location-id="#{location.id}" style="margin-bottom: 20px">
 		    <h3>
 				<span class="dash_img status_#{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
 					<img src="#{public(coalesce(location.getParameter('ui-icon'), '/images/icons/64/location.png'))}" />

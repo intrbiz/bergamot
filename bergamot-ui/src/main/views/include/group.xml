@@ -3,7 +3,7 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
 	<a href="/group/id/#{group.id}">
-		<div class="col3 dash_icon group" data-group-id="#{group.id}">
+		<div class="col3 dash_icon group" data-group-id="#{group.id}" style="margin-bottom: 20px">
 		    <h3>
 				<span class="dash_img status_#{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">
 					<img src="#{public(coalesce(group.getParameter('ui-icon'), '/images/icons/64/group.png'))}" />
