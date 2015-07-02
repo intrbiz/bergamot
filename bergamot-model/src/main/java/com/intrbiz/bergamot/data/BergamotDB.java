@@ -1828,6 +1828,15 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "UPDATE bergamot.notification_engine SET acknowledge_enabled = TRUE"
         );
     }
+
+    @SQLPatch(name = "add_downtime_state", index = 9, type = ScriptType.UPGRADE, version = @SQLVersion({3, 3, 0}), skip = false)
+    public static SQLScript addDowntimeState()
+    {
+        return new SQLScript(
+                "UPDATE bergamot.check_state SET in_downtime = FALSE",
+                "UPDATE bergamot.check_transition SET previous_in_downtime = FALSE, next_in_downtime = FALSE"
+        );
+    }
     
     public static void main(String[] args) throws Exception
     {
