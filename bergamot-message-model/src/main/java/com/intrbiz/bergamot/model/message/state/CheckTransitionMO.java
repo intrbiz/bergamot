@@ -564,7 +564,7 @@ public class CheckTransitionMO extends MessageObject
 
     public boolean isPreviousInDowntime()
     {
-        return this.previousInDowntime();
+        return this.previousInDowntime;
     }
 
     public void setPreviousInDowntime(boolean previousInDowntime)
@@ -577,7 +577,7 @@ public class CheckTransitionMO extends MessageObject
         return this.nextInDowntime;
     }
 
-    public boid setNextInDowntime(boolean nextInDowntime)
+    public void setNextInDowntime(boolean nextInDowntime)
     {
         this.nextInDowntime = nextInDowntime;
     }
