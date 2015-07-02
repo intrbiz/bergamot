@@ -56,6 +56,9 @@ public class CheckReading implements Serializable
 
     @SQLColumn(index = 12, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
+
+    @SQLColumn(index = 13, name = "poll_interval", since = @SQLVersion({ 1, 1, 0 }))
+    protected long pollInterval;
     
     public CheckReading()
     {
@@ -180,5 +183,15 @@ public class CheckReading implements Serializable
     public void setUnit(String unit)
     {
         this.unit = unit;
+    }
+
+    public long getPollInterval()
+    {
+        return this.pollInterval;
+    }
+
+    public void setPollInterval(long pollInterval)
+    {
+        this.pollInterval = pollInterval;
     }
 }

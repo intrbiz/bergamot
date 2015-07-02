@@ -33,7 +33,7 @@ import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
 
 @SQLSchema(
         name = "lamplighter", 
-        version = @SQLVersion({1, 0, 0}),
+        version = @SQLVersion({1, 1, 0}),
         tables = {
             CheckReading.class,
             StoredDoubleGaugeReading.class,
