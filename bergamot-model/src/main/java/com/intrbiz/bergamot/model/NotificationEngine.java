@@ -46,6 +46,9 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
 
     @SQLColumn(index = 7, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     private List<Status> ignore = new LinkedList<Status>();
+    
+    @SQLColumn(index = 8, name = "acknowledge_enabled", since = @SQLVersion({ 3, 2, 0 }))
+    private boolean acknowledgeEnabled = true;
 
     public NotificationEngine()
     {
@@ -121,6 +124,16 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
         this.recoveryEnabled = recoveryEnabled;
     }
 
+    public boolean isAcknowledgeEnabled()
+    {
+        return acknowledgeEnabled;
+    }
+
+    public void setAcknowledgeEnabled(boolean acknowledgeEnabled)
+    {
+        this.acknowledgeEnabled = acknowledgeEnabled;
+    }
+
     public List<Status> getIgnore()
     {
         return ignore;
@@ -137,19 +150,21 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
     public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
     {
         TimePeriod timePeriod = this.getTimePeriod();
-        return this.enabled && this.isNotificationTypeEnabled(type) && (!this.isStatusIgnored(status)) && (timePeriod == null ? true : timePeriod.isInTimeRange(time));
+        return this.enabled && this.isNotificationTypeEnabled(type) && 
+                (!this.isStatusIgnored(status)) && 
+                (timePeriod == null ? true : timePeriod.isInTimeRange(time));
     }
 
-    private boolean isStatusIgnored(Status status)
+    public boolean isStatusIgnored(Status status)
     {
-        return this.ignore.stream().anyMatch((e) -> {
-            return e == status;
-        });
+        return this.ignore.stream().anyMatch((e) -> e == status);
     }
 
-    private boolean isNotificationTypeEnabled(NotificationType type)
+    public boolean isNotificationTypeEnabled(NotificationType type)
     {
-        return (type == NotificationType.ALERT && this.alertsEnabled) || (type == NotificationType.RECOVERY && this.recoveryEnabled);
+        return (type == NotificationType.ALERT && this.alertsEnabled) || 
+                (type == NotificationType.RECOVERY && this.recoveryEnabled) ||
+                (type == NotificationType.ACKNOWLEDGE && this.acknowledgeEnabled);
     }
 
     @Override
@@ -161,6 +176,7 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
         mo.setEngine(this.getEngine());
         mo.setIgnore(this.getIgnore().stream().map(Status::toString).collect(Collectors.toSet()));
         mo.setRecoveryEnabled(this.isRecoveryEnabled());
+        mo.setAcknowledgeEnabled(this.isAcknowledgeEnabled());
         mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
         return mo;
     }

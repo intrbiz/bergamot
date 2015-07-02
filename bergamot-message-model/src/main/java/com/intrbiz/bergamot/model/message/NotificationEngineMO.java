@@ -26,6 +26,9 @@ public class NotificationEngineMO extends MessageObject
 
     @JsonProperty("ignore")
     private Set<String> ignore = new HashSet<String>();
+    
+    @JsonProperty("acknowledge_enabled")
+    private boolean acknowledgeEnabled = true;
 
     public NotificationEngineMO()
     {
@@ -90,5 +93,15 @@ public class NotificationEngineMO extends MessageObject
     public void setIgnore(Set<String> ignore)
     {
         this.ignore = ignore;
+    }
+
+    public boolean isAcknowledgeEnabled()
+    {
+        return acknowledgeEnabled;
+    }
+
+    public void setAcknowledgeEnabled(boolean acknowledgeEnabled)
+    {
+        this.acknowledgeEnabled = acknowledgeEnabled;
     }
 }

@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.notification.engine.email;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -248,6 +249,16 @@ public class EmailEngine extends AbstractNotificationEngine
     {        
         Map<String, String> templates = new HashMap<String, String>();
         // host
+        templates.put("host.acknowledge.subject", "#{user} has acknowledged alert for host #{host.summary}");
+        templates.put("host.acknowledge.content", "The alert for host #{host.summary} has been acknowledged by\r\n"
+                + "\r\n"
+                + "Check output: #{host.state.output}\r\n"
+                + "\r\n"
+                + "Last checked at #{dateformat('HH:mm:ss', host.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime)}\r\n"
+                + "\r\n"
+                + "For more information: https://#{site.name}/host/id/#{host.id}\r\n"
+                + "\r\n"
+                + "Thank you, Bergamot");
         templates.put("host.alert.subject", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
         templates.put("host.alert.content", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}\r\n"
                 + "\r\n"

@@ -66,7 +66,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 1, 0}),
+        version = @SQLVersion({3, 2, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1817,6 +1817,15 @@ public abstract class BergamotDB extends DatabaseAdapter
         return new SQLScript(
                 "CREATE INDEX \"downtime_check_id_idx\" ON bergamot.downtime USING btree (check_id)",
                 "CREATE INDEX \"downtime_starts_ends_idx\" ON bergamot.downtime USING btree (starts, ends)"
+        );
+    }
+    
+    @SQLPatch(name = "add_acknowledge_notifications", index = 8, type = ScriptType.UPGRADE, version = @SQLVersion({3, 2, 0}), skip = false)
+    public static SQLScript addAcknowledgeNotifications()
+    {
+        return new SQLScript(
+                "UPDATE bergamot.notifications SET acknowledge_enabled = TRUE",
+                "UPDATE bergamot.notification_engine SET acknowledge_enabled = TRUE"
         );
     }
     

@@ -6,27 +6,21 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
-import com.intrbiz.bergamot.model.NotificationType;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.VirtualCheck;
-import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
@@ -234,31 +228,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
 
-    protected <T extends CheckNotification> T createNotification(Check<?, ?> check, Alert alertRecord, Calendar now, NotificationType type, Supplier<T> ctor)
-    {
-        T notification = ctor.get();
-        // the site
-        notification.setSite(check.getSite().toMO());
-        notification.setRaised(System.currentTimeMillis());
-        // alert id
-        notification.setAlertId(alertRecord.getId());
-        // compute the engines available
-        final Set<String> enabledEngines = check.getNotifications().getEnginesEnabledAt(type, check.getState().getStatus(), now);
-        // send
-        notification.setRaised(System.currentTimeMillis());
-        notification.setCheck(check.toMO());
-        // to
-        notification.setTo(check.getAllContacts().stream().filter((contact) -> {
-            return contact.getNotifications().isEnabledAt(type, check.getState().getStatus(), now);
-        }).map((contact) -> {
-            ContactMO cmo = contact.toMO();
-            cmo.setEngines(contact.getNotifications().getEnginesEnabledAt(type, check.getState().getStatus(), now).stream().filter((engine) -> {
-                return check.getNotifications().isAllEnginesEnabled() || enabledEngines.contains(engine);
-            }).collect(Collectors.toSet()));
-            return cmo;
-        }).collect(Collectors.toList()));
-        return notification;
-    }
+
 
     protected void sendRecovery(Check<?, ?> check, BergamotDB db)
     {
@@ -277,18 +247,15 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // send notifications?
                 Calendar now = Calendar.getInstance();
                 // send?
-                if (check.getNotifications().isEnabledAt(NotificationType.RECOVERY, check.getState().getStatus(), now))
+                SendRecovery recovery = alertRecord.createRecoveryNotification(now);
+                if (recovery != null && (! recovery.getTo().isEmpty()))
                 {
-                    SendRecovery recovery = this.createNotification(check, alertRecord, now, NotificationType.RECOVERY, SendRecovery::new);
-                    if (!recovery.getTo().isEmpty())
-                    {
-                        logger.warn("Sending recovery for " + check);
-                        this.publishNotification(check, recovery);
-                    }
-                    else
-                    {
-                        logger.warn("Not sending recovery for " + check + " no contacts configured.");
-                    }
+                    logger.warn("Sending recovery for " + check);
+                    this.publishNotification(check, recovery);
+                }
+                else
+                {
+                    logger.warn("Not sending recovery for " + check);
                 }
             }
         }
@@ -304,20 +271,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             db.setAlert(alertRecord);
             // send the notifications
             Calendar now = Calendar.getInstance();
-            // send?
-            if (check.getNotifications().isEnabledAt(NotificationType.ALERT, check.getState().getStatus(), now))
+            // send
+            SendAlert alert = alertRecord.createAlertNotification(now);
+            if (alert != null && (! alert.getTo().isEmpty()))
             {
-                SendAlert alert = this.createNotification(check, alertRecord, now, NotificationType.ALERT, SendAlert::new);
-                if (!alert.getTo().isEmpty())
-                {
-                    logger.warn("Sending alert for " + check);
-                    System.out.println(new BergamotTranscoder().encodeAsString(alert));
-                    this.publishNotification(check, alert);
-                }
-                else
-                {
-                    logger.warn("Not sending alert for " + check + " no contacts configured.");
-                }
+                logger.warn("Sending alert for " + check);
+                this.publishNotification(check, alert);
+            }
+            else
+            {
+                logger.warn("Not sending alert for " + check);
             }
         }
     }

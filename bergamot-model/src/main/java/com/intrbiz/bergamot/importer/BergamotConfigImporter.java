@@ -917,6 +917,7 @@ public class BergamotConfigImporter
         notifications.setEnabled(configuration.getEnabledBooleanValue());
         notifications.setAlertsEnabled(configuration.getAlertsBooleanValue());
         notifications.setRecoveryEnabled(configuration.getRecoveryBooleanValue());
+        notifications.setAcknowledgeEnabled(configuration.getAcknowledgeBooleanValue());
         notifications.setIgnore(configuration.getIgnore().stream().map((e) -> {return Status.valueOf(e.toUpperCase());}).collect(Collectors.toList()));
         notifications.setAllEnginesEnabled(configuration.getAllEnginesEnabledBooleanValue());
         // load the time period

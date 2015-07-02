@@ -45,6 +45,9 @@ public class Notifications extends BergamotObject<NotificationsMO>
 
     @SQLColumn(index = 7, name = "all_engines_enabled", since = @SQLVersion({ 1, 0, 0 }))
     private boolean allEnginesEnabled = true;
+    
+    @SQLColumn(index = 8, name = "acknowledge_enabled", since = @SQLVersion({ 3, 2, 0 }))
+    private boolean acknowledgeEnabled = true;
 
     public Notifications()
     {
@@ -127,6 +130,16 @@ public class Notifications extends BergamotObject<NotificationsMO>
         this.recoveryEnabled = recoveryEnabled;
     }
 
+    public boolean isAcknowledgeEnabled()
+    {
+        return acknowledgeEnabled;
+    }
+
+    public void setAcknowledgeEnabled(boolean acknowledgeEnabled)
+    {
+        this.acknowledgeEnabled = acknowledgeEnabled;
+    }
+
     public List<Status> getIgnore()
     {
         return ignore;
@@ -150,37 +163,38 @@ public class Notifications extends BergamotObject<NotificationsMO>
     public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
     {
         TimePeriod timePeriod = this.getTimePeriod();
-        return this.enabled && this.isNotificationTypeEnabled(type) && (!this.isStatusIgnored(status)) && (timePeriod == null ? true : timePeriod.isInTimeRange(time)) && (this.allEnginesEnabled || this.getEngines().stream().anyMatch((e) -> {
-            return e.isEnabledAt(type, status, time);
-        }));
+        return this.enabled && 
+                this.isNotificationTypeEnabled(type) && 
+                (!this.isStatusIgnored(status)) && 
+                (timePeriod == null ? true : timePeriod.isInTimeRange(time)) && 
+                (this.allEnginesEnabled || this.getEngines().stream().anyMatch((e) -> e.isEnabledAt(type, status, time)));
     }
 
-    private boolean isStatusIgnored(Status status)
+    public boolean isStatusIgnored(Status status)
     {
-        return this.ignore.stream().anyMatch((e) -> {
-            return e == status;
-        });
+        return this.ignore.stream().anyMatch((e) -> e == status);
     }
 
-    private boolean isNotificationTypeEnabled(NotificationType type)
+    public boolean isNotificationTypeEnabled(NotificationType type)
     {
-        return (type == NotificationType.ALERT && this.alertsEnabled) || (type == NotificationType.RECOVERY && this.recoveryEnabled);
+        return (type == NotificationType.ALERT && this.alertsEnabled) || 
+                (type == NotificationType.RECOVERY && this.recoveryEnabled) ||
+                (type == NotificationType.ACKNOWLEDGE && this.acknowledgeEnabled);
     }
 
     public Set<String> getEnginesEnabledAt(NotificationType type, Status status, Calendar time)
     {
-        return this.getEngines().stream().filter((e) -> {
-            return e.isEnabledAt(type, status, time);
-        }).map(NotificationEngine::getEngine).collect(Collectors.toSet());
+        return this.getEngines().stream()
+                .filter((e) -> e.isEnabledAt(type, status, time))
+                .map(NotificationEngine::getEngine)
+                .collect(Collectors.toSet());
     }
 
     public boolean isEngineEnabledAt(NotificationType type, Status status, Calendar time, String engine)
     {
-        return this.getEngines().stream().filter((e) -> {
-            return engine.equals(e.getEngine());
-        }).anyMatch((e) -> {
-            return e.isEnabledAt(type, status, time);
-        });
+        return this.getEngines().stream()
+                .filter((e) -> engine.equals(e.getEngine()))
+                .anyMatch((e) -> e.isEnabledAt(type, status, time));
     }
 
     @Override
@@ -192,6 +206,7 @@ public class Notifications extends BergamotObject<NotificationsMO>
         mo.setAllEnginesEnabled(this.isAllEnginesEnabled());
         mo.setIgnore(this.getIgnore().stream().map(Status::toString).collect(Collectors.toSet()));
         mo.setRecoveryEnabled(this.isRecoveryEnabled());
+        mo.setAcknowledgeEnabled(this.isAcknowledgeEnabled());
         mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
         mo.setEngines(this.getEngines().stream().map(NotificationEngine::toMO).collect(Collectors.toList()));
         return mo;

@@ -32,6 +32,9 @@ public class NotificationsMO extends MessageObject
     @JsonProperty("all_engines_enabled")
     private boolean allEnginesEnabled = true;
     
+    @JsonProperty("acknowledge_enabled")
+    private boolean acknowledgeEnabled = true;
+    
     public NotificationsMO()
     {
         super();
@@ -105,5 +108,15 @@ public class NotificationsMO extends MessageObject
     public void setAllEnginesEnabled(boolean allEnginesEnabled)
     {
         this.allEnginesEnabled = allEnginesEnabled;
+    }
+
+    public boolean isAcknowledgeEnabled()
+    {
+        return acknowledgeEnabled;
+    }
+
+    public void setAcknowledgeEnabled(boolean acknowledgeEnabled)
+    {
+        this.acknowledgeEnabled = acknowledgeEnabled;
     }
 }
