@@ -242,7 +242,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             alertRecord.setRecoveredBy(check.getState().getLastCheckId());
             db.setAlert(alertRecord);
             // don't send notifications for suppressed checks
-            if (!check.isSuppressedOrInDowntime())
+            if (! check.getState().isInDowntime())
             {
                 // send notifications?
                 Calendar now = Calendar.getInstance();
@@ -264,7 +264,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected void sendAlert(Check<?, ?> check, BergamotDB db)
     {
         logger.warn("Alert for " + check);
-        if (!check.isSuppressedOrInDowntime())
+        if (! check.getState().isInDowntime())
         {
             // record the alert
             Alert alertRecord = new Alert(check, check.getState());
