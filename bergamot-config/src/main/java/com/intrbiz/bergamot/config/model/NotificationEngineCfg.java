@@ -33,6 +33,8 @@ public class NotificationEngineCfg implements Serializable
 
     private Boolean recovery;
 
+    private Boolean acknowledge;
+
     private Set<String> ignore = new LinkedHashSet<String>();
 
     public NotificationEngineCfg()
@@ -117,6 +119,24 @@ public class NotificationEngineCfg implements Serializable
     public void setRecovery(Boolean recovery)
     {
         this.recovery = recovery;
+    }
+
+    @XmlJavaTypeAdapter(YesNoAdapter.class)
+    @XmlAttribute(name = "acknowledge")
+    @ResolveWith(Coalesce.class)
+    public Boolean getAcknowledge()
+    {
+        return acknowledge;
+    }
+        
+    public boolean getAcknowledgeBooleanValue()
+    {
+        return this.acknowledge == null ? true : this.acknowledge.booleanValue();
+    }
+        
+    public void setAcknowledge(Boolean acknowledge)
+    {
+        this.acknowledge = acknowledge;
     }
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
