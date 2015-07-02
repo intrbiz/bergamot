@@ -525,6 +525,14 @@ public abstract class LamplighterDB extends DatabaseAdapter
         return SQLScript.fromResource(LamplighterDB.class, "get_float_gauge_readings_by_date.sql");
     }
     
+    @SQLPatch(name = "set_default_poll_interval", index = 20, type = ScriptType.UPGRADE, version = @SQLVersion({1, 1, 0}))
+    protected static SQLScript setDefaultPollInterval()
+    {
+        return new SQLScript(
+                "UPDATE lamplighter.check_reading SET poll_interval = 300000"
+        );
+    }
+    
     @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
     protected static SQLScript setFunctionOWner()
     {
@@ -560,7 +568,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     }
     
     @SQLPatch(name = "setup_existing_sites", index = 2000, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
-    protected static SQLScript setup_existing_sites()
+    protected static SQLScript setupExistingSites()
     {
         return new SQLScript(
                 "SELECT lamplighter.new_site(id) FROM bergamot.site"
