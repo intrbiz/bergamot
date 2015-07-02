@@ -48,6 +48,9 @@ public class CheckStateMO extends MessageObject
     @JsonProperty("last_hard_output")
     private String lastHardOutput;
 
+    @JsonProperty("in_downtime")
+    private boolean inDowntime;
+
     public CheckStateMO()
     {
         super();
@@ -181,5 +184,15 @@ public class CheckStateMO extends MessageObject
     public void setLastHardOutput(String lastHardOutput)
     {
         this.lastHardOutput = lastHardOutput;
+    }
+
+    public boolean isInDowntime()
+    {
+        return this.inDowntime;
+    }
+
+    public void setInDowntime(boolean inDowntime)
+    {
+        this.inDowntime = inDowntime;
     }
 }
