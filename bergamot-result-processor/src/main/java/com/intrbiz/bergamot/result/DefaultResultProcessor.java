@@ -125,7 +125,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // update the state
                 // apply the result
                 Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
-                logger.info("State change for " + check.getType() + "::" + check.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange);
+                logger.info("State change for " + check.getType() + "::" + check.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange + ", in downtime: " + transition.nextState.isInDowntime());
                 // log the transition
                 db.logCheckTransition(transition.toCheckTransition(check.getSite().randomObjectId(), check.getId(), new Timestamp(resultMO.getProcessed())));
                 // update the check state
@@ -148,7 +148,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // send the general state update notifications
                 this.sendCheckStateUpdate(db, check, transition);
                 // send group updates
-                if (transition.stateChange || transition.hardChange || transition.alert || transition.recovery || transition.nextState.getStatus() != transition.previousState.getStatus())
+                if (transition.stateChange || transition.hardChange || transition.alert || transition.recovery || transition.nextState.getStatus() != transition.previousState.getStatus() || transition.nextState.isInDowntime() != transition.previousState.isInDowntime())
                 {
                     // group update
                     this.sendGroupStateUpdate(db, check, transition);
@@ -301,6 +301,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         nextState.setStatus(resultStatus);
         nextState.setOutput(resultMO.getOutput());
         nextState.setLastCheckTime(new Timestamp(resultMO.getExecuted()));
+        // is this check entering downtime?
+        nextState.setInDowntime(check.isSuppressedOrInDowntime());
         // compute the transition
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
@@ -415,6 +417,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         nextState.setStatus(status);
         nextState.setOutput(null);
         nextState.setLastCheckTime(new Timestamp(cause.getExecuted()));
+        // is this check entering downtime?
+        nextState.setInDowntime(check.isSuppressedOrInDowntime());
         // compute the transition
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
