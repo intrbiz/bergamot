@@ -143,18 +143,23 @@ public class SMSEngine extends AbstractNotificationEngine
     {        
         Map<String, String> templates = new HashMap<String, String>();
         // host
+        templates.put("host.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for host #{host.summary}");
         templates.put("host.alert.message", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
         templates.put("host.recovery.message", "Recovery for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
         // cluster
+        templates.put("cluster.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for cluster #{cluster.summary}");
         templates.put("cluster.alert.message", "Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
         templates.put("cluster.recovery.message", "Recovery for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
         // service
+        templates.put("service.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for service #{service.summary} on the host #{host.summary}");
         templates.put("service.alert.message", "Alert for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
         templates.put("service.recovery.message", "Recovery for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
         // trap
+        templates.put("trap.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for trap #{trap.summary} on the host #{host.summary}");
         templates.put("trap.alert.message", "Alert for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
         templates.put("trap.recovery.message", "Recovery for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
         // resource
+        templates.put("resource.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for resource #{resource.summary} on the cluster #{cluster.summary}");
         templates.put("resource.alert.message", "Alert for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
         templates.put("resource.recovery.message", "Recovery for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
         return templates;
