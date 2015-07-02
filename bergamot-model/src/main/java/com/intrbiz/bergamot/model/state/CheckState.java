@@ -117,7 +117,7 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     private String lastHardOutput = "Pending";
 
     /**
-     * Is this check currently in downtime
+     * Is this check currently in downtime or suppressed
      */
     @SQLColumn(index = 16, name = "in_downtime", since = @SQLVersion({ 3, 3, 0 }))
     private boolean inDowntime;
@@ -301,6 +301,9 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
         this.lastHardOutput = lastHardOutput;
     }
 
+    /**
+     * Is this check currently in downtime or suppressed
+     */
     public boolean isInDowntime()
     {
         return this.inDowntime;
