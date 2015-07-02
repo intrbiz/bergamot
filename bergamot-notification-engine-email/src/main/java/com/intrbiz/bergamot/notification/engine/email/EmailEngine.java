@@ -249,15 +249,14 @@ public class EmailEngine extends AbstractNotificationEngine
     {        
         Map<String, String> templates = new HashMap<String, String>();
         // host
-        templates.put("host.acknowledge.subject", "#{user} has acknowledged alert for host #{host.summary}");
-        templates.put("host.acknowledge.content", "The alert for host #{host.summary} has been acknowledged by\r\n"
+        templates.put("host.acknowledge.subject", "#{notification.acknowledgedBy.summary} has acknowledged an alert for host #{host.summary}");
+        templates.put("host.acknowledge.content", "The alert for host #{host.summary} has been acknowledged by "
+                + "#{notification.acknowledgedBy.summary} #{dateformat('HH:mm:ss', notification.raised)} "
+                + "on #{dateformat('EEEE dd/MM/yyyy', notification.raised)} with the following comment:\r\n"
                 + "\r\n"
-                + "Check output: #{host.state.output}\r\n"
+                + "#{notification.acknowledgeSummary}\r\n"
                 + "\r\n"
-                + "Last checked at #{dateformat('HH:mm:ss', host.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime)}\r\n"
-                + "\r\n"
-                + "For more information: https://#{site.name}/host/id/#{host.id}\r\n"
-                + "\r\n"
+                + "#{notification.acknowledgeComment}\r\n"
                 + "Thank you, Bergamot");
         templates.put("host.alert.subject", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
         templates.put("host.alert.content", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}\r\n"
@@ -280,6 +279,15 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // cluster
+        templates.put("cluster.acknowledge.subject", "#{notification.acknowledgedBy.summary} has acknowledged an alert for cluster #{cluster.summary}");
+        templates.put("cluster.acknowledge.content", "The alert for cluster #{cluster.summary} has been acknowledged by "
+                + "#{notification.acknowledgedBy.summary} #{dateformat('HH:mm:ss', notification.raised)} "
+                + "on #{dateformat('EEEE dd/MM/yyyy', notification.raised)} with the following comment:\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeSummary}\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeComment}\r\n"
+                + "Thank you, Bergamot");
         templates.put("cluster.alert.subject", "Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
         templates.put("cluster.alert.content", "Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}\r\n"
                 + "\r\n"
@@ -297,6 +305,15 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // service
+        templates.put("service.acknowledge.subject", "#{notification.acknowledgedBy.summary} has acknowledged an alert for service #{service.summary} on the host #{host.summary}");
+        templates.put("service.acknowledge.content", "The alert for service #{service.summary} on the host #{host.summary} has been acknowledged by "
+                + "#{notification.acknowledgedBy.summary} #{dateformat('HH:mm:ss', notification.raised)} "
+                + "on #{dateformat('EEEE dd/MM/yyyy', notification.raised)} with the following comment:\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeSummary}\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeComment}\r\n"
+                + "Thank you, Bergamot");
         templates.put("service.alert.subject", "Alert for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
         templates.put("service.alert.content", "Alert for service #{service.summary} on the host #{host.summary} is #{service.state.status}\r\n"
                 + "\r\n"
@@ -318,6 +335,15 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // trap
+        templates.put("trap.acknowledge.subject", "#{notification.acknowledgedBy.summary} has acknowledged an alert for trap #{trap.summary} on the host #{host.summary}");
+        templates.put("trap.acknowledge.content", "The alert for trap #{trap.summary} on the host #{host.summary} has been acknowledged by "
+                + "#{notification.acknowledgedBy.summary} #{dateformat('HH:mm:ss', notification.raised)} "
+                + "on #{dateformat('EEEE dd/MM/yyyy', notification.raised)} with the following comment:\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeSummary}\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeComment}\r\n"
+                + "Thank you, Bergamot");
         templates.put("trap.alert.subject", "Alert for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
         templates.put("trap.alert.content", "Alert for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}\r\n"
                 + "\r\n"
@@ -339,6 +365,15 @@ public class EmailEngine extends AbstractNotificationEngine
                 + "\r\n"
                 + "Thank you, Bergamot");
         // resource
+        templates.put("resource.acknowledge.subject", "#{notification.acknowledgedBy.summary} has acknowledged an alert for resource #{resource.summary} on the cluster #{cluster.summary}");
+        templates.put("resource.acknowledge.content", "The alert for resource #{resource.summary} on the cluster #{cluster.summary} has been acknowledged by "
+                + "#{notification.acknowledgedBy.summary} #{dateformat('HH:mm:ss', notification.raised)} "
+                + "on #{dateformat('EEEE dd/MM/yyyy', notification.raised)} with the following comment:\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeSummary}\r\n"
+                + "\r\n"
+                + "#{notification.acknowledgeComment}\r\n"
+                + "Thank you, Bergamot");
         templates.put("resource.alert.subject", "Alert for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
         templates.put("resource.alert.content", "Alert for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}\r\n"
                 + "\r\n"
