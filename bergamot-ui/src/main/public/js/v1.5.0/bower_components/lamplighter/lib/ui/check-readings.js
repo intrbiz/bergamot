@@ -67,22 +67,22 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			// default to last 4 hours
 			var end = new Date().getTime();
 			var start = end - (3600000 * 4);
-			var rollup = 'minute';
+			var rollup = this.readings[readingId].reading.poll_interval;
 			// look at the type
 			if ('day' == type)
 			{
 				start = end - 86400000;
-				rollup = 'hour';
+				rollup = 900000; /* 15 minutes */
 			}
 			else if ('week' == type)
 			{
 				start = end - (86400000 * 7);
-				rollup = 'day';
+				rollup = 7200000; /* 2 hours */
 			}
 			else if ('month' == type)
 			{
 				start = end - (86400000 * 31);
-				rollup = 'day';
+				rollup = 86400000; /* 1 day */
 			}
 			return '/api/lamplighter/' + graphUrl + '/' + readingId + '/date/' + rollup + '/avg/' + start + '/' + end;
 		};

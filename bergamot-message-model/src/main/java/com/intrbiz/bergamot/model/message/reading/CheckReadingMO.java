@@ -39,12 +39,15 @@ public class CheckReadingMO extends MessageObject
     @JsonProperty("updated")
     protected long updated;
     
+    @JsonProperty("poll_interval")
+    protected long pollInterval;
+    
     public CheckReadingMO()
     {
         super();
     }
 
-    public CheckReadingMO(UUID readingId, UUID siteId, UUID checkId, String name, String summary, String description, String unit, String readingType, long created, long updated)
+    public CheckReadingMO(UUID readingId, UUID siteId, UUID checkId, String name, String summary, String description, String unit, String readingType, long created, long updated, long pollInterval)
     {
         super();
         this.readingId = readingId;
@@ -57,6 +60,7 @@ public class CheckReadingMO extends MessageObject
         this.readingType = readingType;
         this.created = created;
         this.updated = updated;
+        this.pollInterval = pollInterval;
     }
 
     public UUID getReadingId()
@@ -157,5 +161,15 @@ public class CheckReadingMO extends MessageObject
     public void setUpdated(long updated)
     {
         this.updated = updated;
+    }
+
+    public long getPollInterval()
+    {
+        return pollInterval;
+    }
+
+    public void setPollInterval(long pollInterval)
+    {
+        this.pollInterval = pollInterval;
     }
 }

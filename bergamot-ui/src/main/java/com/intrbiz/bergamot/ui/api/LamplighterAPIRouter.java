@@ -55,7 +55,8 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
                     reading.getUnit(),
                     reading.getReadingType(),
                     reading.getCreated() == null ? 0 : reading.getCreated().getTime(),
-                    reading.getUpdated() == null ? 0 : reading.getUpdated().getTime()
+                    reading.getUpdated() == null ? 0 : reading.getUpdated().getTime(),
+                    reading.getPollInterval()
             ));
         }
         return readings;
@@ -87,7 +88,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,
@@ -128,7 +129,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,
@@ -169,7 +170,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,
@@ -210,7 +211,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @CheckRegEx(value="(minute|hour|day|month)", mandatory = true, defaultValue = "hour", coalesce = CoalesceMode.ALWAYS) String rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.result.matcher.Matcher;
@@ -47,12 +48,19 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                 Check<?, ?> check = this.matchCheck(readings);
                 if (check != null)
                 {
+                    // guess poll interval for this reading, default to 5 minutes
+                    long pollInterval = 300_000L;
+                    // for an active check, use the worst case poll interval
+                    if (check instanceof ActiveCheck<?,?>)
+                    {
+                        pollInterval = Math.max(Math.max(((ActiveCheck<?,?>) check).getCheckInterval(), ((ActiveCheck<?,?>) check).getRetryInterval()), ((ActiveCheck<?,?>) check).getChangingInterval());
+                    }
                     // store the readings
                     for (Reading reading : readings.getReadings())
                     {
                         if (reading instanceof DoubleGaugeReading)
                         {
-                            CheckReading metadata = db.getOrSetupDoubleGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            CheckReading metadata = db.getOrSetupDoubleGaugeReading(check.getId(), reading.getName(), reading.getUnit(), pollInterval);
                             reading = this.preProcessReading(metadata, reading);
                             db.storeDoubleGaugeReading(new StoredDoubleGaugeReading(
                                     metadata.getSiteId(),
@@ -67,7 +75,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                         }
                         else if (reading instanceof LongGaugeReading)
                         {
-                            CheckReading metadata = db.getOrSetupLongGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            CheckReading metadata = db.getOrSetupLongGaugeReading(check.getId(), reading.getName(), reading.getUnit(), pollInterval);
                             reading = this.preProcessReading(metadata, reading);
                             db.storeLongGaugeReading(new StoredLongGaugeReading(
                                     metadata.getSiteId(),
@@ -82,7 +90,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                         }
                         else if (reading instanceof FloatGaugeReading)
                         {
-                            CheckReading metadata = db.getOrSetupFloatGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            CheckReading metadata = db.getOrSetupFloatGaugeReading(check.getId(), reading.getName(), reading.getUnit(), pollInterval);
                             reading = this.preProcessReading(metadata, reading);
                             db.storeFloatGaugeReading(new StoredFloatGaugeReading(
                                     metadata.getSiteId(),
@@ -97,7 +105,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                         }
                         else if (reading instanceof IntegerGaugeReading)
                         {
-                            CheckReading metadata = db.getOrSetupIntGaugeReading(check.getId(), reading.getName(), reading.getUnit());
+                            CheckReading metadata = db.getOrSetupIntGaugeReading(check.getId(), reading.getName(), reading.getUnit(), pollInterval);
                             reading = this.preProcessReading(metadata, reading);
                             db.storeIntGaugeReading(new StoredIntGaugeReading(
                                     metadata.getSiteId(),
