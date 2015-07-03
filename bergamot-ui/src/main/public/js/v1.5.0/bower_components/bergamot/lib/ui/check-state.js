@@ -13,6 +13,8 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.on(document, "bergamot-api-connected", this.onConnected);
 	    // handle server notifications
 	    this.on(document, "bergamot-api-update", this.onUpdate);
+        // force setup
+        this.onConnected();
 	});
 	
 	this.updateCheck = function(/*Object*/ check)
@@ -116,7 +118,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	this.onConnected = function(/*Event*/ ev)
 	{
 	    // this.log_debug("Registering for updates, check id: " + this.attr.check_id);
-	    this.registerForUpdates([ this.attr.check_id ], function(message)
+	    this.registerForUpdates("check", [ this.attr.check_id ], function(message)
 	    {
 	    	//	this.log_debug("Registered for updates: " + message.stat);
 	    }, 

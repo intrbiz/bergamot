@@ -234,8 +234,9 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
 	this.onRegisterForUpdates = function(/*Event*/ ev, /*Object*/ data)
 	{
 	    this.doAPISend({
-		type: "bergamot.api.register_for_updates", 
-		check_ids: data.check_ids
+			type: "bergamot.api.register_for_updates", 
+			update_type: data.update_type,
+			ids: data.ids
 	    }, data.onResponse, data.onError);
 	};
     

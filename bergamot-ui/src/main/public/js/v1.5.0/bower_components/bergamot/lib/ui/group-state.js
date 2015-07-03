@@ -13,6 +13,8 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.on(document, "bergamot-api-connected", this.onConnected);
 	    // handle server notifications
 	    this.on(document, "bergamot-api-update", this.onUpdate);
+        // force setup
+        this.onConnected();
 	});
 	
 	this.updateGroup = function(/*Object*/ group)
@@ -25,9 +27,9 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.$node.find("span[data-bind=ok_count]").text(group.state.ok_count);
 	    this.$node.find("span[data-bind=warning_count]").text(group.state.warning_count);
 	    this.$node.find("span[data-bind=critical_count]").text(group.state.critical_count);
-		this.$node.find("span[data-bind=in_downtime_count]").text(location.state.in_downtime_count);
-		this.$node.find("span[data-bind=suppressed_count]").text(location.state.suppressed_count);
-		this.$node.find("span[data-bind=total_checks]").text(location.state.total_checks);
+		this.$node.find("span[data-bind=in_downtime_count]").text(group.state.in_downtime_count);
+		this.$node.find("span[data-bind=suppressed_count]").text(group.state.suppressed_count);
+		this.$node.find("span[data-bind=total_checks]").text(group.state.total_checks);
 	    // animate the update
 	    var $fadeNode = this.$node;
 	    $fadeNode.fadeTo(800, 0.2, function() { 
@@ -51,7 +53,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	this.onConnected = function(/*Event*/ ev)
 	{
 	    // this.log_debug("Registering for updates, group id: " + this.attr.group_id);
-	    this.registerForUpdates([ this.attr.group_id ], function(message)
+	    this.registerForUpdates("group", [ this.attr.group_id ], function(message)
 	    {
 	    	// this.log_debug("Registered for updates: " + message.stat);
 	    }, 

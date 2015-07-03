@@ -20,8 +20,13 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
+import com.intrbiz.bergamot.model.message.update.AlertUpdate;
+import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.queue.NotificationQueue;
+import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.bergamot.queue.key.NotificationKey;
+import com.intrbiz.bergamot.queue.key.UpdateKey;
+import com.intrbiz.bergamot.queue.key.UpdateKey.UpdateType;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
@@ -45,10 +50,18 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     private RoutedProducer<Notification, NotificationKey> notificationsProducer;
     
+    private UpdateQueue updateQueue;
+    
+    private RoutedProducer<Update, UpdateKey> updateProducer;
+    
     public AlertsAPIRouter()
     {
+        // notifications
         this.notificationQueue = NotificationQueue.open();
         this.notificationsProducer = this.notificationQueue.publishNotifications();
+        // updates
+        this.updateQueue = UpdateQueue.open();
+        this.updateProducer = this.updateQueue.publishUpdates();
     }
     
     @Get("/")
@@ -124,6 +137,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                     logger.warn("Not sending acknowledge for " + alert);
                 }
             }
+            // send alert update
+            this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), new AlertUpdate(alert.toMO()));
         }
         return alert.toMO();
     }

@@ -98,7 +98,7 @@ public class RabbitUpdateQueue extends UpdateQueue
     }
     
     @Override
-    public Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler, Set<String> initialBindings)
+    public Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler, Set<UpdateKey> initialBindings)
     {
         return new RabbitConsumer<Update, UpdateKey>(this.broker, this.transcoder.asQueueEventTranscoder(Update.class), handler, this.source.getRegistry().timer("consume-update"))
         {
@@ -108,9 +108,9 @@ public class RabbitUpdateQueue extends UpdateQueue
                 String queueName = on.queueDeclare().getQueue();
                 on.exchangeDeclare("bergamot.update", "topic", true);
                 // bind
-                for (String binding : initialBindings)
+                for (UpdateKey binding : initialBindings)
                 {
-                    on.queueBind(queueName, "bergamot.update", binding);    
+                    on.queueBind(queueName, "bergamot.update", binding.toString());    
                 }
                 return queueName;
             }

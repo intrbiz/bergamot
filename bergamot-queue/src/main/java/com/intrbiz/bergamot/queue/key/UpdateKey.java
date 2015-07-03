@@ -5,14 +5,21 @@ import java.util.UUID;
 import com.intrbiz.queue.name.GenericKey;
 
 public class UpdateKey extends GenericKey
-{    
-    public UpdateKey(UUID site, UUID checkId)
-    {
-        super(site + "." + checkId.toString());
+{   
+    public enum UpdateType {
+        CHECK,
+        GROUP,
+        LOCATION,
+        ALERT
     }
     
-    public UpdateKey(UUID site)
+    public UpdateKey(UpdateType type, UUID site, UUID checkId)
     {
-        super(site + ".*");
+        super(type.toString().toLowerCase() + "." + site + "." + checkId.toString());
+    }
+    
+    public UpdateKey(UpdateType type, UUID site)
+    {
+        super(type.toString().toLowerCase() + "." + site + ".*");
     }
 }

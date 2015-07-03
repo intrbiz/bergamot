@@ -11,21 +11,34 @@ import com.intrbiz.bergamot.model.message.api.APIRequest;
 @JsonTypeName("bergamot.api.register_for_updates")
 public class RegisterForUpdates extends APIRequest
 {
-    @JsonProperty("check_ids")
-    private List<UUID> checkIds = new LinkedList<UUID>();
+    @JsonProperty("update_type")
+    private String updateType;
+    
+    @JsonProperty("ids")
+    private List<UUID> ids = new LinkedList<UUID>();
 
     public RegisterForUpdates()
     {
         super();
     }
 
-    public List<UUID> getCheckIds()
+    public String getUpdateType()
     {
-        return checkIds;
+        return updateType;
     }
 
-    public void setCheckIds(List<UUID> checkIds)
+    public void setUpdateType(String updateType)
     {
-        this.checkIds = checkIds;
+        this.updateType = updateType;
+    }
+
+    public List<UUID> getIds()
+    {
+        return ids;
+    }
+
+    public void setIds(List<UUID> ids)
+    {
+        this.ids = ids;
     }
 }

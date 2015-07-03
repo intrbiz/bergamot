@@ -14,6 +14,8 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
             this.on(document, "bergamot-api-connected", this.onConnected);
             // handle server notifications
             this.on(document, "bergamot-api-notification", this.onNotification);
+            // force setup
+            this.onConnected();
         });
             
         this.onNotification = function(/*Event*/ ev, /*Object*/ data)

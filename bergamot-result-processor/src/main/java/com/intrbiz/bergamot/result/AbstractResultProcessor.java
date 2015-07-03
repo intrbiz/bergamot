@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.ActiveCheck;
+import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Location;
@@ -15,6 +16,7 @@ import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
+import com.intrbiz.bergamot.model.message.update.AlertUpdate;
 import com.intrbiz.bergamot.model.message.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.update.GroupUpdate;
 import com.intrbiz.bergamot.model.message.update.LocationUpdate;
@@ -29,6 +31,7 @@ import com.intrbiz.bergamot.queue.key.PassiveResultKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.bergamot.queue.key.UpdateKey;
+import com.intrbiz.bergamot.queue.key.UpdateKey.UpdateType;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.RoutedProducer;
 import com.intrbiz.queue.name.NullKey;
@@ -160,22 +163,28 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         if (logger.isTraceEnabled()) logger.trace("Sending notification:\r\n" + notification);
         this.notificationsProducer.publish(new NotificationKey(check.getSiteId()), notification);
     }
+    
+    protected void publishAlertUpdate(Alert alert, AlertUpdate update)
+    {
+        if (logger.isTraceEnabled()) logger.trace("Sending alert update:\r\n" + update);
+        this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), update);
+    }
 
     protected void publishCheckUpdate(Check<?, ?> check, CheckUpdate update)
     {
-        if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
-        this.updateProducer.publish(new UpdateKey(check.getSiteId(), check.getId()), update);
+        if (logger.isTraceEnabled()) logger.trace("Sending check update:\r\n" + update);
+        this.updateProducer.publish(new UpdateKey(UpdateType.CHECK, check.getSiteId(), check.getId()), update);
     }
     
     protected void publishGroupUpdate(Group group, GroupUpdate update)
     {
-        if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
-        this.updateProducer.publish(new UpdateKey(group.getSiteId(), group.getId()), update);
+        if (logger.isTraceEnabled()) logger.trace("Sending group update:\r\n" + update);
+        this.updateProducer.publish(new UpdateKey(UpdateType.GROUP, group.getSiteId(), group.getId()), update);
     }
     
     protected void publishLocationUpdate(Location location, LocationUpdate update)
     {
-        if (logger.isTraceEnabled()) logger.trace("Sending update:\r\n" + update);
-        this.updateProducer.publish(new UpdateKey(location.getSiteId(), location.getId()), update);
+        if (logger.isTraceEnabled()) logger.trace("Sending location update:\r\n" + update);
+        this.updateProducer.publish(new UpdateKey(UpdateType.LOCATION, location.getSiteId(), location.getId()), update);
     }
 }

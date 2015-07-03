@@ -26,6 +26,7 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.message.update.AlertUpdate;
 import com.intrbiz.bergamot.model.message.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.update.GroupUpdate;
 import com.intrbiz.bergamot.model.message.update.LocationUpdate;
@@ -258,6 +259,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     logger.warn("Not sending recovery for " + check);
                 }
             }
+            // publish alert update
+            this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMO()));
         }
     }
 
@@ -282,6 +285,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             {
                 logger.warn("Not sending alert for " + check);
             }
+            // publish alert update
+            this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMO()));
         }
     }
     

@@ -39,5 +39,5 @@ public abstract class UpdateQueue extends QueueAdapter
     
     public abstract Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler);
     
-    public abstract Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler, Set<String> bindings);
+    public abstract Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler, Set<UpdateKey> bindings);
 }

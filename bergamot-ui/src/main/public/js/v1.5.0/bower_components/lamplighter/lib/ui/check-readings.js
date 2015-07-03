@@ -166,8 +166,9 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 		this.onConnected = function(/*Event*/ ev)
 		{
 			this.registerForUpdates(
-				[ this.attr.check_id ], 
-				function(message)
+                "check", 
+                [ this.attr.check_id ], 
+                function(message)
 				{
 				}, 
 				function(message)
