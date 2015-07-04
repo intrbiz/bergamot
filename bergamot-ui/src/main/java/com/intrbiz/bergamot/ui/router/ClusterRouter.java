@@ -27,7 +27,7 @@ public class ClusterRouter extends Router<BergamotApp>
     public void showClusterByName(BergamotDB db, String name, @SessionVar("site") Site site)
     {
         Cluster cluster = model("cluster", db.getClusterByName(site.getId(), name));
-        model("alerts", db.getAllAlertsForCheck(cluster.getId()));
+        model("alerts", db.getAllAlertsForCheck(cluster.getId(), 3, 0));
         encode("cluster/detail");
     }
     
@@ -36,7 +36,7 @@ public class ClusterRouter extends Router<BergamotApp>
     public void showClusterById(BergamotDB db, @IsaObjectId UUID id)
     {
         model("cluster", db.getCheck(id));
-        model("alerts", db.getAllAlertsForCheck(id));
+        model("alerts", db.getAllAlertsForCheck(id, 3, 0));
         encode("cluster/detail");
     }
     

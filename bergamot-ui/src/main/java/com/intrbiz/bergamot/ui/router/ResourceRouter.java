@@ -26,7 +26,7 @@ public class ResourceRouter extends Router<BergamotApp>
     public void showResourceByName(BergamotDB db, String clusterName, String resourceName, @SessionVar("site") Site site)
     {
         Resource resource = model("resource", db.getResourceOnClusterByName(site.getId(), clusterName, resourceName));
-        model("alerts", db.getAllAlertsForCheck(resource.getId()));
+        model("alerts", db.getAllAlertsForCheck(resource.getId(), 3, 0));
         encode("resource/detail");
     }
     
@@ -35,7 +35,7 @@ public class ResourceRouter extends Router<BergamotApp>
     public void showResourceById(BergamotDB db, @IsaObjectId UUID id)
     {
         model("resource", db.getResource(id));
-        model("alerts", db.getAllAlertsForCheck(id));
+        model("alerts", db.getAllAlertsForCheck(id, 3, 0));
         encode("resource/detail");
     }
     

@@ -66,7 +66,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 4, 0}),
+        version = @SQLVersion({3, 5, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -762,7 +762,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({
-        "get_all_alerts_for_check.*", 
+        "get_all_alerts_for_check.*",
+        "get_all_alerts_for_check_paged.*",
         "get_recovered_alerts_for_check.*", 
         "get_alerts_for_check.*", 
         "get_current_alert_for_check.*"
@@ -773,6 +774,16 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<Alert> getAllAlertsForCheck(@SQLParam("check_id") UUID checkId);
+    
+    @Cacheable
+    @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check_paged", since = @SQLVersion({3, 5, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
+    public abstract List<Alert> getAllAlertsForCheck(@SQLParam("check_id") UUID checkId, @SQLLimit() long limit, @SQLOffset() long offset);
+    
+    @Cacheable
+    @SQLGetter(table = Alert.class, name = "get_all_recent_alerts_for_check", since = @SQLVersion({3, 5, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
+        query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND raised > (now() - p_interval) ORDER BY raised DESC LIMIT p_limit")
+    )
+    public abstract List<Alert> getAllRecentAlertsForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "interval", virtual = true) String interval, @SQLLimit() long limit);
     
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_recovered_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
