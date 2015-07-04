@@ -30,6 +30,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 		this.$node.find("span[data-bind=in_downtime_count]").text(group.state.in_downtime_count);
 		this.$node.find("span[data-bind=suppressed_count]").text(group.state.suppressed_count);
 		this.$node.find("span[data-bind=total_checks]").text(group.state.total_checks);
+        this.$node.find("span[data-bind=not_ok_count]").text(group.state.total_checks - group.state.ok_count);
 	    // animate the update
 	    var $fadeNode = this.$node;
 	    $fadeNode.fadeTo(800, 0.2, function() { 

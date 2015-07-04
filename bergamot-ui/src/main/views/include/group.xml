@@ -15,8 +15,8 @@
 		    	<span class="value" data-bind="ok_count" style="width: 60px;">#{group.state.okCount}</span>
 		    </p>
 		    <p style="width: 205px;">
-			    <span class="label">Total: </span>
-			    <span class="value" data-bind="total_checks" style="width: 60px;">#{group.state.totalChecks}</span>
+			    <span class="label">Not OK: </span>
+			    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{group.state.totalChecks - group.state.okCount}</span>
 		    </p>
 		    <p style="width: 205px;">
 			    <span class="label">In Downtime: </span>
