@@ -8,6 +8,7 @@
 		<data-set var="alert" value="#{alerts}">
 			<include view="include/alert"/>
 		</data-set>
+		
 		<div id="acknowledge_modal" class="reveal-modal">
 	     	<h1>Acknowledge Alert</h1>
 	     	<form id="acknowledge_form" method="post" action="#acknowledge">
