@@ -89,7 +89,7 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
                 if (channel.isActive())
                 {
                     logger.trace("Sending ping to server");
-                    channel.writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new AgentPing(UUID.randomUUID().toString()))));
+                    channel.writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new AgentPing(UUID.randomUUID().toString(), System.currentTimeMillis()))));
                 }
                 else
                 {

@@ -26,7 +26,6 @@ import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -262,7 +261,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                         if (request instanceof AgentPing)
                         {
                             logger.debug("Got ping from server");
-                            return new AgentPong(UUID.randomUUID().toString());
+                            return new AgentPong((AgentPing) request);
                         }
                         else if (request instanceof AgentPong)
                         {

@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.queue.key.PassiveResultKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 /**
  * Check the presence of a Bergamot Agent
@@ -44,20 +45,19 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             // get the agent id
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
-            // check the host presence
-            ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
             // lookup the agent
             BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
             if (agent != null)
             {
-                resultMO.ok("Bergamot Agent " + agent.getAgentName() + " connected");
+                agent.sendOnePingAndOnePingOnly((rtt) -> {
+                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentName() + " connected, RTT: " + rtt).runtime(rtt));
+                    this.publishReading(executeCheck, new LongGaugeReading("round-trip-time", "ms", rtt));
+                });
             }
             else
             {
-                resultMO.disconnected("Bergamot Agent disconnected");
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
-            // submit
-            this.publishActiveResult(executeCheck, resultMO);
         }
         catch (Exception e)
         {

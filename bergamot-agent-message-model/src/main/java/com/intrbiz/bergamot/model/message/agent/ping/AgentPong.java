@@ -1,23 +1,33 @@
 package com.intrbiz.bergamot.model.message.agent.ping;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 
 @JsonTypeName("bergamot.agent.pong")
 public class AgentPong extends AgentMessage
 {
+    @JsonProperty("timestamp")
+    private long timestamp;
+    
     public AgentPong()
     {
         super();
     }
 
-    public AgentPong(AgentMessage message)
+    public AgentPong(AgentPing message)
     {
         super(message);
+        this.timestamp = message.getTimestamp();
+    }
+    
+    public long getTimestamp()
+    {
+        return timestamp;
     }
 
-    public AgentPong(String id)
+    public void setTimestamp(long timestamp)
     {
-        super(id);
+        this.timestamp = timestamp;
     }
 }

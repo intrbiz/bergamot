@@ -142,6 +142,11 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         // send the message
         this.channel.writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message)));
     }
+    
+    public void sendOnePingAndOnePingOnly(Consumer<Long> onPong)
+    {
+        this.sendMessageToAgent(new AgentPing(UUID.randomUUID().toString(), System.currentTimeMillis()), (message) -> onPong.accept(System.currentTimeMillis() - ((AgentPong) message).getTimestamp()) );
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception
@@ -252,11 +257,19 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         {
             logger.debug("Got ping from agent");
             this.server.fireAgentPing(this);
-            writeMessage(ctx, new AgentPong(UUID.randomUUID().toString()));
+            writeMessage(ctx, new AgentPong((AgentPing) request));
         }
         else if (request instanceof AgentPong)
         {
-            logger.debug("Got pong from agent");
+            Consumer<AgentMessage> callback = this.pendingRequests.remove(request.getId());
+            if (callback != null)
+            {
+                callback.accept(request);
+            }
+            else
+            {
+                logger.debug("Got pong from agent");
+            }
         }
         else
         {
