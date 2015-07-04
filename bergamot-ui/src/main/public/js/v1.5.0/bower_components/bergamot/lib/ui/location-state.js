@@ -4,7 +4,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
     {
 	
 	this.after('initialize', function() {
-	    // get the group id
+	    // get the location id
 	    if (! this.attr.location_id)
 	    {
 	    	this.attr.location_id = this.$node.attr("data-location-id");
@@ -24,13 +24,13 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.$node.find("h3 span.dash_img").attr("title", "The location is " + location.state.status.toLowerCase());
 	    this.$node.find("p.field-status span.value").text(location.state.status.toUpperCase().substring(0,1) + location.state.status.toLowerCase().substring(1));
 	    // fields
-	    this.$node.find("span[data-bind=ok_count]").text(location.state.ok_count);
+	    this.$node.find("span[data-bind=ok_count]").text(location.state.ok_count + location.state.info_count + location.state.pending_count);
 	    this.$node.find("span[data-bind=warning_count]").text(location.state.warning_count);
 	    this.$node.find("span[data-bind=critical_count]").text(location.state.critical_count);
 		this.$node.find("span[data-bind=in_downtime_count]").text(location.state.in_downtime_count);
 		this.$node.find("span[data-bind=suppressed_count]").text(location.state.suppressed_count);
 		this.$node.find("span[data-bind=total_checks]").text(location.state.total_checks);
-        this.$node.find("span[data-bind=not_ok_count]").text(location.state.total_checks - location.state.ok_count);
+        this.$node.find("span[data-bind=not_ok_count]").text(location.state.warning_count + location.state.critical_count + location.state.unknown_count + location.state.timeout_count + location.state.error_count + location.state.action_count);
 	    // animate the update
 	    var $fadeNode = this.$node;
 	    $fadeNode.fadeTo(800, 0.2, function() { 

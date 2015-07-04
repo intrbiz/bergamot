@@ -12,11 +12,11 @@
 		    </h3>
 		    <p style="width: 205px;">
 		    	<span class="label">OK: </span>
-		    	<span class="value" data-bind="ok_count" style="width: 60px;">#{group.state.okCount}</span>
+		    	<span class="value" data-bind="ok_count" style="width: 60px;">#{group.state.okCount + group.state.infoCount + group.state.pendingCount}</span>
 		    </p>
 		    <p style="width: 205px;">
 			    <span class="label">Not OK: </span>
-			    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{group.state.totalChecks - group.state.okCount}</span>
+			    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{group.state.warningCount + group.state.criticalCount + group.state.unknownCount + group.state.timeoutCount + group.state.errorCount + group.state.actionCount}</span>
 		    </p>
 		    <p style="width: 205px;">
 			    <span class="label">In Downtime: </span>

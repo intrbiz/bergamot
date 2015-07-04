@@ -24,13 +24,13 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.$node.find("h3 span.dash_img").attr("title", "The group is " + group.state.status.toLowerCase());
 	    this.$node.find("p.field-status span.value").text(group.state.status.toUpperCase().substring(0,1) + group.state.status.toLowerCase().substring(1));
 	    // fields
-	    this.$node.find("span[data-bind=ok_count]").text(group.state.ok_count);
+	    this.$node.find("span[data-bind=ok_count]").text(group.state.ok_count + group.state.info_count + group.state.pending_count);
 	    this.$node.find("span[data-bind=warning_count]").text(group.state.warning_count);
 	    this.$node.find("span[data-bind=critical_count]").text(group.state.critical_count);
 		this.$node.find("span[data-bind=in_downtime_count]").text(group.state.in_downtime_count);
 		this.$node.find("span[data-bind=suppressed_count]").text(group.state.suppressed_count);
 		this.$node.find("span[data-bind=total_checks]").text(group.state.total_checks);
-        this.$node.find("span[data-bind=not_ok_count]").text(group.state.total_checks - group.state.ok_count);
+        this.$node.find("span[data-bind=not_ok_count]").text(group.state.warning_count + group.state.critical_count + group.state.unknown_count + group.state.timeout_count + group.state.error_count + group.state.action_count);
 	    // animate the update
 	    var $fadeNode = this.$node;
 	    $fadeNode.fadeTo(800, 0.2, function() { 
