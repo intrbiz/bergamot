@@ -542,7 +542,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     {
         Check<?,?> check = this.getCheck();
         // check if to send
-        if (check.getNotifications().isEnabledAt(type, check.getState().getStatus(), now)) return null;
+        if (! check.getNotifications().isEnabledAt(type, check.getState().getStatus(), now)) return null;
         // create the notifications
         T notification = ctor.get();
         // the site
