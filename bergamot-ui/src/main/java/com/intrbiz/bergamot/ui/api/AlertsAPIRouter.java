@@ -129,12 +129,12 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 SendAcknowledge sendAck = alert.createAcknowledgeNotification(Calendar.getInstance(), contact, ackCom);
                 if (sendAck != null && (! sendAck.getTo().isEmpty()))
                 {
-                    logger.warn("Sending acknowledge for " + alert);
+                    logger.warn("Sending acknowledge for " + alert.getId());
                     this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
                 }
                 else
                 {
-                    logger.warn("Not sending acknowledge for " + alert);
+                    logger.warn("Not sending acknowledge for " + alert.getId());
                 }
             }
             // send alert update
