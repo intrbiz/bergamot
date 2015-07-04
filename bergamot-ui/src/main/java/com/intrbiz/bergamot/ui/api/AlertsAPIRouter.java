@@ -124,7 +124,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 db.setAlert(alert);
             });
             // send acknowledge notifications
-            if (! alert.getCheck().getState().isInDowntime())
+            if (! alert.getCheck().getState().isSuppressedOrInDowntime())
             {
                 SendAcknowledge sendAck = alert.createAcknowledgeNotification(Calendar.getInstance(), contact, ackCom);
                 if (sendAck != null && (! sendAck.getTo().isEmpty()))

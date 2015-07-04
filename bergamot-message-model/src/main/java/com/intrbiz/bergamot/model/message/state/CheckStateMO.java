@@ -50,6 +50,9 @@ public class CheckStateMO extends MessageObject
 
     @JsonProperty("in_downtime")
     private boolean inDowntime;
+    
+    @JsonProperty("suppressed")
+    private boolean suppressed;
 
     public CheckStateMO()
     {
@@ -194,5 +197,15 @@ public class CheckStateMO extends MessageObject
     public void setInDowntime(boolean inDowntime)
     {
         this.inDowntime = inDowntime;
+    }
+
+    public boolean isSuppressed()
+    {
+        return suppressed;
+    }
+
+    public void setSuppressed(boolean suppressed)
+    {
+        this.suppressed = suppressed;
     }
 }

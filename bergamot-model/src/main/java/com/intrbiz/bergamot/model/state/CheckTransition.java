@@ -254,6 +254,18 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
     @SQLColumn(index = 37, name = "next_in_downtime", since = @SQLVersion({ 3, 3, 0 }))
     private boolean nextInDowntime;
     
+    /**
+     * Previous State: Was the check previously suppressed
+     */
+    @SQLColumn(index = 38, name = "previous_suppressed", since = @SQLVersion({ 3, 4, 0 }))
+    private boolean previousSuppressed;
+
+    /**
+     * Next State: Is the check now suppressed
+     */
+    @SQLColumn(index = 39, name = "next_suppressed", since = @SQLVersion({ 3, 4, 0 }))
+    private boolean nextSuppressed;
+    
     public CheckTransition()
     {
         super();
@@ -642,6 +654,26 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
     {
         this.nextInDowntime = nextInDowntime;
     }
+
+    public boolean isPreviousSuppressed()
+    {
+        return previousSuppressed;
+    }
+
+    public void setPreviousSuppressed(boolean previousSuppressed)
+    {
+        this.previousSuppressed = previousSuppressed;
+    }
+
+    public boolean isNextSuppressed()
+    {
+        return nextSuppressed;
+    }
+
+    public void setNextSuppressed(boolean nextSuppressed)
+    {
+        this.nextSuppressed = nextSuppressed;
+    }
     
     // helpers
 
@@ -664,6 +696,7 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         state.setStatus(this.previousStatus);
         state.setTransitioning(this.previousTransitioning);
         state.setInDowntime(this.previousInDowntime);
+        state.setSuppressed(this.previousSuppressed);
         return state;
     }
     
@@ -684,6 +717,7 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         this.previousStatus = state.getStatus();
         this.previousTransitioning = state.isTransitioning();
         this.previousInDowntime = state.isInDowntime();
+        this.previousSuppressed = state.isSuppressed();
     }
     
     public CheckState toNextState()
@@ -705,6 +739,7 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         state.setStatus(this.nextStatus);
         state.setTransitioning(this.nextTransitioning);
         state.setInDowntime(this.nextInDowntime);
+        state.setSuppressed(this.nextSuppressed);
         return state;
     }
     
@@ -725,6 +760,7 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         this.nextStatus = state.getStatus();
         this.nextTransitioning = state.isTransitioning();
         this.nextInDowntime = state.isInDowntime();
+        this.nextSuppressed = state.isSuppressed();
     }
     
     public CheckTransitionMO toMO(boolean stub)
@@ -750,6 +786,7 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         mo.setPreviousLastHardStatus(this.getPreviousLastHardStatus().toString());
         mo.setPreviousLastHardOutput(this.getPreviousLastHardOutput());
         mo.setPreviousInDowntime(this.isPreviousInDowntime());
+        mo.setPreviousSuppressed(this.isPreviousSuppressed());
         mo.setNextOk(this.isNextOk());
         mo.setNextStatus(this.getNextStatus().toString());
         mo.setNextOutput(this.getNextOutput());
@@ -765,6 +802,7 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         mo.setNextLastHardStatus(this.getNextLastHardStatus().toString());
         mo.setNextLastHardOutput(this.getNextLastHardOutput());
         mo.setNextInDowntime(this.isNextInDowntime());
+        mo.setNextSuppressed(this.isNextSuppressed());
         mo.setAlert(this.isAlert());
         mo.setRecovery(this.isRecovery());
         return mo;

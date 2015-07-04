@@ -207,6 +207,16 @@ public class CheckTransitionMO extends MessageObject
      */
     private boolean nextInDowntime;
     
+    /**
+     * Was this check previously suppressed
+     */
+    private boolean previousSuppressed;
+
+    /**
+     * Is this check now suppressed
+     */
+    private boolean nextSuppressed;
+    
     public CheckTransitionMO()
     {
         super();
@@ -580,5 +590,25 @@ public class CheckTransitionMO extends MessageObject
     public void setNextInDowntime(boolean nextInDowntime)
     {
         this.nextInDowntime = nextInDowntime;
+    }
+
+    public boolean isPreviousSuppressed()
+    {
+        return previousSuppressed;
+    }
+
+    public void setPreviousSuppressed(boolean previousSuppressed)
+    {
+        this.previousSuppressed = previousSuppressed;
+    }
+
+    public boolean isNextSuppressed()
+    {
+        return nextSuppressed;
+    }
+
+    public void setNextSuppressed(boolean nextSuppressed)
+    {
+        this.nextSuppressed = nextSuppressed;
     }
 }

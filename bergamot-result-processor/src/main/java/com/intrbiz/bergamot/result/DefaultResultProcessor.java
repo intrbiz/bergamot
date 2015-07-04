@@ -149,7 +149,15 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // send the general state update notifications
                 this.sendCheckStateUpdate(db, check, transition);
                 // send group updates
-                if (transition.stateChange || transition.hardChange || transition.alert || transition.recovery || transition.nextState.getStatus() != transition.previousState.getStatus() || transition.nextState.isInDowntime() != transition.previousState.isInDowntime())
+                if (
+                        transition.stateChange || 
+                        transition.hardChange || 
+                        transition.alert || 
+                        transition.recovery || 
+                        transition.nextState.getStatus() != transition.previousState.getStatus() || 
+                        transition.nextState.isInDowntime() != transition.previousState.isInDowntime() || 
+                        transition.nextState.isSuppressed() != transition.previousState.isSuppressed()
+                )
                 {
                     // group update
                     this.sendGroupStateUpdate(db, check, transition);
@@ -243,7 +251,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             alertRecord.setRecoveredBy(check.getState().getLastCheckId());
             db.setAlert(alertRecord);
             // don't send notifications for suppressed checks
-            if (! check.getState().isInDowntime())
+            if (! check.getState().isSuppressedOrInDowntime())
             {
                 // send notifications?
                 Calendar now = Calendar.getInstance();
@@ -267,7 +275,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected void sendAlert(Check<?, ?> check, BergamotDB db)
     {
         logger.warn("Alert for " + check);
-        if (! check.getState().isInDowntime())
+        if (! check.getState().isSuppressedOrInDowntime())
         {
             // record the alert
             Alert alertRecord = new Alert(check, check.getState());
@@ -307,7 +315,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         nextState.setOutput(resultMO.getOutput());
         nextState.setLastCheckTime(new Timestamp(resultMO.getExecuted()));
         // is this check entering downtime?
-        nextState.setInDowntime(check.isSuppressedOrInDowntime());
+        nextState.setInDowntime(check.isInDowntime());
+        nextState.setSuppressed(check.isSuppressed());
         // compute the transition
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
@@ -394,7 +403,15 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             // send the general state update notifications
             this.sendCheckStateUpdate(db, referencedBy, virtualTransition);
             // send group state updates
-            if (virtualTransition.stateChange || virtualTransition.hardChange || virtualTransition.alert || virtualTransition.recovery || virtualTransition.nextState.getStatus() != virtualTransition.previousState.getStatus())
+            if (
+                    virtualTransition.stateChange || 
+                    virtualTransition.hardChange || 
+                    virtualTransition.alert || 
+                    virtualTransition.recovery || 
+                    virtualTransition.nextState.getStatus() != virtualTransition.previousState.getStatus() ||
+                    virtualTransition.nextState.isInDowntime() != virtualTransition.previousState.isInDowntime() || 
+                    virtualTransition.nextState.isSuppressed() != virtualTransition.previousState.isSuppressed()
+            )
             {
                 this.sendGroupStateUpdate(db, referencedBy, virtualTransition);
             }
@@ -423,7 +440,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         nextState.setOutput(null);
         nextState.setLastCheckTime(new Timestamp(cause.getExecuted()));
         // is this check entering downtime?
-        nextState.setInDowntime(check.isSuppressedOrInDowntime());
+        nextState.setInDowntime(check.isInDowntime());
+        nextState.setSuppressed(check.isSuppressed());
         // compute the transition
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
