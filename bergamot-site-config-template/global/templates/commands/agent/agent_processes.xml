@@ -15,28 +15,28 @@
         <summary>Bergamot Agent: Processes</summary>
     </command>
     
-    <command category="system" engine="agent" executor="process-stats" extends="check_agent" name="check_agent_zombie_processes">
+    <command category="System" engine="agent" executor="process-stats" extends="check_agent" name="check_agent_zombie_processes">
         <parameter description="Warning threshold" name="warning">0</parameter>
         <parameter description="Critical threshold" name="critical">0</parameter>
         <parameter description="Process state" name="state">zombie</parameter>
         <summary>Bergamot Agent: Zombie Processes</summary>
     </command>
     
-    <command category="system" engine="agent" executor="process-stats" extends="check_agent" name="check_agent_total_processes">
+    <command category="System" engine="agent" executor="process-stats" extends="check_agent" name="check_agent_total_processes">
         <parameter description="Warning threshold" name="warning">150</parameter>
         <parameter description="Critical threshold" name="critical">200</parameter>
         <parameter description="Process state" name="state">total</parameter>
         <summary>Bergamot Agent: Total Processes</summary>
     </command>
     
-    <command category="system" application="ssh" extends="check_agent_processes" name="check_agent_process_sshd">
+    <command category="System" application="SSH" extends="check_agent_processes" name="check_agent_process_sshd">
         <summary>Process: SSHD</summary>
         <parameter name="warning">1:20</parameter>
         <parameter name="critical">1:20</parameter>
         <parameter name="command">sshd</parameter>
     </command>
     
-    <command application="postgresql" extends="check_agent_processes" name="check_agent_process_postgresql">
+    <command application="PostgreSQL" extends="check_agent_processes" name="check_agent_process_postgresql">
         <summary>Process: PostgreSQL</summary>
         <parameter name="warning">1:25</parameter>
         <parameter name="critical">1:25</parameter>
@@ -44,7 +44,7 @@
         <parameter name="user">postgres</parameter>
     </command>
     
-    <command application="mysql" extends="check_agent_processes" name="check_agent_process_mysql">
+    <command application="MySQL" extends="check_agent_processes" name="check_agent_process_mysql">
         <summary>Process: MySQL</summary>
         <parameter name="warning">1:25</parameter>
         <parameter name="critical">1:25</parameter>
@@ -52,14 +52,14 @@
         <parameter name="user">mysql</parameter>
     </command>
     
-    <command application="nginx" extends="check_agent_processes" name="check_agent_process_nginx">
+    <command application="Nginx" extends="check_agent_processes" name="check_agent_process_nginx">
         <summary>Process: Nginx</summary>
         <parameter name="warning">1:4</parameter>
         <parameter name="critical">1:4</parameter>
         <parameter name="command">nginx</parameter>
     </command>
     
-    <command application="apache" extends="check_agent_processes" name="check_agent_process_apache">
+    <command application="Apache" extends="check_agent_processes" name="check_agent_process_apache">
         <summary>Process: Apache HTTPD</summary>
         <parameter name="warning">1:100</parameter>
         <parameter name="critical">1:100</parameter>
@@ -68,7 +68,7 @@
         <parameter name="command">(httpd|apache2)</parameter>
     </command>
     
-    <command application="rabbitmq" extends="check_agent_processes" name="check_agent_process_rabbitmq">
+    <command application="RabbitMQ" extends="check_agent_processes" name="check_agent_process_rabbitmq">
         <summary>Process: RabbitMQ</summary>
         <parameter name="warning">1:1</parameter>
         <parameter name="critical">1:1</parameter>

@@ -6,26 +6,21 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
-    <command name="check_local_disk" extends="check-nagios">
+    <command category="System" name="check_local_disk" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_disk -w #{arg1} -c #{arg2} -p #{arg3}</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
     </command>
     
-    <command name="check_local_load" extends="check-nagios">
+    <command category="System" name="check_local_load" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_load -w #{arg1} -c #{arg2}</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
     </command>
     
-    <command name="check_local_procs" extends="check-nagios">
+    <command category="System" name="check_local_procs" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_procs -w #{arg1} -c #{arg2} -s #{arg3}</parameter>
-    </command>
+    </command> 
     
-    <command name="check_local_users" extends="check-nagios">
-        <parameter name="command_line">#{nagios.path}/check_users -w #{arg1} -c #{arg2}</parameter>
-        <parameter description="UI Icon" name="ui-icon">/images/icons/64/users.png</parameter>
-    </command>
-    
-    <command name="check_local_swap" extends="check-nagios">
+    <command category="System" name="check_local_swap" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_swap -w #{arg1} -c #{arg2}</parameter>
     </command>
     
@@ -51,16 +46,16 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
-    <command name="check_http" extends="check-nagios">
+    <command category="Websites" name="check_http" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_http -I #{host.address} #{arg1}</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
     </command>
     
-    <command name="check_ssh" extends="check-nagios">
+    <command category="System" name="check_ssh" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_ssh #{host.address}</parameter>
     </command>
     
-    <command name="check_ssh_with_options" extends="check-nagios">
+    <command category="System" name="check_ssh_with_options" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_ssh #{arg1} #{host.address}</parameter>
     </command>
     
@@ -68,7 +63,7 @@
         <parameter name="command_line">#{nagios.path}/check_dhcp #{arg1}</parameter>
     </command>
     
-    <command name="check_ping" extends="check-nagios">
+    <command category="System" name="check_ping" extends="check-nagios">
         <parameter name="command_line">#{nagios.path}/check_ping -H #{host.address} -w #{arg1} -c #{arg2} -p 5</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>

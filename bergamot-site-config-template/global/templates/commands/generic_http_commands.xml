@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command name="http_check" engine="http">
+    <command category="Websites" name="http_check" engine="http">
         <summary>HTTP Check</summary>
         <parameter name="host">#{host.address}</parameter>
         <parameter name="port"></parameter>
@@ -20,7 +20,7 @@
         <description>Make a HTTP request and check the response</description>
     </command>
     
-    <command name="https_check" engine="http">
+    <command category="Websites" name="https_check" engine="http">
         <summary>HTTPS Check</summary>
         <parameter name="host">#{host.address}</parameter>
         <parameter name="port"></parameter>
@@ -39,7 +39,7 @@
         <description>Make a HTTPS request and check the response</description>
     </command>
     
-    <command name="certificate_check" engine="http" executor="certificate">
+    <command category="TLS Certificates" name="certificate_check" engine="http" executor="certificate">
         <summary>TLS certificate Check</summary>
         <parameter name="host">#{host.address}</parameter>
         <parameter name="port"></parameter>

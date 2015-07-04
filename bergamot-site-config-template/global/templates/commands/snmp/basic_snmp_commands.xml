@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command engine="snmp" name="check_snmp_description" extends="snmp_get_check">
+    <command category="System" engine="snmp" name="check_snmp_description" extends="snmp_get_check">
         <summary>Get SNMP Description</summary>
         <parameter name="oid">1.3.6.1.2.1.1.1.0</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
         <description>Get the device description of an SNMP device</description>
     </command>
     
-    <command engine="snmp" name="check_snmp_contact" extends="snmp_get_check">
+    <command category="System" engine="snmp" name="check_snmp_contact" extends="snmp_get_check">
         <summary>Get SNMP Contact</summary>
         <parameter name="oid">1.3.6.1.2.1.1.4.0</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
         <description>Get the contact of an SNMP device</description>
     </command>
     
-    <command engine="snmp" name="check_snmp_name" extends="snmp_get_check">
+    <command category="System" engine="snmp" name="check_snmp_name" extends="snmp_get_check">
         <summary>Get SNMP Name</summary>
         <parameter name="oid">1.3.6.1.2.1.1.5.0</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
         <description>Get the name of an SNMP device</description>
     </command>
     
-    <command engine="snmp" name="check_snmp_location" extends="snmp_get_check">
+    <command category="System" engine="snmp" name="check_snmp_location" extends="snmp_get_check">
         <summary>Get SNMP Location</summary>
         <parameter name="oid">1.3.6.1.2.1.1.6.0</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
         <description>Get the location of an SNMP device</description>
     </command>
     
-    <command engine="snmp" name="check_snmp_uptime" extends="snmp_check">
+    <command category="System" engine="snmp" name="check_snmp_uptime" extends="snmp_check">
         <parameter description="Warning if uptime is less than" name="warning">30</parameter>
         <parameter description="Critical if uptime is less than" name="critical">15</parameter>
         <parameter name="script">

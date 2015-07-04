@@ -1,95 +1,95 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command name="check_nrpe_load" extends="check_nrpe">
+    <command category="System" name="check_nrpe_load" extends="check_nrpe">
         <summary>Check Load (NRPE)</summary>
         <parameter name="command">check_load</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
     </command>
     
-    <command name="check_nrpe_mem" extends="check_nrpe">
+    <command category="System" name="check_nrpe_mem" extends="check_nrpe">
         <summary>Check Memory (NRPE)</summary>
         <parameter name="command">check_mem</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/memory.png</parameter>
     </command>
     
-    <command name="check_nrpe_users" extends="check_nrpe">
+    <command category="System" name="check_nrpe_users" extends="check_nrpe">
         <summary>Check Users (NRPE)</summary>
         <parameter name="command">check_users</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/users.png</parameter>
     </command>
     
-    <command name="check_nrpe_zombie_procs" extends="check_nrpe">
+    <command category="System" name="check_nrpe_zombie_procs" extends="check_nrpe">
         <summary>Check Zombie Processes (NRPE)</summary>
         <parameter name="command">check_zombie_procs</parameter>
     </command>
     
-    <command name="check_nrpe_total_procs" extends="check_nrpe">
+    <command category="System" name="check_nrpe_total_procs" extends="check_nrpe">
         <summary>Check Total Processes (NRPE)</summary>
         <parameter name="command">check_total_procs</parameter>
     </command>
     
-    <command name="check_nrpe_disk_space_root" extends="check_nrpe">
+    <command category="System" name="check_nrpe_disk_space_root" extends="check_nrpe">
         <summary>Check Disk Space: / (NRPE)</summary>
         <parameter name="command">check_disk_space_root</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
     </command>
     
-    <command name="check_nrpe_disk_space_var" extends="check_nrpe">
+    <command category="System" name="check_nrpe_disk_space_var" extends="check_nrpe">
         <summary>Check Disk Space: /var (NRPE)</summary>
         <parameter name="command">check_disk_space_var</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
     </command>
     
-    <command name="check_nrpe_disk_space_home" extends="check_nrpe">
+    <command category="System" name="check_nrpe_disk_space_home" extends="check_nrpe">
         <summary>Check Disk Space: /home (NRPE)</summary>
         <parameter name="command">check_disk_space_home</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
     </command>
     
-    <command name="check_nrpe_disk_space_opt" extends="check_nrpe">
+    <command category="System" name="check_nrpe_disk_space_opt" extends="check_nrpe">
         <summary>Check Disk Space: /opt (NRPE)</summary>
         <parameter name="command">check_disk_space_opt</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
     </command>
     
-    <command name="check_nrpe_disk_space_usr" extends="check_nrpe">
+    <command category="System" name="check_nrpe_disk_space_usr" extends="check_nrpe">
         <summary>Check Disk Space: /usr (NRPE)</summary>
         <parameter name="command">check_disk_space_usr</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
     </command>
     
-    <command name="check_nrpe_apache" extends="check_nrpe">
+    <command category="System" name="check_nrpe_apache" extends="check_nrpe">
         <summary>Check Service: Apache HTTPD (NRPE)</summary>
         <parameter name="command">check_apache</parameter>
     </command>
     
-    <command name="check_nrpe_nginx" extends="check_nrpe">
+    <command category="System" name="check_nrpe_nginx" extends="check_nrpe">
         <summary>Check Service: Nginx (NRPE)</summary>
         <parameter name="command">check_nginx</parameter>
     </command>
     
-    <command name="check_nrpe_mysql" extends="check_nrpe">
+    <command category="System" name="check_nrpe_mysql" extends="check_nrpe">
         <summary>Check Service: MySQL (NRPE)</summary>
         <parameter name="command">check_mysql</parameter>
     </command>
     
-    <command name="check_nrpe_mysql_health" extends="check_nrpe">
+    <command category="System" name="check_nrpe_mysql_health" extends="check_nrpe">
         <summary>Check MySQL Health (NRPE)</summary>
         <parameter name="command">check_mysql_health</parameter>
     </command>
     
-    <command name="check_nrpe_postgresql" extends="check_nrpe">
+    <command category="System" name="check_nrpe_postgresql" extends="check_nrpe">
         <summary>Check Service: PostgreSQL (NRPE)</summary>
         <parameter name="command">check_postgresql</parameter>
     </command>
     
-    <command name="check_nrpe_ssh" extends="check_nrpe">
+    <command category="System" name="check_nrpe_ssh" extends="check_nrpe">
         <summary>Check Service: SSH (NRPE)</summary>
         <parameter name="command">check_ssh</parameter>
     </command>
     
-    <command name="check_nrpe_local_ntp_offset" extends="check_nrpe">
+    <command category="System" name="check_nrpe_local_ntp_offset" extends="check_nrpe">
         <summary>Check Local NTP Offset (NRPE)</summary>
         <parameter name="command">check_local_ntp_offset</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
