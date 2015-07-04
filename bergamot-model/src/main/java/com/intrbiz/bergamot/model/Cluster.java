@@ -79,11 +79,11 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
         {
             // get the category for this service
             String categoryTag = Util.coalesceEmpty(resource.resolveCategory(), "default");
-            Category<Resource> category = categories.get(categoryTag);
+            Category<Resource> category = categories.get(categoryTag.toLowerCase());
             if (category == null)
             {
                 category = new Category<Resource>(categoryTag);
-                categories.put(categoryTag, category);
+                categories.put(categoryTag.toLowerCase(), category);
             }
             // by application too?
             String applicationTag = resource.resolveApplication();

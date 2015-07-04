@@ -45,11 +45,11 @@ public class Category<T>
 
     public Application<T> getOrAddApplication(String name)
     {
-        Application<T> application = this.applications.get(name);
+        Application<T> application = this.applications.get(name.toLowerCase());
         if (application == null)
         {
             application = new Application<T>(name);
-            this.applications.put(name, application);
+            this.applications.put(name.toLowerCase(), application);
         }
         return application;
     }

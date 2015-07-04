@@ -136,11 +136,11 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         {
             // get the category for this service
             String categoryTag = Util.coalesceEmpty(service.resolveCategory(), "default");
-            Category<Service> category = categories.get(categoryTag);
+            Category<Service> category = categories.get(categoryTag.toLowerCase());
             if (category == null)
             {
                 category = new Category<Service>(categoryTag);
-                categories.put(categoryTag, category);
+                categories.put(categoryTag.toLowerCase(), category);
             }
             // by application too?
             String applicationTag = service.resolveApplication();
@@ -199,11 +199,11 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         {
             // get the category for this service
             String categoryTag = Util.coalesceEmpty(trap.resolveCategory(), "default");
-            Category<Trap> category = categories.get(categoryTag);
+            Category<Trap> category = categories.get(categoryTag.toLowerCase());
             if (category == null)
             {
                 category = new Category<Trap>(categoryTag);
-                categories.put(categoryTag, category);
+                categories.put(categoryTag.toLowerCase(), category);
             }
             // by application too?
             String applicationTag = trap.resolveApplication();
