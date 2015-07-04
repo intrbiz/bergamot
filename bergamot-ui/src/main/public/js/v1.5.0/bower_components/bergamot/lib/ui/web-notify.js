@@ -49,6 +49,10 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
             {
                 title = "Recovery for ";
             }
+            else if (notification.type == 'bergamot.send_acknowledge')
+            {
+                title = "Acknowledgement for ";
+            }
             // check name
             title += notification.check.summary;
             // on host ?
