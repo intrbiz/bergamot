@@ -160,6 +160,13 @@ public class Notifications extends BergamotObject<NotificationsMO>
         this.allEnginesEnabled = allEnginesEnabled;
     }
 
+    /**
+     * Are notifications enabled for the given notification type, the given check statue and a point in time
+     * @param type the notification type
+     * @param status the status of the check
+     * @param time the time
+     * @return true if notifications are enabled
+     */
     public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
     {
         TimePeriod timePeriod = this.getTimePeriod();
