@@ -3,8 +3,6 @@ package com.intrbiz.bergamot.worker.engine.http;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
-import java.util.function.Consumer;
-
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Counter;
@@ -51,13 +49,12 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && 
-               HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
+        return HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
                (HTTPExecutor.NAME.equalsIgnoreCase(task.getExecutor()) || Util.isEmpty(task.getExecutor()));
     }
     
     @Override
-    public void execute(final ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(final ExecuteCheck executeCheck)
     {
         logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getExecutor() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         // time it
@@ -90,7 +87,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             check.execute((response) -> {
                 logger.info("Got response for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);           
+                ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);           
                 // check the response
                 boolean   cont = checkStatus(executeCheck, response, resultMO);
                 if (cont) cont = checkRuntime(executeCheck, response, resultMO);
@@ -99,7 +96,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 // submit the result
                 resultMO.setRuntime(response.getRuntime());
                 tctx.stop();
-                resultSubmitter.accept(resultMO);
+                this.publishActiveResult(executeCheck, resultMO);
                 // publish some metrics
                 ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
                 readings.longGaugeReading("response-time", "ms", response.getRuntime(), (long) executeCheck.getIntParameter("warning_response_time", 0), (long) executeCheck.getIntParameter("critical_response_time", 0), null, null);
@@ -111,7 +108,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 tctx.stop();
                 failedRequests.inc();
                 logger.error("Error for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(error));
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(error));
             });
         }
         catch (Exception e)
@@ -119,7 +116,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             logger.error("Failed to execute HTTP check", e);
             tctx.stop();
             this.failedRequests.inc();
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }        
     }
     

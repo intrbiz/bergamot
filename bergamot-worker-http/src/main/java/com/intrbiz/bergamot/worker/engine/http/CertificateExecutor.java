@@ -3,8 +3,6 @@ package com.intrbiz.bergamot.worker.engine.http;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 
-import java.util.function.Consumer;
-
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Counter;
@@ -16,7 +14,6 @@ import com.intrbiz.bergamot.crypto.util.TLSInfo;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -49,13 +46,12 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && 
-               HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
+        return HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
                CertificateExecutor.NAME.equalsIgnoreCase(task.getExecutor());
     }
     
     @Override
-    public void execute(final ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(final ExecuteCheck executeCheck)
     {
         logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getExecutor() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         // time it
@@ -89,7 +85,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
             check.execute((response) -> {
                 logger.info("Got response for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+                ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
                 // check the response
                 TLSInfo tls = response.getTlsInfo();
                 CertInfo serverCert = tls.getServerCertInfo();
@@ -116,13 +112,13 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
                 // submit the result
                 resultMO.setRuntime(response.getRuntime());
                 tctx.stop();
-                resultSubmitter.accept(resultMO); 
+                this.publishActiveResult(executeCheck, resultMO); 
             }, 
             (error) -> {
                 tctx.stop();
                 failedRequests.inc();
                 logger.error("Error for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(error));
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(error));
             });
         }
         catch (Exception e)
@@ -130,7 +126,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
             logger.error("Failed to execute TLS Certificate check", e);
             tctx.stop();
             this.failedRequests.inc();
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }        
     }
 

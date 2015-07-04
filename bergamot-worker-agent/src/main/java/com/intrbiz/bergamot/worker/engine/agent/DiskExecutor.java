@@ -1,8 +1,9 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
+import static com.intrbiz.bergamot.util.UnitUtil.*;
+
 import java.text.DecimalFormat;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -12,15 +13,10 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskStat;
 import com.intrbiz.bergamot.model.message.agent.stat.disk.DiskInfo;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
-
-import static com.intrbiz.bergamot.util.UnitUtil.*;
 
 /**
  * Check the disk usage of a mount point on a Bergamot Agent
@@ -44,11 +40,11 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent Disk Usage");
         try
@@ -75,34 +71,34 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
                         // apply the check
                         double warning = executeCheck.getPercentParameter("warning", 0.8D);
                         double critical = executeCheck.getPercentParameter("critical", 0.9D);
-                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
+                        this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                                 fromPercent(disk.getUsedPercent()), 
                                 warning,
                                 critical,
                                 "Disk: " + disk.getMount() + " " + disk.getType() + " on " + disk.getDevice() +" " + DFMT.format(toG(disk.getUsed())) + " GB of " + DFMT.format(toG(disk.getSize())) + " GB (" + DFMT.format(disk.getUsedPercent()) + " %) used" 
                         ).runtime(runtime));
                         // readings
-                        ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
-                        readings.reading(new DoubleGaugeReading("disk-space-used-[" + disk.getMount() + "]", "MB", UnitUtil.toM(disk.getUsed()), UnitUtil.toM(disk.getSize()) * warning, UnitUtil.toM(disk.getSize()) * critical, 0D, UnitUtil.toM(disk.getSize())));
-                        readings.reading(new DoubleGaugeReading("disk-space-available-[" + disk.getMount() + "]", "MB", UnitUtil.toM(disk.getAvailable()), UnitUtil.toM(disk.getSize()) * (1D - warning), UnitUtil.toM(disk.getSize()) * (1D - critical), 0D, UnitUtil.toM(disk.getSize()) ));
-                        readings.reading(new DoubleGaugeReading("disk-space-used-percent-[" + disk.getMount() + "]", "%", disk.getUsedPercent(), UnitUtil.toPercent(warning), UnitUtil.toPercent(critical), 0D, 100D));
-                        this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
+                        this.publishReading(executeCheck, 
+                            new DoubleGaugeReading("disk-space-used-[" + disk.getMount() + "]", "MB", UnitUtil.toM(disk.getUsed()), UnitUtil.toM(disk.getSize()) * warning, UnitUtil.toM(disk.getSize()) * critical, 0D, UnitUtil.toM(disk.getSize())),
+                            new DoubleGaugeReading("disk-space-available-[" + disk.getMount() + "]", "MB", UnitUtil.toM(disk.getAvailable()), UnitUtil.toM(disk.getSize()) * (1D - warning), UnitUtil.toM(disk.getSize()) * (1D - critical), 0D, UnitUtil.toM(disk.getSize())),
+                            new DoubleGaugeReading("disk-space-used-percent-[" + disk.getMount() + "]", "%", disk.getUsedPercent(), UnitUtil.toPercent(warning), UnitUtil.toPercent(critical), 0D, 100D)
+                        );
                     }
                     else
                     {
-                        resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error("No such mount point: " + mount).runtime(runtime));
+                        this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error("No such mount point: " + mount).runtime(runtime));
                     }
                 });
             }
             else
             {
                 // raise an error
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

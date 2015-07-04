@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -10,7 +9,6 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckAgent;
 import com.intrbiz.bergamot.model.message.agent.stat.AgentStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
 /**
@@ -33,11 +31,11 @@ public class AgentExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent self");
         try
@@ -55,7 +53,7 @@ public class AgentExecutor extends AbstractExecutor<AgentEngine>
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     AgentStat stat = (AgentStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got agent info in " + runtime + "ms: " + stat);
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).info(
+                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).info(
                             stat.getAgentProduct() + " " + stat.getAgentVersion() + " (" + stat.getRuntime() + " [" + stat.getRuntimeVendor() + "] " + " " + stat.getRuntimeVersion() + ") on " + stat.getOsName() + " (" + stat.getOsArch() + ")"
                     ).runtime(runtime));
                 });
@@ -63,12 +61,12 @@ public class AgentExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

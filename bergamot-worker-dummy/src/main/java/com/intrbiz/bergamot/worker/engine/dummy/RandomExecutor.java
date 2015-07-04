@@ -1,11 +1,9 @@
 package com.intrbiz.bergamot.worker.engine.dummy;
 
 import java.security.SecureRandom;
-import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
 /**
@@ -24,15 +22,15 @@ public class RandomExecutor extends AbstractExecutor<DummyEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && DummyEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        return DummyEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         // apply a threshold to a random double from 0 - 1
         long start = System.nanoTime();
-        resultSubmitter.accept(
+        this.publishActiveResult(executeCheck, 
                 new ActiveResultMO().fromCheck(executeCheck)
                 .applyGreaterThanThreshold(
                         this.random.nextDouble(), 

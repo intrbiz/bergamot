@@ -1,25 +1,30 @@
 package com.intrbiz.bergamot.worker.engine.script;
 
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.worker.engine.Executor;
+import com.intrbiz.gerald.polyakov.Reading;
+import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
+import com.intrbiz.gerald.polyakov.gauge.FloatGaugeReading;
+import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
+import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
-public class BergamotScriptContext
+public class ActiveCheckScriptContext
 {
     private final ExecuteCheck executeCheck;
     
-    private final Consumer<ResultMO> publishResult;
+    private final Executor<?> executor;
     
     private final long start = System.currentTimeMillis();
     
-    public BergamotScriptContext(ExecuteCheck executeCheck, Consumer<ResultMO> publishResult)
+    public ActiveCheckScriptContext(ExecuteCheck executeCheck, Executor<?> executor)
     {
         this.executeCheck = executeCheck;
-        this.publishResult = publishResult;
+        this.executor = executor;
     }
 
     public ExecuteCheck getExecuteCheck()
@@ -197,13 +202,13 @@ public class BergamotScriptContext
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
     }
     
-    public void publish(ResultMO resultMO)
+    public void publish(ActiveResultMO resultMO)
     {
         resultMO.runtime(System.currentTimeMillis() - this.start);
-        this.publishResult.accept(resultMO);
+        this.executor.publishActiveResult(this.executeCheck, resultMO);
     }
     
-    public ResultMO createResult()
+    public ActiveResultMO createResult()
     {
         return new ActiveResultMO().fromCheck(this.getCheck());
     }
@@ -216,5 +221,57 @@ public class BergamotScriptContext
     public void require(boolean check, String message)
     {
         if (check) throw new RuntimeException(message);
+    }
+    
+    // readings
+    
+    public void publishReadings(Reading... readings)
+    {
+        this.executor.publishReading(this.executeCheck, readings);
+    }
+    
+    public void publishReadings(ReadingParcelMO readings)
+    {
+        this.executor.publishReading(this.executeCheck, readings);
+    }
+    
+    public DoubleGaugeReading createDoubleGaugeReading(String name, String unit, Double value)
+    {
+        return new DoubleGaugeReading(name, unit, value);
+    }
+    
+    public DoubleGaugeReading createDoubleGaugeReading(String name, String unit, Double value, Double warning, Double critical, Double min, Double max)
+    {
+        return new DoubleGaugeReading(name, unit, value, warning, critical, min, max);
+    }
+    
+    public LongGaugeReading createLongGaugeReading(String name, String unit, Long value)
+    {
+        return new LongGaugeReading(name, unit, value);
+    }
+    
+    public LongGaugeReading createDoubleGaugeReading(String name, String unit, Long value, Long warning, Long critical, Long min, Long max)
+    {
+        return new LongGaugeReading(name, unit, value, warning, critical, min, max);
+    }
+    
+    public IntegerGaugeReading createIntegerGaugeReading(String name, String unit, Integer value)
+    {
+        return new IntegerGaugeReading(name, unit, value);
+    }
+    
+    public IntegerGaugeReading createDoubleGaugeReading(String name, String unit, Integer value, Integer warning, Integer critical, Integer min, Integer max)
+    {
+        return new IntegerGaugeReading(name, unit, value, warning, critical, min, max);
+    }
+    
+    public FloatGaugeReading createFloatGaugeReading(String name, String unit, Float value)
+    {
+        return new FloatGaugeReading(name, unit, value);
+    }
+    
+    public FloatGaugeReading createDoubleGaugeReading(String name, String unit, Float value, Float warning, Float critical, Float min, Float max)
+    {
+        return new FloatGaugeReading(name, unit, value, warning, critical, min, max);
     }
 }

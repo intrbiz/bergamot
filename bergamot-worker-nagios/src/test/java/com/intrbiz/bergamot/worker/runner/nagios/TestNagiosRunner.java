@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +12,14 @@ import org.junit.Test;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
+import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.worker.engine.nagios.NagiosExecutor;
 
 public class TestNagiosRunner
 {
-    private NagiosExecutor runner;
+    private NagiosExecutorTester runner;
 
     /**
      * Setup the runner
@@ -24,13 +27,7 @@ public class TestNagiosRunner
     @Before
     public void setup()
     {
-        this.runner = new NagiosExecutor()
-        {
-            public void publishReading(ReadingKey key, ReadingParcelMO reading)
-            {
-                // stub for now
-            }
-        };
+        this.runner = new NagiosExecutorTester();
     }
 
     /**
@@ -67,9 +64,9 @@ public class TestNagiosRunner
     public void testDummyOkCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
-        this.runner.execute(
+        this.runner.test(
             executeCheck, 
-            (res) -> {
+            (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -90,9 +87,9 @@ public class TestNagiosRunner
     public void testDummyWarningCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 1 Test");
-        this.runner.execute(
+        this.runner.test(
             executeCheck,
-            (res) -> {
+            (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -113,9 +110,9 @@ public class TestNagiosRunner
     public void testDummyCriticalCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 2 Test");
-        this.runner.execute(
+        this.runner.test(
             executeCheck,
-            (res) -> {
+            (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -136,9 +133,9 @@ public class TestNagiosRunner
     public void testDummyUnknownCheck()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 3 Test");
-        this.runner.execute(
+        this.runner.test(
             executeCheck,
-            (res) -> {
+            (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -159,9 +156,9 @@ public class TestNagiosRunner
     public void testMissing()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_dummy", "/usr/lib/nagios/plugins/check_missing");
-        this.runner.execute(
+        this.runner.test(
             executeCheck,
-            (res) -> {
+            (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -183,9 +180,9 @@ public class TestNagiosRunner
     {
         // deliberately wrong port number
         ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H 127.0.0.1 -p 35666 -t 15 -c check_load");
-        this.runner.execute(
+        this.runner.test(
             executeCheck,
-            (res) -> {
+            (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -206,9 +203,9 @@ public class TestNagiosRunner
     public void testNRPE()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H 127.0.0.1 -t 15 -c check_load");
-        this.runner.execute(
+        this.runner.test(
             executeCheck,
-            (res) -> {
+            (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -223,5 +220,46 @@ public class TestNagiosRunner
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
+    }
+    
+    private static class NagiosExecutorTester extends NagiosExecutor
+    {
+        private BiConsumer<ResultKey, ResultMO> onResult;
+        
+        private BiConsumer<ReadingKey, ReadingParcelMO> onReading;
+
+        public void setOnResult(BiConsumer<ResultKey, ResultMO> onResult)
+        {
+            this.onResult = onResult;
+        }
+
+        public void setOnReading(BiConsumer<ReadingKey, ReadingParcelMO> onReading)
+        {
+            this.onReading = onReading;
+        }
+
+        @Override
+        public void publishReading(ReadingKey key, ReadingParcelMO readingParcelMO)
+        {
+            if (this.onReading != null) this.onReading.accept(key, readingParcelMO);
+        }
+
+        @Override
+        public void publishResult(ResultKey key, ResultMO resultMO)
+        {
+            if (this.onResult != null) this.onResult.accept(key, resultMO);
+        }
+        
+        public void test(ExecuteCheck check, BiConsumer<ResultKey, ResultMO> onResult, BiConsumer<ReadingKey, ReadingParcelMO> onReading)
+        {
+            this.setOnResult(onResult);
+            this.setOnReading(onReading);
+            this.execute(check);
+        }
+        
+        public void test(ExecuteCheck check, BiConsumer<ResultKey, ResultMO> onResult)
+        {
+            this.test(check, onResult, null);
+        }
     }
 }

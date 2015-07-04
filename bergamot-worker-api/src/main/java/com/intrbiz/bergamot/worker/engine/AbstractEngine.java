@@ -134,23 +134,15 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     @Override
     public void execute(ExecuteCheck task)
     {
-        this.execute(task, (result) -> {
-            this.publishResult(new ActiveResultKey(task.getSiteId(), task.getProcessingPool()), result);
-        });
-    }
-    
-    @Override
-    public void execute(ExecuteCheck task, java.util.function.Consumer<ResultMO> onResult)
-    {
         for (Executor<?> executor : this.executors)
         {
             if (executor.accept(task))
             {
-                executor.execute(task, onResult);
+                executor.execute(task);
                 return;
             }
         }
-        onResult.accept(new ActiveResultMO().fromCheck(task).error("No executor found to execute check"));
+        this.publishResult(new ActiveResultKey(task.getSiteId(), task.getProcessingPool()), new ActiveResultMO().fromCheck(task).error("No executor found to execute check"));
     }
 
     @Override

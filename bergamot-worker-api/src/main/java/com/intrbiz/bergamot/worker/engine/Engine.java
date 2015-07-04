@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.worker.engine;
 
 import java.util.Collection;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
@@ -26,11 +25,6 @@ public interface Engine extends Configurable<EngineCfg>
     void execute(ExecuteCheck task);
     
     boolean isAgentRouted();
-    
-    /**
-     * For testing
-     */
-    void execute(ExecuteCheck task, Consumer<ResultMO> onResult);
     
     /**
      * Publish a result out of band

@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.nagios;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -10,7 +9,6 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
@@ -64,14 +62,14 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && NagiosEngine.NAME.equalsIgnoreCase(task.getEngine());
+        return NagiosEngine.NAME.equalsIgnoreCase(task.getEngine());
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         logger.debug("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
-        ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+        ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
         ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
         try
         {
@@ -104,7 +102,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             logger.error("Failed to execute nagios check command", e);
             resultMO.error(e);
         }
-        resultSubmitter.accept(resultMO);
+        this.publishActiveResult(executeCheck, resultMO);
         if (readings != null && readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId(), executeCheck.getProcessingPool()), readings);
     }
 }

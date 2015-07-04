@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -9,10 +8,7 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.stat.WhoStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 
@@ -37,11 +33,11 @@ public class UsersExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent active users");
         try
@@ -60,27 +56,25 @@ public class UsersExecutor extends AbstractExecutor<AgentEngine>
                     WhoStat stat = (WhoStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got who in " + runtime + "ms: " + stat);
                     // apply the check
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             stat.getUsers().size(), 
                             executeCheck.getIntParameter("warning",  2), 
                             executeCheck.getIntParameter("critical", 5), 
                             stat.getUsers().size() + " active users"
                     ).runtime(runtime));
                     // readings
-                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
-                    readings.reading(new IntegerGaugeReading("active-users", null, stat.getUsers().size(), executeCheck.getIntParameter("warning",  2), executeCheck.getIntParameter("critical", 5), 0, Integer.MAX_VALUE));
-                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
+                    this.publishReading(executeCheck, new IntegerGaugeReading("active-users", null, stat.getUsers().size(), executeCheck.getIntParameter("warning",  2), executeCheck.getIntParameter("critical", 5), 0, Integer.MAX_VALUE));
                 });
             }
             else
             {
                 // raise an error
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

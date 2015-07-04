@@ -15,11 +15,31 @@ public class ReadingKey extends GenericKey
         super(key);
     }
     
+    /**
+     * Route to the specific processing pool of an active check
+     * @param site the site id
+     * @param pool the processing pool
+     */
     public ReadingKey(UUID siteId, int pool)
     {
         super(SiteMO.getSiteId(siteId) + "." + pool);
     }
     
+    /**
+     * Route to the passive check processors for the given site.
+     * 
+     * Note: the given UUID can either be a site id or an object id, it will be masked to a site id
+     */
+    public ReadingKey(UUID id)
+    {
+        super(id == null ? "" : ResultKey.toSiteId(id).toString());
+    }
+    
+    /**
+     * Route to the global passive check processors
+     * 
+     * Note: this should be avoided where possible
+     */
     public ReadingKey()
     {
         super("");

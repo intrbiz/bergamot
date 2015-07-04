@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -13,8 +12,6 @@ import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
 
@@ -39,11 +36,11 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         if (logger.isTraceEnabled()) logger.trace("Executing Nagios plugin via Bergamot Agent");
         try
@@ -74,26 +71,26 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
                     result.setStatus(stat.getStatus());
                     result.setOutput(stat.getOutput());
                     result.runtime(runtime);
-                    resultSubmitter.accept(result);
+                    this.publishActiveResult(executeCheck, result);
                     // readings
                     if (stat.getReadings().size() > 0)
                     {
                         ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
                         readings.setCaptured(System.currentTimeMillis());
                         readings.getReadings().addAll(stat.getReadings());
-                        this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
+                        this.publishReading(executeCheck, readings);
                     }
                 });
             }
             else
             {
                 // raise an error
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

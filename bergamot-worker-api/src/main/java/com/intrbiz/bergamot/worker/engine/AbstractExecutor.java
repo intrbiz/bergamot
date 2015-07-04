@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.worker.engine;
 
 import com.intrbiz.bergamot.config.ExecutorCfg;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
@@ -50,12 +49,6 @@ public abstract class AbstractExecutor<T extends Engine> implements Executor<T>
     @Override
     public void start()
     {
-    }
-    
-    @Override
-    public boolean accept(ExecuteCheck check)
-    {
-        return check instanceof ExecuteCheck;
     }
 
     @Override

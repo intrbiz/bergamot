@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.worker.engine.nrpe;
 
-import java.util.function.Consumer;
-
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Counter;
@@ -10,7 +8,6 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
@@ -44,11 +41,11 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && NRPEEngine.NAME.equalsIgnoreCase(task.getEngine());
+        return NRPEEngine.NAME.equalsIgnoreCase(task.getEngine());
     }
     
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         logger.info("Executing NRPE check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Timer.Context tctx = this.nrpeRequestTimer.time();
@@ -65,13 +62,13 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             this.getEngine().getPoller().command(
                 host, 5666, 5,  60, 
                 (response) -> {
-                    ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+                    ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
                     resultMO.setOk(response.toOk());
                     resultMO.setStatus(response.toStatus());
                     resultMO.setOutput(response.getOutput());
                     resultMO.setRuntime(response.getRuntime());
                     tctx.stop();
-                    resultSubmitter.accept(resultMO);
+                    this.publishActiveResult(executeCheck, resultMO);
                     // readings
                     ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
                     for (NagiosPerfData perfData : response.getPerfData())
@@ -84,7 +81,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                 (exception) -> {
                     tctx.stop();
                     failedRequests.inc();
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(exception));
+                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(exception));
                 },
                 command
             );
@@ -94,7 +91,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             logger.error("Failed to execute NRPE check", e);
             tctx.stop();
             this.failedRequests.inc();
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }        
     }
 }

@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
@@ -10,7 +9,6 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.key.PassiveResultKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 
@@ -34,11 +32,11 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent presence");
         try
@@ -47,7 +45,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // check the host presence
-            ResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+            ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
             // lookup the agent
             BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
             if (agent != null)
@@ -59,11 +57,11 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
                 resultMO.disconnected("Bergamot Agent disconnected");
             }
             // submit
-            resultSubmitter.accept(resultMO);
+            this.publishActiveResult(executeCheck, resultMO);
         }
         catch (Exception e)
         {
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
     

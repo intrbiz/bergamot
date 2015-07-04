@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.worker.engine.agent;
 
 import java.text.DecimalFormat;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -14,8 +13,6 @@ import com.intrbiz.bergamot.model.message.agent.stat.netio.NetIOInfo;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
@@ -42,7 +39,7 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return super.accept(task) && AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
     }
 
     /**
@@ -52,7 +49,7 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
      *   critical  - the throughput critical threshold in Mb/s
      */
     @Override
-    public void execute(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter)
+    public void execute(ExecuteCheck executeCheck)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent network io");
         try
@@ -75,7 +72,7 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
                     double critical = executeCheck.getDoubleParameter("critical", 75);
                     // apply the check
                     boolean peak = executeCheck.getBooleanParameter("peak", false);
-                    resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
+                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
                             stat.getIfaces(),
                             (v, t) -> (peak ? v.getFiveMinuteRate().getTxPeakRateMbps(): v.getFiveMinuteRate().getTxRateMbps()) > t || (peak ? v.getFiveMinuteRate().getRxPeakRateMbps(): v.getFiveMinuteRate().getRxRateMbps()) > t,
                             warning, 
@@ -96,18 +93,18 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
                         readings.reading(new DoubleGaugeReading("tx-rate-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getTxRateMbps(), warning, critical, null, null));
                         readings.reading(new DoubleGaugeReading("tx-rate-peak-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getTxPeakRateMbps(), warning, critical, null, null));
                     }
-                    this.publishReading(new ReadingKey(executeCheck.getSiteId(), executeCheck.getProcessingPool()), readings);
+                    this.publishReading(executeCheck, readings);
                 });
             }
             else
             {
                 // raise an error
-                resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            resultSubmitter.accept(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

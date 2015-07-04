@@ -1,11 +1,8 @@
 package com.intrbiz.bergamot.worker.engine.snmp;
 
-import java.util.function.Consumer;
-
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.error.SNMPTimeout;
 
@@ -29,7 +26,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
     }
 
     @Override
-    protected void executeSNMP(ExecuteCheck executeCheck, Consumer<ResultMO> resultSubmitter, SNMPContext<?> agent) throws Exception
+    protected void executeSNMP(ExecuteCheck executeCheck, SNMPContext<?> agent) throws Exception
     {
         // we need an OID to get
         if (Util.isEmpty(executeCheck.getParameter("oid"))) throw new RuntimeException("The OID to get must be defined!");
@@ -39,7 +36,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
                 executeCheck.getParameter("oid"), 
                 (vb) -> {
                     long runtime = System.currentTimeMillis() - start;
-                    resultSubmitter.accept(
+                    this.publishActiveResult(executeCheck, 
                             new ActiveResultMO()
                             .fromCheck(executeCheck)
                             .info(Util.coalesce(executeCheck.getParameter("prefix"), "") + vb.valueToString() + Util.coalesce(executeCheck.getParameter("suffix"), ""))
@@ -51,7 +48,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
                     if (ex instanceof SNMPTimeout)
                     {
                         // timeout
-                        resultSubmitter.accept(
+                        this.publishActiveResult(executeCheck, 
                                 new ActiveResultMO()
                                 .fromCheck(executeCheck)
                                 .timeout(ex.getMessage())
@@ -61,7 +58,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
                     else
                     {
                         // generic error
-                        resultSubmitter.accept(
+                        this.publishActiveResult(executeCheck, 
                                 new ActiveResultMO()
                                 .fromCheck(executeCheck)
                                 .error(ex)

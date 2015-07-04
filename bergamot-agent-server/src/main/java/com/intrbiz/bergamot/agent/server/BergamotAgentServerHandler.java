@@ -284,11 +284,6 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     {
         ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message)));
     }
-    
-    /*private void writeMessageAndClose(final ChannelHandlerContext ctx, final AgentMessage message) throws Exception
-    {
-        ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(message))).addListener(ChannelFutureListener.CLOSE);
-    }*/
 
     private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res)
     {
