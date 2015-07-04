@@ -54,7 +54,7 @@ public class TestNagiosRunner
         assertThat(this.runner.accept(executeCheck), is(equalTo(true)));
     }
     
-    @Test
+    @Test(expected=NullPointerException.class)
     public void testDoesNotAcceptNullCheck()
     {
         assertThat(this.runner.accept(null), is(equalTo(false)));
