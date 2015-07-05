@@ -4,6 +4,7 @@
 .directory
 target/
 *~
+*.kate-swp
 cfg/
 bergamot-core/bergamot.xml
 bergamot-ui/bergamot.xml
