@@ -22,7 +22,6 @@
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>lamplighter-model</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
