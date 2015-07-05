@@ -68,11 +68,15 @@ http.check()
       var res = JSON.parse(r.content());
       bergamot.publish(
         bergamot.createResult().applyGreaterThanThreshold(
-           res.message_stats.publish_in_details.rate,
-           check.getDoubleParameter('warning'),
-	   check.getDoubleParameter('critical'),
-	   'Queue ' + check.getParameter('queue') + ' publish: ' + res.message_stats.publish_in_details.rate + '/s, total: ' + res.message_stats.publish_in
+            res.message_stats.publish_in_details.rate,
+            check.getDoubleParameter('warning'),
+            check.getDoubleParameter('critical'),
+            'Queue ' + check.getParameter('queue') + ' publish: ' + res.message_stats.publish_in_details.rate + '/s, total: ' + res.message_stats.publish_in
         )
+      );
+      bergamot.publishReadings(
+        bergamot.createDoubleGaugeReading('publish-rate', '1/s', res.message_stats.publish_in_details.rate),
+        bergamot.createLongGaugeReading('publish-rate', null, res.message_stats.publish_in)
       );
     }
     else

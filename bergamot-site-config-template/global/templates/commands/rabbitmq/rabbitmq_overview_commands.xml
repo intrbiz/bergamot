@@ -63,11 +63,14 @@ http.check()
       var res = JSON.parse(r.content());
       bergamot.publish(
         bergamot.createResult().applyGreaterThanThreshold(
-           res.object_totals.connections,
-           check.getIntParameter('warning'),
-	   check.getIntParameter('critical'),
-	   'Active connections: ' + res.object_totals.connections
+            res.object_totals.connections,
+            check.getIntParameter('warning'),
+            check.getIntParameter('critical'),
+            'Active connections: ' + res.object_totals.connections
         )
+      );
+      bergamot.publishReadings(
+        bergamot.createLongGaugeReading('connections', null, res.object_totals.connections)
       );
     }
     else
@@ -110,11 +113,14 @@ http.check()
       var res = JSON.parse(r.content());
       bergamot.publish(
         bergamot.createResult().applyGreaterThanThreshold(
-           res.object_totals.channels,
-           check.getIntParameter('warning'),
-	   check.getIntParameter('critical'),
-	   'Active channels: ' + res.object_totals.channels
+            res.object_totals.channels,
+            check.getIntParameter('warning'),
+            check.getIntParameter('critical'),
+            'Active channels: ' + res.object_totals.channels
         )
+      );
+      bergamot.publishReadings(
+        bergamot.createLongGaugeReading('channels', null, res.object_totals.channels)
       );
     }
     else

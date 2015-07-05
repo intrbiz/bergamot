@@ -27,11 +27,15 @@ http.check()
       var res = JSON.parse(r.content());
       bergamot.publish(
         bergamot.createResult().applyGreaterThanThreshold(
-           res.message_stats.publish_details.rate,
-           check.getDoubleParameter('warning'),
-	   check.getDoubleParameter('critical'),
-	   'Publish: ' + res.message_stats.publish_details.rate + '/s, total: ' + res.message_stats.publish
+            res.message_stats.publish_details.rate,
+            check.getDoubleParameter('warning'),
+            check.getDoubleParameter('critical'),
+            'Publish: ' + res.message_stats.publish_details.rate + '/s, total: ' + res.message_stats.publish
         )
+      );
+      bergamot.publishReadings(
+        bergamot.createDoubleGaugeReading('publish-rate', '/s', res.message_stats.publish_details.rate),
+        bergamot.createLongGaugeReading('published-messages', null, res.message_stats.publish)
       );
     }
     else
@@ -74,11 +78,15 @@ http.check()
       var res = JSON.parse(r.content());
       bergamot.publish(
         bergamot.createResult().applyGreaterThanThreshold(
-           res.message_stats.deliver_details.rate,
-           check.getDoubleParameter('warning'),
-	   check.getDoubleParameter('critical'),
-	   'Deliver: ' + res.message_stats.deliver_details.rate + '/s, total: ' + res.message_stats.deliver
+            res.message_stats.deliver_details.rate,
+            check.getDoubleParameter('warning'),
+            check.getDoubleParameter('critical'),
+            'Deliver: ' + res.message_stats.deliver_details.rate + '/s, total: ' + res.message_stats.deliver
         )
+      );
+      bergamot.publishReadings(
+        bergamot.createDoubleGaugeReading('deliver-rate', '/s', res.message_stats.deliver_details.rate),
+        bergamot.createLongGaugeReading('delivered-messages', null, res.message_stats.deliver)
       );
     }
     else
@@ -121,11 +129,15 @@ http.check()
       var res = JSON.parse(r.content());
       bergamot.publish(
         bergamot.createResult().applyGreaterThanThreshold(
-           res.message_stats.ack_details.rate,
-           check.getDoubleParameter('warning'),
-	   check.getDoubleParameter('critical'),
-	   'Ack: ' + res.message_stats.ack_details.rate + '/s, total: ' + res.message_stats.ack
+            res.message_stats.ack_details.rate,
+            check.getDoubleParameter('warning'),
+            check.getDoubleParameter('critical'),
+            'Ack: ' + res.message_stats.ack_details.rate + '/s, total: ' + res.message_stats.ack
         )
+      );
+      bergamot.publishReadings(
+        bergamot.createDoubleGaugeReading('ack-rate', '/s', res.message_stats.ack_details.rate),
+        bergamot.createLongGaugeReading('acked-messages', null, res.message_stats.ack)
       );
     }
     else
