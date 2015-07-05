@@ -44,7 +44,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			this.readings[reading.reading_id] = { 
                 "reading": reading, 
                 "mode": "hour", 
-                "end": (new Date().getTime() - reading.poll_interval)
+                "end": (new Date().getTime() - (reading.poll_interval / 2))
             }
 			// container for the reading
 			var container = this.createReadingContainer(reading.reading_id);
@@ -211,7 +211,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 				{
 					if (this.readings.hasOwnProperty(readingId))
 					{
-						this.redrawChart(readingId, { "end": data.update.check.stae.last_check_time });
+						this.redrawChart(readingId, { "end": data.update.check.state.last_check_time });
 					}
 				}
 			}
