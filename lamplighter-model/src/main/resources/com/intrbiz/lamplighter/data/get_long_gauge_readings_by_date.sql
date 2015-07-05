@@ -11,7 +11,7 @@ BEGIN
   v_start_time := lamplighter.round_time(p_start, p_rollup);
   v_end_time := lamplighter.round_time(p_end, p_rollup);
   SELECT poll_interval INTO v_poll_interval FROM lamplighter.check_reading WHERE id = p_reading_id;
-  v_table := quote_ident(lamplighter.get_schema(p_site_id)) || '.' || quote_ident(lamplighter.get_table_name('double_gauge_reading', p_reading_id));
+  v_table := quote_ident(lamplighter.get_schema(p_site_id)) || '.' || quote_ident(lamplighter.get_table_name('long_gauge_reading', p_reading_id));
   -- query
   v_query := $$ SELECT 
     $1 AS site_id, 
@@ -22,20 +22,21 @@ BEGIN
     CASE WHEN q."critical" IS NULL THEN 0 ELSE q."critical" END,
     CASE WHEN q."min" IS NULL THEN 0 ELSE q."min" END,
     CASE WHEN q."max" IS NULL THEN 0 ELSE q."max" END
-   FROM generate_series($3, $4, (($5 / 1000) ||' seconds')::interval) i(v) 
+   FROM generate_series($3, ($4 - (($5 / 1000) ||' seconds')::interval), (($5 / 1000) ||' seconds')::interval) i(v) 
    LEFT JOIN ( 
     SELECT 
- 	 round_time(collected_at, $5) as collected_at, 
+ 	 lamplighter.round_time(collected_at, $5) as collected_at, 
  	 $$ || quote_ident(p_agg) || $$("value")::BIGINT AS "value",
  	 $$ || quote_ident(p_agg) || $$("warning")::BIGINT AS "warning",
  	 $$ || quote_ident(p_agg) || $$("critical")::BIGINT AS "critical",
  	 $$ || quote_ident(p_agg) || $$("min")::BIGINT AS "min",
  	 $$ || quote_ident(p_agg) || $$("max")::BIGINT AS "max"
     FROM $$ || v_table || $$ 
-    WHERE collected_at BETWEEN $3 AND $4  
+    WHERE collected_at BETWEEN ($3 - (($5 / 1000) ||' seconds')::interval) AND ($4 + (($5 / 1000) ||' seconds')::interval) 
     GROUP BY 1 
    ) q 
-   ON (q.collected_at = i.v) $$;
+   ON (q.collected_at = i.v) 
+   ORDER BY collected_at ASC $$;
   RETURN QUERY EXECUTE v_query USING p_site_id, p_reading_id, v_start_time, v_end_time, p_rollup;
 END;
 $BODY$

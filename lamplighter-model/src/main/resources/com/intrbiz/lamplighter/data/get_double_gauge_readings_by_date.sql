@@ -22,20 +22,21 @@ BEGIN
     CASE WHEN q."critical" IS NULL THEN 0 ELSE q."critical" END,
     CASE WHEN q."min" IS NULL THEN 0 ELSE q."min" END,
     CASE WHEN q."max" IS NULL THEN 0 ELSE q."max" END
-   FROM generate_series($3, $4, (($5 / 1000) ||' seconds')::interval) i(v) 
+   FROM generate_series($3, ($4 - (($5 / 1000) ||' seconds')::interval), (($5 / 1000) ||' seconds')::interval) i(v) 
    LEFT JOIN ( 
     SELECT 
- 	 round_time(collected_at, $5) as collected_at, 
+ 	 lamplighter.round_time(collected_at, $5) as collected_at, 
  	 $$ || quote_ident(p_agg) || $$("value")::DOUBLE PRECISION AS "value",
  	 $$ || quote_ident(p_agg) || $$("warning")::DOUBLE PRECISION AS "warning",
  	 $$ || quote_ident(p_agg) || $$("critical")::DOUBLE PRECISION AS "critical",
  	 $$ || quote_ident(p_agg) || $$("min")::DOUBLE PRECISION AS "min",
  	 $$ || quote_ident(p_agg) || $$("max")::DOUBLE PRECISION AS "max"
     FROM $$ || v_table || $$ 
-    WHERE collected_at BETWEEN $3 AND $4  
+    WHERE collected_at BETWEEN ($3 - (($5 / 1000) ||' seconds')::interval) AND ($4 + (($5 / 1000) ||' seconds')::interval) 
     GROUP BY 1 
    ) q 
-   ON (q.collected_at = i.v) $$;
+   ON (q.collected_at = i.v) 
+   ORDER BY collected_at ASC $$;
   RETURN QUERY EXECUTE v_query USING p_site_id, p_reading_id, v_start_time, v_end_time, p_rollup;
 END;
 $BODY$
