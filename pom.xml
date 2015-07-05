@@ -231,6 +231,11 @@
   			<version>${project.version}</version>
   		</dependency>
   		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>lamplighter-reading-processor</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>
+  		<dependency>
   			<groupId>com.intrbiz.core</groupId>
   			<artifactId>core</artifactId>
   			<version>[1.0,)</version>

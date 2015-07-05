@@ -71,7 +71,6 @@
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>lamplighter-reading-processor</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
