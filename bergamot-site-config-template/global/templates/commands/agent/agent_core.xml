@@ -9,7 +9,7 @@
         <description>Check the server CPU usage</description>
     </command>
     
-    <command category="System" engine="agent" executor="local" extends="check_agent" name="check_agent_load">
+    <command category="System" engine="agent" executor="load" extends="check_agent" name="check_agent_load">
         <parameter description="1 minute load average warning threshold"   name="load_1_warning">-1</parameter>
         <parameter description="1 minute load average critical threshold"  name="load_1_critical">-1</parameter>
         <parameter description="5 minute load average warning threshold"   name="load_5_warning">-1</parameter>
