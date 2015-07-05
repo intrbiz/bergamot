@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.worker.engine.agent.CPUExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.DiskExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.DiskIOExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.DisksExecutor;
+import com.intrbiz.bergamot.worker.engine.agent.LoadExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.MemoryExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.NagiosExecutor;
 import com.intrbiz.bergamot.worker.engine.agent.NetConExecutor;
@@ -73,7 +74,8 @@ public class AgentWorkerCfg extends WorkerCfg
                         new ExecutorCfg(NetConExecutor.class),
                         new ExecutorCfg(PortListenerExecutor.class),
                         new ExecutorCfg(NetIOExecutor.class),
-                        new ExecutorCfg(DiskIOExecutor.class)
+                        new ExecutorCfg(DiskIOExecutor.class),
+                        new ExecutorCfg(LoadExecutor.class)
                 ));
         // apply defaults from super class
         super.applyDefaults();
