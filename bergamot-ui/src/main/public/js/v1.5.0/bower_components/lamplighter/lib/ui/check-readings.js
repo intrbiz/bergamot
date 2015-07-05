@@ -64,12 +64,22 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			var type = this.readings[readingId].mode;
 			// get the graph url
 			var graphUrl = this.reading_types[this.readings[readingId].reading.reading_type].graph_url;
-			// default to last 4 hours
+			// default to last hour
 			var end = new Date().getTime();
-			var start = end - (3600000 * 4);
+			var start = end - 3600000;
 			var rollup = this.readings[readingId].reading.poll_interval;
 			// look at the type
-			if ('day' == type)
+            if ('4hours' == type)
+			{
+				start = end - (3600000 * 4);
+				rollup = Math.max(this.readings[readingId].reading.poll_interval, 300000); /* 5 minutes or poll interval if larger */
+			}
+			if ('12hours' == type)
+			{
+				start = end - (3600000 * 12);
+				rollup = 900000; /* 15 minutes */
+			}
+			else if ('day' == type)
 			{
 				start = end - 86400000;
 				rollup = 900000; /* 15 minutes */
@@ -125,7 +135,9 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			$(opts).append(selectorLabel);
 			var selector = $.parseHTML([
 				'<select>',
-					'<option selected value="hours">Last 4 Hours</option>',
+                    '<option selected value="hour">Last Hour</option>',
+					'<option value="4hours">Last 4 Hours</option>',
+                    '<option value="12hours">Last 12 Hours</option>',
 					'<option value="day">Last Day</option>',
 					'<option value="week">Last Week</option>',
 					'<option value="month">Last Month</option>',
