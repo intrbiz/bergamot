@@ -76,7 +76,7 @@ http.check()
       );
       bergamot.publishReadings(
         bergamot.createDoubleGaugeReading('publish-rate', '1/s', res.message_stats.publish_in_details.rate),
-        bergamot.createLongGaugeReading('publish-rate', null, res.message_stats.publish_in)
+        bergamot.createLongGaugeReading('published-messages', null, res.message_stats.publish_in)
       );
     }
     else
