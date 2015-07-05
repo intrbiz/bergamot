@@ -41,13 +41,17 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 		this.setupReading = function(reading)
 		{
 			// hold onto the reading metadata
-			this.readings[reading.reading_id] = { "reading": reading, "mode": "hour" }
+			this.readings[reading.reading_id] = { 
+                "reading": reading, 
+                "mode": "hour", 
+                "end": (new Date().getTime() - reading.poll_interval)
+            }
 			// container for the reading
 			var container = this.createReadingContainer(reading.reading_id);
 			// append the container to the page
 			this.$node.append(container);
 			// setup the graph
-			$.getJSON(this.getDataURL(reading.reading_id), function(data) {
+			$.getJSON(this.getDataURL(reading.reading_id, true), function(data) {
 				line_chart.attachTo("#reading-" + reading.reading_id + "-chart", {
 					/* "width": 1140, */
 					"height": 300,
@@ -65,16 +69,31 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			// get the graph url
 			var graphUrl = this.reading_types[this.readings[readingId].reading.reading_type].graph_url;
 			// default to last hour
-			var end = new Date().getTime();
-			var start = end - 3600000;
-			var rollup = this.readings[readingId].reading.poll_interval;
+			var end = this.readings[readingId].end;
+			var start = end - (3600000 * 1);
+			var rollup = Math.min(this.readings[readingId].reading.poll_interval * 2, Math.max(this.readings[readingId].reading.poll_interval, 300000));
 			// look at the type
-            if ('4hours' == type)
+            if ('2hours' == type)
+			{
+				start = end - (3600000 * 2);
+				rollup = Math.max(this.readings[readingId].reading.poll_interval, 300000); /* 5 minutes or poll interval if larger */
+			}
+            else if ('4hours' == type)
 			{
 				start = end - (3600000 * 4);
 				rollup = Math.max(this.readings[readingId].reading.poll_interval, 300000); /* 5 minutes or poll interval if larger */
 			}
-			if ('12hours' == type)
+			else if ('6hours' == type)
+			{
+				start = end - (3600000 * 6);
+				rollup = 900000; /* 15 minutes */
+			}
+			else if ('8hours' == type)
+			{
+				start = end - (3600000 * 8);
+				rollup = 900000; /* 15 minutes */
+			}
+			else if ('12hours' == type)
 			{
 				start = end - (3600000 * 12);
 				rollup = 900000; /* 15 minutes */
@@ -87,23 +106,31 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			else if ('week' == type)
 			{
 				start = end - (86400000 * 7);
-				rollup = 7200000; /* 2 hours */
+				rollup = (3600000 * 2); /* 2 hours */
 			}
 			else if ('month' == type)
 			{
 				start = end - (86400000 * 31);
-				rollup = 86400000; /* 1 day */
+				rollup = (3600000 * 12); /* 1 day */
 			}
 			return '/api/lamplighter/' + graphUrl + '/' + readingId + '/date/' + rollup + '/avg/' + start + '/' + end;
 		};
 		
-		this.redrawChart = function(readingId, type)
+		this.redrawChart = function(readingId, opts)
 		{
-			if (!! type) this.readings[readingId].mode = type;
+            // new options
+			if (opts != null && opts.mode != null) this.readings[readingId].mode = opts.mode;
+            if (opts != null && opts.end  != null) this.readings[readingId].end  = opts.end;
 			// get the data and redraw
 			$.getJSON(this.getDataURL(readingId), function(data) {
-				$("#reading-" + readingId + "-chart").trigger('redraw', data);
+				$("#reading-" + readingId + "-chart").trigger('redraw', { "data": data });
 			});
+		};
+        
+        this.changeChart = function(readingId, opts)
+		{
+			// update the chart with new options
+            $("#reading-" + readingId + "-chart").trigger('redraw', opts);
 		};
 		
 		this.createReadingContainer = function(readingId)
@@ -131,12 +158,15 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			var header = $.parseHTML('<h5 style="margin-bottom: 15px; padding-left: 4px; padding-top: 12px;">Chart Options</h5>');
 			$(opts).append(header);
 			// chart scale dropdown
-			var selectorLabel = $.parseHTML('<h6 style="margin-bottom: 5px; padding-left: 4px;">Chart Range</h6>');
+			var selectorLabel = $.parseHTML('<h6 style="margin-bottom: 5px; padding-left: 4px;">Time range</h6>');
 			$(opts).append(selectorLabel);
 			var selector = $.parseHTML([
 				'<select>',
                     '<option selected value="hour">Last Hour</option>',
+                    '<option value="2hours">Last 2 Hours</option>',
 					'<option value="4hours">Last 4 Hours</option>',
+                    '<option value="6hours">Last 6 Hours</option>',
+                    '<option value="8hours">Last 8 Hours</option>',
                     '<option value="12hours">Last 12 Hours</option>',
 					'<option value="day">Last Day</option>',
 					'<option value="week">Last Week</option>',
@@ -147,7 +177,19 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			// actions
 			$(selector).change((function(ev) {
 				ev.preventDefault();
-				this.redrawChart(readingId, $(selector).val());
+				this.redrawChart(readingId, { "mode": $(selector).val() });
+			}).bind(this));
+			// chart start at zero
+			var startAtZeroLabel = $.parseHTML('<h6 style="margin-bottom: 5px; padding-left: 4px;">Start at zero</h6>');
+			$(opts).append(startAtZeroLabel);
+			var startAtZeroCheck = $.parseHTML([
+				'<input type="checkbox" checked="checked"/>'
+			].join(''));
+			$(opts).append(startAtZeroCheck);
+			// actions
+			$(startAtZeroCheck).change((function(ev) {
+				ev.preventDefault();
+				this.changeChart(readingId, { "y-starts-at-zero": $(startAtZeroCheck).prop("checked") });
 			}).bind(this));
 			return opts;
 		};
@@ -169,7 +211,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 				{
 					if (this.readings.hasOwnProperty(readingId))
 					{
-						this.redrawChart(readingId);
+						this.redrawChart(readingId, { "end": data.update.check.stae.last_check_time });
 					}
 				}
 			}

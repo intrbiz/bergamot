@@ -32,7 +32,7 @@ define(function (require)
 		
 		this.getLeftPadding = function()
 		{
-			return 50;
+			return 70;
 		};
 		
 		this.getRightPadding = function()

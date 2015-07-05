@@ -5,6 +5,8 @@ define(function (require)
 		this.defaultAttrs({
 			"grid-colour": '#888888',
 			"grid-stroke": 1,
+            "y-starts-at-zero": true,
+            "x-starts-at-zero": true
 		});
 		
 		/* Configuration functions */
@@ -16,17 +18,17 @@ define(function (require)
 		
 		this.getYLabelsMargin = function()
 		{
-			return 25;
+			return 35;
 		};
 		
 		this.getStartXAtZero = function()
 		{
-			return true;
+			return this.attr["x-starts-at-zero"];
 		};
 		
 		this.getStartYAtZero = function()
 		{
-			return true;
+			return this.attr["y-starts-at-zero"];
 		};
 		
 		/* Scaling functions */
@@ -56,7 +58,7 @@ define(function (require)
 		{
 			var min = this.getStartYAtZero() ? 0 : this.min(data);
 			var max = this.max(data);
-			return (max - min) == 0 ? (this.getGraphHeight() - 5) / 10 : (this.getGraphHeight() - 5) / (max - min);
+			return (max - min) <= 1 ? (this.getGraphHeight() - 5) / 2 : (this.getGraphHeight() - 5) / (max - min);
 		};
 		
 		/* Drawing functions */

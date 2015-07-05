@@ -96,10 +96,11 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 		{
 			if (this.attr.data != null)
 			{
+                var base = this.getStartYAtZero() ? 0 : this.min(this.attr.data.y[0].y);
 				var yl = [];
 				for (var i = 0; i < this.getGraphHeight(); i += this.getYGridSpacing())
 				{
-					yl.push( { position: i, label: ('' + ( i / this.yScale ).toFixed(1)) } );
+					yl.push( { position: i, label: ('' + ( (i / this.yScale) + base ).toFixed(1)) } );
 				}
 				return yl;
 			}
@@ -124,11 +125,12 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 			//
 			var sX = this.xScale;
 			var sY = this.yScale;
-			var path = ["M" , ((0 * sX) + oX) , (this.translateY((ydata[0] * sY) + oY )) , "L"];
+            var base = this.getStartYAtZero() ? 0 : this.min(this.attr.data.y[0].y);
+			var path = ["M" , ((0 * sX) + oX) , (this.translateY(((ydata[0] - base) * sY) + oY )) , "L"];
 			var nc = false;
 			for (var i = 1; i < xdata.length; i++) {
 				path.push( ((i * sX) + oX) );
-				path.push( this.translateY( (ydata[i] * sY) + oY ) );
+				path.push( this.translateY( ((ydata[i] - base) * sY) + oY ) );
 				nc = true;
 			}
 			return path;
@@ -163,9 +165,10 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 			this.drawData();
 		};
 		
-		this.redraw = function(/*Event*/ ev, /*Object*/ data)
+		this.redraw = function(/*Event*/ ev, /*Object*/ opts)
 		{
-			if (data) this.attr.data = data;
+			if (opts && opts.data) this.attr.data = opts.data;
+            if (opts && opts["y-starts-at-zero"] != null) this.attr["y-starts-at-zero"] = opts["y-starts-at-zero"];
 			// redraw
 			this.paper.clear();
 			this.draw();
