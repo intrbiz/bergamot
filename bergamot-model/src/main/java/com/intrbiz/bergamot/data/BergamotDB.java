@@ -749,7 +749,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @CacheInvalidate({
         "get_all_alerts_for_check.#{check_id}", 
-        "get_recovered_alerts_for_check.#{check_id}", 
+        "get_recovered_alerts_for_check.#{check_id}",
+        "get_all_alerts_for_check_paged.#{check_id}.*",
         "get_alerts_for_check.#{check_id}", 
         "get_current_alert_for_check.#{check_id}"
     })
