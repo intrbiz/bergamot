@@ -94,9 +94,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
 {   
     public static final class VERSION
     {
-        public static final String NUMBER = "1.0.0";
+        public static final String NUMBER = "2.0.0";
         
-        public static final String CODE_NAME = "Violet Club";
+        public static final String CODE_NAME = "Yellow Sun";
     }
     
     private UICfg config;
