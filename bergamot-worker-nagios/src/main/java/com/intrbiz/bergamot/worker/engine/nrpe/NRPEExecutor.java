@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.worker.engine.nrpe;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Counter;
@@ -57,6 +60,13 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             // the command
             String command = executeCheck.getParameter("command");
             if (Util.isEmpty(command)) throw new RuntimeException("The 'command' parameter must be provided.");
+            // arguments - any parameter starting with 'arg' is treated as an argument to send to NRPE
+            List<String> args = executeCheck.getParametersStartingWith("nrpe-arg")
+                    .stream()
+                    .sorted((a,b) -> a.getName().compareTo(b.getName()))
+                    .map((p) -> p.getValue())
+                    .collect(Collectors.toList());
+            if (logger.isTraceEnabled()) logger.trace("Sending arguments: " + args);
             // submit the command to the poller
             // TODO timeouts
             this.getEngine().getPoller().command(
@@ -83,7 +93,8 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                     failedRequests.inc();
                     this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(exception));
                 },
-                command
+                command,
+                args
             );
         }
         catch (Exception e)
