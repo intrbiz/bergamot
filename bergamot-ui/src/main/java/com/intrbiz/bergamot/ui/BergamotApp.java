@@ -88,7 +88,7 @@ import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
 
 /**
- * A very basic Bergamot web interface
+ * The Bergamot web interface
  */
 public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
 {   
