@@ -44,7 +44,8 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			this.readings[reading.reading_id] = { 
                 "reading": reading, 
                 "mode": "hour", 
-                "end": (new Date().getTime() - (reading.poll_interval / 2))
+                "end": (new Date().getTime() - (reading.poll_interval / 2)),
+                "thresholds": false 
             }
 			// container for the reading
 			var container = this.createReadingContainer(reading.reading_id);
@@ -66,6 +67,13 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 		{
 			// get the current graph mode
 			var type = this.readings[readingId].mode;
+            // get the series to display
+            var series = [];
+            if (this.readings[readingId].thresholds)
+            {
+                series.push('warning');
+                series.push('critical');
+            }
 			// get the graph url
 			var graphUrl = this.reading_types[this.readings[readingId].reading.reading_type].graph_url;
 			// default to last hour
@@ -113,7 +121,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 				start = end - (86400000 * 31);
 				rollup = (3600000 * 12); /* 1 day */
 			}
-			return '/api/lamplighter/' + graphUrl + '/' + readingId + '/date/' + rollup + '/avg/' + start + '/' + end;
+			return '/api/lamplighter/' + graphUrl + '/' + readingId + '/date/' + rollup + '/avg/' + start + '/' + end + '?series=' + series.join(' ');
 		};
 		
 		this.redrawChart = function(readingId, opts)
@@ -121,6 +129,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
             // new options
 			if (opts != null && opts.mode != null) this.readings[readingId].mode = opts.mode;
             if (opts != null && opts.end  != null) this.readings[readingId].end  = opts.end;
+            if (opts != null && opts.thresholds  != null) this.readings[readingId].thresholds  = opts.thresholds;
 			// get the data and redraw
 			$.getJSON(this.getDataURL(readingId), function(data) {
 				$("#reading-" + readingId + "-chart").trigger('redraw', { "data": data });
@@ -186,10 +195,22 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 				'<input type="checkbox" checked="checked"/>'
 			].join(''));
 			$(opts).append(startAtZeroCheck);
-			// actions
+            // start at zero actions
 			$(startAtZeroCheck).change((function(ev) {
 				ev.preventDefault();
 				this.changeChart(readingId, { "y-starts-at-zero": $(startAtZeroCheck).prop("checked") });
+			}).bind(this));
+            // chart thresholds
+			var thresholdsLabel = $.parseHTML('<h6 style="margin-bottom: 5px; padding-left: 4px;">Show thresholds</h6>');
+			$(opts).append(thresholdsLabel);
+			var thresholdsCheck = $.parseHTML([
+				'<input type="checkbox" />'
+			].join(''));
+			$(opts).append(thresholdsCheck);
+			// thresholds actions
+			$(thresholdsCheck).change((function(ev) {
+				ev.preventDefault();
+				this.redrawChart(readingId, { "thresholds": $(thresholdsCheck).prop("checked") });
 			}).bind(this));
 			return opts;
 		};
