@@ -31,6 +31,9 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
 
     @SQLColumn(index = 4, name = "application", since = @SQLVersion({ 2, 5, 0 }))
     private String application;
+    
+    @SQLColumn(index = 5, name = "script", since = @SQLVersion({ 3, 6, 0 }))
+    private String script;
 
     public Command()
     {
@@ -45,6 +48,7 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
         this.executor = resolvedConfiguration.getExecutor();
         this.category = resolvedConfiguration.getCategory();
         this.application = resolvedConfiguration.getApplication();
+        this.script = resolvedConfiguration.getScript();
     }
 
     public String getEngine()
@@ -87,6 +91,16 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
         this.application = application;
     }
 
+    public String getScript()
+    {
+        return script;
+    }
+
+    public void setScript(String script)
+    {
+        this.script = script;
+    }
+
     @Override
     public int hashCode()
     {
@@ -124,6 +138,9 @@ public class Command extends NamedObject<CommandMO, CommandCfg>
         super.toMO(mo, stub);
         mo.setEngine(this.getEngine());
         mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
+        mo.setApplication(this.getApplication());
+        mo.setCategory(this.getCategory());
+        mo.setScript(this.getScript());
         return mo;
     }
     

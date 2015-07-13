@@ -21,6 +21,15 @@ public class CommandMO extends NamedObjectMO
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
+    
+    @JsonProperty("category")
+    private String category;
+    
+    @JsonProperty("application")
+    private String application;
+    
+    @JsonProperty("script")
+    private String script;
 
     public CommandMO()
     {
@@ -45,6 +54,36 @@ public class CommandMO extends NamedObjectMO
     public void setExecutor(String executor)
     {
         this.executor = executor;
+    }
+
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
+    public String getApplication()
+    {
+        return application;
+    }
+
+    public void setApplication(String application)
+    {
+        this.application = application;
+    }
+
+    public String getScript()
+    {
+        return script;
+    }
+
+    public void setScript(String script)
+    {
+        this.script = script;
     }
 
     public List<ParameterMO> getParameters()
