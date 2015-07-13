@@ -50,8 +50,8 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             if (agent != null)
             {
                 agent.sendOnePingAndOnePingOnly((rtt) -> {
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentName() + " connected, RTT: " + rtt).runtime(rtt));
-                    this.publishReading(executeCheck, new LongGaugeReading("round-trip-time", "ms", rtt));
+                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentName() + " connected. Latency: " + rtt + "ms").runtime(rtt));
+                    this.publishReading(executeCheck, new LongGaugeReading("latency", "ms", rtt));
                 });
             }
             else
