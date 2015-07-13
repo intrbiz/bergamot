@@ -64,13 +64,13 @@
                         bergamot.publish(
                             bergamot.createResult().applyGreaterThanThreshold(
                                 res.object_totals.connections,
-                                check.getIntParameter('warning'),
-                                check.getIntParameter('critical'),
+                                check.getLongParameter('warning'),
+                                check.getLongParameter('critical'),
                                 'Active connections: ' + res.object_totals.connections
                             )
                         );
                         bergamot.publishReadings(
-                            bergamot.createLongGaugeReading('connections', null, res.object_totals.connections)
+                            bergamot.createLongGaugeReading('connections', null, res.object_totals.connections, check.getLongParameter('warning'), check.getLongParameter('critical'), null, null)
                         );
                     }
                     else
@@ -114,13 +114,13 @@
                         bergamot.publish(
                             bergamot.createResult().applyGreaterThanThreshold(
                                 res.object_totals.channels,
-                                check.getIntParameter('warning'),
-                                check.getIntParameter('critical'),
+                                check.getLongParameter('warning'),
+                                check.getLongParameter('critical'),
                                 'Active channels: ' + res.object_totals.channels
                             )
                         );
                         bergamot.publishReadings(
-                            bergamot.createLongGaugeReading('channels', null, res.object_totals.channels)
+                            bergamot.createLongGaugeReading('channels', null, res.object_totals.channels, check.getLongParameter('warning'), check.getLongParameter('critical'), null, null)
                         );
                     }
                     else

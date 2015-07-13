@@ -34,7 +34,7 @@
                             )
                         );
                         bergamot.publishReadings(
-                            bergamot.createDoubleGaugeReading('publish-rate', '/s', res.message_stats.publish_details.rate),
+                            bergamot.createDoubleGaugeReading('publish-rate', '/s', res.message_stats.publish_details.rate, check.getDoubleParameter('warning'), check.getDoubleParameter('critical'), null, null),
                             bergamot.createLongGaugeReading('published-messages', null, res.message_stats.publish)
                         );
                     }
@@ -136,7 +136,7 @@
                             )
                         );
                         bergamot.publishReadings(
-                            bergamot.createDoubleGaugeReading('ack-rate', '/s', res.message_stats.ack_details.rate),
+                            bergamot.createDoubleGaugeReading('ack-rate', '/s', res.message_stats.ack_details.rate, check.getDoubleParameter('warning'), check.getDoubleParameter('critical'), null, null),
                             bergamot.createLongGaugeReading('acked-messages', null, res.message_stats.ack)
                         );
                     }
