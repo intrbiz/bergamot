@@ -43,40 +43,48 @@ public class ExecHandler implements AgentHandler
         //
         ExecStat stat = new ExecStat(request);
         //
-        try
+        if (Boolean.getBoolean("bergamot.agent.no-exec"))
         {
-            if ("nagios".equalsIgnoreCase(check.getEngine()))
+            logger.error("Cannot execute check, administratively disabled!");
+            stat.error("Cannot execute check, administratively disabled!");
+        }
+        else
+        {
+            try
             {
-                // validate the command line
-                String commandLine = getParameter(check.getParameters(), "command_line");
-                if (AgentUtil.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
-                NagiosResult response = this.executor.execute(commandLine);
-                stat.setOk(response.toOk());
-                stat.setStatus(response.toStatus());
-                stat.setOutput(response.getOutput());
-                stat.setRuntime(response.getRuntime());
-                // readings
-                stat.setCaptured(System.currentTimeMillis());
-                for (NagiosPerfData perf : response.getPerfData())
+                if ("nagios".equalsIgnoreCase(check.getEngine()))
                 {
-                    Reading reading = perf.toReading();
-                    if (reading != null) stat.getReadings().add(reading);
+                    // validate the command line
+                    String commandLine = getParameter(check.getParameters(), "command_line");
+                    if (AgentUtil.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
+                    NagiosResult response = this.executor.execute(commandLine);
+                    stat.setOk(response.toOk());
+                    stat.setStatus(response.toStatus());
+                    stat.setOutput(response.getOutput());
+                    stat.setRuntime(response.getRuntime());
+                    // readings
+                    stat.setCaptured(System.currentTimeMillis());
+                    for (NagiosPerfData perf : response.getPerfData())
+                    {
+                        Reading reading = perf.toReading();
+                        if (reading != null) stat.getReadings().add(reading);
+                    }
+                }
+                else
+                {
+                    stat.error("Cannot execute check, unknown engine!");
                 }
             }
-            else
+            catch (IOException e)
             {
-                stat.error("Cannot execute check, unknown engine!");
+                logger.error("Failed to execute nagios check command", e);
+                stat.error(e);
             }
-        }
-        catch (IOException e)
-        {
-            logger.error("Failed to execute nagios check command", e);
-            stat.error(e);
-        }
-        catch (InterruptedException e)
-        {
-            logger.error("Failed to execute nagios check command", e);
-            stat.error(e);
+            catch (InterruptedException e)
+            {
+                logger.error("Failed to execute nagios check command", e);
+                stat.error(e);
+            }
         }
         //
         return stat;
