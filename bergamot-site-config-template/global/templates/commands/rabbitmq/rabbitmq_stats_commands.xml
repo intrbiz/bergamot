@@ -85,7 +85,7 @@
                             )
                         );
                         bergamot.publishReadings(
-                            bergamot.createDoubleGaugeReading('deliver-rate', '/s', res.message_stats.deliver_details.rate),
+                            bergamot.createDoubleGaugeReading('deliver-rate', '/s', res.message_stats.deliver_details.rate, check.getDoubleParameter('warning'), check.getDoubleParameter('critical'), null, null),
                             bergamot.createLongGaugeReading('delivered-messages', null, res.message_stats.deliver)
                         );
                     }
