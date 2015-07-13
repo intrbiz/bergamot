@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model.message.state;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
@@ -20,27 +21,32 @@ public class CheckTransitionMO extends MessageObject
     /**
      * The transition id, this should match the id of the execution / result
      */
+    @JsonProperty("id")
     private UUID id;
     
     /**
      * The check to which this transition applies
      */
+    @JsonProperty("check_id")
     private UUID checkId;
     
     /**
      * When the transition was applied
      */
+    @JsonProperty("applied_at")
     private long appliedAt;
     
     /**
      * Did this transition result in a change of state for the check
      */
+    @JsonProperty("state_change")
     private boolean stateChange;
     
     /**
      * Did this transition result in a hard change.  IE the check state reached 
      * the attempt threshold which caused a hard change in state.
      */
+    @JsonProperty("hard_change")
     private boolean hardChange;
     
     // previous
@@ -48,11 +54,13 @@ public class CheckTransitionMO extends MessageObject
     /**
      * Previous State: Is the check ok?
      */
+    @JsonProperty("previous_ok")
     private boolean previousOk;
 
     /**
      * Previous State: Why is the check ok or not ok?
      */
+    @JsonProperty("previous_status")
     private String previousStatus;
 
     /**
@@ -63,56 +71,67 @@ public class CheckTransitionMO extends MessageObject
     /**
      * Previous State: When did the last check happen
      */
+    @JsonProperty("previous_last_check_time")
     private long previousLastCheckTime;
 
     /**
      * Previous State: What was the Id of the last check
      */
+    @JsonProperty("previous_last_check_id")
     private UUID previousLastCheckId;
 
     /**
      * Previous State: The number of attempts since the last hard state change
      */
+    @JsonProperty("previous_attempt")
     private int previousAttempt;
 
     /**
      * Previous State: Has a hard state transition happened
      */
+    @JsonProperty("previous_hard")
     private boolean previousHard;
 
     /**
      * Previous State: Is the state in transition
      */
+    @JsonProperty("previous_transitioning")
     private boolean previousTransitioning;
 
     /**
      * Previous State: Is the state flapping between ok and not ok, but never reaching a hard state
      */
+    @JsonProperty("previous_flapping")
     private boolean previousFlapping;
 
     /**
      * Previous State: When was the last hard state change
      */
+    @JsonProperty("previous_last_state_change")
     private long previousLastStateChange;
 
     /**
      * Previous State: A bitmap of the ok history
      */
+    @JsonProperty("previous_ok_history")
     private long previousOkHistory;
 
     /**
      * Previous State: Was the last hard state ok?
      */
+    @JsonProperty("previous_last_hard_ok")
     private boolean previousLastHardOk;
 
     /**
      * Previous State: What was the last hard status?
      */
+    @JsonProperty("previous_last_hard_status")
     private String previousLastHardStatus;
 
     /**
      * Previous State: What was the output of the last hard state
      */
+    @JsonProperty("previous_last_hard_output")
     private String previousLastHardOutput = "Pending";
     
     // next
@@ -120,101 +139,121 @@ public class CheckTransitionMO extends MessageObject
     /**
      * Next State: Is the check ok?
      */
+    @JsonProperty("next_ok")
     private boolean nextOk;
 
     /**
      * Next State: Why is the check ok or not ok?
      */
+    @JsonProperty("next_status")
     private String nextStatus;
 
     /**
      * Next State: What was the output of the last check
      */
+    @JsonProperty("next_output")
     private String nextOutput;
 
     /**
      * Next State: When did the last check happen
      */
+    @JsonProperty("next_last_check_time")
     private long nextLastCheckTime;
 
     /**
      * Next State: What was the Id of the last check
      */
+    @JsonProperty("next_last_check_id")
     private UUID nextLastCheckId;
 
     /**
      * Next State: The number of attempts since the last hard state change
      */
+    @JsonProperty("next_attempt")
     private int nextAttempt;
 
     /**
      * Next State: Has a hard state transition happened
      */
+    @JsonProperty("next_hard")
     private boolean nextHard;
 
     /**
      * Next State: Is the state in transition
      */
+    @JsonProperty("next_transitioning")
     private boolean nextTransitioning;
 
     /**
      * Next State: Is the state flapping between ok and not ok, but never reaching a hard state
      */
+    @JsonProperty("next_flapping")
     private boolean nextFlapping;
 
     /**
      * Next State: When was the last hard state change
      */
+    @JsonProperty("next_last_state_change")
     private long nextLastStateChange;
 
     /**
      * Next State: A bitmap of the ok history
      */
+    @JsonProperty("next_ok_history")
     private long nextOkHistory = 0x1L;
 
     /**
      * Next State: Was the last hard state ok?
      */
+    @JsonProperty("next_last_hard_ok")
     private boolean nextLastHardOk = true;
 
     /**
      * Next State: What was the last hard status?
      */
+    @JsonProperty("next_last_hard_status")
     private String nextLastHardStatus;
 
     /**
      * Next State: What was the output of the last hard state
      */
+    @JsonProperty("next_last_hard_output")
     private String nextLastHardOutput;
     
     /**
      * Does this transition result in an alert, IE: A hard change from ok to not ok.
      */
+    @JsonProperty("next_alert")
     private boolean alert;
     
     /**
      * Does this transition result in a recovery, IE: A hard change from not ok to ok.
      */
+    @JsonProperty("next_recovery")
     private boolean recovery;
 
     /**
      * Was this check previously in downtime
      */
+    @JsonProperty("previous_in_downtime")
     private boolean previousInDowntime;
 
     /**
      * Is this check now in downtime
      */
+    @JsonProperty("next_in_downtime")
     private boolean nextInDowntime;
     
     /**
      * Was this check previously suppressed
      */
+    @JsonProperty("previous_suppressed")
     private boolean previousSuppressed;
 
     /**
      * Is this check now suppressed
      */
+    @JsonProperty("next_suppressed")
     private boolean nextSuppressed;
     
     public CheckTransitionMO()
