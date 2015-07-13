@@ -32,7 +32,7 @@
     <command category="System" engine="snmp" name="check_snmp_uptime" extends="snmp_check">
         <parameter description="Warning if uptime is less than" name="warning">30</parameter>
         <parameter description="Critical if uptime is less than" name="critical">15</parameter>
-        <parameter name="script">
+        <script>
             <![CDATA[
             /* Validate parameters */
             bergamot.require('warning');
@@ -59,7 +59,7 @@
                 }
             );
             ]]>
-        </parameter>
+        </script>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
         <description>Check the uptime of an SNMP device, raising an alert if the agent is restarted</description>
     </command>

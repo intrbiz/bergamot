@@ -54,7 +54,6 @@
     
     <command name="http_script_check" engine="http" executor="script">
         <summary>HTTP Script Check</summary>
-	<parameter name="script"></parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
         <description>Check HTTP/HTTPS resources by executing a Javascript script</description>
     </command>

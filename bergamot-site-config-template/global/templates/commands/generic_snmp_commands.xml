@@ -10,7 +10,6 @@
         <parameter description="The SNMP V3 username"                     name="snmp-user">#{coalesce(host.getParameter('snmp-user'), host.location.getParameter('snmp-user'))}</parameter>
         <parameter description="The SNMP V3 password"                     name="snmp-password">#{coalesce(host.getParameter('snmp-password'), host.location.getParameter('snmp-password'))}</parameter>
         <parameter description="The SNMP V3 engine id"                    name="snmp-engine-id">#{coalesce(host.getParameter('snmp-engine-id'), host.location.getParameter('snmp-engine-id'))}</parameter>
-        <parameter description="The check script"                         name="script"></parameter>
         <description>A generic scripted SNMP check</description>
     </command>
     
