@@ -48,7 +48,7 @@ public class ScriptedHTTPExecutor extends AbstractExecutor<HTTPEngine>
         try
         {
         // we need a script!
-        if (Util.isEmpty(executeCheck.getParameter("script"))) throw new RuntimeException("The script must be defined!");
+        if (Util.isEmpty(executeCheck.getScript())) throw new RuntimeException("The script must be defined!");
         // setup the script engine
         ScriptEngine script = factory.getEngineByName("nashorn");
         SimpleBindings bindings = new SimpleBindings();
@@ -57,7 +57,7 @@ public class ScriptedHTTPExecutor extends AbstractExecutor<HTTPEngine>
         bindings.put("bergamot", this.createScriptContext(executeCheck));
         script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
         // execute
-        script.eval(executeCheck.getParameter("script"));
+        script.eval(executeCheck.getScript());
         }
         catch (Exception e)
         {
