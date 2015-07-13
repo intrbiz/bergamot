@@ -199,6 +199,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         executeCheck.setEngine(command.getEngine());
         executeCheck.setExecutor(command.getExecutor());
         executeCheck.setName(command.getName());
+        executeCheck.setScript(command.getScript());
         // eval parameters
         ExpressContext context = new DefaultContext(new BergamotEntityResolver());
         // configured parameters

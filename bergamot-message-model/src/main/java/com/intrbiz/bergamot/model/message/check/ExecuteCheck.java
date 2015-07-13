@@ -20,6 +20,9 @@ public class ExecuteCheck extends CheckEvent
     
     @JsonProperty("agent-id")
     private UUID agentId;
+    
+    @JsonProperty("script")
+    private String script;
 
     public ExecuteCheck()
     {
@@ -54,5 +57,15 @@ public class ExecuteCheck extends CheckEvent
     public void setAgentId(UUID agentId)
     {
         this.agentId = agentId;
+    }
+
+    public String getScript()
+    {
+        return script;
+    }
+
+    public void setScript(String script)
+    {
+        this.script = script;
     }
 }
