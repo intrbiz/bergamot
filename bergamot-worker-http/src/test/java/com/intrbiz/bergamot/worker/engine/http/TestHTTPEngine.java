@@ -106,7 +106,8 @@ public class TestHTTPEngine
         check.setProcessingPool(1);
         check.setScheduled(System.currentTimeMillis());
         // parameters
-        check.setParameter("script", "http.get('http://10.250.100.144:15672/api/overview').basicAuth('monitor', 'monitor').execute("
+        check.setScript(
+                "http.get('http://10.250.100.144:15672/api/overview').basicAuth('monitor', 'monitor').execute("
                 + " function(r) {"
                 + "   if (r.status() == 200) { "
                 + "     var res = JSON.parse(r.content()); "
@@ -118,7 +119,8 @@ public class TestHTTPEngine
                 + " function(e) { "
                 + "   bergamot.error(e); "
                 + " }"
-                + ");");
+                + ");"
+        );
         // execute
         ResultMO resultMO = this.engine.test(check);
         assertThat(resultMO, is(notNullValue()));
