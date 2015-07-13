@@ -34,7 +34,7 @@
                 }
             );
         ]]>
-        </<script>>
+        </script>
         <description>Check RabbitMQ aliveness test</description>
     </command>
     
