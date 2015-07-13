@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -23,6 +24,8 @@ public class CommandCfg extends NamedObjectCfg<CommandCfg>
     private String category;
     
     private String application;
+    
+    private String script;
 
     public CommandCfg()
     {
@@ -75,6 +78,18 @@ public class CommandCfg extends NamedObjectCfg<CommandCfg>
     public void setApplication(String application)
     {
         this.application = application;
+    }
+    
+    @XmlElement(name = "script")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getScript()
+    {
+        return script;
+    }
+
+    public void setScript(String script)
+    {
+        this.script = script;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
