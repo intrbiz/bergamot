@@ -101,6 +101,8 @@
     <module>bergamot-notifier-webhook</module>
     <module>lamplighter-model</module>
     <module>lamplighter-reading-processor</module>
+    <module>bergamot-worker-jdbc</module>
+    <module>bergamot-check-jdbc</module>
   </modules>
   
   <dependencyManagement>
@@ -391,6 +393,16 @@
   			<groupId>org.mindrot</groupId>
   			<artifactId>jbcrypt</artifactId>
   			<version>0.3m</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>org.postgresql</groupId>
+  			<artifactId>postgresql</artifactId>
+  			<version>9.3-1102-jdbc41</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-check-jdbc</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>
