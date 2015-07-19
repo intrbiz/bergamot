@@ -2,15 +2,17 @@ package com.intrbiz.bergamot.check.jdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.function.Consumer;
 
 public class JDBCCheckContext
 {
-    private Consumer<Throwable> onError;
+    private final JDBCChecker checker;
     
-    public JDBCCheckContext(Consumer<Throwable> onError)
+    private final Consumer<Throwable> onError;
+    
+    public JDBCCheckContext(JDBCChecker checker, Consumer<Throwable> onError)
     {
+        this.checker = checker;
         this.onError = onError;
     }
     
@@ -18,11 +20,25 @@ public class JDBCCheckContext
     {
         try (Connection connection = DriverManager.getConnection(url, username, password))
         {
-            onConnected.accept(new JDBCConnection(connection, this.onError));
+            // TODO: timeouts
+            onConnected.accept(new JDBCConnection(connection));
         }
-        catch (SQLException e)
+        catch (Throwable t)
         {
-            this.onError.accept(e);
+            this.onError.accept(t);
+        }
+    }
+    
+    public void connect(String url, String username, String password, Consumer<JDBCConnection> onConnected, Consumer<Throwable> onError)
+    {
+        try (Connection connection = DriverManager.getConnection(url, username, password))
+        {
+            // TODO: timeouts
+            onConnected.accept(new JDBCConnection(connection));
+        }
+        catch (Throwable t)
+        {
+            onError.accept(t);
         }
     }
 }

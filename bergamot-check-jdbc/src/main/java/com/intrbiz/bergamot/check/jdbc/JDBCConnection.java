@@ -1,27 +1,29 @@
 package com.intrbiz.bergamot.check.jdbc;
 
 import java.sql.Connection;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class JDBCConnection 
-{
-    private Consumer<Throwable> onError;
-    
+{    
     private Connection connection;
     
-    public JDBCConnection(Connection connection, Consumer<Throwable> onError)
+    public JDBCConnection(Connection connection)
     {
         this.connection = connection;
-        this.onError = onError;
     }
     
     public JDBCStatement prepare(String query)
     {
-        return null;
+        return new JDBCStatement(query) {
+            protected Connection getConnection()
+            {
+                return connection;
+            }
+        };
     }
     
-    public JDBCResultSet query(String query)
+    public <T> T query(String query, Function<JDBCResultSet, T> resultProcessor)
     {
-        return null;
+        return this.prepare(query).query(resultProcessor);
     }
 }

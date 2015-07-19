@@ -4,26 +4,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
-import org.apache.log4j.Logger;
-
 /**
  * A JDBC based check framework
  */
 public class JDBCChecker
 {   
-    private final Logger logger = Logger.getLogger(JDBCChecker.class);
-
-    private int defaultRequestTimeoutSeconds;
-
-    private int defaultConnectTimeoutSeconds;
+    private int defaultTimeoutSeconds;
     
     private final Timer timer;
 
-    public JDBCChecker(int defaultConnectTimeoutSeconds, int defaultRequestTimeoutSeconds)
+    public JDBCChecker(int defaultTimeoutSeconds)
     {
-        this.defaultRequestTimeoutSeconds = defaultRequestTimeoutSeconds;
-        this.defaultConnectTimeoutSeconds = defaultConnectTimeoutSeconds;
-        // timer
+        this.defaultTimeoutSeconds = defaultTimeoutSeconds;
+        //
         this.timer = new Timer();
         // some util timer tasks
         // every 5 minutes forcefully purge the timer queue
@@ -40,27 +33,27 @@ public class JDBCChecker
 
     public JDBCChecker()
     {
-        this(5, 60);
+        this(60);
     }
 
-    public int getDefaultRequestTimeoutSeconds()
+    public int getTimeoutSeconds()
     {
-        return defaultRequestTimeoutSeconds;
+        return defaultTimeoutSeconds;
     }
-
-    public int getDefaultConnectTimeoutSeconds()
+    
+    Timer getTimer()
     {
-        return defaultConnectTimeoutSeconds;
+        return this.timer;
     }
 
     public JDBCCheckContext createContext()
     {
-        return null;
+        return new JDBCCheckContext(this, (t) -> { throw new JDBCException(t); });
     }
     
-    public JDBCCheckContext createContext(Consumer<Exception> errorHandler)
+    public JDBCCheckContext createContext(Consumer<Throwable> errorHandler)
     {
-        return null;
+        return new JDBCCheckContext(this, errorHandler);
     }
 
     public void shutdown()
