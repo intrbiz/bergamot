@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.jdbc;
 
+import com.intrbiz.bergamot.check.jdbc.JDBCChecker;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 
 /**
@@ -8,6 +9,8 @@ import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 public class JDBCEngine extends AbstractEngine
 {
     public static final String NAME = "jdbc";
+    
+    private JDBCChecker checker;
 
     public JDBCEngine()
     {
@@ -23,5 +26,12 @@ public class JDBCEngine extends AbstractEngine
         {
             this.addExecutor(new ScriptedJDBCExecutor());
         }
+        // setup the checker
+        this.checker = new JDBCChecker();
+    }
+    
+    public JDBCChecker getChecker()
+    {
+        return this.checker;
     }
 }

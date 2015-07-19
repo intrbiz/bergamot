@@ -50,7 +50,9 @@ public class ScriptedJDBCExecutor extends AbstractExecutor<JDBCEngine>
             ScriptEngine script = factory.getEngineByName("nashorn");
             SimpleBindings bindings = new SimpleBindings();
             bindings.put("check", executeCheck);
-            // TODO: the JDBC engine
+            bindings.put("jdbc", this.getEngine().getChecker().createContext((t) -> {
+                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(t));
+            }));
             bindings.put("bergamot", this.createScriptContext(executeCheck));
             script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
             // execute
