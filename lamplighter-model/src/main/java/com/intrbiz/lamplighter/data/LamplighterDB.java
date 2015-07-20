@@ -13,6 +13,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.Cache;
+import com.intrbiz.data.cache.Cacheable;
 import com.intrbiz.data.db.DatabaseAdapter;
 import com.intrbiz.data.db.DatabaseConnection;
 import com.intrbiz.data.db.compiler.DatabaseAdapterCompiler;
@@ -157,9 +158,11 @@ public abstract class LamplighterDB extends DatabaseAdapter
     @SQLGetter(table = CheckReading.class, name = "get_check_reading", since = @SQLVersion({1, 0, 0}))
     public abstract CheckReading getCheckReading(@SQLParam("id") UUID id);
     
+    @Cacheable
     @SQLGetter(table = CheckReading.class, name ="get_check_reading_by_name", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder("name"))
     public abstract CheckReading getCheckReadingByName(@SQLParam("check_id") UUID checkId, @SQLParam("name") String name);
     
+    @Cacheable
     @SQLGetter(table = CheckReading.class, name ="get_check_readings_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder("name"))
     public abstract List<CheckReading> getCheckReadingsForCheck(@SQLParam("check_id") UUID checkId);
     
@@ -204,7 +207,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     public int setupDoubleGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit, long pollInterval)
     {
-        return this.use((with) -> {
+        int r = this.use((with) -> {
             try (PreparedStatement stmt = with.prepareStatement("SELECT lamplighter.new_reading(?, ?, ?, ?, ?, ?, ?, 'double_gauge_reading', ?)"))
             {
               stmt.setObject(1, siteId);
@@ -225,6 +228,10 @@ public abstract class LamplighterDB extends DatabaseAdapter
             }
             return null;
         });
+        // invalidate caches
+        this.getAdapterCache().removePrefix("get_check_reading_by_name." + checkId);
+        this.getAdapterCache().removePrefix("get_check_readings_for_check." + checkId);
+        return r;
     }
     
     public CheckReading getOrSetupLongGaugeReading(UUID checkId, String name, String unit, long pollInterval)
@@ -245,7 +252,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     public int setupLongGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit, long pollInterval)
     {
-        return this.use((with) -> {
+        int r = this.use((with) -> {
             try (PreparedStatement stmt = with.prepareStatement("SELECT lamplighter.new_reading(?, ?, ?, ?, ?, ?, ?, 'long_gauge_reading', ?)"))
             {
               stmt.setObject(1, siteId);
@@ -266,6 +273,10 @@ public abstract class LamplighterDB extends DatabaseAdapter
             }
             return null;
         });
+        // invalidate caches
+        this.getAdapterCache().removePrefix("get_check_reading_by_name." + checkId);
+        this.getAdapterCache().removePrefix("get_check_readings_for_check." + checkId);
+        return r;
     }
     
     public CheckReading getOrSetupIntGaugeReading(UUID checkId, String name, String unit, long pollInterval)
@@ -286,7 +297,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     public int setupIntGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit, long pollInterval)
     {
-        return this.use((with) -> {
+        int r = this.use((with) -> {
             try (PreparedStatement stmt = with.prepareStatement("SELECT lamplighter.new_reading(?, ?, ?, ?, ?, ?, ?, 'int_gauge_reading', ?)"))
             {
               stmt.setObject(1, siteId);
@@ -307,6 +318,10 @@ public abstract class LamplighterDB extends DatabaseAdapter
             }
             return null;
         });
+        // invalidate caches
+        this.getAdapterCache().removePrefix("get_check_reading_by_name." + checkId);
+        this.getAdapterCache().removePrefix("get_check_readings_for_check." + checkId);
+        return r;
     }
     
     public CheckReading getOrSetupFloatGaugeReading(UUID checkId, String name, String unit, long pollInterval)
@@ -327,7 +342,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     public int setupFloatGaugeReading(UUID siteId, UUID readingId, UUID checkId, String name, String summary, String description, String unit, long pollInterval)
     {
-        return this.use((with) -> {
+        int r = this.use((with) -> {
             try (PreparedStatement stmt = with.prepareStatement("SELECT lamplighter.new_reading(?, ?, ?, ?, ?, ?, ?, 'float_gauge_reading', ?)"))
             {
               stmt.setObject(1, siteId);
@@ -348,6 +363,10 @@ public abstract class LamplighterDB extends DatabaseAdapter
             }
             return null;
         });
+        // invalidate caches
+        this.getAdapterCache().removePrefix("get_check_reading_by_name." + checkId);
+        this.getAdapterCache().removePrefix("get_check_readings_for_check." + checkId);
+        return r;
     }
     
     // gauges
