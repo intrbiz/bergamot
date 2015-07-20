@@ -23,6 +23,9 @@ public class ExecuteCheck extends CheckEvent
     
     @JsonProperty("script")
     private String script;
+    
+    @JsonProperty("saved_state")
+    private String savedState;
 
     public ExecuteCheck()
     {
@@ -67,5 +70,15 @@ public class ExecuteCheck extends CheckEvent
     public void setScript(String script)
     {
         this.script = script;
+    }
+
+    public String getSavedState()
+    {
+        return savedState;
+    }
+
+    public void setSavedState(String savedState)
+    {
+        this.savedState = savedState;
     }
 }

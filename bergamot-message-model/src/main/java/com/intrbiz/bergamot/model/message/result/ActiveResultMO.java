@@ -28,6 +28,9 @@ public class ActiveResultMO extends ResultMO
 
     @JsonProperty("check")
     private CheckEvent check;
+    
+    @JsonProperty("saved_state")
+    private String savedState;
 
     public ActiveResultMO()
     {
@@ -83,8 +86,17 @@ public class ActiveResultMO extends ResultMO
     public void setProcessingPool(int processingPool)
     {
         this.processingPool = processingPool;
+    }    
+
+    public String getSavedState()
+    {
+        return savedState;
     }
-    
+
+    public void setSavedState(String savedState)
+    {
+        this.savedState = savedState;
+    }
 
     /**
      * Create a Result with the details of this check
@@ -101,6 +113,12 @@ public class ActiveResultMO extends ResultMO
         this.setProcessingPool(check.getProcessingPool());
         this.setCheck(check);
         this.setExecuted(System.currentTimeMillis());
+        return this;
+    }
+    
+    public ActiveResultMO state(String savedState)
+    {
+        this.savedState = savedState;
         return this;
     }
     
