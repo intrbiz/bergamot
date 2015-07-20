@@ -36,6 +36,7 @@ import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
+import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.CheckTransition;
@@ -66,7 +67,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 6, 0}),
+        version = @SQLVersion({3, 7, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -93,7 +94,8 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
             ConfigChange.class,
             CheckStats.class,
             CheckTransition.class,
-            AgentRegistration.class
+            AgentRegistration.class,
+            CheckSavedState.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -743,6 +745,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLRemove(table = CheckState.class, name = "remove_check_state", since = @SQLVersion({1, 0, 0}))
     public abstract void removeCheckState(@SQLParam("check_id") UUID id);
+    
+    // saved state
+    
+    @Cacheable
+    @SQLSetter(table = CheckSavedState.class, name = "set_check_saved_state", since = @SQLVersion({3, 7, 0}))
+    public abstract void setCheckSavedState(CheckSavedState savedState);
+    
+    @Cacheable
+    @SQLGetter(table = CheckSavedState.class, name = "get_check_saved_state", since = @SQLVersion({3, 7, 0}))
+    public abstract CheckSavedState getCheckSavedState(@SQLParam("check_id") UUID id);
+    
+    @Cacheable
+    @CacheInvalidate({
+        "get_check_saved_state.#{check_id}",
+    })
+    @SQLRemove(table = CheckSavedState.class, name = "remove_check_saved_state", since = @SQLVersion({3, 7, 0}))
+    public abstract void removeCheckSavedState(@SQLParam("check_id") UUID id);
     
     // alerts
     
