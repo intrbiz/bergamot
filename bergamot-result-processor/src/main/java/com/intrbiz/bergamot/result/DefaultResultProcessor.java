@@ -30,6 +30,7 @@ import com.intrbiz.bergamot.model.message.update.AlertUpdate;
 import com.intrbiz.bergamot.model.message.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.update.GroupUpdate;
 import com.intrbiz.bergamot.model.message.update.LocationUpdate;
+import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.CheckTransition;
@@ -136,6 +137,15 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 {
                     CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), (ActiveResultMO) resultMO);
                     db.setCheckStats(stats);
+                    // saved state
+                    if (resultMO instanceof ActiveResultMO)
+                    {
+                        ActiveResultMO arm = (ActiveResultMO) resultMO;
+                        if (arm.getSavedState() != null)
+                        {
+                            db.setCheckSavedState(new CheckSavedState(check.getId(), arm.getSavedState()));
+                        }
+                    }
                 }
                 db.commit();
                 // reschedule active checks if we have changed state at all

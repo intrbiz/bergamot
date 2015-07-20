@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.express.BergamotEntityResolver;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
@@ -155,6 +156,18 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     public abstract String resolveWorkerPool();
     
     public abstract UUID resolveAgentId();
+    
+    /**
+     * Get the check saved state if any exists
+     * @return the saved state or null
+     */
+    public CheckSavedState getSavedState()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCheckSavedState(this.getId());
+        }
+    }
 
     /**
      * Construct the routing key which should be used to route this execute check message
@@ -200,6 +213,9 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         executeCheck.setExecutor(command.getExecutor());
         executeCheck.setName(command.getName());
         executeCheck.setScript(command.getScript());
+        // saved state?
+        CheckSavedState state = this.getSavedState();
+        if (state != null) executeCheck.setSavedState(state.getSavedState());
         // eval parameters
         ExpressContext context = new DefaultContext(new BergamotEntityResolver());
         // configured parameters
