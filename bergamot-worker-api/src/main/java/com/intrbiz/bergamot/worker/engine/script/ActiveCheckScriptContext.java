@@ -250,7 +250,7 @@ public class ActiveCheckScriptContext
         return new LongGaugeReading(name, unit, value);
     }
     
-    public LongGaugeReading createDoubleGaugeReading(String name, String unit, Long value, Long warning, Long critical, Long min, Long max)
+    public LongGaugeReading createLongGaugeReading(String name, String unit, Long value, Long warning, Long critical, Long min, Long max)
     {
         return new LongGaugeReading(name, unit, value, warning, critical, min, max);
     }
@@ -260,7 +260,7 @@ public class ActiveCheckScriptContext
         return new IntegerGaugeReading(name, unit, value);
     }
     
-    public IntegerGaugeReading createDoubleGaugeReading(String name, String unit, Integer value, Integer warning, Integer critical, Integer min, Integer max)
+    public IntegerGaugeReading createIntegerGaugeReading(String name, String unit, Integer value, Integer warning, Integer critical, Integer min, Integer max)
     {
         return new IntegerGaugeReading(name, unit, value, warning, critical, min, max);
     }
@@ -270,7 +270,7 @@ public class ActiveCheckScriptContext
         return new FloatGaugeReading(name, unit, value);
     }
     
-    public FloatGaugeReading createDoubleGaugeReading(String name, String unit, Float value, Float warning, Float critical, Float min, Float max)
+    public FloatGaugeReading createFloatGaugeReading(String name, String unit, Float value, Float warning, Float critical, Float min, Float max)
     {
         return new FloatGaugeReading(name, unit, value, warning, critical, min, max);
     }
