@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+
+    <command name="postgresql_checkpoint_stats" extends="postgresql_jdbc_check">
+        <summary>PostgreSQL Checkpoints</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                con.query('SELECT checkpoints_timed, checkpoints_req, (checkpoints_timed + checkpoints_req) AS total_checkpoints, (buffers_checkpoint * 8) AS checkpoint_kb, EXTRACT(epoch FROM (now() - stats_reset)) / (checkpoints_timed + checkpoints_req) / 60 AS minutes_between_checkpoints FROM pg_stat_bgwriter', function(rs) {
+                    // get our data
+                    rs.next();
+                    var checkpointsTimed   = rs.getLong(1);
+                    var checkpointsReq     = rs.getLong(2);
+                    var checkpointsTotal   = rs.getLong(3);
+                    var checkpointKb       = rs.getLong(4);
+                    var minsBtwCheckpoints = rs.getDouble(5);
+                    // publish
+                    bergamot.info("Minutes between checkpoints: " + minsBtwCheckpoints);
+                    bergamot.publishReadings(
+                        bergamot.createLongGaugeReading('timed-checkpoints', null, checkpointsTimed),
+                        bergamot.createLongGaugeReading('requested-checkpoints', null, checkpointsReq),
+                        bergamot.createLongGaugeReading('total-checkpoints', null, checkpointsTotal),
+                        bergamot.createLongGaugeReading('checkpoint-buffers', 'kB', checkpointKb)
+                    );
+                });
+            });
+        ]]>
+        </script>
+        <description>PostgreSQL checkpoint statistics</description>
+    </command>
+    
+</bergamot>
