@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
 
+    <command name="postgresql_version" extends="postgresql_jdbc_check">
+        <summary>PostgreSQL Version</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                con.query('SELECT setting FROM pg_settings WHERE name = \'server_version\'', function(rs) {
+                    rs.next();
+                    bergamot.info("PostgreSQL " + rs.getString(1));
+                });
+            });
+        ]]>
+        </script>
+        <description>PostgreSQL version information</description>
+    </command>
+    
     <command name="postgresql_active_connections" extends="postgresql_jdbc_check">
         <summary>PostgreSQL Active Connections</summary>
         <parameter description="Warning threshold" name="warning">50</parameter>
