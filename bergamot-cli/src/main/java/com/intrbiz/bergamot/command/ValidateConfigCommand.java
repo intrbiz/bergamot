@@ -32,7 +32,7 @@ public class ValidateConfigCommand extends BergamotCLICommand
     @Override
     public String help()
     {
-        return "Parse the validate the Bergamot configuration in the given directory\n" +
+        return "Parse and validate the Bergamot configuration in the given directory\n" +
                 "  Eg: bergamot-cli validate-config '/etc/bergamot/config/bergamot.local/'\n" +
                 "\n" +
                 "Arguments:\n" +
@@ -47,7 +47,7 @@ public class ValidateConfigCommand extends BergamotCLICommand
         File confDir = new File(args.get(0));
         if (! confDir.isDirectory()) throw new BergamotCLIException("The path '" + confDir.getAbsolutePath() + "' is not a directory!");
         // load the config
-        Collection<ValidatedBergamotConfiguration> bcfgs = new BergamotConfigReader().includeDir(new File("/home/cellis/Intrbiz/workspace-new/bergamot/cfg/local/")).build();
+        Collection<ValidatedBergamotConfiguration> bcfgs = new BergamotConfigReader().includeDir(confDir).build();
         // assert the configuration is valid
         for (ValidatedBergamotConfiguration vbcfg : bcfgs)
         {
