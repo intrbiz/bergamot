@@ -25,6 +25,7 @@ import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/api/downtime")
@@ -34,6 +35,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
 
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.downtime")
     @WithDataAdapter(BergamotDB.class)
     public DowntimeMO getComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -42,6 +44,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/remove")
     @JSON()
+    @RequirePermission("api.write.downtime.remove")
     @WithDataAdapter(BergamotDB.class)
     public Boolean removeDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -51,6 +54,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     
     @Get("/for-object/id/:id")
     @JSON()
+    @RequirePermission("api.read.downtime")
     @WithDataAdapter(BergamotDB.class)
     public List<DowntimeMO> getDowntimeForObject(
             BergamotDB db, 
@@ -64,6 +68,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     
     @Any("/add-downtime-to-check/id/:id")
     @JSON()
+    @RequirePermission("api.write.downtime.add")
     @WithDataAdapter(BergamotDB.class)
     public DowntimeMO addDowntimeToCheck(
             BergamotDB db, 
@@ -88,6 +93,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/render")
     @JSON()
+    @RequirePermission("api.read.downtime")
     @WithDataAdapter(BergamotDB.class)
     public String renderDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {

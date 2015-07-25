@@ -243,6 +243,19 @@
 		<summary>Allow reading of commands</summary>
 		<description>A contact must be granted this permission in order to be able to read commands</description>
 	</permission>
+	<!-- Downtime -->
+	<permission name="api.read.downtime">
+		<summary>Allow reading of downtime</summary>
+		<description>A contact must be granted this permission in order to be able to read downtime</description>
+	</permission
+	<permission name="api.write.downtime.add">
+		<summary>Allow adding downtime</summary>
+		<description>A contact must be granted this permission in order to be able to adding downtime</description>
+	</permission>
+	<permission name="api.write.downtime.remove">
+		<summary>Allow removing downtime</summary>
+		<description>A contact must be granted this permission in order to be able to removing downtime</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>
