@@ -265,6 +265,15 @@
 		<summary>Allow reading of group configurations</summary>
 		<description>A contact must be granted this permission in order to be able to read group configurations</description>
 	</permission>
+	<!-- Location -->
+	<permission name="api.read.location">
+		<summary>Allow reading of locations</summary>
+		<description>A contact must be granted this permission in order to be able to read locations</description>
+	</permission>
+	<permission name="api.read.location.config">
+		<summary>Allow reading of location configurations</summary>
+		<description>A contact must be granted this permission in order to be able to read location configurations</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>
