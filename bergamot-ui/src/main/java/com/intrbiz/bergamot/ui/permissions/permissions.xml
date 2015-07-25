@@ -238,6 +238,11 @@
 		<summary>Allow acknowledging of alerts</summary>
 		<description>A contact must be granted this permission in order to be able to acknowledge alerts</description>
 	</permission>
+	<!-- Command -->
+	<permission name="api.read.command">
+		<summary>Allow reading of commands</summary>
+		<description>A contact must be granted this permission in order to be able to read commands</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>
