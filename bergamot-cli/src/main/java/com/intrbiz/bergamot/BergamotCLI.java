@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.command.AgentCommand;
 import com.intrbiz.bergamot.command.AlertsCommand;
+import com.intrbiz.bergamot.command.ApplyConfigChangeCommand;
 import com.intrbiz.bergamot.command.ConfigCommand;
 import com.intrbiz.bergamot.command.ConvertCommand;
 import com.intrbiz.bergamot.command.HelpCommand;
@@ -49,6 +50,7 @@ public class BergamotCLI
         this.addCommand(new SiteXMLCommand());
         this.addCommand(new AlertsCommand());
         this.addCommand(new AgentCommand());
+        this.addCommand(new ApplyConfigChangeCommand());
         // local commands
         this.addCommand(new CreateSiteCommand());
         this.addCommand(new ListSitesCommand());
