@@ -279,6 +279,11 @@
 		<summary>Allow reading of check transitions</summary>
 		<description>A contact must be granted this permission in order to be able to read check transitions</description>
 	</permission>
+	<!-- Metrics -->
+	<permission name="api.read.system.metrics">
+		<summary>Allow reading of system metrics</summary>
+		<description>A contact must be granted this permission in order to be able to read system metrics</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>

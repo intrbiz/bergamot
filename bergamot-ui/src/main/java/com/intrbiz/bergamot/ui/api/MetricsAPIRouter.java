@@ -13,6 +13,7 @@ import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/api/metrics")
@@ -20,6 +21,7 @@ import com.intrbiz.metadata.RequireValidPrincipal;
 public class MetricsAPIRouter extends Router<BergamotApp>
 {   
     @Get("/sources")
+    @RequirePermission("api.read.system.metrics")
     public void getIntelligenceSource() throws IOException
     {
         JsonGenerator j = response().json().getJsonWriter();
@@ -51,6 +53,7 @@ public class MetricsAPIRouter extends Router<BergamotApp>
     }
     
     @Get("/source/:source")
+    @RequirePermission("api.read.system.metrics")
     public void getIntelligenceSource(String name) throws IOException
     {
         IntelligenceSource source = Witchcraft.get().get(name);
@@ -78,6 +81,7 @@ public class MetricsAPIRouter extends Router<BergamotApp>
     }
     
     @Get("/metric/:source/:name")
+    @RequirePermission("api.read.system.metrics")
     public void getMetric(String sourceName, String name) throws IOException
     {
         IntelligenceSource source = Witchcraft.get().get(sourceName);
