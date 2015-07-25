@@ -1,8 +1,19 @@
 package com.intrbiz.bergamot.ui.api;
 
+import static com.intrbiz.balsa.BalsaContext.*;
+
+import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamReader;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.intrbiz.balsa.BalsaException;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
@@ -10,15 +21,19 @@ import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.Config;
+import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Order;
+import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -106,5 +121,53 @@ public class ConfigAPIRouter extends Router<BergamotApp>
             }
         }
         return siteCfg;
+    }
+    
+    /**
+     * Apply a configuration change
+     */
+    @Post("/apply")
+    @JSON
+    @RequirePermission("config.change.apply")
+    @WithDataAdapter(BergamotDB.class)
+    public void applyConfigChange(BergamotDB db, @Var("site") Site site) throws IOException
+    {
+        try
+        {
+            // read the change
+            XMLStreamReader reader = this.request().getXMLReader();
+            JAXBContext ctx = JAXBContext.newInstance(BergamotCfg.class);
+            Unmarshaller unm = ctx.createUnmarshaller();
+            BergamotCfg cfg = (BergamotCfg) unm.unmarshal(reader);
+            // create the config change
+            ConfigChange change = new ConfigChange();
+            change.setCreated(new Timestamp(System.currentTimeMillis()));
+            change.setSummary("Change via API: " + cfg.getSummary());
+            change.setDescription(cfg.getDescription());
+            change.setSiteId(site.getId());
+            change.setId(site.randomObjectId());
+            change.setConfiguration(cfg);
+            db.setConfigChange(change);
+            // apply the change
+            BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), Balsa().url(Balsa().path("/reset")));
+            // write out the report
+            JsonGenerator json = response().ok().json().getJsonWriter();
+            json.writeStartObject();
+            json.writeFieldName("stat");
+            json.writeString("ok");
+            json.writeFieldName("result");
+            json.writeString(report.toString());
+        }
+        catch (Exception e)
+        {
+            if (! "application/xml".equals(this.request().getContentType())) throw new BalsaException("Request content type must be 'application/xml'");
+            // write out the report
+            JsonGenerator json = response().status(HTTPStatus.InternalServerError).json().getJsonWriter();
+            json.writeStartObject();
+            json.writeFieldName("stat");
+            json.writeString("ok");
+            json.writeFieldName("message");
+            json.writeString(e.getMessage());
+        }
     }
 }
