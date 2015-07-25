@@ -24,6 +24,7 @@ import com.intrbiz.bergamot.call.alert.GetAlertsCall;
 import com.intrbiz.bergamot.call.auth.AppAuthTokenCall;
 import com.intrbiz.bergamot.call.auth.AuthTokenCall;
 import com.intrbiz.bergamot.call.auth.ExtendAuthTokenCall;
+import com.intrbiz.bergamot.call.config.ApplyConfigChangeCall;
 import com.intrbiz.bergamot.call.config.BuildSiteConfigCall;
 import com.intrbiz.bergamot.call.contact.GetContactByEmailCall;
 import com.intrbiz.bergamot.call.contact.GetContactByNameCall;
@@ -250,6 +251,11 @@ public class BergamotClient
     public BuildSiteConfigCall buildSiteConfig()
     {
         return new BuildSiteConfigCall(this);
+    }
+    
+    public ApplyConfigChangeCall applyConfigChange()
+    {
+        return new ApplyConfigChangeCall(this);
     }
     
     // contacts
