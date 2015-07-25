@@ -132,6 +132,69 @@
 		<summary>Allow reading of comments</summary>
 		<description>A contact must be granted this permission in order to be able to read comments</description>
 	</permission>
+	<!-- Host -->
+	<permission name="api.read.host">
+		<summary>Allow reading of hosts</summary>
+		<description>A contact must be granted this permission in order to be able to read hosts</description>
+	</permission>
+	<permission name="api.read.host.config">
+		<summary>Allow reading of host configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read host configuration</description>
+	</permission>
+	<permission name="api.write.host.execute">
+		<summary>Allow execution of hosts</summary>
+		<description>A contact must be granted this permission in order to be able to execute a host check out of schedule</description>
+	</permission>
+	<permission name="api.write.host.suppress">
+		<summary>Allow suppress hosts</summary>
+		<description>A contact must be granted this permission in order to be able to suppress a host</description>
+	</permission>
+	<permission name="api.write.host.unsuppress">
+		<summary>Allow unsuppress hosts</summary>
+		<description>A contact must be granted this permission in order to be able to unsuppress a host</description>
+	</permission>
+	<!-- Service -->
+	<permission name="api.read.service">
+		<summary>Allow reading of services</summary>
+		<description>A contact must be granted this permission in order to be able to read services</description>
+	</permission>
+	<permission name="api.read.service.config">
+		<summary>Allow reading of service configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read service configuration</description>
+	</permission>
+	<permission name="api.write.service.execute">
+		<summary>Allow execution of services</summary>
+		<description>A contact must be granted this permission in order to be able to execute a service check out of schedule</description>
+	</permission>
+	<permission name="api.write.service.suppress">
+		<summary>Allow suppress services</summary>
+		<description>A contact must be granted this permission in order to be able to suppress a service</description>
+	</permission>
+	<permission name="api.write.service.unsuppress">
+		<summary>Allow unsuppress services</summary>
+		<description>A contact must be granted this permission in order to be able to unsuppress a service</description>
+	</permission>
+	<!-- Trap -->
+	<permission name="api.read.trap">
+		<summary>Allow reading of traps</summary>
+		<description>A contact must be granted this permission in order to be able to read traps</description>
+	</permission>
+	<permission name="api.read.trap.config">
+		<summary>Allow reading of trap configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read trap configuration</description>
+	</permission>
+	<permission name="api.write.trap.submit">
+		<summary>Allow submitting trap results</summary>
+		<description>A contact must be granted this permission in order to be able to submit a result for a trap</description>
+	</permission>
+	<permission name="api.write.trap.suppress">
+		<summary>Allow suppress traps</summary>
+		<description>A contact must be granted this permission in order to be able to suppress a trap</description>
+	</permission>
+	<permission name="api.write.trap.unsuppress">
+		<summary>Allow unsuppress traps</summary>
+		<description>A contact must be granted this permission in order to be able to unsuppress a trap</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>
@@ -142,5 +205,14 @@
 	<permission name="sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>
 		<description>A contact must be granted this permission in order to be able to sign Bergamot Agent certificates</description>
+	</permission>
+	<!-- Config -->
+	<permission name="config.export">
+		<summary>Allow the export of configuration as XML files</summary>
+		<description>A contact must be granted this permission in order to be able to export the configuration as XML</description>
+	</permission>
+	<permission name="config.change">
+		<summary>Allow the changing of configuration</summary>
+		<description>A contact must be granted this permission in order to be able to make a configuration change</description>
 	</permission>
 </permissions>

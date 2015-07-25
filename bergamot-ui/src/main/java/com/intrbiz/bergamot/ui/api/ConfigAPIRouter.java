@@ -20,6 +20,7 @@ import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -36,6 +37,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @Get("/site.xml")
     @Order(10)
     @XML
+    @RequirePermission("config.export")
     @WithDataAdapter(BergamotDB.class)
     public BergamotCfg buildSiteConfig(
             BergamotDB db, 
@@ -88,6 +90,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @Get(value = "/(time-period|team|contact|command|location|group|host|service|trap|cluster|resource)s?.xml", regex = true, as = {"type"})
     @Order(20)
     @XML
+    @RequirePermission("config.export")
     @WithDataAdapter(BergamotDB.class)
     public BergamotCfg builObjectConfig(BergamotDB db, @Var("site") Site site, String type)
     {

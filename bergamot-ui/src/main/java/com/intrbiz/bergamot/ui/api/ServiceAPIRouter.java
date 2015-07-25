@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -28,6 +29,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:host/:name")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.service")
     @WithDataAdapter(BergamotDB.class)
     public ServiceMO getService(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
@@ -36,6 +38,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.service")
     @WithDataAdapter(BergamotDB.class)
     public ServiceMO getService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -44,6 +47,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.service")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getServiceState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -52,6 +56,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.service")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getServiceState(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
@@ -60,6 +65,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/execute")
     @JSON()
+    @RequirePermission("api.write.service.execute")
     @WithDataAdapter(BergamotDB.class)
     public String executeService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -71,6 +77,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/suppress")
     @JSON()
+    @RequirePermission("api.write.service.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -82,6 +89,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/unsuppress")
     @JSON()
+    @RequirePermission("api.write.service.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressService(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -93,6 +101,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.service.config")
     @WithDataAdapter(BergamotDB.class)
     public ServiceCfg getServiceConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
@@ -101,6 +110,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.service.config")
     @WithDataAdapter(BergamotDB.class)
     public ServiceCfg getServiceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {

@@ -21,6 +21,7 @@ import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -32,6 +33,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:host/:name")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public TrapMO getTrap(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
@@ -40,6 +42,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public TrapMO getTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -48,6 +51,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getTrapState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -56,6 +60,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getTrapState(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
@@ -64,6 +69,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Any("/id/:id/submit")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.write.trap.submit")
     @WithDataAdapter(BergamotDB.class)
     public String getServiceState(BergamotDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id, @Param("status") String status, @Param("output") String output)
     {   
@@ -87,6 +93,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/suppress")
     @JSON()
+    @RequirePermission("api.write.trap.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -98,6 +105,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/unsuppress")
     @JSON()
+    @RequirePermission("api.write.trap.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -109,6 +117,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.trap.config")
     @WithDataAdapter(BergamotDB.class)
     public TrapCfg getTrapConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
@@ -117,6 +126,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.trap.config")
     @WithDataAdapter(BergamotDB.class)
     public TrapCfg getTrapConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
