@@ -247,7 +247,7 @@
 	<permission name="api.read.downtime">
 		<summary>Allow reading of downtime</summary>
 		<description>A contact must be granted this permission in order to be able to read downtime</description>
-	</permission
+	</permission>
 	<permission name="api.write.downtime.add">
 		<summary>Allow adding downtime</summary>
 		<description>A contact must be granted this permission in order to be able to adding downtime</description>
@@ -255,6 +255,15 @@
 	<permission name="api.write.downtime.remove">
 		<summary>Allow removing downtime</summary>
 		<description>A contact must be granted this permission in order to be able to removing downtime</description>
+	</permission>
+	<!-- Group -->
+	<permission name="api.read.group">
+		<summary>Allow reading of groups</summary>
+		<description>A contact must be granted this permission in order to be able to read groups</description>
+	</permission>
+	<permission name="api.read.group.config">
+		<summary>Allow reading of group configurations</summary>
+		<description>A contact must be granted this permission in order to be able to read group configurations</description>
 	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
