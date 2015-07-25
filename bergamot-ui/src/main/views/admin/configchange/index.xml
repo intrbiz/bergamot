@@ -31,10 +31,11 @@
     					<a href="/admin/configchange/edit/id/#{change.id}" rendered="#{! change.applied}">Edit Change</a>
     				</td>
     				<td>
-    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{! change.applied}">Apply Change</a>
+    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{(! change.applied) and Balsa().permission('config.change.apply')}">Apply Change</a>
+    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{(! change.applied) and (! Balsa().permission('config.change.apply'))}">Validate Change</a>
     				</td>
     				<td>
-    					<a href="/admin/configchange/remove/id/#{change.id}" rendered="#{! change.applied}">Remove Change</a>
+    					<a href="/admin/configchange/remove/id/#{change.id}" rendered="#{(! change.applied)}">Cancel Change</a>
     				</td>
     			</tr>
     		</data-set>

@@ -14,7 +14,7 @@
 		<!--  -->
 		<pre style="margin-bottom: 20px;">#{report.toString()}</pre>
 		<!--  -->
-		<p rendered="#{report.isValid()}">
+		<p rendered="#{report.isValid() and Balsa().permission('config.change.apply')}">
 			<a href="/admin/configchange/apply/id/#{change.id}">Apply change</a>
 		</p>
 		<p rendered="#{! report.isValid()}">

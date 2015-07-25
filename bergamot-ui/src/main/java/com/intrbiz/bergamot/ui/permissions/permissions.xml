@@ -44,9 +44,9 @@
 		<summary>Allow generation of Bergamot Agent configuration</summary>
 		<description>A contact must be granted this permission in order to be able to generate Bergamot Agent configuration</description>
 	</permission>
-	<!----------------------------------------------------------- 
+	<!-- 
 		API Specific Permissions
-	------------------------------------------------------------->
+	-->
 	<permission name="api.access">
 		<summary>Allow API access</summary>
 		<description>A contact must be granted this permission in order to be able to utilise the API</description>
@@ -305,7 +305,7 @@
 		<summary>Allow the export of configuration as XML files</summary>
 		<description>A contact must be granted this permission in order to be able to export the configuration as XML</description>
 	</permission>
-	<permission name="config.change">
+	<permission name="config.change.apply">
 		<summary>Allow the changing of configuration</summary>
 		<description>A contact must be granted this permission in order to be able to make a configuration change</description>
 	</permission>

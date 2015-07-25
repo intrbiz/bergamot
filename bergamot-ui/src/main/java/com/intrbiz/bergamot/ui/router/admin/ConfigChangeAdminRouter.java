@@ -198,6 +198,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     }
     
     @Any("/apply/id/:id")
+    @RequirePermission("config.change.apply")
     @WithDataAdapter(BergamotDB.class)
     public void apply(BergamotDB db, @SessionVar("site") Site site, @IsaObjectId UUID id)
     {
@@ -217,6 +218,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     }
     
     @Any("/poll/apply/id/:id")
+    @RequirePermission("config.change.apply")
     public void pollApply(@SessionVar("site") Site site, @IsaObjectId UUID id) throws IOException
     {
         // get the task state
@@ -272,7 +274,12 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void remove(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        db.removeConfigChange(id);
+        ConfigChange change = db.getConfigChange(id);
+        if (change != null && (! change.isApplied()))
+        {
+            // can't remove an applied change
+            db.removeConfigChange(id);
+        }
         redirect(path("/admin/configchange/"));
     }
 }
