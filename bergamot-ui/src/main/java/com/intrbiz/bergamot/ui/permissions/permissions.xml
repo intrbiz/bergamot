@@ -274,6 +274,11 @@
 		<summary>Allow reading of location configurations</summary>
 		<description>A contact must be granted this permission in order to be able to read location configurations</description>
 	</permission>
+	<!-- Location -->
+	<permission name="api.read.check.transitions">
+		<summary>Allow reading of check transitions</summary>
+		<description>A contact must be granted this permission in order to be able to read check transitions</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>
