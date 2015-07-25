@@ -11,35 +11,35 @@
         <email>op@localhost</email>
     </contact>
     
-    <team name="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*">
         <summary>Administrators</summary>
     </team>
     
-    <team name="linux-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
+    <team name="linux-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
         <summary>Linux Administrators</summary>
     </team>
     
-    <team name="network-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
+    <team name="network-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
         <summary>Network Administrators</summary>
     </team>
     
-    <team name="web-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
+    <team name="web-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
         <summary>Web Administrators</summary>
     </team>
     
-    <team name="db-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, sign.agent">
+    <team name="db-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
         <summary>DB Administrators</summary>
     </team>
     
-    <team name="bergamot-admins" teams="admins" grants="ui.*, api.*, sign.agent">
+    <team name="bergamot-admins" teams="admins" grants="ui.*, api.*, sign.agent, config.*">
         <summary>Bergamot Administrators</summary>
     </team>
     
-    <team name="ops" grants="ui.access, ui.read.*, api.access, api.read.*">
+    <team name="ops" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.alert.acknowledge, api.write.downtime.remove, api.write.downtime.add, api.write.comment.remove, api.write.comment.create, api.write.alert.acknowledge">
         <summary>Operators</summary>
     </team>
     
-    <team name="api" grants="api.*">
+    <team name="api" grants="api.*" revokes="ui.*">
         <summary>API Only Users</summary>
     </team>
     
