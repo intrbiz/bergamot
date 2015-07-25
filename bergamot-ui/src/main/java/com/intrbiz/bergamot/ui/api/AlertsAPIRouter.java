@@ -34,6 +34,7 @@ import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.queue.RoutedProducer;
@@ -66,6 +67,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/")
     @JSON
+    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public List<AlertMO> getAlerts(BergamotDB db, @Var("site") Site site)
     {
@@ -74,6 +76,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public AlertMO getAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -82,6 +85,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/for-check/id/:id")
     @JSON()
+    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public List<AlertMO> getAlertsForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -90,6 +94,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/current/for-check/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public AlertMO getCurrentAlertForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -98,6 +103,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Any("/id/:id/acknowledge")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.write.alert.acknowledge")
     @WithDataAdapter(BergamotDB.class)
     public AlertMO acknowledgeAlert(
             BergamotDB db, 
@@ -145,6 +151,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/render")
     @JSON
+    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public String renderAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -154,6 +161,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/dashboard/render")
     @JSON()
+    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public String renderComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {

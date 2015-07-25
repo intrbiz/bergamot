@@ -229,6 +229,15 @@
 		<summary>Allow unsuppress resources</summary>
 		<description>A contact must be granted this permission in order to be able to unsuppress a resource</description>
 	</permission>
+	<!-- Alert -->
+	<permission name="api.read.alert">
+		<summary>Allow reading of alerts</summary>
+		<description>A contact must be granted this permission in order to be able to read alerts</description>
+	</permission>
+	<permission name="api.write.alert.acknowledge">
+		<summary>Allow acknowledging of alerts</summary>
+		<description>A contact must be granted this permission in order to be able to acknowledge alerts</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>
