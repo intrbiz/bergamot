@@ -284,6 +284,11 @@
 		<summary>Allow reading of system metrics</summary>
 		<description>A contact must be granted this permission in order to be able to read system metrics</description>
 	</permission>
+	<!-- Lamplighter -->
+	<permission name="api.read.lamplighter.readings">
+		<summary>Allow reading of check readings</summary>
+		<description>A contact must be granted this permission in order to be able to read check readings (graphs)</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>

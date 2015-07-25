@@ -30,6 +30,7 @@ import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 
@@ -39,6 +40,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
 {        
     @Any("/check/id/:id/readings")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public List<CheckReadingMO> getReadingsByCheck(LamplighterDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id)
     {
@@ -65,6 +67,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     // double gauge
     
     @Any("/graph/reading/gauge/double/:id/latest/:limit")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getLatestDoubleReadings(
             LamplighterDB db, 
@@ -83,6 +86,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     }
     
     @Any("/graph/reading/gauge/double/:id/date/:rollup/:agg/:start/:end")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getDoubleReadingsByDate(
             LamplighterDB db, 
@@ -106,6 +110,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     // float gauge
     
     @Any("/graph/reading/gauge/float/:id/latest/:limit")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getLatestFloatReadings(
             LamplighterDB db, 
@@ -124,6 +129,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     }
     
     @Any("/graph/reading/gauge/float/:id/date/:rollup/:agg/:start/:end")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getFloatReadingsByDate(
             LamplighterDB db, 
@@ -147,6 +153,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     // long gauge
     
     @Any("/graph/reading/gauge/long/:id/latest/:limit")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getLatestLongReadings(
             LamplighterDB db, 
@@ -165,6 +172,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     }
     
     @Any("/graph/reading/gauge/long/:id/date/:rollup/:agg/:start/:end")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getLongReadingsByDate(
             LamplighterDB db, 
@@ -188,6 +196,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     // int gauge
     
     @Any("/graph/reading/gauge/int/:id/latest/:limit")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getLatestIntReadings(
             LamplighterDB db, 
@@ -206,6 +215,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     }
     
     @Any("/graph/reading/gauge/int/:id/date/:rollup/:agg/:start/:end")
+    @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
     public void getIntReadingsByDate(
             LamplighterDB db, 
