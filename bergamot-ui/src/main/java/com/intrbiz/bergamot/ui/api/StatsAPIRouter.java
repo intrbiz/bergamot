@@ -17,7 +17,7 @@ import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermissions;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/api/stats")
@@ -26,7 +26,7 @@ public class StatsAPIRouter extends Router<BergamotApp>
 {    
     @Any("/transitions/check/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermissions("api.read.check.transitions")
+    @RequirePermission("api.read.check.transitions")
     @WithDataAdapter(BergamotDB.class)
     public List<CheckTransitionMO> trap(
             BergamotDB db, 
