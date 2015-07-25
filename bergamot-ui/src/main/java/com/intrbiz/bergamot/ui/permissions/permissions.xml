@@ -195,6 +195,40 @@
 		<summary>Allow unsuppress traps</summary>
 		<description>A contact must be granted this permission in order to be able to unsuppress a trap</description>
 	</permission>
+	<!-- Cluster -->
+	<permission name="api.read.cluster">
+		<summary>Allow reading of clusters</summary>
+		<description>A contact must be granted this permission in order to be able to read clusters</description>
+	</permission>
+	<permission name="api.read.cluster.config">
+		<summary>Allow reading of cluster configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read cluster configuration</description>
+	</permission>
+	<permission name="api.write.cluster.suppress">
+		<summary>Allow suppress clusters</summary>
+		<description>A contact must be granted this permission in order to be able to suppress a cluster</description>
+	</permission>
+	<permission name="api.write.cluster.unsuppress">
+		<summary>Allow unsuppress clusters</summary>
+		<description>A contact must be granted this permission in order to be able to unsuppress a cluster</description>
+	</permission>
+	<!-- Resource -->
+	<permission name="api.read.resource">
+		<summary>Allow reading of resources</summary>
+		<description>A contact must be granted this permission in order to be able to read resources</description>
+	</permission>
+	<permission name="api.read.resource.config">
+		<summary>Allow reading of resource configuration</summary>
+		<description>A contact must be granted this permission in order to be able to read resource configuration</description>
+	</permission>
+	<permission name="api.write.resource.suppress">
+		<summary>Allow suppress resources</summary>
+		<description>A contact must be granted this permission in order to be able to suppress a resource</description>
+	</permission>
+	<permission name="api.write.resource.unsuppress">
+		<summary>Allow unsuppress resources</summary>
+		<description>A contact must be granted this permission in order to be able to unsuppress a resource</description>
+	</permission>
 	<!-- Agent -->
 	<permission name="api.sign.agent">
 		<summary>Allow signing of Bergamot Agent certificates</summary>

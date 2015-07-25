@@ -22,6 +22,7 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -33,6 +34,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
+    @RequirePermission("api.read.cluster")
     @WithDataAdapter(BergamotDB.class)
     public List<ClusterMO> getClusters(BergamotDB db, @Var("site") Site site)
     {
@@ -41,6 +43,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
     @WithDataAdapter(BergamotDB.class)
     public ClusterMO getCluster(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -49,6 +52,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getClusterState(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -57,6 +61,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
     @WithDataAdapter(BergamotDB.class)
     public ClusterMO getCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -65,6 +70,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getClusterState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -73,6 +79,8 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/resources")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
+    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public List<ResourceMO> getClusterResources(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -81,6 +89,8 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/resources")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
+    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public List<ResourceMO> getClusterResources(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -89,6 +99,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/references")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
     @WithDataAdapter(BergamotDB.class)
     public List<CheckMO> getClusterReferences(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -97,6 +108,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/references")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster")
     @WithDataAdapter(BergamotDB.class)
     public List<CheckMO> getClusterReferences(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -105,6 +117,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster.config")
     @WithDataAdapter(BergamotDB.class)
     public ClusterCfg getClusterConfig(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -113,6 +126,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.cluster.config")
     @WithDataAdapter(BergamotDB.class)
     public ClusterCfg getClusterConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -121,6 +135,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/suppress")
     @JSON()
+    @RequirePermission("api.write.cluster.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -132,6 +147,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/unsuppress")
     @JSON()
+    @RequirePermission("api.write.cluster.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -143,6 +159,8 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/suppress-resources")
     @JSON()
+    @RequirePermission("api.write.cluster.suppress")
+    @RequirePermission("api.write.resource.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressResourcesOnCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -159,6 +177,8 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/unsuppress-resources")
     @JSON()
+    @RequirePermission("api.write.cluster.suppress")
+    @RequirePermission("api.write.resource.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressResourcesOnCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 

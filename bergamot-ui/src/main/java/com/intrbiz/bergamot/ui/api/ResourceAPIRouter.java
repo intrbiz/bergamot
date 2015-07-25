@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -28,6 +29,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:cluster/:name")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public ResourceMO getResource(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
@@ -36,6 +38,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public ResourceMO getResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -44,6 +47,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getResourceState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -52,6 +56,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
+    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getResourceState(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
@@ -60,6 +65,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.resource.config")
     @WithDataAdapter(BergamotDB.class)
     public ResourceCfg getResourceConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
@@ -68,6 +74,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
+    @RequirePermission("api.read.resource.config")
     @WithDataAdapter(BergamotDB.class)
     public ResourceCfg getResourceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -76,6 +83,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/suppress")
     @JSON()
+    @RequirePermission("api.write.resource.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
@@ -87,6 +95,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/unsuppress")
     @JSON()
+    @RequirePermission("api.write.resource.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
