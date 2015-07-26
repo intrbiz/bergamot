@@ -53,6 +53,8 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
     private List<ResourceCfg> resources = new LinkedList<ResourceCfg>();
 
     private List<ClusterCfg> clusters = new LinkedList<ClusterCfg>();
+    
+    private List<SecurityDomainCfg> securityDomains = new LinkedList<SecurityDomainCfg>();
 
     private Map<String, TemplatedObjectCfg<?>> index = new HashMap<String, TemplatedObjectCfg<?>>();
 
@@ -232,6 +234,17 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
     {
         this.clusters = clusters;
     }
+    
+    @XmlElementRef(type = SecurityDomainCfg.class)
+    public List<SecurityDomainCfg> getSecurityDomains()
+    {
+        return securityDomains;
+    }
+
+    public void setSecurityDomains(List<SecurityDomainCfg> securityDomains)
+    {
+        this.securityDomains = securityDomains;
+    }
 
     public void mergeIn(BergamotCfg other)
     {
@@ -246,6 +259,7 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
         this.traps.addAll(other.getTraps());
         this.resources.addAll(other.getResources());
         this.clusters.addAll(other.getClusters());
+        this.securityDomains.addAll(other.getSecurityDomains());
         // merge in parameters
         this.getParameters().addAll(other.getParameters());
         // update the index
@@ -308,6 +322,10 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
         {
             this.traps.add((TrapCfg) object);
         }
+        else if (object instanceof SecurityDomainCfg)
+        {
+            this.securityDomains.add((SecurityDomainCfg) object);
+        }
         // update the index
         this.index(true);
     }
@@ -315,7 +333,7 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
     @SuppressWarnings("unchecked")
     public List<? extends TemplatedObjectCfg<?>>[] getAllObjects()
     {
-        return new List[] { this.clusters, this.commands, this.contacts, this.groups, this.hosts, this.locations, this.resources, this.services, this.teams, this.timePeriods, this.traps };
+        return new List[] { this.clusters, this.commands, this.contacts, this.groups, this.hosts, this.locations, this.resources, this.services, this.teams, this.timePeriods, this.traps, this.securityDomains };
     }
 
     public void index(boolean force)

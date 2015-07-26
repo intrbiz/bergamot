@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.config.model.CommandCfg;
@@ -15,6 +16,7 @@ import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.config.model.NotifyCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
+import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
@@ -141,6 +143,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 this.checkGroupExists(groupName, group, report);
             }
+            for (String securityDomainName : group.getSecurityDomains())
+            {
+                this.checkSecurityDomainExists(securityDomainName, group, report);
+            }
         }
     }
     
@@ -151,6 +157,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             for (String groupName : host.getGroups())
             {
                 this.checkGroupExists(groupName, host, report);
+            }
+            for (String securityDomainName : host.getSecurityDomains())
+            {
+                this.checkSecurityDomainExists(securityDomainName, host, report);
             }
             if (! Util.isEmpty(host.getLocation()))
             {
@@ -168,6 +178,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
                 {
                     this.checkGroupExists(groupName, service, report);
                 }
+                for (String securityDomainName : service.getSecurityDomains())
+                {
+                    this.checkSecurityDomainExists(securityDomainName, service, report);
+                }
                 this.validateNotify(service.getNotify(), service, report);
             }
             // traps of the host
@@ -176,6 +190,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
                 for (String groupName : trap.getGroups())
                 {
                     this.checkGroupExists(groupName, trap, report);
+                }
+                for (String securityDomainName : trap.getSecurityDomains())
+                {
+                    this.checkSecurityDomainExists(securityDomainName, trap, report);
                 }
                 this.validateNotify(trap.getNotify(), trap, report);
             }
@@ -190,12 +208,20 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 this.checkGroupExists(groupName, cluster, report);
             }
+            for (String securityDomainName : cluster.getSecurityDomains())
+            {
+                this.checkSecurityDomainExists(securityDomainName, cluster, report);
+            }
             // resources of the cluster
             for (ResourceCfg resource : cluster.getResources())
             {
                 for (String groupName : resource.getGroups())
                 {
                     this.checkGroupExists(groupName, resource, report);
+                }
+                for (String securityDomainName : resource.getSecurityDomains())
+                {
+                    this.checkSecurityDomainExists(securityDomainName, resource, report);
                 }
                 this.validateNotify(resource.getNotify(), resource, report);
             }
@@ -209,6 +235,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             for (String groupName : service.getGroups())
             {
                 this.checkGroupExists(groupName, service, report);
+            }
+            for (String securityDomainName : service.getSecurityDomains())
+            {
+                this.checkSecurityDomainExists(securityDomainName, service, report);
             }
             if (service.getTemplate() == null || service.getTemplate() == false)
             {
@@ -232,6 +262,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 this.checkGroupExists(groupName, trap, report);
             }
+            for (String securityDomainName : trap.getSecurityDomains())
+            {
+                this.checkSecurityDomainExists(securityDomainName, trap, report);
+            }
             if (trap.getTemplate() == null || trap.getTemplate() == false)
             {
                 trap.setTemplate(true);
@@ -253,6 +287,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             for (String groupName : resource.getGroups())
             {
                 this.checkGroupExists(groupName, resource, report);
+            }
+            for (String securityDomainName : resource.getSecurityDomains())
+            {
+                this.checkSecurityDomainExists(securityDomainName, resource, report);
             }
             if (resource.getTemplate() == null || resource.getTemplate() == false)
             {
@@ -286,6 +324,10 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 this.checkLocationExists(location.getLocation(), location, report);
             }
+            for (String securityDomainName : location.getSecurityDomains())
+            {
+                this.checkSecurityDomainExists(securityDomainName, location, report);
+            }
         }
     }
     
@@ -297,6 +339,11 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 this.checkTeamExists(teamName, team, report);
             }
+            // validate access controls
+            for (AccessControlCfg accessControl : team.getAccessControls())
+            {
+                this.checkSecurityDomainExists(accessControl.getSecurityDomain(), team, report);
+            }
         }
     }
     
@@ -307,6 +354,11 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             for (String teamName : contact.getTeams())
             {
                 this.checkTeamExists(teamName, contact, report);
+            }
+            // validate access controls
+            for (AccessControlCfg accessControl : contact.getAccessControls())
+            {
+                this.checkSecurityDomainExists(accessControl.getSecurityDomain(), contact, report);
             }
         }
     }
@@ -323,6 +375,15 @@ public class BergamotConfigValidator extends BergamotConfigResolver
     }
     
     // checks
+    
+    private void checkSecurityDomainExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
+    {
+        SecurityDomainCfg domain = this.lookup(SecurityDomainCfg.class, name);
+        if (domain == null)
+        {
+            report.logError("Cannot find the security domain '" + name + "' referenced by " + user);
+        }
+    }
     
     private void checkGroupExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
     {

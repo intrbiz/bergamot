@@ -21,6 +21,8 @@ public class GroupCfg extends NamedObjectCfg<GroupCfg>
     private static final long serialVersionUID = 1L;
     
     private Set<String> groups = new LinkedHashSet<String>();
+    
+    private Set<String> securityDomains = new LinkedHashSet<String>();
 
     public GroupCfg()
     {
@@ -60,6 +62,19 @@ public class GroupCfg extends NamedObjectCfg<GroupCfg>
     public boolean containsGroup(String name)
     {
         return this.groups.contains(name);
+    }
+    
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "security-domains")
+    @ResolveWith(CoalesceEmptyCollection.class)
+    public Set<String> getSecurityDomains()
+    {
+        return securityDomains;
+    }
+
+    public void setSecurityDomains(Set<String> securityDomains)
+    {
+        this.securityDomains = securityDomains;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()

@@ -15,32 +15,36 @@
         <summary>Administrators</summary>
     </team>
     
-    <team name="linux-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
+    <team name="linux-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
         <summary>Linux Administrators</summary>
+        <access-control security-domain="linux-servers" grants="ui.*, api.*, sign.agent"/>
     </team>
     
-    <team name="network-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
+    <team name="network-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
         <summary>Network Administrators</summary>
+        <access-control security-domain="networking-devices" grants="ui.*, api.*, sign.agent"/>
     </team>
     
-    <team name="web-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
+    <team name="web-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
         <summary>Web Administrators</summary>
+        <access-control security-domain="web-servers" grants="ui.*, api.*, sign.agent"/>
     </team>
     
-    <team name="db-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.*, sign.agent">
+    <team name="db-admins" teams="admins" grants="ui.access, ui.read.*, api.access, api.read.*">
         <summary>DB Administrators</summary>
+        <access-control security-domain="database-servers" grants="ui.*, api.*, sign.agent"/>
     </team>
     
     <team name="bergamot-admins" teams="admins" grants="ui.*, api.*, sign.agent, config.*">
         <summary>Bergamot Administrators</summary>
     </team>
     
-    <team name="ops" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.alert.acknowledge, api.write.downtime.remove, api.write.downtime.add, api.write.comment.remove, api.write.comment.create, api.write.alert.acknowledge">
+    <team name="ops" grants="ui.access, ui.read.*, api.access, api.read.*, api.write.downtime.add, api.write.comment.create, api.write.alert.acknowledge">
         <summary>Operators</summary>
     </team>
     
     <team name="api" grants="api.*" revokes="ui.*">
-        <summary>API Only Users</summary>
+        <summary>Complete API access only, no UI access</summary>
     </team>
     
 </bergamot>

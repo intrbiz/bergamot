@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -13,6 +14,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
+import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 
 @XmlType(name = "team")
@@ -26,6 +28,8 @@ public class TeamCfg extends NamedObjectCfg<TeamCfg>
     private Set<String> grantedPermissions = new LinkedHashSet<String>();
 
     private Set<String> revokedPermissions = new LinkedHashSet<String>();
+    
+    private List<AccessControlCfg> accessControls = new LinkedList<AccessControlCfg>();
 
     public TeamCfg()
     {
@@ -84,6 +88,18 @@ public class TeamCfg extends NamedObjectCfg<TeamCfg>
     public void setRevokedPermissions(Set<String> revokedPermissions)
     {
         this.revokedPermissions = revokedPermissions;
+    }
+    
+    @XmlElementRef(type = AccessControlCfg.class)
+    @ResolveWith(MergeList.class)
+    public List<AccessControlCfg> getAccessControls()
+    {
+        return accessControls;
+    }
+
+    public void setAccessControls(List<AccessControlCfg> accessControls)
+    {
+        this.accessControls = accessControls;
     }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
