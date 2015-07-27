@@ -159,6 +159,17 @@ public class Location extends NamedObject<LocationMO, LocationCfg> implements Co
     {
         return this.getComments(5);
     }
+    
+    /**
+     * Get the security domains this location exists within
+     */
+    public List<SecurityDomain> getSecurityDomains()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getSecurityDomainsForCheck(this.getId());
+        }
+    }
 
     @Override
     public LocationMO toMO(boolean stub)

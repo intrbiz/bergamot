@@ -30,6 +30,7 @@ import com.intrbiz.bergamot.config.model.NotificationsCfg;
 import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
+import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
@@ -54,6 +55,7 @@ import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.PassiveCheck;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Resource;
+import com.intrbiz.bergamot.model.SecurityDomain;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Status;
@@ -150,6 +152,8 @@ public class BergamotConfigImporter
                         this.loadSite(db);
                         // compute any cascading changes
                         this.computeCascade(db);
+                        // load any security domains
+                        this.loadSecurityDomains(db);
                         // templates
                         this.loadTemplates(db);
                         // load the commands
@@ -332,6 +336,62 @@ public class BergamotConfigImporter
         }
     }
     
+    private void loadSecurityDomains(BergamotDB db)
+    {
+        for (SecurityDomainCfg configuration : this.config.getSecurityDomains())
+        {
+            if (! configuration.getTemplateBooleanValue())
+            {
+                if (ObjectState.isRemove(configuration.getObjectState()))
+                {
+                    this.removeSecurityDomain(configuration, db);
+                }
+                else
+                {
+                    this.loadSecurityDomain(configuration, db);
+                }
+            }
+        }
+    }
+    
+    private void removeSecurityDomain(SecurityDomainCfg configuration, BergamotDB db)
+    {
+        this.report.info("Removing security domain: " + configuration.resolve().getName());
+        SecurityDomain securityDomain = db.getSecurityDomainByName(this.site.getId(), configuration.getName());
+        if (securityDomain != null)
+        {
+            db.removeSecurityDomain(securityDomain.getId());
+            db.removeConfig(securityDomain.getId());
+        }
+    }
+    
+    private void loadSecurityDomain(SecurityDomainCfg configuration, BergamotDB db)
+    {
+        if (this.loadedObjects.contains("security_domain:" + configuration.getName()))
+        {
+            this.report.info("Skipping reconfiguring security domain " + configuration.getName());
+            return;
+        }
+        // load
+        SecurityDomain securityDomain = db.getSecurityDomainByName(this.site.getId(), configuration.getName());
+        if(securityDomain == null)
+        {
+            configuration.setId(this.site.randomObjectId());
+            securityDomain = new SecurityDomain();
+            this.report.info("Configuring new security domain: " + configuration.resolve().getName());
+        }
+        else
+        {
+            configuration.setId(securityDomain.getId());
+            this.report.info("Reconfiguring existing security domain: " + configuration.resolve().getName() + " (" + configuration.getId() + ")");
+        }
+        // apply the new config
+        securityDomain.configure(configuration);
+        // update
+        db.setSecurityDomain(securityDomain);
+        this.loadedObjects.add("security_domain:" + configuration.getName());
+    }
+    
     private void loadCommands(BergamotDB db)
     {
         for (CommandCfg configuration : this.config.getCommands())
@@ -491,6 +551,14 @@ public class BergamotConfigImporter
         location.configure(configuration);
         db.setLocation(location);
         this.loadedObjects.add("location:" + configuration.getName());
+        // set security domain membership
+        db.removeSecurityDomainMembershipForCheck(location.getId());
+        for (String securityDomainName : configuration.resolve().getSecurityDomains())
+        {
+            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
+            if (domain != null)
+                db.addCheckToSecurityDomain(domain.getId(), location.getId());
+        }
     }
     
     private void linkLocation(LocationCfg configuration, BergamotDB db)
@@ -592,6 +660,14 @@ public class BergamotConfigImporter
         group.configure(configuration);
         db.setGroup(group);
         this.loadedObjects.add("group:" + configuration.getName());
+        // set security domain membership
+        db.removeSecurityDomainMembershipForCheck(group.getId());
+        for (String securityDomainName : configuration.resolve().getSecurityDomains())
+        {
+            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
+            if (domain != null)
+                db.addCheckToSecurityDomain(domain.getId(), group.getId());
+        }
     }
     
     private void linkGroup(GroupCfg configuration, BergamotDB db)
@@ -1231,6 +1307,14 @@ public class BergamotConfigImporter
                 check.getGroupIds().add(group.getId());
                 db.invalidateChecksInGroup(group.getId());
             }
+        }
+        // set security domain membership
+        db.removeSecurityDomainMembershipForCheck(check.getId());
+        for (String securityDomainName : resolvedConfiguration.getSecurityDomains())
+        {
+            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
+            if (domain != null)
+                db.addCheckToSecurityDomain(domain.getId(), check.getId());
         }
     }
     

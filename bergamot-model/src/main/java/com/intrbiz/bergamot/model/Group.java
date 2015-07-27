@@ -158,6 +158,17 @@ public class Group extends NamedObject<GroupMO, GroupCfg> implements Commented
     {
         return this.getComments(5);
     }
+    
+    /**
+     * Get the security domains this group exists within
+     */
+    public List<SecurityDomain> getSecurityDomains()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getSecurityDomainsForCheck(this.getId());
+        }
+    }
 
     @Override
     public GroupMO toMO(boolean stub)

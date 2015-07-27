@@ -360,6 +360,17 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     {
         this.externalRef = externalRef;
     }
+    
+    /**
+     * Get the security domains this group exists within
+     */
+    public List<SecurityDomain> getSecurityDomains()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getSecurityDomainsForCheck(this.getId());
+        }
+    }
 
     protected void toMO(CheckMO mo, boolean stub)
     {

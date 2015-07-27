@@ -36,6 +36,7 @@ import com.intrbiz.bergamot.model.message.NotificationEngineMO;
 import com.intrbiz.bergamot.model.message.NotificationsMO;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
+import com.intrbiz.bergamot.model.message.SecurityDomainMO;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
@@ -135,6 +136,7 @@ public class BergamotTranscoder
         AlertMO.class,
         CommentMO.class,
         DowntimeMO.class,
+        SecurityDomainMO.class,
         // model
         ParameterMO.class,
         // messages
