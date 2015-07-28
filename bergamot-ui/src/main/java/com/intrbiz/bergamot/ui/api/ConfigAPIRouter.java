@@ -30,7 +30,6 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.Get;
-import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Post;
@@ -127,7 +126,6 @@ public class ConfigAPIRouter extends Router<BergamotApp>
      * Apply a configuration change
      */
     @Post("/apply")
-    @JSON
     @RequirePermission("config.change.apply")
     @WithDataAdapter(BergamotDB.class)
     public void applyConfigChange(BergamotDB db, @Var("site") Site site) throws IOException
