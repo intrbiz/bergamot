@@ -149,6 +149,14 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
     {
         this.revokedPermissions = revokedPermissions;
     }
+    
+    public List<AccessControl> getAccessControls()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAccessControlsForRole(this.getId());
+        }
+    }
 
     @Override
     public TeamMO toMO(boolean stub)

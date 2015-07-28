@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.List;
+
 import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.SecurityDomainMO;
@@ -25,6 +27,14 @@ public class SecurityDomain extends NamedObject<SecurityDomainMO, SecurityDomain
     public void configure(SecurityDomainCfg configuration, SecurityDomainCfg resolvedConfiguration)
     {
         super.configure(configuration, resolvedConfiguration);
+    }
+    
+    public List<AccessControl> getAccessControls()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAccessControlsForSecurityDomain(this.getId());
+        }
     }
 
     public String toString()

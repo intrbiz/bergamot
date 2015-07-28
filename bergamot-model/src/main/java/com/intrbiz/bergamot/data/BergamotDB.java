@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.validator.BergamotConfigResolver;
 import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.model.APIToken;
+import com.intrbiz.bergamot.model.AccessControl;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
@@ -99,7 +100,8 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
             AgentRegistration.class,
             CheckSavedState.class,
             SecurityDomain.class,
-            SecurityDomainMembership.class
+            SecurityDomainMembership.class,
+            AccessControl.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -1647,6 +1649,9 @@ public abstract class BergamotDB extends DatabaseAdapter
     // security domains
     
     @Cacheable
+    @CacheInvalidate({
+        "get_security_domain_by_name.#{getSiteId(id)}.*",
+    })
     @SQLSetter(table = SecurityDomain.class, name = "set_security_domain", since = @SQLVersion({3, 8, 0}))
     public abstract void setSecurityDomain(SecurityDomain securityDomain);
     
@@ -1659,6 +1664,9 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract SecurityDomain getSecurityDomainByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
     @Cacheable
+    @CacheInvalidate({
+        "get_security_domain_by_name.#{getSiteId(id)}.*",
+    })
     @SQLRemove(table = SecurityDomain.class, name = "remove_security_domain", since = @SQLVersion({3, 8, 0}))
     public abstract void removeSecurityDomain(@SQLParam("id") UUID id);
     
@@ -1717,6 +1725,28 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         this.setSecurityDomainMembership(new SecurityDomainMembership(securityDomainId, checkId));
     }
+    
+    // access controls
+    
+    @Cacheable
+    @SQLSetter(table = AccessControl.class, name = "set_access_control", since = @SQLVersion({3, 8, 0}))
+    public abstract void setAccessControl(AccessControl accessControl);
+    
+    @Cacheable
+    @SQLGetter(table = AccessControl.class, name = "get_access_control", since = @SQLVersion({3, 8, 0}))
+    public abstract AccessControl getAccessControl(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLGetter(table = AccessControl.class, name = "get_access_controls_for_security_domain", since = @SQLVersion({3, 8, 0}))
+    public abstract List<AccessControl> getAccessControlsForSecurityDomain(@SQLParam("security_domain_id") UUID securityDomainId);
+    
+    @Cacheable
+    @SQLGetter(table = AccessControl.class, name = "get_access_controls_for_role", since = @SQLVersion({3, 8, 0}))
+    public abstract List<AccessControl> getAccessControlsForRole(@SQLParam("role_id") UUID roleId);
+    
+    @Cacheable
+    @SQLRemove(table = AccessControl.class, name = "remove_access_control", since = @SQLVersion({3, 8, 0}))
+    public abstract void removeAccessControl(@SQLParam("security_domain_id") UUID securityDomainId, @SQLParam("role_id") UUID roleId);
     
     
     // helpers
