@@ -1650,7 +1650,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({
-        "get_security_domain_by_name.#{getSiteId(id)}.*",
+        "get_security_domain_by_name.#{this.getSiteId(id)}.*",
     })
     @SQLSetter(table = SecurityDomain.class, name = "set_security_domain", since = @SQLVersion({3, 8, 0}))
     public abstract void setSecurityDomain(SecurityDomain securityDomain);
@@ -1665,7 +1665,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({
-        "get_security_domain_by_name.#{getSiteId(id)}.*",
+        "get_security_domain_by_name.#{this.getSiteId(id)}.*",
     })
     @SQLRemove(table = SecurityDomain.class, name = "remove_security_domain", since = @SQLVersion({3, 8, 0}))
     public abstract void removeSecurityDomain(@SQLParam("id") UUID id);
@@ -1676,7 +1676,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_security_domain_members.#{security_domain_id}",
         "get_security_domains_for_check.#{check_id}"
     })
-    @SQLSetter(table = SecurityDomainMembership.class, name = "set_security_domain_membership", since = @SQLVersion({3, 8, 0}))
+    @SQLSetter(table = SecurityDomainMembership.class, name = "set_security_domain_membership", since = @SQLVersion({3, 8, 0}), upsert = false)
     public abstract void setSecurityDomainMembership(SecurityDomainMembership membership);
     
     @Cacheable
@@ -1734,7 +1734,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @SQLGetter(table = AccessControl.class, name = "get_access_control", since = @SQLVersion({3, 8, 0}))
-    public abstract AccessControl getAccessControl(@SQLParam("id") UUID id);
+    public abstract AccessControl getAccessControl(@SQLParam("security_domain_id") UUID securityDomainId, @SQLParam("role_id") UUID roleId);
     
     @Cacheable
     @SQLGetter(table = AccessControl.class, name = "get_access_controls_for_security_domain", since = @SQLVersion({3, 8, 0}))
