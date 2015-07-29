@@ -10,9 +10,11 @@
     	<table>
     		<tr>
     			<th>Summary</th>
-    			<th>Created</th>
+    			<th>Created By</th>
+    			<th>Created On</th>
     			<th>Pending</th>
-    			<th>Applied</th>
+    			<th>Applied By</th>
+    			<th>Applied On</th>
     			<th></th>
     			<th></th>
     			<th></th>
@@ -21,8 +23,10 @@
     		<data-set var="change" value="#{changes}">
     			<tr>
     				<td>#{change.summary}</td>
+    				<td>#{coalesce(change.createdBy.summary, 'Unknown')}</td>
     				<td>#{dateformat('EEEE dd/MM/yyyy', change.created) + ' at ' + dateformat('HH:mm:ss', change.created)}</td>
     				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
+    				<td>#{if(change.appliedAt != null, coalesce(change.appliedBy.summary, 'Unknown'), '')}</td>
     				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt)  + ' at ' + dateformat('HH:mm:ss', change.appliedAt), '')}</td>
     				<td>
     					<a href="/admin/configchange/view/id/#{change.id}">View Change</a>

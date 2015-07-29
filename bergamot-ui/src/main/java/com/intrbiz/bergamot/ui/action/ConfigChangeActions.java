@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.ConfigChange;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Action;
@@ -24,7 +25,7 @@ public class ConfigChangeActions
     private Logger logger = Logger.getLogger(ConfigChangeActions.class);
 
     @Action("apply-config-change")
-    public BergamotImportReport applyConfigChange(UUID siteId, UUID changeId, String resetUrl)
+    public BergamotImportReport applyConfigChange(UUID siteId, UUID changeId, String resetUrl, Contact user)
     {
         logger.info("Applying configuration change: " + siteId + "::" + changeId);
         try (BergamotDB db = BergamotDB.connect())
@@ -45,6 +46,7 @@ public class ConfigChangeActions
             {
                 change.setApplied(true);
                 change.setAppliedAt(new Timestamp(System.currentTimeMillis()));
+                change.setAppliedById(user == null ? null : user.getId());
                 db.setConfigChange(change);
             }
             // return the report

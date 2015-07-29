@@ -48,17 +48,26 @@ public class ConfigChange implements Serializable
 
     @SQLColumn(index = 8, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     protected Configuration configuration;
+    
+    @SQLColumn(index = 9, name = "created_by_id", since = @SQLVersion({ 3, 10, 0 }))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 10, 0 }))
+    protected UUID createdById;
+    
+    @SQLColumn(index = 10, name = "applied_by_id", since = @SQLVersion({ 3, 10, 0 }))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 10, 0 }))
+    protected UUID appliedById;
 
     public ConfigChange()
     {
         super();
     }
 
-    public ConfigChange(UUID siteId, BergamotCfg configuration)
+    public ConfigChange(UUID siteId, Contact createdBy, BergamotCfg configuration)
     {
         super();
         this.siteId = siteId;
         this.id = Site.randomId(siteId);
+        this.createdById = createdBy == null ? null : createdBy.getId();
         if (configuration != null)
         {
             this.summary = configuration.getSummary();
@@ -148,5 +157,49 @@ public class ConfigChange implements Serializable
     public void setAppliedAt(Timestamp appliedAt)
     {
         this.appliedAt = appliedAt;
+    }
+
+    public UUID getCreatedById()
+    {
+        return createdById;
+    }
+
+    public void setCreatedById(UUID createdById)
+    {
+        this.createdById = createdById;
+    }
+
+    public UUID getAppliedById()
+    {
+        return appliedById;
+    }
+
+    public void setAppliedById(UUID appliedById)
+    {
+        this.appliedById = appliedById;
+    }
+    
+    public Contact getCreatedBy()
+    {
+        if (this.createdById != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                return db.getContact(this.createdById);
+            }
+        }
+        return null;
+    }
+    
+    public Contact getAppliedBy()
+    {
+        if (this.appliedById != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                return db.getContact(this.appliedById);
+            }
+        }
+        return null;
     }
 }

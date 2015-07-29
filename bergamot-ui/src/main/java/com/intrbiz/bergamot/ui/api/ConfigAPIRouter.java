@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.ui.api;
 import static com.intrbiz.balsa.BalsaContext.*;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -24,6 +23,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -132,22 +132,18 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     {
         try
         {
+            Contact user = this.currentPrincipal();
             // read the change
             XMLStreamReader reader = this.request().getXMLReader();
             JAXBContext ctx = JAXBContext.newInstance(BergamotCfg.class);
             Unmarshaller unm = ctx.createUnmarshaller();
             BergamotCfg cfg = (BergamotCfg) unm.unmarshal(reader);
             // create the config change
-            ConfigChange change = new ConfigChange();
-            change.setCreated(new Timestamp(System.currentTimeMillis()));
+            ConfigChange change = new ConfigChange(site.getId(), user, cfg);
             change.setSummary("Change via API: " + cfg.getSummary());
-            change.setDescription(cfg.getDescription());
-            change.setSiteId(site.getId());
-            change.setId(site.randomObjectId());
-            change.setConfiguration(cfg);
             db.setConfigChange(change);
             // apply the change
-            BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), Balsa().url(Balsa().path("/reset")));
+            BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), Balsa().url(Balsa().path("/reset")), user);
             // write out the report
             JsonGenerator json = response().ok().json().getJsonWriter();
             json.writeStartObject();

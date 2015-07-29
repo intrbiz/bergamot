@@ -25,6 +25,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.ConfigChange;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -66,7 +67,8 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
             @Param("description") String description
     ) throws IOException
     {
-        ConfigChange change = new ConfigChange(site.getId(), new BergamotCfg(site.getName(), summary, description));
+        Contact user = currentPrincipal();
+        ConfigChange change = new ConfigChange(site.getId(), user, new BergamotCfg(site.getName(), summary, description));
         db.setConfigChange(change);
         redirect(path("/admin/configchange/edit/id/" + change.getId()));
     }
@@ -113,7 +115,8 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         TemplatedObjectCfg<?> cfg = (TemplatedObjectCfg<?>) db.getConfig(id).getConfiguration();
         // update the change
         UUID currentChangeId = sessionVar("current_change");
-        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), new BergamotCfg(site.getName(), "Edit " + type, null)) : db.getConfigChange(currentChangeId);
+        Contact user = currentPrincipal();
+        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), user, new BergamotCfg(site.getName(), "Edit " + type, null)) : db.getConfigChange(currentChangeId);
         // remove the object id
         ((NamedObjectCfg<?>) cfg).setId(null);
         // add the object
@@ -132,7 +135,8 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         site = db.getSite(site.getId());
         // update the change
         UUID currentChangeId = sessionVar("current_change");
-        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), new BergamotCfg(site.getName(), "Edit site parameters", null)) : db.getConfigChange(currentChangeId);
+        Contact user = currentPrincipal();
+        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), user, new BergamotCfg(site.getName(), "Edit site parameters", null)) : db.getConfigChange(currentChangeId);
         // copy the site parameters into the config change
         BergamotCfg cfg = ((BergamotCfg) change.getConfiguration());
         for (Parameter param : site.getParameters())
@@ -152,7 +156,8 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         TemplatedObjectCfg<?> cfg = (TemplatedObjectCfg<?>) db.getConfig(id).getConfiguration();
         // update the change
         UUID currentChangeId = sessionVar("current_change");
-        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), new BergamotCfg(site.getName(), "Edit " + type, null)) : db.getConfigChange(currentChangeId);
+        Contact user = currentPrincipal();
+        ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), user, new BergamotCfg(site.getName(), "Edit " + type, null)) : db.getConfigChange(currentChangeId);
         // remove the object id
         ((NamedObjectCfg<?>) cfg).setId(null);
         // set removed
@@ -202,6 +207,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void apply(BergamotDB db, @SessionVar("site") Site site, @IsaObjectId UUID id)
     {
+        Contact user = currentPrincipal();
         // nullify any current change
         sessionVar("current_change", null);
         // get the change
@@ -209,7 +215,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         // compute the reset url we need for registrations
         final String resetUrl = Balsa().url(Balsa().path("/reset"));
         // apply the change
-        String taskId = deferredActionWithId(id.toString(), "apply-config-change", site.getId(), id, resetUrl);
+        String taskId = deferredActionWithId(id.toString(), "apply-config-change", site.getId(), id, resetUrl, user);
         //
         var("change", change);
         var("taskid", taskId);
