@@ -21,6 +21,8 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
 {
     private final Logger logger = Logger.getLogger(HTTPClientHandler.class);
     
+    private final String url;
+    
     private volatile long start;
     
     private final FullHttpRequest request;
@@ -37,9 +39,10 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
     
     private volatile boolean timedOut = false;
     
-    public HTTPClientHandler(Timer timer, SSLEngine sslEngine, FullHttpRequest request, Consumer<HTTPCheckResponse> responseHandler, Consumer<Throwable> errorHandler)
+    public HTTPClientHandler(String url, Timer timer, SSLEngine sslEngine, FullHttpRequest request, Consumer<HTTPCheckResponse> responseHandler, Consumer<Throwable> errorHandler)
     {
         super();
+        this.url = url;
         this.sslEngine = sslEngine;
         this.request = request;
         this.responseHandler = responseHandler;
@@ -73,7 +76,7 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
             }
             // invoke the callback
             if (this.responseHandler != null)
-                this.responseHandler.accept(new HTTPCheckResponse(runtime, response, tlsInfo));
+                this.responseHandler.accept(new HTTPCheckResponse(this.url, runtime, response, tlsInfo));
         }
         // close
         if (ctx.channel().isActive()) ctx.close();

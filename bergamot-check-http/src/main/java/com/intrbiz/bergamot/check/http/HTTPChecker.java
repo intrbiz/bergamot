@@ -207,6 +207,8 @@ public class HTTPChecker
             final Consumer<Throwable> errorHandler
     )
     {
+        // build the url
+        String url = (ssl ? "https" : "http") + "://" + host + (port > 0 ? ":" + port : "") + "" + request.getUri();
         // configure the client
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
@@ -226,7 +228,7 @@ public class HTTPChecker
                         new HttpClientCodec(),
                         new HttpContentDecompressor(),
                         new HttpObjectAggregator(1 * 1024 * 1024 /* 1 MiB */),
-                        new HTTPClientHandler(HTTPChecker.this.timer, sslEngine, request, responseHandler, errorHandler)
+                        new HTTPClientHandler(url, HTTPChecker.this.timer, sslEngine, request, responseHandler, errorHandler)
                 );
             }
         });

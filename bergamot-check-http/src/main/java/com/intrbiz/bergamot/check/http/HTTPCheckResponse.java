@@ -1,23 +1,34 @@
 package com.intrbiz.bergamot.check.http;
 
-import io.netty.handler.codec.http.FullHttpResponse;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.crypto.util.TLSInfo;
 
+import io.netty.handler.codec.http.FullHttpResponse;
+
 public class HTTPCheckResponse
 {
+    private final String url;
+    
     private final long runtime;
     
     private final FullHttpResponse response;
     
     private final TLSInfo tlsInfo;
     
-    public HTTPCheckResponse(long runtime, FullHttpResponse response, TLSInfo tlsInfo)
+    public HTTPCheckResponse(String url, long runtime, FullHttpResponse response, TLSInfo tlsInfo)
     {
+        this.url = url;
         this.runtime = runtime;
         this.response = response;
         this.tlsInfo = tlsInfo;
+    }
+    
+    public String getUrl()
+    {
+        return this.url;
     }
 
     public long getRuntime()
@@ -58,6 +69,15 @@ public class HTTPCheckResponse
     public TLSInfo tlsInfo()
     {
         return tlsInfo;
+    }
+    
+    /**
+     * Assuming the response is a HTML document, parse it using jsoup
+     * @return a jsoup Document
+     */
+    public Document parseHTML()
+    {
+        return Jsoup.parse(this.content(), this.url);
     }
 
     public String toString()

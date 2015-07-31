@@ -128,6 +128,46 @@ public class TestHTTPEngine
         System.out.println("Got result: " + resultMO);
     }
     
+    @Test
+    public void testJsoupHTTPCheck() throws Exception
+    {
+        // the check to execute
+        ExecuteCheck check = new ExecuteCheck();
+        check.setEngine("http");
+        check.setExecutor("script");
+        check.setName("check_http_script");
+        check.setCheckType("service");
+        check.setCheckId(UUID.randomUUID());
+        check.setProcessingPool(1);
+        check.setScheduled(System.currentTimeMillis());
+        // parameters
+        check.setScript(
+                "http.get('http://intrbiz.com/').execute("
+                + " function(r) {"
+                + "   if (r.status() == 200) { "
+                + "     var doc = r.parseHTML();"
+                + "     var title = doc.select('title').text();"
+                + "     if (title.contains('Intrbiz')) {"
+                + "       bergamot.ok('Page all ok, title: ' + title);"
+                + "     } else {"
+                + "       bergamot.action('Wasn\\'t expecting: ' + title);"
+                + "     }"
+                + "   } else {"
+                + "     bergamot.error('Request returned: ' + r.status());"
+                + "   }"
+                + " }, "
+                + " function(e) { "
+                + "   bergamot.error(e); "
+                + " }"
+                + ");"
+        );
+        // execute
+        ResultMO resultMO = this.engine.test(check);
+        assertThat(resultMO, is(notNullValue()));
+        assertThat(resultMO.getStatus(), is(equalTo("OK")));
+        System.out.println("Got result: " + resultMO);
+    }
+    
     private class HTTPEngineTester extends HTTPEngine
     {
         private BiConsumer<ResultKey, ResultMO> onResult;
