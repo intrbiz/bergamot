@@ -18,7 +18,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "group", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
-public class Group extends NamedObject<GroupMO, GroupCfg> implements Commented
+public class Group extends NamedObject<GroupMO, GroupCfg> implements Commented, Secured
 {
     private static final long serialVersionUID = 1L;
     
@@ -162,6 +162,7 @@ public class Group extends NamedObject<GroupMO, GroupCfg> implements Commented
     /**
      * Get the security domains this group exists within
      */
+    @Override
     public List<SecurityDomain> getSecurityDomains()
     {
         try (BergamotDB db = BergamotDB.connect())

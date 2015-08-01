@@ -19,7 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * An something which should be checked
  */
-public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends NamedObject<T, C> implements Commented
+public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends NamedObject<T, C> implements Commented, Secured
 {
     private static final long serialVersionUID = 1L;
     
@@ -364,6 +364,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     /**
      * Get the security domains this group exists within
      */
+    @Override
     public List<SecurityDomain> getSecurityDomains()
     {
         try (BergamotDB db = BergamotDB.connect())
