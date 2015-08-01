@@ -157,6 +157,14 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
             return db.getAccessControlsForRole(this.getId());
         }
     }
+    
+    public AccessControl getAccessControl(SecurityDomain domain)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAccessControl(domain.getId(), this.getId());
+        }
+    }
 
     @Override
     public TeamMO toMO(boolean stub)

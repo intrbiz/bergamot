@@ -325,6 +325,14 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
             return db.getAccessControlsForRole(this.getId());
         }
     }
+    
+    public AccessControl getAccessControl(SecurityDomain domain)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAccessControl(domain.getId(), this.getId());
+        }
+    }
 
     public String toString()
     {
