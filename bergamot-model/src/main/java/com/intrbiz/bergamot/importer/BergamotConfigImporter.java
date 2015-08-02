@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.CheckCfg;
@@ -40,6 +41,7 @@ import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.config.model.VirtualCheckCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.AccessControl;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
@@ -864,6 +866,8 @@ public class BergamotConfigImporter
             this.report.info("Reconfiguring existing team: " + configuration.resolve().getName() + " (" + configuration.getId() + ")");
         }
         team.configure(configuration);
+        // access controls
+        this.loadAccessControls(team.getId(), configuration.resolve().getAccessControls(), db);
         db.setTeam(team);
         this.loadedObjects.add("team:" + configuration.getName());
     }
@@ -971,6 +975,8 @@ public class BergamotConfigImporter
         contact.configure(configuration);
         // notifications
         this.loadNotifications(contact.getId(), resolvedConfiguration.getNotifications(), db);
+        // access controls
+        this.loadAccessControls(contact.getId(), resolvedConfiguration.getAccessControls(), db);
         // store
         db.setContact(contact);
         this.loadedObjects.add("contact:" + configuration.getName());
@@ -982,6 +988,18 @@ public class BergamotConfigImporter
             {
                 this.report.info("Adding contact " + contact.getName() + " to team " + team.getName());
                 team.addContact(contact);
+            }
+        }
+    }
+    
+    private void loadAccessControls(UUID roleId, List<AccessControlCfg> acl, BergamotDB db)
+    {
+        for (AccessControlCfg cfg : acl)
+        {
+            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), cfg.getSecurityDomain());
+            if (domain != null)
+            {
+                db.setAccessControl(new AccessControl(domain.getId(), roleId, new LinkedList<String>(cfg.getGrantedPermissions()), new LinkedList<String>(cfg.getRevokedPermissions())));
             }
         }
     }
