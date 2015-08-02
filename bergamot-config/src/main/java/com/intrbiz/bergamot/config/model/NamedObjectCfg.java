@@ -97,10 +97,4 @@ public abstract class NamedObjectCfg<P extends NamedObjectCfg<P>> extends Templa
     {
         return super.getParameters();
     }
-
-    @Override
-    public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
-    {
-        return null;
-    }
 }
