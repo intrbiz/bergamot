@@ -236,7 +236,7 @@ public class Team extends NamedObject<TeamMO, TeamCfg>
     public boolean hasPermission(Permission permission, Secured overObject)
     {
         Boolean allowed = this.checkPermission(permission);
-        if (allowed) return allowed.booleanValue();
+        if (allowed != null) return allowed.booleanValue();
         for (SecurityDomain domain : overObject.getSecurityDomains())
         {
             allowed = this.checkPermission(permission, domain);

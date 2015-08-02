@@ -420,7 +420,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     public boolean hasPermission(Permission permission, Secured overObject)
     {
         Boolean allowed = this.checkPermission(permission);
-        if (allowed) return allowed.booleanValue();
+        if (allowed != null) return allowed.booleanValue();
         for (SecurityDomain domain : overObject.getSecurityDomains())
         {
             allowed = this.checkPermission(permission, domain);
