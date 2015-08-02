@@ -3,9 +3,13 @@ package com.intrbiz.bergamot.model;
 import java.io.Serializable;
 import java.security.Principal;
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -395,12 +399,22 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         return allowed == null ? false : allowed.booleanValue();
     }
     
+    public boolean hasPermission(String permission)
+    {
+        return this.hasPermission(Permission.of(permission));
+    }
+    
     public boolean hasPermission(Permission permission, SecurityDomain domain)
     {
         Boolean allowed = this.checkPermission(permission);
         if (allowed != null) return allowed.booleanValue();
         allowed = this.checkPermission(permission, domain);
         return allowed == null ? false : allowed.booleanValue();
+    }
+    
+    public boolean hasPermission(String permission, SecurityDomain domain)
+    {
+        return this.hasPermission(Permission.of(permission), domain);
     }
     
     public boolean hasPermission(Permission permission, Secured overObject)
@@ -413,6 +427,73 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
             if (allowed != null) return allowed.booleanValue();
         }
         return false;
+    }
+    
+    public boolean hasPermission(String permission, Secured overObject)
+    {
+        return this.hasPermission(Permission.of(permission), overObject);
+    }
+    
+    public <T extends Secured> List<T> hasPermission(Permission permission, Collection<T> overObjects)
+    {
+        List<T> filtered = new LinkedList<T>();
+        for (T overObject : overObjects)
+        {
+            if (this.hasPermission(permission, overObject))
+            {
+                filtered.add(overObject);
+            }
+        }
+        return filtered;
+    }
+    
+    public <T extends Secured> Set<T> hasPermission(Permission permission, Set<T> overObjects)
+    {
+        Set<T> filtered = new HashSet<T>();
+        for (T overObject : overObjects)
+        {
+            if (this.hasPermission(permission, overObject))
+            {
+                filtered.add(overObject);
+            }
+        }
+        return filtered;
+    }
+    
+    public <T extends Secured> List<T> hasPermission(String permission, Collection<T> overObjects)
+    {
+        return this.hasPermission(Permission.of(permission), overObjects);
+    }
+    
+    public <T extends Secured> Set<T> hasPermission(String permission, Set<T> overObjects)
+    {
+        return this.hasPermission(Permission.of(permission), overObjects);
+    }
+    
+    public <T extends Secured> List<T> hasPermission(Function<T,Permission> permission, Collection<T> overObjects)
+    {
+        List<T> filtered = new LinkedList<T>();
+        for (T overObject : overObjects)
+        {
+            if (this.hasPermission(permission.apply(overObject), overObject))
+            {
+                filtered.add(overObject);
+            }
+        }
+        return filtered;
+    }
+    
+    public <T extends Secured> Set<T> hasPermission(Function<T, Permission> permission, Set<T> overObjects)
+    {
+        Set<T> filtered = new HashSet<T>();
+        for (T overObject : overObjects)
+        {
+            if (this.hasPermission(permission.apply(overObject), overObject))
+            {
+                filtered.add(overObject);
+            }
+        }
+        return filtered;
     }
 
     public String toString()
