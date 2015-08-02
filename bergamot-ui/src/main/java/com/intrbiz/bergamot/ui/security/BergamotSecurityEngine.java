@@ -15,8 +15,9 @@ import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Permission;
+import com.intrbiz.bergamot.model.Secured;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.data.DataException;
@@ -193,72 +194,23 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     @Override
     public boolean check(Principal principal, String permission)
     {
-        if (principal instanceof Contact) 
-            return this.check((Contact) principal, permission);
-        return false;
-    }
-    
-    protected boolean check(Contact contact, String permission)
-    {
-        for (String granted : contact.getGrantedPermissions())
+        if (principal instanceof Contact)
         {
-            if (this.matchPermission(granted, permission))
-                return true;
-        }
-        for (String revoked : contact.getRevokedPermissions())
-        {
-            if (this.matchPermission(revoked, permission)) 
-                return false;
-        }
-        // go up the chain
-        for (Team team : contact.getTeams())
-        {
-            Boolean result = check(team, permission);
-            if (result != null) return result;
+            return ((Contact) principal).hasPermission(Permission.of(permission));
         }
         return false;
     }
     
     /**
-     * Tri-stated recursive checking of inherited permissions
+     * Check that the given principal has permissions to the given security domain
      */
-    protected Boolean check(Team team, String permission)
+    @Override
+    public boolean check(Principal principal, String permission, Object object)
     {
-        for (String granted : team.getGrantedPermissions())
+        if (principal instanceof Contact && object instanceof Secured)
         {
-            if (this.matchPermission(granted, permission))
-                return true;
-        }
-        for (String revoked : team.getRevokedPermissions())
-        {
-            if (this.matchPermission(revoked, permission)) 
-                return false;
-        }
-        // go up the chain
-        for (Team parent : team.getTeams())
-        {
-            Boolean result = check(parent, permission);
-            if (result != null) return result;
-        }
-        return null;
-    }
-    
-    /**
-     * Match a granted or revoked permission against the requested permission
-     * @param granted the permission pattern which has been granted of revoked
-     * @param permission the permissions that is being checked for
-     * @return true if they match
-     */
-    protected boolean matchPermission(String granted, String permission)
-    {
-        if (granted.equals(permission))
-        {
-            return true;
-        }
-        else if (granted.endsWith("*") && permission.startsWith(granted.substring(0, granted.length() - 1)))
-        {
-            return true;
+            return ((Contact) principal).hasPermission(Permission.of(permission), (Secured) object);
         }
         return false;
-    }
+    }    
 }

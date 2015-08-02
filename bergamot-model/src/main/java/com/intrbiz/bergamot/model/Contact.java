@@ -333,6 +333,87 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
             return db.getAccessControl(domain.getId(), this.getId());
         }
     }
+    
+    // permissions handling
+    
+    /**
+     * Does this contact have the given permission or does it 
+     * inherit the permission from teams the contact is in
+     * @param permission the permission to check for
+     * @return true if this contact has the given permission
+     */
+    public Boolean checkPermission(Permission permission)
+    {
+        for (String granted : this.getGrantedPermissions())
+        {
+            if (permission.match(Permission.of(granted)))
+                return true;
+        }
+        for (String revoked : this.getRevokedPermissions())
+        {
+            if (permission.match(Permission.of(revoked)))
+                return false;
+        }
+        // go up the chain
+        for (Team team : this.getTeams())
+        {
+            Boolean result = team.checkPermission(permission);
+            if (result != null) return result;
+        }
+        return null;
+    }
+    
+    public Boolean checkPermission(Permission permission, SecurityDomain domain)
+    {
+        // get the access controls for the given contact over the given domain
+        AccessControl access = this.getAccessControl(domain);
+        if (access != null)
+        {
+            for (String granted : access.getGrantedPermissions())
+            {
+                if (permission.match(Permission.of(granted)))
+                    return true;
+            }
+            for (String revoked : access.getRevokedPermissions())
+            {
+                if (permission.match(Permission.of(revoked))) 
+                    return false;
+            }
+        }
+        // go up the chain
+        for (Team team : this.getTeams())
+        {
+            Boolean result = team.checkPermission(permission, domain);
+            if (result != null) return result;
+        }
+        return null;
+    }
+    
+    public boolean hasPermission(Permission permission)
+    {
+        Boolean allowed = this.checkPermission(permission);
+        return allowed == null ? false : allowed.booleanValue();
+    }
+    
+    public boolean hasPermission(Permission permission, SecurityDomain domain)
+    {
+        Boolean allowed = this.checkPermission(permission);
+        if (allowed != null) return allowed.booleanValue();
+        allowed = this.checkPermission(permission, domain);
+        return allowed == null ? false : allowed.booleanValue();
+    }
+    
+    public boolean hasPermission(Permission permission, Secured overObject)
+    {
+        Boolean allowed = this.checkPermission(permission);
+        if (allowed) return allowed.booleanValue();
+        for (SecurityDomain domain : overObject.getSecurityDomains())
+        {
+            allowed = this.checkPermission(permission, domain);
+            if (allowed != null) return allowed.booleanValue();
+        }
+        return false;
+    }
 
     public String toString()
     {
