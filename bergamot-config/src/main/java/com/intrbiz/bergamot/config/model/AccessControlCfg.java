@@ -4,8 +4,14 @@ import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.intrbiz.bergamot.config.adapter.CSVAdapter;
+import com.intrbiz.bergamot.config.resolver.ResolveWith;
+import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 
 @XmlType(name = "access-control")
 @XmlRootElement(name = "access-control")
@@ -24,6 +30,7 @@ public class AccessControlCfg implements Serializable
         super();
     }
 
+    @XmlAttribute(name = "security-domain")
     public String getSecurityDomain()
     {
         return securityDomain;
@@ -34,6 +41,9 @@ public class AccessControlCfg implements Serializable
         this.securityDomain = securityDomain;
     }
 
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "grants")
+    @ResolveWith(MergeSet.class)
     public Set<String> getGrantedPermissions()
     {
         return grantedPermissions;
@@ -44,6 +54,9 @@ public class AccessControlCfg implements Serializable
         this.grantedPermissions = grantedPermissions;
     }
 
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "revokes")
+    @ResolveWith(MergeSet.class)
     public Set<String> getRevokedPermissions()
     {
         return revokedPermissions;
