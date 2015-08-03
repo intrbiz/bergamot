@@ -11,10 +11,13 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Group;
+import com.intrbiz.bergamot.model.Permission;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -33,41 +36,43 @@ public class GroupsRouter extends Router<BergamotApp>
     
     @Any("/group/")
     @WithDataAdapter(BergamotDB.class)
-    public void showGroups(BergamotDB db, @SessionVar("site") Site site)
+    public void showGroups(BergamotDB db, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
-        model("groups", orderGroupsByStatus(db.getRootGroups(site.getId())));
+        model("groups", orderGroupsByStatus(user.hasPermission("ui.read.group", db.getRootGroups(site.getId()))));
         encode("group/index");
     }
     
     @Any("/group/name/:name")
     @WithDataAdapter(BergamotDB.class)
-    public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site)
+    public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
-        Group group = model("group", db.getGroupByName(site.getId(), name));
-        model("checks", orderCheckByStatus(group.getChecks()));
-        model("groups", orderGroupsByStatus(group.getChildren()));
+        Group group = model("group", notNull(db.getGroupByName(site.getId(), name)));
+        require(permission("ui.read.group", group));
+        model("checks", orderCheckByStatus(user.hasPermission((c) -> Permission.of("ui.read." + c.getType()), group.getChecks())));
+        model("groups", orderGroupsByStatus(user.hasPermission("ui.read.group", group.getChildren())));
         encode("group/group");
     }
     
     @Any("/group/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void showHostGroupByName(BergamotDB db, @IsaObjectId UUID id)
+    public void showHostGroupByName(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user)
     {
-        Group group = model("group", db.getGroup(id));
-        model("checks", orderCheckByStatus(group.getChecks()));
-        model("groups", orderGroupsByStatus(group.getChildren()));
+        Group group = model("group", notNull(db.getGroup(id)));
+        require(permission("ui.read.group", group));
+        model("checks", orderCheckByStatus(user.hasPermission((c) -> Permission.of("ui.read." + c.getType()), group.getChecks())));
+        model("groups", orderGroupsByStatus(user.hasPermission("ui.read.group", group.getChildren())));
         encode("group/group");
     }
     
     @Any("/group/execute-all-checks/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void executeChecksInGroup(BergamotDB db, @IsaObjectId UUID id) throws IOException
+    public void executeChecksInGroup(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user) throws IOException
     {
         for (Check<?,?> check : db.getChecksInGroup(id))
         {
             if (check instanceof ActiveCheck)
             {
-                action("execute-check", check);
+                if (user.hasPermission("ui.write." + check.getType() + ".execute", check)) action("execute-check", check);
             }
         }
         redirect("/group/id/" + id);

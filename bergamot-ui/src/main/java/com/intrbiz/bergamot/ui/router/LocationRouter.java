@@ -9,11 +9,13 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -32,39 +34,41 @@ public class LocationRouter extends Router<BergamotApp>
     
     @Any("/location/")
     @WithDataAdapter(BergamotDB.class)
-    public void showLocations(BergamotDB db, @SessionVar("site") Site site)
+    public void showLocations(BergamotDB db, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
-        model("locations", orderLocationsByStatus(db.getRootLocations(site.getId())));
+        model("locations", orderLocationsByStatus(user.hasPermission("ui.read.location", db.getRootLocations(site.getId()))));
         encode("location/index");
     }
     
     @Any("/location/name/:name")
     @WithDataAdapter(BergamotDB.class)
-    public void showLocationByName(BergamotDB db, String name, @SessionVar("site") Site site)
+    public void showLocationByName(BergamotDB db, String name, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
-        Location location = model("location", db.getLocationByName(site.getId(), name));
-        model("hosts", orderHostsByStatus(location.getHosts()));
-        model("locations", orderLocationsByStatus(location.getChildren()));
+        Location location = model("location", notNull(db.getLocationByName(site.getId(), name)));
+        require(permission("ui.read.location", location));
+        model("hosts", orderHostsByStatus(user.hasPermission("ui.read.host", location.getHosts())));
+        model("locations", orderLocationsByStatus(user.hasPermission("ui.read.location", location.getChildren())));
         encode("location/location");
     }
     
     @Any("/location/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void showLocationById(BergamotDB db, @IsaObjectId UUID id)
+    public void showLocationById(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user)
     {
-        Location location = model("location", db.getLocation(id));
-        model("hosts", orderHostsByStatus(location.getHosts()));
-        model("locations", orderLocationsByStatus(location.getChildren()));
+        Location location = model("location", notNull(db.getLocation(id)));
+        require(permission("ui.read.location", location));
+        model("hosts", orderHostsByStatus(user.hasPermission("ui.read.host", location.getHosts())));
+        model("locations", orderLocationsByStatus(user.hasPermission("ui.read.location", location.getChildren())));
         encode("location/location");
     }
     
     @Any("/location/id/:id/execute-all-hosts")
     @WithDataAdapter(BergamotDB.class)
-    public void executeHostsInLocation(BergamotDB db, @IsaObjectId UUID id) throws IOException
+    public void executeHostsInLocation(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user) throws IOException
     { 
         for (Host host : db.getHostsInLocation(id))
         {
-            action("execute-check", host);
+            if (user.hasPermission("ui.write.host.execute", host)) action("execute-check", host);
         }
         redirect("/location/id/" + id);
     }
