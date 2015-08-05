@@ -72,7 +72,7 @@ import com.intrbiz.data.db.compiler.util.SQLScript;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 11, 0}),
+        version = @SQLVersion({3, 13, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -947,7 +947,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "WHERE coalesce(cpfd.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n"
         )
     )
-    public abstract GroupState computeGroupState(@SQLParam(value = "group_id", virtual = true) UUID groupId, @SQLParam(value = "contact_id", virtual = true) UUID contactId);
+    public abstract GroupState computeGroupStateForContact(@SQLParam(value = "group_id", virtual = true) UUID groupId, @SQLParam(value = "contact_id", virtual = true) UUID contactId);
     
     /**
      * Compute the state of the given group, this will recursively follow 
@@ -987,6 +987,55 @@ public abstract class BergamotDB extends DatabaseAdapter
                               "JOIN location_graph lg ON (h.location_id = lg.id)")
     )
     public abstract GroupState computeLocationState(@SQLParam(value = "location_id", virtual = true) UUID locationId);
+    
+    /**
+     * Compute the state of the given location taking into account the permissions 
+     * granted to the given contact, this will recursively follow the location 
+     * hierarchy an compute the state of all the checks within the location
+     * @param groupId
+     * @return
+     */
+    @SQLGetter(table = GroupState.class, name = "compute_location_state_for_contact", since = @SQLVersion({3, 13, 0}),
+        query = @SQLQuery(
+            "WITH RECURSIVE location_graph(id) AS (\n" +
+            "    SELECT l1.id\n" +
+            "    FROM bergamot.location l1\n" +
+            "    LEFT JOIN bergamot.security_domain_membership sdm1 ON (sdm1.check_id = l1.id) \n" +
+            "    LEFT JOIN bergamot.computed_permissions_for_domain cpfd1 ON (cpfd1.security_domain_id = sdm1.security_domain_id AND cpfd1.contact_id = p_contact_id AND cpfd1.permission = 'read') \n" +
+            "    WHERE l1.id = p_location_id AND (coalesce(cpfd1.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
+            "  UNION\n" +
+            "    SELECT l2.id\n" +
+            "    FROM bergamot.location l2\n" +
+            "    LEFT JOIN bergamot.security_domain_membership sdm2 ON (sdm2.check_id = l2.id) \n" +
+            "    LEFT JOIN bergamot.computed_permissions_for_domain cpfd2 ON (cpfd2.security_domain_id = sdm2.security_domain_id AND cpfd2.contact_id = p_contact_id AND cpfd2.permission = 'read'), \n" +
+            "    location_graph lg\n" +
+            "    WHERE l2.location_id = lg.id AND (coalesce(cpfd2.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
+            ") \n" +
+            "SELECT\n" +
+            "  p_location_id,\n" +
+            "  coalesce(bool_and(s.ok OR s.suppressed OR s.in_downtime), true) AS ok, \n" +
+            "  coalesce(max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER, 0) AS status, \n" +
+            "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS pending_count,   \n" +
+            "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS ok_count, \n" +
+            "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS warning_count, \n" +
+            "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS critical_count, \n" +
+            "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, \n" +
+            "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, \n" +
+            "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS error_count, \n" +
+            "  count(CASE WHEN s.suppressed                                         THEN 1 ELSE NULL END)::INTEGER AS suppressed_count,  \n" +
+            "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, \n" +
+            "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, \n" +
+            "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,   \n" +
+            "  count(s.check_id)::INTEGER                                                                          AS total_checks   \n" +
+            "FROM bergamot.check_state s \n" +
+            "JOIN bergamot.host h ON (s.check_id = h.id)\n" +
+            "JOIN location_graph lg ON (h.location_id = lg.id)\n" +
+            "LEFT JOIN bergamot.security_domain_membership sdm ON (sdm.check_id = h.id) \n" +
+            "LEFT JOIN bergamot.computed_permissions_for_domain cpfd ON (cpfd.security_domain_id = sdm.security_domain_id AND cpfd.contact_id = p_contact_id AND cpfd.permission = 'read') \n" +
+            "WHERE coalesce(cpfd.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n"
+        )
+    )
+    public abstract GroupState computeLocationStateForContact(@SQLParam(value = "location_id", virtual = true) UUID locationId, @SQLParam(value = "contact_id", virtual = true) UUID contactId);
     
     // check command
     
