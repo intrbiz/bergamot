@@ -109,6 +109,8 @@ public class BergamotConfigImporter
     
     private Function<Contact, String> registrationURLSupplier;
     
+    private boolean rebuildPermissions = false;
+    
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
         if (! validated.getReport().isValid()) throw new RuntimeException("Cannot import invalid configuration");
@@ -174,6 +176,12 @@ public class BergamotConfigImporter
                         this.loadHosts(db);
                         // clusters
                         this.loadClusters(db);
+                        // rebuild computed permissions
+                        if (this.rebuildPermissions)
+                        {
+                            this.report.info("Rebuilding computed permissions");
+                            db.buildPermissions(this.site.getId());
+                        }
                     });
                     // delayed actions
                     if (this.online)
@@ -870,6 +878,8 @@ public class BergamotConfigImporter
         this.loadAccessControls(team.getId(), configuration.resolve().getAccessControls(), db);
         db.setTeam(team);
         this.loadedObjects.add("team:" + configuration.getName());
+        // we need to rebuild the permissions
+        this.rebuildPermissions = true;
     }
     
     private void linkTeam(TeamCfg configuration, BergamotDB db)
@@ -990,6 +1000,8 @@ public class BergamotConfigImporter
                 team.addContact(contact);
             }
         }
+        // we need to rebuild the permissions
+        this.rebuildPermissions = true;
     }
     
     private void loadAccessControls(UUID roleId, List<AccessControlCfg> acl, BergamotDB db)
