@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.data;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
@@ -1861,6 +1863,30 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLRemove(table = AccessControl.class, name = "remove_access_control", since = @SQLVersion({3, 8, 0}))
     public abstract void removeAccessControl(@SQLParam("security_domain_id") UUID securityDomainId, @SQLParam("role_id") UUID roleId);
     
+    // compute permissions from ACL information
+    
+    /**
+     * Compute the permissions model for the given site
+     * @param siteId
+     * @return the number of permissions computed
+     */
+    public int buildPermissions(UUID siteId)
+    {
+        return this.use((with) -> {
+            try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.build_permissions(?::UUID)"))
+            {
+              stmt.setObject(1, siteId);
+              try (ResultSet rs = stmt.executeQuery())
+              {
+                if (rs.next())
+                {
+                    return rs.getInt(1);
+                }
+              }
+            }
+            return null;
+        });
+    }
     
     // helpers
     
@@ -2223,21 +2249,23 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "END;\n" +
                 "$$",
 
-                "CREATE OR REPLACE FUNCTION bergamot.build_all_permissions()\n" +
+                "CREATE OR REPLACE FUNCTION bergamot.build_permissions(p_site_id UUID)\n" +
                 "RETURNS INTEGER \n" +
                 "LANGUAGE PLPGSQL VOLATILE AS\n" +
                 "$$\n" +
                 "BEGIN\n" +
-                "    -- empty the computed permissions tables\n" +
-                "    DELETE FROM bergamot.computed_permissions;\n" +
-                "    DELETE FROM bergamot.computed_permissions_for_domain;\n" +
                 "    -- compute the permissions\n" +
                 "    RETURN sum(q.cp)\n" +
                 "    FROM\n" +
                 "    (\n" +
-                "        SELECT bergamot.compute_permissions(c.id) AS cp FROM bergamot.contact c\n" +
+                "        SELECT bergamot.compute_permissions(c.id) AS cp \n" +
+                "        FROM bergamot.contact c \n" + 
+                "        WHERE c.site_id = p_site_id\n" +
                 "      UNION ALL\n" +
-                "        SELECT bergamot.compute_permissions_for_domain(c.id, sd.id) AS cp FROM bergamot.contact c CROSS JOIN bergamot.security_domain sd\n" +
+                "        SELECT bergamot.compute_permissions_for_domain(c.id, sd.id) AS cp \n" +
+                "        FROM bergamot.contact c " +
+                "        CROSS JOIN bergamot.security_domain sd \n" +
+                "        WHERE c.site_id = p_site_id\n" +
                 "    ) q;\n" +
                 "END;\n" +
                 "$$",
