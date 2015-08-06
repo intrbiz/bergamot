@@ -138,6 +138,14 @@ public class Location extends NamedObject<LocationMO, LocationCfg> implements Co
         }
     }
     
+    public GroupState getStateForContact(Contact contact)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.computeLocationStateForContact(this.getId(), contact.getId());
+        }
+    }
+    
     /**
      * Get comments against this downtime
      * @param limit the maximum number of comments to get

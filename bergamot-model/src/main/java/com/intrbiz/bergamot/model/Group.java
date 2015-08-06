@@ -46,6 +46,14 @@ public class Group extends NamedObject<GroupMO, GroupCfg> implements Commented, 
             return db.computeGroupState(this.getId());
         }
     }
+    
+    public GroupState getStateForContact(Contact contact)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.computeGroupStateForContact(this.getId(), contact.getId());
+        }
+    }
 
     public List<UUID> getGroupIds()
     {
