@@ -2295,6 +2295,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'ui.view.readings',\n" +
                 "        'ui.sign.agent',\n" +
                 "        'ui.generate.agent',\n" +
+                "        'ui.admin',\n" +
                 "        'api.access',\n" +
                 "        'read',\n" +
                 "        'read.config',\n" +
@@ -2401,10 +2402,18 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "RETURNS BOOLEAN \n" +
                 "LANGUAGE SQL STABLE AS\n" +
                 "$$\n" +
-                "    SELECT cpfd.allowed \n" +
-                "    FROM bergamot.computed_permissions_for_domain cpfd \n" +
-                "    JOIN bergamot.security_domain_membership sdm ON (cpfd.security_domain_id = sdm.security_domain_id)\n" +
-                "    WHERE cpfd.contact_id = $1 AND sdm.check_id = $2 AND cpfd.permission = $3\n" +
+                "  SELECT coalesce(bool_or(q.allowed), false) AS allowed\n" +
+                "  FROM\n" +
+                "  (\n" +
+                "      SELECT cpfd.allowed\n" + 
+                "      FROM bergamot.computed_permissions_for_domain cpfd\n" + 
+                "      JOIN bergamot.security_domain_membership sdm ON (cpfd.security_domain_id = sdm.security_domain_id)\n" +
+                "      WHERE cpfd.contact_id = $1 AND sdm.check_id = $2 AND cpfd.permission = $3\n" +
+                "    UNION ALL\n" +
+                "      SELECT allowed\n" + 
+                "      FROM bergamot.computed_permissions\n" + 
+                "      WHERE contact_id = $1 AND permission = $3\n" +
+                "  ) q\n" +
                 "$$"
         );
     }
