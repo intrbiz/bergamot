@@ -18,7 +18,6 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-@RequirePermission("ui.admin.cluster")
 public class UtilsAdminRouter extends Router<BergamotApp>
 {   
     private Logger logger = Logger.getLogger(UtilsAdminRouter.class);

@@ -18,7 +18,6 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-@RequirePermission("ui.admin.host")
 public class HostAdminRouter extends Router<BergamotApp>
 {    
     @Any("/")

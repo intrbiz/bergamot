@@ -23,7 +23,6 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-@RequirePermission("ui.admin.contact")
 public class ContactAdminRouter extends Router<BergamotApp>
 {    
     @Any("/")

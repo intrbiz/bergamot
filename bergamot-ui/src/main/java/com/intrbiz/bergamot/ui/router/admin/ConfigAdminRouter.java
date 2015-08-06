@@ -19,7 +19,6 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-@RequirePermission("ui.admin.config")
 public class ConfigAdminRouter extends Router<BergamotApp>
 {        
     @Get("/id/:id")
