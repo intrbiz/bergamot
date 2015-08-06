@@ -13,7 +13,6 @@ import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Group;
-import com.intrbiz.bergamot.model.Permission;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -38,7 +37,7 @@ public class GroupsRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showGroups(BergamotDB db, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
-        model("groups", orderGroupsByStatus(user.hasPermission("ui.read.group", db.getRootGroups(site.getId()))));
+        model("groups", orderGroupsByStatus(user.hasPermission("read", db.getRootGroups(site.getId()))));
         encode("group/index");
     }
     
@@ -47,9 +46,9 @@ public class GroupsRouter extends Router<BergamotApp>
     public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
         Group group = model("group", notNull(db.getGroupByName(site.getId(), name)));
-        require(permission("ui.read.group", group));
-        model("checks", orderCheckByStatus(user.hasPermission((c) -> Permission.of("ui.read." + c.getType()), group.getChecks())));
-        model("groups", orderGroupsByStatus(user.hasPermission("ui.read.group", group.getChildren())));
+        require(permission("read", group));
+        model("checks", orderCheckByStatus(user.hasPermission("read", group.getChecks())));
+        model("groups", orderGroupsByStatus(user.hasPermission("read", group.getChildren())));
         encode("group/group");
     }
     
@@ -58,9 +57,9 @@ public class GroupsRouter extends Router<BergamotApp>
     public void showHostGroupByName(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user)
     {
         Group group = model("group", notNull(db.getGroup(id)));
-        require(permission("ui.read.group", group));
-        model("checks", orderCheckByStatus(user.hasPermission((c) -> Permission.of("ui.read." + c.getType()), group.getChecks())));
-        model("groups", orderGroupsByStatus(user.hasPermission("ui.read.group", group.getChildren())));
+        require(permission("read", group));
+        model("checks", orderCheckByStatus(user.hasPermission("read", group.getChecks())));
+        model("groups", orderGroupsByStatus(user.hasPermission("read", group.getChildren())));
         encode("group/group");
     }
     
@@ -72,7 +71,7 @@ public class GroupsRouter extends Router<BergamotApp>
         {
             if (check instanceof ActiveCheck)
             {
-                if (user.hasPermission("ui.write." + check.getType() + ".execute", check)) action("execute-check", check);
+                if (user.hasPermission("execute", check)) action("execute-check", check);
             }
         }
         redirect("/group/id/" + id);

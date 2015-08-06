@@ -36,7 +36,7 @@ public class LocationRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showLocations(BergamotDB db, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
-        model("locations", orderLocationsByStatus(user.hasPermission("ui.read.location", db.getRootLocations(site.getId()))));
+        model("locations", orderLocationsByStatus(user.hasPermission("read", db.getRootLocations(site.getId()))));
         encode("location/index");
     }
     
@@ -45,9 +45,9 @@ public class LocationRouter extends Router<BergamotApp>
     public void showLocationByName(BergamotDB db, String name, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
         Location location = model("location", notNull(db.getLocationByName(site.getId(), name)));
-        require(permission("ui.read.location", location));
-        model("hosts", orderHostsByStatus(user.hasPermission("ui.read.host", location.getHosts())));
-        model("locations", orderLocationsByStatus(user.hasPermission("ui.read.location", location.getChildren())));
+        require(permission("read", location));
+        model("hosts", orderHostsByStatus(user.hasPermission("read", location.getHosts())));
+        model("locations", orderLocationsByStatus(user.hasPermission("read", location.getChildren())));
         encode("location/location");
     }
     
@@ -56,9 +56,9 @@ public class LocationRouter extends Router<BergamotApp>
     public void showLocationById(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user)
     {
         Location location = model("location", notNull(db.getLocation(id)));
-        require(permission("ui.read.location", location));
-        model("hosts", orderHostsByStatus(user.hasPermission("ui.read.host", location.getHosts())));
-        model("locations", orderLocationsByStatus(user.hasPermission("ui.read.location", location.getChildren())));
+        require(permission("read", location));
+        model("hosts", orderHostsByStatus(user.hasPermission("read", location.getHosts())));
+        model("locations", orderLocationsByStatus(user.hasPermission("read", location.getChildren())));
         encode("location/location");
     }
     
@@ -68,7 +68,7 @@ public class LocationRouter extends Router<BergamotApp>
     { 
         for (Host host : db.getHostsInLocation(id))
         {
-            if (user.hasPermission("ui.write.host.execute", host)) action("execute-check", host);
+            if (user.hasPermission("execute", host)) action("execute-check", host);
         }
         redirect("/location/id/" + id);
     }

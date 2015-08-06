@@ -2,30 +2,32 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
-	<a href="/location/id/#{location.id}">
-		<div class="col3 dash_icon location" data-location-id="#{location.id}" style="margin-bottom: 20px">
-		    <h3>
-				<span class="dash_img status_#{location.state.status.toString().toLowerCase()}" title="The location is #{location.state.status.toString().toLowerCase()}">
-					<img src="#{public(coalesce(location.getParameter('ui-icon'), '/images/icons/64/location.png'))}" />
-				</span>
-				<span class="name">#{location.summary}</span>
-		    </h3>
-		    <p style="width: 205px;">
-		    	<span class="label">OK: </span>
-		    	<span class="value" data-bind="ok_count" style="width: 60px;">#{location.state.okCount + location.state.infoCount + location.state.pendingCount}</span>
-		    </p>
-		    <p style="width: 205px;">
-			    <span class="label">Not OK: </span>
-			    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{location.state.warningCount + location.state.criticalCount + location.state.unknownCount + location.state.timeoutCount + location.state.errorCount + location.state.actionCount}</span>
-		    </p>
-		    <p style="width: 205px;">
-			    <span class="label">In Downtime: </span>
-			    <span class="value" data-bind="in_downtime_count" style="width: 60px;">#{location.state.inDowntimeCount}</span>
-		    </p>
-		    <p style="width: 205px;">
-			    <span class="label">Suppressed: </span>
-			    <span class="value" data-bind="suppressed_count" style="width: 60px;">#{location.state.suppressedCount}</span>
-		    </p>
-		</div>
-	</a>
+    <container data-locationstate="#{location.getStateForContact(Balsa().currentPrincipal())}">
+		<a href="/location/id/#{location.id}">
+			<div class="col3 dash_icon location" data-location-id="#{location.id}" style="margin-bottom: 20px">
+			    <h3>
+					<span class="dash_img status_#{locationstate.status.toString().toLowerCase()}" title="The location is #{locationstate.status.toString().toLowerCase()}">
+						<img src="#{public(coalesce(location.getParameter('ui-icon'), '/images/icons/64/location.png'))}" />
+					</span>
+					<span class="name">#{location.summary}</span>
+			    </h3>
+			    <p style="width: 205px;">
+			    	<span class="label">OK: </span>
+			    	<span class="value" data-bind="ok_count" style="width: 60px;">#{locationstate.okCount + locationstate.infoCount + locationstate.pendingCount}</span>
+			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">Not OK: </span>
+				    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{locationstate.warningCount + locationstate.criticalCount + locationstate.unknownCount + locationstate.timeoutCount + locationstate.errorCount + locationstate.actionCount}</span>
+			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">In Downtime: </span>
+				    <span class="value" data-bind="in_downtime_count" style="width: 60px;">#{locationstate.inDowntimeCount}</span>
+			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">Suppressed: </span>
+				    <span class="value" data-bind="suppressed_count" style="width: 60px;">#{locationstate.suppressedCount}</span>
+			    </p>
+			</div>
+		</a>
+	</container>
 </fragment>

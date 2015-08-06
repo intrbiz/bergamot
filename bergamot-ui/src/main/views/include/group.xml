@@ -2,30 +2,32 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
-	<a href="/group/id/#{group.id}">
-		<div class="col3 dash_icon group" data-group-id="#{group.id}" style="margin-bottom: 20px">
-		    <h3>
-				<span class="dash_img status_#{group.state.status.toString().toLowerCase()}" title="The group is #{group.state.status.toString().toLowerCase()}">
-					<img src="#{public(coalesce(group.getParameter('ui-icon'), '/images/icons/64/group.png'))}" />
-				</span>
-				<span class="name">#{group.summary}</span>
-		    </h3>
-		    <p style="width: 205px;">
-		    	<span class="label">OK: </span>
-		    	<span class="value" data-bind="ok_count" style="width: 60px;">#{group.state.okCount + group.state.infoCount + group.state.pendingCount}</span>
-		    </p>
-		    <p style="width: 205px;">
-			    <span class="label">Not OK: </span>
-			    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{group.state.warningCount + group.state.criticalCount + group.state.unknownCount + group.state.timeoutCount + group.state.errorCount + group.state.actionCount}</span>
-		    </p>
-		    <p style="width: 205px;">
-			    <span class="label">In Downtime: </span>
-			    <span class="value" data-bind="in_downtime_count" style="width: 60px;">#{group.state.inDowntimeCount}</span>
-		    </p>
-		    <p style="width: 205px;">
-			    <span class="label">Suppressed: </span>
-			    <span class="value" data-bind="suppressed_count" style="width: 60px;">#{group.state.suppressedCount}</span>
-		    </p>
-		</div>
-	</a>
+	<container data-groupstate="#{group.getStateForContact(Balsa().currentPrincipal())}">
+		<a href="/group/id/#{group.id}">
+			<div class="col3 dash_icon group" data-group-id="#{group.id}" style="margin-bottom: 20px">
+			    <h3>
+					<span class="dash_img status_#{groupstate.status.toString().toLowerCase()}" title="The group is #{groupstate.status.toString().toLowerCase()}">
+						<img src="#{public(coalesce(group.getParameter('ui-icon'), '/images/icons/64/group.png'))}" />
+					</span>
+					<span class="name">#{group.summary}</span>
+			    </h3>
+			    <p style="width: 205px;">
+			    	<span class="label">OK: </span>
+			    	<span class="value" data-bind="ok_count" style="width: 60px;">#{groupstate.okCount + groupstate.infoCount + groupstate.pendingCount}</span>
+			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">Not OK: </span>
+				    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{groupstate.warningCount + groupstate.criticalCount + groupstate.unknownCount + groupstate.timeoutCount + groupstate.errorCount + groupstate.actionCount}</span>
+			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">In Downtime: </span>
+				    <span class="value" data-bind="in_downtime_count" style="width: 60px;">#{groupstate.inDowntimeCount}</span>
+			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">Suppressed: </span>
+				    <span class="value" data-bind="suppressed_count" style="width: 60px;">#{groupstate.suppressedCount}</span>
+			    </p>
+			</div>
+		</a>
+	</container>
 </fragment>

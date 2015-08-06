@@ -9,7 +9,6 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.model.Permission;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -28,9 +27,9 @@ public class DashboardRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
     {
-        model("alerts", user.hasPermission((c) -> Permission.of("ui.read." + c.getType()), db.listAlerts(site.getId()).stream().map(Alert::getCheck).collect(Collectors.toList())));
-        model("groups", orderGroupsByStatus(user.hasPermission("ui.read.group", db.getRootGroups(site.getId()))));
-        model("locations", orderLocationsByStatus(user.hasPermission("ui.read.location", db.getRootLocations(site.getId()))));
+        model("alerts", user.hasPermission("read", db.listAlerts(site.getId()).stream().map(Alert::getCheck).collect(Collectors.toList())));
+        model("groups", orderGroupsByStatus(user.hasPermission("read", db.getRootGroups(site.getId()))));
+        model("locations", orderLocationsByStatus(user.hasPermission("read", db.getRootLocations(site.getId()))));
         encode("index");
     }
 }
