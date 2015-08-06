@@ -1946,7 +1946,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         return this.useTimedCached(
             has_permission_for_domain, 
             cache_miss_has_permission_for_domain, 
-            "has_permission_for_domain." + this.getSiteId(contactId) + "." + contactId + "." + permission,
+            "has_permission_for_domain." + this.getSiteId(contactId) + "." + contactId + "." + securityDomainId + "." + permission,
             null, 
             (with) -> {
                 try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.has_permission_for_domain(?::UUID, ?::UUID, ?::TEXT)"))
@@ -1979,7 +1979,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         return this.useTimedCached(
             has_permission_for_object, 
             cache_miss_has_permission_for_object, 
-            "has_permission_for_object." + this.getSiteId(contactId) + "." + contactId + "." + permission, 
+            "has_permission_for_object." + this.getSiteId(contactId) + "." + contactId + "." + objectId + "." + permission, 
             null, 
             (with) -> {
                 try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.has_permission_for_object(?::UUID, ?::UUID, ?::TEXT)"))
