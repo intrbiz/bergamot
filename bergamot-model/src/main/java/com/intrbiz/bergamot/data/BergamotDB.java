@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.validator.BergamotConfigResolver;
@@ -71,6 +73,7 @@ import com.intrbiz.data.db.compiler.meta.SQLSetter;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.data.db.compiler.meta.ScriptType;
 import com.intrbiz.data.db.compiler.util.SQLScript;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
@@ -1865,6 +1868,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // compute permissions from ACL information
     
+    private Timer build_permissions = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.build_permissions(UUID)"));
+    
     /**
      * Compute the permissions model for the given site
      * @param siteId
@@ -1872,20 +1877,124 @@ public abstract class BergamotDB extends DatabaseAdapter
      */
     public int buildPermissions(UUID siteId)
     {
-        return this.use((with) -> {
-            try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.build_permissions(?::UUID)"))
-            {
-              stmt.setObject(1, siteId);
-              try (ResultSet rs = stmt.executeQuery())
-              {
-                if (rs.next())
+        // compute a flattened view of the permissions
+        int changed = this.useTimed(
+            build_permissions,
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.build_permissions(?::UUID)"))
                 {
-                    return rs.getInt(1);
+                  stmt.setObject(1, siteId);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next()) return rs.getInt(1);
+                  }
                 }
-              }
+                return null;
             }
-            return null;
-        });
+        );
+        // cache management
+        this.getAdapterCache().removePrefix("has_permission." + siteId);
+        this.getAdapterCache().removePrefix("has_permission_for_object." + siteId);
+        this.getAdapterCache().removePrefix("has_permission_for_domain." + siteId);
+        // return the number of permissions which were computed
+        return changed;
+    }
+    
+    private Timer has_permission = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.has_permission(UUID,TEXT)"));
+    private Meter cache_miss_has_permission = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().meter(Witchcraft.name(BergamotDB.class, "cache_miss.bergamot.has_permission(UUID,TEXT)"));
+    
+    /**
+     * Does the given contact have the given permission
+     * @param contactId the contact
+     * @param permission the permission
+     * @return true if the contact has permission
+     */
+    public boolean hasPermission(UUID contactId, String permission)
+    {
+        return this.useTimedCached(
+            has_permission, 
+            cache_miss_has_permission, 
+            "has_permission." + this.getSiteId(contactId) + "." + contactId + "." + permission, 
+            null, 
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.has_permission(?::UUID, ?::TEXT)"))
+                {
+                  stmt.setObject(1, contactId);
+                  stmt.setString(2, permission);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next()) return rs.getBoolean(1);
+                  }
+                }
+                return false;
+            }
+        );
+    }
+    
+    private Timer has_permission_for_domain = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.has_permission_for_domain(UUID,UUID,TEXT)"));
+    private Meter cache_miss_has_permission_for_domain = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().meter(Witchcraft.name(BergamotDB.class, "cache_miss.bergamot.has_permission_for_domain(UUID,UUID,TEXT)"));
+    
+    /**
+     * Does the given contact have the given permission for the given security domain
+     * @param contactId the contact
+     * @param securityDomainId the security domain
+     * @param permission the permission
+     * @return true if the contact has permission
+     */
+    public boolean hasPermissionForSecurityDomain(UUID contactId, UUID securityDomainId, String permission)
+    {
+        return this.useTimedCached(
+            has_permission_for_domain, 
+            cache_miss_has_permission_for_domain, 
+            "has_permission_for_domain." + this.getSiteId(contactId) + "." + contactId + "." + permission,
+            null, 
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.has_permission_for_domain(?::UUID, ?::UUID, ?::TEXT)"))
+                {
+                  stmt.setObject(1, contactId);
+                  stmt.setObject(2, securityDomainId);
+                  stmt.setString(3, permission);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next()) return rs.getBoolean(1);
+                  }
+                }
+                return false;
+            }
+        );
+    }
+    
+    private Timer has_permission_for_object = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.has_permission_for_object(UUID,UUID,TEXT)"));
+    private Meter cache_miss_has_permission_for_object = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().meter(Witchcraft.name(BergamotDB.class, "cache_miss.bergamot.has_permission_for_object(UUID,UUID,TEXT)"));
+    
+    /**
+     * Does the given contact have the given permission for the given object
+     * @param contactId the contact
+     * @param objectId the object
+     * @param permission the permission
+     * @return true if the contact has permission
+     */
+    public boolean hasPermissionForObject(UUID contactId, UUID objectId, String permission)
+    {
+        return this.useTimedCached(
+            has_permission_for_object, 
+            cache_miss_has_permission_for_object, 
+            "has_permission_for_object." + this.getSiteId(contactId) + "." + contactId + "." + permission, 
+            null, 
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.has_permission_for_object(?::UUID, ?::UUID, ?::TEXT)"))
+                {
+                  stmt.setObject(1, contactId);
+                  stmt.setObject(2, objectId);
+                  stmt.setString(3, permission);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next()) return rs.getBoolean(1);
+                  }
+                }
+                return false;
+            }
+        );
     }
     
     // helpers

@@ -340,98 +340,43 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
     
     // permissions handling
     
-    /**
-     * Does this contact have the given permission or does it 
-     * inherit the permission from teams the contact is in
-     * @param permission the permission to check for
-     * @return true if this contact has the given permission
-     */
-    public Boolean checkPermission(Permission permission)
-    {
-        for (String granted : this.getGrantedPermissions())
-        {
-            if (permission.match(Permission.of(granted)))
-                return true;
-        }
-        for (String revoked : this.getRevokedPermissions())
-        {
-            if (permission.match(Permission.of(revoked)))
-                return false;
-        }
-        // go up the chain
-        for (Team team : this.getTeams())
-        {
-            Boolean result = team.checkPermission(permission);
-            if (result != null) return result;
-        }
-        return null;
-    }
-    
-    public Boolean checkPermission(Permission permission, SecurityDomain domain)
-    {
-        // get the access controls for the given contact over the given domain
-        AccessControl access = this.getAccessControl(domain);
-        if (access != null)
-        {
-            for (String granted : access.getGrantedPermissions())
-            {
-                if (permission.match(Permission.of(granted)))
-                    return true;
-            }
-            for (String revoked : access.getRevokedPermissions())
-            {
-                if (permission.match(Permission.of(revoked))) 
-                    return false;
-            }
-        }
-        // go up the chain
-        for (Team team : this.getTeams())
-        {
-            Boolean result = team.checkPermission(permission, domain);
-            if (result != null) return result;
-        }
-        return null;
-    }
-    
     public boolean hasPermission(Permission permission)
     {
-        Boolean allowed = this.checkPermission(permission);
-        return allowed == null ? false : allowed.booleanValue();
+        return this.hasPermission(permission.toString());
     }
     
     public boolean hasPermission(String permission)
     {
-        return this.hasPermission(Permission.of(permission));
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.hasPermission(this.getId(), permission);
+        }
     }
     
     public boolean hasPermission(Permission permission, SecurityDomain domain)
     {
-        Boolean allowed = this.checkPermission(permission);
-        if (allowed != null) return allowed.booleanValue();
-        allowed = this.checkPermission(permission, domain);
-        return allowed == null ? false : allowed.booleanValue();
+        return this.hasPermission(permission.toString(), domain);
     }
     
     public boolean hasPermission(String permission, SecurityDomain domain)
     {
-        return this.hasPermission(Permission.of(permission), domain);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.hasPermissionForSecurityDomain(this.getId(), domain.getId(), permission);
+        }
     }
     
     public boolean hasPermission(Permission permission, Secured overObject)
     {
-        Boolean allowed = this.checkPermission(permission);
-        if (allowed != null) return allowed.booleanValue();
-        for (SecurityDomain domain : overObject.getSecurityDomains())
-        {
-            allowed = this.checkPermission(permission, domain);
-            if (allowed != null) return allowed.booleanValue();
-        }
-        return false;
+        return this.hasPermission(permission.toString(), overObject);
     }
     
     public boolean hasPermission(String permission, Secured overObject)
     {
-        return this.hasPermission(Permission.of(permission), overObject);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.hasPermissionForObject(this.getId(), overObject.getId(), permission);
+        }
     }
     
     public <T extends Secured> List<T> hasPermission(Permission permission, Collection<T> overObjects)
