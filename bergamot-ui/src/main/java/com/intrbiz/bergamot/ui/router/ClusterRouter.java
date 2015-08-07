@@ -26,7 +26,8 @@ public class ClusterRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showClusterByName(BergamotDB db, String name, @SessionVar("site") Site site)
     {
-        Cluster cluster = model("cluster", db.getClusterByName(site.getId(), name));
+        Cluster cluster = model("cluster", notNull(db.getClusterByName(site.getId(), name)));
+        require(permission("read", cluster));
         model("alerts", db.getAllAlertsForCheck(cluster.getId(), 3, 0));
         encode("cluster/detail");
     }
@@ -35,7 +36,8 @@ public class ClusterRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showClusterById(BergamotDB db, @IsaObjectId UUID id)
     {
-        model("cluster", db.getCheck(id));
+        Cluster cluster = model("cluster", notNull(db.getCluster(id)));
+        require(permission("read", cluster));
         model("alerts", db.getAllAlertsForCheck(id, 3, 0));
         encode("cluster/detail");
     }
@@ -44,12 +46,10 @@ public class ClusterRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void enableCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Cluster cluster = db.getCluster(id);
-        if (cluster != null)
-        {
-            cluster.setEnabled(true);
-            db.setCluster(cluster);
-        }
+        Cluster cluster = notNull(db.getCluster(id));
+        require(permission("enable", cluster));
+        cluster.setEnabled(true);
+        db.setCluster(cluster);
         redirect("/cluster/id/" + id);
     }
     
@@ -57,12 +57,10 @@ public class ClusterRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void disableCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Cluster cluster = db.getCluster(id);
-        if (cluster != null)
-        {
-            cluster.setEnabled(false);
-            db.setCluster(cluster);
-        }
+        Cluster cluster = notNull(db.getCluster(id));
+        require(permission("disable", cluster));
+        cluster.setEnabled(false);
+        db.setCluster(cluster);
         redirect("/cluster/id/" + id);
     }
     
@@ -70,11 +68,9 @@ public class ClusterRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void suppressCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Cluster cluster = db.getCluster(id);
-        if (cluster != null)
-        {
-            action("suppress-check", cluster);
-        }
+        Cluster cluster = notNull(db.getCluster(id));
+        require(permission("suppress", cluster));
+        action("suppress-check", cluster);
         redirect("/cluster/id/" + id);
     }
     
@@ -82,11 +78,9 @@ public class ClusterRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void unsuppressCluster(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Cluster cluster = db.getCluster(id);
-        if (cluster != null)
-        {
-            action("unsuppress-check", cluster);
-        }
+        Cluster cluster = notNull(db.getCluster(id));
+        require(permission("unsuppress", cluster));
+        action("unsuppress-check", cluster);
         redirect("/cluster/id/" + id);
     }
     
@@ -96,7 +90,7 @@ public class ClusterRouter extends Router<BergamotApp>
     {
         for (Resource resource : db.getResourcesOnCluster(id))
         {
-            action("suppress-check", resource);
+            if (permission("suppress", resource)) action("suppress-check", resource);
         }
         redirect("/cluster/id/" + id);
     }
@@ -107,7 +101,7 @@ public class ClusterRouter extends Router<BergamotApp>
     {
         for (Resource resource : db.getResourcesOnCluster(id))
         {
-            action("unsuppress-check", resource);
+            if (permission("unsuppress", resource)) action("unsuppress-check", resource);
         }
         redirect("/cluster/id/" + id);
     }
