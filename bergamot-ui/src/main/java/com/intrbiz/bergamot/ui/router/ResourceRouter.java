@@ -25,7 +25,8 @@ public class ResourceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showResourceByName(BergamotDB db, String clusterName, String resourceName, @SessionVar("site") Site site)
     {
-        Resource resource = model("resource", db.getResourceOnClusterByName(site.getId(), clusterName, resourceName));
+        Resource resource = model("resource", notNull(db.getResourceOnClusterByName(site.getId(), clusterName, resourceName)));
+        require(permission("read", resource));
         model("alerts", db.getAllAlertsForCheck(resource.getId(), 3, 0));
         encode("resource/detail");
     }
@@ -34,7 +35,8 @@ public class ResourceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showResourceById(BergamotDB db, @IsaObjectId UUID id)
     {
-        model("resource", db.getResource(id));
+        Resource resource = model("resource", notNull(db.getResource(id)));
+        require(permission("read", resource));
         model("alerts", db.getAllAlertsForCheck(id, 3, 0));
         encode("resource/detail");
     }
@@ -43,12 +45,10 @@ public class ResourceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void enableResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Resource resource = db.getResource(id);
-        if (resource != null)
-        {
-            resource.setEnabled(true);
-            db.setResource(resource);
-        }
+        Resource resource = notNull(db.getResource(id));
+        require(permission("enable", resource));
+        resource.setEnabled(true);
+        db.setResource(resource);
         redirect("/resource/id/" + id);
     }
     
@@ -56,12 +56,10 @@ public class ResourceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void disableResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Resource resource = db.getResource(id);
-        if (resource != null)
-        {
-            resource.setEnabled(false);
-            db.setResource(resource);
-        }
+        Resource resource = notNull(db.getResource(id));
+        require(permission("disable", resource));
+        resource.setEnabled(false);
+        db.setResource(resource);
         redirect("/resource/id/" + id);
     }
     
@@ -69,11 +67,9 @@ public class ResourceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void suppressResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Resource resource = db.getResource(id);
-        if (resource != null)
-        {
-            action("suppress-check", resource);
-        }
+        Resource resource = notNull(db.getResource(id));
+        require(permission("suppress", resource));
+        action("suppress-check", resource);
         redirect("/resource/id/" + id);
     }
     
@@ -81,11 +77,9 @@ public class ResourceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void unsuppressResource(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Resource resource = db.getResource(id);
-        if (resource != null)
-        {
-            action("unsuppress-check", resource);
-        }
+        Resource resource = notNull(db.getResource(id));
+        require(permission("unsuppress", resource));
+        action("unsuppress-check", resource);
         redirect("/resource/id/" + id);
     }
 }
