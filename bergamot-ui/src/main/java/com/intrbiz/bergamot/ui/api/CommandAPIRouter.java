@@ -29,7 +29,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    @RequirePermission("api.read.command")
+    @RequirePermission("ui.admin")
     @WithDataAdapter(BergamotDB.class)
     public List<CommandMO> getCommand(BergamotDB db, @Var("site") Site site)
     {
@@ -38,7 +38,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.command")
+    @RequirePermission("ui.admin")
     @WithDataAdapter(BergamotDB.class)
     public CommandMO getCommand(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -47,7 +47,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.command")
+    @RequirePermission("ui.admin")
     @WithDataAdapter(BergamotDB.class)
     public CommandMO getCommand(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
@@ -56,7 +56,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.command.config")
+    @RequirePermission("ui.admin")
     @WithDataAdapter(BergamotDB.class)
     public CommandCfg getCommandConfig(BergamotDB db, @Var("site") Site site, String name)
     {
@@ -65,7 +65,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.command.config")
+    @RequirePermission("ui.admin")
     @WithDataAdapter(BergamotDB.class)
     public CommandCfg getCommandConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
