@@ -6,10 +6,10 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
+import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
 
@@ -19,11 +19,11 @@ import com.intrbiz.metadata.Template;
 public class CommandRouter extends Router<BergamotApp>
 {    
     @Any("/id/:id")
-    @RequirePermission("ui.config.view")
     @WithDataAdapter(BergamotDB.class)
-    public void timePeriod(BergamotDB db, @IsaObjectId UUID id)
+    public void command(BergamotDB db, @IsaObjectId UUID id)
     {
-        model("command", db.getCommand(id));
+        Command command = model("command", notNull(db.getCommand(id)));
+        require(permission("read.config", command));
         encode("command/detail");
     }
 }
