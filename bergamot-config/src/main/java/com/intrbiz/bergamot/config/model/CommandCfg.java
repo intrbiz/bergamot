@@ -13,7 +13,7 @@ import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 @XmlType(name = "command")
 @XmlRootElement(name = "command")
-public class CommandCfg extends NamedObjectCfg<CommandCfg>
+public class CommandCfg extends SecuredObjectCfg<CommandCfg>
 {
     private static final long serialVersionUID = 1L;
     

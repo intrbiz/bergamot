@@ -19,7 +19,7 @@ import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 
 @XmlType(name = "team")
 @XmlRootElement(name = "team")
-public class TeamCfg extends NamedObjectCfg<TeamCfg>
+public class TeamCfg extends SecuredObjectCfg<TeamCfg>
 {
     private static final long serialVersionUID = 1L;
 

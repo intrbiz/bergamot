@@ -23,7 +23,7 @@ import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
 
 @XmlType(name = "contact")
 @XmlRootElement(name = "contact")
-public class ContactCfg extends NamedObjectCfg<ContactCfg> implements Serializable
+public class ContactCfg extends SecuredObjectCfg<ContactCfg> implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

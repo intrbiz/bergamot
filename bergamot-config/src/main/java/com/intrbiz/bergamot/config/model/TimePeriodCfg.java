@@ -22,7 +22,7 @@ import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 
 @XmlType(name = "time-period")
 @XmlRootElement(name = "time-period")
-public class TimePeriodCfg extends NamedObjectCfg<TimePeriodCfg>
+public class TimePeriodCfg extends SecuredObjectCfg<TimePeriodCfg>
 {
     private static final long serialVersionUID = 1L;
     

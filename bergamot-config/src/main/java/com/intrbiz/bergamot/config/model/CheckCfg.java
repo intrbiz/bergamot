@@ -19,7 +19,7 @@ import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
-public abstract class CheckCfg<P extends CheckCfg<P>> extends NamedObjectCfg<P>
+public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P>
 {
     private static final long serialVersionUID = 1L;
     
@@ -36,8 +36,6 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends NamedObjectCfg<P>
     private InitiallyCfg initialState;
     
     private String externalRef;
-    
-    private Set<String> securityDomains = new LinkedHashSet<String>();
 
     public CheckCfg()
     {
@@ -162,18 +160,5 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends NamedObjectCfg<P>
     public void setExternalRef(String externalRef)
     {
         this.externalRef = externalRef;
-    }
-
-    @XmlJavaTypeAdapter(CSVAdapter.class)
-    @XmlAttribute(name = "security-domains")
-    @ResolveWith(CoalesceEmptyCollection.class)
-    public Set<String> getSecurityDomains()
-    {
-        return securityDomains;
-    }
-
-    public void setSecurityDomains(Set<String> securityDomains)
-    {
-        this.securityDomains = securityDomains;
     }
 }
