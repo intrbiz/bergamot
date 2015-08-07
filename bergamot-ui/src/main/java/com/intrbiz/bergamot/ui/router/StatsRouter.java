@@ -6,6 +6,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CoalesceMode;
@@ -29,7 +30,8 @@ public class StatsRouter extends Router<BergamotApp>
             @Param("limit")  @IsaLong(min = 1, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 100L) long limit
     )
     {
-        model("check", db.getCheck(id));
+        Check<?,?> check = model("check", notNull(db.getCheck(id)));
+        require(permission("read", check));
         model("transitions", db.listCheckTransitionsForCheck(id, offset, limit));
         var("offset", offset);
         var("limit", limit);
