@@ -25,7 +25,8 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void trap(BergamotDB db, String hostName, String trapName, @SessionVar("site") Site site)
     {
-        Trap trap = model("trap", db.getTrapOnHostByName(site.getId(), hostName, trapName));
+        Trap trap = model("trap", notNull(db.getTrapOnHostByName(site.getId(), hostName, trapName)));
+        require(permission("read", trap));
         model("alerts", db.getAllAlertsForCheck(trap.getId(), 3, 0));
         encode("trap/detail");
     }
@@ -34,7 +35,8 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void trap(BergamotDB db, @IsaObjectId UUID id)
     {
-        model("trap", db.getTrap(id));
+        Trap trap = model("trap", notNull(db.getTrap(id)));
+        require(permission("read", trap));
         model("alerts", db.getAllAlertsForCheck(id, 3, 0));
         encode("trap/detail");
     }
@@ -43,12 +45,10 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void enableTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Trap trap = db.getTrap(id);
-        if (trap != null)
-        {
-            trap.setEnabled(true);
-            db.setTrap(trap);
-        }
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("enable", trap));
+        trap.setEnabled(true);
+        db.setTrap(trap);
         redirect("/trap/id/" + id);
     }
     
@@ -56,12 +56,10 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void disableTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Trap trap = db.getTrap(id);
-        if (trap != null)
-        {
-            trap.setEnabled(false);
-            db.setTrap(trap);
-        }
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("disable", trap));
+        trap.setEnabled(false);
+        db.setTrap(trap);
         redirect("/trap/id/" + id);
     }
     
@@ -69,11 +67,9 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void suppressTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Trap trap = db.getTrap(id);
-        if (trap != null)
-        {
-            action("suppress-check", trap);
-        }
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("suppress", trap));
+        action("suppress-check", trap);
         redirect("/trap/id/" + id);
     }
     
@@ -81,11 +77,9 @@ public class TrapRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void unsuppressTrap(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Trap trap = db.getTrap(id);
-        if (trap != null)
-        {
-            action("unsuppress-check", trap);
-        }
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("unsuppress", trap));
+        action("unsuppress-check", trap);
         redirect("/trap/id/" + id);
     }
 }
