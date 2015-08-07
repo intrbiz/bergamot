@@ -115,8 +115,11 @@ public class GroupAPIRouter extends Router<BergamotApp>
         {
             if (check instanceof ActiveCheck)
             {
-                if (permission("execute", check)) action("execute-check", check);
-                executed++;
+                if (permission("execute", check))
+                {
+                    action("execute-check", check);
+                    executed++;
+                }
             }
         }
         return "Ok, executed " + executed + " checks";
