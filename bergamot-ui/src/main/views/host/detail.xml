@@ -79,7 +79,7 @@
 		<a href="/host/execute-services/#{host.id}"    id="check-services-now"  data-host-id="#{host.id}">Check all now</a>
 	</div>
 
-	<data-set var="category" value="#{host.getCategorisedServices()}">
+	<data-set var="category" value="#{host.getCategorisedServicesForContact(Balsa().currentPrincipal())}">
 		<div class="row hostgroup services">
 			<h3 rendered="#{category.name != 'default'}">Category: #{ucfirst(category.name)}</h3>
 			<div class="row hostgroup services">
@@ -102,7 +102,7 @@
 	
 	<h2 rendered="#{! host.traps.isEmpty()}">Traps</h2>
 	
-	<data-set var="category" value="#{host.getCategorisedTraps()}">
+	<data-set var="category" value="#{host.getCategorisedTrapsForContact(Balsa().currentPrincipal())}">
 		<div class="row hostgroup services">
 			<h3 rendered="#{category.name != 'default'}">Category: #{ucfirst(category.name)}</h3>
 			<div class="row hostgroup services">

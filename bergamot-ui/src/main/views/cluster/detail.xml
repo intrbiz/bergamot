@@ -74,7 +74,7 @@
 		<a href="/cluster/suppress-resource/#{host.id}"   id="suppress-resources"   data-cluster-id="#{cluster.id}">Suppress all</a>
 	</div>
 	
-	<data-set var="category" value="#{host.getCategorisedResources()}">
+	<data-set var="category" value="#{host.getCategorisedResourcesForContact(Balsa().currentPrincipal())}">
 		<div class="row hostgroup services">
 			<h3 rendered="#{category.name != 'default'}">Category: #{ucfirst(category.name)}</h3>
 			<div class="row hostgroup services">
