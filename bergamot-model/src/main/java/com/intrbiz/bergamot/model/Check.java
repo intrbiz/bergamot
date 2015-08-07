@@ -19,7 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * An something which should be checked
  */
-public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends NamedObject<T, C> implements Commented, Secured
+public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends SecuredObject<T, C> implements Commented
 {
     private static final long serialVersionUID = 1L;
     
@@ -359,18 +359,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Na
     public void setExternalRef(String externalRef)
     {
         this.externalRef = externalRef;
-    }
-    
-    /**
-     * Get the security domains this group exists within
-     */
-    @Override
-    public List<SecurityDomain> getSecurityDomains()
-    {
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            return db.getSecurityDomainsForCheck(this.getId());
-        }
     }
 
     protected void toMO(CheckMO mo, boolean stub)

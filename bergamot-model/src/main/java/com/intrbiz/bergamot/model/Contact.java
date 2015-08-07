@@ -25,7 +25,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "contact", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
-public class Contact extends NamedObject<ContactMO, ContactCfg> implements Principal, Serializable
+public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Principal, Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -366,7 +366,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         }
     }
     
-    public boolean hasPermission(Permission permission, Secured overObject)
+    public boolean hasPermission(Permission permission, SecuredObject<?,?> overObject)
     {
         return this.hasPermission(permission.toString(), overObject);
     }
@@ -376,7 +376,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         return this.hasPermission(permission.toString(), overObjectId);
     }
     
-    public boolean hasPermission(String permission, Secured overObject)
+    public boolean hasPermission(String permission, SecuredObject<?,?> overObject)
     {
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -392,7 +392,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         }
     }
     
-    public <T extends Secured> List<T> hasPermission(Permission permission, Collection<T> overObjects)
+    public <T extends SecuredObject<?,?>> List<T> hasPermission(Permission permission, Collection<T> overObjects)
     {
         List<T> filtered = new LinkedList<T>();
         for (T overObject : overObjects)
@@ -405,7 +405,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         return filtered;
     }
     
-    public <T extends Secured> Set<T> hasPermission(Permission permission, Set<T> overObjects)
+    public <T extends SecuredObject<?,?>> Set<T> hasPermission(Permission permission, Set<T> overObjects)
     {
         Set<T> filtered = new HashSet<T>();
         for (T overObject : overObjects)
@@ -418,17 +418,17 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         return filtered;
     }
     
-    public <T extends Secured> List<T> hasPermission(String permission, Collection<T> overObjects)
+    public <T extends SecuredObject<?,?>> List<T> hasPermission(String permission, Collection<T> overObjects)
     {
         return this.hasPermission(Permission.of(permission), overObjects);
     }
     
-    public <T extends Secured> Set<T> hasPermission(String permission, Set<T> overObjects)
+    public <T extends SecuredObject<?,?>> Set<T> hasPermission(String permission, Set<T> overObjects)
     {
         return this.hasPermission(Permission.of(permission), overObjects);
     }
     
-    public <T extends Secured> List<T> hasPermission(Function<T,Permission> permission, Collection<T> overObjects)
+    public <T extends SecuredObject<?,?>> List<T> hasPermission(Function<T,Permission> permission, Collection<T> overObjects)
     {
         List<T> filtered = new LinkedList<T>();
         for (T overObject : overObjects)
@@ -441,7 +441,7 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         return filtered;
     }
     
-    public <T extends Secured> Set<T> hasPermission(Function<T, Permission> permission, Set<T> overObjects)
+    public <T extends SecuredObject<?,?>> Set<T> hasPermission(Function<T, Permission> permission, Set<T> overObjects)
     {
         Set<T> filtered = new HashSet<T>();
         for (T overObject : overObjects)

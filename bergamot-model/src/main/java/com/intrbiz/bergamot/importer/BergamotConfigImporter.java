@@ -31,6 +31,7 @@ import com.intrbiz.bergamot.config.model.NotificationsCfg;
 import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
+import com.intrbiz.bergamot.config.model.SecuredObjectCfg;
 import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
@@ -57,6 +58,7 @@ import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.PassiveCheck;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Resource;
+import com.intrbiz.bergamot.model.SecuredObject;
 import com.intrbiz.bergamot.model.SecurityDomain;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
@@ -458,23 +460,26 @@ public class BergamotConfigImporter
             return;
         }
         // load
+        CommandCfg resolvedConfiguration = configuration.resolve();
         Command command = db.getCommandByName(this.site.getId(), configuration.getName());
         if(command == null)
         {
             configuration.setId(this.site.randomObjectId());
             command = new Command();
-            this.report.info("Configuring new command: " + configuration.resolve().getName());
+            this.report.info("Configuring new command: " + resolvedConfiguration.getName());
         }
         else
         {
             configuration.setId(command.getId());
-            this.report.info("Reconfiguring existing command: " + configuration.resolve().getName() + " (" + configuration.getId() + ")");
+            this.report.info("Reconfiguring existing command: " + resolvedConfiguration.getName() + " (" + configuration.getId() + ")");
         }
         // apply the new config
         command.configure(configuration);
         // update
         db.setCommand(command);
         this.loadedObjects.add("command:" + configuration.getName());
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, command, db);
     }
 
     private void loadLocations(BergamotDB db)
@@ -546,29 +551,24 @@ public class BergamotConfigImporter
             return;
         }
         // load
+        LocationCfg resolvedConfiguration = configuration.resolve();
         Location location = db.getLocationByName(this.site.getId(), configuration.getName());
         if (location == null)
         {
             configuration.setId(this.site.randomObjectId());
             location = new Location();
-            this.report.info("Configuring new location: " + configuration.resolve().getName());
+            this.report.info("Configuring new location: " + resolvedConfiguration.getName());
         }
         else
         {
             configuration.setId(location.getId());
-            this.report.info("Reconfiguring existing location: " + configuration.resolve().getName() + " (" + configuration.getId() + ")");
+            this.report.info("Reconfiguring existing location: " + resolvedConfiguration.getName() + " (" + configuration.getId() + ")");
         }
         location.configure(configuration);
         db.setLocation(location);
         this.loadedObjects.add("location:" + configuration.getName());
-        // set security domain membership
-        db.removeSecurityDomainMembershipForCheck(location.getId());
-        for (String securityDomainName : configuration.resolve().getSecurityDomains())
-        {
-            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
-            if (domain != null)
-                db.addCheckToSecurityDomain(domain.getId(), location.getId());
-        }
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, location, db);
     }
     
     private void linkLocation(LocationCfg configuration, BergamotDB db)
@@ -654,30 +654,25 @@ public class BergamotConfigImporter
             this.report.info("Skipping reconfiguring group " + configuration.getName());
             return;
         }
+        GroupCfg resolvedConfiguration = configuration.resolve();
         // load
         Group group = db.getGroupByName(this.site.getId(), configuration.getName());
         if (group == null)
         {
             configuration.setId(this.site.randomObjectId());
             group = new Group();
-            this.report.info("Configuring new group: " + configuration.resolve().getName());
+            this.report.info("Configuring new group: " + resolvedConfiguration.getName());
         }
         else
         {
             configuration.setId(group.getId());
-            this.report.info("Reconfiguring existing group: " + configuration.resolve().getName() + " (" + configuration.getId() + ")");
+            this.report.info("Reconfiguring existing group: " + resolvedConfiguration.getName() + " (" + configuration.getId() + ")");
         }
         group.configure(configuration);
         db.setGroup(group);
         this.loadedObjects.add("group:" + configuration.getName());
-        // set security domain membership
-        db.removeSecurityDomainMembershipForCheck(group.getId());
-        for (String securityDomainName : configuration.resolve().getSecurityDomains())
-        {
-            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
-            if (domain != null)
-                db.addCheckToSecurityDomain(domain.getId(), group.getId());
-        }
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, group, db);
     }
     
     private void linkGroup(GroupCfg configuration, BergamotDB db)
@@ -762,21 +757,24 @@ public class BergamotConfigImporter
             return;
         }
         // load
+        TimePeriodCfg resolvedConfiguration = configuration.resolve();
         TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), configuration.getName());
         if (timePeriod == null)
         {
             configuration.setId(this.site.randomObjectId());
             timePeriod = new TimePeriod();
-            this.report.info("Configuring new timeperiod: " + configuration.resolve().getName());
+            this.report.info("Configuring new timeperiod: " + resolvedConfiguration.getName());
         }
         else
         {
             configuration.setId(timePeriod.getId());
-            this.report.info("Reconfiguring existing timeperiod: " + configuration.resolve().getName() + " (" + configuration.getId() + ")");
+            this.report.info("Reconfiguring existing timeperiod: " + resolvedConfiguration.getName() + " (" + configuration.getId() + ")");
         }
         timePeriod.configure(configuration);
         db.setTimePeriod(timePeriod);
         this.loadedObjects.add("timeperiod:" + configuration.getName());
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, timePeriod, db);
     }
     
     private void linkTimePeriod(TimePeriodCfg configuration, BergamotDB db)
@@ -861,17 +859,18 @@ public class BergamotConfigImporter
             return;
         }
         // load
+        TeamCfg resolvedConfiguration = configuration.resolve();
         Team team = db.getTeamByName(this.site.getId(), configuration.getName());
         if (team == null)
         {
             configuration.setId(this.site.randomObjectId());
             team = new Team();
-            this.report.info("Configuring new team: " + configuration.resolve().getName());
+            this.report.info("Configuring new team: " + resolvedConfiguration.getName());
         }
         else
         {
             configuration.setId(team.getId());
-            this.report.info("Reconfiguring existing team: " + configuration.resolve().getName() + " (" + configuration.getId() + ")");
+            this.report.info("Reconfiguring existing team: " + resolvedConfiguration.getName() + " (" + configuration.getId() + ")");
         }
         team.configure(configuration);
         // access controls
@@ -880,6 +879,8 @@ public class BergamotConfigImporter
         this.loadedObjects.add("team:" + configuration.getName());
         // we need to rebuild the permissions
         this.rebuildPermissions = true;
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, team, db);
     }
     
     private void linkTeam(TeamCfg configuration, BergamotDB db)
@@ -1002,6 +1003,8 @@ public class BergamotConfigImporter
         }
         // we need to rebuild the permissions
         this.rebuildPermissions = true;
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, contact, db);
     }
     
     private void loadAccessControls(UUID roleId, List<AccessControlCfg> acl, BergamotDB db)
@@ -1338,14 +1341,8 @@ public class BergamotConfigImporter
                 db.invalidateChecksInGroup(group.getId());
             }
         }
-        // set security domain membership
-        db.removeSecurityDomainMembershipForCheck(check.getId());
-        for (String securityDomainName : resolvedConfiguration.getSecurityDomains())
-        {
-            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
-            if (domain != null)
-                db.addCheckToSecurityDomain(domain.getId(), check.getId());
-        }
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, check, db);
     }
     
     private void removeService(Host host, ServiceCfg configuration, BergamotDB db)
@@ -1606,6 +1603,18 @@ public class BergamotConfigImporter
         this.loadVirtualCheck(resource, resolvedConfiguration, db);
         // add
         db.setResource(resource);
+    }
+    
+    protected void linkSecurityDomains(SecuredObjectCfg<?> resolvedConfiguration, SecuredObject<?,?> object, BergamotDB db)
+    {
+        // set security domain membership
+        db.removeSecurityDomainMembershipForCheck(object.getId());
+        for (String securityDomainName : resolvedConfiguration.getSecurityDomains())
+        {
+            SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
+            if (domain != null)
+                db.addCheckToSecurityDomain(domain.getId(), object.getId());
+        }
     }
     
     /**

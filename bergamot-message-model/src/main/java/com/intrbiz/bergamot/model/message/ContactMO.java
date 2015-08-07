@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Contact message object
  */
 @JsonTypeName("bergamot.contact")
-public class ContactMO extends NamedObjectMO
+public class ContactMO extends SecuredObjectMO
 {
     @JsonProperty("email")
     private String email;

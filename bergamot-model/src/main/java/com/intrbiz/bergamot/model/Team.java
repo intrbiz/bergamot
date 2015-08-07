@@ -19,7 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "team", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
-public class Team extends NamedObject<TeamMO, TeamCfg>
+public class Team extends SecuredObject<TeamMO, TeamCfg>
 {
     private static final long serialVersionUID = 1L;
 

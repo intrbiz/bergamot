@@ -77,7 +77,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 13, 0}),
+        version = @SQLVersion({3, 14, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1819,7 +1819,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     
     @Cacheable
-    @SQLGetter(table = SecurityDomain.class, name = "get_security_domains_for_check", since = @SQLVersion({3, 8, 0}),
+    @SQLGetter(table = SecurityDomain.class, name = "get_security_domains_for_object", since = @SQLVersion({3, 8, 0}),
         query = @SQLQuery(
                 "SELECT sd.* "
                 + "FROM bergamot.security_domain sd "
@@ -1827,7 +1827,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 + "WHERE sdm.check_id = p_check_id"
         )
     )
-    public abstract List<SecurityDomain> getSecurityDomainsForCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId);
+    public abstract List<SecurityDomain> getSecurityDomainsForObject(@SQLParam(value = "check_id", virtual = true) UUID checkId);
     
     public List<Check<?,?>> getChecksInSecurityDomain(UUID securityDomainId)
     {

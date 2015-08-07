@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Contact message object
  */
 @JsonTypeName("bergamot.team")
-public class TeamMO extends NamedObjectMO
+public class TeamMO extends SecuredObjectMO
 {
     @JsonProperty("teams")
     private List<TeamMO> teams = new LinkedList<TeamMO>();

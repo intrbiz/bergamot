@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 
-public abstract class CheckMO extends NamedObjectMO implements CommentedMO
+public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
 {
     @JsonProperty("state")
     protected CheckStateMO state;

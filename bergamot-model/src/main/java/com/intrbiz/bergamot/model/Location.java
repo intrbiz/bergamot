@@ -21,7 +21,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "location", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
-public class Location extends NamedObject<LocationMO, LocationCfg> implements Commented, Secured
+public class Location extends SecuredObject<LocationMO, LocationCfg> implements Commented
 {
     private static final long serialVersionUID = 1L;
 
@@ -166,18 +166,6 @@ public class Location extends NamedObject<LocationMO, LocationCfg> implements Co
     public List<Comment> getComments()
     {
         return this.getComments(5);
-    }
-    
-    /**
-     * Get the security domains this location exists within
-     */
-    @Override
-    public List<SecurityDomain> getSecurityDomains()
-    {
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            return db.getSecurityDomainsForCheck(this.getId());
-        }
     }
 
     @Override

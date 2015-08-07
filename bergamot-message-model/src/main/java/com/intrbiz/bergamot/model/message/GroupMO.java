@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.model.message.state.GroupStateMO;
  * Contact message object
  */
 @JsonTypeName("bergamot.group")
-public class GroupMO extends NamedObjectMO
+public class GroupMO extends SecuredObjectMO
 {
     @JsonProperty("state")
     private GroupStateMO state;

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Contact message object
  */
 @JsonTypeName("bergamot.time_period")
-public class TimePeriodMO extends NamedObjectMO
+public class TimePeriodMO extends SecuredObjectMO
 {
     @JsonProperty("excludes")
     private List<TimePeriodMO> excludes = new LinkedList<TimePeriodMO>();

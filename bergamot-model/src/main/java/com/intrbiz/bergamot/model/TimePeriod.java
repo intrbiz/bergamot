@@ -27,7 +27,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "timeperiod", since = @SQLVersion({ 1, 0, 0 }))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
-public class TimePeriod extends NamedObject<TimePeriodMO, TimePeriodCfg> implements TimeRange
+public class TimePeriod extends SecuredObject<TimePeriodMO, TimePeriodCfg> implements TimeRange
 {
     private static final long serialVersionUID = 1L;
     

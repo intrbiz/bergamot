@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Contact message object
  */
 @JsonTypeName("bergamot.command")
-public class CommandMO extends NamedObjectMO
+public class CommandMO extends SecuredObjectMO
 {
     @JsonProperty("engine")
     private String engine;

@@ -16,7 +16,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Permission;
-import com.intrbiz.bergamot.model.Secured;
+import com.intrbiz.bergamot.model.SecuredObject;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
@@ -209,9 +209,9 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     {
         if (principal instanceof Contact)
         {
-            if (object instanceof Secured)
+            if (object instanceof SecuredObject)
             {
-                return ((Contact) principal).hasPermission(Permission.of(permission), (Secured) object);
+                return ((Contact) principal).hasPermission(Permission.of(permission), (SecuredObject<?,?>) object);
             }
             else if (object instanceof UUID)
             {
