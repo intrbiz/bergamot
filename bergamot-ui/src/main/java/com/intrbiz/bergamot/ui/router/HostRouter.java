@@ -27,7 +27,8 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void host(BergamotDB db, String name, @SessionVar("site") Site site)
     {
-        Host host = model("host", db.getHostByName(site.getId(), name));
+        Host host = model("host", notNull(db.getHostByName(site.getId(), name)));
+        require(permission("read", host));
         model("alerts", db.getAllAlertsForCheck(host.getId(), 3, 0));
         encode("host/detail");
     }
@@ -36,7 +37,8 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void host(BergamotDB db, @IsaObjectId UUID id)
     {
-        model("host", db.getHost(id));
+        Host host = model("host", notNull(db.getHost(id)));
+        require(permission("read", host));
         model("alerts", db.getAllAlertsForCheck(id, 3, 0));
         encode("host/detail");
     }
@@ -48,7 +50,7 @@ public class HostRouter extends Router<BergamotApp>
         Host host = db.getHost(id);
         if (host != null)
         {
-            action("execute-check", host);
+            if (permission("execute", host)) action("execute-check", host);
         }
         redirect("/host/id/" + id);
     }
@@ -57,13 +59,13 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void enableHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Host host = db.getHost(id);
-        if (host != null)
-        {
-            host.setEnabled(true);
-            db.setHost(host);
-            action("enable-check", host);
-        }
+        Host host = notNull(db.getHost(id));
+        require(permission("enable", host));
+        // enable the host
+        host.setEnabled(true);
+        db.setHost(host);
+        // update scheduling
+        action("enable-check", host);
         redirect("/host/id/" + id);
     }
     
@@ -71,13 +73,13 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void disableHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Host host = db.getHost(id);
-        if (host != null)
-        {
-            host.setEnabled(false);
-            db.setHost(host);
-            action("disable-check", host);
-        }
+        Host host = notNull(db.getHost(id));
+        require(permission("disable", host));
+        // disable the host
+        host.setEnabled(false);
+        db.setHost(host);
+        // update scheduler
+        action("disable-check", host);
         redirect("/host/id/" + id);
     }
     
@@ -85,12 +87,11 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void suppressHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Host host = db.getHost(id);
-        if (host != null)
-        {
-            host.setSuppressed(true);
-            db.setHost(host);
-        }
+        Host host = notNull(db.getHost(id));
+        require(permission("suppress", host));
+        // suppress the host
+        host.setSuppressed(true);
+        db.setHost(host);
         redirect("/host/id/" + id);
     }
     
@@ -98,12 +99,11 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void unsuppressHost(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Host host = db.getHost(id);
-        if (host != null)
-        {
-            host.setSuppressed(false);
-            db.setHost(host);
-        }
+        Host host = notNull(db.getHost(id));
+        require(permission("unsuppress", host));
+        // unsuppress the host
+        host.setSuppressed(false);
+        db.setHost(host);
         redirect("/host/id/" + id);
     }
     
@@ -113,7 +113,7 @@ public class HostRouter extends Router<BergamotApp>
     {
         for (Service service : db.getServicesOnHost(id))
         {
-            action("execute-check", service);
+            if (permission("execute", service)) action("execute-check", service);
         }
         redirect("/host/id/" + id);
     }
@@ -124,11 +124,11 @@ public class HostRouter extends Router<BergamotApp>
     {
         for (Service service : db.getServicesOnHost(id))
         {
-            action("suppress-check", service);
+            if (permission("suppress", service)) action("suppress-check", service);
         }
         for (Trap trap : db.getTrapsOnHost(id))
         {
-            action("suppress-check", trap);
+            if (permission("suppress", trap)) action("suppress-check", trap);
         }
         redirect("/host/id/" + id);
     }
@@ -139,11 +139,11 @@ public class HostRouter extends Router<BergamotApp>
     {
         for (Service service : db.getServicesOnHost(id))
         {
-            action("unsuppress-check", service);
+            if (permission("unsuppress", service)) action("unsuppress-check", service);
         }
         for (Trap trap : db.getTrapsOnHost(id))
         {
-            action("suppress-check", trap);
+            if (permission("unsuppress", trap)) action("suppress-check", trap);
         }
         redirect("/host/id/" + id);
     }

@@ -8,11 +8,9 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Alert;
-import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
@@ -25,11 +23,11 @@ public class DashboardRouter extends Router<BergamotApp>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
+    public void index(BergamotDB db, @SessionVar("site") Site site)
     {
-        model("alerts", user.hasPermission("read", db.listAlerts(site.getId()).stream().map(Alert::getCheck).collect(Collectors.toList())));
-        model("groups", orderGroupsByStatus(user.hasPermission("read", db.getRootGroups(site.getId()))));
-        model("locations", orderLocationsByStatus(user.hasPermission("read", db.getRootLocations(site.getId()))));
+        model("alerts", db.listAlerts(site.getId()).stream().map(Alert::getCheck).filter((c) -> permission("read", c)).collect(Collectors.toList()));
+        model("groups", orderGroupsByStatus(permission("read", db.getRootGroups(site.getId()))));
+        model("locations", orderLocationsByStatus(permission("read", db.getRootLocations(site.getId()))));
         encode("index");
     }
 }

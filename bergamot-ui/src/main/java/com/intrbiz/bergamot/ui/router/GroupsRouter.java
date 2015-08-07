@@ -35,20 +35,20 @@ public class GroupsRouter extends Router<BergamotApp>
     
     @Any("/group/")
     @WithDataAdapter(BergamotDB.class)
-    public void showGroups(BergamotDB db, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
+    public void showGroups(BergamotDB db, @SessionVar("site") Site site)
     {
-        model("groups", orderGroupsByStatus(user.hasPermission("read", db.getRootGroups(site.getId()))));
+        model("groups", orderGroupsByStatus(permission("read", db.getRootGroups(site.getId()))));
         encode("group/index");
     }
     
     @Any("/group/name/:name")
     @WithDataAdapter(BergamotDB.class)
-    public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site, @CurrentPrincipal Contact user)
+    public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site)
     {
         Group group = model("group", notNull(db.getGroupByName(site.getId(), name)));
         require(permission("read", group));
-        model("checks", orderCheckByStatus(user.hasPermission("read", group.getChecks())));
-        model("groups", orderGroupsByStatus(user.hasPermission("read", group.getChildren())));
+        model("checks", orderCheckByStatus(permission("read", group.getChecks())));
+        model("groups", orderGroupsByStatus(permission("read", group.getChildren())));
         encode("group/group");
     }
     
@@ -58,20 +58,20 @@ public class GroupsRouter extends Router<BergamotApp>
     {
         Group group = model("group", notNull(db.getGroup(id)));
         require(permission("read", group));
-        model("checks", orderCheckByStatus(user.hasPermission("read", group.getChecks())));
-        model("groups", orderGroupsByStatus(user.hasPermission("read", group.getChildren())));
+        model("checks", orderCheckByStatus(permission("read", group.getChecks())));
+        model("groups", orderGroupsByStatus(permission("read", group.getChildren())));
         encode("group/group");
     }
     
     @Any("/group/execute-all-checks/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void executeChecksInGroup(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user) throws IOException
+    public void executeChecksInGroup(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         for (Check<?,?> check : db.getChecksInGroup(id))
         {
             if (check instanceof ActiveCheck)
             {
-                if (user.hasPermission("execute", check)) action("execute-check", check);
+                if (permission("execute", check)) action("execute-check", check);
             }
         }
         redirect("/group/id/" + id);
