@@ -371,11 +371,24 @@ public class Contact extends NamedObject<ContactMO, ContactCfg> implements Princ
         return this.hasPermission(permission.toString(), overObject);
     }
     
+    public boolean hasPermission(Permission permission, UUID overObjectId)
+    {
+        return this.hasPermission(permission.toString(), overObjectId);
+    }
+    
     public boolean hasPermission(String permission, Secured overObject)
     {
         try (BergamotDB db = BergamotDB.connect())
         {
             return db.hasPermissionForObject(this.getId(), overObject.getId(), permission);
+        }
+    }
+    
+    public boolean hasPermission(String permission, UUID overObjectId)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.hasPermissionForObject(this.getId(), overObjectId, permission);
         }
     }
     

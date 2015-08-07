@@ -202,14 +202,21 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     }
     
     /**
-     * Check that the given principal has permissions to the given security domain
+     * Check that the given principal has permission over the given object or object UUID
      */
     @Override
     public boolean check(Principal principal, String permission, Object object)
     {
-        if (principal instanceof Contact && object instanceof Secured)
+        if (principal instanceof Contact)
         {
-            return ((Contact) principal).hasPermission(Permission.of(permission), (Secured) object);
+            if (object instanceof Secured)
+            {
+                return ((Contact) principal).hasPermission(Permission.of(permission), (Secured) object);
+            }
+            else if (object instanceof UUID)
+            {
+                return ((Contact) principal).hasPermission(Permission.of(permission), (UUID) object);
+            }
         }
         return false;
     }    
