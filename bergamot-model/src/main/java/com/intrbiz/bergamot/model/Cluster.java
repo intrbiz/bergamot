@@ -47,6 +47,14 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
             return db.getResourcesOnCluster(getId());
         }
     }
+    
+    public List<Resource> getResourcesForContact(Contact contact)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return contact.hasPermission("read", db.getResourcesOnCluster(getId()));
+        }
+    }
 
     public void addResource(Resource resource)
     {
@@ -76,6 +84,27 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
     {
         Map<String, Category<Resource>> categories = new TreeMap<String, Category<Resource>>();
         for (Resource resource : this.getResources())
+        {
+            // get the category for this service
+            String categoryTag = Util.coalesceEmpty(resource.resolveCategory(), "default");
+            Category<Resource> category = categories.get(categoryTag.toLowerCase());
+            if (category == null)
+            {
+                category = new Category<Resource>(categoryTag);
+                categories.put(categoryTag.toLowerCase(), category);
+            }
+            // by application too?
+            String applicationTag = resource.resolveApplication();
+            if (applicationTag == null) category.addCheck(resource);
+            else category.getOrAddApplication(applicationTag).addCheck(resource);
+        }
+        return categories.values();
+    }
+    
+    public Collection<Category<Resource>> getCategorisedResourcesForContact(Contact contact)
+    {
+        Map<String, Category<Resource>> categories = new TreeMap<String, Category<Resource>>();
+        for (Resource resource : this.getResourcesForContact(contact))
         {
             // get the category for this service
             String categoryTag = Util.coalesceEmpty(resource.resolveCategory(), "default");

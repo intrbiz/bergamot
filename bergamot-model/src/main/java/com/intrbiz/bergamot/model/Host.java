@@ -97,6 +97,14 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         }
     }
     
+    public List<Service> getServicesForContact(Contact contact)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return contact.hasPermission("read", db.getServicesOnHost(this.getId()));
+        }
+    }
+    
     public Service getService(String name)
     {
         try (BergamotDB db = BergamotDB.connect())
@@ -149,6 +157,27 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         }
         return categories.values();
     }
+    
+    public Collection<Category<Service>> getCategorisedServicesForContact(Contact contact)
+    {
+        Map<String, Category<Service>> categories = new TreeMap<String, Category<Service>>();
+        for (Service service : this.getServicesForContact(contact))
+        {
+            // get the category for this service
+            String categoryTag = Util.coalesceEmpty(service.resolveCategory(), "default");
+            Category<Service> category = categories.get(categoryTag.toLowerCase());
+            if (category == null)
+            {
+                category = new Category<Service>(categoryTag);
+                categories.put(categoryTag.toLowerCase(), category);
+            }
+            // by application too?
+            String applicationTag = service.resolveApplication();
+            if (applicationTag == null) category.addCheck(service);
+            else category.getOrAddApplication(applicationTag).addCheck(service);
+        }
+        return categories.values();
+    }
 
     // traps
 
@@ -157,6 +186,14 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
         try (BergamotDB db = BergamotDB.connect())
         {
             return db.getTrapsOnHost(this.getId());
+        }
+    }
+    
+    public Collection<Trap> getTrapsForContact(Contact contact)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return contact.hasPermission("read", db.getTrapsOnHost(this.getId()));
         }
     }
 
@@ -196,6 +233,27 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     {
         Map<String, Category<Trap>> categories = new TreeMap<String, Category<Trap>>();
         for (Trap trap : this.getTraps())
+        {
+            // get the category for this service
+            String categoryTag = Util.coalesceEmpty(trap.resolveCategory(), "default");
+            Category<Trap> category = categories.get(categoryTag.toLowerCase());
+            if (category == null)
+            {
+                category = new Category<Trap>(categoryTag);
+                categories.put(categoryTag.toLowerCase(), category);
+            }
+            // by application too?
+            String applicationTag = trap.resolveApplication();
+            if (applicationTag == null) category.addCheck(trap);
+            else category.getOrAddApplication(applicationTag).addCheck(trap);
+        }
+        return categories.values();
+    }
+    
+    public Collection<Category<Trap>> getCategorisedTrapsForContact(Contact contact)
+    {
+        Map<String, Category<Trap>> categories = new TreeMap<String, Category<Trap>>();
+        for (Trap trap : this.getTrapsForContact(contact))
         {
             // get the category for this service
             String categoryTag = Util.coalesceEmpty(trap.resolveCategory(), "default");
