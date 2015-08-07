@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -67,43 +66,43 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/")
     @JSON
-    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public List<AlertMO> getAlerts(BergamotDB db, @Var("site") Site site)
     {
-        return db.listAlerts(site.getId()).stream().map(Alert::toMO).collect(Collectors.toList());
+        return db.listAlerts(site.getId()).stream().filter((a) -> permission("read", a.getCheckId())).map(Alert::toMO).collect(Collectors.toList());
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public AlertMO getAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getAlert(id), Alert::toMO);
+        Alert alert = notNull(db.getAlert(id));
+        require(permission("read", alert.getCheckId()));
+        return alert.toMO();
     }
     
     @Get("/for-check/id/:id")
     @JSON()
-    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public List<AlertMO> getAlertsForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
+        require(permission("read", id));
         return db.getAlertsForCheck(id).stream().map(Alert::toMO).collect(Collectors.toList());
     }
     
     @Get("/current/for-check/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public AlertMO getCurrentAlertForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getCurrentAlertForCheck(id), Alert::toMO);
+        Alert alert = notNull(db.getCurrentAlertForCheck(id));
+        require(permission("read", alert.getCheckId()));
+        return alert.toMO();
     }
     
     @Any("/id/:id/acknowledge")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.write.alert.acknowledge")
     @WithDataAdapter(BergamotDB.class)
     public AlertMO acknowledgeAlert(
             BergamotDB db, 
@@ -112,8 +111,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
             @Param("comment") @CheckStringLength(min = 0, max = 4096, mandatory = false) String comment
     )
     {
-        Alert alert = db.getAlert(id);
-        if (alert == null) return null;
+        Alert alert = notNull(db.getAlert(id));
+        require(permission("acknowledge", alert.getCheckId()));
         // can only acknowledge an non-recovered and non-acknowledged alert
         if (! (alert.isAcknowledged() || alert.isRecovered()))
         {
@@ -151,12 +150,12 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/render")
     @JSON
-    @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     public String renderAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        Alert alert = var("alert", db.getAlert(id));
-        return alert == null ? null : encodeBuffered("include/alert");
+        Alert alert = var("alert", notNull(db.getAlert(id)));
+        require(permission("read", alert.getCheckId()));
+        return encodeBuffered("include/alert");
     }
     
     @Get("/id/:id/dashboard/render")
@@ -165,8 +164,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public String renderComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        Alert alert = db.getAlert(id);
-        if (alert == null) return null;
+        Alert alert = notNull(db.getAlert(id));
+        require(permission("read", alert.getCheckId()));
         var("check", alert.getCheck());
         var("alert", true);
         return encodeBuffered("include/check");
