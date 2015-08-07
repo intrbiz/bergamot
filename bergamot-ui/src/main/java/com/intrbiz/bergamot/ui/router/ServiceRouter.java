@@ -25,7 +25,8 @@ public class ServiceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void service(BergamotDB db, String hostName, String serviceName, @SessionVar("site") Site site)
     {
-        Service service = model("service", db.getServiceOnHostByName(site.getId(), hostName, serviceName));
+        Service service = model("service", notNull(db.getServiceOnHostByName(site.getId(), hostName, serviceName)));
+        require(permission("read", service));
         model("alerts", db.getAllAlertsForCheck(service.getId(), 3, 0));
         encode("service/detail");
     }
@@ -34,7 +35,8 @@ public class ServiceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void service(BergamotDB db, @IsaObjectId UUID id)
     {
-        model("service", db.getService(id));
+        Service service = model("service", notNull(db.getService(id)));
+        require(permission("read", service));
         model("alerts", db.getAllAlertsForCheck(id, 3, 0));
         encode("service/detail");
     }
@@ -43,11 +45,9 @@ public class ServiceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void executeService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Service service = db.getService(id);
-        if (service != null)
-        {
-            action("execute-check", service);
-        }
+        Service service = notNull(db.getService(id));
+        require(permission("execute", service));
+        action("execute-check", service);
         redirect("/service/id/" + id);
     }
     
@@ -55,13 +55,11 @@ public class ServiceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void enableService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Service service = db.getService(id);
-        if (service != null)
-        {
-            service.setEnabled(true);
-            db.setService(service);
-            action("enable-check", service);
-        }
+        Service service = notNull(db.getService(id));
+        require(permission("enable", service));
+        service.setEnabled(true);
+        db.setService(service);
+        action("enable-check", service);
         redirect("/service/id/" + id);
     }
     
@@ -69,13 +67,11 @@ public class ServiceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void disableService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Service service = db.getService(id);
-        if (service != null)
-        {
-            service.setEnabled(false);
-            db.setService(service);
-            action("disable-check", service);
-        }
+        Service service = notNull(db.getService(id));
+        require(permission("disable", service));
+        service.setEnabled(false);
+        db.setService(service);
+        action("disable-check", service);
         redirect("/service/id/" + id);
     }
     
@@ -83,11 +79,9 @@ public class ServiceRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void suppressService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
-        Service service = db.getService(id);
-        if (service != null)
-        {
-            action("suppress-check", service);
-        }
+        Service service = notNull(db.getService(id));
+        require(permission("suppress", service));
+        action("suppress-check", service);
         redirect("/service/id/" + id);
     }
     
@@ -96,10 +90,8 @@ public class ServiceRouter extends Router<BergamotApp>
     public void unsuppressService(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
         Service service = db.getService(id);
-        if (service != null)
-        {
-            action("unsuppress-check", service);
-        }
+        require(permission("unsuppress", service));
+        action("unsuppress-check", service);
         redirect("/service/id/" + id);
     }
 }
