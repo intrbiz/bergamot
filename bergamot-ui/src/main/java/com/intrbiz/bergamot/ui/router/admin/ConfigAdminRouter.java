@@ -10,7 +10,6 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
@@ -18,13 +17,13 @@ import com.intrbiz.metadata.Template;
 @Prefix("/admin/config")
 @Template("layout/main")
 @RequireValidPrincipal()
-@RequirePermission("ui.admin")
 public class ConfigAdminRouter extends Router<BergamotApp>
 {        
     @Get("/id/:id")
     @WithDataAdapter(BergamotDB.class)
     public void showConfigure(BergamotDB db, @IsaObjectId UUID id, @SessionVar("site") Site site)
     {
+        require(permission("read.config", id));
         var("config", db.getConfig(id));
         encode("admin/config/view");
     }
