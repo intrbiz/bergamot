@@ -4,10 +4,10 @@
 <fragment xmlns="com.intrbiz.balsa" title="Resource #{resource.summary} on Cluster #{resource.cluster.summary}">
 
 	<div class="row submenu pull-right">
-		<a rendered="#{resource.suppressed}"  href="/resource/unsuppress/#{resource.id}">Unsuppress</a>
-		<a rendered="#{!resource.suppressed}" href="/resource/suppress/#{resource.id}">Suppress</a>
-		<a rendered="#{resource.enabled}"     href="/resource/disable/#{resource.id}">Disable</a>
-		<a rendered="#{!resource.enabled}"    href="/resource/enable/#{resource.id}">Enable</a>
+		<a rendered="#{resource.suppressed and Balsa().permission('unsuppress', resource)}"  href="/resource/unsuppress/#{resource.id}">Unsuppress</a>
+		<a rendered="#{(!resource.suppressed) and Balsa().permission('suppress', resource)}" href="/resource/suppress/#{resource.id}">Suppress</a>
+		<a rendered="#{resource.enabled and Balsa().permission('disable', resource)}"        href="/resource/disable/#{resource.id}">Disable</a>
+		<a rendered="#{(!resource.enabled) and Balsa().permission('enable', resource)}"      href="/resource/enable/#{resource.id}">Enable</a>
 	</div>
 
 	<div class="row">

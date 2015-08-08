@@ -4,10 +4,10 @@
 <fragment xmlns="com.intrbiz.balsa" title="Trap #{trap.summary} on Host #{trap.host.summary}">
 
 	<div class="row submenu pull-right">
-		<a rendered="#{trap.suppressed}"  href="/trap/unsuppress/#{trap.id}">Unsupress</a>
-		<a rendered="#{!trap.suppressed}" href="/trap/suppress/#{trap.id}">Supress</a>
-		<a rendered="#{trap.enabled}"     href="/trap/disable/#{trap.id}">Disable</a>
-		<a rendered="#{!trap.enabled}"    href="/trap/enable/#{trap.id}">Enable</a>
+		<a rendered="#{trap.suppressed and Balsa().permission('unsuppress', trap)}"   href="/trap/unsuppress/#{trap.id}">Unsupress</a>
+		<a rendered="#{(!trap.suppressed) and Balsa().permission('suppress', trap)}"  href="/trap/suppress/#{trap.id}">Supress</a>
+		<a rendered="#{trap.enabled and Balsa().permission('disable', trap)}"         href="/trap/disable/#{trap.id}">Disable</a>
+		<a rendered="#{(!trap.enabled) and Balsa().permission('enable', trap)}"       href="/trap/enable/#{trap.id}">Enable</a>
 	</div>
 
 	<div class="row">

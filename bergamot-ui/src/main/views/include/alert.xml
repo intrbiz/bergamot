@@ -2,7 +2,7 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
 	<div class="row" id="alert-#{alert.id}">
-		<div class="submenu pull-right" rendered="#{!(alert.acknowledged or alert.recovered)}">
+		<div class="submenu pull-right" rendered="#{(!(alert.acknowledged or alert.recovered)) and Balsa().permission('acknowledge', alert.checkId)}">
 			<a href="#acknowledge-alert" id="acknowledge-#{alert.id}" data-acknowledge-alert="#{alert.id}">Acknowledge this alert</a>
 		</div>
 	    <div class="col4 dash_icon alert">

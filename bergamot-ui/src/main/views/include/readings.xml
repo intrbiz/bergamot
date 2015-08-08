@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
-	<div id="readings" class="row" data-check-id="#{check.id}" style="display: none">
+	<div rendered="#{Balsa().permission('read.readings', check)}" id="readings" class="row" data-check-id="#{check.id}" style="display: none">
 		<H2>Readings</H2>
 		<script type="text/javascript">
 			<![CDATA[

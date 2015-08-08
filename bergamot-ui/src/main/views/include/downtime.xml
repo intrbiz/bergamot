@@ -2,7 +2,7 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
 	<h3 class="summary">#{downtime.summary}</h3>
-	<a href="#remove" data-downtime-id="#{downtime.id}" class="pull-right">Remove this downtime</a>
+	<a rendered="#{Balsa().permission('remove.downtime', check)}" href="#remove" data-downtime-id="#{downtime.id}" class="pull-right">Remove this downtime</a>
 	<div class="col4 downtime">
 	    <div class="description">#{coalesce(downtime.description, '')}</div>
 		<div class="metadata" style="margin-top: 10px;">

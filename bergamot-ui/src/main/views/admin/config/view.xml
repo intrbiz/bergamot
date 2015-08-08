@@ -11,7 +11,7 @@
    		<p class="text-body">The following is the resultant configuration once templates have been applied:</p>
    		<pre>#{config.getResolvedConfiguration().resolve().toString()}</pre>
     </div>
-    <div class="row">
+    <div class="row" rendered="#{Balsa().permission('config.change.apply', config.id)}">
     	<a href="/admin/configchange/add/#{config.type}/id/#{config.id}" class="add">Edit this #{config.type}</a>
     	<a href="/admin/configchange/remove/#{config.type}/id/#{config.id}" class="remove">Remove this #{config.type}</a>
     </div>
@@ -27,7 +27,10 @@
     		<data-set var="dep" value="#{config.listAllDependentsObjects()}">
     			<tr>
     				<td>#{ucfirst(dep.type)}</td>
-    			    <td><a href="/admin/config/id/#{dep.id}" title="Configure">#{coalesce(dep.summary, ucfirst(dep.name))}</a></td>
+    			    <td>
+    			    	<a rendered="#{Balsa().permission('config.change.apply', dep.id)}" href="/admin/config/id/#{dep.id}" title="Configure">#{coalesce(dep.summary, ucfirst(dep.name))}</a>
+    			    	<span>#{coalesce(dep.summary, ucfirst(dep.name))}</span>
+    			    </td>
     				<td>#{dep.name}</td>
     			</tr>
     		</data-set>

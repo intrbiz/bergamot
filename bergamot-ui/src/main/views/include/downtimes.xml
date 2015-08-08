@@ -1,10 +1,10 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
-	<container rendered="#{Balsa().permission('ui.read.downtime')}">
+	<container rendered="#{Balsa().permission('read.downtime', check)}">
 		<h2>Downtime</h2>
 		<div class="row" id="downtime_header_row">
-			<div class="submenu pull-right" rendered="#{Balsa().permission('ui.write.downtime')}">
+			<div class="submenu pull-right" rendered="#{Balsa().permission('write.downtime', check)}">
 				<a data-check-id="#{check.id}" id="add_downtime" href="#add-downtime">Add downtime</a>
 			</div>
 		</div>
@@ -13,7 +13,7 @@
 				<include view="include/downtime"/>
 	    	</div>
 		</data-set>
-		<div id="downtime_modal" class="reveal-modal">
+		<div id="downtime_modal" class="reveal-modal" rendered="#{Balsa().permission('write.downtime', check)}">
 	     	<h1>Add Dowtime</h1>
 	     	<form id="downtime_form" method="post" action="#downtime">
 	     		<p>Please explain why downtime is being added to this check.</p>
@@ -41,7 +41,7 @@
 	     	</form>
 	    	<a class="close-reveal-modal">&#215;</a>
 		</div>
-		<script type="text/javascript">
+		<script type="text/javascript" rendered="#{Balsa().permission('write.downtime', check)}">
 			<![CDATA[
 				$(document).ready(function() {
 					$('input[data-datetime]').appendDtpicker({

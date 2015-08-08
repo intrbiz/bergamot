@@ -1,10 +1,10 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
-	<container rendered="#{Balsa().permission('ui.config.view')}">
+	<container rendered="#{Balsa().permission('read.config', check)}">
 		<h2>Configuration</h2>
 		<div class="row">
-			<div class="submenu pull-right" rendered="#{Balsa().permission('ui.view.config-all')}">
+			<div class="submenu pull-right" rendered="#{Balsa().permission('read.config', check)}">
 				<a href="/admin/config/id/#{if(check.type == 'service' || check.type == 'trap', check.host.id, if(check.type == 'resource', check.cluster.id, check.id))}">View configuration</a>
 			</div>
 			<div class="col4 dash_icon" rendered="#{check.type == 'host' or check.type == 'service'}">
@@ -67,7 +67,7 @@
 			</div>
 		</div>
 	</container>
-	<container rendered="#{Balsa().permission('ui.view.config-all') and (check.type == 'host' or check.type == 'service')}">
+	<container rendered="#{Balsa().permission('read.config', check) and (check.type == 'host' or check.type == 'service' or check.type == 'trap')}">
 		<div class="row">
 			<div class="col4 dash_icon">
 				<h3>Command</h3>

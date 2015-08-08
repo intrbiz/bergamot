@@ -1,14 +1,14 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
-	<container rendered="#{Balsa().permission('ui.read.comments')}">
+	<container rendered="#{Balsa().permission('read.comment', check)}">
 		<h2>Comments</h2>
 		<data-set var="comment" value="#{check.getComments()}">
 			<div class="row" id="comment-#{comment.id}">
 				<include view="include/comment"/>
 	    	</div>
 		</data-set>
-		<div class="row" id="add_comment_row" rendered="#{Balsa().permission('ui.write.comments') and Balsa().permission('api.read.comment') and Balsa().permission('api.write.comment.create')}">
+		<div class="row" id="add_comment_row" rendered="#{Balsa().permission('write.comment', check)}">
 			<h3>Add comment</h3>
 		    <form id="comment_form" method="post" action="#comment">
 	     		<p>
@@ -26,7 +26,7 @@
 	     		</p>
 		    </form>
 	   	</div>
-	  	<script type="text/javascript" rendered="#{Balsa().permission('ui.write.comments') and Balsa().permission('api.read.comment') and Balsa().permission('api.write.comment.create')}">
+	  	<script type="text/javascript" rendered="#{Balsa().permission('write.comment', check)}">
 			<![CDATA[
 				$('#comment_form').submit(function(ev) {
 					ev.preventDefault();

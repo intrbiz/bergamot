@@ -4,11 +4,11 @@
 <fragment xmlns="com.intrbiz.balsa" title="Service #{service.summary} on Host #{service.host.summary}">
 
 	<div class="row submenu pull-right">
-		<a rendered="#{service.suppressed}"  href="/service/unsuppress/#{service.id}">Unsuppress</a>
-		<a rendered="#{!service.suppressed}" href="/service/suppress/#{service.id}">Suppress</a>
-		<a rendered="#{service.enabled}"     href="/service/disable/#{service.id}">Disable</a>
-		<a rendered="#{!service.enabled}"    href="/service/enable/#{service.id}">Enable</a>
-		<a href="/service/execute/#{service.id}" id="check-now" data-check-id="#{service.id}">Check now</a>
+		<a rendered="#{service.suppressed and Balsa().permission('unsuppress', service)}"   href="/service/unsuppress/#{service.id}">Unsuppress</a>
+		<a rendered="#{(!service.suppressed) and Balsa().permission('suppress', service)}"  href="/service/suppress/#{service.id}">Suppress</a>
+		<a rendered="#{service.enabled and Balsa().permission('disable', service)}"         href="/service/disable/#{service.id}">Disable</a>
+		<a rendered="#{(!service.enabled) and Balsa().permission('enable', service)}"       href="/service/enable/#{service.id}">Enable</a>
+		<a rendered="#{Balsa().permission('execute', service)}"                             href="/service/execute/#{service.id}" id="check-now" data-check-id="#{service.id}">Check now</a>
 	</div>
 
 	<div class="row">
