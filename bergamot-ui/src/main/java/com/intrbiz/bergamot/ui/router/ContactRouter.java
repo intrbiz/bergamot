@@ -23,7 +23,7 @@ public class ContactRouter extends Router<BergamotApp>
     public void contact(BergamotDB db, @IsaObjectId UUID id)
     {
         Contact contact = var("the_contact", notNull(db.getContact(id)));
-        require(permission("read.config", contact));
+        require(permission("read", contact));
         encode("contact/detail");
     }
 }

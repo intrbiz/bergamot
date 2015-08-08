@@ -23,7 +23,7 @@ public class CommandRouter extends Router<BergamotApp>
     public void command(BergamotDB db, @IsaObjectId UUID id)
     {
         Command command = model("command", notNull(db.getCommand(id)));
-        require(permission("read.config", command));
+        require(permission("read", command));
         encode("command/detail");
     }
 }

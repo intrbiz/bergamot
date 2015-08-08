@@ -23,7 +23,7 @@ public class TimePeriodRouter extends Router<BergamotApp>
     public void timePeriod(BergamotDB db, @IsaObjectId UUID id)
     {
         TimePeriod timePeriod = model("timeperiod", notNull(db.getTimePeriod(id)));
-        require(permission("read.config", timePeriod));
+        require(permission("read", timePeriod));
         encode("timeperiod/detail");
     }
 }

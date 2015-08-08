@@ -67,7 +67,7 @@
 			</div>
 		</div>
 	</container>
-	<container rendered="#{Balsa().permission('read.config', check) and (check.type == 'host' or check.type == 'service' or check.type == 'trap')}">
+	<container rendered="#{Balsa().permission('read.config', check) and Balsa().permission('read', check.checkCommand.command) and (check.type == 'host' or check.type == 'service' or check.type == 'trap')}">
 		<div class="row">
 			<div class="col4 dash_icon">
 				<h3>Command</h3>

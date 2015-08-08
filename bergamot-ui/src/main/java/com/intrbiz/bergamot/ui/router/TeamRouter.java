@@ -23,7 +23,7 @@ public class TeamRouter extends Router<BergamotApp>
     public void team(BergamotDB db, @IsaObjectId UUID id)
     {
         Team team = model("team", notNull(db.getTeam(id)));
-        require(permission("read.config", team));
+        require(permission("read", team));
         encode("team/detail");
     }
 }
