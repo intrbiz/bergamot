@@ -77,7 +77,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 14, 0}),
+        version = @SQLVersion({3, 15, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -2226,7 +2226,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "   0 AS depth, \n" +
                 "   ARRAY[c.id] AS chain, \n" +
                 "   bergamot.match_permission(c.granted_permissions,  $2) AS granted_generic, \n" +
-                "   bergamot.match_permission(c.revoked_permissions,  $2) AS revoked_generic\n" +
+                "   bergamot.match_permission(c.revoked_permissions,  $2) AS revoked_generic \n" +
                 "  FROM bergamot.contact c\n" +
                 "  WHERE c.id = $1\n" +
                 " UNION ALL\n" +
@@ -2297,11 +2297,14 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'ui.generate.agent',\n" +
                 "        'ui.admin',\n" +
                 "        'api.access',\n" +
+                "        'api.sign.agent',\n" +
                 "        'read',\n" +
                 "        'read.config',\n" +
                 "        'read.comment',\n" +
                 "        'read.downtime',\n" +
                 "        'read.readings',\n" +
+                "        'enable',\n" +
+                "        'disable',\n" +
                 "        'execute',\n" +
                 "        'suppress',\n" +
                 "        'unsuppress',\n" +
@@ -2310,9 +2313,10 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'write',\n" +
                 "        'write.comment',\n" +
                 "        'write.downtime',\n" +
-                "        'write.create',\n" +
-                "        'write.remove',\n" +
-                "        'write.change',\n" +
+                "        'create',\n" +
+                "        'remove',\n" +
+                "        'remove.comment',\n" +
+                "        'remove.downtime',\n" +
                 "        'sign.agent',\n" +
                 "        'config.export',\n" +
                 "        'config.change.apply'\n" +
