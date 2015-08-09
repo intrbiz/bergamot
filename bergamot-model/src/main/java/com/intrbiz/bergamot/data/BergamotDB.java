@@ -905,17 +905,29 @@ public abstract class BergamotDB extends DatabaseAdapter
         query = @SQLQuery(
                 "WITH RECURSIVE group_graph(id) AS (  \n" +
                 "    SELECT g.id  \n" +
-                "    FROM bergamot.group g  \n" +
-                "    LEFT JOIN bergamot.security_domain_membership sdm1 ON (sdm1.check_id = g.id) \n" +
-                "    LEFT JOIN bergamot.computed_permissions_for_domain cpfd1 ON (cpfd1.security_domain_id = sdm1.security_domain_id AND cpfd1.contact_id = p_contact_id AND cpfd1.permission = 'read') \n" +
-                "    WHERE g.id = p_group_id AND (coalesce(cpfd1.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
+                "    FROM bergamot.group g \n" +
+                "    LEFT JOIN \n" +
+                "    ( \n" +
+                "      SELECT sdm1.check_id, coalesce(bool_or(cpfd1.allowed), false) as allowed \n" +
+                "      FROM bergamot.security_domain_membership sdm1 \n" +
+                "      JOIN bergamot.computed_permissions_for_domain cpfd1 ON (sdm1.security_domain_id = cpfd1.security_domain_id) \n" +
+                "      WHERE cpfd1.permission = 'read' AND cpfd1.contact_id = p_contact_id \n" +
+                "      GROUP BY sdm1.check_id \n" +
+                "    ) q1 ON (q1.check_id = g.id) \n" +
+                "    WHERE g.id = p_group_id AND (coalesce(q1.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
                 "  UNION  \n" +
                 "    SELECT g.id  \n" +
                 "    FROM bergamot.group g\n" +
-                "    LEFT JOIN bergamot.security_domain_membership sdm1 ON (sdm1.check_id = g.id) \n" +
-                "    LEFT JOIN bergamot.computed_permissions_for_domain cpfd1 ON (cpfd1.security_domain_id = sdm1.security_domain_id AND cpfd1.contact_id = p_contact_id AND cpfd1.permission = 'read'), \n" +
+                "    LEFT JOIN \n" +
+                "    ( \n" +
+                "      SELECT sdm2.check_id, coalesce(bool_or(cpfd2.allowed), false) as allowed \n" +
+                "      FROM bergamot.security_domain_membership sdm2 \n" +
+                "      JOIN bergamot.computed_permissions_for_domain cpfd2 ON (sdm2.security_domain_id = cpfd2.security_domain_id) \n" +
+                "      WHERE cpfd2.permission = 'read' AND cpfd2.contact_id = p_contact_id \n" +
+                "      GROUP BY sdm2.check_id \n" +
+                "    ) q2 ON (q2.check_id = g.id), \n" +
                 "    group_graph gg  \n" +
-                "    WHERE g.group_ids @> ARRAY[gg.id] AND (coalesce(cpfd1.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
+                "    WHERE g.group_ids @> ARRAY[gg.id] AND (coalesce(q2.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
                 ")  \n" +
                 "SELECT   \n" +
                 "  p_group_id,  \n" +
@@ -945,11 +957,17 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "    SELECT id, group_ids FROM bergamot.cluster  \n" +
                 "  UNION  \n" +
                 "    SELECT id, group_ids FROM bergamot.resource  \n" +
-                " ) q ON (s.check_id = q.id )\n" +
+                " ) q ON (s.check_id = q.id)\n" +
                 "JOIN group_graph g ON (q.group_ids @> ARRAY[g.id])\n" +
-                "LEFT JOIN bergamot.security_domain_membership sdm ON (sdm.check_id = q.id)\n" +
-                "LEFT JOIN bergamot.computed_permissions_for_domain cpfd ON (cpfd.security_domain_id = sdm.security_domain_id AND cpfd.contact_id = p_contact_id AND cpfd.permission = 'read')\n" +
-                "WHERE coalesce(cpfd.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n"
+                "LEFT JOIN \n" +
+                "( \n" +
+                "  SELECT sdm3.check_id, coalesce(bool_or(cpfd3.allowed), false) as allowed \n" +
+                "  FROM bergamot.security_domain_membership sdm3 \n" +
+                "  JOIN bergamot.computed_permissions_for_domain cpfd3 ON (sdm3.security_domain_id = cpfd3.security_domain_id) \n" +
+                "  WHERE cpfd3.permission = 'read' AND cpfd3.contact_id = p_contact_id \n" +
+                "  GROUP BY sdm3.check_id \n" +
+                ") q3 ON (q3.check_id = s.check_id) \n" +
+                "WHERE coalesce(q3.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n"
         )
     )
     public abstract GroupState computeGroupStateForContact(@SQLParam(value = "group_id", virtual = true) UUID groupId, @SQLParam(value = "contact_id", virtual = true) UUID contactId);
@@ -1005,16 +1023,28 @@ public abstract class BergamotDB extends DatabaseAdapter
             "WITH RECURSIVE location_graph(id) AS (\n" +
             "    SELECT l1.id\n" +
             "    FROM bergamot.location l1\n" +
-            "    LEFT JOIN bergamot.security_domain_membership sdm1 ON (sdm1.check_id = l1.id) \n" +
-            "    LEFT JOIN bergamot.computed_permissions_for_domain cpfd1 ON (cpfd1.security_domain_id = sdm1.security_domain_id AND cpfd1.contact_id = p_contact_id AND cpfd1.permission = 'read') \n" +
-            "    WHERE l1.id = p_location_id AND (coalesce(cpfd1.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
+            "    LEFT JOIN \n" +
+            "    ( \n" +
+            "      SELECT sdm1.check_id, coalesce(bool_or(cpfd1.allowed), false) as allowed \n" +
+            "      FROM bergamot.security_domain_membership sdm1 \n" +
+            "      JOIN bergamot.computed_permissions_for_domain cpfd1 ON (sdm1.security_domain_id = cpfd1.security_domain_id) \n" +
+            "      WHERE cpfd1.permission = 'read' AND cpfd1.contact_id = p_contact_id \n" +
+            "      GROUP BY sdm1.check_id \n" +
+            "    ) q1 ON (q1.check_id = l1.id) \n" +
+            "    WHERE l1.id = p_location_id AND (coalesce(q1.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
             "  UNION\n" +
             "    SELECT l2.id\n" +
             "    FROM bergamot.location l2\n" +
-            "    LEFT JOIN bergamot.security_domain_membership sdm2 ON (sdm2.check_id = l2.id) \n" +
-            "    LEFT JOIN bergamot.computed_permissions_for_domain cpfd2 ON (cpfd2.security_domain_id = sdm2.security_domain_id AND cpfd2.contact_id = p_contact_id AND cpfd2.permission = 'read'), \n" +
+            "    LEFT JOIN \n" +
+            "    ( \n" +
+            "      SELECT sdm2.check_id, coalesce(bool_or(cpfd2.allowed), false) as allowed \n" +
+            "      FROM bergamot.security_domain_membership sdm2 \n" +
+            "      JOIN bergamot.computed_permissions_for_domain cpfd2 ON (sdm2.security_domain_id = cpfd2.security_domain_id) \n" +
+            "      WHERE cpfd2.permission = 'read' AND cpfd2.contact_id = p_contact_id \n" +
+            "      GROUP BY sdm2.check_id \n" +
+            "    ) q2 ON (q2.check_id = l2.id), \n" +
             "    location_graph lg\n" +
-            "    WHERE l2.location_id = lg.id AND (coalesce(cpfd2.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
+            "    WHERE l2.location_id = lg.id AND (coalesce(q2.allowed, false) OR bergamot.has_permission(p_contact_id, 'read'))\n" +
             ") \n" +
             "SELECT\n" +
             "  p_location_id,\n" +
@@ -1035,9 +1065,15 @@ public abstract class BergamotDB extends DatabaseAdapter
             "FROM bergamot.check_state s \n" +
             "JOIN bergamot.host h ON (s.check_id = h.id)\n" +
             "JOIN location_graph lg ON (h.location_id = lg.id)\n" +
-            "LEFT JOIN bergamot.security_domain_membership sdm ON (sdm.check_id = h.id) \n" +
-            "LEFT JOIN bergamot.computed_permissions_for_domain cpfd ON (cpfd.security_domain_id = sdm.security_domain_id AND cpfd.contact_id = p_contact_id AND cpfd.permission = 'read') \n" +
-            "WHERE coalesce(cpfd.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n"
+            "LEFT JOIN \n" +
+            "( \n" +
+            "  SELECT sdm3.check_id, coalesce(bool_or(cpfd3.allowed), false) as allowed \n" +
+            "  FROM bergamot.security_domain_membership sdm3 \n" +
+            "  JOIN bergamot.computed_permissions_for_domain cpfd3 ON (sdm3.security_domain_id = cpfd3.security_domain_id) \n" +
+            "  WHERE cpfd3.permission = 'read' AND cpfd3.contact_id = p_contact_id \n" +
+            "  GROUP BY sdm3.check_id \n" +
+            ") q3 ON (q3.check_id = s.check_id) \n" +
+            "WHERE coalesce(q3.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n"
         )
     )
     public abstract GroupState computeLocationStateForContact(@SQLParam(value = "location_id", virtual = true) UUID locationId, @SQLParam(value = "contact_id", virtual = true) UUID contactId);
