@@ -33,6 +33,7 @@ public abstract class SecuredObject<T extends SecuredObjectMO, C extends Secured
     
     protected void toMO(SecuredObjectMO mo, boolean stub)
     {
+        super.toMO(mo, stub);
         mo.setSecurityDomains(this.getSecurityDomains().stream().map((sd) -> sd.toMO(stub)).collect(Collectors.toList()));
     }
 }
