@@ -77,7 +77,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 15, 0}),
+        version = @SQLVersion({3, 17, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1816,6 +1816,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLGetter(table = SecurityDomain.class, name = "get_security_domain_by_name", since = @SQLVersion({3, 8, 0}))
     public abstract SecurityDomain getSecurityDomainByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
+    
+    @Cacheable
+    @SQLGetter(table = SecurityDomain.class, name = "list_security_domains", since = @SQLVersion({3, 17, 0}))
+    public abstract List<SecurityDomain> listSecurityDomains(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({

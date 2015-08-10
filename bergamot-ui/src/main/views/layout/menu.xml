@@ -47,6 +47,9 @@
         <div class="menu-group">
             <h4><a href="/admin/">Admin</a></h4>
             <ul>
+            	<li>
+                    <a href="/admin/securitydomain/">Security Domains</a>
+                </li>
                 <li>
                     <a href="/admin/team/">Teams</a>
                 </li>

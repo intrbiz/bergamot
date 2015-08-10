@@ -1,0 +1,29 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Security Domains">
+    
+    <div clas="row">
+    	<p class="text-body">
+    		Security Domains define a collection of checks to 
+    		which access controls can be applied.
+    	</p>
+    	<div class="col12">
+	    	<table>
+	    		<tr>
+		    		<th>Display Name</th>
+		    		<th>Name</th>
+		    		<th>Description</th>
+	    		</tr>
+	    		<data-set var="securitydomain" value="#{securitydomains}">
+	    			<tr data-securitydomain-id="#{securitydomain.id}">
+	    				<td><a href="/admin/config/id/#{securitydomain.id}">#{securitydomain.summary}</a></td>
+	    				<td>#{securitydomain.name}</td>
+	    				<td>#{coalesce(securitydomain.description, '')}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>
