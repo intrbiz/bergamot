@@ -72,7 +72,7 @@
 			/* setup common javascript components */
 			require(["bergamot/lib/util/console-log", "bergamot/lib/ui/web-notify", "bergamot/lib/data/api-driver"], function(bergamot_console_log, bergamot_ui_web_notify, bergamot_api_driver)
 			{
-				/* bergamot_console_log.attachTo(document); */
+			    if (#{Balsa().param('debug_js') != null}) bergamot_console_log.attachTo(document);
 			
 			    bergamot_ui_web_notify.attachTo(document, {
 			    	site_id: #{'"' + site.id + '"'}
