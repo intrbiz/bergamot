@@ -30,7 +30,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<CommandMO> getCommand(BergamotDB db, @Var("site") Site site)
     {
-        return db.listCommands(site.getId()).stream().filter((c) -> permission("read", c)).map(Command::toMO).collect(Collectors.toList());
+        return db.listCommands(site.getId()).stream().filter((c) -> permission("read", c)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
@@ -40,7 +40,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     {
         Command command = notNull(db.getCommandByName(site.getId(), name));
         require(permission("read", command));
-        return command.toMO();
+        return command.toMO(currentPrincipal());
     }
     
     @Get("/id/:id")
@@ -50,7 +50,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     {
         Command command = notNull(db.getCommand(id));
         require(permission("read", command));
-        return command.toMO();
+        return command.toMO(currentPrincipal());
     }
     
     @Get("/name/:name/config.xml")

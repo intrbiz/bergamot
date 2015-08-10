@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -32,65 +30,70 @@ public class ContactAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    @RequirePermission("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public List<ContactMO> getContacts(BergamotDB db, @Var("site") Site site)
     {
-        return db.listContacts(site.getId()).stream().map(Contact::toMO).collect(Collectors.toList());
+        return db.listContacts(site.getId()).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContact(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getContactByName(site.getId(), name), Contact::toMO);
+        Contact contact = notNull(db.getContactByName(site.getId(), name));
+        require(permission("read", contact));
+        return contact.toMO(currentPrincipal());
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContact(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getContact(id), Contact::toMO);
+        Contact contact = notNull(db.getContact(id));
+        require(permission("read", contact));
+        return contact.toMO(currentPrincipal());
     }
     
     @Get("/email/:email")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContactByEmail(BergamotDB db, @Var("site") Site site, String email)
     {
-        return Util.nullable(db.getContactByEmail(site.getId(), email), Contact::toMO);
+        Contact contact = notNull(db.getContactByEmail(site.getId(), email));
+        require(permission("read", contact));
+        return contact.toMO(currentPrincipal());
     }
     
     @Get("/name-or-email/:nameOrEmail")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.contact")
     @WithDataAdapter(BergamotDB.class)
     public ContactMO getContactByNameOrEmail(BergamotDB db, @Var("site") Site site, String nameOrEmail)
     {
-        return Util.nullable(db.getContactByNameOrEmail(site.getId(), nameOrEmail), Contact::toMO);
+        Contact contact = notNull(db.getContactByNameOrEmail(site.getId(), nameOrEmail));
+        require(permission("read", contact));
+        return contact.toMO(currentPrincipal());
     }
     
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.contact.config")
     @WithDataAdapter(BergamotDB.class)
     public ContactCfg getContactConfig(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getContactByName(site.getId(), name), Contact::getConfiguration);
+        Contact contact = notNull(db.getContactByName(site.getId(), name));
+        require(permission("read.config", contact));
+        return contact.getConfiguration();
     }
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.contact.config")
     @WithDataAdapter(BergamotDB.class)
     public ContactCfg getContactConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getContact(id), Contact::getConfiguration);
+        Contact contact = notNull(db.getContact(id));
+        require(permission("read.config", contact));
+        return contact.getConfiguration();
     }
     
     @Get("/id/:id/set-password")
@@ -99,8 +102,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public Boolean setPassword(BergamotDB db, @IsaObjectId(session = false) UUID id, @Param("password") @CheckStringLength(min = 1, max = 80, mandatory = true) String password)
     {
-        Contact contact = db.getContact(id);
-        if (contact == null) throw new BalsaNotFound("No contact with the id: " + id);
+        Contact contact = notNull(db.getContact(id));
         boolean res = action("set-password", contact, password); 
         return res;
     }

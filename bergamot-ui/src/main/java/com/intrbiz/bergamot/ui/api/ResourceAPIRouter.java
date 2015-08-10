@@ -2,9 +2,7 @@ package com.intrbiz.bergamot.ui.api;
 
 import java.util.UUID;
 
-import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -17,7 +15,6 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -29,78 +26,82 @@ public class ResourceAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:cluster/:name")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public ResourceMO getResource(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
-        return Util.nullable(db.getResourceOnClusterByName(site.getId(), clusterName, name), Resource::toMO);
+        Resource resource = notNull(db.getResourceOnClusterByName(site.getId(), clusterName, name));
+        require(permission("read", resource));
+        return resource.toMO(currentPrincipal());
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public ResourceMO getResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getResource(id), Resource::toMO);
+        Resource resource = notNull(db.getResource(id));
+        require(permission("read", resource));
+        return resource.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getResourceState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getResource(id), (r)->{return r.getState().toMO();});
+        Resource resource = notNull(db.getResource(id));
+        require(permission("read", resource));
+        return resource.getState().toMO(currentPrincipal());
     }
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.resource")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getResourceState(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
-        return Util.nullable(db.getResourceOnClusterByName(site.getId(), clusterName, name), (r)->{return r.getState().toMO();});
+        Resource resource = notNull(db.getResourceOnClusterByName(site.getId(), clusterName, name));
+        require(permission("read", resource));
+        return resource.getState().toMO(currentPrincipal());
     }
     
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.resource.config")
     @WithDataAdapter(BergamotDB.class)
-    public ResourceCfg getResourceConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    public ResourceCfg getResourceConfig(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {
-        return Util.nullable(db.getResourceOnClusterByName(site.getId(), hostName, name), Resource::getConfiguration);
+        Resource resource = notNull(db.getResourceOnClusterByName(site.getId(), clusterName, name));
+        require(permission("read.config", resource));
+        return resource.getConfiguration();
     }
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.resource.config")
     @WithDataAdapter(BergamotDB.class)
     public ResourceCfg getResourceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getResource(id), Resource::getConfiguration);
+        Resource resource = notNull(db.getResource(id));
+        require(permission("read.config", resource));
+        return resource.getConfiguration();
     }
     
     @Get("/id/:id/suppress")
     @JSON()
-    @RequirePermission("api.write.resource.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Resource resource = db.getResource(id);
-        if (resource == null) throw new BalsaNotFound("No resource with id '" + id + "' exists.");
+        Resource resource = notNull(db.getResource(id));
+        require(permission("suppress", resource));
         action("suppress-check", resource);
         return "Ok";
     }
     
     @Get("/id/:id/unsuppress")
     @JSON()
-    @RequirePermission("api.write.resource.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Resource resource = db.getResource(id);
-        if (resource == null) throw new BalsaNotFound("No resource with id '" + id + "' exists.");
+        Resource resource = notNull(db.getResource(id));
+        require(permission("unsuppress", resource));
         action("unsuppress-check", resource);
         return "Ok";
     }

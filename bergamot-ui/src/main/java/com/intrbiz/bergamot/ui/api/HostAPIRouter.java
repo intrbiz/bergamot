@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -35,157 +33,157 @@ public class HostAPIRouter extends Router<BergamotApp>
 {
     @Get("/")
     @JSON
-    @RequirePermission("api.read.host")
     @WithDataAdapter(BergamotDB.class)
     public List<HostMO> getHosts(BergamotDB db, @Var("site") Site site)
     {
-        return db.listHosts(site.getId()).stream().map(Host::toStubMO).collect(Collectors.toList());
+        return db.listHosts(site.getId()).stream().map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
     @WithDataAdapter(BergamotDB.class)
     public HostMO getHost(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getHostByName(site.getId(), name), Host::toMO);
+        Host host = notNull(db.getHostByName(site.getId(), name));
+        require(permission("read", host));
+        return host.toMO(currentPrincipal());
     }
     
     @Get("/name/:name/state")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getHostState(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getHostByName(site.getId(), name), (h)->{return h.getState().toMO();});
+        Host host = notNull(db.getHostByName(site.getId(), name));
+        require(permission("read", host));
+        return host.getState().toMO(currentPrincipal());
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
     @WithDataAdapter(BergamotDB.class)
     public HostMO getHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getHost(id), Host::toMO);
+        Host host = notNull(db.getHost(id));
+        require(permission("read", host));
+        return host.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getHostState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getHost(id), (h)->{return h.getState().toMO();});
+        Host host = notNull(db.getHost(id));
+        require(permission("read", host));
+        return host.getState().toMO(currentPrincipal());
     }
     
     @Get("/name/:name/services")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
-    @RequirePermission("api.read.service")
     @WithDataAdapter(BergamotDB.class)
     public List<ServiceMO> getHostServices(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getHostByName(site.getId(), name), (h) -> {return h.getServices().stream().map(Service::toMO).collect(Collectors.toList());});
+        Host host = notNull(db.getHostByName(site.getId(), name));
+        require(permission("read", host));
+        return host.getServices().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id/services")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
-    @RequirePermission("api.read.service")
     @WithDataAdapter(BergamotDB.class)
     public List<ServiceMO> getHostServices(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getHost(id), (e)->{return e.getServices().stream().map(Service::toMO).collect(Collectors.toList());});
+        Host host = notNull(db.getHost(id));
+        require(permission("read", host));
+        return host.getServices().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name/traps")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
-    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public List<TrapMO> getHostTraps(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getHostByName(site.getId(), name), (h)->{return h.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
+        Host host = notNull(db.getHostByName(site.getId(), name));
+        require(permission("read", host));
+        return host.getTraps().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id/traps")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.host")
-    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public List<TrapMO> getHostTraps(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getHost(id), (e)->{return e.getTraps().stream().map(Trap::toMO).collect(Collectors.toList());});
+        Host host = notNull(db.getHost(id));
+        require(permission("read", host));
+        return host.getTraps().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id/execute")
     @JSON()
-    @RequirePermission("api.write.host.execute")
     @WithDataAdapter(BergamotDB.class)
     public String executeHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
+        require(permission("execute", host));
         action("execute-check", host);
         return "Ok";
     }
     
     @Get("/id/:id/suppress")
     @JSON()
-    @RequirePermission("api.write.host.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppress(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
+        require(permission("suppress", host));
         action("suppress-check", host);
         return "Ok";
     }
     
     @Get("/id/:id/unsuppress")
     @JSON()
-    @RequirePermission("api.write.host.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppress(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
+        require(permission("unsuppress", host));
         action("unsuppress-check", host);
         return "Ok";
     }
     
     @Get("/id/:id/execute-services")
     @JSON()
-    @RequirePermission("api.write.host.execute")
-    @RequirePermission("api.write.service.execute")
     @WithDataAdapter(BergamotDB.class)
     public String executeServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
         int executed = 0;
         for (Service service : host.getServices())
         {
-            action("execute-check", service);
-            executed++;
+            if (permission("execute", service))
+            {
+                action("execute-check", service);
+                executed++;
+            }
         }
         return "Ok, executed " + executed + " services";
     }
     
     @Get("/id/:id/suppress-services")
     @JSON()
-    @RequirePermission("api.write.host.suppress")
-    @RequirePermission("api.write.service.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
         int suppressed = 0;
         for (Service service : host.getServices())
         {
-            action("suppress-check", service);
-            suppressed++;
+            if (permission("suppress", service))
+            {
+                action("suppress-check", service);
+                suppressed++;
+            }
         }
         return "Ok, suppressed " + suppressed + " services";
     }
@@ -197,116 +195,124 @@ public class HostAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
         int unsuppressed = 0;
         for (Service service : host.getServices())
         {
-            action("unsuppress-check", service);
-            unsuppressed++;
+            if (permission("unsuppress", service))
+            {
+                action("unsuppress-check", service);
+                unsuppressed++;
+            }
         }
         return "Ok, unsuppressed " + unsuppressed + " services";
     }
     
     @Get("/id/:id/suppress-traps")
     @JSON()
-    @RequirePermission("api.write.host.suppress")
-    @RequirePermission("api.write.trap.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressTrapsOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
         int suppressed = 0;
         for (Trap trap : host.getTraps())
         {
-            action("suppress-check", trap);
-            suppressed++;
+            if (permission("suppress", trap))
+            {
+                action("suppress-check", trap);
+                suppressed++;
+            }
         }
         return "Ok, suppressed " + suppressed + " traps";
     }
     
     @Get("/id/:id/unsuppress-traps")
     @JSON()
-    @RequirePermission("api.write.host.unsuppress")
-    @RequirePermission("api.write.trap.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressTrapsOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
         int unsuppressed = 0;
         for (Trap trap : host.getTraps())
         {
-            action("unsuppress-check", trap);
-            unsuppressed++;
+            if (permission("unsuppress", trap))
+            {
+                action("unsuppress-check", trap);
+                unsuppressed++;
+            }
         }
         return "Ok, unsuppressed " + unsuppressed + " traps";
     }
     
     @Get("/id/:id/suppress-all")
     @JSON()
-    @RequirePermission("api.write.host.suppress")
-    @RequirePermission("api.write.service.suppress")
-    @RequirePermission("api.write.trap.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressAllOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
         int suppressed = 0;
         for (Service service : host.getServices())
         {
-            action("suppress-check", service);
-            suppressed++;
+            if (permission("suppress", service))
+            {
+                action("suppress-check", service);
+                suppressed++;
+            }
         }
         for (Trap trap : host.getTraps())
         {
-            action("suppress-check", trap);
-            suppressed++;
+            if (permission("suppress", trap))
+            {
+                action("suppress-check", trap);
+                suppressed++;
+            }
         }
         return "Ok, suppressed " + suppressed;
     }
     
     @Get("/id/:id/unsuppress-all")
     @JSON()
-    @RequirePermission("api.write.host.unsuppress")
-    @RequirePermission("api.write.service.unsuppress")
-    @RequirePermission("api.write.trap.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressAllOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Host host = db.getHost(id);
-        if (host == null) throw new BalsaNotFound("No host with id '" + id + "' exists.");
+        Host host = notNull(db.getHost(id));
         int unsuppressed = 0;
         for (Service service : host.getServices())
         {
-            action("unsuppress-check", service);
-            unsuppressed++;
+            if (permission("unsuppress", service))
+            {
+                action("unsuppress-check", service);
+                unsuppressed++;
+            }
         }
         for (Trap trap : host.getTraps())
         {
-            action("unsuppress-check", trap);
-            unsuppressed++;
+            if (permission("unsuppress", trap))
+            {
+                action("unsuppress-check", trap);
+                unsuppressed++;
+            }
         }
         return "Ok, unsuppressed " + unsuppressed;
     }
     
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.host.config")
     @WithDataAdapter(BergamotDB.class)
     public HostCfg getHostConfig(BergamotDB db, @Var("site") Site site, String name)
     {
-        return Util.nullable(db.getHostByName(site.getId(), name), Host::getConfiguration);
+        Host host = notNull(db.getHostByName(site.getId(), name));
+        require(permission("read.config", host));
+        return host.getConfiguration();
     }
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.host.config")
     @WithDataAdapter(BergamotDB.class)
     public HostCfg getHostConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getHost(id), Host::getConfiguration);
+        Host host = notNull(db.getHost(id));
+        require(permission("read.config", host));
+        return host.getConfiguration();
     }
 }

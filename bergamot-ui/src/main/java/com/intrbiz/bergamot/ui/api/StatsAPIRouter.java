@@ -9,7 +9,6 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
-import com.intrbiz.bergamot.model.state.CheckTransition;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CoalesceMode;
@@ -17,7 +16,6 @@ import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/api/stats")
@@ -26,7 +24,6 @@ public class StatsAPIRouter extends Router<BergamotApp>
 {    
     @Any("/transitions/check/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.check.transitions")
     @WithDataAdapter(BergamotDB.class)
     public List<CheckTransitionMO> trap(
             BergamotDB db, 
@@ -35,6 +32,7 @@ public class StatsAPIRouter extends Router<BergamotApp>
             @Param("limit")  @IsaLong(min = 1L, max = 1001L, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 100L) long limit
     )
     {
-        return db.listCheckTransitionsForCheck(id, offset, limit).stream().map(CheckTransition::toMO).collect(Collectors.toList());
+        require(permission("read", id));
+        return db.listCheckTransitionsForCheck(id, offset, limit).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
 }

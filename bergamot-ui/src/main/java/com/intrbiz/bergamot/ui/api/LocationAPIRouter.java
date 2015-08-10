@@ -31,7 +31,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<LocationMO> getLocations(BergamotDB db, @Var("site") Site site)
     {
-        return db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).map(Location::toStubMO).collect(Collectors.toList());
+        return db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/roots")
@@ -39,7 +39,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<LocationMO> getRootLocations(BergamotDB db, @Var("site") Site site)
     {
-        return db.getRootLocations(site.getId()).stream().filter((l) -> permission("read", l)).map(Location::toMO).collect(Collectors.toList());
+        return db.getRootLocations(site.getId()).stream().filter((l) -> permission("read", l)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
@@ -49,7 +49,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
         require(permission("read", location));
-        return location.toMO();
+        return location.toMO(currentPrincipal());
     }
     
     @Get("/name/:name/children")
@@ -59,7 +59,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
         require(permission("read", location));
-        return location.getChildren().stream().filter((l) -> permission("read", l)).map(Location::toMO).collect(Collectors.toList());
+        return location.getChildren().stream().filter((l) -> permission("read", l)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name/hosts")
@@ -69,7 +69,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
         require(permission("read", location));
-        return location.getHosts().stream().filter((h) -> permission("read", h)).map(Host::toMO).collect(Collectors.toList());
+        return location.getHosts().stream().filter((h) -> permission("read", h)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     //
@@ -81,7 +81,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     {
         Location location = notNull(db.getLocation(id));
         require(permission("read", location));
-        return location.toMO();
+        return location.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/children")
@@ -91,7 +91,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     {
         Location location = notNull(db.getLocation(id));
         require(permission("read", location));
-        return location.getChildren().stream().filter((l) -> permission("read", l)).map(Location::toMO).collect(Collectors.toList());
+        return location.getChildren().stream().filter((l) -> permission("read", l)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id/hosts")
@@ -101,7 +101,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     {
         Location location = notNull(db.getLocation(id));
         require(permission("read", location));
-        return location.getHosts().stream().filter((h) -> permission("read", h)).map(Host::toMO).collect(Collectors.toList());
+        return location.getHosts().stream().filter((h) -> permission("read", h)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id/execute-all-hosts")

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
@@ -35,7 +34,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<ClusterMO> getClusters(BergamotDB db, @Var("site") Site site)
     {
-        return db.listClusters(site.getId()).stream().filter((c) -> permission("read", c)).map(Cluster::toStubMO).collect(Collectors.toList());
+        return db.listClusters(site.getId()).stream().filter((c) -> permission("read", c)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
@@ -45,7 +44,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
-        return cluster.toMO();
+        return cluster.toMO(currentPrincipal());
     }
     
     @Get("/name/:name/state")
@@ -55,7 +54,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
-        return cluster.getState().toMO();
+        return cluster.getState().toMO(currentPrincipal());
     }
     
     @Get("/id/:id")
@@ -65,7 +64,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
-        return Util.nullable(db.getCluster(id), Cluster::toMO);
+        return cluster.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/state")
@@ -75,7 +74,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
-        return cluster.getState().toMO();
+        return cluster.getState().toMO(currentPrincipal());
     }
     
     @Get("/name/:name/resources")
@@ -85,7 +84,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
-        return cluster.getResources().stream().filter((r) -> permission("read", r)).map(Resource::toMO).collect(Collectors.toList());
+        return cluster.getResources().stream().filter((r) -> permission("read", r)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id/resources")
@@ -95,7 +94,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
-        return cluster.getResources().stream().filter((r) -> permission("read", r)).map(Resource::toMO).collect(Collectors.toList());
+        return cluster.getResources().stream().filter((r) -> permission("read", r)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name/references")
@@ -105,7 +104,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
-        return cluster.getReferences().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());
+        return cluster.getReferences().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO(currentPrincipal());}).collect(Collectors.toList());
     }
     
     @Get("/id/:id/references")
@@ -115,7 +114,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
-        return cluster.getReferences().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());
+        return cluster.getReferences().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO(currentPrincipal());}).collect(Collectors.toList());
     }
     
     @Get("/name/:name/config.xml")

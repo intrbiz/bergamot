@@ -37,7 +37,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     {
         Downtime downtime = notNull(db.getDowntime(id));
         require(permission("read.downtime", downtime.getCheckId()));
-        return downtime.toMO();
+        return downtime.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/remove")
@@ -65,7 +65,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     )
     {
         require(permission("read.downtime", id));
-        return db.getDowntimesForCheck(id, pastDays + " days", futureDays + " days").stream().map(Downtime::toMO).collect(Collectors.toList());
+        return db.getDowntimesForCheck(id, pastDays + " days", futureDays + " days").stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Any("/add-downtime-to-check/id/:id")
@@ -89,7 +89,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
         //
         Downtime downtime = new Downtime().createdBy(this.currentPrincipal()).on(check).between(starts, ends).summary(summary).description(description);
         db.setDowntime(downtime);
-        return downtime.toMO();
+        return downtime.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/render")

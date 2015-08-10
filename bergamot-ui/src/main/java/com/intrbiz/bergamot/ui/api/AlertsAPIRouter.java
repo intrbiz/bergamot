@@ -69,7 +69,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<AlertMO> getAlerts(BergamotDB db, @Var("site") Site site)
     {
-        return db.listAlerts(site.getId()).stream().filter((a) -> permission("read", a.getCheckId())).map(Alert::toMO).collect(Collectors.toList());
+        return db.listAlerts(site.getId()).stream().filter((a) -> permission("read", a.getCheckId())).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id")
@@ -79,7 +79,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     {
         Alert alert = notNull(db.getAlert(id));
         require(permission("read", alert.getCheckId()));
-        return alert.toMO();
+        return alert.toMO(currentPrincipal());
     }
     
     @Get("/for-check/id/:id")
@@ -88,7 +88,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     public List<AlertMO> getAlertsForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         require(permission("read", id));
-        return db.getAlertsForCheck(id).stream().map(Alert::toMO).collect(Collectors.toList());
+        return db.getAlertsForCheck(id).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/current/for-check/id/:id")
@@ -98,7 +98,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     {
         Alert alert = notNull(db.getCurrentAlertForCheck(id));
         require(permission("read", alert.getCheckId()));
-        return alert.toMO();
+        return alert.toMO(currentPrincipal());
     }
     
     @Any("/id/:id/acknowledge")
@@ -143,9 +143,9 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 }
             }
             // send alert update
-            this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), new AlertUpdate(alert.toMO()));
+            this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), new AlertUpdate(alert.toMO(currentPrincipal())));
         }
-        return alert.toMO();
+        return alert.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/render")

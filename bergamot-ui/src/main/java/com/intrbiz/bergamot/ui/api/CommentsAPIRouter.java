@@ -39,7 +39,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     {
         Comment comment = notNull(db.getComment(id));
         require(permission("read.comment", comment.getObjectId()));
-        return comment.toMO();
+        return comment.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/remove")
@@ -67,7 +67,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     )
     {
         require(permission("read.comment", id));
-        return db.getCommentsForObject(id, offset, limit).stream().map(Comment::toMO).collect(Collectors.toList());
+        return db.getCommentsForObject(id, offset, limit).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Any("/add-comment-to-check/id/:id")
@@ -84,7 +84,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
         require(permission("write.comment", check));
         Comment comment = new Comment().author(currentPrincipal()).on(check).summary(summary).message(message);
         db.setComment(comment);
-        return comment.toMO();
+        return comment.toMO(currentPrincipal());
     }
     
     @Any("/add-comment-to-alert/id/:id")
@@ -101,7 +101,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
         require(permission("write.comment", alert.getCheckId()));
         Comment comment = new Comment().author(currentPrincipal()).on(alert).summary(summary).message(message);
         db.setComment(comment);
-        return comment.toMO();
+        return comment.toMO(currentPrincipal());
     }
     
     @Any("/add-comment-to-downtime/id/:id")
@@ -118,7 +118,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
         require(permission("write.comment", downtime.getCheckId()));
         Comment comment = new Comment().author(currentPrincipal()).on(downtime).summary(summary).message(message);
         db.setComment(comment);
-        return comment.toMO();
+        return comment.toMO(currentPrincipal());
     }
     
     @Any("/add-comment-to-object/id/:id")
@@ -136,7 +136,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
         require(permission("write.comment", id));
         Comment comment = new Comment().author(currentPrincipal()).on(site, id).summary(summary).message(message);
         db.setComment(comment);
-        return comment.toMO();
+        return comment.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/render")

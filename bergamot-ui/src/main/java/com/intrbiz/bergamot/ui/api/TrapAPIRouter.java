@@ -2,9 +2,7 @@ package com.intrbiz.bergamot.ui.api;
 
 import java.util.UUID;
 
-import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
-import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -21,7 +19,6 @@ import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -33,48 +30,51 @@ public class TrapAPIRouter extends Router<BergamotApp>
 {    
     @Get("/name/:host/:name")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public TrapMO getTrap(BergamotDB db, @Var("site") Site site, String hostName, String name)
-    {    
-        return Util.nullable(db.getTrapOnHostByName(site.getId(), hostName, name), Trap::toMO);
+    {   
+        Trap trap = notNull(db.getTrapOnHostByName(site.getId(), hostName, name));
+        require(permission("read", trap));
+        return trap.toMO(currentPrincipal());
     }
     
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public TrapMO getTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getTrap(id), Trap::toMO);
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("read", trap));
+        return trap.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getTrapState(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getTrap(id), (t)->{return t.getState().toMO();});
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("read", trap));
+        return trap.getState().toMO(currentPrincipal());
     }
     
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.read.trap")
     @WithDataAdapter(BergamotDB.class)
     public CheckStateMO getTrapState(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
-        return Util.nullable(db.getTrapOnHostByName(site.getId(), hostName, name), (t)->{return t.getState().toMO();});
+        Trap trap = notNull(db.getTrapOnHostByName(site.getId(), hostName, name));
+        require(permission("read", trap));
+        return trap.getState().toMO(currentPrincipal());
     }
     
     @Any("/id/:id/submit")
     @JSON(notFoundIfNull = true)
-    @RequirePermission("api.write.trap.submit")
     @WithDataAdapter(BergamotDB.class)
     public String getServiceState(BergamotDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id, @Param("status") String status, @Param("output") String output)
     {   
-        Trap trap = db.getTrap(id);
-        if (trap == null) return null;
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("submit", trap));
         // the result
         PassiveResultMO resultMO = new PassiveResultMO();
         resultMO.setId(UUID.randomUUID());
@@ -93,43 +93,43 @@ public class TrapAPIRouter extends Router<BergamotApp>
     
     @Get("/id/:id/suppress")
     @JSON()
-    @RequirePermission("api.write.trap.suppress")
     @WithDataAdapter(BergamotDB.class)
     public String suppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Trap trap = db.getTrap(id);
-        if (trap == null) throw new BalsaNotFound("No trap with id '" + id + "' exists.");
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("suppress", trap));
         action("suppress-check", trap);
         return "Ok";
     }
     
     @Get("/id/:id/unsuppress")
     @JSON()
-    @RequirePermission("api.write.trap.unsuppress")
     @WithDataAdapter(BergamotDB.class)
     public String unsuppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
-        Trap trap = db.getTrap(id);
-        if (trap == null) throw new BalsaNotFound("No trap with id '" + id + "' exists.");
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("unsuppress", trap));
         action("unsuppress-check", trap);
         return "Ok";
     }
     
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.trap.config")
     @WithDataAdapter(BergamotDB.class)
     public TrapCfg getTrapConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
-        return Util.nullable(db.getTrapOnHostByName(site.getId(), hostName, name), Trap::getConfiguration);
+        Trap trap = notNull(db.getTrapOnHostByName(site.getId(), hostName, name));
+        require(permission("read.config", trap));
+        return trap.getConfiguration();
     }
     
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
-    @RequirePermission("api.read.trap.config")
     @WithDataAdapter(BergamotDB.class)
     public TrapCfg getTrapConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
-        return Util.nullable(db.getTrap(id), Trap::getConfiguration);
+        Trap trap = notNull(db.getTrap(id));
+        require(permission("read.config", trap));
+        return trap.getConfiguration();
     }
 }

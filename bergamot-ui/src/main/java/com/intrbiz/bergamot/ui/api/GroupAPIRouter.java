@@ -33,7 +33,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<GroupMO> getGroups(BergamotDB db, @Var("site") Site site)
     {
-        return db.listGroups(site.getId()).stream().filter((g) -> permission("read", g)).map(Group::toStubMO).collect(Collectors.toList());
+        return db.listGroups(site.getId()).stream().filter((g) -> permission("read", g)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/roots")
@@ -41,7 +41,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public List<GroupMO> getRootGroups(BergamotDB db, @Var("site") Site site)
     {
-        return db.getRootGroups(site.getId()).stream().filter((g) -> permission("read", g)).map(Group::toMO).collect(Collectors.toList());
+        return db.getRootGroups(site.getId()).stream().filter((g) -> permission("read", g)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id")
@@ -51,7 +51,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     {
         Group group = notNull(db.getGroup(id));
         require(permission("read", group));
-        return group.toMO();
+        return group.toMO(currentPrincipal());
     }
     
     @Get("/id/:id/children")
@@ -61,7 +61,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     {
         Group group = notNull(db.getGroup(id));
         require(permission("read", group));
-        return group.getChildren().stream().filter((g) -> permission("read", g)).map(Group::toMO).collect(Collectors.toList());
+        return group.getChildren().stream().filter((g) -> permission("read", g)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/id/:id/checks")
@@ -71,7 +71,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     {
         Group group = notNull(db.getGroup(id));
         require(permission("read", group));
-        return group.getChecks().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());
+        return group.getChecks().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO(currentPrincipal());}).collect(Collectors.toList());
     }
     
     @Get("/name/:name")
@@ -81,7 +81,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
         require(permission("read", group));
-        return group.toMO();
+        return group.toMO(currentPrincipal());
     }
     
     @Get("/name/:name/children")
@@ -91,7 +91,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
         require(permission("read", group));
-        return group.getChildren().stream().filter((g) -> permission("read", g)).map(Group::toMO).collect(Collectors.toList());
+        return group.getChildren().stream().filter((g) -> permission("read", g)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
     @Get("/name/:name/checks")
@@ -101,7 +101,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
         require(permission("read", group));
-        return group.getChecks().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO();}).collect(Collectors.toList());
+        return group.getChecks().stream().filter((c) -> permission("read", c)).map((c) -> {return (CheckMO) c.toMO(currentPrincipal());}).collect(Collectors.toList());
     }
     
     @Get("/id/:id/execute-all-checks")
