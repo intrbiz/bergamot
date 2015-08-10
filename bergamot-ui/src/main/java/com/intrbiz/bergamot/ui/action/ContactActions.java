@@ -64,7 +64,7 @@ public class ContactActions
             // send a notification, only via email
             this.notificationsProducer.publish(
                     new NotificationKey(contact.getSite().getId()),
-                    new PasswordResetNotification(contact.getSite().toMO(), contact.toMO().addEngine("email"), url)
+                    new PasswordResetNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url)
             );
             logger.info("Sent password reset for contact " + contact.getSite().getName() + "::" + contact.getName() + " (" + contact.getId() + ")");
         }
