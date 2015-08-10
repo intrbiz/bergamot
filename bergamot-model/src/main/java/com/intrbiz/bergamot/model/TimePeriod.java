@@ -147,7 +147,7 @@ public class TimePeriod extends SecuredObject<TimePeriodMO, TimePeriodCfg> imple
     {
         TimePeriodMO mo = new TimePeriodMO();
         super.toMO(mo, contact, options);
-        if (options.contains(MOFlag.EXCLUDES)) mo.setExcludes(this.getExcludes().stream().map(TimePeriod::toStubMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.EXCLUDES)) mo.setExcludes(this.getExcludes().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         if (options.contains(MOFlag.RANGES)) mo.setRanges(this.getRanges().stream().map(TimeRange::toString).collect(Collectors.toList()));
         return mo;
     }

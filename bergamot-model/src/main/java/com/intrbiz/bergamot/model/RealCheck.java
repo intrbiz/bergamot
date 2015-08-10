@@ -87,8 +87,8 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         mo.setAlertAttemptThreshold(this.getAlertAttemptThreshold());
         mo.setRecoveryAttemptThreshold(this.getRecoveryAttemptThreshold());
         mo.setCurrentAttemptThreshold(this.getCurrentAttemptThreshold());
-        if (options.contains(MOFlag.STATS)) mo.setStats(this.getStats().toMO());
-        if (options.contains(MOFlag.COMMAND)) mo.setCheckCommand(Util.nullable(this.getCheckCommand(), CheckCommand::toStubMO));
+        if (options.contains(MOFlag.STATS)) mo.setStats(this.getStats().toMO(contact));
+        if (options.contains(MOFlag.COMMAND)) mo.setCheckCommand(Util.nullable(this.getCheckCommand(), (x) -> x.toStubMO(contact)));
     }
     
     @Override

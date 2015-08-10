@@ -46,7 +46,7 @@ public abstract class BergamotObject<T extends MessageObject> implements Seriali
         super();
     }
     
-    public final T toMO()
+    public final T toMOUnsafe()
     {
         return this.toMO(null);
     }
@@ -56,7 +56,7 @@ public abstract class BergamotObject<T extends MessageObject> implements Seriali
         return this.toMO(contact, MOFlag.ALL);
     }
     
-    public final T toStubMO()
+    public final T toStubMOUnsafe()
     {
         return this.toStubMO(null);
     }

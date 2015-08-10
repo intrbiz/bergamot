@@ -214,7 +214,7 @@ public class BergamotConfigImporter
                                         // send a notification, only via email
                                         notificationsProducer.publish(
                                                 new NotificationKey(contact.getSite().getId()),
-                                                new RegisterContactNotification(contact.getSite().toMO(), contact.toMO().addEngine("email"), url) 
+                                                new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) 
                                         );
                                     }
                                     catch (Exception e)

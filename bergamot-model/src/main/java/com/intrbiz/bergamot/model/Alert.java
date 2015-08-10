@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
@@ -503,8 +502,9 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         AlertMO mo = new AlertMO();
         mo.setAcknowledged(this.isAcknowledged());
         mo.setAcknowledgedAt(this.getAcknowledgedAt() == null ? -1 : this.getAcknowledgedAt().getTime());
-        mo.setAcknowledgedBy(Util.nullable(this.getAcknowledgedBy(), Contact::toStubMO));
-        mo.setCheck(this.getCheck().toMO());
+        Contact ackedBy = this.getAcknowledgedBy();
+        if (ackedBy != null && (contact == null || contact.hasPermission("read", ackedBy))) mo.setAcknowledgedBy(ackedBy.toStubMO(contact));
+        mo.setCheck(this.getCheck().toMO(contact));
         mo.setFlapping(this.isFlapping());
         mo.setHard(this.isHard());
         mo.setId(this.getId());
@@ -524,7 +524,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         mo.setTransitioning(this.isTransitioning());
         if (options.contains(MOFlag.COMMENTS))
         {
-            mo.setComments(this.getComments().stream().map(Comment::toMO).collect(Collectors.toList()));
+            mo.setComments(this.getComments().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
         }
         return mo;
     }
@@ -547,7 +547,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         // create the notifications
         T notification = ctor.get();
         // the site
-        notification.setSite(check.getSite().toMO());
+        notification.setSite(check.getSite().toMOUnsafe());
         notification.setRaised(now.getTimeInMillis());
         // alert id
         notification.setAlertId(this.getId());
@@ -555,12 +555,12 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         final Set<String> enabledEngines = check.getNotifications().getEnginesEnabledAt(type, check.getState().getStatus(), now);
         // send
         notification.setRaised(System.currentTimeMillis());
-        notification.setCheck(check.toMO());
+        notification.setCheck(check.toMOUnsafe());
         // to
         notification.setTo(check.getAllContacts().stream()
          .filter((contact) -> contact.getNotifications().isEnabledAt(type, check.getState().getStatus(), now))
          .map((contact) -> {
-             ContactMO cmo = contact.toMO();
+             ContactMO cmo = contact.toMOUnsafe();
              cmo.setEngines(
                      contact.getNotifications().getEnginesEnabledAt(type, check.getState().getStatus(), now).stream()
                      .filter((engine) -> check.getNotifications().isAllEnginesEnabled() || enabledEngines.contains(engine))
@@ -587,7 +587,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         SendAcknowledge sa = this.createNotification(now, NotificationType.ACKNOWLEDGE, SendAcknowledge::new);
         if (sa == null) return null;
         // additional detail for acknowledge
-        sa.setAcknowledgedBy(acknowledgedBy.toStubMO());
+        sa.setAcknowledgedBy(acknowledgedBy.toStubMOUnsafe());
         sa.setAcknowledgeSummary(acknowledgeComment.getSummary());
         sa.setAcknowledgeComment(acknowledgeComment.getComment());
         // done

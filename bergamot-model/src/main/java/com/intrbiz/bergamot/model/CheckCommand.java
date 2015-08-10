@@ -152,7 +152,7 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
         {
             if (contact == null || contact.hasPermission("read", command)) mo.setCommand(command.toStubMO(contact));
         }
-        mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
+        mo.setParameters(this.getParameters().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
         return mo;
     }
     

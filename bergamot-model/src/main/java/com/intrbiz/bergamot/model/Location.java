@@ -174,7 +174,7 @@ public class Location extends SecuredObject<LocationMO, LocationCfg> implements 
     {
         LocationMO mo = new LocationMO();
         super.toMO(mo, contact, options);
-        mo.setState(this.getState().toMO());
+        mo.setState(this.getState().toMO(contact));
         if (options.contains(MOFlag.LOCATION))
         {
             Location location = this.getLocation();

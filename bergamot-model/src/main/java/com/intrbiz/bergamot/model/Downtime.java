@@ -260,8 +260,8 @@ public class Downtime extends BergamotObject<DowntimeMO> implements Serializable
     public DowntimeMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         DowntimeMO mo = new DowntimeMO();
-        mo.setCheck(this.getCheck().toStubMO());
-        mo.setComments(this.getComments().stream().map(Comment::toMO).collect(Collectors.toList()));
+        mo.setCheck(this.getCheck().toStubMO(contact));
+        mo.setComments(this.getComments().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
         mo.setCreated(this.getCreated().getTime());
         Contact createdBy = this.getCreatedBy();
         if (createdBy != null)

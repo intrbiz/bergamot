@@ -201,7 +201,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         mo.setName(this.getName());
         mo.setSummary(this.getSummary());
         if (options.contains(MOFlag.DESCRIPTION)) mo.setDescription(this.getDescription());
-        if (options.contains(MOFlag.PARAMETERS)) mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.PARAMETERS)) mo.setParameters(this.getParameters().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
     }
 
     @Override

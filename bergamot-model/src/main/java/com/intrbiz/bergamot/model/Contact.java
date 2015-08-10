@@ -471,7 +471,7 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         mo.setPhone(this.getPhone());
         mo.setGrantedPermissions(this.getGrantedPermissions());
         mo.setRevokedPermissions(this.getRevokedPermissions());
-        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Team::toStubMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         if (options.contains(MOFlag.NOTIFICATIONS)) mo.setNotifications(Util.nullable(this.getNotifications(), (x) -> x.toStubMO(contact)));
         return mo;
     }

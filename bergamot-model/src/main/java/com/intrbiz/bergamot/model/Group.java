@@ -173,7 +173,7 @@ public class Group extends SecuredObject<GroupMO, GroupCfg> implements Commented
     {
         GroupMO mo = new GroupMO();
         super.toMO(mo, contact, options);
-        mo.setState(this.getState().toMO());
+        mo.setState(this.getState().toMO(contact));
         if (options.contains(MOFlag.CHECKS)) mo.setChecks(this.getChecks().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((c) -> {return (CheckMO) c.toStubMO(contact);}).collect(Collectors.toList()));
         if (options.contains(MOFlag.GROUPS)) mo.setGroups(this.getGroups().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         if (options.contains(MOFlag.CHILDREN)) mo.setChildren(this.getChildren().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));

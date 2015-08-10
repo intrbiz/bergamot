@@ -214,7 +214,8 @@ public class Comment extends BergamotObject<CommentMO> implements Serializable
     public CommentMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         CommentMO mo = new CommentMO();
-        mo.setAuthor(this.getAuthor().toStubMO());
+        Contact author = this.getAuthor();
+        if (author != null && (contact == null || contact.hasPermission("read", author))) mo.setAuthor(author.toStubMO(contact));
         mo.setComment(this.getComment());
         mo.setCommentType(this.getCommentType());
         mo.setCreated(this.getCreated().getTime());

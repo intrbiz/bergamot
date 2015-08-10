@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CommandMO;
-import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLUnique;
@@ -138,7 +137,7 @@ public class Command extends SecuredObject<CommandMO, CommandCfg>
         CommandMO mo = new CommandMO();
         super.toMO(mo, contact, options);
         mo.setEngine(this.getEngine());
-        mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
+        mo.setParameters(this.getParameters().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
         mo.setApplication(this.getApplication());
         mo.setCategory(this.getCategory());
         mo.setScript(this.getScript());

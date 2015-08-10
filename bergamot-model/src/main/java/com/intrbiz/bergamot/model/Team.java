@@ -174,9 +174,9 @@ public class Team extends SecuredObject<TeamMO, TeamCfg>
         super.toMO(mo, contact, options);
         mo.setGrantedPermissions(this.getGrantedPermissions());
         mo.setRevokedPermissions(this.getRevokedPermissions());
-        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Team::toStubMO).collect(Collectors.toList()));
-        if (options.contains(MOFlag.CHILDREN)) mo.setChildren(this.getChildren().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Team::toStubMO).collect(Collectors.toList()));
-        if (options.contains(MOFlag.CONTACTS)) mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Contact::toStubMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.CHILDREN)) mo.setChildren(this.getChildren().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.CONTACTS)) mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
 }
