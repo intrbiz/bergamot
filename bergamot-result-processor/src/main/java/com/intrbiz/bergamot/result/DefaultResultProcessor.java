@@ -198,7 +198,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected void sendCheckStateUpdate(BergamotDB db, Check<?, ?> check, Transition transition)
     {
         // send the update
-        this.publishCheckUpdate(check, new CheckUpdate(check.toStubMO()));
+        this.publishCheckUpdate(check, new CheckUpdate(check.toStubMOUnsafe()));
     }
     
     /**
@@ -217,7 +217,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             {
                 updated.add(group.getId());
                 // send update for group
-                this.publishGroupUpdate(group, new GroupUpdate(group.toStubMO()));
+                this.publishGroupUpdate(group, new GroupUpdate(group.toStubMOUnsafe()));
                 // recurse up the chain
                 groups.addAll(group.getGroups());
             }
@@ -240,7 +240,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             {
                 updated.add(location.getId());
                 // send update for location
-                this.publishLocationUpdate(location, new LocationUpdate(location.toStubMO()));
+                this.publishLocationUpdate(location, new LocationUpdate(location.toStubMOUnsafe()));
                 // recurse up the chain
                 if (location.getLocation() != null) locations.add(location.getLocation());
             }
@@ -278,7 +278,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 }
             }
             // publish alert update
-            this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMO()));
+            this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
         }
     }
 
@@ -304,7 +304,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 logger.warn("Not sending alert for " + check);
             }
             // publish alert update
-            this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMO()));
+            this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
         }
     }
     
