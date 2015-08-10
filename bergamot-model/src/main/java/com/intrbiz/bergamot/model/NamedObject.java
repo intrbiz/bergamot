@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.sql.Timestamp;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -193,14 +194,14 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         this.parameters = parameters;
     }
 
-    protected void toMO(NamedObjectMO mo, boolean stub)
+    protected void toMO(NamedObjectMO mo, Contact contact, EnumSet<MOFlag> options)
     {
         mo.setId(this.getId());
         mo.setSiteId(this.getSiteId());
         mo.setName(this.getName());
         mo.setSummary(this.getSummary());
-        if (!stub) mo.setDescription(this.getDescription());
-        mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.DESCRIPTION)) mo.setDescription(this.getDescription());
+        if (options.contains(MOFlag.PARAMETERS)) mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -255,13 +256,18 @@ public class Downtime extends BergamotObject<DowntimeMO> implements Serializable
         return "Downtime { check => " + this.getCheckId() + ", starts => " + this.getStarts() + ", ends => " + this.getEnds() + ", summary => " + this.getSummary()  + " }";
     }
     
-    public DowntimeMO toMO(boolean stub)
+    @Override
+    public DowntimeMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         DowntimeMO mo = new DowntimeMO();
         mo.setCheck(this.getCheck().toStubMO());
         mo.setComments(this.getComments().stream().map(Comment::toMO).collect(Collectors.toList()));
         mo.setCreated(this.getCreated().getTime());
-        mo.setCreatedBy(this.getCreatedBy().toStubMO());
+        Contact createdBy = this.getCreatedBy();
+        if (createdBy != null)
+        {
+            if (contact == null || contact.hasPermission("read", createdBy)) mo.setCreatedBy(createdBy.toStubMO(contact));
+        }
         mo.setDescription(this.getDescription());
         mo.setEnds(this.getEnds().getTime());
         mo.setId(this.getId());

@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.io.Serializable;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -250,5 +251,11 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     public static UUID setSiteId(UUID siteId, UUID objectId)
     {
         return new UUID((siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | (objectId.getMostSignificantBits() & 0x00000000_0000FFFFL), objectId.getLeastSignificantBits());
+    }
+
+    @Override
+    public SiteMO toMO(Contact contact, EnumSet<com.intrbiz.bergamot.model.BergamotObject.MOFlag> options)
+    {
+        return null;
     }
 }

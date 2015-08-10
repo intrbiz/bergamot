@@ -1,11 +1,14 @@
 package com.intrbiz.bergamot.model.util;
 
+import java.util.EnumSet;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.BergamotObject;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
@@ -98,9 +101,9 @@ public class Parameter extends BergamotObject<ParameterMO>
     }
 
     @Override
-    public ParameterMO toMO(boolean stub)
+    public ParameterMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
-        return new ParameterMO(this.getName(), (stub ? this.getDescription() : null), this.getValue());
+        return new ParameterMO(this.getName(), (options.contains(MOFlag.DESCRIPTION) ? this.getDescription() : null), this.getValue());
     }
 
     public String toString()

@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -167,18 +168,15 @@ public class Team extends SecuredObject<TeamMO, TeamCfg>
     }
 
     @Override
-    public TeamMO toMO(boolean stub)
+    public TeamMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         TeamMO mo = new TeamMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setGrantedPermissions(this.getGrantedPermissions());
         mo.setRevokedPermissions(this.getRevokedPermissions());
-        if (!stub)
-        {
-            mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
-            mo.setChildren(this.getChildren().stream().map(Team::toStubMO).collect(Collectors.toList()));
-            mo.setContacts(this.getContacts().stream().map(Contact::toStubMO).collect(Collectors.toList()));
-        }
+        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Team::toStubMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.CHILDREN)) mo.setChildren(this.getChildren().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Team::toStubMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.CONTACTS)) mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Contact::toStubMO).collect(Collectors.toList()));
         return mo;
     }
 }

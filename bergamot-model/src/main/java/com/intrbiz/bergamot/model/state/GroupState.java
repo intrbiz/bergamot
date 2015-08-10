@@ -1,9 +1,11 @@
 package com.intrbiz.bergamot.model.state;
 
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.BergamotObject;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -237,7 +239,7 @@ public class GroupState extends BergamotObject<GroupStateMO>
     }
 
     @Override
-    public GroupStateMO toMO(boolean stub)
+    public GroupStateMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         GroupStateMO mo = new GroupStateMO();
         mo.setOk(this.ok);

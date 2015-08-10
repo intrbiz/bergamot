@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -497,7 +498,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     }
 
     @Override
-    public AlertMO toMO(boolean stub)
+    public AlertMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         AlertMO mo = new AlertMO();
         mo.setAcknowledged(this.isAcknowledged());
@@ -521,7 +522,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         mo.setRecoveredBy(this.getRecoveredBy());
         mo.setStatus(this.getStatus().toString());
         mo.setTransitioning(this.isTransitioning());
-        if (! stub)
+        if (options.contains(MOFlag.COMMENTS))
         {
             mo.setComments(this.getComments().stream().map(Comment::toMO).collect(Collectors.toList()));
         }

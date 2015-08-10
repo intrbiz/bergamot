@@ -1,10 +1,12 @@
 package com.intrbiz.bergamot.model.state;
 
 import java.sql.Timestamp;
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.BergamotObject;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -763,7 +765,8 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         this.nextSuppressed = state.isSuppressed();
     }
     
-    public CheckTransitionMO toMO(boolean stub)
+    @Override
+    public CheckTransitionMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         CheckTransitionMO mo = new CheckTransitionMO();
         mo.setId(this.getId());

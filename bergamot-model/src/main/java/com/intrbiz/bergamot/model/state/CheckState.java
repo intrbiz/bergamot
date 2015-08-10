@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model.state;
 
 import java.sql.Timestamp;
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.intrbiz.Util;
@@ -8,6 +9,7 @@ import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.BergamotObject;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -336,7 +338,7 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     }
 
     @Override
-    public CheckStateMO toMO(boolean stub)
+    public CheckStateMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         CheckStateMO mo = new CheckStateMO();
         mo.setAttempt(this.getAttempt());

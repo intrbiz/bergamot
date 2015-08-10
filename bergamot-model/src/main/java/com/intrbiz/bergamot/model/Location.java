@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -169,17 +170,18 @@ public class Location extends SecuredObject<LocationMO, LocationCfg> implements 
     }
 
     @Override
-    public LocationMO toMO(boolean stub)
+    public LocationMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         LocationMO mo = new LocationMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setState(this.getState().toMO());
-        if (!stub)
+        if (options.contains(MOFlag.LOCATION))
         {
-            mo.setLocation(Util.nullable(this.getLocation(), Location::toStubMO));
-            mo.setChildren(this.getChildren().stream().map(Location::toStubMO).collect(Collectors.toList()));
-            mo.setHosts(this.getHosts().stream().map(Host::toStubMO).collect(Collectors.toList()));
+            Location location = this.getLocation();
+            if (location != null && (contact == null || contact.hasPermission("read", location))) mo.setLocation(location.toStubMO(contact));
         }
+        if (options.contains(MOFlag.CHILDREN)) mo.setChildren(this.getChildren().stream().filter((x) -> contact == null || contact.hasPermission("read", contact)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.HOSTS)) mo.setHosts(this.getHosts().stream().filter((x) -> contact == null || contact.hasPermission("read", contact)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
 }

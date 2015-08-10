@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -297,16 +298,17 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     }
 
     @Override
-    public HostMO toMO(boolean stub)
+    public HostMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         HostMO mo = new HostMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setAddress(this.getAddress());
-        if (!stub)
+        if (options.contains(MOFlag.SERVICES)) mo.setServices(this.getServices().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.TRAPS)) mo.setTraps(this.getTraps().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.LOCATION))
         {
-            mo.setServices(this.getServices().stream().map(Service::toStubMO).collect(Collectors.toList()));
-            mo.setTraps(this.getTraps().stream().map(Trap::toStubMO).collect(Collectors.toList()));
-            mo.setLocation(Util.nullable(this.getLocation(), Location::toStubMO));
+            Location location = this.getLocation();
+            if (location != null && (contact == null || contact.hasPermission("read", location))) mo.setLocation(location.toStubMO(contact));
         }
         return mo;
     }

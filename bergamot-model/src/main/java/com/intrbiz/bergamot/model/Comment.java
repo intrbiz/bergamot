@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -210,7 +211,7 @@ public class Comment extends BergamotObject<CommentMO> implements Serializable
     }
     
     @Override
-    public CommentMO toMO(boolean stub)
+    public CommentMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         CommentMO mo = new CommentMO();
         mo.setAuthor(this.getAuthor().toStubMO());

@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.intrbiz.Util;
@@ -112,15 +113,16 @@ public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
     }
 
     @Override
-    public ResourceMO toMO(boolean stub)
+    public ResourceMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         ResourceMO mo = new ResourceMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setCategory(this.resolveCategory());
         mo.setApplication(this.resolveApplication());
-        if (! stub)
+        if (options.contains(MOFlag.CLUSTER))
         {
-            mo.setCluster(this.getCluster().toStubMO());
+            Cluster cluster = this.getCluster();
+            if (cluster != null && (contact == null || contact.hasPermission("read", cluster))) mo.setCluster(cluster.toStubMO(contact));
         }
         return mo;
     }

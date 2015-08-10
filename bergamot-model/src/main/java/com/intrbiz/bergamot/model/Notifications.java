@@ -1,13 +1,13 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.StatusesAdapter;
 import com.intrbiz.bergamot.model.message.NotificationsMO;
@@ -205,7 +205,7 @@ public class Notifications extends BergamotObject<NotificationsMO>
     }
 
     @Override
-    public NotificationsMO toMO(boolean stub)
+    public NotificationsMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         NotificationsMO mo = new NotificationsMO();
         mo.setEnabled(this.isEnabled());
@@ -214,8 +214,12 @@ public class Notifications extends BergamotObject<NotificationsMO>
         mo.setIgnore(this.getIgnore().stream().map(Status::toString).collect(Collectors.toSet()));
         mo.setRecoveryEnabled(this.isRecoveryEnabled());
         mo.setAcknowledgeEnabled(this.isAcknowledgeEnabled());
-        mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
-        mo.setEngines(this.getEngines().stream().map(NotificationEngine::toMO).collect(Collectors.toList()));
+        TimePeriod timePeriod = this.getTimePeriod();
+        if (timePeriod != null)
+        {
+            if (contact == null || contact.hasPermission("read", timePeriod)) mo.setTimePeriod(timePeriod.toStubMO(contact));
+        }
+        mo.setEngines(this.getEngines().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
 }

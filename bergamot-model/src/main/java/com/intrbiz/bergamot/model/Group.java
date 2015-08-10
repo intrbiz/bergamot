@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -168,17 +169,14 @@ public class Group extends SecuredObject<GroupMO, GroupCfg> implements Commented
     }
 
     @Override
-    public GroupMO toMO(boolean stub)
+    public GroupMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         GroupMO mo = new GroupMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setState(this.getState().toMO());
-        if (!stub)
-        {
-            mo.setChecks(this.getChecks().stream().map((c) -> {return (CheckMO) c.toStubMO();}).collect(Collectors.toList()));
-            mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));
-            mo.setChildren(this.getChildren().stream().map(Group::toStubMO).collect(Collectors.toList()));
-        }
+        if (options.contains(MOFlag.CHECKS)) mo.setChecks(this.getChecks().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((c) -> {return (CheckMO) c.toStubMO(contact);}).collect(Collectors.toList()));
+        if (options.contains(MOFlag.GROUPS)) mo.setGroups(this.getGroups().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.CHILDREN)) mo.setChildren(this.getChildren().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
 }

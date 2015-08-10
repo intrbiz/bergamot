@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -168,7 +169,7 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
     }
 
     @Override
-    public NotificationEngineMO toMO(boolean stub)
+    public NotificationEngineMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         NotificationEngineMO mo = new NotificationEngineMO();
         mo.setEnabled(this.isEnabled());
@@ -177,7 +178,7 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
         mo.setIgnore(this.getIgnore().stream().map(Status::toString).collect(Collectors.toSet()));
         mo.setRecoveryEnabled(this.isRecoveryEnabled());
         mo.setAcknowledgeEnabled(this.isAcknowledgeEnabled());
-        mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
+        mo.setTimePeriod(Util.nullable(this.getTimePeriod(), (x) -> x.toStubMO(contact)));
         return mo;
     }
 }

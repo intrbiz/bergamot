@@ -1,11 +1,11 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CheckCommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.ParametersAdapter;
@@ -144,10 +144,14 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
     }
 
     @Override
-    public CheckCommandMO toMO(boolean stub)
+    public CheckCommandMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         CheckCommandMO mo = new CheckCommandMO();
-        mo.setCommand(Util.nullable(this.getCommand(), Command::toStubMO));
+        Command command = this.getCommand();
+        if (command != null)
+        {
+            if (contact == null || contact.hasPermission("read", command)) mo.setCommand(command.toStubMO(contact));
+        }
         mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
         return mo;
     }

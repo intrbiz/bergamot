@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
@@ -43,10 +44,10 @@ public class SecurityDomain extends NamedObject<SecurityDomainMO, SecurityDomain
     }
 
     @Override
-    public SecurityDomainMO toMO(boolean stub)
+    public SecurityDomainMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         SecurityDomainMO mo = new SecurityDomainMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         return null;
     }
 }

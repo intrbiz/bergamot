@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -460,21 +461,18 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
     }
 
     @Override
-    public ContactMO toMO(boolean stub)
+    public ContactMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         ContactMO mo = new ContactMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setEmail(this.getEmail());
         mo.setMobile(this.getMobile());
         mo.setPager(this.getPager());
         mo.setPhone(this.getPhone());
         mo.setGrantedPermissions(this.getGrantedPermissions());
         mo.setRevokedPermissions(this.getRevokedPermissions());
-        if (!stub)
-        {
-            mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
-            mo.setNotifications(Util.nullable(this.getNotifications(), Notifications::toStubMO));
-        }
+        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map(Team::toStubMO).collect(Collectors.toList()));
+        if (options.contains(MOFlag.NOTIFICATIONS)) mo.setNotifications(Util.nullable(this.getNotifications(), (x) -> x.toStubMO(contact)));
         return mo;
     }
 }

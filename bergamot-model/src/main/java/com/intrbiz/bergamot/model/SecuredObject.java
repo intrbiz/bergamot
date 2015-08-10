@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,9 +32,9 @@ public abstract class SecuredObject<T extends SecuredObjectMO, C extends Secured
         }
     }
     
-    protected void toMO(SecuredObjectMO mo, boolean stub)
+    protected void toMO(SecuredObjectMO mo, Contact contact, EnumSet<MOFlag> options)
     {
-        super.toMO(mo, stub);
-        mo.setSecurityDomains(this.getSecurityDomains().stream().map((sd) -> sd.toMO(stub)).collect(Collectors.toList()));
+        super.toMO(mo, contact, options);
+        mo.setSecurityDomains(this.getSecurityDomains().stream().map((sd) -> sd.toMO(contact, options)).collect(Collectors.toList()));
     }
 }

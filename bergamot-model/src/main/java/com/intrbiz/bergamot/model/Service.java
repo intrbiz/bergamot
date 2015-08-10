@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.intrbiz.Util;
@@ -130,15 +131,16 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     }
 
     @Override
-    public ServiceMO toMO(boolean stub)
+    public ServiceMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         ServiceMO mo = new ServiceMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setCategory(this.resolveCategory());
         mo.setApplication(this.resolveApplication());
-        if (! stub)
+        if (options.contains(MOFlag.HOST))
         {
-            mo.setHost(this.getHost().toStubMO());
+            Host host = this.getHost();
+            if (host != null && (contact == null || contact.hasPermission("read", host))) mo.setHost(host.toStubMO(contact));
         }
         return mo;
     }

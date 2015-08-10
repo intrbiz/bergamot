@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
+
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -79,17 +81,14 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         }
     }
     
-    protected void toMO(RealCheckMO mo, boolean stub)
+    protected void toMO(RealCheckMO mo, Contact contact, EnumSet<MOFlag> options)
     {
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setAlertAttemptThreshold(this.getAlertAttemptThreshold());
         mo.setRecoveryAttemptThreshold(this.getRecoveryAttemptThreshold());
         mo.setCurrentAttemptThreshold(this.getCurrentAttemptThreshold());
-        mo.setStats(this.getStats().toMO());
-        if (!stub)
-        {
-            mo.setCheckCommand(Util.nullable(this.getCheckCommand(), CheckCommand::toStubMO));
-        }
+        if (options.contains(MOFlag.STATS)) mo.setStats(this.getStats().toMO());
+        if (options.contains(MOFlag.COMMAND)) mo.setCheckCommand(Util.nullable(this.getCheckCommand(), CheckCommand::toStubMO));
     }
     
     @Override

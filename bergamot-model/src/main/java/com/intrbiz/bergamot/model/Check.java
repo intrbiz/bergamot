@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -361,24 +362,21 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         this.externalRef = externalRef;
     }
 
-    protected void toMO(CheckMO mo, boolean stub)
+    protected void toMO(CheckMO mo, Contact contact, EnumSet<MOFlag> options)
     {
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setEnabled(this.isEnabled());
         mo.setState(this.getState().toMO());
         mo.setSuppressed(this.isSuppressed());
         mo.setInDowntime(this.isInDowntime());
         mo.setPool(this.getPool());
-        if (!stub)
-        {
-            mo.setGroups(this.getGroups().stream().map(Group::toStubMO).collect(Collectors.toList()));
-            mo.setContacts(this.getContacts().stream().map(Contact::toStubMO).collect(Collectors.toList()));
-            mo.setTeams(this.getTeams().stream().map(Team::toStubMO).collect(Collectors.toList()));
-            mo.setReferencedBy(this.getReferencedBy().stream().map((v) -> {return (VirtualCheckMO) v.toStubMO();}).collect(Collectors.toList()));
-            mo.setNotifications(this.getNotifications().toMO());
-            mo.setDowntime(this.getDowntime().stream().map(Downtime::toStubMO).collect(Collectors.toList()));
-            mo.setComments(this.getComments().stream().map(Comment::toStubMO).collect(Collectors.toList()));
-        }
+        if (options.contains(MOFlag.GROUPS)) mo.setGroups(this.getGroups().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.CONTACTS)) mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.REFERENCED_BY)) mo.setReferencedBy(this.getReferencedBy().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((v) -> {return (VirtualCheckMO) v.toStubMO(contact);}).collect(Collectors.toList()));
+        if (options.contains(MOFlag.NOTIFICATIONS)) mo.setNotifications(this.getNotifications().toMO(contact));
+        if (options.contains(MOFlag.DOWNTIME)) mo.setDowntime(this.getDowntime().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.COMMENTS)) mo.setComments(this.getComments().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
     }
     
     @Override

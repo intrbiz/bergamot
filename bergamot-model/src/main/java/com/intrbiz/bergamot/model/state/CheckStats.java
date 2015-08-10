@@ -1,9 +1,11 @@
 package com.intrbiz.bergamot.model.state;
 
+import java.util.EnumSet;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.BergamotObject;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
@@ -118,7 +120,7 @@ public class CheckStats extends BergamotObject<CheckStatsMO> implements Cloneabl
     }
 
     @Override
-    public CheckStatsMO toMO(boolean stub)
+    public CheckStatsMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         CheckStatsMO mo = new CheckStatsMO();
         mo.setAverageCheckExecutionLatency(this.getAverageCheckExecutionLatency());

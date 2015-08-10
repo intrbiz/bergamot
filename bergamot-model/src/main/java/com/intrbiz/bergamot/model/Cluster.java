@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -123,14 +124,11 @@ public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
     }
 
     @Override
-    public ClusterMO toMO(boolean stub)
+    public ClusterMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         ClusterMO mo = new ClusterMO();
-        super.toMO(mo, stub);
-        if (! stub)
-        {
-            mo.setResources(this.getResources().stream().map(Resource::toStubMO).collect(Collectors.toList()));
-        }
+        super.toMO(mo, contact, options);
+        if (options.contains(MOFlag.RESOURCES)) mo.setResources(this.getResources().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
     

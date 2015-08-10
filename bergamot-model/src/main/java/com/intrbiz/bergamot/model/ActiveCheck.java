@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -238,15 +239,16 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         return executeCheck;
     }
 
-    protected void toMO(ActiveCheckMO mo, boolean stub)
+    protected void toMO(ActiveCheckMO mo, Contact contact, EnumSet<MOFlag> options)
     {
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setCheckInterval(this.getCheckInterval());
         mo.setRetryInterval(this.getRetryInterval());
         mo.setCurrentInterval(this.getCurrentInterval());
-        if (!stub)
+        TimePeriod timePeriod = this.getTimePeriod();
+        if (timePeriod != null)
         {
-            mo.setTimePeriod(Util.nullable(this.getTimePeriod(), TimePeriod::toStubMO));
+            if (contact == null || contact.hasPermission("read", timePeriod)) mo.setTimePeriod(timePeriod.toStubMO(contact));
         }
     }
     

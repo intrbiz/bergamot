@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 import com.intrbiz.bergamot.config.model.CommandCfg;
@@ -132,10 +133,10 @@ public class Command extends SecuredObject<CommandMO, CommandCfg>
     }
 
     @Override
-    public CommandMO toMO(boolean stub)
+    public CommandMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         CommandMO mo = new CommandMO();
-        super.toMO(mo, stub);
+        super.toMO(mo, contact, options);
         mo.setEngine(this.getEngine());
         mo.setParameters(this.getParameters().stream().map(Parameter::toMO).collect(Collectors.toList()));
         mo.setApplication(this.getApplication());
