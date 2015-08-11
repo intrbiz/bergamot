@@ -40,13 +40,7 @@ public class RegisterForNotificationsHandler extends RequestHandler
             try
             {
                 NotificationQueue notificationQueue = context.var("notificationQueue", NotificationQueue.open());
-                context.var("notificationConsumer", notificationQueue.consumeNotifications((n) -> {
-                    if (n instanceof CheckNotification)
-                    {
-                        logger.debug("Sending notification to client: " + n);
-                        context.send(new NotificationEvent((CheckNotification) n));
-                    }
-                }, rfns.getSiteId()));
+                context.var("notificationConsumer", notificationQueue.consumeNotifications((n) -> { this.sendNotification(context, n); }, rfns.getSiteId()));
                 // on close
                 context.onClose((ctx) -> {
                     Consumer<Notification, NotificationKey> c = ctx.var("notificationConsumer");
@@ -69,6 +63,18 @@ public class RegisterForNotificationsHandler extends RequestHandler
         {
             // done
             context.send(new RegisteredForNotifications(rfns));
+        }
+    }
+    
+    private void sendNotification(ClientContext context, Notification notification)
+    {
+        if (notification instanceof CheckNotification)
+        {
+            if (context.getPrincipal().hasPermission("", ((CheckNotification)notification).getCheck().getId()))
+            {
+                logger.debug("Sending notification to client: " + notification);
+                context.send(new NotificationEvent((CheckNotification) notification));
+            }
         }
     }
 }
