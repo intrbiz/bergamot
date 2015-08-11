@@ -8,11 +8,16 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.api.APIRequest;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
+import com.intrbiz.bergamot.model.message.update.AlertUpdate;
+import com.intrbiz.bergamot.model.message.update.CheckUpdate;
+import com.intrbiz.bergamot.model.message.update.GroupUpdate;
+import com.intrbiz.bergamot.model.message.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.update.Update;
 import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.bergamot.queue.key.UpdateKey;
@@ -44,7 +49,7 @@ public class RegisterForUpdatesHandler extends RequestHandler
                 logger.info("Reigster for updates: " + bindings);
                 // setup the queue
                 UpdateQueue queue = context.var("updateQueue", UpdateQueue.open());
-                context.var("updateConsumer", queue.consumeUpdates((u) -> { context.send(new UpdateEvent(u)); }, bindings));
+                context.var("updateConsumer", queue.consumeUpdates((u) -> { this.sendUpdate(context, u); }, bindings));
                 // on close handler
                 context.onClose((ctx) -> {
                     Consumer<Update, UpdateKey> c = ctx.var("updateConsumer");
@@ -86,12 +91,51 @@ public class RegisterForUpdatesHandler extends RequestHandler
         }
     }
     
+    private void sendUpdate(ClientContext context, Update update)
+    {
+        if (update instanceof CheckUpdate)
+        {
+            // only send the update if the user has permission over the check
+            if (context.getPrincipal().hasPermission("read", ((CheckUpdate) update).getCheck().getId()))
+            {
+                context.send(new UpdateEvent(update));
+            }
+        }
+        else if (update instanceof AlertUpdate)
+        {
+            if (context.getPrincipal().hasPermission("read", ((AlertUpdate) update).getAlert().getCheck().getId()))
+            {
+                context.send(new UpdateEvent(update));
+            }
+        }
+        else if (update instanceof GroupUpdate)
+        {
+            // we need to recompute the state of the group with respect to the given user
+            GroupUpdate groupUpdate = (GroupUpdate) update;
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                groupUpdate.getGroup().setState(db.computeGroupStateForContact(groupUpdate.getGroup().getId(), context.getPrincipal().getId()).toMO(context.getPrincipal()));
+            }
+            context.send(new UpdateEvent(update));
+        }
+        else if (update instanceof LocationUpdate)
+        {
+            // we need to recompute the state of the group with respect to the given user
+            LocationUpdate locationUpdate = (LocationUpdate) update;
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                locationUpdate.getLocation().setState(db.computeLocationStateForContact(locationUpdate.getLocation().getId(), context.getPrincipal().getId()).toMO(context.getPrincipal()));
+            }
+            context.send(new UpdateEvent(update));
+        }
+    }
+    
     private Set<UpdateKey> computeBindings(ClientContext context, RegisterForUpdates rfsn)
     {
         // the type of updates we are listening for
         UpdateType type = UpdateType.valueOf(Util.coalesceEmpty(rfsn.getUpdateType(), "check").toUpperCase());
         // wildcard ?
-        if (rfsn.getIds() == null || rfsn.getIds().isEmpty())
+        if ((rfsn.getIds() == null || rfsn.getIds().isEmpty()))
         {
             return new HashSet<UpdateKey>(Arrays.asList(new UpdateKey(type, context.getSite().getId())));
         }
