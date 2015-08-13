@@ -1933,11 +1933,16 @@ public abstract class BergamotDB extends DatabaseAdapter
             }
         );
         // cache management
+        this.invalidatePermissionsCache(siteId);
+        // return the number of permissions which were computed
+        return changed;
+    }
+    
+    public void invalidatePermissionsCache(UUID siteId)
+    {
         this.getAdapterCache().removePrefix("has_permission." + siteId);
         this.getAdapterCache().removePrefix("has_permission_for_object." + siteId);
         this.getAdapterCache().removePrefix("has_permission_for_domain." + siteId);
-        // return the number of permissions which were computed
-        return changed;
     }
     
     private Timer has_permission = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.has_permission(UUID,TEXT)"));

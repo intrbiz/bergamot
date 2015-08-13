@@ -113,6 +113,8 @@ public class BergamotConfigImporter
     
     private boolean rebuildPermissions = false;
     
+    private boolean clearPermissionsCache = false;
+    
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
         if (! validated.getReport().isValid()) throw new RuntimeException("Cannot import invalid configuration");
@@ -183,6 +185,11 @@ public class BergamotConfigImporter
                         {
                             this.report.info("Rebuilding computed permissions");
                             db.buildPermissions(this.site.getId());
+                        }
+                        if (this.clearPermissionsCache)
+                        {
+                            this.report.info("Clearing permissions cache");
+                            db.invalidatePermissionsCache(this.site.getId());
                         }
                     });
                     // delayed actions
@@ -1615,6 +1622,8 @@ public class BergamotConfigImporter
             if (domain != null)
                 db.addCheckToSecurityDomain(domain.getId(), object.getId());
         }
+        // ensure we flush cached permissions
+        this.clearPermissionsCache = true;
     }
     
     /**
