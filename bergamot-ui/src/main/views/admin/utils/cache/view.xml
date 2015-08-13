@@ -1,0 +1,19 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Admin - View Cache">
+	<div clas="row">
+    	<div class="col12">
+    		<table>
+    			<tr>
+    				<th>Cache Key</th>
+    			</tr>
+    			<data-set var="cachekey" value="#{cachekeys}">
+	    			<tr>
+	    				<td>#{cachekey}</td>
+	    			</tr>
+    			</data-set>
+    		</table>
+    	</div>
+    </div>
+</fragment>

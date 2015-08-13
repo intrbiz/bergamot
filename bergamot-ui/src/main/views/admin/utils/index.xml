@@ -10,6 +10,9 @@
     		<ul>
     			<li><a href="/admin/utils/cache/clear">Clear Caches - clear all cached data objects</a></li>
     		</ul>
+    		<ul>
+    			<li><a href="/admin/utils/cache/view">View Cache</a></li>
+    		</ul>
     	</div>
     </div>
 </fragment>
