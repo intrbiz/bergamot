@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command application="PostgreSQL" name="postgresql_jdbc_check" extends="jdbc_script_check">
+    <command application="PostgreSQL" name="postgresql_jdbc_check" extends="jdbc_script_check" security-domains="global">
         <summary>Check PostgreSQL by executing SQL</summary>
         <parameter name="host">#{host.address}</parameter>
         <parameter name="port">5432</parameter>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command name="jdbc_script_check" engine="jdbc" executor="script">
+    <command name="jdbc_script_check" engine="jdbc" executor="script" security-domains="global">
         <summary>JDBC Script Check</summary>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage.png</parameter>
         <description>Check database resources by executing a Javascript script utilising JDBC</description>

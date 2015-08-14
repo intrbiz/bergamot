@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command engine="nrpe" name="check_nrpe">
+    <command engine="nrpe" name="check_nrpe" security-domains="global">
         <summary>Check NRPE</summary>
         <parameter description="The NRPE command name" name="command">#{arg1}</parameter>
         <parameter description="The NRPE host" name="host">#{host.address}</parameter>

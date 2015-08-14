@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command application="RabbitMQ" name="rabbitmq_api_check" extends="http_script_check">
+    <command application="RabbitMQ" name="rabbitmq_api_check" extends="http_script_check" security-domains="global">
         <summary>Check RabbitMQ via it's HTTP API</summary>
 	<parameter name="host">#{host.address}</parameter>
 	<parameter name="port">15672</parameter>

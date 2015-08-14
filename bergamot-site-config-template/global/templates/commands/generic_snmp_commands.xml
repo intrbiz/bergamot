@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command engine="snmp" executor="script" name="snmp_check" template="yes">
+    <command engine="snmp" executor="script" name="snmp_check" template="yes" security-domains="global">
         <parameter description="The SNMP agent hostname"                  name="host">#{host.address}</parameter>
         <parameter description="The SNMP version"                         name="snmp-version">#{coalesce(host.getParameter('snmp-version'), host.location.getParameter('snmp-version'), '2')}</parameter>
         <parameter description="The SNMP community string"                name="snmp-community">#{coalesce(host.getParameter('snmp-community'), host.location.getParameter('snmp-community'), 'public')}</parameter>

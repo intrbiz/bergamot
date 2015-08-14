@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
     
-    <command category="Websites" name="http_check" engine="http">
+    <command category="Websites" name="http_check" engine="http" security-domains="global">
         <summary>HTTP Check</summary>
         <parameter name="host">#{host.address}</parameter>
         <parameter name="port"></parameter>
