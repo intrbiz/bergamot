@@ -1,68 +1,68 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
     
-    <group name="services">
+    <group name="services" security-domains="global">
         <summary>Services</summary>
     </group>
     
-    <group name="linux-services" groups="services">
+    <group name="linux-services" groups="services" security-domains="linux">
         <summary>Linux Services</summary>
     </group>
     
-    <group name="network-services" groups="services">
+    <group name="network-services" groups="services" security-domains="network">
         <summary>Network Services</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
-    <group name="vm-host-services" groups="linux-services">
+    <group name="vm-host-services" groups="linux-services" security-domains="linux">
         <summary>VM Host Services</summary>
     </group>
     
-    <group name="web-services" groups="services">
+    <group name="web-services" groups="services" security-domains="web">
         <summary>Web Services</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
     </group>
     
-    <group name="db-services" groups="services">
+    <group name="db-services" groups="services" security-domains="db">
         <summary>DB Services</summary>
     </group>
     
-    <group name="hosts">
+    <group name="hosts" security-domains="global">
         <summary>Hosts</summary>
     </group>
     
-    <group name="network-devices" groups="hosts">
+    <group name="network-devices" groups="hosts" security-domains="network">
         <summary>Network Devices</summary>
     </group>
     
-    <group name="routers" groups="network-devices">
+    <group name="routers" groups="network-devices" security-domains="network">
         <summary>Routers</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
-    <group name="switches" groups="network-devices">
+    <group name="switches" groups="network-devices" security-domains="network">
         <summary>Switches</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
-    <group name="linux-servers" groups="hosts">
+    <group name="linux-servers" groups="hosts" security-domains="linux">
         <summary>Linux Servers</summary>
     </group>
     
-    <group name="vm-servers" groups="linux-servers">
+    <group name="vm-servers" groups="linux-servers" security-domains="linux">
         <summary>VM Host Servers</summary>
     </group>
     
-    <group name="web-servers" groups="hosts">
+    <group name="web-servers" groups="hosts" security-domains="web">
         <summary>Web Servers</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
     </group>
     
-    <group name="db-servers" groups="hosts">
+    <group name="db-servers" groups="hosts" security-domains="db">
         <summary>DB Servers</summary>
     </group>
     
-    <group name="websites">
+    <group name="websites" security-domains="web">
         <summary>Websites</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
     </group>
