@@ -10,27 +10,27 @@
         <description>A generic service template</description>
     </service>
     
-    <service name="linux-service" groups="linux-services" extends="generic-service" template="yes">
+    <service name="linux-service" groups="linux-services" extends="generic-service" template="yes" security-domains="linux">
         <notify teams="linux-admins"/>
     </service>
     
-    <service name="network-service" groups="network-services" extends="generic-service" template="yes">
+    <service name="network-service" groups="network-services" extends="generic-service" template="yes" security-domains="network">
         <notify teams="network-admins"/>
         <schedule every="15" retry-every="5" time-period="24x7"/>
     </service>
     
-    <service name="vm-host-service" groups="vm-host-services" extends="linux-service" template="yes">
+    <service name="vm-host-service" groups="vm-host-services" extends="linux-service" template="yes" security-domains="linux">
     </service>
     
-    <service name="web-service" groups="web-services" extends="generic-service" template="yes">
+    <service name="web-service" groups="web-services" extends="generic-service" template="yes" security-domains="web">
         <notify teams="web-admins"/>
     </service>
     
-    <service name="db-service" groups="db-services" extends="generic-service" template="yes">
+    <service name="db-service" groups="db-services" extends="generic-service" template="yes" security-domains="database">
         <notify teams="db-admins"/>
     </service>
     
-    <service name="website-service" groups="websites" extends="generic-service" template="yes">
+    <service name="website-service" groups="websites" extends="generic-service" template="yes" security-domains="web">
         <notify teams="web-admins"/>
     </service>
     
