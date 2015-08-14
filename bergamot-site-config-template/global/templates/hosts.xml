@@ -13,24 +13,24 @@
         <description>A generic host template</description>
     </host>
     
-    <host name="web-server" extends="generic-host" template="yes" groups="web-servers">
+    <host name="web-server" extends="generic-host" template="yes" groups="web-servers" security-domains="web">
         <summary>Web Server</summary>
         <notify teams="web-admins"/>
         <description>A web server template</description>
     </host>
     
-    <host name="db-server" extends="generic-host" template="yes" groups="db-servers">
+    <host name="db-server" extends="generic-host" template="yes" groups="db-servers" security-domains="db">
         <summary>DB Server</summary>
         <notify teams="db-admins"/>
         <description>A database server template</description>
     </host>
     
-    <host name="vm-host-server" extends="generic-host" template="yes" groups="vm-servers">
+    <host name="vm-host-server" extends="generic-host" template="yes" groups="vm-servers" security-domains="linux">
         <summary>VM Host Server</summary>
         <description>A VM host server template</description>
     </host>
     
-    <host name="network-device" extends="generic-host" template="yes" groups="network-devices">
+    <host name="network-device" extends="generic-host" template="yes" groups="network-devices" security-domains="network">
         <summary>Network Device</summary>
         <notify teams="network-admins"/>
         <description>A generic network device template</description>
@@ -48,7 +48,7 @@
     
     <!-- Default Linux host timeplates -->
     
-    <host name="linux-server-nrpe" extends="generic-host" template="yes" groups="linux-servers">
+    <host name="linux-server-nrpe" extends="generic-host" template="yes" groups="linux-servers" security-domains="linux">
         <summary>Linux Server (NRPE)</summary>
         <notify teams="linux-admins"/>
         <description>Default Linux server checked via NRPE template</description>
@@ -103,7 +103,7 @@
         
     </host>
     
-    <host name="linux-server-agent" extends="generic-host" template="yes" groups="linux-servers">
+    <host name="linux-server-agent" extends="generic-host" template="yes" groups="linux-servers" security-domains="linux">
         <summary>Linux Server (Bergamot Agent)</summary>
         <check-command command="check_agent_presence"/>
         <notify teams="linux-admins"/>
@@ -196,7 +196,7 @@
     
     <!-- Default application host templates -->
     
-    <host name="nginx-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers">
+    <host name="nginx-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers" security-domains="web">
         <summary>Nginx Web Server (NRPE)</summary>
         <description>Default Nginx web server checked via NRPE template</description>
         
@@ -206,7 +206,7 @@
         </service>
     </host>
     
-    <host name="nginx-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers">
+    <host name="nginx-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
         <summary>Nginx Web Server (Bergamot Agent)</summary>
         <description>Default Nginx web server checked via Bergamot Agent template</description>
         
@@ -221,7 +221,7 @@
         </service>
     </host>
     
-    <host name="apache-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers">
+    <host name="apache-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers" security-domains="web">
         <summary>Apache Web Server (NRPE)</summary>
         <description>Default Apache web server checked via NRPE template</description>
         
@@ -231,7 +231,7 @@
         </service>
     </host>
     
-    <host name="apache-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers">
+    <host name="apache-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
         <summary>Apache Web Server (Bergamot Agent)</summary>
         <description>Default Apache web server checked via Bergamot Agent template</description>
         
@@ -246,7 +246,7 @@
         </service>
     </host>
     
-    <host name="mysql-server-nrpe" extends="db-server, linux-server-nrpe" template="yes" groups="db-servers">
+    <host name="mysql-server-nrpe" extends="db-server, linux-server-nrpe" template="yes" groups="db-servers" security-domains="db">
         <summary>MySQL DB Server (NRPE)</summary>
         <description>Default MySQL DB server checked via NRPE template</description>
         
@@ -256,7 +256,7 @@
         </service>
     </host>
     
-    <host name="mysql-server-nrpe" extends="db-server, linux-server-agent" template="yes" groups="db-servers">
+    <host name="mysql-server-nrpe" extends="db-server, linux-server-agent" template="yes" groups="db-servers" security-domains="db">
         <summary>MySQL DB Server (Bergamot Agent)</summary>
         <description>Default MySQL DB server checked via Bergamot Agent template</description>
         
@@ -271,7 +271,7 @@
         </service>
     </host>
     
-    <host name="postgresql-server-nrpe" extends="db-server, linux-server-nrpe" template="yes" groups="db-servers">
+    <host name="postgresql-server-nrpe" extends="db-server, linux-server-nrpe" template="yes" groups="db-servers" security-domains="db">
         <summary>PostgreSQL DB Server (NRPE)</summary>
         
         <service name="service_postgresql" extends="db-service">
@@ -280,7 +280,7 @@
         </service>
     </host>
     
-    <host name="postgresql-server-agent" extends="db-server, linux-server-agent" template="yes" groups="db-servers">
+    <host name="postgresql-server-agent" extends="db-server, linux-server-agent" template="yes" groups="db-servers" security-domains="db">
         <summary>PostgreSQL DB Server (Bergamot Agent)</summary>
         
         <service extends="db-service" name="process-postgresql">
@@ -296,7 +296,7 @@
 
     <!-- Network device templates -->
     
-    <host name="snmp-network-device" extends="network-device" template="yes" groups="network-devices">
+    <host name="snmp-network-device" extends="network-device" template="yes" groups="network-devices" security-domains="network">
         <summary>Network Device (SNMP)</summary>
         <notify teams="network-admins"/>
         <description>A generic SNMP capable network device template</description>
@@ -329,12 +329,12 @@
 
     </host>
 
-    <host name="snmp-router" extends="snmp-network-device" template="yes" groups="routers">
+    <host name="snmp-router" extends="snmp-network-device" template="yes" groups="routers" security-domains="network">
         <summary>Router (SNMP)</summary>
         <description>A generic SNMP capable network router template</description>
     </host>
     
-    <host name="snmp-switch" extends="snmp-network-device" template="yes" groups="switches">
+    <host name="snmp-switch" extends="snmp-network-device" template="yes" groups="switches" security-domains="network">
         <summary>Switch (SNMP)</summary>
         <description>A generic SNMP capable network switch template</description>
     </host>
