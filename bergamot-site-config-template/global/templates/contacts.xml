@@ -2,6 +2,7 @@
 <bergamot site="bergamot.template">
     
     <contact name="generic_contact" template="yes">
+        <access-control security-domain="global" grants="read"/>
         <notifications enabled="yes" time-period="24x7" alerts="yes" recovery="yes" acknowledge="yes">
             <notification-engine engine="email" enabled="yes" time-period="24x7"/>
             <notification-engine engine="sms" enabled="yes" time-period="24x7" alert="yes" recovery="no" ignore="pending, ok, warning"/>
