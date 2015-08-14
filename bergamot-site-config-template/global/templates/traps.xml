@@ -10,7 +10,7 @@
         <description>A generic trap template</description>
     </trap>
     
-    <trap name="network-trap" extends="generic-trap" template="yes">
+    <trap name="network-trap" extends="generic-trap" template="yes" security-domains="network">
         <notify teams="network-admins"/>
     </trap>
     
