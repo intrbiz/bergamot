@@ -1,60 +1,60 @@
 <bergamot site="bergamot.template">
     
-    <location name="aws">
+    <location name="aws" security-domains="global">
         <summary>Amazon Web Services</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
 
-    <location name="aws-eu-ireland" location="aws">
+    <location name="aws-eu-ireland" location="aws" security-domains="global">
         <summary>Amazon Web Services - EU (Ireland)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-us-east-n-virginia" location="aws">
+    <location name="aws-us-east-n-virginia" location="aws" security-domains="global">
         <summary>Amazon Web Services - US East (N. Virginia)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-us-west-oregon" location="aws">
+    <location name="aws-us-west-oregon" location="aws" security-domains="global">
         <summary>Amazon Web Services - US West (Oregon)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-us-west-n-california" location="aws">
+    <location name="aws-us-west-n-california" location="aws" security-domains="global">
         <summary>Amazon Web Services - US West (N. California)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-asia-pacific-singapore" location="aws">
+    <location name="aws-asia-pacific-singapore" location="aws" security-domains="global">
         <summary>Amazon Web Services - Asia Pacific (Singapore)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-asia-pacific-tokyo" location="aws">
+    <location name="aws-asia-pacific-tokyo" location="aws" security-domains="global">
         <summary>Amazon Web Services - Asia Pacific (Tokyo)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-asia-pacific-sydney" location="aws">
+    <location name="aws-asia-pacific-sydney" location="aws" security-domains="global">
         <summary>Amazon Web Services - Asia Pacific (Sydney)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-south-america-sao-paulo" location="aws">
+    <location name="aws-south-america-sao-paulo" location="aws" security-domains="global">
         <summary>Amazon Web Services - South America (Sao Paulo)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
 
-    <location name="main-data-centre">
+    <location name="main-data-centre" security-domains="global">
         <summary>Main Data Centre</summary>
     </location>
     
-    <location name="the-office">
+    <location name="the-office" security-domains="global">
         <summary>The Office</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/office.png</parameter>
     </location>
 
-    <location name="remote">
+    <location name="remote" security-domains="global">
         <summary>Remote</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/globe.png</parameter>
     </location>
