@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
     
-    <time-period name="uk_holidays">
+    <time-period name="uk_holidays" security-domains="global">
         <summary>UK Holidays</summary>
         <description>UK Bank Holidays 2015</description>
         <time-range>january 1 00:00-24:00</time-range>
@@ -14,7 +14,7 @@
         <time-range>december 26 00:00-24:00</time-range>
     </time-period>
     
-    <time-period name="24x7">
+    <time-period name="24x7" security-domains="global">
         <summary>24x7</summary>
         <description>24 hours a day, seven days a week</description>
         <time-range>sunday 00:00-24:00</time-range>
@@ -26,7 +26,7 @@
         <time-range>saturday 00:00-24:00</time-range>
     </time-period>
     
-    <time-period name="24x7_except_uk_holidays" excludes="uk_holidays">
+    <time-period name="24x7_except_uk_holidays" excludes="uk_holidays" security-domains="global">
         <summary>24x7 except for UK Holidays</summary>
         <description>24 hours a day, seven days a week except for UK bank holidays</description>
         <time-range>sunday 00:00-24:00</time-range>
@@ -38,7 +38,7 @@
         <time-range>saturday 00:00-24:00</time-range>
     </time-period>
     
-    <time-period name="workhours" excludes="uk_holidays">
+    <time-period name="workhours" excludes="uk_holidays" security-domains="global">
         <summary>Workhours: 9:00 to 17:30 Monday to Friday except UK holidays</summary>
         <description>09:00 to 17:30 Monday to Friday except for UK bank holidays</description>
         <time-range>monday 09:00-17:30</time-range>
@@ -48,14 +48,14 @@
         <time-range>friday 09:00-17:30</time-range>
     </time-period>
     
-    <time-period name="weekends">
+    <time-period name="weekends" security-domains="global">
         <summary>Weekends</summary>
         <description>Satuday and Sunday</description>
         <time-range>saturday 00:00-24:00</time-range>
         <time-range>sunday 00:00-24:00</time-range>
     </time-period>
     
-    <time-period name="weekdays">
+    <time-period name="weekdays" security-domains="global">
         <summary>Weekdays</summary>
         <description>Monday to Friday</description>
         <time-range>monday 00:00-24:00</time-range>
@@ -65,7 +65,7 @@
         <time-range>friday 00:00-24:00</time-range>
     </time-period>
     
-    <time-period name="outofhours" excludes="workhours">
+    <time-period name="outofhours" excludes="workhours" security-domains="global">
         <summary>Out of hours</summary>
         <description>Inverse of workhours</description>
     </time-period>
