@@ -10,8 +10,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.intrbiz.balsa.BalsaException;
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaBadRequest;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -29,6 +29,7 @@ import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.CheckRegEx;
+import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Order;
@@ -128,11 +129,11 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @Post("/apply")
     @RequirePermission("config.change.apply")
     @WithDataAdapter(BergamotDB.class)
-    public void applyConfigChange(BergamotDB db, @Var("site") Site site) throws IOException
+    public void applyConfigChange(BergamotDB db, @Var("site") Site site, @CurrentPrincipal() Contact user) throws IOException
     {
         try
         {
-            Contact user = this.currentPrincipal();
+            require(request().isXml(), () -> new BalsaBadRequest("Request content type must be 'application/xml'"));
             // read the change
             XMLStreamReader reader = this.request().getXMLReader();
             JAXBContext ctx = JAXBContext.newInstance(BergamotCfg.class);
@@ -154,7 +155,6 @@ public class ConfigAPIRouter extends Router<BergamotApp>
         }
         catch (Exception e)
         {
-            if (! "application/xml".equals(this.request().getContentType())) throw new BalsaException("Request content type must be 'application/xml'");
             // write out the report
             JsonGenerator json = response().status(HTTPStatus.InternalServerError).json().getJsonWriter();
             json.writeStartObject();
