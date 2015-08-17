@@ -83,5 +83,5 @@ public abstract class BergamotAPICall<T>
     /**
      * Execute this call
      */
-    public abstract T execute();
+    public abstract T execute() throws BergamotAPIException;
 }

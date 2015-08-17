@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 
 public class ApplyConfigChangeCommand extends BergamotCLICommand
 {
@@ -59,7 +60,16 @@ public class ApplyConfigChangeCommand extends BergamotCLICommand
         // connect to the API
         BergamotClient client = new BergamotClient(site.getUrl(), site.getAuthToken());
         // apply the change
-        System.out.println(client.applyConfigChange().configChange(configChange).execute());
-        return 0;
+        AppliedConfigChange response = client.applyConfigChange().configChange(configChange).execute();
+        System.out.println("Configuration change was " + (response.getReport().isSuccessful() ? "successful" : "unsucessful"));
+        for (String info : response.getReport().getInfo())
+        {
+            System.out.println("INFO " + info);
+        }
+        for (String error : response.getReport().getErrors())
+        {
+            System.out.println("ERROR " + error);
+        }
+        return response.getReport().isSuccessful() ? 0 : -1;
     }
 }
