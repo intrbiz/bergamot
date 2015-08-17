@@ -4,10 +4,7 @@ import static com.intrbiz.balsa.BalsaContext.*;
 
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamReader;
-
+import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaBadRequest;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
@@ -130,17 +127,15 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @RequirePermission("config.change.apply")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public APIResponse applyConfigChange(BergamotDB db, @Var("site") Site site, @CurrentPrincipal() Contact user) throws Exception
+    public APIResponse applyConfigChange(BergamotDB db, @Var("site") Site site, @XML BergamotCfg config, @CurrentPrincipal() Contact user) throws Exception
     {
-        require(request().isXml(), () -> new BalsaBadRequest("Request content type must be 'application/xml'"));
-        // read the change
-        XMLStreamReader reader = this.request().getXMLReader();
-        JAXBContext ctx = JAXBContext.newInstance(BergamotCfg.class);
-        Unmarshaller unm = ctx.createUnmarshaller();
-        BergamotCfg cfg = (BergamotCfg) unm.unmarshal(reader);
+        // check that the change has a summary
+        require(! Util.isEmpty(config.getSummary()), () -> new BalsaBadRequest("The configuration change must have a summary"));
+        // assert the site name
+        config.setSite(site.getName());
         // create the config change
-        ConfigChange change = new ConfigChange(site.getId(), user, cfg);
-        change.setSummary("Change via API: " + cfg.getSummary());
+        ConfigChange change = new ConfigChange(site.getId(), user, config);
+        change.setSummary("Change via API: " + config.getSummary());
         db.setConfigChange(change);
         // apply the change
         BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), Balsa().url(Balsa().path("/reset")), user);
