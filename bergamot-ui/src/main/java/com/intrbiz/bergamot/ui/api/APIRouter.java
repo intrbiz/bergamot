@@ -10,6 +10,7 @@ import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
 import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.balsa.error.BalsaValidationError;
+import com.intrbiz.balsa.error.http.BalsaBadRequest;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
@@ -105,6 +106,23 @@ public class APIRouter extends Router<BergamotApp>
             logger.error("Validation exception on request", vex);
         }
         return new APIError("Bad Request");
+    }
+    
+    /**
+     * Validation and Conversion error handler
+     */
+    @Catch(BalsaBadRequest.class)
+    @Any("**")
+    @Order(40)
+    @JSON(status = HTTPStatus.BadRequest)
+    public APIError badRequest()
+    {
+        Throwable error = balsa().getException();
+        if (error != null)
+        {
+            logger.error("Caught internal bad request error: " + error.getMessage(), error);
+        }
+        return new APIError("Bad Request: " + (error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage()));
     }
     
     /**
