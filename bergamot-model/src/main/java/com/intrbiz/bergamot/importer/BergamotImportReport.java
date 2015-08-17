@@ -1,10 +1,15 @@
 package com.intrbiz.bergamot.importer;
 
 import java.io.Serializable;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BergamotImportReport implements Serializable
+import com.intrbiz.bergamot.model.BergamotObject;
+import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.message.importer.BergamotImportReportMO;
+
+public class BergamotImportReport extends BergamotObject<BergamotImportReportMO> implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -18,6 +23,7 @@ public class BergamotImportReport implements Serializable
 
     public BergamotImportReport(String site)
     {
+        super();
         this.site = site;
     }
 
@@ -66,4 +72,16 @@ public class BergamotImportReport implements Serializable
         }
         return sb.toString();
     }
+
+    @Override
+    public BergamotImportReportMO toMO(Contact contact, EnumSet<MOFlag> options)
+    {
+        BergamotImportReportMO mo = new BergamotImportReportMO();
+        mo.setSite(this.site);
+        mo.setSuccessful(this.successful);
+        mo.setInfo(this.info);
+        mo.setErrors(this.errors);
+        return mo;
+    }
+    
 }
