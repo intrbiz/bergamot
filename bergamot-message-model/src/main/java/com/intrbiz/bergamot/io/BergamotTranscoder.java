@@ -28,7 +28,6 @@ import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.DowntimeMO;
-import com.intrbiz.bergamot.model.message.ErrorMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.LocationMO;
@@ -56,6 +55,7 @@ import com.intrbiz.bergamot.model.message.agent.manager.response.GotServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
+import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
 import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
@@ -190,8 +190,6 @@ public class BergamotTranscoder
         // watcher
         RegisterCheck.class,
         UnregisterCheck.class,
-        // generic
-        ErrorMO.class,
         // auth
         AuthTokenMO.class,
         // stats
@@ -220,7 +218,8 @@ public class BergamotTranscoder
         FlushGlobalCaches.class,
         FlushedGlobalCaches.class,
         // util models
-        BergamotImportReportMO.class
+        BergamotImportReportMO.class,
+        AppliedConfigChange.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();

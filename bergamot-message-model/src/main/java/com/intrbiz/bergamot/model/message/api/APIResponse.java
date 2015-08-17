@@ -17,6 +17,12 @@ public class APIResponse extends APIObject
         super();
     }
     
+    public APIResponse(Stat stat)
+    {
+        super();
+        this.stat = stat;
+    }
+    
     public APIResponse(APIRequest inResponseTo, Stat stat)
     {
         super();

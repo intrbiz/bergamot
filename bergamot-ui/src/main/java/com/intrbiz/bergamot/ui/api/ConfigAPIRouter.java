@@ -2,17 +2,14 @@ package com.intrbiz.bergamot.ui.api;
 
 import static com.intrbiz.balsa.BalsaContext.*;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaBadRequest;
-import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
@@ -25,12 +22,15 @@ import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.message.api.APIResponse;
+import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Post;
@@ -128,40 +128,23 @@ public class ConfigAPIRouter extends Router<BergamotApp>
      */
     @Post("/apply")
     @RequirePermission("config.change.apply")
+    @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public void applyConfigChange(BergamotDB db, @Var("site") Site site, @CurrentPrincipal() Contact user) throws IOException
+    public APIResponse applyConfigChange(BergamotDB db, @Var("site") Site site, @CurrentPrincipal() Contact user) throws Exception
     {
-        try
-        {
-            require(request().isXml(), () -> new BalsaBadRequest("Request content type must be 'application/xml'"));
-            // read the change
-            XMLStreamReader reader = this.request().getXMLReader();
-            JAXBContext ctx = JAXBContext.newInstance(BergamotCfg.class);
-            Unmarshaller unm = ctx.createUnmarshaller();
-            BergamotCfg cfg = (BergamotCfg) unm.unmarshal(reader);
-            // create the config change
-            ConfigChange change = new ConfigChange(site.getId(), user, cfg);
-            change.setSummary("Change via API: " + cfg.getSummary());
-            db.setConfigChange(change);
-            // apply the change
-            BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), Balsa().url(Balsa().path("/reset")), user);
-            // write out the report
-            JsonGenerator json = response().ok().json().getJsonWriter();
-            json.writeStartObject();
-            json.writeFieldName("stat");
-            json.writeString("ok");
-            json.writeFieldName("result");
-            json.writeString(report.toString());
-        }
-        catch (Exception e)
-        {
-            // write out the report
-            JsonGenerator json = response().status(HTTPStatus.InternalServerError).json().getJsonWriter();
-            json.writeStartObject();
-            json.writeFieldName("stat");
-            json.writeString("ok");
-            json.writeFieldName("message");
-            json.writeString(e.getMessage());
-        }
+        require(request().isXml(), () -> new BalsaBadRequest("Request content type must be 'application/xml'"));
+        // read the change
+        XMLStreamReader reader = this.request().getXMLReader();
+        JAXBContext ctx = JAXBContext.newInstance(BergamotCfg.class);
+        Unmarshaller unm = ctx.createUnmarshaller();
+        BergamotCfg cfg = (BergamotCfg) unm.unmarshal(reader);
+        // create the config change
+        ConfigChange change = new ConfigChange(site.getId(), user, cfg);
+        change.setSummary("Change via API: " + cfg.getSummary());
+        db.setConfigChange(change);
+        // apply the change
+        BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), Balsa().url(Balsa().path("/reset")), user);
+        // write out the report
+        return new AppliedConfigChange(report.toMOUnsafe());
     }
 }

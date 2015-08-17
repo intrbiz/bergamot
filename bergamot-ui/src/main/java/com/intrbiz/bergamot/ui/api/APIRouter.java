@@ -17,7 +17,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
-import com.intrbiz.bergamot.model.message.ErrorMO;
+import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.converter.ConversionException;
 import com.intrbiz.metadata.Any;
@@ -46,9 +46,9 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**\\.xml")
     @Order(10)
     @XML(status = HTTPStatus.NotFound)
-    public ErrorMO notFoundXML()
+    public APIError notFoundXML()
     {
-        return new ErrorMO("Not found");
+        return new APIError("Not found");
     }
     
     /**
@@ -58,9 +58,9 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**\\.xml")
     @Order(10)
     @XML(status = HTTPStatus.Forbidden)
-    public ErrorMO accessDeniedXML()
+    public APIError accessDeniedXML()
     {
-        return new ErrorMO("Access denied");
+        return new APIError("Access denied");
     }
     
     /**
@@ -70,9 +70,9 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(20)
     @JSON(status = HTTPStatus.NotFound)
-    public ErrorMO notFound()
+    public APIError notFound()
     {
-        return new ErrorMO("Not found");
+        return new APIError("Not found");
     }
     
     /**
@@ -82,9 +82,9 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(20)
     @JSON(status = HTTPStatus.Forbidden)
-    public ErrorMO accessDenied()
+    public APIError accessDenied()
     {
-        return new ErrorMO("Access denied");
+        return new APIError("Access denied");
     }
     
     /**
@@ -94,7 +94,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(30)
     @JSON(status = HTTPStatus.BadRequest)
-    public ErrorMO invalideRequest()
+    public APIError invalideRequest()
     {
         for (ConversionException cex : balsa().getConversionErrors())
         {
@@ -104,7 +104,7 @@ public class APIRouter extends Router<BergamotApp>
         {
             logger.error("Validation exception on request", vex);
         }
-        return new ErrorMO("Bad Request");
+        return new APIError("Bad Request");
     }
     
     /**
@@ -114,14 +114,14 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(Order.LAST)
     @JSON(status = HTTPStatus.InternalServerError)
-    public ErrorMO internalServerError()
+    public APIError internalServerError()
     {
         Throwable error = balsa().getException();
         if (error != null)
         {
             logger.error("Caught internal server error: " + error.getMessage(), error);
         }
-        return new ErrorMO(error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage());
+        return new APIError(error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage());
     }
     
     /**
