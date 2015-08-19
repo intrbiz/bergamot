@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
-import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
+import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 @XmlType(name = "group")
 @XmlRootElement(name = "group")
@@ -36,7 +36,7 @@ public class GroupCfg extends SecuredObjectCfg<GroupCfg>
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "groups")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getGroups()
     {
         return groups;

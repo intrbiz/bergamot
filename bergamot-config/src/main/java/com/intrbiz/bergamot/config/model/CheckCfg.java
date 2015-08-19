@@ -16,8 +16,8 @@ import com.intrbiz.bergamot.config.adapter.YesNoAdapter;
 import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
-import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
+import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P>
 {
@@ -44,7 +44,7 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "groups")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getGroups()
     {
         return groups;

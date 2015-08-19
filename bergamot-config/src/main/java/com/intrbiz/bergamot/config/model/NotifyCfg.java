@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
-import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
+import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 @XmlType(name = "notify")
 @XmlRootElement(name = "notify")
@@ -30,7 +30,7 @@ public class NotifyCfg implements Serializable
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "teams")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getTeams()
     {
         return teams;
@@ -43,7 +43,7 @@ public class NotifyCfg implements Serializable
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "contacts")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getContacts()
     {
         return contacts;
