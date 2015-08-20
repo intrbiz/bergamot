@@ -29,8 +29,13 @@ public class BergamotConfigResolver
         return inherited;
     }
     
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public <T extends TemplatedObjectCfg<T>> T resolveInherit(T object)
+    {
+        return this.resolveInherit(object, null);
+    }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public <T extends TemplatedObjectCfg<T>> T resolveInherit(T object, BergamotValidationReport report)
     {
         if (((TemplatedObjectCfg) object).getInherits().size() > 0)
         {
@@ -41,37 +46,36 @@ public class BergamotConfigResolver
             logger.debug("Resolving inheritance for " + object.getClass().getSimpleName() + "::" + object.getName());
             for (String inheritsFrom : object.getInheritedTemplates())
             {
-                logger.debug("Looking up inherited object: " + inheritsFrom);   
+                logger.debug("Looking up inherited object: " + inheritsFrom);
                 TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
                 if (superObject != null)
                 {
                     // we need to recursively ensure that the inherited object is resolved
-                    this.resolveInherit((TemplatedObjectCfg) superObject);
+                    this.resolveInherit((TemplatedObjectCfg) superObject, report);
                     // add the inherited object
                     ((TemplatedObjectCfg) object).addInheritedObject(superObject);
                 }
                 else
                 {
                     // error
-                    logger.error("Cannot find the inherited object " + inheritsFrom + "!");
-                    logger.warn("Error: Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
+                    if (report != null) report.logError("Error: Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
                 }
             }
             // child objects
             for (TemplatedObjectCfg<?> child : object.getTemplatedChildObjects())
             {
-                this.resolveInherit((TemplatedObjectCfg) child);
+                this.resolveInherit((TemplatedObjectCfg) child, report);
             }
             // special cases
             if (object instanceof TimePeriodCfg)
             {
-                resolveExcludes((TimePeriodCfg) object);
+                resolveExcludes((TimePeriodCfg) object, report);
             }
         }
         return object;
     }
     
-    private TimePeriodCfg resolveExcludes(TimePeriodCfg object)
+    private TimePeriodCfg resolveExcludes(TimePeriodCfg object, BergamotValidationReport report)
     {
         for (String exclude : object.getExcludes())
         {
@@ -79,7 +83,7 @@ public class BergamotConfigResolver
             if (excludedTimePeriod == null)
             {
                 // error
-                logger.warn("Error: Cannot find the excluded time period named '" + exclude + "' which is excluded by " + object);
+                if (report != null) report.logError("Cannot find the excluded time period named '" + exclude + "' which is excluded by " + object);
             }
         }
         return object;

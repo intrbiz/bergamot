@@ -2,8 +2,6 @@ package com.intrbiz.bergamot.config.validator;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -20,14 +18,11 @@ import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
-import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 
 public class BergamotConfigValidator extends BergamotConfigResolver
 {
     private final BergamotCfg cfg;
-    
-    private Logger logger = Logger.getLogger(BergamotConfigValidator.class);
     
     public  BergamotConfigValidator(BergamotCfg cfg)
     {
@@ -64,73 +59,15 @@ public class BergamotConfigValidator extends BergamotConfigResolver
         return new ValidatedBergamotConfiguration(this.cfg, report);
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private void computeInheritenance(BergamotValidationReport report)
     {
         // walk the object tree and compute the inheritance graph
         for (List<? extends TemplatedObjectCfg<?>> objects : this.cfg.getAllObjects())
         {
-            for (TemplatedObjectCfg<?> object : objects)
+            for (TemplatedObjectCfg object : objects)
             {
                 this.resolveInherit(object, report);
-                // process any child templated objects
-                for (TemplatedObjectCfg<?> child : object.getTemplatedChildObjects())
-                {
-                    this.resolveInherit(child, report);
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void resolveInherit(TemplatedObjectCfg<?> object, BergamotValidationReport report)
-    {
-        if (((TemplatedObjectCfg) object).getInherits().size() > 0)
-        {
-            logger.debug("Skipping previously resolved object: " + object.getClass().getSimpleName() + "::" + object.getName());
-        }
-        else
-        {
-            logger.debug("Resolving inheritance for " + object.getClass().getSimpleName() + "::" + object.getName());
-            for (String inheritsFrom : object.getInheritedTemplates())
-            {
-                logger.debug("Looking up inherited object: " + inheritsFrom);
-                TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
-                if (superObject != null)
-                {
-                    // we need to recursively ensure that the inherited object is resolved
-                    this.resolveInherit((TemplatedObjectCfg) superObject, report);
-                    // add the inherited object
-                    ((TemplatedObjectCfg) object).addInheritedObject(superObject);
-                }
-                else
-                {
-                    // error
-                    logger.error("Cannot find the inherited object " + inheritsFrom + "!");
-                    report.logError("Cannot find the inherited " + object.getClass().getSimpleName() + " named '" + inheritsFrom + "' which is inherited by " + object);
-                }
-            }
-            // child objects
-            for (TemplatedObjectCfg<?> child : object.getTemplatedChildObjects())
-            {
-                this.resolveInherit((TemplatedObjectCfg) child, report);
-            }
-            // special cases
-            if (object instanceof TimePeriodCfg)
-            {
-                this.resolveExcludes((TimePeriodCfg) object, report);
-            }
-        }
-    }
-    
-    private void resolveExcludes(TimePeriodCfg object, BergamotValidationReport report)
-    {
-        for (String exclude : object.getExcludes())
-        {
-            TimePeriodCfg excludedTimePeriod = this.lookup(TimePeriodCfg.class, exclude);
-            if (excludedTimePeriod == null)
-            {
-                // error
-                report.logError("Cannot find the excluded time period named '" + exclude + "' which is excluded by " + object);
             }
         }
     }
