@@ -20,7 +20,7 @@ public class TeamActions
         try (BergamotDB db = BergamotDB.connect())
         {
             // resolve the config
-            db.getConfigResolver(Site.getSiteId(config.getId())).resolveInherit(config);
+            db.getConfigResolver(Site.getSiteId(config.getId())).computeInheritenance(config);
             // store the config
             db.setConfig(new Config(config.getId(), Site.getSiteId(config.getId()), config));
             // create the team

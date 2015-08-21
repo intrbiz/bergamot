@@ -171,7 +171,7 @@ public class Config implements Serializable
         {
             try (BergamotDB db = BergamotDB.connect())
             {
-                db.getConfigResolver(this.siteId).resolveInherit((TemplatedObjectCfg) this.configuration);
+                db.getConfigResolver(this.siteId).computeInheritenance((TemplatedObjectCfg) this.configuration);
             }
         }
         return configuration;

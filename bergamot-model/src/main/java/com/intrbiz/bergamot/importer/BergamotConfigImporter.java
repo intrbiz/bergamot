@@ -439,7 +439,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring command " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadCommand(configuration, db);
                 }
@@ -529,7 +529,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring location " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadLocation(configuration, db);
                     this.linkLocation(configuration, db);
@@ -633,7 +633,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring group " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadGroup(configuration, db);
                     this.linkGroup(configuration, db);
@@ -736,7 +736,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring time period " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadTimePeriod(configuration, db);
                     this.linkTimePeriod(configuration, db);
@@ -838,7 +838,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring team " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadTeam(configuration, db);
                     this.linkTeam(configuration, db);
@@ -933,7 +933,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring contact " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadContact(configuration, db);
                 }
@@ -1099,7 +1099,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring host " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadHost(configuration, db);
                 }
@@ -1490,7 +1490,7 @@ public class BergamotConfigImporter
                 {
                     this.report.info("Reconfiguring cluster " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
                     // first we need to resolve the inheritance for the cascaded object
-                    db.getConfigResolver(this.site.getId()).resolveInherit(configuration);
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
                     // load
                     this.loadCluster(configuration, db);
                 }
