@@ -67,7 +67,7 @@ public class BergamotConfigValidator extends BergamotConfigResolver
         {
             for (TemplatedObjectCfg object : objects)
             {
-                this.resolveInherit(object, report);
+                this.computeInheritenance(object, report);
             }
         }
     }
