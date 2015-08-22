@@ -83,22 +83,24 @@ public class BergamotConfigResolver
      * @param name the template we are looking for
      * @return the template if found, or null
      */
-    protected <P extends TemplatedObjectCfg<P>> TemplatedObjectCfg<?> lookupChildTemplate(P parent, String name)
+    protected <C extends TemplatedObjectCfg<C>> TemplatedObjectCfg<?> lookupChildTemplate(C container, String name)
     {
-        for (P parentTemplate : parent.getInherits())
+        for (C containerTemplate : container.getInherits())
         {
-            TemplatedObjectCfg<?> template = this.lookupChildTemplate(parentTemplate, name);
-            if (template != null) return template; 
-        }
-        for (TemplatedObjectCfg<?> child : parent.getTemplatedChildObjects())
-        {
-            if (name.equals(child.getName())) return child;
+            // search for the child object in the inherited template
+            for (TemplatedObjectCfg<?> child : containerTemplate.getTemplatedChildObjects())
+            {
+                if (name.equals(child.getName())) return child;
+            }
+            // recurse up the template chain
+            TemplatedObjectCfg<?> template = this.lookupChildTemplate(containerTemplate, name);
+            if (template != null) return template;
         }
         return null;
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected <T extends TemplatedObjectCfg<T>, P extends TemplatedObjectCfg<P>> void resolveChildInherit(P parent, T object, BergamotValidationReport report)
+    protected <T extends TemplatedObjectCfg<T>, C extends TemplatedObjectCfg<C>> void resolveChildInherit(C container, T object, BergamotValidationReport report)
     {
         if (object.getInherits().isEmpty())
         {
@@ -106,7 +108,7 @@ public class BergamotConfigResolver
             for (String inheritsFrom : object.getInheritedTemplates())
             {
                 // lookup in the containers inheritance tree
-                TemplatedObjectCfg<?> superObject = this.lookupChildTemplate(parent, inheritsFrom);
+                TemplatedObjectCfg<?> superObject = this.lookupChildTemplate(container, inheritsFrom);
                 // fallback to a global template
                 if (superObject == null) superObject = this.lookup(object.getClass(), inheritsFrom);
                 // yay or nay
