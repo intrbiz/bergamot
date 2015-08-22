@@ -52,4 +52,15 @@ public class ClusterCfg extends VirtualCheckCfg<ClusterCfg>
         }
         return r;
     }
+
+    @Override
+    protected void resolveChildren(ClusterCfg resolved)
+    {
+        List<ResourceCfg> resources = new LinkedList<ResourceCfg>();
+        for (ResourceCfg cfg : resolved.getResources())
+        {
+            resources.add(cfg.resolve());
+        }
+        resolved.setResources(resources);
+    }
 }

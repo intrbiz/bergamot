@@ -102,4 +102,23 @@ public class HostCfg extends ActiveCheckCfg<HostCfg>
             r.addAll(this.traps);
         return r;
     }
+    
+    @Override
+    protected void resolveChildren(HostCfg resolved)
+    {
+        // services
+        List<ServiceCfg> services = new LinkedList<ServiceCfg>();
+        for (ServiceCfg cfg : resolved.getServices())
+        {
+            services.add(cfg.resolve());
+        }
+        resolved.setServices(services);
+        // traps
+        List<TrapCfg> traps = new LinkedList<TrapCfg>();
+        for (TrapCfg cfg : resolved.getTraps())
+        {
+            traps.add(cfg.resolve());
+        }
+        resolved.setTraps(traps);
+    }
 }

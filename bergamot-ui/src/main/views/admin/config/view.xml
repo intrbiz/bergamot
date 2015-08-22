@@ -9,7 +9,7 @@
     <div class="row">
    		<h4>Resolved Configuration</h4>
    		<p class="text-body">The following is the resultant configuration once templates have been applied:</p>
-   		<pre>#{config.getResolvedConfiguration().resolve().toString()}</pre>
+   		<pre>#{config.getResolvedConfiguration().resolveDeep().toString()}</pre>
     </div>
     <div class="row" rendered="#{Balsa().permission('config.change.apply', config.id)}">
     	<a href="/admin/configchange/add/#{config.type}/id/#{config.id}" class="add">Edit this #{config.type}</a>
@@ -29,7 +29,7 @@
     				<td>#{ucfirst(dep.type)}</td>
     			    <td>
     			    	<a rendered="#{Balsa().permission('config.change.apply', dep.id)}" href="/admin/config/id/#{dep.id}" title="Configure">#{coalesce(dep.summary, ucfirst(dep.name))}</a>
-    			    	<span>#{coalesce(dep.summary, ucfirst(dep.name))}</span>
+    			    	<span rendered="#{! Balsa().permission('config.change.apply', dep.id)}">#{coalesce(dep.summary, ucfirst(dep.name))}</span>
     			    </td>
     				<td>#{dep.name}</td>
     			</tr>

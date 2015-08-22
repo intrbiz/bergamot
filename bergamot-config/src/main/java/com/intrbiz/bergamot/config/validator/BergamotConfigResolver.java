@@ -38,6 +38,7 @@ public class BergamotConfigResolver
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public <T extends TemplatedObjectCfg<T>> T computeInheritenance(T object, BergamotValidationReport report)
     {
+        logger.debug("Computing inheritenance for: " + object.getClass().getSimpleName() + " " + object.getName());
         // resolve the object
         this.resolveInherit(object, report);
         // now resolve the children
@@ -53,13 +54,14 @@ public class BergamotConfigResolver
     {
         if (object.getInherits().isEmpty())
         {
+            logger.debug("Resolving inheritenance for: " + object.getClass().getSimpleName() + " " + object.getName());
             for (String inheritsFrom : object.getInheritedTemplates())
             {
                 TemplatedObjectCfg<?> superObject = this.lookup(object.getClass(), inheritsFrom);
                 if (superObject != null)
                 {
                     // we need to recursively ensure that the inherited object is resolved
-                    this.resolveInherit(superObject, report);
+                    this.computeInheritenance((TemplatedObjectCfg) superObject, report);
                     // add the inherited object
                     ((TemplatedObjectCfg) object).addInheritedObject(superObject);
                 }
@@ -104,6 +106,7 @@ public class BergamotConfigResolver
     {
         if (object.getInherits().isEmpty())
         {
+            logger.debug("Resolving child inheritenance for: " + object.getClass().getSimpleName() + " " + object.getName() + " <<<< " + container.getClass().getSimpleName() + " " + container.getName());
             // Firstly look for are we inheriting from a child object of the parent object's templates
             for (String inheritsFrom : object.getInheritedTemplates())
             {
@@ -114,7 +117,7 @@ public class BergamotConfigResolver
                 // yay or nay
                 if (superObject != null)
                 {
-                    // we need to recursively ensure that the inherited object is resolved
+                    // resolve the super object
                     this.resolveInherit(superObject, report);
                     // add the inherited object
                     ((TemplatedObjectCfg) object).addInheritedObject(superObject);

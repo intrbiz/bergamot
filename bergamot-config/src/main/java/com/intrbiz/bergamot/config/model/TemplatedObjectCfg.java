@@ -135,7 +135,7 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
      * Process the inheritance hierarchy and produce a resolved configuration
      */
     @SuppressWarnings("unchecked")
-    public P resolve(ObjectResolver<P> resolver)
+    protected P resolve(ObjectResolver<P> resolver)
     {
         // nothing to resolve
         if (this.inherits == null || this.inherits.isEmpty()) return (P) this;
@@ -159,5 +159,16 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
     public final P resolve()
     {
         return this.resolve(BeanResolver.fromClass((Class<P>) this.getClass()));
+    }
+    
+    public final P resolveDeep()
+    {
+        P resolved = this.resolve();
+        this.resolveChildren(resolved);
+        return resolved;
+    }
+    
+    protected void resolveChildren(P resolved)
+    {
     }
 }
