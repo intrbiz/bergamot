@@ -142,7 +142,7 @@ public class TestHTTPEngine
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setScript(
-                "http.get('http://intrbiz.com/').execute("
+                "http.get('https://intrbiz.com/').execute("
                 + " function(r) {"
                 + "   if (r.status() == 200) { "
                 + "     var doc = r.parseHTML();"
