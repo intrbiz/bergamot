@@ -130,7 +130,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     public APIResponse applyConfigChange(BergamotDB db, @Var("site") Site site, @XML BergamotCfg config, @CurrentPrincipal() Contact user) throws Exception
     {
         // check that the change has a summary
-        require(! Util.isEmpty(config.getSummary()), () -> new BalsaBadRequest("The configuration change must have a summary"));
+        require(! Util.isEmpty(config.getSummary()), new BalsaBadRequest("The configuration change must have a summary"));
         // assert the site name
         config.setSite(site.getName());
         // create the config change
