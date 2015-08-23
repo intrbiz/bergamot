@@ -165,12 +165,8 @@ public class HTTPChecker
             // enabled ciphers
             if (ciphers == null || ciphers.isEmpty())
             {
-                /*
-                 * Default to using non GCM ciphers, there 
-                 * is a bug in JDK8 which is leading to NullPointerExceptions 
-                 * when using GCM ciphers - https://bugs.openjdk.java.net/browse/JDK-8049855?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel
-                 */
-                sslEngine.setEnabledCipherSuites(TLSConstants.getCipherNames(TLSConstants.CIPHERS.SAFE_CIPHERS_NO_GCM));
+                // default to safe ciphers which are supported by this JVM
+                sslEngine.setEnabledCipherSuites(TLSConstants.CIPHERS.SAFE_SUPPORTED_CIPHER_NAMES);
             }
             else
             {
