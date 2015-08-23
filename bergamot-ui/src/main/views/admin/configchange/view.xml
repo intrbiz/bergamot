@@ -4,9 +4,20 @@
     <div class="row">
 		<div class="col12">
 			<p class="field area">
-				<label for="change_configuration">Configuration</label>
-				<pre name="change_configuration" id="change_configuration" style="height: 600px; width: 1700px;">#{change.configuration.toString()}</pre>
+				<label style="display: none;" for="change_configuration">Configuration</label>
+				<pre name="change_configuration" id="change_configuration" style="width: 95%; min-height: 400px;">#{change.configuration.toString()}</pre>
 			</p>
 		</div>
     </div>
+    <!-- ACE text editor -->
+    <script src="#{public('/js/v1.5.0/bower_components/ace-builds/src-noconflict/ace.js')}" />
+    <script type="text/javascript">
+	  <![CDATA[
+		var editor = ace.edit("change_configuration");
+    	editor.setTheme("ace/theme/github");
+    	editor.getSession().setMode("ace/mode/xml");
+    	editor.setReadOnly(true);
+    	editor.getSession().setUseWrapMode(true);
+      ]]>
+    </script>
 </fragment>

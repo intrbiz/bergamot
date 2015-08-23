@@ -5,8 +5,9 @@
     	<form id="changes" method="post" action="#{path('/admin/configchange/edit/id/' + change.id)}">
 			<div class="col12">
 				<p class="field area">
-					<label for="change_configuration">Configuration</label>
-					<textarea name="change_configuration" id="change_configuration" style="height: 600px; width: 1700px;">#{if(error == null, change.configuration.toString(), bad_configuration)}</textarea>
+					<label style="display: none;" for="change_configuration">Configuration</label>
+					<pre id="change_configuration" style="width: 95%; min-height: 400px;">#{if(error == null, change.configuration.toString(), bad_configuration)}</pre>
+					<input type="hidden" name="change_configuration" id="change_configuration_hidden"/>
 					<div class="error" rendered="#{error != null}">
 						<p>An error was detected in the above configuration:</p>
 						<p>#{error}</p>
@@ -19,4 +20,17 @@
 	   		</div>
    		</form>
     </div>
+    <!-- ACE text editor -->
+    <script src="#{public('/js/v1.5.0/bower_components/ace-builds/src-noconflict/ace.js')}" />
+    <script type="text/javascript">
+	  <![CDATA[
+		var editor = ace.edit("change_configuration");
+    	editor.setTheme("ace/theme/github");
+    	editor.getSession().setMode("ace/mode/xml");
+    	$('#changes').submit(function(ev) {
+    		var code = editor.getValue();
+    		$('#change_configuration_hidden').val(code);
+    	});
+      ]]>
+    </script>
 </fragment>

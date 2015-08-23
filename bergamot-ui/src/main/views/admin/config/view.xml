@@ -1,15 +1,15 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Configuration for #{config.type} #{coalesce(config.summary, config.name)}">
+<fragment xmlns="com.intrbiz.balsa" title="Configuration for #{config.type} #{coalesce(config.summary, config.name)}">    
     <div class="row">
    		<h4>XML Configuration</h4>
-   		<pre>#{config.getConfiguration().toString()}</pre>
+   		<pre id="view_config" style="width: 95%; min-height: 400px;">#{config.getConfiguration().toString()}</pre>
     </div>
     <div class="row">
    		<h4>Resolved Configuration</h4>
    		<p class="text-body">The following is the resultant configuration once templates have been applied:</p>
-   		<pre>#{config.getResolvedConfiguration().resolveDeep().toString()}</pre>
+   		<pre id="view_resolved_config" style="width: 95%; min-height: 400px;">#{config.getResolvedConfiguration().resolveDeep().toString()}</pre>
     </div>
     <div class="row" rendered="#{Balsa().permission('config.change.apply', config.id)}">
     	<a href="/admin/configchange/add/#{config.type}/id/#{config.id}" class="add">Edit this #{config.type}</a>
@@ -36,4 +36,21 @@
     		</data-set>
     	</table>
     </div>
+    <!-- ACE text editor -->
+    <script src="#{public('/js/v1.5.0/bower_components/ace-builds/src-noconflict/ace.js')}" />
+    <script type="text/javascript">
+	  <![CDATA[
+		var editor1 = ace.edit("view_config");
+    	editor1.setTheme("ace/theme/github");
+    	editor1.getSession().setMode("ace/mode/xml");
+    	editor1.setReadOnly(true);
+    	editor1.getSession().setUseWrapMode(true);
+    	/* */
+    	var editor2 = ace.edit("view_resolved_config");
+    	editor2.setTheme("ace/theme/github");
+    	editor2.getSession().setMode("ace/mode/xml");
+    	editor2.setReadOnly(true);
+    	editor2.getSession().setUseWrapMode(true);
+      ]]>
+    </script>
 </fragment>
