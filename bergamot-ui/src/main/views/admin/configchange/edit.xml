@@ -1,6 +1,6 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
-<fragment xmlns="com.intrbiz.balsa" title="Change #{change.summary}">
+<fragment xmlns="com.intrbiz.balsa" title="Configuration Change: #{change.summary}">
     <div class="row">
     	<form id="changes" method="post" action="#{path('/admin/configchange/edit/id/' + change.id)}">
 			<div class="col12">
@@ -22,15 +22,75 @@
     </div>
     <!-- ACE text editor -->
     <script src="#{public('/js/v1.5.0/bower_components/ace-builds/src-noconflict/ace.js')}" />
+    <script src="#{public('/js/v1.5.0/bower_components/ace-builds/src-noconflict/ext-language_tools.js')}" />
     <script type="text/javascript">
 	  <![CDATA[
+	    /* Setup the editor */
+	    var langTools = ace.require("ace/ext/language_tools");
 		var editor = ace.edit("change_configuration");
     	editor.setTheme("ace/theme/github");
     	editor.getSession().setMode("ace/mode/xml");
+    	editor.setOptions({ enableBasicAutocompletion: true, enableLiveAutocompletion: true });
+    	/* On form submit, get the value from the editor */
     	$('#changes').submit(function(ev) {
     		var code = editor.getValue();
     		$('#change_configuration_hidden').val(code);
     	});
+    	/* Auto complete */
+    	var bergamotCompleter = {
+        	getCompletions: function(editor, session, pos, prefix, callback)
+        	{
+        		console.log("Autocomplete: " + JSON.stringify(pos) + " [" + prefix + "]");
+        		/* some context */
+        		var line = editor.getSession().getLine(pos.row);
+        		var startElem = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == '<' : false;
+        		var startAttr = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == ' ' : false;
+        		var startAttrVal = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == '"' : false;
+        		console.log("Line: " + line + " - " + " [" + line.substring(pos.column - prefix.length -1, pos.column - prefix.length) + "] " + startElem + " " + startAttr + " " + startAttrVal);
+        		/* autocomplete bergamot keywords */
+        		var kwordsElems = [
+        			'host', "service", "trap", "cluster", "resource", "command", "summary", "description"
+        		];
+        		var kwordsAttrs = [ 
+        			"name", "extends", "groups", "location", "address", "security-domains"
+        		];
+        		var matches = [];
+        		if (startElem)
+        		{
+        			for (var i = 0; i < kwordsElems.length; i++)
+        			{
+        				if (kwordsElems[i].startsWith(prefix)) 
+        				{
+        					matches.push({ name: kwordsElems[i], value: kwordsElems[i], score: 100, meta: "element" });
+        					matches.push({ name: kwordsElems[i], value: kwordsElems[i] + ' name="" extends=""', score: 99, meta: "element" });
+        				}
+        			}
+        		}
+        		else if (startAttr)
+        		{
+        			for (var i = 0; i < kwordsAttrs.length; i++)
+        			{
+        				if (kwordsAttrs[i].startsWith(prefix)) 
+        					matches.push({ name: kwordsAttrs[i], value: kwordsAttrs[i] + '=""', score: 100, meta: "attribute" });
+        			}
+        		}
+        		else
+        		{
+        			for (var i = 0; i < kwordsElems.length; i++)
+        			{
+        				if (kwordsElems[i].startsWith(prefix)) 
+        					matches.push({ name: kwordsElems[i], value: kwordsElems[i], score: 100, meta: "element" });
+        			}
+        			for (var i = 0; i < kwordsAttrs.length; i++)
+        			{
+        				if (kwordsAttrs[i].startsWith(prefix)) 
+        					matches.push({ name: kwordsAttrs[i], value: kwordsAttrs[i], score: 100, meta: "attribute" });
+        			}
+        		}
+	            callback(null, matches);
+	        }
+	    }
+	    langTools.addCompleter(bergamotCompleter);
       ]]>
     </script>
 </fragment>
