@@ -38,59 +38,571 @@
     	});
     	/* Auto complete */
     	var bergamotCompleter = {
-        	getCompletions: function(editor, session, pos, prefix, callback)
-        	{
-        		console.log("Autocomplete: " + JSON.stringify(pos) + " [" + prefix + "]");
-        		/* some context */
-        		var line = editor.getSession().getLine(pos.row);
-        		var startElem = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == '<' : false;
-        		var startAttr = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == ' ' : false;
-        		var startAttrVal = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == '"' : false;
-        		console.log("Line: " + line + " - " + " [" + line.substring(pos.column - prefix.length -1, pos.column - prefix.length) + "] " + startElem + " " + startAttr + " " + startAttrVal);
-        		/* autocomplete bergamot keywords */
-        		var kwordsElems = [
-        			'host', "service", "trap", "cluster", "resource", "command", "summary", "description"
-        		];
-        		var kwordsAttrs = [ 
-        			"name", "extends", "groups", "location", "address", "security-domains"
-        		];
-        		var matches = [];
-        		if (startElem)
-        		{
-        			for (var i = 0; i < kwordsElems.length; i++)
-        			{
-        				if (kwordsElems[i].startsWith(prefix)) 
-        				{
-        					matches.push({ name: kwordsElems[i], value: kwordsElems[i], score: 100, meta: "element" });
-        					matches.push({ name: kwordsElems[i], value: kwordsElems[i] + ' name="" extends=""', score: 99, meta: "element" });
-        				}
-        			}
-        		}
-        		else if (startAttr)
-        		{
-        			for (var i = 0; i < kwordsAttrs.length; i++)
-        			{
-        				if (kwordsAttrs[i].startsWith(prefix)) 
-        					matches.push({ name: kwordsAttrs[i], value: kwordsAttrs[i] + '=""', score: 100, meta: "attribute" });
-        			}
-        		}
-        		else
-        		{
-        			for (var i = 0; i < kwordsElems.length; i++)
-        			{
-        				if (kwordsElems[i].startsWith(prefix)) 
-        					matches.push({ name: kwordsElems[i], value: kwordsElems[i], score: 100, meta: "element" });
-        			}
-        			for (var i = 0; i < kwordsAttrs.length; i++)
-        			{
-        				if (kwordsAttrs[i].startsWith(prefix)) 
-        					matches.push({ name: kwordsAttrs[i], value: kwordsAttrs[i], score: 100, meta: "attribute" });
-        			}
-        		}
-	            callback(null, matches);
-	        }
-	    }
-	    langTools.addCompleter(bergamotCompleter);
+            keywords: {
+                "elements": [
+                    {
+                        "name": "security-domain",
+                        "object": true
+                    },
+                    {
+                        "name": "team",
+                        "object": true
+                    },
+                    {
+                        "name": "contact",
+                        "object": true
+                    },
+                    {
+                        "name": "time-period",
+                        "object": true
+                    },
+                    {
+                        "name": "command",
+                        "object": true
+                    },
+                    {
+                        "name": "location",
+                        "object": true
+                    },
+                    {
+                        "name": "group",
+                        "object": true
+                    },
+                    {
+                        "name": "host",
+                        "object": true
+                    },
+                    {
+                        "name": "service",
+                        "object": true
+                    },
+                    {
+                        "name": "trap",
+                        "object": true
+                    },
+                    {
+                        "name": "cluster",
+                        "object": true
+                    },
+                    {
+                        "name": "resource",
+                        "object": true
+                    },
+                    {
+                        "name": "access-control",
+                        "object": false
+                    },
+                    {
+                        "name": "check-command",
+                        "object": false
+                    },
+                    {
+                        "name": "initially",
+                        "object": false
+                    },
+                    {
+                        "name": "notification-engine",
+                        "object": false
+                    },
+                    {
+                        "name": "notifications",
+                        "object": false
+                    },
+                    {
+                        "name": "notify",
+                        "object": false
+                    },
+                    {
+                        "name": "schedule",
+                        "object": false
+                    },
+                    {
+                        "name": "state",
+                        "object": false
+                    },
+                    {
+                        "name": "time-zone",
+                        "object": false
+                    },
+                    {
+                        "name": "condition",
+                        "object": false
+                    },
+                    {
+                        "name": "description",
+                        "object": false
+                    },
+                    {
+                        "name": "email",
+                        "object": false
+                    },
+                    {
+                        "name": "external-ref",
+                        "object": false
+                    },
+                    {
+                        "name": "family-name",
+                        "object": false
+                    },
+                    {
+                        "name": "first-name",
+                        "object": false
+                    },
+                    {
+                        "name": "full-name",
+                        "object": false
+                    },
+                    {
+                        "name": "im",
+                        "object": false
+                    },
+                    {
+                        "name": "mobile",
+                        "object": false
+                    },
+                    {
+                        "name": "pager",
+                        "object": false
+                    },
+                    {
+                        "name": "phone",
+                        "object": false
+                    },
+                    {
+                        "name": "preferred-name",
+                        "object": false
+                    },
+                    {
+                        "name": "script",
+                        "object": false
+                    },
+                    {
+                        "name": "summary",
+                        "object": false
+                    },
+                    {
+                        "name": "time-range",
+                        "object": false
+                    },
+                    {
+                        "name": "parameter",
+                        "object": false
+                    },
+                ],
+                "attributes": [
+                    {
+                        "name": "acknowledge",
+                        "elements": [
+                            "notification-engine",
+                            "notifications"
+                        ]
+                    },
+                    {
+                        "name": "address",
+                        "elements": [
+                            "host"
+                        ]
+                    },
+                    {
+                        "name": "agent-id",
+                        "elements": [
+                            "host",
+                            "service"
+                        ]
+                    },
+                    {
+                        "name": "alerts",
+                        "elements": [
+                            "notification-engine",
+                            "notifications"
+                        ]
+                    },
+                    {
+                        "name": "all-engines",
+                        "elements": [
+                            "notifications"
+                        ]
+                    },
+                    {
+                        "name": "application",
+                        "elements": [
+                            "resource",
+                            "trap",
+                            "service",
+                            "command"
+                        ]
+                    },
+                    {
+                        "name": "category",
+                        "elements": [
+                            "resource",
+                            "trap",
+                            "service",
+                            "command"
+                        ]
+                    },
+                    {
+                        "name": "changing-every",
+                        "elements": [
+                            "schedule"
+                        ]
+                    },
+                    {
+                        "name": "command",
+                        "elements": [
+                            "check-command"
+                        ]
+                    },
+                    {
+                        "name": "contacts",
+                        "elements": [
+                            "notify"
+                        ]
+                    },
+                    {
+                        "name": "description",
+                        "elements": [
+                            "tag"
+                        ]
+                    },
+                    {
+                        "name": "enabled",
+                        "elements": [
+                            "notification-engine",
+                            "notifications",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "engine",
+                        "elements": [
+                            "command",
+                            "notification-engine"
+                        ]
+                    },
+                    {
+                        "name": "every",
+                        "elements": [
+                            "schedule"
+                        ]
+                    },
+                    {
+                        "name": "excludes",
+                        "elements": [
+                            "time-period"
+                        ]
+                    },
+                    {
+                        "name": "executor",
+                        "elements": [
+                            "command"
+                        ]
+                    },
+                    {
+                        "name": "extends",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "time-period",
+                            "command",
+                            "group",
+                            "location",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "failed-after",
+                        "elements": [
+                            "state"
+                        ]
+                    },
+                    {
+                        "name": "grants",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "access-control"
+                        ]
+                    },
+                    {
+                        "name": "groups",
+                        "elements": [
+                            "group",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "id",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "time-period",
+                            "command",
+                            "group",
+                            "location",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "ignore",
+                        "elements": [
+                            "notification-engine",
+                            "notifications"
+                        ]
+                    },
+                    {
+                        "name": "location",
+                        "elements": [
+                            "host"
+                        ]
+                    },
+                    {
+                        "name": "name",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "time-period",
+                            "command",
+                            "group",
+                            "location",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "output",
+                        "elements": [
+                            "initially"
+                        ]
+                    },
+                    {
+                        "name": "recovers-after",
+                        "elements": [
+                            "state"
+                        ]
+                    },
+                    {
+                        "name": "recovery",
+                        "elements": [
+                            "notification-engine",
+                            "notifications"
+                        ]
+                    },
+                    {
+                        "name": "retry-every",
+                        "elements": [
+                            "schedule"
+                        ]
+                    },
+                    {
+                        "name": "revokes",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "access-control"
+                        ]
+                    },
+                    {
+                        "name": "security-domain",
+                        "elements": [
+                            "access-control"
+                        ]
+                    },
+                    {
+                        "name": "security-domains",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "command",
+                            "time-period",
+                            "group",
+                            "location",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "state",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "command",
+                            "time-period",
+                            "group",
+                            "location",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "status",
+                        "elements": [
+                            "initially"
+                        ]
+                    },
+                    {
+                        "name": "suppressed",
+                        "elements": [
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "teams",
+                        "elements": [
+                            "notify",
+                            "team",
+                            "contact"
+                        ]
+                    },
+                    {
+                        "name": "template",
+                        "elements": [
+                            "team",
+                            "contact",
+                            "command",
+                            "time-period",
+                            "group",
+                            "location",
+                            "host",
+                            "service",
+                            "trap",
+                            "cluster",
+                            "resource"
+                        ]
+                    },
+                    {
+                        "name": "time-period",
+                        "elements": [
+                            "schedule",
+                            "notification-engine",
+                            "notifications"
+                        ]
+                    },
+                    {
+                        "name": "worker-pool",
+                        "elements": [
+                            "location",
+                            "host",
+                            "service"
+                        ]
+                    },
+                ]
+            },
+            
+            attr_filters: {},
+            
+            init: function()
+            {
+                for (var i = 0; i < this.keywords.attributes.length; i++)
+                {
+                    var attr = this.keywords.attributes[i];
+                    for (var j = 0; j < attr.elements.length; j++)
+                    {
+                        var elem = attr.elements[j];
+                        var attrs = this.attr_filters[elem];
+                        if (! attrs) this.attr_filters[elem] = attrs = [];
+                        attrs.push(attr);
+                    }
+                }
+                return this;
+            },
+		
+			getCompletions: function(editor, session, pos, prefix, callback)
+			{
+				/* some context */
+				var line = editor.getSession().getLine(pos.row);
+				var startElem = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == '<' : false;
+				var startAttr = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == ' ' : false;
+				var startAttrVal = (pos.column > 1) ? line.substring(pos.column - prefix.length - 1, pos.column - prefix.length) == '"' : false;
+				console.log("Line: " + line + " - " + " [" + line.substring(pos.column - prefix.length -1, pos.column - prefix.length) + "] " + startElem + " " + startAttr + " " + startAttrVal);
+				var matches = [];
+				if (startElem)
+				{
+					for (var i = 0; i < this.keywords.elements.length; i++)
+					{
+						var elem = this.keywords.elements[i];
+						if (elem.name.startsWith(prefix)) 
+						{
+							matches.push({ name: elem.name, value: elem.name, score: 100, meta: "element" });
+						}
+					}
+				}
+				else if (startAttr)
+				{
+					// filter the attribute list by context
+					var attrs = this.keywords.attributes;
+					var filter;
+					for (filter in this.attr_filters)
+					{
+						console.log("Trying filter: " + filter);
+						if (line.contains('<' + filter))
+						{
+							attrs = this.attr_filters[filter];
+							break;
+						}
+					}
+					// filter the attributes
+					for (var i = 0; i < attrs.length; i++)
+					{
+						var attr = attrs[i];
+						if (attr.name.startsWith(prefix)) 
+						{
+							matches.push({ name: attr.name, value: attr.name, score: 100, meta: "keyword" });
+						}
+					}
+				}
+				else
+				{
+					for (var i = 0; i < this.keywords.elements.length; i++)
+					{
+						var elem = this.keywords.elements[i];
+						if (elem.name.startsWith(prefix)) 
+						{
+							matches.push({ name: elem.name, value: elem.name, score: 100, meta: "keyword" });
+						}
+					}
+					for (var i = 0; i < this.keywords.attributes.length; i++)
+					{
+						var attr = this.keywords.attributes[i];
+						if (attr.name.startsWith(prefix)) 
+						{
+							matches.push({ name: attr.name, value: attr.name, score: 100, meta: "keyword" });
+						}
+					}
+				}
+				callback(null, matches);
+			}
+		};
+		langTools.addCompleter(bergamotCompleter.init());
       ]]>
     </script>
 </fragment>
