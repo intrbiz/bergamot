@@ -13,9 +13,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
-import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
-import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
+import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 @XmlType(name = "team")
 @XmlRootElement(name = "team")
@@ -38,7 +37,7 @@ public class TeamCfg extends SecuredObjectCfg<TeamCfg>
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "teams")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getTeams()
     {
         return teams;
@@ -66,7 +65,7 @@ public class TeamCfg extends SecuredObjectCfg<TeamCfg>
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "grants")
-    @ResolveWith(MergeSet.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getGrantedPermissions()
     {
         return grantedPermissions;
@@ -79,7 +78,7 @@ public class TeamCfg extends SecuredObjectCfg<TeamCfg>
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "revokes")
-    @ResolveWith(MergeSet.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getRevokedPermissions()
     {
         return revokedPermissions;

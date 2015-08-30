@@ -16,10 +16,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
-import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyCollection;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
-import com.intrbiz.bergamot.config.resolver.stratergy.MergeSet;
+import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 @XmlType(name = "contact")
 @XmlRootElement(name = "contact")
@@ -62,7 +61,7 @@ public class ContactCfg extends SecuredObjectCfg<ContactCfg> implements Serializ
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "teams")
-    @ResolveWith(CoalesceEmptyCollection.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getTeams()
     {
         return teams;
@@ -210,7 +209,7 @@ public class ContactCfg extends SecuredObjectCfg<ContactCfg> implements Serializ
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "grants")
-    @ResolveWith(MergeSet.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getGrantedPermissions()
     {
         return grantedPermissions;
@@ -223,7 +222,7 @@ public class ContactCfg extends SecuredObjectCfg<ContactCfg> implements Serializ
 
     @XmlJavaTypeAdapter(CSVAdapter.class)
     @XmlAttribute(name = "revokes")
-    @ResolveWith(MergeSet.class)
+    @ResolveWith(SmartMergeSet.class)
     public Set<String> getRevokedPermissions()
     {
         return revokedPermissions;
