@@ -45,6 +45,7 @@ public class UtilsAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void viewCache(BergamotDB db, @SessionVar("site") Site site)
     {
+        require(app().isDevEnv());
         Cache cache = DataManager.get().cache("cache.bergamot");
         var("cachekeys", cache.keySet(""));
         encode("admin/utils/cache/view");
