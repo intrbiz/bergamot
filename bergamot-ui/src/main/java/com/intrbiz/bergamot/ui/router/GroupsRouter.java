@@ -4,9 +4,11 @@ import static com.intrbiz.bergamot.ui.util.Sorter.*;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.ActiveCheck;
@@ -15,25 +17,27 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CurrentPrincipal;
+import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
-@Prefix("/")
+@Prefix("/group")
 @Template("layout/main")
 @RequireValidPrincipal()
 public class GroupsRouter extends Router<BergamotApp>
 {    
-    @Any("/group")
+    /*@Any("")
     public void rediectGroups() throws IOException
     {
         redirect("/group/");
-    }
+    }*/
     
-    @Any("/group/")
+    @Any("/")
     @WithDataAdapter(BergamotDB.class)
     public void showGroups(BergamotDB db, @SessionVar("site") Site site)
     {
@@ -41,7 +45,7 @@ public class GroupsRouter extends Router<BergamotApp>
         encode("group/index");
     }
     
-    @Any("/group/name/:name")
+    @Any("/name/:name")
     @WithDataAdapter(BergamotDB.class)
     public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site)
     {
@@ -52,7 +56,7 @@ public class GroupsRouter extends Router<BergamotApp>
         encode("group/group");
     }
     
-    @Any("/group/id/:id")
+    @Any("/id/:id")
     @WithDataAdapter(BergamotDB.class)
     public void showHostGroupByName(BergamotDB db, @IsaObjectId UUID id, @CurrentPrincipal Contact user)
     {
@@ -63,7 +67,7 @@ public class GroupsRouter extends Router<BergamotApp>
         encode("group/group");
     }
     
-    @Any("/group/execute-all-checks/:id")
+    @Any("/execute-all-checks/:id")
     @WithDataAdapter(BergamotDB.class)
     public void executeChecksInGroup(BergamotDB db, @IsaObjectId UUID id) throws IOException
     {
@@ -75,5 +79,15 @@ public class GroupsRouter extends Router<BergamotApp>
             }
         }
         redirect("/group/id/" + id);
+    }
+    
+    @Get("/create")
+    @WithDataAdapter(BergamotDB.class)
+    public void create(BergamotDB db, @SessionVar("site") Site site)
+    {
+        var("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(GroupCfg.class)).stream().filter((t) -> permission("read", t.getId())).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
+        var("locations", db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
+        var("groups", db.listGroups(site.getId()).stream().filter((g) -> permission("read", g)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
+        encode("/group/create");
     }
 }

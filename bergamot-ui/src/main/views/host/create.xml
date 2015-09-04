@@ -7,9 +7,9 @@
 		<form id="create_host" name="create_host" method="post" action="#{path('/host/create')}">
 			<p>
 				<label for="host_extends">Template</label>
-				<select id="" name="">
+				<select id="host_extends" name="host_extends">
 					<option value="" selected="selected">Please select a template</option>
-					<data-set var="template" value="#{host_templates}">
+					<data-set var="template" value="#{templates}">
 						<option value="#{template.id}">#{coalesce(template.summary, template.name)}</option>
 					</data-set>
 				</select>

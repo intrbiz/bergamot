@@ -157,9 +157,9 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void create(BergamotDB db, @SessionVar("site") Site site)
     {
-        var("host_templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(HostCfg.class)).stream().filter((t) -> permission("read", t.getId())).sorted((a, b) -> a.getName().compareTo(b.getName())).collect(Collectors.toList()));
-        var("locations", db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).sorted((a, b) -> a.getName().compareTo(b.getName())).collect(Collectors.toList()));
-        var("groups", db.listGroups(site.getId()).stream().filter((g) -> permission("read", g)).sorted((a, b) -> a.getName().compareTo(b.getName())).collect(Collectors.toList()));
+        var("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(HostCfg.class)).stream().filter((t) -> permission("read", t.getId())).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
+        var("locations", db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
+        var("groups", db.listGroups(site.getId()).stream().filter((g) -> permission("read", g)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
         encode("/host/create");
     }
     
