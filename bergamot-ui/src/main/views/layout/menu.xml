@@ -27,6 +27,25 @@
         </ul>
     </div>
     
+    <!-- Creation Menu -->
+    <div class="menu-group">
+        <h4>Add New</h4>
+        <ul>
+         	<li>
+                <a href="/host/create">Host</a>
+            </li>
+            <li>
+                <a href="/cluster/create">Cluster</a>
+            </li>
+            <li>
+                <a href="/group/create">Group</a>
+            </li>
+            <li>
+                <a href="/location/create">Location</a>
+            </li>
+        </ul>
+    </div>
+    
     <!-- Admin Menu -->
     <container rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
         <div class="menu-group">
