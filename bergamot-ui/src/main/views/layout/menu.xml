@@ -47,11 +47,7 @@
 	            </li>
 	        </ul>
 	    </div>
-    
-    </div>
-    
-    <div class="menu-col">
-    
+	            
 	    <!-- Admin Menu -->
 	    <container rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
 	        <div class="menu-group">
@@ -66,6 +62,10 @@
 	            </ul>
 	        </div>
 	    </container>
+    
+    </div>
+    
+    <div class="menu-col">
 	    
 	    <!-- Admin Menu -->
 	    <container rendered="#{Balsa().permission('ui.admin')}">
