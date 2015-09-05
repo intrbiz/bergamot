@@ -5,7 +5,7 @@
 
 	<div class="row">
 		<form id="create_cluster" name="create_cluster" method="post" action="#{path('/cluster/create')}">
-			<p>
+			<div>
 				<label for="cluster_extends">Template</label>
 				<select id="cluster_extends" name="cluster_extends">
 					<option value="" selected="selected">Please select a template</option>
@@ -13,62 +13,85 @@
 						<option value="#{template.id}">#{coalesce(template.summary, template.name)}</option>
 					</data-set>
 				</select>
-			</p>
-			<p>
+			</div>
+			<div>
 				<label for="cluster_summary">Summary</label>
 				<input type="text" id="cluster_summary" name="cluster_summary"/>
-			</p>
-			<p>
+			</div>
+			<div>
 				<label for="cluster_address">Name</label>
 				<input type="text" id="cluster_name" name="cluster_name"/>
-			</p>
-			<p>
+			</div>
+			<div>
 				<label for="cluster_group[0]">Groups</label>
-				<select id="cluster_group[0]" name="cluster_group[0]">
-					<option value="" selected="selected">No group</option>
-					<data-set var="group" value="#{groups}">
-						<option value="#{group.id}">#{coalesce(group.summary, group.name)}</option>
-					</data-set>
-				</select>
-			</p>
-			<p>
+				<ul>
+					<li>
+						<select id="cluster_group_0" name="cluster_group[0]" data-groups="1">
+							<option value="" selected="selected">No group</option>
+							<data-set var="group" value="#{groups}">
+								<option value="#{group.id}">#{coalesce(group.summary, group.name)}</option>
+							</data-set>
+						</select>
+						<a href="#add_group" id="add_group" class="add">Another</a>
+					</li>
+				</ul>
+			</div>
+			<div>
 				<label for="cluster_description">Description</label>
 				<textarea id="cluster_description" name="cluster_description"></textarea>
-			</p>
-			<p>
+			</div>
+			<div>
 				<input type="submit" value="Add Cluster"/>
-			</p>
+			</div>
 		</form>
 	</div>
 	
 	<style>
-		form > p {
+		form > div {
+			float: left;
+			clear: both;
+			width: 100%;
 		}
 		
-		form > p > label {
-			display: inline-block;
+		form > div > label {
+			display: block;
+			float: left;
 			width: 150px;
 			margin-right: 20px;
 			font-weight: bold;
 			text-align: right;
+			margin-top: 10px;
 		}
 		
-		form > p > input[type=text] {
+		form > div input[type=text] {
+			display: block;
+			float: left;
 			width: 400px;
 		}
 		
-		form > p > select {
+		form > div select {
+			display: block;
+			float: left;
 			width: 420px;
 		}
 		
-		form > p > textarea {
+		form > div textarea {
+			display: block;
+			float: left;
 			width: 410px;
 			height: 150px;
 		}
 		
-		form > p > input[type=submit] {
+		form > div input[type=submit] {
+			display: block;
+			float: left;
 			margin-left: 175px;
 			font-weight: bold;
+		}
+		
+		form > div ul {
+			display: block;
+			float: left;
 		}
 	</style>
 	
@@ -81,6 +104,25 @@
 			$('#cluster_summary').keyup(function(ev) {
 				ev.preventDefault();
 				$('#cluster_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
+			});
+			$('#add_group').click(function(ev) {
+				ev.preventDefault();
+				var id = parseInt($('#cluster_group_0').attr('data-groups'));
+				$('#cluster_group_0').attr('data-groups', id + 1);
+				var sel = $('#cluster_group_0').clone();
+				$(sel).attr('id', 'cluster_group_' + id);
+				$(sel).attr('name', 'cluster_group[' + id + ']');
+				var li = document.createElement('li');
+				var a = document.createElement('a');
+				$(a).attr('class', 'remove');
+				$(a).text('Remove');
+				$(a).click(function(ev) {
+					ev.preventDefault();
+					$(this).parent().remove();
+				});
+				$(li).append(sel);
+				$(li).append(a);
+				$(this).parent().before(li);
 			});
 		});
 	</script>
