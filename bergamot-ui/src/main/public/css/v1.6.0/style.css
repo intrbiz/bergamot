@@ -125,7 +125,7 @@ table tr:hover {
     position: absolute;
     top: 60px;
     right: 5px;
-    width: 320px;
+    width: 640px;
     visibility: hidden;
     font-family: 'Merriweather Sans', sans-serif;
     line-height: 22px;
@@ -140,12 +140,20 @@ table tr:hover {
 }
 
 #sub-menu div.menu-group {
-    padding: 10px 20px;
+    padding: 10px;
     overflow: hidden;
+    width: 300px;
 }
 
 #sub-menu div.menu-group h4 {
     margin-bottom: 5px;
+}
+
+#sub-menu div.menu-col {
+    padding: 10px;
+    overflow: hidden;
+    width: 300px;
+    float: left;
 }
 
 #sub-menu a {

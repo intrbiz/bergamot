@@ -3,121 +3,129 @@
 <!-- The main menu include -->
 <fragment xmlns="com.intrbiz.balsa">
     
-    <div class="menu-group">    
-        <h4><a href="/profile/">Hello #{Balsa().currentPrincipal().summary}</a></h4>
-        <ul>
-            <li>
-                <a href="/">Overview</a>
-            </li>
-            <li>
-                <a href="/location/">Locations</a>
-            </li>
-            <li>
-                <a href="/group/">Groups</a>
-            </li>
-            <li>
-                <a href="/group/name/hosts">Hosts</a>
-            </li>
-            <li>
-                <a href="/group/name/services">Services</a>
-            </li>
-            <li>
-                <a href="/logout">Logout</a>
-            </li>
-        </ul>
-    </div>
+    <div class="menu-col">
     
-    <!-- Creation Menu -->
-    <div class="menu-group">
-        <h4>Add New</h4>
-        <ul>
-         	<li>
-                <a href="/host/create">Host</a>
-            </li>
-            <li>
-                <a href="/cluster/create">Cluster</a>
-            </li>
-            <li>
-                <a href="/group/create">Group</a>
-            </li>
-            <li>
-                <a href="/location/create">Location</a>
-            </li>
-        </ul>
-    </div>
-    
-    <!-- Admin Menu -->
-    <container rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
-        <div class="menu-group">
-            <h4><a href="/agent/">Bergamot Agent Manager</a></h4>
-            <ul>
+	    <div class="menu-group">    
+	        <h4><a href="/profile/">Hello #{Balsa().currentPrincipal().summary}</a></h4>
+	        <ul>
 	            <li>
-                    <a href="/agent/sign">Sign Agent Certificate</a>
-                </li>
-                <li rendered="#{Balsa().permission('ui.generate.agent')}">
-                    <a href="/agent/generate-config">Generate Agent Configuration</a>
-                </li>
-            </ul>
-        </div>
-    </container>
+	                <a href="/">Overview</a>
+	            </li>
+	            <li>
+	                <a href="/location/">Locations</a>
+	            </li>
+	            <li>
+	                <a href="/group/">Groups</a>
+	            </li>
+	            <li>
+	                <a href="/group/name/hosts">Hosts</a>
+	            </li>
+	            <li>
+	                <a href="/group/name/services">Services</a>
+	            </li>
+	            <li>
+	                <a href="/logout">Logout</a>
+	            </li>
+	        </ul>
+	    </div>
+	    
+	    <!-- Creation Menu -->
+	    <div class="menu-group">
+	        <h4>Add New</h4>
+	        <ul>
+	         	<li>
+	                <a href="/host/create">Host</a>
+	            </li>
+	            <li>
+	                <a href="/cluster/create">Cluster</a>
+	            </li>
+	            <li>
+	                <a href="/group/create">Group</a>
+	            </li>
+	            <li>
+	                <a href="/location/create">Location</a>
+	            </li>
+	        </ul>
+	    </div>
     
-    <!-- Admin Menu -->
-    <container rendered="#{Balsa().permission('ui.admin')}">
-        <div class="menu-group">
-            <h4><a href="/admin/">Admin</a></h4>
-            <ul>
-            	<li>
-                    <a href="/admin/securitydomain/">Security Domains</a>
-                </li>
-                <li>
-                    <a href="/admin/team/">Teams</a>
-                </li>
-                <li>
-                    <a href="/admin/contact/">Contacts</a>
-                </li>
-                <li>
-                    <a href="/admin/timeperiod/">Time Periods</a>
-                </li>
-                <li>
-                    <a href="/admin/command/">Commands</a>
-                </li>
-                <li>
-                    <a href="/admin/location/">Locations</a>
-                </li>
-                <li>
-                    <a href="/admin/group/">Groups</a>
-                </li>
-                <li>
-                    <a href="/admin/host/">Hosts</a>
-                </li>
-                <li>
-                    <a href="/admin/service/">Services</a>
-                </li>
-                <li>
-                    <a href="/admin/trap/">Traps</a>
-                </li>
-                <li>
-                    <a href="/admin/cluster/">Clusters</a>
-                </li>
-                <li>
-                    <a href="/admin/resource/">Resources</a>
-                </li>
-                <li>
-                    <a href="/admin/site/">Global Configuration</a>
-                </li>
-                <li>
-                    <a href="/admin/configchange/">Configuration Changes</a>
-                </li>
-                <li>
-                    <a href="/admin/utils/">Utilities</a>
-                </li>                
-            </ul>
-        </div>
-    </container>
+    </div>
     
-    <!-- About -->
-    <div class="menu-group">
-        <h4><a href="/about/">About Bergamot Monitoring</a></h4>
+    <div class="menu-col">
+    
+	    <!-- Admin Menu -->
+	    <container rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
+	        <div class="menu-group">
+	            <h4><a href="/agent/">Bergamot Agent Manager</a></h4>
+	            <ul>
+		            <li>
+	                    <a href="/agent/sign">Sign Agent Certificate</a>
+	                </li>
+	                <li rendered="#{Balsa().permission('ui.generate.agent')}">
+	                    <a href="/agent/generate-config">Generate Agent Configuration</a>
+	                </li>
+	            </ul>
+	        </div>
+	    </container>
+	    
+	    <!-- Admin Menu -->
+	    <container rendered="#{Balsa().permission('ui.admin')}">
+	        <div class="menu-group">
+	            <h4><a href="/admin/">Admin</a></h4>
+	            <ul>
+	            	<li>
+	                    <a href="/admin/securitydomain/">Security Domains</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/team/">Teams</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/contact/">Contacts</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/timeperiod/">Time Periods</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/command/">Commands</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/location/">Locations</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/group/">Groups</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/host/">Hosts</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/service/">Services</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/trap/">Traps</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/cluster/">Clusters</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/resource/">Resources</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/site/">Global Configuration</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/configchange/">Configuration Changes</a>
+	                </li>
+	                <li>
+	                    <a href="/admin/utils/">Utilities</a>
+	                </li>                
+	            </ul>
+	        </div>
+	    </container>
+	      
+	    <!-- About -->
+	    <div class="menu-group">
+	        <h4><a href="/about/">About Bergamot Monitoring</a></h4>
+	    </div>
+    
     </div>
     
 </fragment>
