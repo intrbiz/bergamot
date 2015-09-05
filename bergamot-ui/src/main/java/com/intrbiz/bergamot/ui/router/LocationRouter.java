@@ -4,33 +4,32 @@ import static com.intrbiz.bergamot.ui.util.Sorter.*;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
-@Prefix("/")
+@Prefix("/location")
 @Template("layout/main")
 @RequireValidPrincipal()
 public class LocationRouter extends Router<BergamotApp>
-{    
-    @Any("/location")
-    public void rediectLocations() throws IOException
-    {
-        redirect("/location/");
-    }
+{
     
-    @Any("/location/")
+    @Any("/")
     @WithDataAdapter(BergamotDB.class)
     public void showLocations(BergamotDB db, @SessionVar("site") Site site)
     {
@@ -38,7 +37,7 @@ public class LocationRouter extends Router<BergamotApp>
         encode("location/index");
     }
     
-    @Any("/location/name/:name")
+    @Any("/name/:name")
     @WithDataAdapter(BergamotDB.class)
     public void showLocationByName(BergamotDB db, String name, @SessionVar("site") Site site)
     {
@@ -49,7 +48,7 @@ public class LocationRouter extends Router<BergamotApp>
         encode("location/location");
     }
     
-    @Any("/location/id/:id")
+    @Any("/id/:id")
     @WithDataAdapter(BergamotDB.class)
     public void showLocationById(BergamotDB db, @IsaObjectId UUID id)
     {
@@ -60,7 +59,7 @@ public class LocationRouter extends Router<BergamotApp>
         encode("location/location");
     }
     
-    @Any("/location/id/:id/execute-all-hosts")
+    @Any("/id/:id/execute-all-hosts")
     @WithDataAdapter(BergamotDB.class)
     public void executeHostsInLocation(BergamotDB db, @IsaObjectId UUID id) throws IOException
     { 
@@ -69,5 +68,14 @@ public class LocationRouter extends Router<BergamotApp>
             if (permission("execute", host)) action("execute-check", host);
         }
         redirect("/location/id/" + id);
+    }
+    
+    @Get("/create")
+    @WithDataAdapter(BergamotDB.class)
+    public void create(BergamotDB db, @SessionVar("site") Site site)
+    {
+        var("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(LocationCfg.class)).stream().filter((t) -> permission("read", t.getId())).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
+        var("locations", db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
+        encode("/host/create");
     }
 }

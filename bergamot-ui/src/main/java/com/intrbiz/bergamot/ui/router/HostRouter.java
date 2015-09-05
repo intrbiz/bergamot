@@ -167,6 +167,5 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void create(BergamotDB db)
     {
-        
     }
 }

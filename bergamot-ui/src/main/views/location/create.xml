@@ -1,0 +1,88 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Add Location">
+
+	<div class="row">
+		<form id="create_location" name="create_location" method="post" action="#{path('/location/create')}">
+			<p>
+				<label for="location_extends">Template</label>
+				<select id="location_extends" name="location_extends">
+					<option value="" selected="selected">Please select a template</option>
+					<data-set var="template" value="#{templates}">
+						<option value="#{template.id}">#{coalesce(template.summary, template.name)}</option>
+					</data-set>
+				</select>
+			</p>
+			<p>
+				<label for="location_summary">Summary</label>
+				<input type="text" id="location_summary" name="location_summary"/>
+			</p>
+			<p>
+				<label for="location_address">Name</label>
+				<input type="text" id="location_name" name="location_name"/>
+			</p>
+			<p>
+				<label for="location_location">Location</label>
+				<select id="location_location" name="location_location">
+					<option value="" selected="selected">No location</option>
+					<data-set var="location" value="#{locations}">
+						<option value="#{location.id}">#{coalesce(location.summary, location.name)}</option>
+					</data-set>
+				</select>
+			</p>
+			<p>
+				<label for="location_description">Description</label>
+				<textarea id="location_description" name="location_description"></textarea>
+			</p>
+			<p>
+				<input type="submit" value="Add Host"/>
+			</p>
+		</form>
+	</div>
+	
+	<style>
+		form > p {
+		}
+		
+		form > p > label {
+			display: inline-block;
+			width: 150px;
+			margin-right: 20px;
+			font-weight: bold;
+			text-align: right;
+		}
+		
+		form > p > input[type=text] {
+			width: 400px;
+		}
+		
+		form > p > select {
+			width: 420px;
+		}
+		
+		form > p > textarea {
+			width: 410px;
+			height: 150px;
+		}
+		
+		form > p > input[type=submit] {
+			margin-left: 175px;
+			font-weight: bold;
+		}
+	</style>
+	
+	<script>
+		$(document).ready(function() {
+			$('#location_summary').change(function(ev) {
+				ev.preventDefault();
+				$('#location_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
+			});
+			$('#location_summary').keyup(function(ev) {
+				ev.preventDefault();
+				$('#location_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
+			});
+		});
+	</script>
+
+</fragment>

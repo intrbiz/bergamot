@@ -1,13 +1,13 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Add Group">
+<fragment xmlns="com.intrbiz.balsa" title="Add Cluster">
 
 	<div class="row">
-		<form id="create_group" name="create_group" method="post" action="#{path('/group/create')}">
-			<p rendered="#{! templates.isEmpty()}">
-				<label for="group_extends">Template</label>
-				<select id="group_extends" name="group_extends">
+		<form id="create_cluster" name="create_cluster" method="post" action="#{path('/cluster/create')}">
+			<p>
+				<label for="cluster_extends">Template</label>
+				<select id="cluster_extends" name="cluster_extends">
 					<option value="" selected="selected">Please select a template</option>
 					<data-set var="template" value="#{templates}">
 						<option value="#{template.id}">#{coalesce(template.summary, template.name)}</option>
@@ -15,16 +15,16 @@
 				</select>
 			</p>
 			<p>
-				<label for="group_summary">Summary</label>
-				<input type="text" id="group_summary" name="group_summary"/>
+				<label for="cluster_summary">Summary</label>
+				<input type="text" id="cluster_summary" name="cluster_summary"/>
 			</p>
 			<p>
-				<label for="group_address">Name</label>
-				<input type="text" id="group_name" name="group_name"/>
+				<label for="cluster_address">Name</label>
+				<input type="text" id="cluster_name" name="cluster_name"/>
 			</p>
 			<p>
-				<label for="group_group[0]">Groups</label>
-				<select id="group_group[0]" name="group_group[0]">
+				<label for="cluster_group[0]">Groups</label>
+				<select id="cluster_group[0]" name="cluster_group[0]">
 					<option value="" selected="selected">No group</option>
 					<data-set var="group" value="#{groups}">
 						<option value="#{group.id}">#{coalesce(group.summary, group.name)}</option>
@@ -32,11 +32,11 @@
 				</select>
 			</p>
 			<p>
-				<label for="group_description">Description</label>
-				<textarea id="group_description" name="group_description"></textarea>
+				<label for="cluster_description">Description</label>
+				<textarea id="cluster_description" name="cluster_description"></textarea>
 			</p>
 			<p>
-				<input type="submit" value="Add Group"/>
+				<input type="submit" value="Add Cluster"/>
 			</p>
 		</form>
 	</div>
@@ -74,13 +74,13 @@
 	
 	<script>
 		$(document).ready(function() {
-			$('#group_summary').change(function(ev) {
+			$('#cluster_summary').change(function(ev) {
 				ev.preventDefault();
-				$('#group_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
+				$('#cluster_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
 			});
-			$('#group_summary').keyup(function(ev) {
+			$('#cluster_summary').keyup(function(ev) {
 				ev.preventDefault();
-				$('#group_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
+				$('#cluster_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
 			});
 		});
 	</script>

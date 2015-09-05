@@ -30,12 +30,7 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 public class GroupsRouter extends Router<BergamotApp>
-{    
-    /*@Any("")
-    public void rediectGroups() throws IOException
-    {
-        redirect("/group/");
-    }*/
+{
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
