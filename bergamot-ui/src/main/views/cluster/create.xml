@@ -26,7 +26,7 @@
 				<label for="cluster_group[0]">Groups</label>
 				<ul>
 					<li>
-						<select id="cluster_group_0" name="cluster_group[0]" data-groups="1">
+						<select id="cluster_group_0" name="cluster_group[0]" data-fieldcount="1">
 							<option value="" selected="selected">No group</option>
 							<data-set var="group" value="#{groups}">
 								<option value="#{group.id}">#{coalesce(group.summary, group.name)}</option>
@@ -46,84 +46,10 @@
 		</form>
 	</div>
 	
-	<style>
-		form > div {
-			float: left;
-			clear: both;
-			width: 100%;
-		}
-		
-		form > div > label {
-			display: block;
-			float: left;
-			width: 150px;
-			margin-right: 20px;
-			font-weight: bold;
-			text-align: right;
-			margin-top: 10px;
-		}
-		
-		form > div input[type=text] {
-			display: block;
-			float: left;
-			width: 400px;
-		}
-		
-		form > div select {
-			display: block;
-			float: left;
-			width: 420px;
-		}
-		
-		form > div textarea {
-			display: block;
-			float: left;
-			width: 410px;
-			height: 150px;
-		}
-		
-		form > div input[type=submit] {
-			display: block;
-			float: left;
-			margin-left: 175px;
-			font-weight: bold;
-		}
-		
-		form > div ul {
-			display: block;
-			float: left;
-		}
-	</style>
-	
 	<script>
 		$(document).ready(function() {
-			$('#cluster_summary').change(function(ev) {
-				ev.preventDefault();
-				$('#cluster_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
-			});
-			$('#cluster_summary').keyup(function(ev) {
-				ev.preventDefault();
-				$('#cluster_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
-			});
-			$('#add_group').click(function(ev) {
-				ev.preventDefault();
-				var id = parseInt($('#cluster_group_0').attr('data-groups'));
-				$('#cluster_group_0').attr('data-groups', id + 1);
-				var sel = $('#cluster_group_0').clone();
-				$(sel).attr('id', 'cluster_group_' + id);
-				$(sel).attr('name', 'cluster_group[' + id + ']');
-				var li = document.createElement('li');
-				var a = document.createElement('a');
-				$(a).attr('class', 'remove');
-				$(a).text('Remove');
-				$(a).click(function(ev) {
-					ev.preventDefault();
-					$(this).parent().remove();
-				});
-				$(li).append(sel);
-				$(li).append(a);
-				$(this).parent().before(li);
-			});
+			$('#cluster_summary').copyInputTo('#cluster_name');
+			$('#add_group').addAnotherField('cluster_group');
 		});
 	</script>
 

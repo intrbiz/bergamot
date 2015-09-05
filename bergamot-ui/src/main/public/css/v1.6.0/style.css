@@ -744,6 +744,55 @@ span.disabled {
     right: 74px;
 }
 
+/* Create forms */
+
+form > div {
+    float: left;
+    clear: both;
+    width: 100%;
+}
+
+form > div > label {
+    display: block;
+    float: left;
+    width: 150px;
+    margin-right: 20px;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 10px;
+}
+
+form > div input[type=text] {
+    display: block;
+    float: left;
+    width: 400px;
+}
+
+form > div select {
+    display: block;
+    float: left;
+    width: 420px;
+}
+
+form > div textarea {
+    display: block;
+    float: left;
+    width: 410px;
+    height: 150px;
+}
+
+form > div input[type=submit] {
+    display: block;
+    float: left;
+    margin-left: 175px;
+    font-weight: bold;
+}
+
+form > div ul {
+    display: block;
+    float: left;
+}
+
 /* Resizing */
 
 @media (min-width: 571px) and (max-width: 869px) {

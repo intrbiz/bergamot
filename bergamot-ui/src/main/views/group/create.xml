@@ -5,7 +5,7 @@
 
 	<div class="row">
 		<form id="create_group" name="create_group" method="post" action="#{path('/group/create')}">
-			<p rendered="#{! templates.isEmpty()}">
+			<div rendered="#{! templates.isEmpty()}">
 				<label for="group_extends">Template</label>
 				<select id="group_extends" name="group_extends">
 					<option value="" selected="selected">Please select a template</option>
@@ -13,75 +13,43 @@
 						<option value="#{template.id}">#{coalesce(template.summary, template.name)}</option>
 					</data-set>
 				</select>
-			</p>
-			<p>
+			</div>
+			<div>
 				<label for="group_summary">Summary</label>
 				<input type="text" id="group_summary" name="group_summary"/>
-			</p>
-			<p>
+			</div>
+			<div>
 				<label for="group_address">Name</label>
 				<input type="text" id="group_name" name="group_name"/>
-			</p>
-			<p>
+			</div>
+			<div>
 				<label for="group_group[0]">Groups</label>
-				<select id="group_group[0]" name="group_group[0]">
-					<option value="" selected="selected">No group</option>
-					<data-set var="group" value="#{groups}">
-						<option value="#{group.id}">#{coalesce(group.summary, group.name)}</option>
-					</data-set>
-				</select>
-			</p>
-			<p>
+				<ul>
+					<li>
+						<select id="group_group_0" name="group_group[0]" data-fieldcount="1">
+							<option value="" selected="selected">No group</option>
+							<data-set var="group" value="#{groups}">
+								<option value="#{group.id}">#{coalesce(group.summary, group.name)}</option>
+							</data-set>
+						</select>
+						<a href="#add_group" id="add_group" class="add">Another</a>
+					</li>
+				</ul>
+			</div>
+			<div>
 				<label for="group_description">Description</label>
 				<textarea id="group_description" name="group_description"></textarea>
-			</p>
-			<p>
+			</div>
+			<div>
 				<input type="submit" value="Add Group"/>
-			</p>
+			</div>
 		</form>
 	</div>
 	
-	<style>
-		form > p {
-		}
-		
-		form > p > label {
-			display: inline-block;
-			width: 150px;
-			margin-right: 20px;
-			font-weight: bold;
-			text-align: right;
-		}
-		
-		form > p > input[type=text] {
-			width: 400px;
-		}
-		
-		form > p > select {
-			width: 420px;
-		}
-		
-		form > p > textarea {
-			width: 410px;
-			height: 150px;
-		}
-		
-		form > p > input[type=submit] {
-			margin-left: 175px;
-			font-weight: bold;
-		}
-	</style>
-	
 	<script>
 		$(document).ready(function() {
-			$('#group_summary').change(function(ev) {
-				ev.preventDefault();
-				$('#group_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
-			});
-			$('#group_summary').keyup(function(ev) {
-				ev.preventDefault();
-				$('#group_name').val( $(this).val().toLowerCase().replace(/ /g, '_').replace(/[^a-z0-9_-]/g, ''));
-			});
+			$('#group_summary').copyInputTo('#group_name');
+			$('#add_group').addAnotherField('group_group');
 		});
 	</script>
 

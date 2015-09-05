@@ -14,6 +14,7 @@
     	<script src="#{public('/js/v1.5.0/bower_components/jquery/dist/jquery.js')}"></script>
     	<script src="#{public('/js/v1.5.0/plugins/jquery.reveal.js')}"></script>
     	<script src="#{public('/js/v1.5.0/plugins/jquery.simple-dtpicker.js')}"></script>
+    	<script src="#{public('/js/v1.5.0/plugins/bergamot-plugins.js')}"></script>
     	<script type="text/javascript">
             <![CDATA[
 			/* Configure require js */
