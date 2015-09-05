@@ -27,6 +27,14 @@
 				<input type="text" id="host_address" name="host_address"/>
 			</div>
 			<div>
+				<label for="host_agent_id">Agent ID</label>
+				<input type="text" id="host_agent_id" name="host_agent_id"/>
+				<p style="margin-left: 175px;">
+					<input rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}" type="checkbox" id="host_agent_id_generate" name="host_agent_id_generate"/>
+					<span>Generate Agent Configuration and assign Agent ID</span>
+				</p>
+			</div>
+			<div>
 				<label for="host_location">Location</label>
 				<select id="host_location" name="host_location">
 					<option value="" selected="selected">No location</option>
@@ -63,6 +71,9 @@
 		$(document).ready(function() {
 			$('#host_summary').copyInputTo('#host_name');
 			$('#add_group').addAnotherField('host_group');
+			$('#host_agent_id_generate').change(function(ev) {
+				$('#host_agent_id').prop('disabled', this.checked);
+			});
 		});
 	</script>
 

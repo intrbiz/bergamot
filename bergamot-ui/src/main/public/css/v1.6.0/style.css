@@ -770,21 +770,15 @@ form > div > label {
     margin-top: 10px;
 }
 
+form > div textarea,
+form > div select,
 form > div input[type=text] {
     display: block;
     float: left;
     width: 400px;
 }
 
-form > div select {
-    display: block;
-    float: left;
-    width: 420px;
-}
-
 form > div textarea {
-    display: block;
-    float: left;
     width: 410px;
     height: 150px;
 }
