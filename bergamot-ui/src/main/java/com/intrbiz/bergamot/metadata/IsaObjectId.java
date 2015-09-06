@@ -21,4 +21,6 @@ import com.intrbiz.metadata.UseValidator;
 public @interface IsaObjectId
 {   
     boolean session() default true;
+    
+    boolean mandatory() default true;
 }
