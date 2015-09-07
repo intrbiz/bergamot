@@ -24,6 +24,7 @@ import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.configuration.CfgParameter;
+import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Get;
@@ -141,5 +142,14 @@ public class ConfigAPIRouter extends Router<BergamotApp>
         BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), Balsa().url(Balsa().path("/reset")), user);
         // write out the report
         return new AppliedConfigChange(report.toMOUnsafe());
+    }
+    
+    @Any("/exists/:type/:name")
+    @JSON()
+    @WithDataAdapter(BergamotDB.class)
+    public boolean objectExists(BergamotDB db, @Var("site") Site site, String type, String name)
+    {
+        Config config = db.getConfigByName(site.getId(), type, name);
+        return config != null;
     }
 }
