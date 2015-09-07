@@ -48,6 +48,8 @@
 	<script>
 		$(document).ready(function() {
 			$('#location_summary').copyInputTo('#location_name');
+			$('#location_name').checkObjectName('#location_name', 'location');
+			$('#location_summary').checkObjectName('#location_name', 'location');
 		});
 	</script>
 
