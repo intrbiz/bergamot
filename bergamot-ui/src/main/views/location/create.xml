@@ -32,11 +32,15 @@
 				</select>
 			</div>
 			<div>
+				<label for="location_workerpool">Worker Pool</label>
+				<input type="text" id="location_workerpool" name="location_workerpool"/>
+			</div>
+			<div>
 				<label for="location_description">Description</label>
 				<textarea id="location_description" name="location_description"></textarea>
 			</div>
 			<div>
-				<input type="submit" value="Add Host"/>
+				<input type="submit" value="Add Location"/>
 			</div>
 		</form>
 	</div>
