@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.LocationCfg;
-import com.intrbiz.bergamot.config.model.TemplatedObjectCfg.ObjectState;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
@@ -109,12 +109,10 @@ public class LocationRouter extends Router<BergamotApp>
     {
         // create the configuration object we are going to add
         LocationCfg config = new LocationCfg();
-        config.setTemplate(false);
-        config.setObjectState(ObjectState.PRESENT);
         config.setSummary(summary);
         config.setName(name);
-        config.setWorkerPool(workerPool);
-        config.setDescription(description);
+        if (! Util.isEmpty(workerPool)) config.setWorkerPool(workerPool);
+        if (! Util.isEmpty(description)) config.setDescription(description);
         // extends
         if (templateId != null)
         {
