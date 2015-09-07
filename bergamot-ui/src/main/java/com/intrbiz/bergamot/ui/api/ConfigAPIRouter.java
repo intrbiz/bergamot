@@ -147,7 +147,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @Any("/exists/:type/:name")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public boolean objectExists(BergamotDB db, @Var("site") Site site, String type, String name)
+    public Boolean objectExists(BergamotDB db, @Var("site") Site site, String type, String name)
     {
         Config config = db.getConfigByName(site.getId(), type, name);
         return config != null;
