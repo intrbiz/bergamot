@@ -34,6 +34,9 @@ public class ObjectIdValidator extends Validator<UUID>
     @Override
     public UUID validate(UUID in) throws ValidationException
     {
+        // should the input be null and not mandatory we skip validation 
+        // as there is nothing to validate and that is fine 
+        if (in == null && (! this.mandatory)) return null;
         // must be not null
         if (this.mandatory && in == null) throw new ValidationException("No object id given");
         // lookup the current site
