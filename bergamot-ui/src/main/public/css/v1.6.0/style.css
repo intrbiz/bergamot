@@ -778,8 +778,12 @@ form > div input[type=text] {
     width: 400px;
 }
 
+form > div select {
+    width: 420px;
+}
+
 form > div textarea {
-    width: 410px;
+    width: 411px;
     height: 150px;
 }
 
