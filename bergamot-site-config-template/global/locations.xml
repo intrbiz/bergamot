@@ -1,60 +1,64 @@
 <bergamot site="bergamot.template">
     
-    <location name="aws" security-domains="global">
+    <location name="generic_location" security-domains="global" template="yes">
+        <summary>Generic Location Template</summary>
+    </location>
+    
+    <location name="aws" extends="generic_location">
         <summary>Amazon Web Services</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
 
-    <location name="aws-eu-ireland" location="aws" security-domains="global">
+    <location name="aws-eu-ireland" location="aws" extends="generic_location">
         <summary>Amazon Web Services - EU (Ireland)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-us-east-n-virginia" location="aws" security-domains="global">
+    <location name="aws-us-east-n-virginia" location="aws" extends="generic_location">
         <summary>Amazon Web Services - US East (N. Virginia)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-us-west-oregon" location="aws" security-domains="global">
+    <location name="aws-us-west-oregon" location="aws" extends="generic_location">
         <summary>Amazon Web Services - US West (Oregon)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-us-west-n-california" location="aws" security-domains="global">
+    <location name="aws-us-west-n-california" location="aws" extends="generic_location">
         <summary>Amazon Web Services - US West (N. California)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-asia-pacific-singapore" location="aws" security-domains="global">
+    <location name="aws-asia-pacific-singapore" location="aws" extends="generic_location">
         <summary>Amazon Web Services - Asia Pacific (Singapore)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-asia-pacific-tokyo" location="aws" security-domains="global">
+    <location name="aws-asia-pacific-tokyo" location="aws" extends="generic_location">
         <summary>Amazon Web Services - Asia Pacific (Tokyo)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-asia-pacific-sydney" location="aws" security-domains="global">
+    <location name="aws-asia-pacific-sydney" location="aws" extends="generic_location">
         <summary>Amazon Web Services - Asia Pacific (Sydney)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
     
-    <location name="aws-south-america-sao-paulo" location="aws" security-domains="global">
+    <location name="aws-south-america-sao-paulo" location="aws" extends="generic_location">
         <summary>Amazon Web Services - South America (Sao Paulo)</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
     </location>
 
-    <location name="main-data-centre" security-domains="global">
+    <location name="main-data-centre" extends="generic_location">
         <summary>Main Data Centre</summary>
     </location>
     
-    <location name="the-office" security-domains="global">
+    <location name="the-office" extends="generic_location">
         <summary>The Office</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/office.png</parameter>
     </location>
 
-    <location name="remote" security-domains="global">
+    <location name="remote" extends="generic_location">
         <summary>Remote</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/globe.png</parameter>
     </location>
