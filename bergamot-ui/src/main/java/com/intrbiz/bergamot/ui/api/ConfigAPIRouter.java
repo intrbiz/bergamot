@@ -2,9 +2,11 @@ package com.intrbiz.bergamot.ui.api;
 
 import static com.intrbiz.balsa.BalsaContext.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.intrbiz.Util;
+import com.intrbiz.balsa.engine.publicresource.PublicResource;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaBadRequest;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
@@ -151,5 +153,19 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     {
         Config config = db.getConfigByName(site.getId(), type, name);
         return config != null;
+    }
+    
+    @Any("/icon/")
+    @JSON()
+    public List<String> listIcons()
+    {
+        List<String> ret = new LinkedList<String>();
+        // scan the icon folder
+        for (PublicResource resource : app().getPublicResourceEngine().get(balsa(), "/images/icons/64/").getChildren())
+        {
+            if (resource.getName().endsWith(".png")) 
+                ret.add("/images/icons/64/" + resource.getName());
+        }
+        return ret;
     }
 }
