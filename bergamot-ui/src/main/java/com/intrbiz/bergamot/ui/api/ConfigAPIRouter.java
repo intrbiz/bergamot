@@ -164,7 +164,9 @@ public class ConfigAPIRouter extends Router<BergamotApp>
         for (PublicResource resource : app().getPublicResourceEngine().get(balsa(), "/images/icons/64/").getChildren())
         {
             if (resource.getName().endsWith(".png")) 
-                ret.add("/images/icons/64/" + resource.getName());
+            {
+                ret.add(resource.getPath());
+            }
         }
         return ret;
     }
