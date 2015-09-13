@@ -19,7 +19,7 @@
 				<input type="text" id="host_summary" name="host_summary"/>
 			</div>
 			<div>
-				<label for="host_address">Name</label>
+				<label for="host_name">Name</label>
 				<input type="text" id="host_name" name="host_name"/>
 			</div>
 			<div>
@@ -27,10 +27,14 @@
 				<input type="text" id="host_address" name="host_address"/>
 			</div>
 			<div>
+				<label for="host_external_ref">External Ref</label>
+				<input type="text" id="host_external_ref" name="host_external_ref"/>
+			</div>
+			<div>
 				<label for="host_agent_id">Agent ID</label>
 				<input type="text" id="host_agent_id" name="host_agent_id"/>
 				<p style="margin-left: 175px;">
-					<input rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}" type="checkbox" id="host_agent_id_generate" name="host_agent_id_generate"/>
+					<input rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}" type="checkbox" id="host_agent_id_generate" name="host_agent_id_generate" value="yes"/>
 					<span>Generate Agent Configuration and assign Agent ID</span>
 				</p>
 			</div>

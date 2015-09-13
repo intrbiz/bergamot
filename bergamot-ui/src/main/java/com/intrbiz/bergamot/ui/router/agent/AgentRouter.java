@@ -110,7 +110,7 @@ public class AgentRouter extends Router<BergamotApp>
         encode("agent/signed-agent");
     }
     
-    private static String padCert(String cert)
+    public static String padCert(String cert)
     {
         StringBuilder sb = new StringBuilder("\r\n");
         for (String s : cert.split("\n"))
