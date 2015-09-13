@@ -14,7 +14,6 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.GroupCfg;
-import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
@@ -122,7 +121,7 @@ public class GroupsRouter extends Router<BergamotApp>
         if (templateId != null)
         {
             Config extendsCfg = db.getConfig(templateId);
-            if (extendsCfg != null && extendsCfg.getConfiguration() instanceof LocationCfg)
+            if (extendsCfg != null && extendsCfg.getConfiguration() instanceof GroupCfg)
             {
                 config.getInheritedTemplates().add(extendsCfg.getConfiguration().getName());
             }
