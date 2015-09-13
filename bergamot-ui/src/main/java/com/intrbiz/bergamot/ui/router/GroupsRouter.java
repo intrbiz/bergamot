@@ -147,7 +147,7 @@ public class GroupsRouter extends Router<BergamotApp>
         configContainer.setSite(site.getName());
         configContainer.setSummary("Create group: " + name);
         configContainer.getGroups().add(config);
-        logger.info("Creating location " + name + ":\n" + configContainer);
+        logger.info("Creating group " + name + ":\n" + configContainer);
         // create the configuration change
         ConfigChange change = new ConfigChange(site.getId(), user, configContainer);
         db.setConfigChange(change);
