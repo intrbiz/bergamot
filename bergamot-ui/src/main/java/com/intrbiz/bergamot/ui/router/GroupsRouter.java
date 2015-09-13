@@ -109,7 +109,6 @@ public class GroupsRouter extends Router<BergamotApp>
             @Param("group_extends") @IsaObjectId(mandatory = false) UUID templateId,
             @Param("group_summary") @CheckStringLength(mandatory = true, max = 255) String summary,
             @Param("group_name") @CheckStringLength(mandatory = true, max = 255) String name,
-            @Param("group_location") @IsaObjectId(mandatory = false) UUID locationId,
             @Param("group_description") @CheckStringLength(mandatory = false, max = 4096) String description,
             @ListParam("group_group") @IsaObjectId(mandatory = false) List<UUID> groupGroups
     )
