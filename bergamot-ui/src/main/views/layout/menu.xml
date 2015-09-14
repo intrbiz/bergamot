@@ -38,9 +38,6 @@
 		                <a href="/host/create">Host</a>
 		            </li>
 		            <li>
-		                <a href="/cluster/create">Cluster</a>
-		            </li>
-		            <li>
 		                <a href="/group/create">Group</a>
 		            </li>
 		            <li>
