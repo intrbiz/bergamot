@@ -11,6 +11,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.command.AcknowledgeAlertCommand;
 import com.intrbiz.bergamot.command.AgentCommand;
 import com.intrbiz.bergamot.command.AlertsCommand;
 import com.intrbiz.bergamot.command.ApplyConfigChangeCommand;
@@ -49,6 +50,7 @@ public class BergamotCLI
         this.addCommand(new TestCommand());
         this.addCommand(new SiteXMLCommand());
         this.addCommand(new AlertsCommand());
+        this.addCommand(new AcknowledgeAlertCommand());
         this.addCommand(new AgentCommand());
         this.addCommand(new ApplyConfigChangeCommand());
         // local commands
