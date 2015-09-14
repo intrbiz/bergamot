@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.call.alert;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.http.client.fluent.Response;
@@ -11,7 +10,7 @@ import com.intrbiz.bergamot.BergamotAPIException;
 import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.model.message.AlertMO;
 
-public class AcknoweledgeAlertCall extends BergamotAPICall<List<AlertMO>>
+public class AcknowledgeAlertCall extends BergamotAPICall<AlertMO>
 {   
     private UUID id;
     
@@ -19,30 +18,30 @@ public class AcknoweledgeAlertCall extends BergamotAPICall<List<AlertMO>>
     
     private String comment;
     
-    public AcknoweledgeAlertCall(BergamotClient client)
+    public AcknowledgeAlertCall(BergamotClient client)
     {
         super(client);
     }
     
-    public AcknoweledgeAlertCall id(UUID id)
+    public AcknowledgeAlertCall id(UUID id)
     {
         this.id = id;
         return this;
     }
     
-    public AcknoweledgeAlertCall summary(String summary)
+    public AcknowledgeAlertCall summary(String summary)
     {
         this.summary = summary;
         return this;
     }
     
-    public AcknoweledgeAlertCall comment(String comment)
+    public AcknowledgeAlertCall comment(String comment)
     {
         this.comment = comment;
         return this;
     }
     
-    public List<AlertMO> execute()
+    public AlertMO execute()
     {
         try
         {
@@ -54,7 +53,7 @@ public class AcknoweledgeAlertCall extends BergamotAPICall<List<AlertMO>>
                     param("comment", this.comment)
                 )
             );
-            return transcoder().decodeListFromString(response.returnContent().asString(), AlertMO.class);
+            return transcoder().decodeFromString(response.returnContent().asString(), AlertMO.class);
         }
         catch (IOException e)
         {
