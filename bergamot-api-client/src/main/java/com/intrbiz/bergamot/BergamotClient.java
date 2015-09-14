@@ -20,6 +20,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.call.agent.SignAgentKey;
+import com.intrbiz.bergamot.call.alert.AcknoweledgeAlertCall;
 import com.intrbiz.bergamot.call.alert.GetAlertsCall;
 import com.intrbiz.bergamot.call.auth.AppAuthTokenCall;
 import com.intrbiz.bergamot.call.auth.AuthTokenCall;
@@ -300,6 +301,11 @@ public class BergamotClient
     public GetAlertsCall getAlerts()
     {
         return new GetAlertsCall(this);
+    }
+    
+    public AcknoweledgeAlertCall acknoweledgeAlert()
+    {
+        return new AcknoweledgeAlertCall(this);
     }
     
     // agent

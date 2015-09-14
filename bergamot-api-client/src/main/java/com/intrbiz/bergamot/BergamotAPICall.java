@@ -8,6 +8,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 
@@ -53,6 +54,11 @@ public abstract class BergamotAPICall<T>
     protected Header authHeader()
     {
         return new BasicHeader("X-Bergamot-Auth", this.authToken());
+    }
+    
+    protected NameValuePair param(String name, String value)
+    {
+        return new BasicNameValuePair(name, value);
     }
     
     protected Response execute(Request request) throws ClientProtocolException, IOException
