@@ -8,17 +8,27 @@
 			<table>
 				<tr>
 					<th>Method</th>
+					<th>Prefix</th>
 					<th>Path</th>
 					<th>As</th>
+					<th>Param</th>
 				</tr>
 				<data-set var="route" value="#{routes}">
 					<tr>
 						<td>#{route.method}</td>
-						<td>#{route.prefix + route.pattern}</td>
+						<td>#{route.prefix}</td>
+						<td>#{route.pattern}</td>
 						<td>
 							<ul>
-								<data-set var="as" value="#{route.compiledPattern.as}">
+								<data-set var="as" value="#{route.as}">
 									<li>#{as}</li>
+								</data-set>
+							</ul>
+						</td>
+						<td>
+							<ul>
+								<data-set var="param" value="#{route.parameters}">
+									<li>#{param}</li>
 								</data-set>
 							</ul>
 						</td>
