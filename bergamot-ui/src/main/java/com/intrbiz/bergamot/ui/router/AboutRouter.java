@@ -56,7 +56,7 @@ public class AboutRouter extends Router<BergamotApp>
         
         private LinkedHashSet<String> as;
         
-        private List<String> parameters;
+        private List<RouteParameter> parameters;
         
         public RouteInfo(Route route)
         {
@@ -64,7 +64,7 @@ public class AboutRouter extends Router<BergamotApp>
             this.prefix = route.getPrefix();
             this.pattern = route.getPattern();
             this.as = new LinkedHashSet<String>(Arrays.asList(route.getCompiledPattern().getAs()));
-            this.parameters = new LinkedList<String>();
+            this.parameters = new LinkedList<RouteParameter>();
             // look at the annotations
             for (Parameter parameter : route.getHandler().getParameters())
             {
@@ -72,14 +72,14 @@ public class AboutRouter extends Router<BergamotApp>
                 if (param != null)
                 {
                     if (! this.as.contains(param.value())) 
-                        this.parameters.add(param.value());
+                        this.parameters.add(new RouteParameter(param.value(), parameter.getType()));
                     continue;
                 }
                 ListParam listParam = parameter.getAnnotation(ListParam.class);
                 if (listParam != null)
                 {
                     if (! this.as.contains(listParam.value()))
-                        this.parameters.add(listParam.value());
+                        this.parameters.add(new RouteParameter(listParam.value(), parameter.getType()));
                     continue;
                 }
             }
@@ -105,9 +105,33 @@ public class AboutRouter extends Router<BergamotApp>
             return as;
         }
 
-        public List<String> getParameters()
+        public List<RouteParameter> getParameters()
         {
             return parameters;
+        }
+        
+    }
+    
+    public static class RouteParameter
+    {
+        private final String name;
+        
+        private final Class<?> type;
+        
+        public RouteParameter(String name, Class<?> type)
+        {
+            this.name = name;
+            this.type = type;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public Class<?> getType()
+        {
+            return type;
         }
     }
 }

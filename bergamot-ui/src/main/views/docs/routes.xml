@@ -28,7 +28,7 @@
 						<td>
 							<ul>
 								<data-set var="param" value="#{route.parameters}">
-									<li>#{param}</li>
+									<li>#{param.name} :: #{param.type.getSimpleName()}</li>
 								</data-set>
 							</ul>
 						</td>
