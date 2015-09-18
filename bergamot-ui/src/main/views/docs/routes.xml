@@ -33,6 +33,11 @@
 							</ul>
 						</td>
 					</tr>
+					<tr rendered="#{route.prefix.startsWith('/api')}">
+						<td colspan="5">
+							<pre>#{route.buildRouteAPICall()}</pre>
+						</td>
+					</tr>
 				</data-set>
 			</table>
 		</div>

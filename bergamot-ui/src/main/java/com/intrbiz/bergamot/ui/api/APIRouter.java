@@ -25,7 +25,6 @@ import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.CheckStringLength;
-import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IgnorePaths;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Order;
@@ -211,7 +210,7 @@ public class APIRouter extends Router<BergamotApp>
     /**
      * Change the current users password
      */
-    @Get("/change-password")
+    @Any("/change-password")
     @JSON()
     @RequireValidPrincipal()
     @WithDataAdapter(BergamotDB.class)
