@@ -260,7 +260,7 @@ public class AboutRouter extends Router<BergamotApp>
             for (RouteParameter parameter : this.parameters)
             {
                 sb.append("\n");
-                sb.append("    private ").append(parameter.getType().getSimpleName()).append(" ").append(parameter.getFieldName()).append("\n");
+                sb.append("    private ").append(parameter.getType().getSimpleName()).append(" ").append(parameter.getFieldName()).append(";\n");
             }
             sb.append("\n");
             //
@@ -276,7 +276,7 @@ public class AboutRouter extends Router<BergamotApp>
                 sb.append("    public ").append(Util.ucFirst(this.callName)).append("Call ").append(parameter.getFieldName())
                  .append("(").append(parameter.getType().getSimpleName()).append(" ").append(parameter.getFieldName()).append(")\n");
                 sb.append("    {\n");
-                sb.append("        this.").append(parameter.getFieldName()).append(" = ").append(parameter.getFieldName()).append("\n");
+                sb.append("        this.").append(parameter.getFieldName()).append(" = ").append(parameter.getFieldName()).append(";\n");
                 sb.append("        return this;\n");
                 sb.append("    }\n");
             }
