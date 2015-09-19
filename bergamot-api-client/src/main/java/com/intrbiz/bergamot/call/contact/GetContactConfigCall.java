@@ -7,14 +7,14 @@ import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 
 public class GetContactConfigCall extends BergamotAPICall<ContactCfg>
 {   
     private UUID id;
     
-    public GetContactConfigCall(BergamotClient client)
+    public GetContactConfigCall(BaseBergamotClient client)
     {
         super(client);
     }

@@ -7,12 +7,12 @@ import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.model.message.ContactMO;
 
 public class GetContactsCall extends BergamotAPICall<List<ContactMO>>
 {    
-    public GetContactsCall(BergamotClient client)
+    public GetContactsCall(BaseBergamotClient client)
     {
         super(client);
     }

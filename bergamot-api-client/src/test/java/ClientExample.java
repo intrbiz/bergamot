@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 
 
 public class ClientExample
@@ -13,7 +13,7 @@ public class ClientExample
         //
         System.setProperty("ssl.SocketFactory.provider", "");
         //
-        BergamotClient client = new BergamotClient("https://bergamot.local/api/", "chris.ellis", password);
+        BaseBergamotClient client = new BaseBergamotClient("https://bergamot.local/api/", "chris.ellis", password);
         // auth api calls
         System.out.println(client.authToken().username("chris.ellis").password(password).execute());
         System.out.println(client.extendAuthToken().token(client.getAuthToken().getToken()).execute());

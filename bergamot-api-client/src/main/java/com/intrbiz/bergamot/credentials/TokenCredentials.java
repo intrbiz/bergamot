@@ -1,6 +1,6 @@
 package com.intrbiz.bergamot.credentials;
 
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 
 public class TokenCredentials implements ClientCredentials
@@ -18,7 +18,7 @@ public class TokenCredentials implements ClientCredentials
     }
 
     @Override
-    public AuthTokenMO auth(BergamotClient client)
+    public AuthTokenMO auth(BaseBergamotClient client)
     {
         return new AuthTokenMO(this.getAuthToken(), -1);
     }

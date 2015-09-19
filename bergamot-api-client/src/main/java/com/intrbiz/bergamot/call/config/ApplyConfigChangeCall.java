@@ -8,7 +8,7 @@ import org.apache.http.entity.ContentType;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
@@ -20,7 +20,7 @@ public class ApplyConfigChangeCall extends BergamotAPICall<AppliedConfigChange>
     
     private BergamotTranscoder transcoder = new BergamotTranscoder();
     
-    public ApplyConfigChangeCall(BergamotClient client)
+    public ApplyConfigChangeCall(BaseBergamotClient client)
     {
         super(client);
     }

@@ -7,14 +7,14 @@ import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 
 public class ExtendAuthTokenCall extends BergamotAPICall<AuthTokenMO>
 {
     private String token;
     
-    public ExtendAuthTokenCall(BergamotClient client)
+    public ExtendAuthTokenCall(BaseBergamotClient client)
     {
         super(client);
     }

@@ -7,12 +7,12 @@ import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.model.message.AlertMO;
 
 public class GetAlertsCall extends BergamotAPICall<List<AlertMO>>
 {    
-    public GetAlertsCall(BergamotClient client)
+    public GetAlertsCall(BaseBergamotClient client)
     {
         super(client);
     }

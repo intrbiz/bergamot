@@ -14,14 +14,14 @@ import com.intrbiz.bergamot.io.BergamotTranscoder;
 
 public abstract class BergamotAPICall<T>
 {
-    private BergamotClient client;
+    private BaseBergamotClient client;
     
-    public BergamotAPICall(BergamotClient client)
+    public BergamotAPICall(BaseBergamotClient client)
     {
         this.client = client;
     }
     
-    protected BergamotClient client()
+    protected BaseBergamotClient client()
     {
         return this.client;
     }
@@ -59,6 +59,11 @@ public abstract class BergamotAPICall<T>
     protected NameValuePair param(String name, String value)
     {
         return new BasicNameValuePair(name, value);
+    }
+    
+    protected NameValuePair param(String name, Object value)
+    {
+        return new BasicNameValuePair(name, String.valueOf(value));
     }
     
     protected Response execute(Request request) throws ClientProtocolException, IOException

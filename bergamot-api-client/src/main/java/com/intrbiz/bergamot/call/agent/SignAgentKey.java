@@ -10,7 +10,7 @@ import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 
 public class SignAgentKey extends BergamotAPICall<List<Certificate>>
@@ -19,7 +19,7 @@ public class SignAgentKey extends BergamotAPICall<List<Certificate>>
     
     private PublicKey key;
     
-    public SignAgentKey(BergamotClient client)
+    public SignAgentKey(BaseBergamotClient client)
     {
         super(client);
     }

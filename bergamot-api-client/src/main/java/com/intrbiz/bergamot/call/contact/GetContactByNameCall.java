@@ -6,14 +6,14 @@ import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.model.message.ContactMO;
 
 public class GetContactByNameCall extends BergamotAPICall<ContactMO>
 {   
     private String name;
     
-    public GetContactByNameCall(BergamotClient client)
+    public GetContactByNameCall(BaseBergamotClient client)
     {
         super(client);
     }

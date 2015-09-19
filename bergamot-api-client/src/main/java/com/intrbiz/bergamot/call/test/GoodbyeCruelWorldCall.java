@@ -6,11 +6,11 @@ import org.apache.http.client.fluent.Response;
 
 import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 
 public class GoodbyeCruelWorldCall extends BergamotAPICall<String>
 {    
-    public GoodbyeCruelWorldCall(BergamotClient client)
+    public GoodbyeCruelWorldCall(BaseBergamotClient client)
     {
         super(client);
     }
