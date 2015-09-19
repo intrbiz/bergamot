@@ -7,7 +7,7 @@ import java.util.List;
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
 import com.intrbiz.bergamot.model.message.AlertMO;
@@ -54,7 +54,7 @@ public class AlertsCommand extends BergamotCLICommand
         CLISiteCfg site = CLICfg.loadConfiguration().getSite(siteName);
         if (site == null) throw new BergamotCLIException("No site configured with the name '" + siteName + "'");
         // connect to the API
-        BergamotClient client = new BergamotClient(site.getUrl(), site.getAuthToken());
+        BaseBergamotClient client = new BaseBergamotClient(site.getUrl(), site.getAuthToken());
         // call the hello world test
         for (AlertMO alert : client.getAlerts().execute())
         {

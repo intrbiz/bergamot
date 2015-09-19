@@ -7,7 +7,7 @@ import java.util.List;
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
-import com.intrbiz.bergamot.BergamotClient;
+import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -58,7 +58,7 @@ public class ApplyConfigChangeCommand extends BergamotCLICommand
         // load the config
         BergamotCfg configChange = BergamotCfg.read(BergamotCfg.class, new FileReader(confFile));
         // connect to the API
-        BergamotClient client = new BergamotClient(site.getUrl(), site.getAuthToken());
+        BaseBergamotClient client = new BaseBergamotClient(site.getUrl(), site.getAuthToken());
         // apply the change
         AppliedConfigChange response = client.applyConfigChange().configChange(configChange).execute();
         System.out.println("Configuration change was " + (response.getReport().isSuccessful() ? "successful" : "unsucessful"));
