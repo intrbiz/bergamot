@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
@@ -17,6 +18,7 @@ import com.intrbiz.bergamot.model.message.LocationMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
@@ -29,6 +31,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(LocationMO.class)
     public List<LocationMO> getLocations(BergamotDB db, @Var("site") Site site)
     {
         return db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
@@ -37,6 +40,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/roots")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(LocationMO.class)
     public List<LocationMO> getRootLocations(BergamotDB db, @Var("site") Site site)
     {
         return db.getRootLocations(site.getId()).stream().filter((l) -> permission("read", l)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
@@ -55,6 +59,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/children")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(LocationMO.class)
     public List<LocationMO> getLocationChildren(BergamotDB db, @Var("site") Site site, String name)
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
@@ -65,6 +70,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/hosts")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(HostMO.class)
     public List<HostMO> getLocationHosts(BergamotDB db, @Var("site") Site site, String name)
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
@@ -87,6 +93,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/children")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(LocationMO.class)
     public List<LocationMO> getLocationChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Location location = notNull(db.getLocation(id));
@@ -97,6 +104,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/hosts")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(HostMO.class)
     public List<HostMO> getLocationHosts(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Location location = notNull(db.getLocation(id));
@@ -125,6 +133,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public LocationCfg getLocationConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
@@ -135,6 +144,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public LocationCfg getLocationConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Location location = notNull(db.getLocation(id));

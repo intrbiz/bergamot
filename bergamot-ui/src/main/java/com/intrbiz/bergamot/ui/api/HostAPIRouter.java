@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
@@ -20,6 +21,7 @@ import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -34,6 +36,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(HostMO.class)
     public List<HostMO> getHosts(BergamotDB db, @Var("site") Site site)
     {
         return db.listHosts(site.getId()).stream().map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
@@ -82,6 +85,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/services")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ServiceMO.class)
     public List<ServiceMO> getHostServices(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
@@ -92,6 +96,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/services")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ServiceMO.class)
     public List<ServiceMO> getHostServices(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Host host = notNull(db.getHost(id));
@@ -102,6 +107,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/traps")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(TrapMO.class)
     public List<TrapMO> getHostTraps(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
@@ -112,6 +118,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/traps")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(TrapMO.class)
     public List<TrapMO> getHostTraps(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Host host = notNull(db.getHost(id));
@@ -299,6 +306,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public HostCfg getHostConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
@@ -309,6 +317,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public HostCfg getHostConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Host host = notNull(db.getHost(id));

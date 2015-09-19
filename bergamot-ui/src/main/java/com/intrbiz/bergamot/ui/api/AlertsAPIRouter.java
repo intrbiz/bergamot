@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Comment;
@@ -31,6 +32,7 @@ import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
@@ -67,6 +69,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(AlertMO.class)
     public List<AlertMO> getAlerts(BergamotDB db, @Var("site") Site site)
     {
         return db.listAlerts(site.getId()).stream().filter((a) -> permission("read", a.getCheckId())).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
@@ -85,6 +88,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/for-check/id/:id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(AlertMO.class)
     public List<AlertMO> getAlertsForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         require(permission("read", id));
@@ -151,6 +155,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/render")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public String renderAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Alert alert = var("alert", notNull(db.getAlert(id)));
@@ -162,6 +167,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @JSON()
     @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public String renderComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Alert alert = notNull(db.getAlert(id));

@@ -6,6 +6,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
@@ -100,6 +101,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ServiceCfg getServiceConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
         Service service = notNull(db.getServiceOnHostByName(site.getId(), hostName, name));
@@ -110,6 +112,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ServiceCfg getServiceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Service service = notNull(db.getService(id));

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
@@ -28,6 +29,7 @@ import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
@@ -42,6 +44,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @ListOf(CheckReadingMO.class)
     public List<CheckReadingMO> getReadingsByCheck(LamplighterDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id)
     {
         List<CheckReadingMO> readings = new LinkedList<CheckReadingMO>();
@@ -69,11 +72,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/double/:id/latest/:limit")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getLatestDoubleReadings(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) Integer limit,
             @Param("series") String series
     ) throws IOException
     {
@@ -88,11 +92,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/double/:id/date/:rollup/:agg/:start/:end")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getDoubleReadingsByDate(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) Long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,
@@ -112,11 +117,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/float/:id/latest/:limit")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getLatestFloatReadings(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) Integer limit,
             @Param("series") String series
     ) throws IOException
     {
@@ -131,11 +137,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/float/:id/date/:rollup/:agg/:start/:end")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getFloatReadingsByDate(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) Long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,
@@ -155,11 +162,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/long/:id/latest/:limit")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getLatestLongReadings(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) Integer limit,
             @Param("series") String series
     ) throws IOException
     {
@@ -174,11 +182,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/long/:id/date/:rollup/:agg/:start/:end")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getLongReadingsByDate(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) Long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,
@@ -198,11 +207,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/int/:id/latest/:limit")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getLatestIntReadings(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) int limit,
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) Integer limit,
             @Param("series") String series
     ) throws IOException
     {
@@ -217,11 +227,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/graph/reading/gauge/int/:id/date/:rollup/:agg/:start/:end")
     @RequirePermission("api.read.lamplighter.readings")
     @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding
     public void getIntReadingsByDate(
             LamplighterDB db, 
             @Var("site") Site site, 
             @IsaObjectId(session = false) UUID id, 
-            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) long rollup, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) Long rollup, 
             @CheckRegEx(value="(avg|sum)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
             @IsaLong() Long start,
             @IsaLong() Long end,

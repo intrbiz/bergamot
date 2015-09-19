@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Downtime;
@@ -21,6 +22,7 @@ import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -57,6 +59,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/for-object/id/:id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(DowntimeMO.class)
     public List<DowntimeMO> getDowntimeForObject(
             BergamotDB db, 
             @IsaObjectId(session = false) UUID id, 
@@ -95,6 +98,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/render")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public String renderDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Downtime downtime = var("downtime", notNull(db.getDowntime(id)));

@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
@@ -18,6 +19,7 @@ import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
@@ -31,6 +33,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(GroupMO.class)
     public List<GroupMO> getGroups(BergamotDB db, @Var("site") Site site)
     {
         return db.listGroups(site.getId()).stream().filter((g) -> permission("read", g)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
@@ -39,6 +42,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/roots")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(GroupMO.class)
     public List<GroupMO> getRootGroups(BergamotDB db, @Var("site") Site site)
     {
         return db.getRootGroups(site.getId()).stream().filter((g) -> permission("read", g)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
@@ -57,6 +61,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/children")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(GroupMO.class)
     public List<GroupMO> getGroupChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Group group = notNull(db.getGroup(id));
@@ -67,6 +72,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/checks")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(CheckMO.class)
     public List<CheckMO> getGroupChecks(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Group group = notNull(db.getGroup(id));
@@ -87,6 +93,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/children")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(GroupMO.class)
     public List<GroupMO> getGroupChildren(BergamotDB db, @Var("site") Site site, String name)
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
@@ -97,6 +104,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/checks")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(CheckMO.class)
     public List<CheckMO> getGroupChecks(BergamotDB db, @Var("site") Site site, String name)
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
@@ -128,6 +136,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public GroupCfg getGroupConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
@@ -138,6 +147,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public GroupCfg getGroupConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Group group = notNull(db.getGroup(id));

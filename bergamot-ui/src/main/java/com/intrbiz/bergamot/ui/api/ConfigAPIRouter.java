@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
@@ -31,6 +32,7 @@ import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.ListParam;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Post;
@@ -54,6 +56,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @XML
     @RequirePermission("config.export")
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public BergamotCfg buildSiteConfig(
             BergamotDB db, 
             @Var("site") Site site, 
@@ -107,6 +110,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @XML
     @RequirePermission("config.export")
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public BergamotCfg builObjectConfig(BergamotDB db, @Var("site") Site site, String type)
     {
         // build the entire site configuration
@@ -157,6 +161,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     
     @Any("/icon/")
     @JSON()
+    @ListOf(String.class)
     public List<String> listIcons()
     {
         List<String> ret = new LinkedList<String>();

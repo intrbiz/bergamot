@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.TimePeriod;
@@ -15,6 +16,7 @@ import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
@@ -28,6 +30,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(TimePeriodMO.class)
     public List<TimePeriodMO> getTimePeriods(BergamotDB db, @Var("site") Site site)
     {
         return db.listTimePeriods(site.getId()).stream().filter((x) -> permission("read", x)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
@@ -56,6 +59,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         TimePeriod timePeriod = notNull(db.getTimePeriodByName(site.getId(), name));
@@ -66,6 +70,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         TimePeriod timePeriod = notNull(db.getTimePeriod(id));

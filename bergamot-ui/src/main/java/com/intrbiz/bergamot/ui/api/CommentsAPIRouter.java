@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
@@ -21,6 +22,7 @@ import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
@@ -59,6 +61,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @Get("/for-object/id/:id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(CommentMO.class)
     public List<CommentMO> getCommentsForObject(
             BergamotDB db, 
             @IsaObjectId(session = false) UUID id, 
@@ -143,6 +146,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @RequirePermission("api.read.comment")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public String renderComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Comment comment = var("comment", notNull(db.getComment(id)));

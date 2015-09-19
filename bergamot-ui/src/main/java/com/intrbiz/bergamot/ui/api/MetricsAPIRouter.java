@@ -7,6 +7,7 @@ import com.codahale.metrics.Metric;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.bergamot.ui.util.MetricWriter;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -22,6 +23,7 @@ public class MetricsAPIRouter extends Router<BergamotApp>
 {   
     @Get("/sources")
     @RequirePermission("api.read.system.metrics")
+    @IgnoreBinding
     public void getIntelligenceSource() throws IOException
     {
         JsonGenerator j = response().json().getJsonWriter();
@@ -54,6 +56,7 @@ public class MetricsAPIRouter extends Router<BergamotApp>
     
     @Get("/source/:source")
     @RequirePermission("api.read.system.metrics")
+    @IgnoreBinding
     public void getIntelligenceSource(String name) throws IOException
     {
         IntelligenceSource source = Witchcraft.get().get(name);
@@ -82,6 +85,7 @@ public class MetricsAPIRouter extends Router<BergamotApp>
     
     @Get("/metric/:source/:name")
     @RequirePermission("api.read.system.metrics")
+    @IgnoreBinding
     public void getMetric(String sourceName, String name) throws IOException
     {
         IntelligenceSource source = Witchcraft.get().get(sourceName);

@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
@@ -16,6 +17,7 @@ import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
@@ -29,6 +31,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(TeamMO.class)
     public List<TeamMO> getTeams(BergamotDB db, @Var("site") Site site)
     {
         return db.listTeams(site.getId()).stream().filter((x) -> permission("read", x)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
@@ -47,6 +50,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/children")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(TeamMO.class)
     public List<TeamMO> getTeamChildren(BergamotDB db, @Var("site") Site site, String name)
     {
         Team team = notNull(db.getTeamByName(site.getId(), name));
@@ -57,6 +61,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/contacts")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ContactMO.class)
     public List<ContactMO> getTeamContacts(BergamotDB db, @Var("site") Site site, String name)
     {
         Team team = notNull(db.getTeamByName(site.getId(), name));
@@ -77,6 +82,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/children")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(TeamMO.class)
     public List<TeamMO> getTeamChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Team team = notNull(db.getTeam(id));
@@ -87,6 +93,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/contacts")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ContactMO.class)
     public List<ContactMO> getTeamContacts(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Team team = notNull(db.getTeam(id));
@@ -97,6 +104,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public TeamCfg getTeamConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         Team team = notNull(db.getTeamByName(site.getId(), name));
@@ -107,6 +115,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public TeamCfg getTeamConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Team team = notNull(db.getTeam(id));

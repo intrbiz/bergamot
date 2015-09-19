@@ -31,7 +31,7 @@ public class UtilAPIRouter extends Router<BergamotApp>
     @Any("/id/new/:count")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public List<UUID> newId(@Var("site") Site site, @IsaInt(min = 1, max = 1000) int count)
+    public List<UUID> newId(@Var("site") Site site, @IsaInt(min = 1, max = 1000) Integer count)
     {
         List<UUID> ids = new LinkedList<UUID>();
         for (int i = 0; i < count; i++)

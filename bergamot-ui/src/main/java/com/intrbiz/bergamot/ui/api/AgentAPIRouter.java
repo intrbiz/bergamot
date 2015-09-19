@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.crypto.util.CertificateRequest;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -40,6 +41,7 @@ public class AgentAPIRouter extends Router<BergamotApp>
     @Any("/sign-agent")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public List<String> signAgent(
             BergamotDB db, 
             @Var("site") Site site, 
@@ -75,6 +77,7 @@ public class AgentAPIRouter extends Router<BergamotApp>
     @Any("/sign-agent-key")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public List<String> signAgentKey(
             BergamotDB db, 
             @Var("site") Site site,

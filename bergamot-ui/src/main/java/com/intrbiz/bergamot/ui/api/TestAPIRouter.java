@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.ui.api;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
@@ -18,6 +19,7 @@ public class TestAPIRouter extends Router<BergamotApp>
 {    
     @Get("/hello/world")
     @JSON()
+    @IgnoreBinding
     public String helloWorld()
     {    
         return "Hello World";
@@ -26,6 +28,7 @@ public class TestAPIRouter extends Router<BergamotApp>
     @Get("/hello/you")
     @JSON()
     @RequireValidPrincipal()
+    @IgnoreBinding
     public String helloYou()
     {    
         return "Hello " + ((Contact) currentPrincipal()).getName();
@@ -33,6 +36,7 @@ public class TestAPIRouter extends Router<BergamotApp>
     
     @Get("/goodbye/cruel/world")
     @RequireValidPrincipal()
+    @IgnoreBinding
     public void goodbyeCruelWorld()
     {    
         throw new RuntimeException("Goodby Cruel World");
@@ -40,6 +44,7 @@ public class TestAPIRouter extends Router<BergamotApp>
     
     @Get("/looking/for/something")
     @RequireValidPrincipal()
+    @IgnoreBinding
     public void lookingForSomething()
     {    
         throw new BalsaNotFound();

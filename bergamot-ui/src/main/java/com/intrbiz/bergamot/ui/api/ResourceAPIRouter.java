@@ -6,6 +6,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
@@ -67,6 +68,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ResourceCfg getResourceConfig(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {
         Resource resource = notNull(db.getResourceOnClusterByName(site.getId(), clusterName, name));
@@ -77,6 +79,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ResourceCfg getResourceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Resource resource = notNull(db.getResource(id));
@@ -98,7 +101,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
     { 
         Resource resource = notNull(db.getResource(id));
         require(permission("unsuppress", resource));

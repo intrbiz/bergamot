@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ContactCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
@@ -16,6 +17,7 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
@@ -31,6 +33,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ContactMO.class)
     public List<ContactMO> getContacts(BergamotDB db, @Var("site") Site site)
     {
         return db.listContacts(site.getId()).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
@@ -79,6 +82,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ContactCfg getContactConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         Contact contact = notNull(db.getContactByName(site.getId(), name));
@@ -89,6 +93,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ContactCfg getContactConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Contact contact = notNull(db.getContact(id));

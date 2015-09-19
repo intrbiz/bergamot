@@ -6,6 +6,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.TrapCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
@@ -71,7 +72,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Any("/id/:id/submit")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public String getServiceState(BergamotDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id, @Param("status") String status, @Param("output") String output)
+    public String submitTrapStatus(BergamotDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id, @Param("status") String status, @Param("output") String output)
     {   
         Trap trap = notNull(db.getTrap(id));
         require(permission("submit", trap));
@@ -116,6 +117,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public TrapCfg getTrapConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
         Trap trap = notNull(db.getTrapOnHostByName(site.getId(), hostName, name));
@@ -126,6 +128,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public TrapCfg getTrapConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Trap trap = notNull(db.getTrap(id));

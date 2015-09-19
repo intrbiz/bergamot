@@ -8,6 +8,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
@@ -19,6 +20,7 @@ import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
@@ -32,6 +34,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ClusterMO.class)
     public List<ClusterMO> getClusters(BergamotDB db, @Var("site") Site site)
     {
         return db.listClusters(site.getId()).stream().filter((c) -> permission("read", c)).map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
@@ -80,6 +83,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/resources")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ResourceMO.class)
     public List<ResourceMO> getClusterResources(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
@@ -90,6 +94,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/resources")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(ResourceMO.class)
     public List<ResourceMO> getClusterResources(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
@@ -100,6 +105,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/references")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(CheckMO.class)
     public List<CheckMO> getClusterReferences(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
@@ -110,6 +116,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/references")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @ListOf(CheckMO.class)
     public List<CheckMO> getClusterReferences(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
@@ -120,6 +127,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ClusterCfg getClusterConfig(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
@@ -130,6 +138,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public ClusterCfg getClusterConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
