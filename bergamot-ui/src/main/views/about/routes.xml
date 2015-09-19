@@ -6,9 +6,8 @@
     <div clas="row">
     	<div class="col12">
 			<table>
-				<tr>
+				<tr>content
 					<th>Method</th>
-					<th>Prefix</th>
 					<th>Path</th>
 					<th>As</th>
 					<th>Param</th>
@@ -16,26 +15,20 @@
 				<data-set var="route" value="#{routes}">
 					<tr>
 						<td>#{route.method}</td>
-						<td>#{route.prefix}</td>
-						<td>#{route.pattern}</td>
+						<td>#{route.path}</td>
 						<td>
 							<ul>
-								<data-set var="as" value="#{route.as}">
-									<li>#{as}</li>
+								<data-set var="as" value="#{route.parameters}">
+									<li rendered="#{as.isAs()}">#{as.name} :: #{as.type.getSimpleName()}</li>
 								</data-set>
 							</ul>
 						</td>
 						<td>
 							<ul>
 								<data-set var="param" value="#{route.parameters}">
-									<li>#{param.name} :: #{param.type.getSimpleName()}</li>
+									<li rendered="#{! param.isAs()}">#{param.name} :: #{param.type.getSimpleName()}</li>
 								</data-set>
 							</ul>
-						</td>
-					</tr>
-					<tr rendered="#{route.prefix.startsWith('/api')}">
-						<td colspan="5">
-							<pre>#{route.buildRouteAPICall()}</pre>
 						</td>
 					</tr>
 				</data-set>
