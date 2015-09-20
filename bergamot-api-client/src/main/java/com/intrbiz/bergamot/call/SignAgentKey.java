@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.call.agent;
+package com.intrbiz.bergamot.call;
 
 import java.security.PublicKey;
 import java.security.cert.Certificate;

@@ -28,6 +28,6 @@ public class BasicCredentials implements ClientCredentials
     @Override
     public AuthTokenMO auth(BaseBergamotClient client)
     {
-        return client.authToken().username(this.getUsername()).password(this.getPassword()).execute();
+        return client.callGetAuthToken().username(this.getUsername()).password(this.getPassword()).execute();
     }
 }

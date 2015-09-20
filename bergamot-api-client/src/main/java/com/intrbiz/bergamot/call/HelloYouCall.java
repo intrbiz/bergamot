@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.call.test;
+package com.intrbiz.bergamot.call;
 
 import java.io.IOException;
 

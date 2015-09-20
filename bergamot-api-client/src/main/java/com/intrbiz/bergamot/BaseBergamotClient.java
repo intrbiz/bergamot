@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -10,6 +11,7 @@ import javax.net.ssl.TrustManager;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.fluent.Executor;
+import org.apache.http.client.fluent.Response;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -19,25 +21,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.call.agent.SignAgentKey;
-import com.intrbiz.bergamot.call.alert.AcknowledgeAlertCall;
-import com.intrbiz.bergamot.call.alert.GetAlertsCall;
-import com.intrbiz.bergamot.call.auth.AppAuthTokenCall;
-import com.intrbiz.bergamot.call.auth.AuthTokenCall;
-import com.intrbiz.bergamot.call.auth.ExtendAuthTokenCall;
-import com.intrbiz.bergamot.call.config.ApplyConfigChangeCall;
-import com.intrbiz.bergamot.call.config.BuildSiteConfigCall;
-import com.intrbiz.bergamot.call.contact.GetContactByEmailCall;
-import com.intrbiz.bergamot.call.contact.GetContactByNameCall;
-import com.intrbiz.bergamot.call.contact.GetContactByNameOrEmailCall;
-import com.intrbiz.bergamot.call.contact.GetContactCall;
-import com.intrbiz.bergamot.call.contact.GetContactConfigByNameCall;
-import com.intrbiz.bergamot.call.contact.GetContactConfigCall;
-import com.intrbiz.bergamot.call.contact.GetContactsCall;
-import com.intrbiz.bergamot.call.test.GoodbyeCruelWorldCall;
-import com.intrbiz.bergamot.call.test.HelloWorldCall;
-import com.intrbiz.bergamot.call.test.HelloYouCall;
-import com.intrbiz.bergamot.call.test.LookingForSomethingCall;
+import com.intrbiz.bergamot.call.ApplyConfigChangeCall;
+import com.intrbiz.bergamot.call.BuildSiteConfigCall;
+import com.intrbiz.bergamot.call.GoodbyeCruelWorldCall;
+import com.intrbiz.bergamot.call.HelloWorldCall;
+import com.intrbiz.bergamot.call.HelloYouCall;
+import com.intrbiz.bergamot.call.LookingForSomethingCall;
+import com.intrbiz.bergamot.call.SignAgentKey;
 import com.intrbiz.bergamot.credentials.BasicCredentials;
 import com.intrbiz.bergamot.credentials.ClientCredentials;
 import com.intrbiz.bergamot.credentials.TokenCredentials;
@@ -45,7 +35,7 @@ import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 
-public class BaseBergamotClient
+public abstract class BaseBergamotClient
 {
     protected final BergamotTranscoder transcoder = new BergamotTranscoder();
     
@@ -206,111 +196,94 @@ public class BaseBergamotClient
         return sb.toString();
     }
     
-    // calls
+    // auth calls
     
-    // auth
-    
-    public AuthTokenCall authToken()
+    public static class GetAuthTokenCall extends BergamotAPICall<AuthTokenMO>
     {
-        return new AuthTokenCall(this);
+        private String username;
+
+        private String password;
+
+        public GetAuthTokenCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+        public GetAuthTokenCall username(String username)
+        {
+            this.username = username;
+            return this;
+        }
+
+        public GetAuthTokenCall password(String password)
+        {
+            this.password = password;
+            return this;
+        }
+
+        public AuthTokenMO execute()
+        {
+            try
+            {
+                Response response = execute(
+                    post(url("/api/auth-token"))
+                    .addHeader(authHeader())
+                    .bodyForm(
+                        param("username", this.username),
+                        param("password", this.password)
+                    )
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), AuthTokenMO.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
     }
-    
-    public ExtendAuthTokenCall extendAuthToken()
+
+    public GetAuthTokenCall callGetAuthToken()
     {
-        return new ExtendAuthTokenCall(this);
-    }
-    
-    public AppAuthTokenCall appAuthToken()
-    {
-        return new AppAuthTokenCall(this);
+        return new GetAuthTokenCall(this);
     }
     
     // test calls
     
-    public HelloWorldCall helloWorld()
+    public HelloWorldCall callHelloWorld()
     {
         return new HelloWorldCall(this);
     }
     
-    public HelloYouCall helloYou()
+    public HelloYouCall callHelloYou()
     {
         return new HelloYouCall(this);
     }
     
-    public GoodbyeCruelWorldCall goodbyeCruelWorld()
+    public GoodbyeCruelWorldCall callGoodbyeCruelWorld()
     {
         return new GoodbyeCruelWorldCall(this);
     }
     
-    public LookingForSomethingCall lookingForSomething()
+    public LookingForSomethingCall callLookingForSomething()
     {
         return new LookingForSomethingCall(this);
     }
     
     // config
     
-    public BuildSiteConfigCall buildSiteConfig()
+    public BuildSiteConfigCall callBuildSiteConfig()
     {
         return new BuildSiteConfigCall(this);
     }
     
-    public ApplyConfigChangeCall applyConfigChange()
+    public ApplyConfigChangeCall callApplyConfigChange()
     {
         return new ApplyConfigChangeCall(this);
     }
     
-    // contacts
-    
-    public GetContactsCall getContacts()
-    {
-        return new GetContactsCall(this);
-    }
-    
-    public GetContactCall getContact()
-    {
-        return new GetContactCall(this);
-    }
-    
-    public GetContactByNameCall getContactByName()
-    {
-        return new GetContactByNameCall(this);
-    }
-    
-    public GetContactByEmailCall getContactByEmail()
-    {
-        return new GetContactByEmailCall(this);
-    }
-    
-    public GetContactByNameOrEmailCall getContactByNameOrEmail()
-    {
-        return new GetContactByNameOrEmailCall(this);
-    }
-    
-    public GetContactConfigCall getContactConfig()
-    {
-        return new GetContactConfigCall(this);
-    }
-    
-    public GetContactConfigByNameCall getContactConfigByName()
-    {
-        return new GetContactConfigByNameCall(this);
-    }
-    
-    // alerts
-    
-    public GetAlertsCall getAlerts()
-    {
-        return new GetAlertsCall(this);
-    }
-    
-    public AcknowledgeAlertCall acknowledgeAlert()
-    {
-        return new AcknowledgeAlertCall(this);
-    }
-    
     // agent
     
-    public SignAgentKey signAgentKey()
+    public SignAgentKey callSignAgentKey()
     {
         return new SignAgentKey(this);
     }
