@@ -35,7 +35,7 @@ public class ApplyConfigChangeCall extends BergamotAPICall<AppliedConfigChange>
     {
         try
         {
-            Response response = execute(post(url("/config/apply")).addHeader(authHeader()).bodyString(this.configChange.toString(), ContentType.create("application/xml", Consts.UTF_8)));
+            Response response = execute(post(url("/api/config/apply")).addHeader(authHeader()).bodyString(this.configChange.toString(), ContentType.create("application/xml", Consts.UTF_8)));
             if (response.returnResponse().getStatusLine().getStatusCode() == 200)
             {
                 return this.transcoder.decodeFromString(response.returnContent().asString(), AppliedConfigChange.class);

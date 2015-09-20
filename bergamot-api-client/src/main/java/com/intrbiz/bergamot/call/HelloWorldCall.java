@@ -19,7 +19,7 @@ public class HelloWorldCall extends BergamotAPICall<String>
     {
         try
         {
-            Response response = execute(get(url("/test/hello/world")));
+            Response response = execute(get(url("/api/test/hello/world")));
             return transcoder().decodeFromString(response.returnContent().asString(), String.class);
         }
         catch (IOException e)

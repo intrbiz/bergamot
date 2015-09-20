@@ -19,7 +19,7 @@ public class GoodbyeCruelWorldCall extends BergamotAPICall<String>
     {
         try
         {
-            Response response = execute(get(url("/test/goodbye/cruel/world")).addHeader(authHeader()));
+            Response response = execute(get(url("/api/test/goodbye/cruel/world")).addHeader(authHeader()));
             return transcoder().decodeFromString(response.returnContent().asString(), String.class);
         }
         catch (IOException e)

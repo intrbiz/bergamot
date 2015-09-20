@@ -40,7 +40,7 @@ public class SignAgentKey extends BergamotAPICall<List<Certificate>>
     {
         try
         {
-            Response response = execute(post(url("/agent/sign-agent-key")).addHeader(authHeader())
+            Response response = execute(post(url("/api/agent/sign-agent-key")).addHeader(authHeader())
                      .bodyForm(
                          Form.form()
                          .add("common-name", this.commonName)

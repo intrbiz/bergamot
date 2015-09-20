@@ -19,7 +19,7 @@ public class HelloYouCall extends BergamotAPICall<String>
     {
         try
         {
-            Response response = execute(get(url("/test/hello/you")).addHeader(authHeader()));
+            Response response = execute(get(url("/api/test/hello/you")).addHeader(authHeader()));
             return transcoder().decodeFromString(response.returnContent().asString(), String.class);
         }
         catch (IOException e)

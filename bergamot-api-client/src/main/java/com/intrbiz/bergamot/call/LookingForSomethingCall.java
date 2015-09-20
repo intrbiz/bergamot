@@ -19,7 +19,7 @@ public class LookingForSomethingCall extends BergamotAPICall<String>
     {
         try
         {
-            Response response = execute(get(url("/test/looking/for/something")).addHeader(authHeader()));
+            Response response = execute(get(url("/api/test/looking/for/something")).addHeader(authHeader()));
             return transcoder().decodeFromString(response.returnContent().asString(), String.class);
         }
         catch (IOException e)

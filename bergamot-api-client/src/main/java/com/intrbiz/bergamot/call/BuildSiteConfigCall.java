@@ -34,7 +34,7 @@ public class BuildSiteConfigCall extends BergamotAPICall<BergamotCfg>
     {
         try
         {
-            Response response = execute(get(appendQuery(url("/config/site.xml"), types.stream().map((e) -> { return new BasicNameValuePair("type", Configuration.getRootElement(e));}).collect(Collectors.toList()))).addHeader(authHeader()));
+            Response response = execute(get(appendQuery(url("/api/config/site.xml"), types.stream().map((e) -> { return new BasicNameValuePair("type", Configuration.getRootElement(e));}).collect(Collectors.toList()))).addHeader(authHeader()));
             return BergamotCfg.fromString(BergamotCfg.class, response.returnContent().asString());
         }
         catch (IOException e)
