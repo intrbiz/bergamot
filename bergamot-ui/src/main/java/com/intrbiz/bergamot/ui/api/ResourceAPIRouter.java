@@ -28,7 +28,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/name/:cluster/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ResourceMO getResource(BergamotDB db, @Var("site") Site site, String clusterName, String name)
+    public ResourceMO getResourceByName(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
         Resource resource = notNull(db.getResourceOnClusterByName(site.getId(), clusterName, name));
         require(permission("read", resource));
@@ -58,7 +58,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getResourceState(BergamotDB db, @Var("site") Site site, String clusterName, String name)
+    public CheckStateMO getResourceStateByName(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {    
         Resource resource = notNull(db.getResourceOnClusterByName(site.getId(), clusterName, name));
         require(permission("read", resource));
@@ -69,7 +69,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ResourceCfg getResourceConfig(BergamotDB db, @Var("site") Site site, String clusterName, String name)
+    public ResourceCfg getResourceConfigByName(BergamotDB db, @Var("site") Site site, String clusterName, String name)
     {
         Resource resource = notNull(db.getResourceOnClusterByName(site.getId(), clusterName, name));
         require(permission("read.config", resource));

@@ -27,7 +27,7 @@ public class StatsAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(CheckTransitionMO.class)
-    public List<CheckTransitionMO> trap(
+    public List<CheckTransitionMO> getCheckTransitions(
             BergamotDB db, 
             @IsaObjectId(session = false) UUID id, 
             @Param("offset") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L) Long offset,

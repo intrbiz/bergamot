@@ -49,7 +49,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public LocationMO getLocation(BergamotDB db, @Var("site") Site site, String name)
+    public LocationMO getLocationByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
         require(permission("read", location));
@@ -60,7 +60,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(LocationMO.class)
-    public List<LocationMO> getLocationChildren(BergamotDB db, @Var("site") Site site, String name)
+    public List<LocationMO> getLocationChildrenByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
         require(permission("read", location));
@@ -71,7 +71,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(HostMO.class)
-    public List<HostMO> getLocationHosts(BergamotDB db, @Var("site") Site site, String name)
+    public List<HostMO> getLocationHostsByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
         require(permission("read", location));
@@ -134,7 +134,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public LocationCfg getLocationConfig(BergamotDB db, @Var("site") Site site, String name)
+    public LocationCfg getLocationConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Location location = notNull(db.getLocationByName(site.getId(), name));
         require(permission("read.config", location));

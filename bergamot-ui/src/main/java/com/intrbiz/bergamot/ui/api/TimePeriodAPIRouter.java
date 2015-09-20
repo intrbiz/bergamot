@@ -39,7 +39,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public TimePeriodMO getTimePeriod(BergamotDB db, @Var("site") Site site, String name)
+    public TimePeriodMO getTimePeriodByName(BergamotDB db, @Var("site") Site site, String name)
     {
         TimePeriod timePeriod = notNull(db.getTimePeriodByName(site.getId(), name));
         require(permission("read", timePeriod));
@@ -60,7 +60,7 @@ public class TimePeriodAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public TimePeriodCfg getTimePeriodConfig(BergamotDB db, @Var("site") Site site, String name)
+    public TimePeriodCfg getTimePeriodConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         TimePeriod timePeriod = notNull(db.getTimePeriodByName(site.getId(), name));
         require(permission("read.config", timePeriod));

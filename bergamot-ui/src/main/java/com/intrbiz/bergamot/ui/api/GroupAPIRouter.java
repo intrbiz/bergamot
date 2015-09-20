@@ -83,7 +83,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public GroupMO getGroup(BergamotDB db, @Var("site") Site site, String name)
+    public GroupMO getGroupByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
         require(permission("read", group));
@@ -94,7 +94,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(GroupMO.class)
-    public List<GroupMO> getGroupChildren(BergamotDB db, @Var("site") Site site, String name)
+    public List<GroupMO> getGroupChildrenByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
         require(permission("read", group));
@@ -105,7 +105,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(CheckMO.class)
-    public List<CheckMO> getGroupChecks(BergamotDB db, @Var("site") Site site, String name)
+    public List<CheckMO> getGroupChecksByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
         require(permission("read", group));
@@ -137,7 +137,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public GroupCfg getGroupConfig(BergamotDB db, @Var("site") Site site, String name)
+    public GroupCfg getGroupConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Group group = notNull(db.getGroupByName(site.getId(), name));
         require(permission("read.config", group));

@@ -32,7 +32,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public TrapMO getTrap(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    public TrapMO getTrapByName(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {   
         Trap trap = notNull(db.getTrapOnHostByName(site.getId(), hostName, name));
         require(permission("read", trap));
@@ -62,7 +62,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getTrapState(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    public CheckStateMO getTrapStateByName(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
         Trap trap = notNull(db.getTrapOnHostByName(site.getId(), hostName, name));
         require(permission("read", trap));
@@ -118,7 +118,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public TrapCfg getTrapConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    public TrapCfg getTrapConfigByName(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
         Trap trap = notNull(db.getTrapOnHostByName(site.getId(), hostName, name));
         require(permission("read.config", trap));

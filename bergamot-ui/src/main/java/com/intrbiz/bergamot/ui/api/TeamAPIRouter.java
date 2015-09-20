@@ -40,7 +40,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public TeamMO getTeam(BergamotDB db, @Var("site") Site site, String name)
+    public TeamMO getTeamByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Team team = notNull(db.getTeamByName(site.getId(), name));
         require(permission("read", team));
@@ -51,7 +51,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(TeamMO.class)
-    public List<TeamMO> getTeamChildren(BergamotDB db, @Var("site") Site site, String name)
+    public List<TeamMO> getTeamChildrenByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Team team = notNull(db.getTeamByName(site.getId(), name));
         require(permission("read", team));
@@ -62,7 +62,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(ContactMO.class)
-    public List<ContactMO> getTeamContacts(BergamotDB db, @Var("site") Site site, String name)
+    public List<ContactMO> getTeamContactsByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Team team = notNull(db.getTeamByName(site.getId(), name));
         require(permission("read", team));
@@ -105,7 +105,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public TeamCfg getTeamConfig(BergamotDB db, @Var("site") Site site, String name)
+    public TeamCfg getTeamConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Team team = notNull(db.getTeamByName(site.getId(), name));
         require(permission("read.config", team));

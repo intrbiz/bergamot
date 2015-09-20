@@ -15,6 +15,7 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
@@ -186,6 +187,7 @@ public class APIRouter extends Router<BergamotApp>
      */
     @Any("/auth-token")
     @JSON()
+    @IgnoreBinding
     public AuthTokenMO getAuthToken(@Param("username") String username, @Param("password") String password)
     {
         authenticateRequest(username, password);

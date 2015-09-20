@@ -14,13 +14,10 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
-import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
@@ -42,7 +39,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ContactMO getContact(BergamotDB db, @Var("site") Site site, String name)
+    public ContactMO getContactByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Contact contact = notNull(db.getContactByName(site.getId(), name));
         require(permission("read", contact));
@@ -83,7 +80,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ContactCfg getContactConfig(BergamotDB db, @Var("site") Site site, String name)
+    public ContactCfg getContactConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Contact contact = notNull(db.getContactByName(site.getId(), name));
         require(permission("read.config", contact));
@@ -99,16 +96,5 @@ public class ContactAPIRouter extends Router<BergamotApp>
         Contact contact = notNull(db.getContact(id));
         require(permission("read.config", contact));
         return contact.getConfiguration();
-    }
-    
-    @Get("/id/:id/set-password")
-    @JSON()
-    @RequirePermission("api.write.contact.set-password")
-    @WithDataAdapter(BergamotDB.class)
-    public Boolean setPassword(BergamotDB db, @IsaObjectId(session = false) UUID id, @Param("password") @CheckStringLength(min = 1, max = 80, mandatory = true) String password)
-    {
-        Contact contact = notNull(db.getContact(id));
-        boolean res = action("set-password", contact, password); 
-        return res;
     }
 }

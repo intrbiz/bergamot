@@ -45,7 +45,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public HostMO getHost(BergamotDB db, @Var("site") Site site, String name)
+    public HostMO getHostByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
         require(permission("read", host));
@@ -55,7 +55,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getHostState(BergamotDB db, @Var("site") Site site, String name)
+    public CheckStateMO getHostStateByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
         require(permission("read", host));
@@ -86,7 +86,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(ServiceMO.class)
-    public List<ServiceMO> getHostServices(BergamotDB db, @Var("site") Site site, String name)
+    public List<ServiceMO> getHostServicesByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
         require(permission("read", host));
@@ -108,7 +108,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(TrapMO.class)
-    public List<TrapMO> getHostTraps(BergamotDB db, @Var("site") Site site, String name)
+    public List<TrapMO> getHostTrapsByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
         require(permission("read", host));
@@ -307,7 +307,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public HostCfg getHostConfig(BergamotDB db, @Var("site") Site site, String name)
+    public HostCfg getHostConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
         require(permission("read.config", host));

@@ -35,7 +35,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public DowntimeMO getComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public DowntimeMO getDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
     {
         Downtime downtime = notNull(db.getDowntime(id));
         require(permission("read.downtime", downtime.getCheckId()));

@@ -31,7 +31,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @JSON
     @WithDataAdapter(BergamotDB.class)
     @ListOf(CommandMO.class)
-    public List<CommandMO> getCommand(BergamotDB db, @Var("site") Site site)
+    public List<CommandMO> getCommands(BergamotDB db, @Var("site") Site site)
     {
         return db.listCommands(site.getId()).stream().filter((c) -> permission("read", c)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
@@ -39,7 +39,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CommandMO getCommand(BergamotDB db, @Var("site") Site site, String name)
+    public CommandMO getCommandByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Command command = notNull(db.getCommandByName(site.getId(), name));
         require(permission("read", command));
@@ -60,7 +60,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public CommandCfg getCommandConfig(BergamotDB db, @Var("site") Site site, String name)
+    public CommandCfg getCommandConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Command command = notNull(db.getCommandByName(site.getId(), name));
         require(permission("read.config", command));

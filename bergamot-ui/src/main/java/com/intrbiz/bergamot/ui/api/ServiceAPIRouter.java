@@ -28,7 +28,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ServiceMO getService(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    public ServiceMO getServiceByName(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {   
         Service service = notNull(db.getServiceOnHostByName(site.getId(), hostName, name));
         require(permission("read", service));
@@ -58,7 +58,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/name/:host/:name/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getServiceState(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    public CheckStateMO getServiceStateByName(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {    
         Service service = notNull(db.getServiceOnHostByName(site.getId(), hostName, name));
         require(permission("read", service));
@@ -102,7 +102,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ServiceCfg getServiceConfig(BergamotDB db, @Var("site") Site site, String hostName, String name)
+    public ServiceCfg getServiceConfigByName(BergamotDB db, @Var("site") Site site, String hostName, String name)
     {
         Service service = notNull(db.getServiceOnHostByName(site.getId(), hostName, name));
         require(permission("read.config", service));

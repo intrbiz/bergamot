@@ -134,6 +134,7 @@ public class ConfigAPIRouter extends Router<BergamotApp>
     @RequirePermission("config.change.apply")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public APIResponse applyConfigChange(BergamotDB db, @Var("site") Site site, @XML BergamotCfg config, @CurrentPrincipal() Contact user) throws Exception
     {
         // check that the change has a summary

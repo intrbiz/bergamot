@@ -43,7 +43,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ClusterMO getCluster(BergamotDB db, @Var("site") Site site, String name)
+    public ClusterMO getClusterByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
@@ -53,7 +53,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/name/:name/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getClusterState(BergamotDB db, @Var("site") Site site, String name)
+    public CheckStateMO getClusterStateByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
@@ -84,7 +84,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(ResourceMO.class)
-    public List<ResourceMO> getClusterResources(BergamotDB db, @Var("site") Site site, String name)
+    public List<ResourceMO> getClusterResourcesByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
@@ -106,7 +106,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(CheckMO.class)
-    public List<CheckMO> getClusterReferences(BergamotDB db, @Var("site") Site site, String name)
+    public List<CheckMO> getClusterReferencesByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read", cluster));
@@ -128,7 +128,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ClusterCfg getClusterConfig(BergamotDB db, @Var("site") Site site, String name)
+    public ClusterCfg getClusterConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Cluster cluster = notNull(db.getClusterByName(site.getId(), name));
         require(permission("read.config", cluster));
