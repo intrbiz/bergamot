@@ -8,7 +8,7 @@ import java.util.List;
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
-import com.intrbiz.bergamot.BaseBergamotClient;
+import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.config.CfgParameter;
 import com.intrbiz.bergamot.config.CLICfg;
@@ -61,11 +61,11 @@ public class AgentCommand extends BergamotCLICommand
             CLISiteCfg site = CLICfg.loadConfiguration().getSite(siteName);
             if (site == null) throw new BergamotCLIException("No site configured with the name '" + siteName + "'");
             // connect to the API
-            BaseBergamotClient client = new BaseBergamotClient(site.getUrl(), site.getAuthToken());
+            BergamotClient client = new BergamotClient(site.getUrl(), site.getAuthToken());
             // call the hello world test
             try
             {
-                client.helloYou().execute();
+                client.callHelloYou().execute();
             }
             catch (Exception e)
             {
@@ -74,7 +74,7 @@ public class AgentCommand extends BergamotCLICommand
             // generate a key pair
             KeyPair pair = RSAUtil.generateRSAKeyPair(2048);
             // sign the certificate
-            List<Certificate> chain = client.signAgentKey().commonName(commonName).publicKey(pair.getPublic()).execute();
+            List<Certificate> chain = client.callSignAgentKey().commonName(commonName).publicKey(pair.getPublic()).execute();
             Certificate agentCrt = chain.get(0);
             Certificate siteCrt  = chain.get(1);
             Certificate caCrt    = chain.get(2);

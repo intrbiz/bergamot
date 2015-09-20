@@ -11,7 +11,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
-import com.intrbiz.bergamot.BaseBergamotClient;
+import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
 import com.intrbiz.bergamot.model.message.AlertMO;
@@ -88,9 +88,9 @@ public class AcknowledgeAlertCommand extends BergamotCLICommand
             }
         }
         // connect to the API
-        BaseBergamotClient client = new BaseBergamotClient(site.getUrl(), site.getAuthToken());
+        BergamotClient client = new BergamotClient(site.getUrl(), site.getAuthToken());
         // acknowledge the alert
-        AlertMO alert = client.acknowledgeAlert().id(alertId).summary(summary.toString()).comment(comment.toString()).execute();
+        AlertMO alert = client.callAcknowledgeAlert().id(alertId).summary(summary.toString()).comment(comment.toString()).execute();
         // print the acked alert
         System.out.print("Acknowledged Alert [" + alert.getId() + "] - " + alert.getStatus() + " " + alert.getCheck().getCheckType() + " " + alert.getCheck().getName());
         if (alert.getCheck() instanceof ServiceMO) System.out.print(" on host " + ((ServiceMO) alert.getCheck()).getHost().getName());

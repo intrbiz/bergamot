@@ -5,7 +5,7 @@ import java.util.List;
 import com.intrbiz.bergamot.BergamotCLI;
 import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
-import com.intrbiz.bergamot.BaseBergamotClient;
+import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
@@ -63,11 +63,11 @@ public class ConfigCommand extends BergamotCLICommand
                 String username = args.remove(0);
                 String password = args.remove(0);
                 // talk to the API
-                BaseBergamotClient client = new BaseBergamotClient(url);
-                String hello = client.helloWorld().execute();
+                BergamotClient client = new BergamotClient(url);
+                String hello = client.callHelloWorld().execute();
                 System.out.println("Successfully connected to " + name + " (" + url + ") => " + hello);
                 // auth
-                AuthTokenMO token = client.appAuthToken().app("Bergamot CLI").username(username).password(password).execute();
+                AuthTokenMO token = client.callGetAppAuthToken().appName("Bergamot CLI").username(username).password(password).execute();
                 System.out.println("Sucessfully authenticated with " + name);
                 // add the config
                 CLICfg cfg = CLICfg.loadConfiguration();
