@@ -250,17 +250,17 @@
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-core</artifactId>
-  			<version>4.2.0-SNAPSHOT</version>
+  			<version>[4.2,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-data</artifactId>
-  			<version>4.2.0-SNAPSHOT</version>
+  			<version>[4.2,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-hazelcast</artifactId>
-  			<version>4.2.0-SNAPSHOT</version>
+  			<version>[4.2,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.gerald</groupId>
@@ -402,7 +402,7 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-check-jdbc</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<version>${project.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>org.jsoup</groupId>
