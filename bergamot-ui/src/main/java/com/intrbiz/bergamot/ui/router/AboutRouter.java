@@ -63,7 +63,7 @@ public class AboutRouter extends Router<BergamotApp>
             }
         }
         // write the response
-        BalsaWriter writer = response().ok().contentType("text/java").getViewWriter();
+        BalsaWriter writer = response().ok().contentType("text/java").header("Content-Disposition", "attachment; filename=BergamotClient.java").getViewWriter();
         // write the client
         writer.write("package com.intrbiz.bergamot;\n");
         writer.write("\n");
@@ -254,31 +254,31 @@ public class AboutRouter extends Router<BergamotApp>
             if (void.class != this.returnType) imports.add(this.returnType.getCanonicalName());
             if (this.returnOfType != null) imports.add(this.returnOfType.getCanonicalName());
             sb.append("\n\n");
-            sb.append("public static class ").append(Util.ucFirst(this.callName)).append("Call extends BergamotAPICall<").append(this.getBindingReturnType()).append(">\n");
-            sb.append("{\n");
+            sb.append("    public static class ").append(Util.ucFirst(this.callName)).append("Call extends BergamotAPICall<").append(this.getBindingReturnType()).append(">\n");
+            sb.append("    {\n");
             // parameters
             for (RouteParameter parameter : this.parameters)
             {
                 sb.append("\n");
-                sb.append("    private ").append(parameter.getType().getSimpleName()).append(" ").append(parameter.getFieldName()).append(";\n");
+                sb.append("        private ").append(parameter.getType().getSimpleName()).append(" ").append(parameter.getFieldName()).append(";\n");
             }
             sb.append("\n");
             //
-            sb.append("public ").append(Util.ucFirst(this.callName)).append("Call(BergamotClient client)\n");
-            sb.append("{\n");
-            sb.append("    super(client);\n");
-            sb.append("}\n");
+            sb.append("        public ").append(Util.ucFirst(this.callName)).append("Call(BaseBergamotClient client)\n");
+            sb.append("        {\n");
+            sb.append("            super(client);\n");
+            sb.append("        }\n");
             //
             sb.append("\n");
             for (RouteParameter parameter : this.parameters)
             {
                 sb.append("\n");
-                sb.append("    public ").append(Util.ucFirst(this.callName)).append("Call ").append(parameter.getFieldName())
+                sb.append("        public ").append(Util.ucFirst(this.callName)).append("Call ").append(parameter.getFieldName())
                  .append("(").append(parameter.getType().getSimpleName()).append(" ").append(parameter.getFieldName()).append(")\n");
-                sb.append("    {\n");
-                sb.append("        this.").append(parameter.getFieldName()).append(" = ").append(parameter.getFieldName()).append(";\n");
-                sb.append("        return this;\n");
-                sb.append("    }\n");
+                sb.append("        {\n");
+                sb.append("            this.").append(parameter.getFieldName()).append(" = ").append(parameter.getFieldName()).append(";\n");
+                sb.append("            return this;\n");
+                sb.append("        }\n");
             }
             //
             String url = "\"" + this.getPath() + "\"";
@@ -289,81 +289,81 @@ public class AboutRouter extends Router<BergamotApp>
             }
             //
             sb.append("\n");
-            sb.append("    public ").append(this.getBindingReturnType()).append(" execute()\n");
-            sb.append("    {\n");
-            sb.append("        try\n");
+            sb.append("        public ").append(this.getBindingReturnType()).append(" execute()\n");
             sb.append("        {\n");
-            sb.append("            Response response = execute(\n");
+            sb.append("            try\n");
+            sb.append("            {\n");
+            sb.append("                Response response = execute(\n");
             if ("post".equalsIgnoreCase(this.method) || "any".equalsIgnoreCase(this.method))
             {
-                sb.append("                post(url(").append(url).append("))\n");
-                sb.append("                .addHeader(authHeader())\n");
-                sb.append("                .bodyForm(\n");
+                sb.append("                    post(url(").append(url).append("))\n");
+                sb.append("                    .addHeader(authHeader())\n");
+                sb.append("                    .bodyForm(\n");
                 boolean ns = false;
                 for (RouteParameter param : this.parameters)
                 {
                     if (! param.isAs())
                     {
                         if (ns) sb.append(",\n");
-                        sb.append("                    param(\"").append(param.getName()).append("\", this.").append(param.getFieldName()).append(")");
+                        sb.append("                        param(\"").append(param.getName()).append("\", this.").append(param.getFieldName()).append(")");
                         ns = true;
                     }
                 }
                 sb.append("\n");
-                sb.append("                )\n");
+                sb.append("                    )\n");
             }
             else
             {
-                if (this.parameters.stream().anyMatch((p) -> ! p.isAs()))
+                if (this.parameters.stream().allMatch((p) -> p.isAs()))
                 {
-                    sb.append("                get(url(").append(url).append("))\n");
-                    sb.append("                .addHeader(authHeader())\n");
+                    sb.append("                    get(url(").append(url).append("))\n");
+                    sb.append("                    .addHeader(authHeader())\n");
                 }
                 else
                 {
-                    sb.append("                get(\n");
-                    sb.append("                    appendQuery(\n");
-                    sb.append("                        url(").append(url).append(")");
+                    sb.append("                    get(\n");
+                    sb.append("                        appendQuery(\n");
+                    sb.append("                            url(").append(url).append(")");
                     for (RouteParameter param : this.parameters)
                     {
                         if (! param.isAs())
                         {
                             sb.append(",\n");
-                            sb.append("                    param(\"").append(param.getName()).append("\", this.").append(param.getFieldName()).append(")");
+                            sb.append("                        param(\"").append(param.getName()).append("\", this.").append(param.getFieldName()).append(")");
                         }
                     }
                     sb.append("\n");
-                    sb.append("                    )\n");
-                    sb.append("                ).addHeader(authHeader())\n");
+                    sb.append("                        )\n");
+                    sb.append("                    ).addHeader(authHeader())\n");
                 }
             }
-            sb.append("            );\n");
+            sb.append("                );\n");
             if (void.class == this.returnType)
             {
-                sb.append("            return response.returnContent().asString();\n");
+                sb.append("                return response.returnContent().asString();\n");
             }
             else if (List.class == this.returnType)
             {
-                sb.append("            return transcoder().decodeListFromString(response.returnContent().asString(), ").append(this.returnOfType == null ? "?" : this.returnOfType.getSimpleName()).append(".class);\n");                
+                sb.append("                return transcoder().decodeListFromString(response.returnContent().asString(), ").append(this.returnOfType == null ? "?" : this.returnOfType.getSimpleName()).append(".class);\n");                
             }
             else
             {
-                sb.append("            return transcoder().decodeFromString(response.returnContent().asString(), ").append(this.getReturnType().getSimpleName()).append(".class);\n");
+                sb.append("                return transcoder().decodeFromString(response.returnContent().asString(), ").append(this.getReturnType().getSimpleName()).append(".class);\n");
             }
+            sb.append("            }\n");
+            sb.append("            catch (IOException e)\n");
+            sb.append("            {\n");
+            sb.append("                throw new BergamotAPIException(\"Error calling Bergamot Monitoring API\", e);\n");
+            sb.append("            }\n");
             sb.append("        }\n");
-            sb.append("        catch (IOException e)\n");
-            sb.append("        {\n");
-            sb.append("            throw new BergamotAPIException(\"Error calling Bergamot Monitoring API\", e);\n");
-            sb.append("        }\n");
-            sb.append("    }\n");
             sb.append("\n");
-            sb.append("}\n");
+            sb.append("    }\n");
             sb.append("\n\n");
             // the binding method
-            sb.append("public ").append(Util.ucFirst(this.callName)).append("Call ").append(this.callName).append("()\n");
-            sb.append("{\n");
-            sb.append("    return new ").append(Util.ucFirst(this.callName)).append("Call(this);\n");
-            sb.append("}\n");
+            sb.append("    public ").append(Util.ucFirst(this.callName)).append("Call call").append(Util.ucFirst(this.callName)).append("()\n");
+            sb.append("    {\n");
+            sb.append("        return new ").append(Util.ucFirst(this.callName)).append("Call(this);\n");
+            sb.append("    }\n");
             sb.append("\n");
         }
     }
