@@ -34,7 +34,7 @@ import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
 
 @SQLSchema(
         name = "lamplighter", 
-        version = @SQLVersion({1, 4, 0}),
+        version = @SQLVersion({1, 5, 0}),
         tables = {
             CheckReading.class,
             StoredDoubleGaugeReading.class,
@@ -417,7 +417,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     
     // custom SQL patches
     
-    @SQLPatch(name = "create_helper_functions", index = 1, type = ScriptType.BOTH, version = @SQLVersion({1, 5, 0}))
+    @SQLPatch(name = "create_helper_functions", index = 1, type = ScriptType.BOTH, version = @SQLVersion({1, 0, 0}))
     protected static SQLScript createHelperFunctions()
     {
         return new SQLScript(
@@ -562,7 +562,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.BOTH, version = @SQLVersion({1, 5, 0}))
+    @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.BOTH, version = @SQLVersion({1, 0, 0}))
     protected static SQLScript setFunctionOWner()
     {
         return new SQLScript(
