@@ -68,6 +68,12 @@ import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
  */
 public class BergamotAgent implements Configurable<BergamotAgentCfg>
 {
+    public static final String AGENT_VENDOR = "Bergamot Monitoring";
+    
+    public static final String AGENT_PRODUCT = "Bergamot Agent";
+    
+    public static final String AGENT_VERSION = "2.0.0";
+    
     private Logger logger = Logger.getLogger(BergamotAgent.class);
     
     private URI server;
