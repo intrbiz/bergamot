@@ -141,7 +141,8 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
         this.parameters = parameters;
     }
 
-    public SiteMO toMO(boolean stub)
+    @Override
+    public SiteMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
         SiteMO mo = new SiteMO();
         mo.setId(this.getId());
@@ -251,11 +252,5 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     public static UUID setSiteId(UUID siteId, UUID objectId)
     {
         return new UUID((siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | (objectId.getMostSignificantBits() & 0x00000000_0000FFFFL), objectId.getLeastSignificantBits());
-    }
-
-    @Override
-    public SiteMO toMO(Contact contact, EnumSet<com.intrbiz.bergamot.model.BergamotObject.MOFlag> options)
-    {
-        return null;
     }
 }
