@@ -877,7 +877,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                               "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, " +
                               "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, " +
                               "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count, " +  
-                              "  count(s.check_id)::INTEGER                                                                          AS total_checks " +
+                              "  count(s.check_id)::INTEGER                                                                          AS total_checks, " +
                               "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count, " +
                               "FROM bergamot.check_state s " +
                               "JOIN ( " +
@@ -945,7 +945,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count,  \n" +
                 "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count,  \n" +
                 "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,    \n" +
-                "  count(s.check_id)::INTEGER                                                                          AS total_checks  \n" +
+                "  count(s.check_id)::INTEGER                                                                          AS total_checks,  \n" +
                 "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count, " +
                 "FROM\n" +
                 " bergamot.check_state s  \n" +
@@ -1006,7 +1006,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                               "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, " +
                               "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, " +
                               "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count, " +  
-                              "  count(s.check_id)::INTEGER                                                                          AS total_checks " +
+                              "  count(s.check_id)::INTEGER                                                                          AS total_checks, " +
                               "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count, " +
                               "FROM bergamot.check_state s " +
                               "JOIN bergamot.host h ON (s.check_id = h.id) "+
@@ -1064,7 +1064,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, \n" +
             "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, \n" +
             "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,   \n" +
-            "  count(s.check_id)::INTEGER                                                                          AS total_checks   \n" +
+            "  count(s.check_id)::INTEGER                                                                          AS total_checks,   \n" +
             "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count, " +
             "FROM bergamot.check_state s \n" +
             "JOIN bergamot.host h ON (s.check_id = h.id)\n" +
