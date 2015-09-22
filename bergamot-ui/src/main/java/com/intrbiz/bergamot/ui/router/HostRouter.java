@@ -256,7 +256,7 @@ public class HostRouter extends Router<BergamotApp>
         // the container
         BergamotCfg configContainer = new BergamotCfg();
         configContainer.setSite(site.getName());
-        configContainer.setSummary("Create group: " + name);
+        configContainer.setSummary("Create host: " + name);
         configContainer.getHosts().add(config);
         logger.info("Creating host " + name + ":\n" + configContainer);
         // create the configuration change
