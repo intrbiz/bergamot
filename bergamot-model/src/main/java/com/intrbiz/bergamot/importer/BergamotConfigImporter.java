@@ -292,6 +292,11 @@ public class BergamotConfigImporter
                         conf =  new Config(this.site.randomObjectId(), this.site.getId(), (NamedObjectCfg<?>) object);
                         this.report.info("Configuring new " + type + " template: " + object.getName());
                         db.setConfig(conf);
+                        // add the template to the correct security domains
+                        if (object instanceof SecuredObjectCfg)
+                        {
+                            this.linkSecurityDomains((SecuredObjectCfg<?>) object.resolve(), conf.getId(), db);
+                        }
                     }
                     else
                     {
@@ -302,6 +307,7 @@ public class BergamotConfigImporter
                                 // nothing is using this template, so remove it
                                 this.report.info("Removing existing " + type + " template: " + object.getName() + " (" + conf.getId() + ")");
                                 db.removeConfig(conf.getId());
+                                db.removeSecurityDomainMembershipForCheck(conf.getId());
                             }
                             else
                             {
@@ -456,6 +462,7 @@ public class BergamotConfigImporter
         {
             db.removeCommand(command.getId());
             db.removeConfig(command.getId());
+            db.removeSecurityDomainMembershipForCheck(command.getId());
         }
     }
     
@@ -547,6 +554,7 @@ public class BergamotConfigImporter
         {
             db.removeLocation(location.getId());
             db.removeConfig(location.getId());
+            db.removeSecurityDomainMembershipForCheck(location.getId());
         }
     }
     
@@ -651,6 +659,7 @@ public class BergamotConfigImporter
         {
             db.removeGroup(group.getId());
             db.removeConfig(group.getId());
+            db.removeSecurityDomainMembershipForCheck(group.getId());
         }
     }
     
@@ -753,6 +762,7 @@ public class BergamotConfigImporter
         {
             db.removeTimePeriod(timePeriod.getId());
             db.removeConfig(timePeriod.getId());
+            db.removeSecurityDomainMembershipForCheck(timePeriod.getId());
         }
     }
     
@@ -855,6 +865,7 @@ public class BergamotConfigImporter
         {
             db.removeTeam(team.getId());
             db.removeConfig(team.getId());
+            db.removeSecurityDomainMembershipForCheck(team.getId());
         }
     }
     
@@ -949,6 +960,7 @@ public class BergamotConfigImporter
         {
             db.removeContact(contact.getId());
             db.removeConfig(contact.getId());
+            db.removeSecurityDomainMembershipForCheck(contact.getId());
         }
     }
     
@@ -1121,11 +1133,13 @@ public class BergamotConfigImporter
                 this.unscheduleCheck(service);
                 db.removeService(service.getId());
                 db.removeConfig(service.getId());
+                db.removeSecurityDomainMembershipForCheck(service.getId());
             }
             // remove the host
             this.unscheduleCheck(host);
             db.removeHost(host.getId());
             db.removeConfig(host.getId());
+            db.removeSecurityDomainMembershipForCheck(host.getId());
         }
     }
     
@@ -1362,6 +1376,7 @@ public class BergamotConfigImporter
             this.unscheduleCheck(service);
             db.removeService(service.getId());
             db.removeConfig(service.getId());
+            db.removeSecurityDomainMembershipForCheck(service.getId());
         }
     }
 
@@ -1411,6 +1426,7 @@ public class BergamotConfigImporter
         {
             db.removeTrap(trap.getId());
             db.removeConfig(trap.getId());
+            db.removeSecurityDomainMembershipForCheck(trap.getId());
         }
     }
     
@@ -1508,9 +1524,11 @@ public class BergamotConfigImporter
             {
                 db.removeResource(resource.getId());
                 db.removeConfig(resource.getId());
+                db.removeSecurityDomainMembershipForCheck(cluster.getId());
             }
             db.removeCluster(cluster.getId());
             db.removeConfig(cluster.getId());
+            db.removeSecurityDomainMembershipForCheck(cluster.getId());
         }
     }
     
@@ -1584,6 +1602,7 @@ public class BergamotConfigImporter
         {
             db.removeResource(resource.getId());
             db.removeConfig(resource.getId());
+            db.removeSecurityDomainMembershipForCheck(resource.getId());
         }
     }
     
@@ -1614,13 +1633,18 @@ public class BergamotConfigImporter
     
     protected void linkSecurityDomains(SecuredObjectCfg<?> resolvedConfiguration, SecuredObject<?,?> object, BergamotDB db)
     {
+        this.linkSecurityDomains(resolvedConfiguration, object.getId(), db);
+    }
+    
+    protected void linkSecurityDomains(SecuredObjectCfg<?> resolvedConfiguration, UUID objectId, BergamotDB db)
+    {
         // set security domain membership
-        db.removeSecurityDomainMembershipForCheck(object.getId());
+        db.removeSecurityDomainMembershipForCheck(objectId);
         for (String securityDomainName : resolvedConfiguration.getSecurityDomains())
         {
             SecurityDomain domain = db.getSecurityDomainByName(this.site.getId(), securityDomainName);
             if (domain != null)
-                db.addCheckToSecurityDomain(domain.getId(), object.getId());
+                db.addCheckToSecurityDomain(domain.getId(), objectId);
         }
         // ensure we flush cached permissions
         this.clearPermissionsCache = true;
