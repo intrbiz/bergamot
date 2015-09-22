@@ -65,13 +65,16 @@ public class GroupState extends BergamotObject<GroupStateMO>
     
     @SQLColumn(index = 15, name = "total_checks", since = @SQLVersion({ 2, 7, 0 }))
     private int totalChecks = 0;
+    
+    @SQLColumn(index = 16, name = "disconnected_count", since = @SQLVersion({ 3, 19, 0 }))
+    private int disconnectedCount = 0;
 
     public GroupState()
     {
         super();
     }
 
-    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int errorCount, int infoCount, int actionCount, int inDowntimeCount, int totalChecks)
+    public GroupState(boolean ok, Status status, int okCount, int warningCount, int criticalCount, int unknownCount, int timeoutCount, int errorCount, int infoCount, int actionCount, int inDowntimeCount, int totalChecks, int disconnectedCount)
     {
         super();
         this.ok = ok;
@@ -86,6 +89,7 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.actionCount = actionCount;
         this.inDowntimeCount = inDowntimeCount;
         this.totalChecks = totalChecks;
+        this.disconnectedCount = disconnectedCount;
     }
 
     public UUID getGroupId()
@@ -238,6 +242,16 @@ public class GroupState extends BergamotObject<GroupStateMO>
         this.totalChecks = totalChecks;
     }
 
+    public int getDisconnectedCount()
+    {
+        return disconnectedCount;
+    }
+
+    public void setDisconnectedCount(int disconnectedCount)
+    {
+        this.disconnectedCount = disconnectedCount;
+    }
+
     @Override
     public GroupStateMO toMO(Contact contact, EnumSet<MOFlag> options)
     {
@@ -256,6 +270,7 @@ public class GroupState extends BergamotObject<GroupStateMO>
         mo.setActionCount(this.actionCount);
         mo.setInDowntimeCount(this.inDowntimeCount);
         mo.setTotalchecks(this.totalChecks);
+        mo.setDisconnectedCount(this.disconnectedCount);
         return mo;
     }
 }

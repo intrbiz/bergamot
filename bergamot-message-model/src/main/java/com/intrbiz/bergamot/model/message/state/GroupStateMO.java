@@ -48,6 +48,9 @@ public class GroupStateMO extends MessageObject
     
     @JsonProperty("total_checks")
     private int totalchecks = 0;
+    
+    @JsonProperty("disconnected_count")
+    private int disconnectedCount;
 
     public GroupStateMO()
     {
@@ -192,5 +195,15 @@ public class GroupStateMO extends MessageObject
     public void setTotalchecks(int totalchecks)
     {
         this.totalchecks = totalchecks;
+    }
+
+    public int getDisconnectedCount()
+    {
+        return disconnectedCount;
+    }
+
+    public void setDisconnectedCount(int disconnectedCount)
+    {
+        this.disconnectedCount = disconnectedCount;
     }
 }

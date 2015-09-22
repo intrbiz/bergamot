@@ -17,7 +17,7 @@
 			    </p>
 			    <p style="width: 205px;">
 				    <span class="label">Not OK: </span>
-				    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{locationstate.warningCount + locationstate.criticalCount + locationstate.unknownCount + locationstate.timeoutCount + locationstate.errorCount + locationstate.actionCount}</span>
+				    <span class="value" data-bind="not_ok_count" style="width: 60px;">#{locationstate.warningCount + locationstate.criticalCount + locationstate.unknownCount + locationstate.timeoutCount + locationstate.errorCount + locationstate.actionCount + groupstate.disconnectedCount}</span>
 			    </p>
 			    <p style="width: 205px;">
 				    <span class="label">In Downtime: </span>
