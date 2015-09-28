@@ -42,6 +42,7 @@ import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.api.UtilAPIRouter;
 import com.intrbiz.bergamot.ui.express.BergamotUpdateURL;
 import com.intrbiz.bergamot.ui.router.AboutRouter;
+import com.intrbiz.bergamot.ui.router.AlertsRouter;
 import com.intrbiz.bergamot.ui.router.ClusterRouter;
 import com.intrbiz.bergamot.ui.router.CommandRouter;
 import com.intrbiz.bergamot.ui.router.ContactRouter;
@@ -186,6 +187,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new ProfileRouter());
         router(new StatsRouter());
         router(new CommandRouter());
+        router(new AlertsRouter());
         // Agent
         router(new AgentRouter());
         // About
