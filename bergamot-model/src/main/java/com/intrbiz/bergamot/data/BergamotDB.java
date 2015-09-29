@@ -77,7 +77,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 19, 0}),
+        version = @SQLVersion({3, 20, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -2046,6 +2046,32 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
+    private Timer suppress_check = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.suppress_check(UUID,BOOLEAN)"));
+    
+    /**
+     * Update the suppressed state of the given check
+     * @param checkId the check id
+     * @param suppressed is this check suppressed
+     * @return true if the check was updated
+     */
+    public boolean suppressCheck(UUID checkId, boolean suppressed)
+    {
+        return this.useTimed(
+            suppress_check, 
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.suppress_check(?::UUID, ?::BOOLEAN)"))
+                {
+                  stmt.setObject(1, checkId);
+                  stmt.setObject(2, suppressed);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next()) return rs.getBoolean(1);
+                  }
+                }
+                return false;
+        });
+    }
+    
     // helpers
     
     /**
@@ -2517,6 +2543,22 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "$$",
                 
                 "SELECT bergamot.build_permissions(id) FROM bergamot.site"
+        );
+    }
+    
+    @SQLPatch(name = "add_suppress_check", index = 12, type = ScriptType.BOTH, version = @SQLVersion({3, 20, 0}), skip = false)
+    public static SQLScript addSuppressCheckFunction()
+    {
+        return new SQLScript(
+                
+                "CREATE OR REPLACE FUNCTION bergamot.suppress_check(p_check_id UUID, p_suppressed BOOLEAN)\n" +
+                "RETURNS BOOLEAN\n" +
+                "LANGUAGE PLPGSQL AS $$\n" +
+                "BEGIN\n" +
+                "    UPDATE bergamot.check_state SET suppressed = p_suppressed WHERE check_id = p_check_id;\n" +
+                "    RETURN FOUND;\n" +
+                "END;\n" +
+                "$$"
         );
     }
     
