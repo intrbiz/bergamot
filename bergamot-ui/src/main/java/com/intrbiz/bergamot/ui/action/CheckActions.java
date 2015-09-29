@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.ui.action;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.metadata.Action;
 
@@ -18,21 +17,13 @@ public class CheckActions
     public void suppressCheck(Check<?,?> check)
     {
         if (logger.isTraceEnabled()) logger.trace("Suppressing check:\r\n" + check);
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            check.setSuppressed(true);
-            db.setCheck(check);
-        }
+        check.suppress();
     }
     
     @Action("unsuppress-check")
     public void unsuppressCheck(Check<?,?> check)
     {
         if (logger.isTraceEnabled()) logger.trace("Unsuppressing check:\r\n" + check);
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            check.setSuppressed(false);
-            db.setCheck(check);
-        }
+        check.unsuppress();
     }
 }

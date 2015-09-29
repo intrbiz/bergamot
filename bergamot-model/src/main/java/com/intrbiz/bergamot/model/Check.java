@@ -361,6 +361,60 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     {
         this.externalRef = externalRef;
     }
+    
+    // some basic actions
+    
+    /**
+     * Suppress this check
+     */
+    public void suppress()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            this.setSuppressed(true);
+            db.setCheck(this);
+            db.suppressCheck(this.getId(), true);
+        }
+    }
+    
+    /**
+     * Unsuppress this check
+     */
+    public void unsuppress()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            this.setSuppressed(false);
+            db.setCheck(this);
+            db.suppressCheck(this.getId(), false);
+        }
+    }
+    
+    /**
+     * Enable this check 
+     */
+    public void enable()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            this.setEnabled(true);
+            db.setCheck(this);
+        }
+    }
+    
+    /**
+     * Disable this check
+     */
+    public void disable()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            this.setEnabled(false);
+            db.setCheck(this);
+        }
+    }
+    
+    //
 
     protected void toMO(CheckMO mo, Contact contact, EnumSet<MOFlag> options)
     {
