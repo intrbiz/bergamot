@@ -2062,7 +2062,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.suppress_check(?::UUID, ?::BOOLEAN)"))
                 {
                   stmt.setObject(1, checkId);
-                  stmt.setObject(2, suppressed);
+                  stmt.setBoolean(2, suppressed);
                   try (ResultSet rs = stmt.executeQuery())
                   {
                     if (rs.next()) return rs.getBoolean(1);
