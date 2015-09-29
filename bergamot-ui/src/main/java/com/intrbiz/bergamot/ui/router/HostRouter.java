@@ -120,8 +120,7 @@ public class HostRouter extends Router<BergamotApp>
         Host host = notNull(db.getHost(id));
         require(permission("suppress", host));
         // suppress the host
-        host.setSuppressed(true);
-        db.setHost(host);
+        action("suppress-check", host);
         redirect("/host/id/" + id);
     }
     
@@ -132,8 +131,7 @@ public class HostRouter extends Router<BergamotApp>
         Host host = notNull(db.getHost(id));
         require(permission("unsuppress", host));
         // unsuppress the host
-        host.setSuppressed(false);
-        db.setHost(host);
+        action("unsuppress-check", host);
         redirect("/host/id/" + id);
     }
     
