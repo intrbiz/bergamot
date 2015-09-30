@@ -48,12 +48,12 @@ public class JDBCChecker
 
     public JDBCCheckContext createContext()
     {
-        return new JDBCCheckContext(this, (t) -> { throw new JDBCException(t); });
+        return new JDBCCheckContext((t) -> { throw new JDBCException(t); });
     }
     
     public JDBCCheckContext createContext(Consumer<Throwable> errorHandler)
     {
-        return new JDBCCheckContext(this, errorHandler);
+        return new JDBCCheckContext(errorHandler);
     }
 
     public void shutdown()

@@ -5,14 +5,11 @@ import java.sql.DriverManager;
 import java.util.function.Consumer;
 
 public class JDBCCheckContext
-{
-    private final JDBCChecker checker;
-    
+{    
     private final Consumer<Throwable> onError;
     
-    public JDBCCheckContext(JDBCChecker checker, Consumer<Throwable> onError)
+    public JDBCCheckContext(Consumer<Throwable> onError)
     {
-        this.checker = checker;
         this.onError = onError;
     }
     
