@@ -50,7 +50,7 @@
             var pass = check.getParameter('password');
             /* Execute */
             jdbc.connect(url, user, pass, function(con) {
-                var total = con.query('SELECT round(pg_relation_size('bergamot.check_transition'::regclass) / 1024.0 / 1024.0, 3)', function(rs) {
+                var total = con.query('SELECT round(pg_relation_size(\'bergamot.check_transition\'::regclass) / 1024.0 / 1024.0, 3)', function(rs) {
                     return rs.next() ? rs.getDouble(1) : 0.0;
                 });
                 bergamot.info('Check Transitions Size: ' + total + ' MiB');
