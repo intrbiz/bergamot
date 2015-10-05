@@ -539,7 +539,7 @@ public class WheelScheduler extends AbstractScheduler
             if (executeCheck != null)
             {
                 // account
-                WheelScheduler.this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), executeCheck.getEngine(), executeCheck.getName()));
+                WheelScheduler.this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), executeCheck.getEngine(), executeCheck.getExecutor(), executeCheck.getName()));
                 // execute
                 WheelScheduler.this.publishExecuteCheck(executeCheck, this.check.getRoutingKey(), this.check.getMessageTTL());
             }

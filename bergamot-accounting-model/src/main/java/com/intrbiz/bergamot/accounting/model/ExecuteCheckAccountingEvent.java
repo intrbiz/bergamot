@@ -11,6 +11,8 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
     
     private String engine;
     
+    private String executor;
+    
     private String command;
     
     public ExecuteCheckAccountingEvent()
@@ -18,19 +20,21 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
         super();
     }
     
-    public ExecuteCheckAccountingEvent(long timestamp, UUID siteId, UUID executionId, String engine, String command)
+    public ExecuteCheckAccountingEvent(long timestamp, UUID siteId, UUID executionId, String engine, String executor, String command)
     {
         super(timestamp, siteId);
         this.executionId = executionId;
         this.engine = engine;
+        this.executor = executor;
         this.command = command;
     }
     
-    public ExecuteCheckAccountingEvent(UUID siteId, UUID executionId, String engine, String command)
+    public ExecuteCheckAccountingEvent(UUID siteId, UUID executionId, String engine, String executor, String command)
     {
         super(siteId);
         this.executionId = executionId;
         this.engine = engine;
+        this.executor = executor;
         this.command = command;
     }
 
@@ -70,9 +74,19 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
         this.command = command;
     }
     
+    public String getExecutor()
+    {
+        return executor;
+    }
+
+    public void setExecutor(String executor)
+    {
+        this.executor = executor;
+    }
+
     public String toString()
     {
-        return super.toString() + " [" + this.executionId + "] [" + this.engine + "] [" + this.command + "]";
+        return super.toString() + " [" + this.executionId + "] [" + this.engine + "] [" + this.executor + "] [" + this.command + "]";
     }
 
     @Override
@@ -81,6 +95,7 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
         super.pack(into);
         this.packUUID(this.executionId, into);
         this.packString(this.engine, into);
+        this.packString(this.executor, into);
         this.packString(this.command, into);
     }
 
@@ -90,6 +105,7 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
         super.unpack(from);
         this.executionId = this.unpackUUID(from);
         this.engine = this.unpackString(from);
+        this.executor = this.unpackString(from);
         this.command = this.unpackString(from);
     }
 
@@ -101,6 +117,7 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
         result = prime * result + ((command == null) ? 0 : command.hashCode());
         result = prime * result + ((engine == null) ? 0 : engine.hashCode());
         result = prime * result + ((executionId == null) ? 0 : executionId.hashCode());
+        result = prime * result + ((executor == null) ? 0 : executor.hashCode());
         return result;
     }
 
@@ -126,6 +143,11 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
             if (other.executionId != null) return false;
         }
         else if (!executionId.equals(other.executionId)) return false;
+        if (executor == null)
+        {
+            if (other.executor != null) return false;
+        }
+        else if (!executor.equals(other.executor)) return false;
         return true;
     }
 }
