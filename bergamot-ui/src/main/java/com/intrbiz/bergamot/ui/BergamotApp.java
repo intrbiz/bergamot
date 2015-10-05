@@ -2,9 +2,11 @@ package com.intrbiz.bergamot.ui;
 
 import java.util.UUID;
 
+import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.balsa.util.Util;
+import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -153,6 +155,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             // set the key
             this.getSecurityEngine().applicationKey(SecretKey.fromString(this.getConfiguration().getSecurityKey()));
         }
+        // setup accounting
+        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
+        AccountingManager.getInstance().bindRootConsumer("logger");
         // setup ClusterManager to manage our critical
         // resources across the cluster
         this.clusterManager = new ClusterManager();

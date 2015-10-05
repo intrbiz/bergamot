@@ -421,6 +421,11 @@
   			<artifactId>accounting</artifactId>
   			<version>1.0.0-SNAPSHOT</version>
   		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-accounting-model</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
   	</dependencies>
   </dependencyManagement>
   

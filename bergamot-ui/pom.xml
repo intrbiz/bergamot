@@ -72,6 +72,10 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>lamplighter-reading-processor</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-accounting-model</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>

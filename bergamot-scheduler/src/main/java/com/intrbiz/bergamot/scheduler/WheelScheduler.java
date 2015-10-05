@@ -12,6 +12,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
@@ -82,6 +84,10 @@ public class WheelScheduler extends AbstractScheduler
     // task executor
     
     protected ExecutorService taskExecutor;
+    
+    // accounting
+    
+    protected Accounting accounting = Accounting.create(WheelScheduler.class);
 
     public WheelScheduler()
     {
@@ -532,6 +538,9 @@ public class WheelScheduler extends AbstractScheduler
             ExecuteCheck executeCheck = this.check.executeCheck();
             if (executeCheck != null)
             {
+                // account
+                WheelScheduler.this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), executeCheck.getEngine(), executeCheck.getName()));
+                // execute
                 WheelScheduler.this.publishExecuteCheck(executeCheck, this.check.getRoutingKey(), this.check.getMessageTTL());
             }
         }
