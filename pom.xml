@@ -104,6 +104,7 @@
     <module>lamplighter-reading-processor</module>
     <module>bergamot-worker-jdbc</module>
     <module>bergamot-check-jdbc</module>
+    <module>bergamot-accounting-model</module>
   </modules>
   
   <dependencyManagement>
@@ -414,6 +415,11 @@
   			<groupId>mysql</groupId>
   			<artifactId>mysql-connector-java</artifactId>
   			<version>5.1.36</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.accounting</groupId>
+  			<artifactId>accounting</artifactId>
+  			<version>1.0.0-SNAPSHOT</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>

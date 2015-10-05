@@ -1,0 +1,131 @@
+package com.intrbiz.bergamot.accounting.model;
+
+import java.nio.ByteBuffer;
+import java.util.UUID;
+
+public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
+{
+    public static final UUID TYPE_ID = UUID.fromString("ab52d8b1-b43f-4dd7-9b9b-9bde92da1fde");
+    
+    private UUID executionId;
+    
+    private String engine;
+    
+    private String command;
+    
+    public ExecuteCheckAccountingEvent()
+    {
+        super();
+    }
+    
+    public ExecuteCheckAccountingEvent(long timestamp, UUID siteId, UUID executionId, String engine, String command)
+    {
+        super(timestamp, siteId);
+        this.executionId = executionId;
+        this.engine = engine;
+        this.command = command;
+    }
+    
+    public ExecuteCheckAccountingEvent(UUID siteId, UUID executionId, String engine, String command)
+    {
+        super(siteId);
+        this.executionId = executionId;
+        this.engine = engine;
+        this.command = command;
+    }
+
+    @Override
+    public final UUID getTypeId()
+    {
+        return TYPE_ID;
+    }
+
+    public UUID getExecutionId()
+    {
+        return executionId;
+    }
+
+    public void setExecutionId(UUID executionId)
+    {
+        this.executionId = executionId;
+    }
+
+    public String getEngine()
+    {
+        return engine;
+    }
+
+    public void setEngine(String engine)
+    {
+        this.engine = engine;
+    }
+
+    public String getCommand()
+    {
+        return command;
+    }
+
+    public void setCommand(String command)
+    {
+        this.command = command;
+    }
+    
+    public String toString()
+    {
+        return super.toString() + " [" + this.executionId + "] [" + this.engine + "] [" + this.command + "]";
+    }
+
+    @Override
+    public void pack(ByteBuffer into)
+    {
+        super.pack(into);
+        this.packUUID(this.executionId, into);
+        this.packString(this.engine, into);
+        this.packString(this.command, into);
+    }
+
+    @Override
+    public void unpack(ByteBuffer from)
+    {
+        super.unpack(from);
+        this.executionId = this.unpackUUID(from);
+        this.engine = this.unpackString(from);
+        this.command = this.unpackString(from);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((command == null) ? 0 : command.hashCode());
+        result = prime * result + ((engine == null) ? 0 : engine.hashCode());
+        result = prime * result + ((executionId == null) ? 0 : executionId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (!super.equals(obj)) return false;
+        if (getClass() != obj.getClass()) return false;
+        ExecuteCheckAccountingEvent other = (ExecuteCheckAccountingEvent) obj;
+        if (command == null)
+        {
+            if (other.command != null) return false;
+        }
+        else if (!command.equals(other.command)) return false;
+        if (engine == null)
+        {
+            if (other.engine != null) return false;
+        }
+        else if (!engine.equals(other.engine)) return false;
+        if (executionId == null)
+        {
+            if (other.executionId != null) return false;
+        }
+        else if (!executionId.equals(other.executionId)) return false;
+        return true;
+    }
+}
