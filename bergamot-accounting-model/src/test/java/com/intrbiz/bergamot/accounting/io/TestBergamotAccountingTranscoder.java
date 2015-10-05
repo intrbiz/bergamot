@@ -26,7 +26,7 @@ public class TestBergamotAccountingTranscoder
     @Test
     public void testEncodeExecuteCheckAccountingEventToString()
     {
-        ExecuteCheckAccountingEvent original = new ExecuteCheckAccountingEvent(siteId, execId, "nrpe", "check_load");
+        ExecuteCheckAccountingEvent original = new ExecuteCheckAccountingEvent(siteId, execId, "nrpe", "nrpe", "check_load");
         String encoded = this.codec.encodeToString(original);
         assertThat(encoded, is(notNullValue()));
         ExecuteCheckAccountingEvent decoded = this.codec.decodeFromString(encoded);

@@ -22,7 +22,7 @@ public class TestExecuteCheckAccountingEvent
     @Test
     public void packUnpack()
     {
-        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(siteId, execId, "nrpe", "check_load");
+        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(siteId, execId, "nrpe", "nrpe", "check_load");
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(notNullValue()));
@@ -54,7 +54,7 @@ public class TestExecuteCheckAccountingEvent
     @Test
     public void packUnpackWithNulls()
     {
-        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(null, null, null, null);
+        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(null, null, null, null, null);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(nullValue()));
