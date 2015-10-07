@@ -21,9 +21,12 @@ public class BergamotLoggingConsumer extends AsyncConsumer
     @Override
     protected void processAccountingEvent(Class<?> source, AccountingEvent event)
     {
-        if (event instanceof BergamotAccountingEvent)
+        if (logger.isDebugEnabled())
         {
-            logger.info("Accounting from " + source + " " + this.transcoder.encodeToString((BergamotAccountingEvent) event));
+            if (event instanceof BergamotAccountingEvent)
+            {
+                logger.debug("Accounting from " + source + " " + this.transcoder.encodeToString((BergamotAccountingEvent) event));
+            }
         }
     }
 }
