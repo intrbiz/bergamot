@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.accounting.model.BergamotAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 
 public class BergamotAccountingTranscoder
 {
@@ -28,6 +29,7 @@ public class BergamotAccountingTranscoder
         super();
         // register default types
         this.registerType(ExecuteCheckAccountingEvent.TYPE_ID, ExecuteCheckAccountingEvent::new);
+        this.registerType(ProcessResultAccountingEvent.TYPE_ID, ProcessResultAccountingEvent::new);
     }
     
     public void registerType(UUID id, Supplier<? extends BergamotAccountingEvent> factory)
