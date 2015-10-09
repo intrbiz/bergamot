@@ -10,6 +10,9 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
@@ -42,6 +45,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     private Logger logger = Logger.getLogger(DefaultResultProcessor.class);
     
     private Matchers matchers = new Matchers();
+    
+    private Accounting accounting = Accounting.create(DefaultResultProcessor.class);
 
     public DefaultResultProcessor()
     {
@@ -119,6 +124,10 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     logger.warn("Failed to match result to a real check: " + resultMO.getId() + ", discarding!");
                     return;
                 }
+                // account this processing
+                // account
+                this.accounting.account(new ProcessResultAccountingEvent(check.getSiteId(), resultMO.getId(), resultMO instanceof ActiveResultMO ? ResultType.ACTIVE : ResultType.PASSIVE));
+                // only process for enabled checks
                 if (!check.isEnabled())
                 {
                     logger.warn("Discarding result " + resultMO.getId() + " for " + check.getType() + "::" + check.getId() + " because it is disabled.");
