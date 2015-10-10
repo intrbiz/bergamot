@@ -1,14 +1,16 @@
 package com.intrbiz.bergamot.accounting.io;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
 import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
-
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.CoreMatchers.*;
+import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 
 public class TestBergamotAccountingTranscoder
 {
@@ -30,6 +32,17 @@ public class TestBergamotAccountingTranscoder
         String encoded = this.codec.encodeToString(original);
         assertThat(encoded, is(notNullValue()));
         ExecuteCheckAccountingEvent decoded = this.codec.decodeFromString(encoded);
+        assertThat(decoded, is(notNullValue()));
+        assertThat(decoded, is(equalTo(original)));
+    }
+    
+    @Test
+    public void testEncodeProcessResultAccountingEventToString()
+    {
+        ProcessResultAccountingEvent original = new ProcessResultAccountingEvent(siteId, execId, ResultType.ACTIVE);
+        String encoded = this.codec.encodeToString(original);
+        assertThat(encoded, is(notNullValue()));
+        ProcessResultAccountingEvent decoded = this.codec.decodeFromString(encoded);
         assertThat(decoded, is(notNullValue()));
         assertThat(decoded, is(equalTo(original)));
     }
