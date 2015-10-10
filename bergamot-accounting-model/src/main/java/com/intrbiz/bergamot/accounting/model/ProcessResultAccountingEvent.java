@@ -48,7 +48,15 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
         this.executionId = executionId;
     }
 
-    
+    public ResultType getResultType()
+    {
+        return resultType;
+    }
+
+    public void setResultType(ResultType resultType)
+    {
+        this.resultType = resultType;
+    }
 
     public String toString()
     {
