@@ -126,7 +126,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 }
                 // account this processing
                 // account
-                this.accounting.account(new ProcessResultAccountingEvent(check.getSiteId(), resultMO.getId(), resultMO instanceof ActiveResultMO ? ResultType.ACTIVE : ResultType.PASSIVE));
+                this.accounting.account(new ProcessResultAccountingEvent(check.getSiteId(), resultMO.getId(), check.getId(), resultMO instanceof ActiveResultMO ? ResultType.ACTIVE : ResultType.PASSIVE));
                 // only process for enabled checks
                 if (!check.isEnabled())
                 {

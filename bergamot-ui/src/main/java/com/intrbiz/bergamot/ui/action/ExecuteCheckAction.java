@@ -36,7 +36,7 @@ public class ExecuteCheckAction
         {
             if (logger.isTraceEnabled()) logger.trace("Executing check:\r\n" + executeCheck);
             // account
-            this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), executeCheck.getEngine(), executeCheck.getExecutor(), executeCheck.getName()));
+            this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), check.getId(), executeCheck.getEngine(), executeCheck.getExecutor(), executeCheck.getName()));
             // execute
             synchronized (this)
             {
