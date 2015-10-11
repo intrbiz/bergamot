@@ -11,6 +11,8 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
     
     private UUID executionId;
     
+    private UUID checkId;
+    
     private ResultType resultType;
     
     public ProcessResultAccountingEvent()
@@ -18,17 +20,19 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
         super();
     }
     
-    public ProcessResultAccountingEvent(long timestamp, UUID siteId, UUID executionId, ResultType resultType)
+    public ProcessResultAccountingEvent(long timestamp, UUID siteId, UUID executionId, UUID checkId, ResultType resultType)
     {
         super(timestamp, siteId);
         this.executionId = executionId;
+        this.checkId = checkId;
         this.resultType = resultType;
     }
     
-    public ProcessResultAccountingEvent(UUID siteId, UUID executionId, ResultType resultType)
+    public ProcessResultAccountingEvent(UUID siteId, UUID executionId, UUID checkId, ResultType resultType)
     {
         super(siteId);
         this.executionId = executionId;
+        this.checkId = checkId;
         this.resultType = resultType;
     }
 
@@ -46,6 +50,16 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
     public void setExecutionId(UUID executionId)
     {
         this.executionId = executionId;
+    }
+
+    public UUID getCheckId()
+    {
+        return checkId;
+    }
+
+    public void setCheckId(UUID checkId)
+    {
+        this.checkId = checkId;
     }
 
     public ResultType getResultType()
@@ -68,6 +82,7 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
     {
         super.pack(into);
         this.packUUID(this.executionId, into);
+        this.packUUID(this.checkId, into);
         into.putInt(this.resultType == null ? -1 : this.resultType.ordinal());
     }
 
@@ -76,6 +91,7 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
     {
         super.unpack(from);
         this.executionId = this.unpackUUID(from);
+        this.checkId = this.unpackUUID(from);
         int rType = from.getInt();
         this.resultType = rType == -1 ? null : ResultType.values()[rType]; 
     }
@@ -85,6 +101,7 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
     {
         final int prime = 31;
         int result = super.hashCode();
+        result = prime * result + ((checkId == null) ? 0 : checkId.hashCode());
         result = prime * result + ((executionId == null) ? 0 : executionId.hashCode());
         result = prime * result + ((resultType == null) ? 0 : resultType.hashCode());
         return result;
@@ -97,6 +114,11 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
         if (!super.equals(obj)) return false;
         if (getClass() != obj.getClass()) return false;
         ProcessResultAccountingEvent other = (ProcessResultAccountingEvent) obj;
+        if (checkId == null)
+        {
+            if (other.checkId != null) return false;
+        }
+        else if (!checkId.equals(other.checkId)) return false;
         if (executionId == null)
         {
             if (other.executionId != null) return false;

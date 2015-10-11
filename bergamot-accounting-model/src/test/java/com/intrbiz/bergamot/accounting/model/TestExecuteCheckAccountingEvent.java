@@ -11,6 +11,7 @@ public class TestExecuteCheckAccountingEvent
 {
     private static UUID siteId = UUID.fromString("01cf7f8e-2da3-4b5b-8764-a8cb0e1e8e6b");
     private static UUID execId = UUID.fromString("7c5efc47-8cd4-475c-817c-fba6acf291c6");
+    private static UUID checkId = UUID.fromString("3640d25d-547d-40ab-8eb6-fa97155e9dbb");
     
     
     @Test
@@ -28,11 +29,12 @@ public class TestExecuteCheckAccountingEvent
     @Test
     public void packUnpack()
     {
-        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(siteId, execId, "nrpe", "nrpe", "check_load");
+        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(siteId, execId, checkId, "nrpe", "nrpe", "check_load");
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(notNullValue()));
         assertThat(a.getExecutionId(), is(notNullValue()));
+        assertThat(a.getCheckId(), is(notNullValue()));
         assertThat(a.getEngine(), is(notNullValue()));
         assertThat(a.getCommand(), is(notNullValue()));
         // pack
@@ -46,13 +48,16 @@ public class TestExecuteCheckAccountingEvent
         assertThat(b.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(b.getSiteId(), is(notNullValue()));
         assertThat(b.getExecutionId(), is(notNullValue()));
+        assertThat(b.getCheckId(), is(notNullValue()));
         assertThat(b.getEngine(), is(notNullValue()));
         assertThat(b.getCommand(), is(notNullValue()));
         // compare
+        assertThat(a, is(equalTo(b)));
         assertThat(a.getTypeId(), is(equalTo(b.getTypeId())));
         assertThat(a.getTimestamp(), is(equalTo(b.getTimestamp())));
         assertThat(a.getSiteId(), is(equalTo(b.getSiteId())));
         assertThat(a.getExecutionId(), is(equalTo(b.getExecutionId())));
+        assertThat(a.getCheckId(), is(equalTo(b.getCheckId())));
         assertThat(a.getEngine(), is(equalTo(b.getEngine())));
         assertThat(a.getCommand(), is(equalTo(b.getCommand())));
     }
@@ -60,11 +65,12 @@ public class TestExecuteCheckAccountingEvent
     @Test
     public void packUnpackWithNulls()
     {
-        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(null, null, null, null, null);
+        ExecuteCheckAccountingEvent a = new ExecuteCheckAccountingEvent(null, null, null, null, null, null);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(nullValue()));
         assertThat(a.getExecutionId(), is(nullValue()));
+        assertThat(a.getCheckId(), is(nullValue()));
         assertThat(a.getEngine(), is(nullValue()));
         assertThat(a.getCommand(), is(nullValue()));
         // pack
@@ -78,13 +84,16 @@ public class TestExecuteCheckAccountingEvent
         assertThat(b.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(b.getSiteId(), is(nullValue()));
         assertThat(b.getExecutionId(), is(nullValue()));
+        assertThat(b.getCheckId(), is(nullValue()));
         assertThat(b.getEngine(), is(nullValue()));
         assertThat(b.getCommand(), is(nullValue()));
         // compare
+        assertThat(a, is(equalTo(b)));
         assertThat(a.getTypeId(), is(equalTo(b.getTypeId())));
         assertThat(a.getTimestamp(), is(equalTo(b.getTimestamp())));
         assertThat(a.getSiteId(), is(equalTo(b.getSiteId())));
         assertThat(a.getExecutionId(), is(equalTo(b.getExecutionId())));
+        assertThat(a.getCheckId(), is(equalTo(b.getCheckId())));
         assertThat(a.getEngine(), is(equalTo(b.getEngine())));
         assertThat(a.getCommand(), is(equalTo(b.getCommand())));
     }
