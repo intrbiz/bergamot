@@ -11,8 +11,8 @@ import org.junit.Test;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
-import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent;
-import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent.AlertType;
+import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent.NotificationType;
 
 public class TestBergamotAccountingTranscoder
 {
@@ -54,10 +54,10 @@ public class TestBergamotAccountingTranscoder
     @Test
     public void testEncodeSendAlertAccountingEventToString()
     {
-        SendAlertAccountingEvent original = new SendAlertAccountingEvent(siteId, alertId, checkId, AlertType.ALERT, 1);
+        SendNotificationAccountingEvent original = new SendNotificationAccountingEvent(siteId, alertId, checkId, NotificationType.ALERT, 1);
         String encoded = this.codec.encodeToString(original);
         assertThat(encoded, is(notNullValue()));
-        SendAlertAccountingEvent decoded = this.codec.decodeFromString(encoded);
+        SendNotificationAccountingEvent decoded = this.codec.decodeFromString(encoded);
         assertThat(decoded, is(notNullValue()));
         assertThat(decoded, is(equalTo(original)));
     }
