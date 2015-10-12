@@ -9,6 +9,8 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
     
     private UUID contactId;
     
+    private String host;
+    
     private String username;
     
     private String sessionId;
@@ -22,20 +24,22 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
         super();
     }
     
-    public LoginAccountingEvent(long timestamp, UUID siteId, UUID contactId, String username, String sessionId, boolean autoLogin, boolean success)
+    public LoginAccountingEvent(long timestamp, UUID siteId, UUID contactId, String host, String username, String sessionId, boolean autoLogin, boolean success)
     {
         super(timestamp, siteId);
         this.contactId = contactId;
+        this.host = host;
         this.username = username;
         this.sessionId = sessionId;
         this.autoLogin = autoLogin;
         this.success = success;
     }
     
-    public LoginAccountingEvent(UUID siteId, UUID contactId, String username, String sessionId, boolean autoLogin, boolean success)
+    public LoginAccountingEvent(UUID siteId, UUID contactId, String host, String username, String sessionId, boolean autoLogin, boolean success)
     {
         super(siteId);
         this.contactId = contactId;
+        this.host = host;
         this.username = username;
         this.sessionId = sessionId;
         this.autoLogin = autoLogin;
@@ -56,6 +60,16 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
     public void setContactId(UUID contactId)
     {
         this.contactId = contactId;
+    }
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public void setHost(String host)
+    {
+        this.host = host;
     }
 
     public String getUsername()
@@ -100,7 +114,7 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
 
     public String toString()
     {
-        return super.toString() + " [" + this.contactId + "] [" + this.username + "] [" + this.sessionId + "] [" + this.autoLogin + "] [" + this.success + "]";
+        return super.toString() + " [" + this.contactId + "] [" + this.host + "] [" + this.username + "] [" + this.sessionId + "] [" + this.autoLogin + "] [" + this.success + "]";
     }
 
     @Override
@@ -108,6 +122,7 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
     {
         super.pack(into);
         this.packUUID(this.contactId, into);
+        this.packString(this.host, into);
         this.packString(username, into);
         this.packString(sessionId, into);
         into.put((byte) (this.autoLogin ? 1 : 0));
@@ -119,6 +134,7 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
     {
         super.unpack(from);
         this.contactId = this.unpackUUID(from);
+        this.host = this.unpackString(from);
         this.username = this.unpackString(from);
         this.sessionId = this.unpackString(from);
         this.autoLogin = from.get() == 1;
@@ -132,6 +148,7 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
         int result = super.hashCode();
         result = prime * result + (autoLogin ? 1231 : 1237);
         result = prime * result + ((contactId == null) ? 0 : contactId.hashCode());
+        result = prime * result + ((host == null) ? 0 : host.hashCode());
         result = prime * result + ((sessionId == null) ? 0 : sessionId.hashCode());
         result = prime * result + (success ? 1231 : 1237);
         result = prime * result + ((username == null) ? 0 : username.hashCode());
@@ -151,6 +168,11 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
             if (other.contactId != null) return false;
         }
         else if (!contactId.equals(other.contactId)) return false;
+        if (host == null)
+        {
+            if (other.host != null) return false;
+        }
+        else if (!host.equals(other.host)) return false;
         if (sessionId == null)
         {
             if (other.sessionId != null) return false;

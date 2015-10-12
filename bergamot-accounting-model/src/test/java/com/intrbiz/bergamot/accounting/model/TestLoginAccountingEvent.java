@@ -28,11 +28,12 @@ public class TestLoginAccountingEvent
     @Test
     public void packUnpack()
     {
-        LoginAccountingEvent a = new LoginAccountingEvent(siteId, contactId, "admin", "balsad52097987906", true, true);
+        LoginAccountingEvent a = new LoginAccountingEvent(siteId, contactId, "bergamot.local", "admin", "balsad52097987906", true, true);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(notNullValue()));
         assertThat(a.getContactId(), is(notNullValue()));
+        assertThat(a.getHost(), is(notNullValue()));
         assertThat(a.getUsername(), is(notNullValue()));
         assertThat(a.getSessionId(), is(notNullValue()));
         assertThat(a.isAutoLogin(), is(equalTo(true)));
@@ -48,6 +49,7 @@ public class TestLoginAccountingEvent
         assertThat(b.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(b.getSiteId(), is(notNullValue()));
         assertThat(b.getContactId(), is(notNullValue()));
+        assertThat(b.getHost(), is(notNullValue()));
         assertThat(b.getUsername(), is(notNullValue()));
         assertThat(b.getSessionId(), is(notNullValue()));
         assertThat(b.isAutoLogin(), is(equalTo(true)));
@@ -57,6 +59,7 @@ public class TestLoginAccountingEvent
         assertThat(b.getTimestamp(), is(equalTo(a.getTimestamp())));
         assertThat(b.getSiteId(), is(equalTo(a.getSiteId())));
         assertThat(b.getContactId(), is(equalTo(b.getContactId())));
+        assertThat(b.getHost(), is(equalTo(b.getHost())));
         assertThat(b.getUsername(), is(equalTo(b.getUsername())));
         assertThat(b.getSessionId(), is(equalTo(b.getSessionId())));
         assertThat(b.isAutoLogin(), is(equalTo(a.isAutoLogin())));
@@ -66,11 +69,12 @@ public class TestLoginAccountingEvent
     @Test
     public void packUnpackWithNulls()
     {
-        LoginAccountingEvent a = new LoginAccountingEvent(null, null, null, null, false, false);
+        LoginAccountingEvent a = new LoginAccountingEvent(null, null, null, null, null, false, false);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(nullValue()));
         assertThat(a.getContactId(), is(nullValue()));
+        assertThat(a.getHost(), is(nullValue()));
         assertThat(a.getUsername(), is(nullValue()));
         assertThat(a.getSessionId(), is(nullValue()));
         assertThat(a.isAutoLogin(), is(equalTo(false)));
@@ -86,6 +90,7 @@ public class TestLoginAccountingEvent
         assertThat(b.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(b.getSiteId(), is(nullValue()));
         assertThat(b.getContactId(), is(nullValue()));
+        assertThat(b.getHost(), is(nullValue()));
         assertThat(b.getUsername(), is(nullValue()));
         assertThat(b.getSessionId(), is(nullValue()));
         assertThat(b.isAutoLogin(), is(equalTo(false)));
@@ -95,6 +100,7 @@ public class TestLoginAccountingEvent
         assertThat(b.getTimestamp(), is(equalTo(a.getTimestamp())));
         assertThat(b.getSiteId(), is(equalTo(a.getSiteId())));
         assertThat(b.getContactId(), is(equalTo(b.getContactId())));
+        assertThat(b.getHost(), is(equalTo(b.getHost())));
         assertThat(b.getUsername(), is(equalTo(b.getUsername())));
         assertThat(b.getSessionId(), is(equalTo(b.getSessionId())));
         assertThat(b.isAutoLogin(), is(equalTo(a.isAutoLogin())));
