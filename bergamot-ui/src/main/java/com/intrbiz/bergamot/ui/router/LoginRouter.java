@@ -6,12 +6,14 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.accounting.Accounting;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.engine.security.GenericAuthenticationToken;
 import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.balsa.error.BalsaValidationError;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.accounting.model.LoginAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
@@ -41,6 +43,8 @@ public class LoginRouter extends Router<BergamotApp>
 {   
     private Logger logger = Logger.getLogger(LoginRouter.class);
     
+    private Accounting accounting = Accounting.create(LoginRouter.class);
+    
     @Get("/login")
     public void login(@Param("redirect") String redirect) throws IOException
     {
@@ -53,6 +57,8 @@ public class LoginRouter extends Router<BergamotApp>
             if (contact != null && permission("ui.access"))
             {
                 logger.info("Successfully auto authenticated user: " + contact.getName() + " => " + contact.getSiteId() + "::" + contact.getId());
+                // accounting
+                this.accounting.account(new LoginAccountingEvent(contact.getSiteId(), contact.getId(), request().getServerName(), null, balsa().session().id(), true, true));
                 // setup the session
                 sessionVar("contact", currentPrincipal());
                 sessionVar("site", contact.getSite());
@@ -91,6 +97,9 @@ public class LoginRouter extends Router<BergamotApp>
         // store the current site and contact
         Contact contact = sessionVar("contact", currentPrincipal());
         sessionVar("site", contact.getSite());
+        // account this login
+        // accounting
+        this.accounting.account(new LoginAccountingEvent(contact.getSiteId(), contact.getId(), request().getServerName(), username, balsa().session().id(), false, true));
         // set a cookie of the username, to remember the user
         cookie().name("bergamot.username").value(username).path(path("/login")).expiresAfter(90, TimeUnit.DAYS).httpOnly().set();
         // force a password change
@@ -245,6 +254,8 @@ public class LoginRouter extends Router<BergamotApp>
         var("error", "invalid");
         var("redirect", redirect);
         var("username", cookie("bergamot.username"));
+        // account this invalid login
+        this.accounting.account(new LoginAccountingEvent(null, null, request().getServerName(), username, balsa().session().id(), false, false));
         // encode login page
         encode("login/login");
     }
