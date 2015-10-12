@@ -11,12 +11,15 @@ import org.junit.Test;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
+import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent.AlertType;
 
 public class TestBergamotAccountingTranscoder
 {
     private static UUID siteId = UUID.fromString("01cf7f8e-2da3-4b5b-8764-a8cb0e1e8e6b");
     private static UUID execId = UUID.fromString("7c5efc47-8cd4-475c-817c-fba6acf291c6");
     private static UUID checkId = UUID.fromString("3640d25d-547d-40ab-8eb6-fa97155e9dbb");
+    private static UUID alertId = UUID.fromString("e6fa47ea-f435-4607-b0d5-d128fe259742");
     
     private BergamotAccountingTranscoder codec;
     
@@ -44,6 +47,17 @@ public class TestBergamotAccountingTranscoder
         String encoded = this.codec.encodeToString(original);
         assertThat(encoded, is(notNullValue()));
         ProcessResultAccountingEvent decoded = this.codec.decodeFromString(encoded);
+        assertThat(decoded, is(notNullValue()));
+        assertThat(decoded, is(equalTo(original)));
+    }
+    
+    @Test
+    public void testEncodeSendAlertAccountingEventToString()
+    {
+        SendAlertAccountingEvent original = new SendAlertAccountingEvent(siteId, alertId, checkId, AlertType.ALERT, 1);
+        String encoded = this.codec.encodeToString(original);
+        assertThat(encoded, is(notNullValue()));
+        SendAlertAccountingEvent decoded = this.codec.decodeFromString(encoded);
         assertThat(decoded, is(notNullValue()));
         assertThat(decoded, is(equalTo(original)));
     }

@@ -100,7 +100,7 @@ public class ExecuteCheckAccountingEvent extends BergamotAccountingEvent
 
     public String toString()
     {
-        return super.toString() + " [" + this.executionId + "] [" + this.engine + "] [" + this.executor + "] [" + this.command + "]";
+        return super.toString() + " [" + this.executionId + "] [" + this.checkId + "] [" + this.engine + "] [" + this.executor + "] [" + this.command + "]";
     }
 
     @Override

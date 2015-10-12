@@ -74,7 +74,7 @@ public class ProcessResultAccountingEvent extends BergamotAccountingEvent
 
     public String toString()
     {
-        return super.toString() + " [" + this.executionId + "] [" + this.resultType + "]";
+        return super.toString() + " [" + this.executionId + "] [" + this.checkId + "] [" + this.resultType + "]";
     }
 
     @Override
