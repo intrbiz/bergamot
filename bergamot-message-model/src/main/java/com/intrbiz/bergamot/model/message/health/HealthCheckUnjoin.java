@@ -3,12 +3,13 @@ package com.intrbiz.bergamot.model.message.health;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.intrbiz.bergamot.model.message.MessageObject;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * Announce a daemons intention to stop heartbeating and leave the cluster
  */
-public class HealthCheckUnjoin extends MessageObject
+@JsonTypeName("bergamot.healthcheck.unjoin")
+public class HealthCheckUnjoin extends HealthCheckMessage
 {
     @JsonProperty("instance-id")
     private UUID instanceId;

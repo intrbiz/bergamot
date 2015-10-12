@@ -3,12 +3,13 @@ package com.intrbiz.bergamot.model.message.health;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.intrbiz.bergamot.model.message.MessageObject;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
  * Send a heartbeat
  */
-public class HealthCheckHeartbeat extends MessageObject
+@JsonTypeName("bergamot.healthcheck.heartbeat")
+public class HealthCheckHeartbeat extends HealthCheckMessage
 {
     @JsonProperty("instance-id")
     private UUID instanceId;
