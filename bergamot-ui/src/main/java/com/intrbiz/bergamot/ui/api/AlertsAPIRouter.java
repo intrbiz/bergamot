@@ -8,8 +8,11 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.accounting.Accounting;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent.AlertType;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
@@ -55,6 +58,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     private UpdateQueue updateQueue;
     
     private RoutedProducer<Update, UpdateKey> updateProducer;
+    
+    private Accounting accounting = Accounting.create(AlertsAPIRouter.class);
     
     public AlertsAPIRouter()
     {
@@ -140,6 +145,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 {
                     logger.warn("Sending acknowledge for " + alert.getId());
                     this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
+                    // accounting
+                    this.accounting.account(new SendAlertAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AlertType.ACKNOWLEDGEMENT, sendAck.getTo().size()));
                 }
                 else
                 {
