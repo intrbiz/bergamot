@@ -74,6 +74,9 @@ import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
+import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
+import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
+import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.model.message.importer.BergamotImportReportMO;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
@@ -219,7 +222,11 @@ public class BergamotTranscoder
         FlushedGlobalCaches.class,
         // util models
         BergamotImportReportMO.class,
-        AppliedConfigChange.class
+        AppliedConfigChange.class,
+        // heathchecks
+        HealthCheckJoin.class,
+        HealthCheckHeartbeat.class,
+        HealthCheckUnjoin.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();
