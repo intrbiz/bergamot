@@ -13,6 +13,8 @@ import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
+import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.SendAlertAccountingEvent.AlertType;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
@@ -280,6 +282,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 {
                     logger.warn("Sending recovery for " + check);
                     this.publishNotification(check, recovery);
+                    // accounting
+                    this.accounting.account(new SendAlertAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AlertType.RECOVERY, recovery.getTo().size()));
                 }
                 else
                 {
@@ -307,6 +311,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             {
                 logger.warn("Sending alert for " + check);
                 this.publishNotification(check, alert);
+                // accounting
+                this.accounting.account(new SendAlertAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AlertType.ALERT, alert.getTo().size()));
             }
             else
             {
