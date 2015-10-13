@@ -105,6 +105,8 @@
     <module>bergamot-worker-jdbc</module>
     <module>bergamot-check-jdbc</module>
     <module>bergamot-accounting-model</module>
+    <module>bergamot-healthcheck-agent</module>
+    <module>bergamot-healthcheck-tracker</module>
   </modules>
   
   <dependencyManagement>
