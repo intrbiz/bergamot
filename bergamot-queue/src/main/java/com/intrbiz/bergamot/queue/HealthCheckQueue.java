@@ -28,7 +28,11 @@ public abstract class HealthCheckQueue extends QueueAdapter
     
     // control events
     
-    public abstract Producer<HealthCheckMessage> publishHealthChecks();
+    public abstract Producer<HealthCheckMessage> publishHealthCheckEvents();
     
-    public abstract Consumer<HealthCheckMessage, NullKey> consumeHealthChecks(DeliveryHandler<HealthCheckMessage> handler);
+    public abstract Producer<HealthCheckMessage> publishHealthCheckControlEvents();
+    
+    public abstract Consumer<HealthCheckMessage, NullKey> consumeHealthCheckEvents(DeliveryHandler<HealthCheckMessage> handler);
+    
+    public abstract Consumer<HealthCheckMessage, NullKey> consumeHealthCheckControlEvents(DeliveryHandler<HealthCheckMessage> handler);
 }
