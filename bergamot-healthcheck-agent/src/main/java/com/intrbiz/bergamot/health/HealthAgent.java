@@ -8,9 +8,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckMessage;
+import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.queue.HealthCheckQueue;
+import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.Producer;
+import com.intrbiz.queue.name.NullKey;
 
 public final class HealthAgent
 {
@@ -36,6 +39,9 @@ public final class HealthAgent
     private HealthCheckQueue queue;
     
     private Producer<HealthCheckMessage> healthcheckProducer;
+    
+    @SuppressWarnings("unused")
+    private Consumer<HealthCheckMessage, NullKey> healthcheckConsumer;
     
     private Timer timer;
     
@@ -89,7 +95,8 @@ public final class HealthAgent
     private void setupQueues()
     {
         this.queue = HealthCheckQueue.open();
-        this.healthcheckProducer = this.queue.publishHealthChecks();
+        this.healthcheckProducer = this.queue.publishHealthCheckEvents();
+        this.healthcheckConsumer = this.queue.consumeHealthCheckControlEvents(this::handleHealthCheckMessage);
     }
     
     private void setupTimer()
@@ -132,5 +139,13 @@ public final class HealthAgent
     private void sendHeartbeat()
     {
         this.healthcheckProducer.publish(new HealthCheckHeartbeat(this.instanceId, System.currentTimeMillis(), this.nextHeartbeatSequence()));
+    }
+    
+    private void handleHealthCheckMessage(HealthCheckMessage message)
+    {
+        if (message instanceof HealthCheckRequestJoin)
+        {
+            this.joinHealthCheckCluster();
+        }
     }
 }
