@@ -76,6 +76,7 @@ import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
 import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
+import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.model.message.importer.BergamotImportReportMO;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
@@ -226,7 +227,8 @@ public class BergamotTranscoder
         // heathchecks
         HealthCheckJoin.class,
         HealthCheckHeartbeat.class,
-        HealthCheckUnjoin.class
+        HealthCheckUnjoin.class,
+        HealthCheckRequestJoin.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();
