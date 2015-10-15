@@ -52,18 +52,22 @@ public final class HealthAgent
     
     public void init(String daemonName)
     {
-        if (! this.inited)
+        synchronized (this)
         {
-            this.daemonName = daemonName;
-            this.startedAt = System.currentTimeMillis();
-            // setup our queues
-            this.setupQueues();
-            // setup shutdown hook
-            this.setupShutdownHook();
-            // send join
-            this.joinHealthCheckCluster();
-            // setup timer
-            this.setupTimer();
+            if (! this.inited)
+            {
+                this.inited = true;
+                this.daemonName = daemonName;
+                this.startedAt = System.currentTimeMillis();
+                // setup our queues
+                this.setupQueues();
+                // setup shutdown hook
+                this.setupShutdownHook();
+                // send join
+                this.joinHealthCheckCluster();
+                // setup timer
+                this.setupTimer();
+            }
         }
     }
     
