@@ -20,7 +20,7 @@ public final class HealthAgent
 {
     private static final HealthAgent US = new HealthAgent();
     
-    public HealthAgent getInstance()
+    public static HealthAgent getInstance()
     {
         return US;
     }
