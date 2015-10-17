@@ -9,7 +9,7 @@ public class JDBCWorker extends DefaultWorker
 {
     public JDBCWorker()
     {
-        super(JDBCWorkerCfg.class, "/etc/bergamot/worker/jdbc.xml");
+        super(JDBCWorkerCfg.class, "/etc/bergamot/worker/jdbc.xml", "bergamot-worker-jdbc");
     }
     
     public static void main(String[] args) throws Exception

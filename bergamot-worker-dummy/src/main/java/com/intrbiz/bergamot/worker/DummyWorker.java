@@ -9,7 +9,7 @@ public class DummyWorker extends DefaultWorker
 {
     public DummyWorker()
     {
-        super(DummyWorkerCfg.class, "/etc/bergamot/worker/dummy.xml");
+        super(DummyWorkerCfg.class, "/etc/bergamot/worker/dummy.xml", "bergamot-worker-dummy");
     }
     
     public static void main(String[] args) throws Exception

@@ -11,7 +11,7 @@ public class NagiosWorker extends DefaultWorker
 {
     public NagiosWorker()
     {
-        super(NagiosWorkerCfg.class, "/etc/bergamot/worker/nagios.xml");
+        super(NagiosWorkerCfg.class, "/etc/bergamot/worker/nagios.xml", "bergamot-worker-nagios");
     }
     
     public static void main(String[] args) throws Exception

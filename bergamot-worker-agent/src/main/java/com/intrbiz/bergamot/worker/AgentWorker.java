@@ -9,7 +9,7 @@ public class AgentWorker extends DefaultWorker
 {
     public AgentWorker()
     {
-        super(AgentWorkerCfg.class, "/etc/bergamot/worker/agent.xml");
+        super(AgentWorkerCfg.class, "/etc/bergamot/worker/agent.xml", "bergamot-worker-agent");
     }
     
     public static void main(String[] args) throws Exception

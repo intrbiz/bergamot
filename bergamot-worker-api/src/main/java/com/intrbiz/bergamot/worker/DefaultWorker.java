@@ -8,8 +8,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.intrbiz.bergamot.config.DefaultWorkerCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
+import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
@@ -21,16 +21,20 @@ public class DefaultWorker extends AbstractWorker
     
     protected final String defaultConfigFile;
     
-    public DefaultWorker(Class<? extends WorkerCfg> configurationClass, String defaultConfigFile)
+    protected final String daemonName;
+    
+    public DefaultWorker(Class<? extends WorkerCfg> configurationClass, String defaultConfigFile, String daemonName)
     {
         super();
         this.configurationClass = configurationClass;
         this.defaultConfigFile = defaultConfigFile;
+        this.daemonName = daemonName;
     }
     
-    public DefaultWorker()
+    @Override
+    public String getDaemonName()
     {
-        this(DefaultWorkerCfg.class, "/etc/bergamot/worker/default.xml");
+        return this.daemonName;
     }
     
     protected void configureLogging() throws Exception
@@ -82,12 +86,9 @@ public class DefaultWorker extends AbstractWorker
         this.configure(config);
         // go go go
         logger.info("Bergamot worker starting.");
+        // start the health agent
+        HealthAgent.getInstance().init(this.getDaemonName());
+        // start the actual worker
         super.start();
-    }
-    
-    public static void main(String[] args) throws Exception
-    {
-        Worker worker = new DefaultWorker();
-        worker.start();
     }
 }

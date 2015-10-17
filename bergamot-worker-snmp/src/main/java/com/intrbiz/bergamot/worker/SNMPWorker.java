@@ -9,7 +9,7 @@ public class SNMPWorker extends DefaultWorker
 {
     public SNMPWorker()
     {
-        super(SNMPWorkerCfg.class, "/etc/bergamot/worker/snmp.xml");
+        super(SNMPWorkerCfg.class, "/etc/bergamot/worker/snmp.xml", "bergamot-worker-snmp");
     }
     
     public static void main(String[] args) throws Exception

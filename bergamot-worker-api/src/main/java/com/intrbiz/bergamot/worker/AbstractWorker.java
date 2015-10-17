@@ -87,5 +87,7 @@ public abstract class AbstractWorker implements Worker
         {
             engine.start();
         }
-    }    
+    }
+    
+    public abstract String getDaemonName();
 }

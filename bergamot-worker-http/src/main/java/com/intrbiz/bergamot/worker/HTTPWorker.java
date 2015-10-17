@@ -9,7 +9,7 @@ public class HTTPWorker extends DefaultWorker
 {
     public HTTPWorker()
     {
-        super(HTTPWorkerCfg.class, "/etc/bergamot/worker/http.xml");
+        super(HTTPWorkerCfg.class, "/etc/bergamot/worker/http.xml", "bergamot-worker-http");
     }
     
     public static void main(String[] args) throws Exception
