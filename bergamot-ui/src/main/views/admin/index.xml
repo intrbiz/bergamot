@@ -10,7 +10,7 @@
 					<span class="dash_img status_#{if(daemon.isAlive(),'ok', 'critical')}" title="Daemon is #{if(daemon.isAlive(), 'alive', 'failed')}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
-					<span class="name">#{ucFirst(daemon.daemonName)}</span>
+					<span class="name">#{ucFirst(daemon.daemonName.replace('-', ' '))}</span>
 			    </h3>
 			    <p>
 				    <span class="label">Host: </span>
@@ -26,7 +26,7 @@
 			    </p>
 			    <p>
 				    <span class="label">Instance Id:</span>
-				    <span class="value">#{daemon.instanceId}</span>
+				    <span class="value" style="font-size: 13px;">#{daemon.instanceId}</span>
 			    </p>
 			</div>
 		</data-set>
