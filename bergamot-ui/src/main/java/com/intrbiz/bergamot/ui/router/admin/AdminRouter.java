@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.ui.router.admin;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
@@ -20,6 +21,7 @@ public class AdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db)
     {
+        var("daemons", HealthTracker.getInstance().getDaemons());
         encode("admin/index");
     }
 }

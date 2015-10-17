@@ -10,6 +10,8 @@ import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.cluster.ClusterManager;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.health.HealthAgent;
+import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.action.BergamotAgentActions;
 import com.intrbiz.bergamot.ui.action.CheckActions;
@@ -145,6 +147,10 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
          * serialising Apache Log4J Loggers
          * taskEngine(new HazelcastTaskEngine());
          */
+        // setup healthcheck tracker
+        HealthTracker.getInstance().init();
+        // setup healthcheck agent
+        HealthAgent.getInstance().init("bergamot-ui");
         // session engine
         sessionEngine(new HazelcastSessionEngine());
         // security engine

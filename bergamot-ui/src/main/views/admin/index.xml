@@ -2,5 +2,33 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Admin">
-    
+    <div class="row">
+		<h3>System Status</h3>
+		<data-set var="daemon" value="#{daemons}">				
+			<div class="col3 dash_icon check">
+				<h3>
+					<span class="dash_img status_#{if(daemon.isAlive(),'ok', 'critical')}" title="Daemon is #{if(daemon.isAlive(), 'alive', 'failed')}">
+						<img src="#{public('/images/icons/64/bergamot.png')}" />
+					</span>
+					<span class="name">#{ucFirst(daemon.daemonName)}</span>
+			    </h3>
+			    <p>
+				    <span class="label">Host: </span>
+				    <span class="value">#{daemon.hostName}</span>
+			    </p>				    
+			    <p>
+				    <span class="label">Started At: </span>
+				    <span class="value">#{dateformat('HH:mm:ss', daemon.startedAt)} on #{dateformat('EEEE dd/MM/yyyy', daemon.startedAt)}</span>
+			    </p>
+			    <p>
+				    <span class="label">Last Seen: </span>
+				    <span class="value">#{dateformat('HH:mm:ss', daemon.lastHeartbeatTime)} on #{dateformat('EEEE dd/MM/yyyy', daemon.lastHeartbeatTime)}</span>
+			    </p>
+			    <p>
+				    <span class="label">Instance Id:</span>
+				    <span class="value">#{daemon.instanceId}</span>
+			    </p>
+			</div>
+		</data-set>
+    </div>
 </fragment>
