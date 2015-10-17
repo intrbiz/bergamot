@@ -181,7 +181,7 @@ public final class HealthAgent
     public static final UUID computeInstanceId()
     {
         String instanceIdStr = System.getProperty("bergamot.instanceid", System.getenv("BERGAMOT_INSTANCEID"));
-        if (instanceIdStr != null && instanceIdStr.length() == 37)
+        if (instanceIdStr != null && instanceIdStr.length() > 0)
         {
             try
             {
