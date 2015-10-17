@@ -13,6 +13,8 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     
     private final long startedAt;
     
+    private final UUID hostId;
+    
     private final String hostName;
     
     private volatile long lastHeartbeatAt = System.nanoTime();
@@ -33,13 +35,14 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     
     private volatile boolean alive = true;
     
-    public KnownDaemon(UUID instanceId, UUID runtimeId, String daemonName, long startedAt, String hostName)
+    public KnownDaemon(UUID instanceId, UUID runtimeId, String daemonName, long startedAt, UUID hostId, String hostName)
     {
         Objects.requireNonNull(instanceId);
         this.instanceId = instanceId;
         this.runtimeId = runtimeId;
         this.daemonName = daemonName;
         this.startedAt = startedAt;
+        this.hostId = hostId;
         this.hostName = hostName;
     }
 
@@ -81,6 +84,11 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     public long getStartedAt()
     {
         return startedAt;
+    }
+    
+    public UUID getHostId()
+    {
+        return this.hostId;
     }
 
     public String getHostName()

@@ -192,7 +192,7 @@ public class HealthTracker
     
     private void processJoin(HealthCheckJoin join)
     {
-        this.knownDaemons.put(join.getInstanceId(), new KnownDaemon(join.getInstanceId(), join.getRuntimeId(), join.getDaemonName(), join.getStarted(), join.getHostName()));
+        this.knownDaemons.put(join.getInstanceId(), new KnownDaemon(join.getInstanceId(), join.getRuntimeId(), join.getDaemonName(), join.getStarted(), join.getHostId(), join.getHostName()));
         logger.info("Received join event from " + join.getInstanceId() + " daemon " + join.getDaemonName());
     }
     
