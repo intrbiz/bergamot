@@ -136,7 +136,14 @@ public final class HealthAgent
             @Override
             public void run()
             {
-                sendHeartbeat();
+                try
+                {
+                    sendHeartbeat();
+                }
+                catch (Exception e)
+                {
+                    // ignore
+                }
             }
         }, 
         5_000L, 5_000L);
