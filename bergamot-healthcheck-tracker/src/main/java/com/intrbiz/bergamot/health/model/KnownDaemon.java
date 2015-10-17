@@ -143,10 +143,8 @@ public class KnownDaemon implements Comparable<KnownDaemon>
 
     public boolean isLastHeartbeatTooOld()
     {
-        // how long ago was the last heartbeat
-        long timeSinceLastHeartbeat = Math.min(System.nanoTime() - this.lastHeartbeatAt, 0);
-        // was it too long (over 30 seconds) since the last heartbeat
-        return timeSinceLastHeartbeat > 30_000_000_000L;
+        // was the heartbeat over 30 seconds ago
+        return this.getLastHeartbeatAge() > 30_000L;
     }
 
     public boolean isAlive()
