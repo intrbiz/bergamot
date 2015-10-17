@@ -23,5 +23,9 @@
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-queue</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.gerald</groupId>
+    	<artifactId>polyakov-model</artifactId>
+    </dependency>
   </dependencies>
 </project>

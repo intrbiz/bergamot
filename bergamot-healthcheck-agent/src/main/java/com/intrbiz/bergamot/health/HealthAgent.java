@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.message.health.HealthCheckMessage;
 import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.queue.HealthCheckQueue;
+import com.intrbiz.gerald.polyakov.Node;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.Producer;
 import com.intrbiz.queue.name.NullKey;
@@ -24,7 +25,9 @@ public final class HealthAgent
         return US;
     }
     
-    private final UUID instanceId = UUID.randomUUID();
+    private UUID instanceId = null;
+    
+    private final UUID runtimeId = UUID.randomUUID();
     
     private String daemonName;
     
@@ -33,6 +36,8 @@ public final class HealthAgent
     private volatile boolean inited = false;
     
     private long startedAt;
+    
+    private UUID hostId;
     
     private String hostName;
     
@@ -50,14 +55,17 @@ public final class HealthAgent
         super();
     }
     
-    public void init(String daemonName)
+    public void init(UUID instanceId, String daemonName, UUID hostId, String hostName)
     {
         synchronized (this)
         {
             if (! this.inited)
             {
                 this.inited = true;
+                this.instanceId = instanceId;
                 this.daemonName = daemonName;
+                this.hostId = hostId;
+                this.hostName = hostName;
                 this.startedAt = System.currentTimeMillis();
                 // setup our queues
                 this.setupQueues();
@@ -71,6 +79,18 @@ public final class HealthAgent
         }
     }
     
+    public void init(String daemonName)
+    {
+        Node node = Node.service(daemonName);
+        this.init(computeInstanceId(), daemonName, node.getHostId(), node.getHostName());
+    }
+    
+    public void init()
+    {
+        Node node = Node.service();
+        this.init(computeInstanceId(), node.getServiceName(), node.getHostId(), node.getHostName());
+    }
+    
     public String getDaemonName()
     {
         return this.daemonName;
@@ -79,6 +99,11 @@ public final class HealthAgent
     public UUID getInstanceId()
     {
         return this.instanceId;
+    }
+    
+    public UUID getRuntimeId()
+    {
+        return this.runtimeId;
     }
     
     public String getHostName()
@@ -131,7 +156,7 @@ public final class HealthAgent
     private void joinHealthCheckCluster()
     {
         // send a join message
-        this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.daemonName, this.startedAt, this.hostName));
+        this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.runtimeId, this.daemonName, this.startedAt, this.hostId, this.hostName));
     }
     
     private void unjoinHealthCheckCluster()
@@ -151,5 +176,21 @@ public final class HealthAgent
         {
             this.joinHealthCheckCluster();
         }
+    }
+    
+    public static final UUID computeInstanceId()
+    {
+        String instanceIdStr = System.getProperty("bergamot.instanceid", System.getenv("BERGAMOT_INSTANCEID"));
+        if (instanceIdStr != null && instanceIdStr.length() == 37)
+        {
+            try
+            {
+                return UUID.fromString(instanceIdStr);
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+        }
+        return UUID.randomUUID();
     }
 }
