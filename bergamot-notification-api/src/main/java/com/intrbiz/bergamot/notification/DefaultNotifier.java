@@ -8,8 +8,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.intrbiz.bergamot.config.DefaultNotifierCfg;
 import com.intrbiz.bergamot.config.NotifierCfg;
+import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
@@ -30,15 +30,16 @@ public class DefaultNotifier extends AbstractNotifier
         this.notifierName = notifierName;
     }
 
-    public DefaultNotifier()
-    {
-        this(DefaultNotifierCfg.class, "/etc/bergamot/notifier/default.xml", "default");
-    }
-
     @Override
     protected String getNotifierName()
     {
         return this.notifierName;
+    }
+    
+    @Override
+    public String getDaemonName()
+    {
+        return "bergamot-notifier-" + this.notifierName.toLowerCase();
     }
 
     protected void configureLogging() throws Exception
@@ -90,12 +91,9 @@ public class DefaultNotifier extends AbstractNotifier
         this.configure(config);
         // go go go
         logger.info("Bergamot notifier starting.");
+        // start the health agent
+        HealthAgent.getInstance().init(this.getDaemonName());
+        // start the notifier
         super.start();
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        Notifier notifier = new DefaultNotifier();
-        notifier.start();
     }
 }

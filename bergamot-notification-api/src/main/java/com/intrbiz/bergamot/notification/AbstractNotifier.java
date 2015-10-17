@@ -124,4 +124,6 @@ public abstract class AbstractNotifier implements Notifier
             }
         }
     }
+    
+    public abstract String getDaemonName();
 }
