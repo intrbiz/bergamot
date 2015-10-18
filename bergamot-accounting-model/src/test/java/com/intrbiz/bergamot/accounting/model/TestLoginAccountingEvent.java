@@ -28,7 +28,7 @@ public class TestLoginAccountingEvent
     @Test
     public void packUnpack()
     {
-        LoginAccountingEvent a = new LoginAccountingEvent(siteId, contactId, "bergamot.local", "admin", "balsad52097987906", true, true);
+        LoginAccountingEvent a = new LoginAccountingEvent(siteId, contactId, "bergamot.local", "admin", "balsad52097987906", true, true, "127.0.0.1");
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(notNullValue()));
@@ -38,6 +38,7 @@ public class TestLoginAccountingEvent
         assertThat(a.getSessionId(), is(notNullValue()));
         assertThat(a.isAutoLogin(), is(equalTo(true)));
         assertThat(a.isSuccess(), is(equalTo(true)));
+        assertThat(a.getRemoteAddress(), is(notNullValue()));
         // pack
         ByteBuffer buf = ByteBuffer.allocate(8192);
         a.pack(buf);
@@ -54,6 +55,7 @@ public class TestLoginAccountingEvent
         assertThat(b.getSessionId(), is(notNullValue()));
         assertThat(b.isAutoLogin(), is(equalTo(true)));
         assertThat(b.isSuccess(), is(equalTo(true)));
+        assertThat(b.getRemoteAddress(), is(notNullValue()));
         // compare
         assertThat(b, is(equalTo(b)));
         assertThat(b.getTimestamp(), is(equalTo(a.getTimestamp())));
@@ -64,12 +66,13 @@ public class TestLoginAccountingEvent
         assertThat(b.getSessionId(), is(equalTo(b.getSessionId())));
         assertThat(b.isAutoLogin(), is(equalTo(a.isAutoLogin())));
         assertThat(b.isSuccess(), is(equalTo(a.isSuccess())));
+        assertThat(b.getRemoteAddress(), is(equalTo(a.getRemoteAddress())));
     }
     
     @Test
     public void packUnpackWithNulls()
     {
-        LoginAccountingEvent a = new LoginAccountingEvent(null, null, null, null, null, false, false);
+        LoginAccountingEvent a = new LoginAccountingEvent(null, null, null, null, null, false, false, null);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(nullValue()));
@@ -79,6 +82,7 @@ public class TestLoginAccountingEvent
         assertThat(a.getSessionId(), is(nullValue()));
         assertThat(a.isAutoLogin(), is(equalTo(false)));
         assertThat(a.isSuccess(), is(equalTo(false)));
+        assertThat(a.getRemoteAddress(), is(nullValue()));
         // pack
         ByteBuffer buf = ByteBuffer.allocate(8192);
         a.pack(buf);
@@ -95,6 +99,7 @@ public class TestLoginAccountingEvent
         assertThat(b.getSessionId(), is(nullValue()));
         assertThat(b.isAutoLogin(), is(equalTo(false)));
         assertThat(b.isSuccess(), is(equalTo(false)));
+        assertThat(b.getRemoteAddress(), is(nullValue()));
         // compare
         assertThat(b, is(equalTo(b)));
         assertThat(b.getTimestamp(), is(equalTo(a.getTimestamp())));
@@ -105,5 +110,6 @@ public class TestLoginAccountingEvent
         assertThat(b.getSessionId(), is(equalTo(b.getSessionId())));
         assertThat(b.isAutoLogin(), is(equalTo(a.isAutoLogin())));
         assertThat(b.isSuccess(), is(equalTo(a.isSuccess())));
+        assertThat(b.getRemoteAddress(), is(equalTo(a.getRemoteAddress())));
     }
 }

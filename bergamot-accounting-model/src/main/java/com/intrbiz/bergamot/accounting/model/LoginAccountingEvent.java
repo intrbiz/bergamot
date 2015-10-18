@@ -19,12 +19,14 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
     
     private boolean success;
     
+    private String remoteAddress;
+    
     public LoginAccountingEvent()
     {
         super();
     }
     
-    public LoginAccountingEvent(long timestamp, UUID siteId, UUID contactId, String host, String username, String sessionId, boolean autoLogin, boolean success)
+    public LoginAccountingEvent(long timestamp, UUID siteId, UUID contactId, String host, String username, String sessionId, boolean autoLogin, boolean success, String remoteAddress)
     {
         super(timestamp, siteId);
         this.contactId = contactId;
@@ -33,9 +35,10 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
         this.sessionId = sessionId;
         this.autoLogin = autoLogin;
         this.success = success;
+        this.remoteAddress = remoteAddress;
     }
     
-    public LoginAccountingEvent(UUID siteId, UUID contactId, String host, String username, String sessionId, boolean autoLogin, boolean success)
+    public LoginAccountingEvent(UUID siteId, UUID contactId, String host, String username, String sessionId, boolean autoLogin, boolean success, String remoteAddress)
     {
         super(siteId);
         this.contactId = contactId;
@@ -44,6 +47,7 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
         this.sessionId = sessionId;
         this.autoLogin = autoLogin;
         this.success = success;
+        this.remoteAddress = remoteAddress;
     }
 
     @Override
@@ -112,9 +116,19 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
         this.success = success;
     }
 
+    public String getRemoteAddress()
+    {
+        return remoteAddress;
+    }
+
+    public void setRemoteAddress(String remoteAddress)
+    {
+        this.remoteAddress = remoteAddress;
+    }
+
     public String toString()
     {
-        return super.toString() + " [" + this.contactId + "] [" + this.host + "] [" + this.username + "] [" + this.sessionId + "] [" + this.autoLogin + "] [" + this.success + "]";
+        return super.toString() + " [" + this.contactId + "] [" + this.host + "] [" + this.username + "] [" + this.sessionId + "] [" + this.autoLogin + "] [" + this.success + "] [" + this.remoteAddress + "]";
     }
 
     @Override
@@ -127,6 +141,7 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
         this.packString(sessionId, into);
         into.put((byte) (this.autoLogin ? 1 : 0));
         into.put((byte) (this.success ? 1 : 0));
+        this.packString(this.remoteAddress, into);
     }
 
     @Override
@@ -139,6 +154,7 @@ public class LoginAccountingEvent extends BergamotAccountingEvent
         this.sessionId = this.unpackString(from);
         this.autoLogin = from.get() == 1;
         this.success = from.get() == 1;
+        this.remoteAddress = this.unpackString(from);
     }
 
     @Override

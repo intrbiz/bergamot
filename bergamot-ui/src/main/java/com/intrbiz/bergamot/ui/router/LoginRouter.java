@@ -58,7 +58,7 @@ public class LoginRouter extends Router<BergamotApp>
             {
                 logger.info("Successfully auto authenticated user: " + contact.getName() + " => " + contact.getSiteId() + "::" + contact.getId());
                 // accounting
-                this.accounting.account(new LoginAccountingEvent(contact.getSiteId(), contact.getId(), request().getServerName(), null, balsa().session().id(), true, true));
+                this.accounting.account(new LoginAccountingEvent(contact.getSiteId(), contact.getId(), request().getServerName(), null, balsa().session().id(), true, true, request().getRemoteAddress()));
                 // setup the session
                 sessionVar("contact", currentPrincipal());
                 sessionVar("site", contact.getSite());
@@ -99,7 +99,7 @@ public class LoginRouter extends Router<BergamotApp>
         sessionVar("site", contact.getSite());
         // account this login
         // accounting
-        this.accounting.account(new LoginAccountingEvent(contact.getSiteId(), contact.getId(), request().getServerName(), username, balsa().session().id(), false, true));
+        this.accounting.account(new LoginAccountingEvent(contact.getSiteId(), contact.getId(), request().getServerName(), username, balsa().session().id(), false, true, request().getRemoteAddress()));
         // set a cookie of the username, to remember the user
         cookie().name("bergamot.username").value(username).path(path("/login")).expiresAfter(90, TimeUnit.DAYS).httpOnly().set();
         // force a password change
@@ -255,7 +255,7 @@ public class LoginRouter extends Router<BergamotApp>
         var("redirect", redirect);
         var("username", cookie("bergamot.username"));
         // account this invalid login
-        this.accounting.account(new LoginAccountingEvent(null, null, request().getServerName(), username, balsa().session().id(), false, false));
+        this.accounting.account(new LoginAccountingEvent(null, null, request().getServerName(), username, balsa().session().id(), false, false, request().getRemoteAddress()));
         // encode login page
         encode("login/login");
     }
