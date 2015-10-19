@@ -29,21 +29,6 @@
         <summary>Bergamot Agent: Memory</summary>
     </command>
     
-    <command category="System" engine="agent" executor="disk" extends="check_agent" name="check_agent_disk">
-        <parameter description="Disk Usage Warning Threshold" name="warning">80</parameter>
-        <parameter description="Disk Usage Critical Threshold" name="critical">90</parameter>
-        <parameter description="Mount point" name="mount">/</parameter>
-        <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
-        <summary>Bergamot Agent: Disk Space</summary>
-    </command>
-    
-    <command category="System" engine="agent" executor="disks" extends="check_agent" name="check_agent_disks">
-        <parameter description="Disk Usage Warning Threshold" name="warning">80</parameter>
-        <parameter description="Disk Usage Critical Threshold" name="critical">90</parameter>
-        <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
-        <summary>Bergamot Agent: All Disks</summary>
-    </command>
-    
     <command category="System" engine="agent" executor="os" extends="check_agent" name="check_agent_os">
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
         <summary>Bergamot Agent: OS Info</summary>
@@ -61,15 +46,6 @@
         <parameter description="Critical threshold (s)" name="critical">300</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
         <summary>Bergamot Agent: Uptime</summary>
-    </command>
-    
-    <command category="System" engine="agent" executor="disk-io" extends="check_agent" name="check_agent_disk_io">
-        <parameter description="Disk IO Warning Threshold (MB/s)" name="warning">200</parameter>
-        <parameter description="Disk IO Critical Threshold (MB/s)" name="critical">250</parameter>
-        <parameter description="Check peak IO" name="peak">no</parameter>
-        <parameter description="Device Name" name="device">/dev/sda1</parameter>
-        <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
-        <summary>Bergamot Agent: Disk IO</summary>
     </command>
     
 </bergamot>

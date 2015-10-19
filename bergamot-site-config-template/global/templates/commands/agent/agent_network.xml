@@ -18,7 +18,7 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </command>
     
-    <command category="System" engine="agent" executor="network-io" extends="check_agent" name="check_agent_network_io">
+    <command category="System Network" engine="agent" executor="network-io" extends="check_agent" name="check_agent_network_io">
         <parameter description="Warning (Mb/s)" name="warning">50</parameter>
         <parameter description="Critical (Mb/s)" name="critical">75</parameter>
         <parameter description="Check peak rate" name="peak">no</parameter>
