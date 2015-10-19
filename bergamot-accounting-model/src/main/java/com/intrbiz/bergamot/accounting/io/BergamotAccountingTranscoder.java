@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.LoginAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.SignAgentAccountingEvent;
 
 public class BergamotAccountingTranscoder
 {
@@ -34,6 +35,7 @@ public class BergamotAccountingTranscoder
         this.registerType(ProcessResultAccountingEvent.TYPE_ID, ProcessResultAccountingEvent::new);
         this.registerType(SendNotificationAccountingEvent.TYPE_ID, SendNotificationAccountingEvent::new);
         this.registerType(LoginAccountingEvent.TYPE_ID, LoginAccountingEvent::new);
+        this.registerType(SignAgentAccountingEvent.TYPE_ID, SignAgentAccountingEvent::new);
     }
     
     public void registerType(UUID id, Supplier<? extends BergamotAccountingEvent> factory)
