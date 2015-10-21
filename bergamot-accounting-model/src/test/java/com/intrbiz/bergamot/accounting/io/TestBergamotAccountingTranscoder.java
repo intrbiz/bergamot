@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent.NotificationType;
+import com.intrbiz.bergamot.accounting.model.SignAgentAccountingEvent;
 
 public class TestBergamotAccountingTranscoder
 {
@@ -20,6 +21,8 @@ public class TestBergamotAccountingTranscoder
     private static UUID execId = UUID.fromString("7c5efc47-8cd4-475c-817c-fba6acf291c6");
     private static UUID checkId = UUID.fromString("3640d25d-547d-40ab-8eb6-fa97155e9dbb");
     private static UUID alertId = UUID.fromString("e6fa47ea-f435-4607-b0d5-d128fe259742");
+    private static UUID agentId = UUID.fromString("7d3a4022-d76e-4a0a-b719-d18ea36d2aae");
+    private static UUID contactId = UUID.fromString("8b0d6ed1-e118-4179-9d87-2c07e0c18776");
     
     private BergamotAccountingTranscoder codec;
     
@@ -58,6 +61,17 @@ public class TestBergamotAccountingTranscoder
         String encoded = this.codec.encodeToString(original);
         assertThat(encoded, is(notNullValue()));
         SendNotificationAccountingEvent decoded = this.codec.decodeFromString(encoded);
+        assertThat(decoded, is(notNullValue()));
+        assertThat(decoded, is(equalTo(original)));
+    }
+    
+    @Test
+    public void testEncodeSignAgentAccountingEventToString()
+    {
+        SignAgentAccountingEvent original = new SignAgentAccountingEvent(siteId, agentId, "test.local", "AF453BE3533523", contactId);
+        String encoded = this.codec.encodeToString(original);
+        assertThat(encoded, is(notNullValue()));
+        SignAgentAccountingEvent decoded = this.codec.decodeFromString(encoded);
         assertThat(decoded, is(notNullValue()));
         assertThat(decoded, is(equalTo(original)));
     }
