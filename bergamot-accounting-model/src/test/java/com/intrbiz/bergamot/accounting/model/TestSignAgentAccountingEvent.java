@@ -13,7 +13,6 @@ public class TestSignAgentAccountingEvent
     private static UUID agentId = UUID.fromString("7d3a4022-d76e-4a0a-b719-d18ea36d2aae");
     private static UUID contactId = UUID.fromString("8b0d6ed1-e118-4179-9d87-2c07e0c18776");
     
-    
     @Test
     public void hasTypeId()
     {
