@@ -9,10 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
+import com.intrbiz.bergamot.accounting.model.NotificationType;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
-import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent.NotificationType;
+import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.SignAgentAccountingEvent;
 
 public class TestBergamotAccountingTranscoder
@@ -72,6 +73,17 @@ public class TestBergamotAccountingTranscoder
         String encoded = this.codec.encodeToString(original);
         assertThat(encoded, is(notNullValue()));
         SignAgentAccountingEvent decoded = this.codec.decodeFromString(encoded);
+        assertThat(decoded, is(notNullValue()));
+        assertThat(decoded, is(equalTo(original)));
+    }
+    
+    @Test
+    public void testEncodeSendNotificationToContactAccountingEventoString()
+    {
+        SendNotificationToContactAccountingEvent original = new SendNotificationToContactAccountingEvent(siteId, alertId, checkId, NotificationType.ALERT, contactId, "email", "email", "test@localhost", "1234");
+        String encoded = this.codec.encodeToString(original);
+        assertThat(encoded, is(notNullValue()));
+        SendNotificationToContactAccountingEvent decoded = this.codec.decodeFromString(encoded);
         assertThat(decoded, is(notNullValue()));
         assertThat(decoded, is(equalTo(original)));
     }

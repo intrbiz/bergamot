@@ -11,10 +11,10 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.NotificationType;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
-import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent.NotificationType;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;

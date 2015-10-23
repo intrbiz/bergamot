@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.NotificationType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
-import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent.NotificationType;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Contact.LockOutReason;

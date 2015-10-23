@@ -7,8 +7,6 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
 {
     public static final UUID TYPE_ID = UUID.fromString("fcafd43f-1b35-43a3-96db-8094f48c664a");
     
-    public static enum NotificationType { ALERT, RECOVERY, ACKNOWLEDGEMENT, RESET }
-    
     private UUID notificationId;
     
     private UUID objectId;
