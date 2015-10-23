@@ -12,6 +12,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.SignAgentAccountingEvent;
 import com.intrbiz.bergamot.crypto.util.CertificatePair;
 import com.intrbiz.bergamot.crypto.util.CertificateRequest;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
@@ -37,6 +39,8 @@ public class BergamotAgentActions
     
     private RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client;
     
+    private Accounting accounting = Accounting.create(BergamotAgentActions.class);
+    
     public BergamotAgentActions()
     {
         this.queue = BergamotAgentManagerQueue.open();
@@ -44,7 +48,7 @@ public class BergamotAgentActions
     }
     
     @Action("sign-agent")
-    public Certificate signAgent(UUID siteId, UUID agentId, CertificateRequest req)
+    public Certificate signAgent(UUID siteId, UUID agentId, CertificateRequest req, UUID contactId)
     {
         try
         {
@@ -53,7 +57,11 @@ public class BergamotAgentActions
             AgentManagerResponse response = this.client.publish(new SignAgent(siteId, agentId, req.getCommonName(), PEMUtil.savePublicKey(req.getKey()))).get(10, TimeUnit.SECONDS);
             if (response instanceof SignedAgent)
             {
-                return PEMUtil.loadCertificate(((SignedAgent) response).getCertificatePEM());
+                Certificate crt = PEMUtil.loadCertificate(((SignedAgent) response).getCertificatePEM());                
+                // account
+                this.accounting.account(new SignAgentAccountingEvent(siteId, agentId, req.getCommonName(), ((X509Certificate) crt).getSerialNumber().toString(), contactId));
+                // done
+                return crt;
             }
             throw new RuntimeException("Failed to sign agent");
         }
@@ -64,7 +72,7 @@ public class BergamotAgentActions
     }
     
     @Action("sign-agent-key")
-    public Certificate signAgentKey(UUID siteId, UUID agentId, String commonName, PublicKey key)
+    public Certificate signAgentKey(UUID siteId, UUID agentId, String commonName, PublicKey key, UUID contactId)
     {
         try
         {
@@ -73,7 +81,11 @@ public class BergamotAgentActions
             AgentManagerResponse response = this.client.publish(new SignAgent(siteId, agentId, commonName, PEMUtil.savePublicKey(key))).get(10, TimeUnit.SECONDS);
             if (response instanceof SignedAgent)
             {
-                return PEMUtil.loadCertificate(((SignedAgent) response).getCertificatePEM());
+                Certificate crt = PEMUtil.loadCertificate(((SignedAgent) response).getCertificatePEM());
+                // account
+                this.accounting.account(new SignAgentAccountingEvent(siteId, agentId, commonName, ((X509Certificate) crt).getSerialNumber().toString(), contactId));
+                // done
+                return crt;
             }
             throw new RuntimeException("Failed to sign agent key");
         }
@@ -84,7 +96,7 @@ public class BergamotAgentActions
     }
     
     @Action("generate-agent")
-    public CertificatePair generateAgent(UUID siteId, UUID agentId, String commonName)
+    public CertificatePair generateAgent(UUID siteId, UUID agentId, String commonName, UUID contactId)
     {
         try
         {
@@ -95,7 +107,11 @@ public class BergamotAgentActions
             AgentManagerResponse response = this.client.publish(new SignAgent(siteId, agentId, commonName, PEMUtil.savePublicKey(pair.getPublic()))).get(10, TimeUnit.SECONDS);
             if (response instanceof SignedAgent)
             {
-                return new CertificatePair((X509Certificate) PEMUtil.loadCertificate(((SignedAgent) response).getCertificatePEM()), pair.getPrivate());
+                CertificatePair crtPair = new CertificatePair((X509Certificate) PEMUtil.loadCertificate(((SignedAgent) response).getCertificatePEM()), pair.getPrivate());
+                // account
+                this.accounting.account(new SignAgentAccountingEvent(siteId, agentId, commonName, ((X509Certificate) crtPair.getCertificate()).getSerialNumber().toString(), contactId));
+                // done
+                return crtPair;
             }
             throw new RuntimeException("Failed to sign agent");
         }

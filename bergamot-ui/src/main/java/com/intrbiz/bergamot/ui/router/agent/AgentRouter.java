@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.AgentRegistration;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -70,7 +71,7 @@ public class AgentRouter extends Router<BergamotApp>
         // generate
         Certificate     rootCert = action("get-root-ca");
         Certificate     siteCert = action("get-site-ca", site.getId());
-        CertificatePair pair     = action("generate-agent", site.getId(), agentId, commonName);
+        CertificatePair pair     = action("generate-agent", site.getId(), agentId, commonName, ((Contact) currentPrincipal()).getId());
         // build the config
         BergamotAgentCfg cfg = new BergamotAgentCfg();
         cfg.setCaCertificate(padCert(PEMUtil.saveCertificate(rootCert)));
@@ -100,7 +101,7 @@ public class AgentRouter extends Router<BergamotApp>
         // sign
         Certificate rootCrt  = action("get-root-ca");
         Certificate siteCrt  = action("get-site-ca", site.getId());
-        Certificate agentCrt = action("sign-agent", site.getId(), agentId, req);
+        Certificate agentCrt = action("sign-agent", site.getId(), agentId, req, ((Contact) currentPrincipal()).getId());
         // store the registration
         db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, req.getCommonName(), SerialNum.fromBigInt(((X509Certificate) agentCrt).getSerialNumber()).toString()));
         // display

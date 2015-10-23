@@ -16,6 +16,7 @@ import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.AgentRegistration;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -60,7 +61,7 @@ public class AgentAPIRouter extends Router<BergamotApp>
         // get the Site CA Certificate
         Certificate siteCrt  = action("get-site-ca", site.getId());
         // ok, actually sign the agent certificate
-        Certificate agentCrt = action("sign-agent", site.getId(), agentId, req);
+        Certificate agentCrt = action("sign-agent", site.getId(), agentId, req, ((Contact) currentPrincipal()).getId());
         // store the registration
         db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, req.getCommonName(), SerialNum.fromBigInt(((X509Certificate) agentCrt).getSerialNumber()).toString()));
         // return the certificate chain
@@ -97,7 +98,7 @@ public class AgentAPIRouter extends Router<BergamotApp>
         // get the Site CA Certificate
         Certificate siteCrt  = action("get-site-ca", site.getId());
         // ok, actually sign the agent certificate
-        Certificate agentCrt = action("sign-agent-key", site.getId(), agentId, commonName, key);
+        Certificate agentCrt = action("sign-agent-key", site.getId(), agentId, commonName, key, ((Contact) currentPrincipal()).getId());
         // store the registration
         db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, commonName, SerialNum.fromBigInt(((X509Certificate) agentCrt).getSerialNumber()).toString()));
         // return the certificate chain
