@@ -8,6 +8,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import com.intrbiz.accounting.AccountingManager;
+import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.configuration.Configuration;
@@ -82,6 +84,10 @@ public class DefaultNotifier extends AbstractNotifier
         // setup logging
         this.configureLogging();
         Logger logger = Logger.getLogger(Notifier.class);
+        // configure accounting
+        // setup accounting
+        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
+        AccountingManager.getInstance().bindRootConsumer("logger");
         // load the config
         NotifierCfg config = this.loadConfiguration();
         logger.debug("Bergamot notifier, using configuration:\r\n" + config.toString());

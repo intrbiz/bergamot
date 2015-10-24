@@ -43,5 +43,9 @@
     	<groupId>com.intrbiz.bergamot</groupId>
     	<artifactId>bergamot-healthcheck-agent</artifactId>
     </dependency>
+    <dependency>
+		<groupId>com.intrbiz.bergamot</groupId>
+		<artifactId>bergamot-accounting-model</artifactId>
+	</dependency>
   </dependencies>
 </project>
