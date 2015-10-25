@@ -438,8 +438,8 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     {
         super.configure(configuration, resolvedConfiguration);
         // configure basic check state
-        this.enabled    = resolvedConfiguration.getEnabledBooleanValue();
-        this.suppressed = resolvedConfiguration.getSuppressedBooleanValue();
+        this.enabled    = resolvedConfiguration.getEnabledBooleanValue(this.enabled);
+        this.suppressed = resolvedConfiguration.getSuppressedBooleanValue(this.suppressed);
         this.externalRef = resolvedConfiguration.getExternalRef();
     }
 }
