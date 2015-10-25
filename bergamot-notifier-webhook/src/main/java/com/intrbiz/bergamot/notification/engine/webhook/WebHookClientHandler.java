@@ -1,17 +1,17 @@
 package com.intrbiz.bergamot.notification.engine.webhook;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.ssl.SslHandshakeCompletionEvent;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.net.ssl.SSLEngine;
 
 import org.apache.log4j.Logger;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.ssl.SslHandshakeCompletionEvent;
 
 public class WebHookClientHandler extends ChannelInboundHandlerAdapter
 {

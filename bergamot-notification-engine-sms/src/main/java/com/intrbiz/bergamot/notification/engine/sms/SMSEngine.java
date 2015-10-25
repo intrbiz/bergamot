@@ -103,8 +103,8 @@ public class SMSEngine extends AbstractNotificationEngine
                             this.accounting.account(new SendNotificationToContactAccountingEvent(
                                 notification.getSite().getId(),
                                 notification.getId(),
-                                this.getObjectId(notification),
-                                this.getNotificationType(notification),
+                                getObjectId(notification),
+                                getNotificationType(notification),
                                 contact.getId(),
                                 this.getName(),
                                 "sms",

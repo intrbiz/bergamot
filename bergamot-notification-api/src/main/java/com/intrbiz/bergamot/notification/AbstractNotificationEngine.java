@@ -218,7 +218,7 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
     
     // accounting helpers
     
-    protected NotificationType getNotificationType(Notification notification)
+    public static NotificationType getNotificationType(Notification notification)
     {
         if (notification instanceof SendAlert) return NotificationType.ALERT;
         else if (notification instanceof SendRecovery) return NotificationType.RECOVERY;
@@ -228,7 +228,7 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
         return null;
     }
     
-    protected UUID getObjectId(Notification notification)
+    public static UUID getObjectId(Notification notification)
     {
         if (notification instanceof CheckNotification) return ((CheckNotification) notification).getCheck().getId();
         else if (notification instanceof PasswordResetNotification) return ((PasswordResetNotification) notification).getContact().getId();

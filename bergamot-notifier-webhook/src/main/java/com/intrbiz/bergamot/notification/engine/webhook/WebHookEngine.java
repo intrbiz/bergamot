@@ -33,6 +33,8 @@ import javax.net.ssl.TrustManager;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
 import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.CheckMO;
@@ -55,6 +57,8 @@ public class WebHookEngine extends AbstractNotificationEngine
     private final Timer timer;
     
     private final BergamotTranscoder transcoder = new BergamotTranscoder();
+    
+    private Accounting accounting = Accounting.create(WebHookEngine.class);
 
     public WebHookEngine()
     {
@@ -155,6 +159,18 @@ public class WebHookEngine extends AbstractNotificationEngine
                         });
                         // connect the client
                         b.connect(url.getHost(), url.getPort() == -1 ? url.getDefaultPort() : url.getPort());
+                        // accounting
+                        this.accounting.account(new SendNotificationToContactAccountingEvent(
+                            notification.getSite().getId(),
+                            notification.getId(),
+                            getObjectId(notification),
+                            getNotificationType(notification),
+                            null,
+                            this.getName(),
+                            "webhook",
+                            url.toString(),
+                            null
+                        ));
                     }
                     catch (MalformedURLException e)
                     {
