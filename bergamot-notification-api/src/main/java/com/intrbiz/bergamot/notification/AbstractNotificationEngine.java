@@ -2,10 +2,12 @@ package com.intrbiz.bergamot.notification;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.accounting.model.NotificationType;
 import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.HostMO;
@@ -16,6 +18,9 @@ import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
+import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
+import com.intrbiz.bergamot.model.message.notification.SendAlert;
+import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.ExpressEntityResolver;
@@ -209,5 +214,25 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
             }
         });
         return ctx;
+    }
+    
+    // accounting helpers
+    
+    protected NotificationType getNotificationType(Notification notification)
+    {
+        if (notification instanceof SendAlert) return NotificationType.ALERT;
+        else if (notification instanceof SendRecovery) return NotificationType.RECOVERY;
+        else if (notification instanceof SendAcknowledge) return NotificationType.ACKNOWLEDGEMENT;
+        else if (notification instanceof PasswordResetNotification) return NotificationType.RESET;
+        else if (notification instanceof RegisterContactNotification) return NotificationType.REGISTER;
+        return null;
+    }
+    
+    protected UUID getObjectId(Notification notification)
+    {
+        if (notification instanceof CheckNotification) return ((CheckNotification) notification).getCheck().getId();
+        else if (notification instanceof PasswordResetNotification) return ((PasswordResetNotification) notification).getContact().getId();
+        else if (notification instanceof RegisterContactNotification) return ((RegisterContactNotification) notification).getContact().getId();
+        return null;
     }
 }

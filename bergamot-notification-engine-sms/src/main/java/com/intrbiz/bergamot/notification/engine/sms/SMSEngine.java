@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
+import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
@@ -43,6 +45,8 @@ public class SMSEngine extends AbstractNotificationEngine
     private final Timer smsSendTimer;
     
     private final Counter smsSendErrors;
+    
+    private Accounting accounting = Accounting.create(SMSEngine.class);
 
     public SMSEngine()
     {
@@ -94,7 +98,19 @@ public class SMSEngine extends AbstractNotificationEngine
                             params.add(new BasicNameValuePair("From", this.from));
                             params.add(new BasicNameValuePair("Body", message));
                             Message sms = this.messageFactory.create(params);
-                            logger.info("Sent SMS, Id: " + sms.getSid());                            
+                            logger.info("Sent SMS, Id: " + sms.getSid());
+                            // accounting
+                            this.accounting.account(new SendNotificationToContactAccountingEvent(
+                                notification.getSite().getId(),
+                                notification.getId(),
+                                this.getObjectId(notification),
+                                this.getNotificationType(notification),
+                                contact.getId(),
+                                this.getName(),
+                                "sms",
+                                contact.getPager(),
+                                sms.getSid()
+                            ));
                         }
                         catch (Exception e)
                         {
