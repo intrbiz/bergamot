@@ -31,5 +31,9 @@
     	<groupId>org.hamcrest</groupId>
     	<artifactId>hamcrest-all</artifactId>
     </dependency>
+    <dependency>
+		<groupId>com.intrbiz.bergamot</groupId>
+		<artifactId>bergamot-accounting-model</artifactId>
+	</dependency>
   </dependencies>
 </project>
