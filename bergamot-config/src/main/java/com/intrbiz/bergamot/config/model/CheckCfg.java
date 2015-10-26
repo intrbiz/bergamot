@@ -108,7 +108,6 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
         return this.getSuppressedBooleanValue(false);
     }
     
-    @XmlTransient
     public boolean getSuppressedBooleanValue(boolean defaultValue)
     {
         return this.suppressed == null ? defaultValue : this.suppressed.booleanValue();
@@ -133,7 +132,6 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
         return this.getEnabledBooleanValue(true);
     }
     
-    @XmlTransient
     public boolean getEnabledBooleanValue(boolean defaultValue)
     {
         return this.enabled == null ? defaultValue : this.enabled.booleanValue();
