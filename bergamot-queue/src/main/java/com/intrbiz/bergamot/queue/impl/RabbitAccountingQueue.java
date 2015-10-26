@@ -71,9 +71,7 @@ public class RabbitAccountingQueue extends AccountingQueue
         {
             protected String setupExchange(Channel on) throws IOException
             {
-                on.queueDeclare("bergamot.accounting", true, false, false, null);
                 on.exchangeDeclare("bergamot.accounting", "topic", true);
-                on.queueBind("bergamot.accounting", "bergamot.accounting", "#");
                 return "bergamot.accounting";
             }
         };
