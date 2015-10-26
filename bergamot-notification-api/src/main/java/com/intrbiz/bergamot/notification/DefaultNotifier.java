@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.intrbiz.accounting.AccountingManager;
+import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.health.HealthAgent;
@@ -85,14 +86,16 @@ public class DefaultNotifier extends AbstractNotifier
         this.configureLogging();
         Logger logger = Logger.getLogger(Notifier.class);
         // configure accounting
-        // setup accounting
-        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
-        AccountingManager.getInstance().bindRootConsumer("logger");
         // load the config
         NotifierCfg config = this.loadConfiguration();
         logger.debug("Bergamot notifier, using configuration:\r\n" + config.toString());
         // setup the queue broker
         QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        // setup accounting
+        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
+        AccountingManager.getInstance().registerConsumer("queue", new BergamotAccountingQueueConsumer());
+        AccountingManager.getInstance().bindRootConsumer("logger");
+        AccountingManager.getInstance().bindRootConsumer("queue");
         // configure the worker
         this.configure(config);
         // go go go

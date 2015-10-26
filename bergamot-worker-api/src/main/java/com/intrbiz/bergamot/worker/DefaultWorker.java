@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.intrbiz.accounting.AccountingManager;
+import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.health.HealthAgent;
@@ -80,14 +81,16 @@ public class DefaultWorker extends AbstractWorker
         this.configureLogging();
         Logger logger = Logger.getLogger(Worker.class);
         // configure accounting
-        // setup accounting
-        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
-        AccountingManager.getInstance().bindRootConsumer("logger");
         // load the config
         WorkerCfg config = this.loadConfiguration();
         logger.debug("Bergamot worker, using configuration:\r\n" + config.toString());
         // setup the queue broker
         QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        // setup accounting
+        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
+        AccountingManager.getInstance().registerConsumer("queue", new BergamotAccountingQueueConsumer());
+        AccountingManager.getInstance().bindRootConsumer("logger");
+        AccountingManager.getInstance().bindRootConsumer("queue");
         // configure the worker
         this.configure(config);
         // go go go
