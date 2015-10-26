@@ -84,6 +84,10 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-healthcheck-tracker</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-accounting-consumer</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>

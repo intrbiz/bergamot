@@ -107,6 +107,7 @@
     <module>bergamot-accounting-model</module>
     <module>bergamot-healthcheck-agent</module>
     <module>bergamot-healthcheck-tracker</module>
+    <module>bergamot-accounting-consumer</module>
   </modules>
   
   <dependencyManagement>
@@ -436,6 +437,11 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-healthcheck-tracker</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-accounting-consumer</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   	</dependencies>

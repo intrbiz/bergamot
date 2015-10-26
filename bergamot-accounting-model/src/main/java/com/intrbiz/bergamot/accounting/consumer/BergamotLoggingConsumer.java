@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.accounting.consumer;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.accounting.consumer.AsyncConsumer;
@@ -13,9 +14,17 @@ public class BergamotLoggingConsumer extends AsyncConsumer
     
     private BergamotAccountingTranscoder transcoder = BergamotAccountingTranscoder.getDefault();
     
+    private Level level = Level.DEBUG;
+    
     public BergamotLoggingConsumer()
     {
         super();
+    }
+    
+    public BergamotLoggingConsumer(Level level)
+    {
+        super();
+        this.level = level;
     }
 
     @Override
@@ -25,7 +34,7 @@ public class BergamotLoggingConsumer extends AsyncConsumer
         {
             if (event instanceof BergamotAccountingEvent)
             {
-                logger.debug("Accounting from " + source + " " + this.transcoder.encodeToString((BergamotAccountingEvent) event));
+                logger.log(this.level, "Accounting from " + source + " " + this.transcoder.encodeToString((BergamotAccountingEvent) event));
             }
         }
     }
