@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
+import javax.management.MBeanOperationInfo;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
@@ -18,7 +19,9 @@ public class MBeanWrapper
     
     private final MBeanInfo info;
     
-    private final Map<String, MBeanAttributeWrapper> attributes = new HashMap<String, MBeanAttributeWrapper>();
+    private Map<String, MBeanAttributeWrapper> attributes;
+    
+    private Map<String, MBeanOperationWrapper> operations;
 
     public MBeanWrapper(JMXConnection connection, ObjectName name, MBeanInfo info)
     {
@@ -26,10 +29,32 @@ public class MBeanWrapper
         this.connection = connection;
         this.name = name;
         this.info = info;
-        for (MBeanAttributeInfo attrInfo : info.getAttributes())
+    }
+    
+    private Map<String, MBeanAttributeWrapper> buildAttributes()
+    {
+        if (this.attributes == null)
         {
-            this.attributes.put(attrInfo.getName(), new MBeanAttributeWrapper(this, attrInfo));
+            this.attributes = new HashMap<String, MBeanAttributeWrapper>();
+            for (MBeanAttributeInfo attr : this.info.getAttributes())
+            {
+                this.attributes.put(attr.getName(), new MBeanAttributeWrapper(this, attr));
+            }
         }
+        return this.attributes;
+    }
+    
+    private Map<String, MBeanOperationWrapper> buildOperations()
+    {
+        if (this.operations == null)
+        {
+            this.operations = new HashMap<String, MBeanOperationWrapper>();
+            for (MBeanOperationInfo attr : this.info.getOperations())
+            {
+                this.operations.put(attr.getName(), new MBeanOperationWrapper(this, attr));
+            }
+        }
+        return this.operations;
     }
     
     public String getDomain()
@@ -49,25 +74,68 @@ public class MBeanWrapper
     
     public List<MBeanAttributeWrapper> getAttributes()
     {
-        return new ArrayList<MBeanAttributeWrapper>(this.attributes.values());
+        return new ArrayList<MBeanAttributeWrapper>(this.buildAttributes().values());
     }
     
     public MBeanAttributeWrapper getAttribute(String name)
     {
-        return this.attributes.get(name);
+        return this.buildAttributes().get(name);
     }
     
-    public Object getAttributeValue(String attribute)
+    public List<MBeanOperationWrapper> getOperations()
+    {
+        return new ArrayList<MBeanOperationWrapper>(this.buildOperations().values());
+    }
+    
+    public MBeanOperationWrapper getOperation(String name)
+    {
+        return this.buildOperations().get(name);
+    }
+    
+    public MBeanOperationWrapper getOperation(String name, String[] signature)
+    {
+        return this.buildOperations().get(MBeanOperationWrapper.operationId(name, signature));
+    }
+    
+    public MBeanOperationWrapper getOperation(String name, List<String> signature)
+    {
+        return this.getOperation(name, signature.toArray(new String[signature.size()]));
+    }
+    
+    // get stuff
+    
+    @SuppressWarnings("unchecked")
+    public <T> T getAttributeValue(String attribute)
     {
         try
         {
-            return this.convertValue(this.connection.getMBeanServer().getAttribute(this.name, attribute));
+            return (T) this.convertValue(this.connection.getMBeanServer().getAttribute(this.name, attribute));
         }
         catch (Exception e)
         {
             throw new JMXException(e);
         }
     }
+    
+    @SuppressWarnings("unchecked")
+    public <T> T invokeOperation(String operation, String[] signature, Object[] parameters)
+    {
+        try
+        {
+            return (T) this.convertValue(this.connection.getMBeanServer().invoke(this.name, operation, parameters, signature));
+        }
+        catch (Exception e)
+        {
+            throw new JMXException(e);
+        }
+    }
+    
+    public <T> T invokeOperation(String operation, List<String> signature, List<Object> parameters)
+    {
+        return this.invokeOperation(operation, signature.toArray(new String[signature.size()]), parameters.toArray());
+    }
+    
+    // handle data
     
     private Object convertValue(Object value)
     {

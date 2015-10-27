@@ -6,31 +6,31 @@ public class MBeanAttributeWrapper
 {
     private MBeanWrapper mBean;
     
-    private MBeanAttributeInfo attr;
+    private MBeanAttributeInfo info;
     
-    public MBeanAttributeWrapper(MBeanWrapper mBean, MBeanAttributeInfo attr)
+    public MBeanAttributeWrapper(MBeanWrapper mBean, MBeanAttributeInfo info)
     {
         this.mBean = mBean;
-        this.attr = attr;
+        this.info = info;
     }
     
     public String getName()
     {
-        return this.attr.getName();
+        return this.info.getName();
     }
     
     public String getType()
     {
-        return this.attr.getType();
+        return this.info.getType();
     }
     
     public String getDescription()
     {
-        return this.attr.getDescription();
+        return this.info.getDescription();
     }
     
-    public Object getValue()
+    public <T> T getValue()
     {
-        return this.mBean.getAttributeValue(this.attr.getName());
+        return this.mBean.getAttributeValue(this.info.getName());
     }
 }
