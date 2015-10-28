@@ -6,17 +6,17 @@ import java.util.List;
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 
-public class MBeanOperationWrapper
+public class JMXMBeanOperation
 {
-    private final MBeanWrapper mBean;
+    private final JMXMBean mBean;
     
     private final MBeanOperationInfo info;
     
-    private List<MBeanParameterWrapper> parameters;
+    private List<JMXMBeanOperationParameter> parameters;
     
     private String[] signature;
     
-    public MBeanOperationWrapper(MBeanWrapper mBean, MBeanOperationInfo info)
+    public JMXMBeanOperation(JMXMBean mBean, MBeanOperationInfo info)
     {
         this.mBean = mBean;
         this.info = info;
@@ -37,14 +37,14 @@ public class MBeanOperationWrapper
         return this.info.getDescription();
     }
     
-    public List<MBeanParameterWrapper> getParameter()
+    public List<JMXMBeanOperationParameter> getParameter()
     {
         if (this.parameters == null)
         {
-            this.parameters = new LinkedList<MBeanParameterWrapper>();
+            this.parameters = new LinkedList<JMXMBeanOperationParameter>();
             for (MBeanParameterInfo info : this.info.getSignature())
             {
-                this.parameters.add(new MBeanParameterWrapper(info));
+                this.parameters.add(new JMXMBeanOperationParameter(info));
             }
         }
         return this.parameters;

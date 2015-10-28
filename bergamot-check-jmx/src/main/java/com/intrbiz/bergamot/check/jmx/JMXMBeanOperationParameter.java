@@ -2,11 +2,11 @@ package com.intrbiz.bergamot.check.jmx;
 
 import javax.management.MBeanParameterInfo;
 
-public class MBeanParameterWrapper
+public class JMXMBeanOperationParameter
 {    
     private final MBeanParameterInfo param;
     
-    public MBeanParameterWrapper(MBeanParameterInfo param)
+    public JMXMBeanOperationParameter(MBeanParameterInfo param)
     {
         this.param = param;
     }

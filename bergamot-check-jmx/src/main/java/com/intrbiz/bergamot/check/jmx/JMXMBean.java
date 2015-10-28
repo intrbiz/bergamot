@@ -11,7 +11,7 @@ import javax.management.MBeanOperationInfo;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
-public class MBeanWrapper
+public class JMXMBean
 {
     private final JMXConnection connection;
     
@@ -19,11 +19,11 @@ public class MBeanWrapper
     
     private final MBeanInfo info;
     
-    private Map<String, MBeanAttributeWrapper> attributes;
+    private Map<String, JMXMBeanAttribute> attributes;
     
-    private Map<String, MBeanOperationWrapper> operations;
+    private Map<String, JMXMBeanOperation> operations;
 
-    public MBeanWrapper(JMXConnection connection, ObjectName name, MBeanInfo info)
+    public JMXMBean(JMXConnection connection, ObjectName name, MBeanInfo info)
     {
         super();
         this.connection = connection;
@@ -31,27 +31,27 @@ public class MBeanWrapper
         this.info = info;
     }
     
-    private Map<String, MBeanAttributeWrapper> buildAttributes()
+    private Map<String, JMXMBeanAttribute> buildAttributes()
     {
         if (this.attributes == null)
         {
-            this.attributes = new HashMap<String, MBeanAttributeWrapper>();
+            this.attributes = new HashMap<String, JMXMBeanAttribute>();
             for (MBeanAttributeInfo attr : this.info.getAttributes())
             {
-                this.attributes.put(attr.getName(), new MBeanAttributeWrapper(this, attr));
+                this.attributes.put(attr.getName(), new JMXMBeanAttribute(this, attr));
             }
         }
         return this.attributes;
     }
     
-    private Map<String, MBeanOperationWrapper> buildOperations()
+    private Map<String, JMXMBeanOperation> buildOperations()
     {
         if (this.operations == null)
         {
-            this.operations = new HashMap<String, MBeanOperationWrapper>();
+            this.operations = new HashMap<String, JMXMBeanOperation>();
             for (MBeanOperationInfo attr : this.info.getOperations())
             {
-                this.operations.put(attr.getName(), new MBeanOperationWrapper(this, attr));
+                this.operations.put(attr.getName(), new JMXMBeanOperation(this, attr));
             }
         }
         return this.operations;
@@ -72,32 +72,32 @@ public class MBeanWrapper
         return this.info.getDescription();
     }
     
-    public List<MBeanAttributeWrapper> getAttributes()
+    public List<JMXMBeanAttribute> getAttributes()
     {
-        return new ArrayList<MBeanAttributeWrapper>(this.buildAttributes().values());
+        return new ArrayList<JMXMBeanAttribute>(this.buildAttributes().values());
     }
     
-    public MBeanAttributeWrapper getAttribute(String name)
+    public JMXMBeanAttribute getAttribute(String name)
     {
         return this.buildAttributes().get(name);
     }
     
-    public List<MBeanOperationWrapper> getOperations()
+    public List<JMXMBeanOperation> getOperations()
     {
-        return new ArrayList<MBeanOperationWrapper>(this.buildOperations().values());
+        return new ArrayList<JMXMBeanOperation>(this.buildOperations().values());
     }
     
-    public MBeanOperationWrapper getOperation(String name)
+    public JMXMBeanOperation getOperation(String name)
     {
         return this.buildOperations().get(name);
     }
     
-    public MBeanOperationWrapper getOperation(String name, String[] signature)
+    public JMXMBeanOperation getOperation(String name, String[] signature)
     {
-        return this.buildOperations().get(MBeanOperationWrapper.operationId(name, signature));
+        return this.buildOperations().get(JMXMBeanOperation.operationId(name, signature));
     }
     
-    public MBeanOperationWrapper getOperation(String name, List<String> signature)
+    public JMXMBeanOperation getOperation(String name, List<String> signature)
     {
         return this.getOperation(name, signature.toArray(new String[signature.size()]));
     }

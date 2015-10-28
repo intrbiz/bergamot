@@ -22,14 +22,14 @@ public class JMXConnection
         return this.mBeanServer;
     }
 
-    public List<MBeanWrapper> getMBeans()
+    public List<JMXMBean> getMBeans()
     {
         try
         {
-            List<MBeanWrapper> mbeans = new ArrayList<MBeanWrapper>();
+            List<JMXMBean> mbeans = new ArrayList<JMXMBean>();
             for (ObjectInstance oi : this.mBeanServer.queryMBeans(null, null))
             {
-                mbeans.add(new MBeanWrapper(this, oi.getObjectName(), this.mBeanServer.getMBeanInfo(oi.getObjectName())));
+                mbeans.add(new JMXMBean(this, oi.getObjectName(), this.mBeanServer.getMBeanInfo(oi.getObjectName())));
             }
             return mbeans;
         }
@@ -39,12 +39,12 @@ public class JMXConnection
         }
     }
     
-    public MBeanWrapper getMBean(String objectName)
+    public JMXMBean getMBean(String objectName)
     {
         try
         {
             ObjectName name = ObjectName.getInstance(objectName);
-            return new MBeanWrapper(this, name, this.mBeanServer.getMBeanInfo(name));
+            return new JMXMBean(this, name, this.mBeanServer.getMBeanInfo(name));
         }
         catch (Exception e)
         {

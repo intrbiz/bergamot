@@ -2,13 +2,13 @@ package com.intrbiz.bergamot.check.jmx;
 
 import javax.management.MBeanAttributeInfo;
 
-public class MBeanAttributeWrapper
+public class JMXMBeanAttribute
 {
-    private MBeanWrapper mBean;
+    private JMXMBean mBean;
     
     private MBeanAttributeInfo info;
     
-    public MBeanAttributeWrapper(MBeanWrapper mBean, MBeanAttributeInfo info)
+    public JMXMBeanAttribute(JMXMBean mBean, MBeanAttributeInfo info)
     {
         this.mBean = mBean;
         this.info = info;
