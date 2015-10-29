@@ -37,7 +37,7 @@ public class JMXMBeanOperation
         return this.info.getDescription();
     }
     
-    public List<JMXMBeanOperationParameter> getParameter()
+    public List<JMXMBeanOperationParameter> getParameters()
     {
         if (this.parameters == null)
         {

@@ -34,6 +34,12 @@ public class JMXExample
                 "    print('  -> ' + memBean.getAttributes()[i].getValue());" +
                 "  }" +
                 "  print(memBean.getAttributeValue('NonHeapMemoryUsage').committed);" +
+                "  for (var i = 0; i < memBean.getOperations().length; i++) {" +
+                "    print('Oper: ' + memBean.getOperations()[i].getName() + ' ' + memBean.getOperations()[i].getParameters().length);" +
+                "    if (memBean.getOperations()[i].getParameters().length == 0) {" +
+                "        print('  Invoke: ' + memBean.getOperations()[i].invoke());" +
+                "    }" +
+                "  }" +
                 "});"
         );
     }
