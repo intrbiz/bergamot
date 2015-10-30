@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="bergamot_slow_queries" extends="bergamot_postgresql_jdbc_check">
+        <summary>PostgreSQL Slow Queries</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            var warning = check.getDoubleParameter('warning');
+            var critical = check.getDoubleParameter('critical');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                var stats = con.prepare('SELECT q.pid, q.usename, q.query, q.query_duration, q.query_duration > (? * 1000) AS warning_query, q.query_duration > (? * 1000) AS critical_query, max(q.query_duration) OVER () AS max_query_time, min(q.query_duration) OVER () AS min_query_time, avg(q.query_duration) OVER () AS avg_query_time, count(*) OVER () AS active_queries, coalesce(q.application_name, '') FROM (SELECT *, extract(milliseconds FROM (clock_timestamp() - query_start)) AS query_duration FROM pg_stat_activity WHERE state = 'active') q')
+                 .bindDouble(1, warning)
+                 .bindDouble(2, critical)
+                 .query(function(rs) {
+                    var ret = { min: 0, max: 0, active: 0, avg: 0.0, critical: [], warning: []};
+                    while (rs.next()) {
+                        ret.max = rs.getDouble(7);
+                        ret.min = rs.getDouble(8);
+                        ret.avg = rs.getDouble(9);
+                        ret.active = rs.getInt(10);
+                        /* slow? */
+                        if (rs.getBoolean(6)) {
+                            ret.critical.push({ 
+                              pid: rs.getInt(1),
+                              user: rs.getString(2),
+                              app: rs.getString(11),
+                              query: rs.getString(3),
+                              duration: rs.getDouble(4)
+                            });
+                        } else if (rs.getBoolean(5)) {
+                            ret.warning.push({ 
+                              pid: rs.getInt(1),
+                              user: rs.getString(2),
+                              app: rs.getString(11),
+                              query: rs.getString(3),
+                              duration: rs.getDouble(4)
+                            });
+                        }
+                    }
+                    return ret;
+                });
+                /* Result */
+                if (stats.critical.length > 0) {
+                    bergamot.critical(
+                      (stats.critical.length + stats.warning.length) + ' slow queries critical: ' + 
+                      stats.critical.map(function(q) {return q.user + ' ' + q.app + ' (' + q.pid + ')';}).join(', ') +
+                      (stats.warning.length > 0 ? '; warning: ' + stats.warning.map(function(q) {return q.user + ' ' + q.app + ' (' + q.pid + ')';}).join(', ') : '')
+                    );
+                } else if (stats.warning.length > 0) {
+                    bergamot.warning(
+                      stats.warning.length + ' slow queries critical: ' + 
+                      stats.warning.map(function(q) {return q.user + ' ' + q.app + ' (' + q.pid + ')';}).join(', ')
+                    );
+                } else {
+                    bergamot.ok('All queries ok, average duration: ' + stats.avg + ' ms');
+                }
+                /* Readings */
+                bergamot.publishReadings(
+                    bergamot.createDoubleGaugeReading('Query Duration', 'ms', stats.avg, warning, critical, stats.min, stats.max)
+                );
+            });
+        ]]>
+        </script>
+        <description>Check for long running PostgreSQL queries</description>
+    </command>
+    
+</bergamot>
