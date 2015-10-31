@@ -1,46 +1,36 @@
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleBindings;
+import java.util.Arrays;
 
+import com.intrbiz.bergamot.check.jmx.JMXCheckContext;
 import com.intrbiz.bergamot.check.jmx.JMXChecker;
-import com.intrbiz.scripting.RestrictedScriptEngineManager;
+import com.intrbiz.bergamot.check.jmx.JMXMBean;
+import com.intrbiz.bergamot.check.jmx.JMXMBeanAttribute;
+import com.intrbiz.bergamot.check.jmx.JMXMBeanOperation;
 
 public class JMXExample
 {
-    public static void main(String[] args) throws Exception
+    public static void main(String[] args)
     {
+        // the checker
         JMXChecker checker = new JMXChecker();
-        //
-        ScriptEngineManager factory = new RestrictedScriptEngineManager();
-        // setup the script engine
-        ScriptEngine script = factory.getEngineByName("nashorn");
-        SimpleBindings bindings = new SimpleBindings();
-        bindings.put("jmx", checker.createContext((t) -> {
-            t.printStackTrace();
-        }));
-        script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-        // execute
-        script.eval(
-                "jmx.connect('127.0.0.1', 5010, function(con) {" +
-                "  print('Connected');" +
-                "  var mbeans = con.getMBeans();" +
-                "  for (var i = 0; i < mbeans.length; i++) {" +
-                "    print(mbeans[i].getName());" +
-                "  }" +
-                "  var memBean = con.getMBean('java.lang:type=Memory');" +
-                "  for (var i = 0; i < memBean.getAttributes().length; i++) {" +
-                "    print('Attr: ' + memBean.getAttributes()[i].getName() + ' :: ' + memBean.getAttributes()[i].getType());" +
-                "    print('  -> ' + memBean.getAttributes()[i].getValue());" +
-                "  }" +
-                "  print(memBean.getAttributeValue('NonHeapMemoryUsage').committed);" +
-                "  for (var i = 0; i < memBean.getOperations().length; i++) {" +
-                "    print('Oper: ' + memBean.getOperations()[i].getName() + ' ' + memBean.getOperations()[i].getParameters().length);" +
-                "    if (memBean.getOperations()[i].getParameters().length == 0) {" +
-                "        print('  Invoke: ' + memBean.getOperations()[i].invoke());" +
-                "    }" +
-                "  }" +
-                "});"
-        );
+        // context
+        JMXCheckContext context = checker.createContext();
+        // connect
+        context.connect("127.0.0.1", 5010, (con) -> {
+            for (JMXMBean bean : con.getMBeans())
+            {
+                System.out.println("MBean: " + bean.getName());
+            }
+            JMXMBean memBean = con.getMBean("java.lang:type=Memory");
+            for (JMXMBeanAttribute attr : memBean.getAttributes())
+            {
+                System.out.println("Attribute: " + attr.getName() + " " + attr.getType());
+                System.out.println("  -> " + attr.getValue());
+            }
+            for (JMXMBeanOperation oper : memBean.getOperations())
+            {
+                System.out.println("Operation: " + oper.getName() + "(" + Arrays.asList(oper.getSignature()).toString() + ")");
+                if (oper.getParameters().isEmpty()) System.out.println("  -> " + oper.invoke());
+            }
+        });
     }
 }
