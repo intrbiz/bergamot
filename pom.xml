@@ -109,6 +109,7 @@
     <module>bergamot-healthcheck-tracker</module>
     <module>bergamot-accounting-consumer</module>
     <module>bergamot-check-jmx</module>
+    <module>bergamot-worker-jmx</module>
   </modules>
   
   <dependencyManagement>
@@ -428,22 +429,27 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-accounting-model</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<version>${project.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-healthcheck-agent</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<version>${project.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-healthcheck-tracker</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<version>${project.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-accounting-consumer</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-check-jmx</artifactId>
+  			<version>${project.version}</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>
