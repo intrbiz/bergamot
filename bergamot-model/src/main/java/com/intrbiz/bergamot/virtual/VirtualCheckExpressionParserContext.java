@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.virtual;
 
 import java.util.UUID;
 
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Resource;
@@ -12,7 +13,9 @@ import com.intrbiz.bergamot.model.Trap;
  * Resolve checks by looking them up in the ObjectStore
  */
 public interface VirtualCheckExpressionParserContext
-{    
+{   
+    Check<?,?> lookupCheck(UUID id);
+    
     Host lookupHost(String name);
     
     Host lookupHost(UUID id);
