@@ -1741,7 +1741,13 @@ public abstract class BergamotDB extends DatabaseAdapter
     public VirtualCheckExpressionParserContext createVirtualCheckContext(final UUID siteId)
     {      
         return new VirtualCheckExpressionParserContext()
-        {            
+        {
+            @Override
+            public Check<?, ?> lookupCheck(UUID id)
+            {
+                return getCheck(Site.setSiteId(siteId, id));
+            }
+
             @Override
             public Host lookupHost(String name)
             {
@@ -1751,7 +1757,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Host lookupHost(UUID id)
             {
-                return getHost(id);
+                return getHost(Site.setSiteId(siteId, id));
             }
 
             @Override
@@ -1763,7 +1769,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Cluster lookupCluster(UUID id)
             {
-                return getCluster(id);
+                return getCluster(Site.setSiteId(siteId, id));
             }
 
             @Override
@@ -1775,7 +1781,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Service lookupService(UUID id)
             {
-                return getService(id);
+                return getService(Site.setSiteId(siteId, id));
             }
 
             @Override
@@ -1787,7 +1793,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Trap lookupTrap(UUID id)
             {
-                return getTrap(id);
+                return getTrap(Site.setSiteId(siteId, id));
             }
 
             @Override
@@ -1799,7 +1805,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Resource lookupResource(UUID id)
             {
-                return getResource(id);
+                return getResource(Site.setSiteId(siteId, id));
             }           
         };
     }
