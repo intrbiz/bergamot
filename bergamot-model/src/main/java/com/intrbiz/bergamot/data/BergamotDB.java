@@ -1775,7 +1775,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Service lookupService(Host on, String name)
             {
-                return getServiceOnHost(on.getId(), name);
+                return getServiceOnHost(Site.setSiteId(siteId, on.getId()), name);
             }
 
             @Override
@@ -1787,7 +1787,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Trap lookupTrap(Host on, String name)
             {
-                return getTrapOnHost(on.getId(), name);
+                return getTrapOnHost(Site.setSiteId(siteId, on.getId()), name);
             }
 
             @Override
@@ -1799,7 +1799,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             @Override
             public Resource lookupResource(Cluster on, String name)
             {
-                return getResourceOnCluster(on.getId(), name);
+                return getResourceOnCluster(Site.setSiteId(siteId, on.getId()), name);
             }
 
             @Override
