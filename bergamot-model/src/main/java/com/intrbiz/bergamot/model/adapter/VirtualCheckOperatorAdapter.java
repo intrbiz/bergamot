@@ -1,8 +1,8 @@
 package com.intrbiz.bergamot.model.adapter;
 
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParser;
+import com.intrbiz.bergamot.virtual.operator.VirtualCheckOperator;
 import com.intrbiz.data.db.util.DBTypeAdapter;
 
 public class VirtualCheckOperatorAdapter implements DBTypeAdapter<String, VirtualCheckOperator>

@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.virtual;
 
 import java.io.StringReader;
 
-import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
+import com.intrbiz.bergamot.virtual.operator.VirtualCheckOperator;
 import com.intrbiz.bergamot.virtual.parser.VirtualCheckExpressionParserInternal;
 
 public class VirtualCheckExpressionParser

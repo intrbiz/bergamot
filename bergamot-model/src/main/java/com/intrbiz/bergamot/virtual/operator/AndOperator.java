@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.model.virtual;
+package com.intrbiz.bergamot.virtual.operator;
 
 import java.util.Set;
 

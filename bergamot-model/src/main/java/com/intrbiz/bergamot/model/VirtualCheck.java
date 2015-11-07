@@ -8,7 +8,7 @@ import com.intrbiz.bergamot.config.model.VirtualCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.VirtualCheckOperatorAdapter;
 import com.intrbiz.bergamot.model.message.VirtualCheckMO;
-import com.intrbiz.bergamot.model.virtual.VirtualCheckOperator;
+import com.intrbiz.bergamot.virtual.operator.VirtualCheckOperator;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 

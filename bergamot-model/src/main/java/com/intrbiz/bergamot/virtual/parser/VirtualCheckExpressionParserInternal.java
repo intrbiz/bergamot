@@ -2,8 +2,9 @@
 package com.intrbiz.bergamot.virtual.parser;
 
 import com.intrbiz.bergamot.model.*;
-import com.intrbiz.bergamot.model.virtual.*;
 import com.intrbiz.bergamot.virtual.*;
+import com.intrbiz.bergamot.virtual.operator.*;
+
 import java.util.*;
 
 @SuppressWarnings("all")
