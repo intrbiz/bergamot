@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.virtual.reference;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.Cluster;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class ClusterById extends CheckById implements ClusterReference
 {
@@ -20,7 +20,7 @@ public class ClusterById extends CheckById implements ClusterReference
     }
     
     @Override
-    public Cluster resolve(VirtualCheckExpressionParserContext context)
+    public Cluster resolve(VirtualCheckExpressionContext context)
     {
         return context.lookupCluster(this.getId());
     }

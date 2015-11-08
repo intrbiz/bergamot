@@ -2,9 +2,9 @@ package com.intrbiz.bergamot.virtual.reference;
 
 
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public interface ServiceReference extends CheckReference
 {
-    Service resolve(VirtualCheckExpressionParserContext context);
+    Service resolve(VirtualCheckExpressionContext context);
 }

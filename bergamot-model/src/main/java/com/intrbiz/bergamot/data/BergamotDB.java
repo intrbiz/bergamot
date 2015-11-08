@@ -50,7 +50,7 @@ import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.CheckTransition;
 import com.intrbiz.bergamot.model.state.GroupState;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.Cache;
@@ -1738,9 +1738,9 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     //
     
-    public VirtualCheckExpressionParserContext createVirtualCheckContext(final UUID siteId)
+    public VirtualCheckExpressionContext createVirtualCheckContext(final UUID siteId)
     {      
-        return new VirtualCheckExpressionParserContext()
+        return new VirtualCheckExpressionContext()
         {
             @Override
             public Check<?, ?> lookupCheck(UUID id)

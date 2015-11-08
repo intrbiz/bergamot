@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.virtual.reference;
 
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Trap;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class TrapByName implements CheckReference, TrapReference
 {
@@ -45,7 +45,7 @@ public class TrapByName implements CheckReference, TrapReference
     }
     
     @Override
-    public Trap resolve(VirtualCheckExpressionParserContext context)
+    public Trap resolve(VirtualCheckExpressionContext context)
     {
         Host on = (Host) this.getHost().resolve(context);
         return context.lookupTrap(on, this.getName());

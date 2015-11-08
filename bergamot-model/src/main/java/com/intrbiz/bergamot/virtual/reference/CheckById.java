@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.virtual.reference;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class CheckById implements CheckReference
 {
@@ -31,7 +31,7 @@ public class CheckById implements CheckReference
         this.id = id;
     }
 
-    public Check<?, ?> resolve(VirtualCheckExpressionParserContext context)
+    public Check<?, ?> resolve(VirtualCheckExpressionContext context)
     {
         return context.lookupCheck(this.getId());
     }

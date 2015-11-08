@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.virtual.reference;
 
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class ServiceByName implements CheckReference, ServiceReference
 {
@@ -45,7 +45,7 @@ public class ServiceByName implements CheckReference, ServiceReference
     }
     
     @Override
-    public Service resolve(VirtualCheckExpressionParserContext context)
+    public Service resolve(VirtualCheckExpressionContext context)
     {
         Host on = (Host) this.getHost().resolve(context);
         return context.lookupService(on, this.getName());

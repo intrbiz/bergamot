@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.model.Trap;
 /**
  * Resolve checks by looking them up in the ObjectStore
  */
-public interface VirtualCheckExpressionParserContext
+public interface VirtualCheckExpressionContext
 {   
     Check<?,?> lookupCheck(UUID id);
     

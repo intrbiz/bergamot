@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.virtual.reference;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class ServiceById extends CheckById implements ServiceReference
 {
@@ -20,7 +20,7 @@ public class ServiceById extends CheckById implements ServiceReference
     }
     
     @Override
-    public Service resolve(VirtualCheckExpressionParserContext context)
+    public Service resolve(VirtualCheckExpressionContext context)
     {
         return context.lookupService(this.getId());
     }

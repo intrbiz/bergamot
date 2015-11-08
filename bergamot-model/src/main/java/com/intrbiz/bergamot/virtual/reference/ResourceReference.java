@@ -1,9 +1,9 @@
 package com.intrbiz.bergamot.virtual.reference;
 
 import com.intrbiz.bergamot.model.Resource;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public interface ResourceReference extends CheckReference
 {
-    Resource resolve(VirtualCheckExpressionParserContext context);
+    Resource resolve(VirtualCheckExpressionContext context);
 }

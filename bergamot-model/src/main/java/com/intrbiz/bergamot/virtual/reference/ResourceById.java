@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.virtual.reference;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.Resource;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class ResourceById extends CheckById implements ResourceReference
 {
@@ -20,7 +20,7 @@ public class ResourceById extends CheckById implements ResourceReference
     }
     
     @Override
-    public Resource resolve(VirtualCheckExpressionParserContext context)
+    public Resource resolve(VirtualCheckExpressionContext context)
     {
         return context.lookupResource(this.getId());
     }

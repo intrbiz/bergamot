@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.virtual.reference;
 
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class ResourceByName implements CheckReference, ResourceReference
 {
@@ -45,7 +45,7 @@ public class ResourceByName implements CheckReference, ResourceReference
     }
     
     @Override
-    public Resource resolve(VirtualCheckExpressionParserContext context)
+    public Resource resolve(VirtualCheckExpressionContext context)
     {
         Cluster on = this.getCluster().resolve(context);
         return context.lookupResource(on, this.getName());

@@ -1,7 +1,7 @@
 package com.intrbiz.bergamot.virtual.reference;
 
 import com.intrbiz.bergamot.model.Host;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class HostByName implements CheckReference, HostReference
 {
@@ -30,7 +30,7 @@ public class HostByName implements CheckReference, HostReference
     }
 
     @Override
-    public Host resolve(VirtualCheckExpressionParserContext context)
+    public Host resolve(VirtualCheckExpressionContext context)
     {
         return context.lookupHost(this.getName());
     }

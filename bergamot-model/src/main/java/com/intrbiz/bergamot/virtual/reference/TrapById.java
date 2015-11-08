@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.virtual.reference;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.Trap;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class TrapById extends CheckById implements TrapReference
 {
@@ -20,7 +20,7 @@ public class TrapById extends CheckById implements TrapReference
     }
     
     @Override
-    public Trap resolve(VirtualCheckExpressionParserContext context)
+    public Trap resolve(VirtualCheckExpressionContext context)
     {
         return context.lookupTrap(this.getId());
     }

@@ -1,9 +1,9 @@
 package com.intrbiz.bergamot.virtual.reference;
 
 import com.intrbiz.bergamot.model.Trap;
-import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParserContext;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public interface TrapReference extends CheckReference
 {
-    Trap resolve(VirtualCheckExpressionParserContext context);
+    Trap resolve(VirtualCheckExpressionContext context);
 }
