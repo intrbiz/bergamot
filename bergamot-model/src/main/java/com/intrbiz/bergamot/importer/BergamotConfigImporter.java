@@ -1485,7 +1485,7 @@ public class BergamotConfigImporter
                 check.setCondition(cond);
                 this.report.info("Using virtual check condition " + cond.toString() + " for " + check);
                 // cross reference the checks
-                check.setReferenceIds(cond.computeDependencies().stream().map((c) -> c.resolve(vcec).getId()).collect(Collectors.toList()));
+                check.setReferenceIds(new LinkedList<UUID>(cond.computeDependencies().stream().map((c) -> c.resolve(vcec).getId()).collect(Collectors.toSet())));
             }
         }
     }
