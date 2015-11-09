@@ -305,6 +305,29 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     throw new Error("Missing return statement in function");
   }
 
+  final public List<CheckReference> readParents() throws ParseException {
+    List<CheckReference> checks = new LinkedList<CheckReference>();
+    ValueOperator check;
+    check = readCheck();
+                  checks.add(check.getCheck());
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEP:
+        ;
+        break;
+      default:
+        jj_la1[17] = jj_gen;
+        break label_2;
+      }
+      jj_consume_token(SEP);
+      check = readCheck();
+                          checks.add(check.getCheck());
+    }
+      {if (true) return checks;}
+    throw new Error("Missing return statement in function");
+  }
+
   final private VirtualCheckOperator readValue() throws ParseException {
     VirtualCheckOperator value;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -315,7 +338,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
                   value = new BracketOperator(value);
       break;
     default:
-      jj_la1[17] = jj_gen;
+      jj_la1[18] = jj_gen;
       if (jj_2_1(2147483647)) {
         value = readCheck();
       } else {
@@ -343,7 +366,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       jj_consume_token(OF);
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[19] = jj_gen;
       ;
     }
     checks = readCheckList();
@@ -359,7 +382,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       jj_consume_token(OF);
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[20] = jj_gen;
       ;
     }
     checks = readCheckList();
@@ -376,7 +399,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       jj_consume_token(OF);
       break;
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[21] = jj_gen;
       ;
     }
     checks = readCheckList();
@@ -386,7 +409,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       as = readStatus();
       break;
     default:
-      jj_la1[21] = jj_gen;
+      jj_la1[22] = jj_gen;
       ;
     }
       {if (true) return new OneOfFunction(checks, as);}
@@ -405,7 +428,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       status = readStatus();
       break;
     default:
-      jj_la1[22] = jj_gen;
+      jj_la1[23] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -413,7 +436,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       jj_consume_token(OF);
       break;
     default:
-      jj_la1[23] = jj_gen;
+      jj_la1[24] = jj_gen;
       ;
     }
     checks = readCheckList();
@@ -422,7 +445,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       jj_consume_token(IS);
       break;
     default:
-      jj_la1[24] = jj_gen;
+      jj_la1[25] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -445,7 +468,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       jj_consume_token(GTEQ);
       break;
     default:
-      jj_la1[25] = jj_gen;
+      jj_la1[26] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -456,7 +479,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       as = readStatus();
       break;
     default:
-      jj_la1[26] = jj_gen;
+      jj_la1[27] = jj_gen;
       ;
     }
       {if (true) return new CountFunction(status, checks, test.image.toLowerCase(), Integer.parseInt(value.image), as);}
@@ -477,15 +500,15 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     jj_consume_token(THEN);
     as = readStatus();
                           when.add(new CaseOperator.CaseWhen(check, status, as));
-    label_2:
+    label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case WHEN:
         ;
         break;
       default:
-        jj_la1[27] = jj_gen;
-        break label_2;
+        jj_la1[28] = jj_gen;
+        break label_3;
       }
       jj_consume_token(WHEN);
       check = readExpression();
@@ -501,7 +524,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       elseStatus = readStatus();
       break;
     default:
-      jj_la1[28] = jj_gen;
+      jj_la1[29] = jj_gen;
       ;
     }
     jj_consume_token(END);
@@ -528,7 +551,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       operator = readCaseFunction();
       break;
     default:
-      jj_la1[29] = jj_gen;
+      jj_la1[30] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -558,7 +581,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       operator = readFunction();
       break;
     default:
-      jj_la1[30] = jj_gen;
+      jj_la1[31] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -577,15 +600,15 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     VirtualCheckOperator l;
     VirtualCheckOperator r;
     l = readOrExpression();
-    label_3:
+    label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case XOR:
         ;
         break;
       default:
-        jj_la1[31] = jj_gen;
-        break label_3;
+        jj_la1[32] = jj_gen;
+        break label_4;
       }
       jj_consume_token(XOR);
       r = readOrExpression();
@@ -599,15 +622,15 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     VirtualCheckOperator l;
     VirtualCheckOperator r;
     l = readAndExpression();
-    label_4:
+    label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OR:
         ;
         break;
       default:
-        jj_la1[32] = jj_gen;
-        break label_4;
+        jj_la1[33] = jj_gen;
+        break label_5;
       }
       jj_consume_token(OR);
       r = readAndExpression();
@@ -621,15 +644,15 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     VirtualCheckOperator l;
     VirtualCheckOperator r;
     l = readOperator();
-    label_5:
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
         ;
         break;
       default:
-        jj_la1[33] = jj_gen;
-        break label_5;
+        jj_la1[34] = jj_gen;
+        break label_6;
       }
       jj_consume_token(AND);
       r = readOperator();
@@ -646,41 +669,41 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     finally { jj_save(0, xla); }
   }
 
-  private boolean jj_3R_35() {
-    if (jj_3R_28()) return true;
+  private boolean jj_3R_36() {
+    if (jj_3R_29()) return true;
     return false;
   }
 
-  private boolean jj_3R_31() {
+  private boolean jj_3R_32() {
     if (jj_scan_token(LON)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(28)) jj_scanpos = xsp;
     xsp = jj_scanpos;
-    if (jj_3R_36()) {
+    if (jj_3R_37()) {
     jj_scanpos = xsp;
-    if (jj_3R_37()) return true;
+    if (jj_3R_38()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_23() {
-    if (jj_3R_27()) return true;
+  private boolean jj_3R_24() {
+    if (jj_3R_28()) return true;
     return false;
   }
 
-  private boolean jj_3R_6() {
+  private boolean jj_3R_7() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_7()) {
-    jj_scanpos = xsp;
     if (jj_3R_8()) {
     jj_scanpos = xsp;
     if (jj_3R_9()) {
     jj_scanpos = xsp;
     if (jj_3R_10()) {
     jj_scanpos = xsp;
-    if (jj_3R_11()) return true;
+    if (jj_3R_11()) {
+    jj_scanpos = xsp;
+    if (jj_3R_12()) return true;
     }
     }
     }
@@ -688,42 +711,24 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     return false;
   }
 
-  private boolean jj_3R_34() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_18() {
+  private boolean jj_3R_35() {
     if (jj_3R_28()) return true;
     return false;
   }
 
-  private boolean jj_3R_14() {
+  private boolean jj_3R_19() {
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_15() {
     if (jj_scan_token(TRAP)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_21()) {
+    if (jj_3R_22()) {
     jj_scanpos = xsp;
-    if (jj_3R_22()) return true;
+    if (jj_3R_23()) return true;
     }
-    return false;
-  }
-
-  private boolean jj_3R_29() {
-    if (jj_scan_token(LON)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(24)) jj_scanpos = xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_32()) {
-    jj_scanpos = xsp;
-    if (jj_3R_33()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_17() {
-    if (jj_3R_27()) return true;
     return false;
   }
 
@@ -733,63 +738,99 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     xsp = jj_scanpos;
     if (jj_scan_token(24)) jj_scanpos = xsp;
     xsp = jj_scanpos;
-    if (jj_3R_34()) {
+    if (jj_3R_33()) {
     jj_scanpos = xsp;
-    if (jj_3R_35()) return true;
+    if (jj_3R_34()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_15() {
+  private boolean jj_3R_18() {
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1() {
+    if (jj_3R_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_31() {
+    if (jj_scan_token(LON)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(24)) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_35()) {
+    jj_scanpos = xsp;
+    if (jj_3R_36()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_16() {
     if (jj_scan_token(CLUSTER)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_23()) {
+    if (jj_3R_24()) {
     jj_scanpos = xsp;
-    if (jj_3R_24()) return true;
+    if (jj_3R_25()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3R_27() {
+    if (jj_3R_29()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_32()) jj_scanpos = xsp;
     return false;
   }
 
   private boolean jj_3R_26() {
     if (jj_3R_28()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_31()) jj_scanpos = xsp;
     return false;
   }
 
-  private boolean jj_3R_25() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_12() {
+  private boolean jj_3R_13() {
     if (jj_scan_token(HOST)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_17()) {
+    if (jj_3R_18()) {
     jj_scanpos = xsp;
-    if (jj_3R_18()) return true;
+    if (jj_3R_19()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3R_21() {
+    if (jj_3R_29()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_30()) jj_scanpos = xsp;
     return false;
   }
 
   private boolean jj_3R_20() {
     if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_38() {
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_29() {
+    if (jj_scan_token(LSTRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_23() {
+    if (jj_3R_29()) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_29()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_3R_6()) return true;
+    if (jj_3R_31()) jj_scanpos = xsp;
     return false;
   }
 
@@ -798,42 +839,29 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     return false;
   }
 
-  private boolean jj_3R_28() {
-    if (jj_scan_token(LSTRING)) return true;
-    return false;
-  }
-
   private boolean jj_3R_22() {
     if (jj_3R_28()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_30()) jj_scanpos = xsp;
     return false;
   }
 
-  private boolean jj_3R_36() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_16() {
+  private boolean jj_3R_17() {
     if (jj_scan_token(RESOURCE)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_25()) {
+    if (jj_3R_26()) {
     jj_scanpos = xsp;
-    if (jj_3R_26()) return true;
+    if (jj_3R_27()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_33() {
-    if (jj_3R_28()) return true;
+  private boolean jj_3R_34() {
+    if (jj_3R_29()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_12() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
@@ -842,18 +870,23 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     return false;
   }
 
+  private boolean jj_3R_33() {
+    if (jj_3R_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_28() {
+    if (jj_scan_token(LUUID)) return true;
+    return false;
+  }
+
   private boolean jj_3R_10() {
     if (jj_3R_15()) return true;
     return false;
   }
 
-  private boolean jj_3R_32() {
-    if (jj_3R_27()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_27() {
-    if (jj_scan_token(LUUID)) return true;
+  private boolean jj_3R_25() {
+    if (jj_3R_29()) return true;
     return false;
   }
 
@@ -862,29 +895,19 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     return false;
   }
 
-  private boolean jj_3R_24() {
-    if (jj_3R_28()) return true;
+  private boolean jj_3R_14() {
+    if (jj_scan_token(SERVICE)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_20()) {
+    jj_scanpos = xsp;
+    if (jj_3R_21()) return true;
+    }
     return false;
   }
 
   private boolean jj_3R_8() {
     if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_13() {
-    if (jj_scan_token(SERVICE)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_7() {
-    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -899,7 +922,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[34];
+  final private int[] jj_la1 = new int[35];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -907,10 +930,10 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x40,0x1000000,0x40,0x20000000,0x40,0x1000000,0x40,0x20000000,0x40,0x40,0x10000000,0x40,0x20000000,0x40,0x1f000000,0x800000,0x1f000000,0x20000,0x0,0x0,0x0,0x0,0x0,0x0,0x80000000,0x1f800,0x0,0x0,0x0,0x40000000,0x5f020400,0x80,0x100,0x200,};
+      jj_la1_0 = new int[] {0x40,0x1000000,0x40,0x20000000,0x40,0x1000000,0x40,0x20000000,0x40,0x40,0x10000000,0x40,0x20000000,0x40,0x1f000000,0x800000,0x1f000000,0x800000,0x20000,0x0,0x0,0x0,0x0,0x0,0x0,0x80000000,0x1f800,0x0,0x0,0x0,0x40000000,0x5f020400,0x80,0x100,0x200,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x10000,0x0,0x10000,0x0,0x10000,0x0,0x10000,0x0,0x10000,0x10000,0x0,0x10000,0x0,0x10000,0x0,0x0,0x0,0x0,0x8,0x8,0x8,0x200,0x400,0x8,0x0,0x0,0x200,0x20,0x80,0x17,0x17,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x10000,0x0,0x10000,0x0,0x10000,0x0,0x10000,0x0,0x10000,0x10000,0x0,0x10000,0x0,0x10000,0x0,0x0,0x0,0x0,0x0,0x8,0x8,0x8,0x200,0x400,0x8,0x0,0x0,0x200,0x20,0x80,0x17,0x17,0x0,0x0,0x0,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[1];
   private boolean jj_rescan = false;
@@ -927,7 +950,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -942,7 +965,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -953,7 +976,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -964,7 +987,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -974,7 +997,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -984,7 +1007,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 35; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1101,7 +1124,7 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 34; i++) {
+    for (int i = 0; i < 35; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

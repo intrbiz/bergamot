@@ -302,6 +302,24 @@ private List<ValueOperator> readCheckList() :
     { return checks; }
 }
 
+public List<CheckReference> readParents() :
+{
+    List<CheckReference> checks = new LinkedList<CheckReference>();
+    ValueOperator check;
+}
+{
+    (
+		check = readCheck()
+		{ checks.add(check.getCheck()); }
+		(
+			<SEP>
+			check = readCheck()
+			{ checks.add(check.getCheck()); }
+		)*
+    )
+    { return checks; }
+}
+
 private VirtualCheckOperator readValue() :
 {
     VirtualCheckOperator value;
