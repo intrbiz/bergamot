@@ -53,6 +53,6 @@ public class ServiceByName implements CheckReference, ServiceReference
 
     public String toString()
     {
-        return "service \"" + this.name + "\" on " + this.host;
+        return "service '" + this.name + "' on " + this.host;
     } 
 }

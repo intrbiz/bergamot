@@ -37,6 +37,6 @@ public class HostByName implements CheckReference, HostReference
     
     public String toString()
     {
-        return "host \"" + this.getName() + "\""; 
+        return "host '" + this.getName() + "'"; 
     }
 }

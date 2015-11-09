@@ -7,14 +7,14 @@ import com.intrbiz.bergamot.virtual.parser.VirtualCheckExpressionParserInternal;
 
 public class VirtualCheckExpressionParser
 {
-    public static final VirtualCheckOperator parseVirtualCheckExpression(VirtualCheckExpressionParserContext context, String expression)
+    public static final VirtualCheckOperator parseVirtualCheckExpression(String expression)
     {
         try
         {
             try (StringReader reader = new StringReader(expression))
             {
                 VirtualCheckExpressionParserInternal parser = new VirtualCheckExpressionParserInternal(reader);
-                return parser.readExpression(context);
+                return parser.readExpression();
             }
         }
         catch (Exception e)

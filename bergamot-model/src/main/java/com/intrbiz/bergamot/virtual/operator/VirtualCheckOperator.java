@@ -4,20 +4,21 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
+import com.intrbiz.bergamot.virtual.reference.CheckReference;
 
 public abstract class VirtualCheckOperator implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    public abstract boolean computeOk();
+    public abstract boolean computeOk(VirtualCheckExpressionContext context);
     
-    public abstract Status computeStatus();
+    public abstract Status computeStatus(VirtualCheckExpressionContext context);
     
-    public final Set<Check<?,?>> computeDependencies()
+    public final Set<CheckReference> computeDependencies()
     {
-        Set<Check<?,?>> checks = new HashSet<Check<?,?>>();
+        Set<CheckReference> checks = new HashSet<CheckReference>();
         this.computeDependencies(checks);
         return checks;
     }
@@ -26,15 +27,15 @@ public abstract class VirtualCheckOperator implements Serializable
     /**
      * Are all dependent checks in a hard state?
      */
-    public boolean isAllDependenciesHard()
+    public boolean isAllDependenciesHard(VirtualCheckExpressionContext context)
     {
-        for (Check<?, ?> check : this.computeDependencies())
+        for (CheckReference check : this.computeDependencies())
         {
-            if (! check.getState().isHard())
+            if (! check.resolve(context).getState().isHard())
                 return false;
         }
         return true;
     }
     
-    public abstract void computeDependencies(Set<Check<?,?>> checks);
+    public abstract void computeDependencies(Set<CheckReference> checks);
 }

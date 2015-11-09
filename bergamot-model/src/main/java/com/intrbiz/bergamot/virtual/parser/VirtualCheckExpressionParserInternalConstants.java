@@ -21,43 +21,93 @@ public interface VirtualCheckExpressionParserInternalConstants {
   /** RegularExpression Id. */
   int NOT = 10;
   /** RegularExpression Id. */
-  int STCOMP = 11;
+  int EQ = 11;
   /** RegularExpression Id. */
-  int EDCOMP = 12;
+  int NE = 12;
   /** RegularExpression Id. */
-  int HOST = 13;
+  int LT = 13;
   /** RegularExpression Id. */
-  int SERVICE = 14;
+  int LTEQ = 14;
   /** RegularExpression Id. */
-  int TRAP = 15;
+  int GT = 15;
   /** RegularExpression Id. */
-  int RESOURCE = 16;
+  int GTEQ = 16;
   /** RegularExpression Id. */
-  int CLUSTER = 17;
+  int STCOMP = 17;
   /** RegularExpression Id. */
-  int LON = 18;
+  int EDCOMP = 18;
   /** RegularExpression Id. */
-  int LBOOLEAN = 19;
+  int STARRAY = 19;
   /** RegularExpression Id. */
-  int HEXCHAR = 20;
+  int EDARRAY = 20;
   /** RegularExpression Id. */
-  int ESCAPECHAR = 21;
+  int STBRACE = 21;
   /** RegularExpression Id. */
-  int UESCAPECHAR = 22;
+  int EDBRACE = 22;
   /** RegularExpression Id. */
-  int LSTRING = 23;
+  int SEP = 23;
   /** RegularExpression Id. */
-  int QUOTE = 24;
+  int HOST = 24;
   /** RegularExpression Id. */
-  int ENDQUOTE = 26;
+  int SERVICE = 25;
   /** RegularExpression Id. */
-  int CHAR = 27;
+  int TRAP = 26;
   /** RegularExpression Id. */
-  int CNTRLESC = 28;
+  int RESOURCE = 27;
   /** RegularExpression Id. */
-  int HEX = 30;
+  int CLUSTER = 28;
   /** RegularExpression Id. */
-  int HEXESC = 31;
+  int LON = 29;
+  /** RegularExpression Id. */
+  int COUNT = 30;
+  /** RegularExpression Id. */
+  int IS = 31;
+  /** RegularExpression Id. */
+  int ALL = 32;
+  /** RegularExpression Id. */
+  int ANY = 33;
+  /** RegularExpression Id. */
+  int ONE = 34;
+  /** RegularExpression Id. */
+  int OF = 35;
+  /** RegularExpression Id. */
+  int CASE = 36;
+  /** RegularExpression Id. */
+  int WHEN = 37;
+  /** RegularExpression Id. */
+  int THEN = 38;
+  /** RegularExpression Id. */
+  int ELSE = 39;
+  /** RegularExpression Id. */
+  int END = 40;
+  /** RegularExpression Id. */
+  int AS = 41;
+  /** RegularExpression Id. */
+  int LSTATUS = 42;
+  /** RegularExpression Id. */
+  int LBOOLEAN = 43;
+  /** RegularExpression Id. */
+  int LINTEGER = 44;
+  /** RegularExpression Id. */
+  int HEXCHAR = 45;
+  /** RegularExpression Id. */
+  int ESCAPECHAR = 46;
+  /** RegularExpression Id. */
+  int UESCAPECHAR = 47;
+  /** RegularExpression Id. */
+  int LSTRING = 48;
+  /** RegularExpression Id. */
+  int QUOTE = 49;
+  /** RegularExpression Id. */
+  int ENDQUOTE = 51;
+  /** RegularExpression Id. */
+  int CHAR = 52;
+  /** RegularExpression Id. */
+  int CNTRLESC = 53;
+  /** RegularExpression Id. */
+  int HEX = 55;
+  /** RegularExpression Id. */
+  int HEXESC = 56;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -81,15 +131,40 @@ public interface VirtualCheckExpressionParserInternalConstants {
     "<OR>",
     "<AND>",
     "<NOT>",
+    "<EQ>",
+    "<NE>",
+    "<LT>",
+    "<LTEQ>",
+    "<GT>",
+    "<GTEQ>",
     "\"(\"",
     "\")\"",
+    "\"[\"",
+    "\"]\"",
+    "\"{\"",
+    "\"}\"",
+    "\",\"",
     "\"host\"",
     "\"service\"",
     "\"trap\"",
     "\"resource\"",
     "\"cluster\"",
     "\"on\"",
+    "\"count\"",
+    "\"is\"",
+    "\"all\"",
+    "\"any\"",
+    "\"one\"",
+    "\"of\"",
+    "\"case\"",
+    "\"when\"",
+    "\"then\"",
+    "\"else\"",
+    "\"end\"",
+    "\"as\"",
+    "<LSTATUS>",
     "<LBOOLEAN>",
+    "<LINTEGER>",
     "<HEXCHAR>",
     "<ESCAPECHAR>",
     "<UESCAPECHAR>",

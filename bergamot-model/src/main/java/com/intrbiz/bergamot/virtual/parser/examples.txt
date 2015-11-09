@@ -1,0 +1,36 @@
+# Virtual Check Expression Examples
+
+host 1cf38409-e6f6-473f-9a27-bc88665640e8 || host 1cf38409-e6f6-473f-9a27-bc88665640e8
+
+host 'vm1' and host 'vm2
+
+service 'ping' on host 'vm1 && service 'ping' on host 'vm2'
+
+trap 'port1' on host 'sw1' or trap 'port2' on host 'sw2'
+
+service 1cf38409-e6f6-473f-9a27-bc88665640e8 ^ service 1cf38409-e6f6-473f-9a27-bc88665640e8 ^ trap 1cf38409-e6f6-473f-9a27-bc88665640e8
+
+all of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+all [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+
+any of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+any [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+
+one of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+one [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+
+one of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as WARNING
+one [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as CRITICAL
+
+count OK of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is == 1
+count WARNING of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is > 1
+count CRITICAL of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is < 1
+count of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is != 1
+count of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is >= 1
+count of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is <= 1
+count [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is <= 1
+count [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] <= 1
+count [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is <= 1 as WARNING
+count [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] != 1 as ACTION
+
+case when host 'vm1' is OK then OK when host 'vm1' is WARNING then OK else CRITICAL end

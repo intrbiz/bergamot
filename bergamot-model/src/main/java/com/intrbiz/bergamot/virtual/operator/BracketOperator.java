@@ -2,8 +2,9 @@ package com.intrbiz.bergamot.virtual.operator;
 
 import java.util.Set;
 
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
+import com.intrbiz.bergamot.virtual.reference.CheckReference;
 
 public class BracketOperator extends VirtualCheckOperator
 {
@@ -23,18 +24,18 @@ public class BracketOperator extends VirtualCheckOperator
     }
 
     @Override
-    public boolean computeOk()
+    public boolean computeOk(VirtualCheckExpressionContext context)
     {
-        return this.operand.computeOk();
+        return this.operand.computeOk(context);
     }
 
-    public Status computeStatus()
+    public Status computeStatus(VirtualCheckExpressionContext context)
     {
-        return this.operand.computeStatus();
+        return this.operand.computeStatus(context);
     }
 
     @Override
-    public void computeDependencies(Set<Check<?,?>> checks)
+    public void computeDependencies(Set<CheckReference> checks)
     {
         this.operand.computeDependencies(checks);
     }

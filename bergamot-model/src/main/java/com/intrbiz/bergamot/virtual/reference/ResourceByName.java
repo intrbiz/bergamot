@@ -53,6 +53,6 @@ public class ResourceByName implements CheckReference, ResourceReference
 
     public String toString()
     {
-        return "resource \"" + this.name + "\" on " + this.getCluster();
+        return "resource '" + this.name + "' on " + this.getCluster();
     } 
 }

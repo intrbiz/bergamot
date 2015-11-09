@@ -2,8 +2,9 @@ package com.intrbiz.bergamot.virtual.operator;
 
 import java.util.Set;
 
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
+import com.intrbiz.bergamot.virtual.reference.CheckReference;
 
 public class OrOperator extends VirtualCheckOperator
 {
@@ -31,18 +32,18 @@ public class OrOperator extends VirtualCheckOperator
     }
 
     @Override
-    public boolean computeOk()
+    public boolean computeOk(VirtualCheckExpressionContext context)
     {
-        return this.left.computeOk() || this.right.computeOk();
+        return this.left.computeOk(context) || this.right.computeOk(context);
     }
 
-    public Status computeStatus()
+    public Status computeStatus(VirtualCheckExpressionContext context)
     {
-        return Status.best(this.left.computeStatus(), this.right.computeStatus());
+        return Status.best(this.left.computeStatus(context), this.right.computeStatus(context));
     }
 
     @Override
-    public void computeDependencies(Set<Check<?,?>> checks)
+    public void computeDependencies(Set<CheckReference> checks)
     {
         this.left.computeDependencies(checks);
         this.right.computeDependencies(checks);

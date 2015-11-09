@@ -2,8 +2,9 @@ package com.intrbiz.bergamot.virtual.operator;
 
 import java.util.Set;
 
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
+import com.intrbiz.bergamot.virtual.reference.CheckReference;
 
 public class XorOperator extends VirtualCheckOperator
 {
@@ -31,19 +32,19 @@ public class XorOperator extends VirtualCheckOperator
     }
 
     @Override
-    public boolean computeOk()
+    public boolean computeOk(VirtualCheckExpressionContext context)
     {
-        return this.left.computeOk() ^ this.right.computeOk();
+        return this.left.computeOk(context) ^ this.right.computeOk(context);
     }
 
-    public Status computeStatus()
+    public Status computeStatus(VirtualCheckExpressionContext context)
     {
         // we are making an implicit decision with this operator, so:
-        return this.computeOk() ? Status.OK : Status.CRITICAL;
+        return this.computeOk(context) ? Status.OK : Status.CRITICAL;
     }
 
     @Override
-    public void computeDependencies(Set<Check<?,?>> checks)
+    public void computeDependencies(Set<CheckReference> checks)
     {
         this.left.computeDependencies(checks);
         this.right.computeDependencies(checks);
@@ -51,6 +52,6 @@ public class XorOperator extends VirtualCheckOperator
     
     public String toString()
     {
-        return this.left.toString() + " || " + this.right.toString();
+        return this.left.toString() + " ^ " + this.right.toString();
     }
 }

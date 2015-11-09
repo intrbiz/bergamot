@@ -37,6 +37,6 @@ public class ClusterByName implements CheckReference, ClusterReference
     
     public String toString()
     {
-        return "cluster \"" + this.getName() + "\""; 
+        return "cluster '" + this.getName() + "'"; 
     }
 }

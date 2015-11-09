@@ -2,8 +2,9 @@ package com.intrbiz.bergamot.virtual.operator;
 
 import java.util.Set;
 
-import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Status;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
+import com.intrbiz.bergamot.virtual.reference.CheckReference;
 
 public class NotOperator extends VirtualCheckOperator
 {
@@ -23,19 +24,19 @@ public class NotOperator extends VirtualCheckOperator
     }
 
     @Override
-    public boolean computeOk()
+    public boolean computeOk(VirtualCheckExpressionContext context)
     {
-        return ! this.operand.computeOk();
+        return ! this.operand.computeOk(context);
     }
 
-    public Status computeStatus()
+    public Status computeStatus(VirtualCheckExpressionContext context)
     {
         // we are making an implicit decision with this operator, so:
-        return this.computeOk() ? Status.OK : Status.CRITICAL;
+        return this.computeOk(context) ? Status.OK : Status.CRITICAL;
     }
 
     @Override
-    public void computeDependencies(Set<Check<?,?>> checks)
+    public void computeDependencies(Set<CheckReference> checks)
     {
         this.operand.computeDependencies(checks);
     }

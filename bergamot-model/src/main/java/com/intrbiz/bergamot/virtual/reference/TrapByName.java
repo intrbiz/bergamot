@@ -53,6 +53,6 @@ public class TrapByName implements CheckReference, TrapReference
 
     public String toString()
     {
-        return "trap \"" + this.name + "\" on " + this.host;
+        return "trap '" + this.name + "' on " + this.host;
     } 
 }
