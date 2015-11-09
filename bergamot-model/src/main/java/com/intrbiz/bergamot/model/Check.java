@@ -62,6 +62,12 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     
     @SQLColumn(index = 9, name = "external_ref", since = @SQLVersion({ 2, 1, 0 }))
     protected String externalRef;
+    
+    /**
+     * Checks which this check depends upon for reachability
+     */
+    @SQLColumn(index = 10, name = "depends", type = "UUID[]", since = @SQLVersion({ 3, 21, 0 }))
+    protected List<UUID> dependsIds = new LinkedList<UUID>();
 
     public Check()
     {
@@ -362,8 +368,18 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         this.externalRef = externalRef;
     }
     
-    // some basic actions
+    public List<UUID> getDependsIds()
+    {
+        return dependsIds;
+    }
+
+    public void setDependsIds(List<UUID> dependsIds)
+    {
+        this.dependsIds = dependsIds;
+    }
     
+    // some basic actions
+
     /**
      * Suppress this check
      */

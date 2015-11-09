@@ -182,6 +182,8 @@ public class BergamotConfigImporter
                         this.loadHosts(db);
                         // clusters
                         this.loadClusters(db);
+                        // link any check to check dependencies
+                        this.linkDependencies(db);
                         // rebuild computed permissions
                         if (this.rebuildPermissions)
                         {
@@ -1661,6 +1663,52 @@ public class BergamotConfigImporter
         }
         // ensure we flush cached permissions
         this.clearPermissionsCache = true;
+    }
+    
+    protected void linkDependencies(BergamotDB db)
+    {
+        for (List<? extends TemplatedObjectCfg<?>> objects : this.config.getAllObjects())
+        {
+            for (TemplatedObjectCfg<?> object : objects)
+            {
+                if ((! object.getTemplateBooleanValue()) && object instanceof CheckCfg<?>)
+                {
+                    CheckCfg<?> checkCfg = (CheckCfg<?>) object;
+                    if (! Util.isEmpty(checkCfg.getDepends()))
+                    {
+                        // we only need to link dependencies on host and cluster
+                        // as services auto depend on host and resources auto depend on cluster
+                        Check<?,?> check = null;
+                        if (checkCfg instanceof HostCfg)
+                        {
+                            check = db.getHostByName(this.site.getId(), checkCfg.getName());
+                        }
+                        else if (checkCfg instanceof ClusterCfg)
+                        {
+                            check = db.getClusterByName(this.site.getId(), checkCfg.getName());
+                        }
+                        // did we find the check
+                        if (check != null)
+                        {
+                            // parse the dependencies
+                            List<CheckReference> dependsOn = VirtualCheckExpressionParser.parseParentsExpression(checkCfg.getDepends());
+                            // validate the references and link
+                            VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId());
+                            for (CheckReference chkRef : dependsOn)
+                            {
+                                Check<?,?> dependsOnCheck = chkRef.resolve(vcec);
+                                if (dependsOnCheck == null) throw new RuntimeException("The check " + checkCfg.getName() + " depends upon the check " + chkRef + " which does not exist");
+                                check.getDependsIds().add(dependsOnCheck.getId());
+                            }
+                            //
+                            this.report.info("The check " + checkCfg.getName() + "(" + check.getId() + ") depends upon " + check.getDependsIds());
+                            // update
+                            db.setCheck(check);
+                        }
+                    }
+                }
+            }
+        }
     }
     
     /**
