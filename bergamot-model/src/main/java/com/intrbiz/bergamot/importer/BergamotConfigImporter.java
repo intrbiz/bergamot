@@ -83,6 +83,7 @@ import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParser;
 import com.intrbiz.bergamot.virtual.operator.VirtualCheckOperator;
+import com.intrbiz.bergamot.virtual.reference.CheckReference;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataException;
@@ -1470,10 +1471,20 @@ public class BergamotConfigImporter
             VirtualCheckOperator cond = VirtualCheckExpressionParser.parseVirtualCheckExpression(resolvedConfiguration.getCondition());
             if (cond != null)
             {
+                // context to use
+                VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId());
+                // validate the condition
+                for (CheckReference chkRef : cond.computeDependencies())
+                {
+                    if (chkRef.resolve(vcec) == null)
+                    {
+                        throw new RuntimeException("The virtual check " + check.getType() + " " + check.getName() + " is referencing checks which do not exist: " + chkRef.toString());
+                    }
+                }
+                // set the condition
                 check.setCondition(cond);
                 this.report.info("Using virtual check condition " + cond.toString() + " for " + check);
                 // cross reference the checks
-                VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId());
                 check.setReferenceIds(cond.computeDependencies().stream().map((c) -> c.resolve(vcec).getId()).collect(Collectors.toList()));
             }
         }
