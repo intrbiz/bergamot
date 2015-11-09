@@ -149,6 +149,11 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 this.checkSecurityDomainExists(securityDomainName, cluster, report);
             }
+            // the condition
+            if (Util.isEmpty(cluster.getCondition()))
+            {
+                report.logError("You must provide a condition for the cluster " + cluster.getName());
+            }
             // resources of the cluster
             for (ResourceCfg resource : cluster.getResources())
             {
@@ -233,6 +238,11 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 resource.setTemplate(true);
                 report.logWarn("Top level resources must be templates: " + resource);
+            }
+            // the condition
+            if (Util.isEmpty(resource.getCondition()))
+            {
+                report.logError("You must provide a condition for the resource " + resource.getName());
             }
             this.validateNotify(resource.getNotify(), resource, report);
         }
