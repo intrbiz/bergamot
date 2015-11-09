@@ -41,6 +41,7 @@ import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.model.state.CheckTransition;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
+import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class DefaultResultProcessor extends AbstractResultProcessor
 {
@@ -415,9 +416,10 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             processedVirtualChecks.add(referencedBy.getId());
             // update the status of the check
-            boolean ok = referencedBy.getCondition().computeOk();
-            Status status = referencedBy.getCondition().computeStatus();
-            boolean allHard = referencedBy.getCondition().isAllDependenciesHard();
+            VirtualCheckExpressionContext context = db.createVirtualCheckContext(check.getSiteId());
+            boolean ok = referencedBy.getCondition().computeOk(context);
+            Status status = referencedBy.getCondition().computeStatus(context);
+            boolean allHard = referencedBy.getCondition().isAllDependenciesHard(context);
             // update the check
             Transition virtualTransition = this.applyVirtualResult(referencedBy, referencedBy.getState(), ok, status, allHard, resultMO);
             logger.info("Virtual state change for " + referencedBy.getType() + "::" + referencedBy.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange + " triggered by " + check.getType() + "::" + check.getId());
