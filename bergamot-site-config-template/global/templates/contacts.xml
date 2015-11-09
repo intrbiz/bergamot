@@ -6,6 +6,13 @@
         <notifications enabled="yes" time-period="24x7" alerts="yes" recovery="yes" acknowledge="yes">
             <notification-engine engine="email" enabled="yes" time-period="24x7"/>
             <notification-engine engine="sms" enabled="yes" time-period="24x7" alert="yes" recovery="no" ignore="pending, ok, warning"/>
+            <!-- escalation policies -->
+            <escalate after="1h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+            <escalate after="6h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
         </notifications>
     </contact>
     

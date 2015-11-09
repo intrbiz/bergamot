@@ -42,6 +42,8 @@ public class NotificationsCfg implements Serializable
     
     private Boolean allEnginesEnabled;
     
+    private List<EscalateCfg> escalations = new LinkedList<EscalateCfg>();
+    
     public NotificationsCfg()
     {
         super();
@@ -178,5 +180,17 @@ public class NotificationsCfg implements Serializable
     public void setAllEnginesEnabled(Boolean allEnginesEnabled)
     {
         this.allEnginesEnabled = allEnginesEnabled;
+    }
+
+    @XmlElementRef(type = EscalateCfg.class)
+    @ResolveWith(CoalesceEmptyCollection.class)
+    public List<EscalateCfg> getEscalations()
+    {
+        return escalations;
+    }
+
+    public void setEscalations(List<EscalateCfg> escalations)
+    {
+        this.escalations = escalations;
     }
 }

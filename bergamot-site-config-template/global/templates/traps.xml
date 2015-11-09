@@ -3,7 +3,15 @@
     
     <trap template="yes" name="generic-trap">
         <summary>Generic Trap</summary>
-        <notifications enabled="yes" time-period="24x7" all-engines="yes"/>
+        <notifications enabled="yes" time-period="24x7" all-engines="yes">
+            <!-- escalation policies -->
+            <escalate after="1h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+            <escalate after="6h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+        </notifications>
         <notify teams="admins"/>
         <state failed-after="1" recovers-after="1"/>
         <initially status="ok" output="OK"/>
