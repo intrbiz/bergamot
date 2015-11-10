@@ -44,6 +44,9 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     
     @JsonProperty("comments")
     protected List<CommentMO> comments = new LinkedList<CommentMO>();
+    
+    @JsonProperty("depends")
+    protected List<? extends CheckMO> depends = new LinkedList<CheckMO>();
 
     public CheckMO()
     {
@@ -173,5 +176,15 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     public void setComments(List<CommentMO> comments)
     {
         this.comments = comments;
+    }
+
+    public List<? extends CheckMO> getDepends()
+    {
+        return depends;
+    }
+
+    public void setDepends(List<? extends CheckMO> depends)
+    {
+        this.depends = depends;
     }
 }

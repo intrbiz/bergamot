@@ -31,6 +31,7 @@ import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Downtime;
+import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
@@ -110,7 +111,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             SecurityDomainMembership.class,
             AccessControl.class,
             ComputedPermission.class,
-            ComputedPermissionForDomain.class
+            ComputedPermissionForDomain.class,
+            Escalation.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter

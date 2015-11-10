@@ -35,6 +35,9 @@ public class NotificationsMO extends MessageObject
     @JsonProperty("acknowledge_enabled")
     private boolean acknowledgeEnabled = true;
     
+    @JsonProperty("escalations")
+    private List<EscalationMO> escalations = new LinkedList<EscalationMO>();
+    
     public NotificationsMO()
     {
         super();
@@ -118,5 +121,15 @@ public class NotificationsMO extends MessageObject
     public void setAcknowledgeEnabled(boolean acknowledgeEnabled)
     {
         this.acknowledgeEnabled = acknowledgeEnabled;
+    }
+
+    public List<EscalationMO> getEscalations()
+    {
+        return escalations;
+    }
+
+    public void setEscalations(List<EscalationMO> escalations)
+    {
+        this.escalations = escalations;
     }
 }
