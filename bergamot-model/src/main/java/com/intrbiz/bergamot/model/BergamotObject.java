@@ -34,7 +34,8 @@ public abstract class BergamotObject<T extends MessageObject> implements Seriali
         TRAPS,
         RESOURCES,
         HOST,
-        CLUSTER;
+        CLUSTER,
+        DEPENDS;
         
         public static final EnumSet<MOFlag> ALL = EnumSet.allOf(MOFlag.class);
         
