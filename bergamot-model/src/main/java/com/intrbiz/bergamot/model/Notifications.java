@@ -203,6 +203,14 @@ public class Notifications extends BergamotObject<NotificationsMO>
                 .filter((e) -> engine.equals(e.getEngine()))
                 .anyMatch((e) -> e.isEnabledAt(type, status, time));
     }
+    
+    public List<Escalation> getEscalations()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getEscalations(this.getId());
+        }
+    }
 
     @Override
     public NotificationsMO toMO(Contact contact, EnumSet<MOFlag> options)
@@ -220,6 +228,7 @@ public class Notifications extends BergamotObject<NotificationsMO>
             if (contact == null || contact.hasPermission("read", timePeriod)) mo.setTimePeriod(timePeriod.toStubMO(contact));
         }
         mo.setEngines(this.getEngines().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setEscalations(this.getEscalations().stream().map((e) -> e.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
 }

@@ -78,7 +78,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 21, 0}),
+        version = @SQLVersion({3, 22, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -748,6 +748,36 @@ public abstract class BergamotDB extends DatabaseAdapter
     @CacheInvalidate({"get_notification_engines.#{notifications_id}"})
     @SQLRemove(table = NotificationEngine.class, name = "remove_notification_engine", since = @SQLVersion({1, 0, 0}))
     public abstract void removeNotificationEngine(@SQLParam("notifications_id") UUID notificationId, @SQLParam("engine") String engine);
+    
+    @Cacheable
+    @CacheInvalidate({"get_notification_engines.#{notifications_id}"})
+    @SQLRemove(table = NotificationEngine.class, name = "remove_notification_engines", since = @SQLVersion({3, 22, 0}))
+    public abstract void removeNotificationEngines(@SQLParam("notifications_id") UUID notificationId);
+    
+    // escalations
+    
+    @Cacheable
+    @CacheInvalidate({"get_escalations.#{notifications_id}"})
+    @SQLSetter(table = Escalation.class, name = "set_escalation", since = @SQLVersion({3, 22, 0}))
+    public abstract void setEscalation(Escalation escalation);
+    
+    @Cacheable
+    @SQLGetter(table = Escalation.class, name = "get_escalation", since = @SQLVersion({3, 22, 0}))
+    public abstract Escalation getEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("sequence") int sequence);
+    
+    @Cacheable
+    @SQLGetter(table = Escalation.class, name = "get_escalations", since = @SQLVersion({3, 22, 0}))
+    public abstract List<Escalation> getEscalations(@SQLParam("notifications_id") UUID notificationId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_escalations.#{notifications_id}"})
+    @SQLRemove(table = Escalation.class, name = "remove_escalation", since = @SQLVersion({3, 22, 0}))
+    public abstract void removeEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("sequence") int sequence);
+    
+    @Cacheable
+    @CacheInvalidate({"get_escalations.#{notifications_id}"})
+    @SQLRemove(table = Escalation.class, name = "remove_escalations", since = @SQLVersion({3, 22, 0}))
+    public abstract void removeEscalations(@SQLParam("notifications_id") UUID notificationId);
     
     // state
     

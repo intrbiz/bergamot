@@ -180,8 +180,8 @@ public class Escalation extends BergamotObject<EscalationMO>
             if (contact == null || contact.hasPermission("read", timePeriod)) 
                 mo.setTimePeriod(timePeriod.toStubMO(contact));
         }
-        if (options.contains(MOFlag.CONTACTS)) mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
-        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
 }
