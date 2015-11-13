@@ -161,7 +161,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 }
                 db.commit();
                 // reschedule active checks if we have changed state at all
-                if ((check instanceof ActiveCheck) && (transition.stateChange || transition.hardChange))
+                if ((check instanceof ActiveCheck) && transition.hasSchedulingChanged())
                 {
                     // inform the scheduler to reschedule this check
                     long interval = ((ActiveCheck<?,?>) check).computeCurrentInterval(transition.nextState);
@@ -573,6 +573,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             this.nextState.getStatus() != this.previousState.getStatus() || 
             this.nextState.isInDowntime() != this.previousState.isInDowntime() || 
             this.nextState.isSuppressed() != this.previousState.isSuppressed();
+        }
+        
+        public boolean hasSchedulingChanged()
+        {
+            return this.stateChange || this.hardChange;
         }
     }
 }
