@@ -22,6 +22,7 @@ import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.config.model.ContactCfg;
+import com.intrbiz.bergamot.config.model.EscalateCfg;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.config.model.LocationCfg;
@@ -50,6 +51,7 @@ import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
@@ -1071,7 +1073,7 @@ public class BergamotConfigImporter
             notificationEngine.setEnabled(econfiguration.getEnabledBooleanValue());
             notificationEngine.setAlertsEnabled(econfiguration.getAlertsBooleanValue());
             notificationEngine.setRecoveryEnabled(econfiguration.getRecoveryBooleanValue());
-            notificationEngine.setIgnore(econfiguration.getIgnore().stream().map((e) -> {return Status.valueOf(e.toUpperCase()); }).collect(Collectors.toList()));
+            notificationEngine.setIgnore(econfiguration.getIgnore().stream().map(Status::parse).collect(Collectors.toList()));
             if (! Util.isEmpty(econfiguration.getNotificationPeriod()))
             {
                 TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), econfiguration.getNotificationPeriod());
@@ -1082,6 +1084,50 @@ public class BergamotConfigImporter
             }
             //
             db.setNotificationEngine(notificationEngine);
+        }
+        // escalations
+        db.removeEscalations(owner);
+        int seq = 0;
+        for (EscalateCfg ecfg : configuration.getEscalations())
+        {
+            Escalation esc = new Escalation();
+            esc.setNotificationsId(owner);
+            esc.setSequence(seq++);
+            esc.setAfter(ecfg.getAfterTimeInterval().toMillis());
+            esc.setIgnore(ecfg.getIgnore().stream().map(Status::parse).collect(Collectors.toList()));
+            // load the time period
+            if (! Util.isEmpty(ecfg.getEscalationPeriod()))
+            {
+                TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), ecfg.getEscalationPeriod());
+                if (timePeriod != null)
+                {
+                    notifications.setTimePeriodId(timePeriod.getId());
+                }
+            }
+            // notify
+            esc.getTeamIds().clear();
+            esc.getContactIds().clear();
+            if (ecfg.getNotify() != null)
+            {
+                for (String teamName : ecfg.getNotify().getTeams())
+                {
+                    Team team = db.getTeamByName(this.site.getId(), teamName);
+                    if (team != null)
+                    {
+                        esc.getTeamIds().add(team.getId());
+                    }
+                }
+                for (String contactName : ecfg.getNotify().getContacts())
+                {
+                    Contact contact = db.getContactByName(this.site.getId(), contactName);
+                    if (contact != null)
+                    {
+                        esc.getContactIds().add(contact.getId());
+                    }
+                }
+            }
+            // store it
+            db.setEscalation(esc);
         }
     }
 
