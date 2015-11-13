@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -178,6 +179,30 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
      */
     @SQLColumn(index = 24, name = "recovered_at", since = @SQLVersion({ 1, 0, 0 }))
     private Timestamp recoveredAt;
+    
+    /**
+     * Was this alert escalated
+     */
+    @SQLColumn(index = 25, name = "escalated", since = @SQLVersion({ 3, 23, 0 }))
+    private boolean escalated;
+    
+    /**
+     * When was this alert first escalated
+     */
+    @SQLColumn(index = 26, name = "escalated_at", since = @SQLVersion({ 3, 23, 0 }))
+    private Timestamp escalatedAt;
+    
+    /**
+     * How many times was this alert escalated
+     */
+    @SQLColumn(index = 27, name = "escalations", since = @SQLVersion({ 3, 23, 0 }))
+    private int escalations;
+    
+    /**
+     * When was this alert escalated
+     */
+    @SQLColumn(index = 28, name = "escalations_at", type = "TIMESTAMP WITH TIME ZONE[]", since = @SQLVersion({ 3, 23, 0 }))
+    private List<Timestamp> escalationsAt = new LinkedList<Timestamp>();
 
     public Alert()
     {
@@ -212,6 +237,10 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         this.recovered = false;
         this.recoveredAt = null;
         this.recoveredBy = null;
+        this.escalated = false;
+        this.escalatedAt = null;
+        this.escalations = 0;
+        this.escalationsAt = new LinkedList<Timestamp>();
     }
 
     public UUID getSiteId()
@@ -454,6 +483,46 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         this.recoveredAt = recoveredAt;
     }
     
+    public boolean isEscalated()
+    {
+        return escalated;
+    }
+
+    public void setEscalated(boolean escalated)
+    {
+        this.escalated = escalated;
+    }
+
+    public Timestamp getEscalatedAt()
+    {
+        return escalatedAt;
+    }
+
+    public void setEscalatedAt(Timestamp escalatedAt)
+    {
+        this.escalatedAt = escalatedAt;
+    }
+
+    public int getEscalations()
+    {
+        return escalations;
+    }
+
+    public void setEscalations(int escalations)
+    {
+        this.escalations = escalations;
+    }
+
+    public List<Timestamp> getEscalationsAt()
+    {
+        return escalationsAt;
+    }
+
+    public void setEscalationsAt(List<Timestamp> escalationsAt)
+    {
+        this.escalationsAt = escalationsAt;
+    }
+
     /**
      * Get comments against this alert
      * @param limit the maximum number of comments to get
@@ -526,6 +595,10 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         {
             mo.setComments(this.getComments().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
         }
+        mo.setEscalated(this.isEscalated());
+        mo.setEscalatedAt(this.getEscalatedAt() == null ? -1 : this.getEscalatedAt().getTime());
+        mo.setEscalations(this.getEscalations());
+        if (this.getEscalationsAt() != null) mo.setEscalationsAt(this.getEscalationsAt().stream().map(Timestamp::getTime).collect(Collectors.toList()));
         return mo;
     }
     

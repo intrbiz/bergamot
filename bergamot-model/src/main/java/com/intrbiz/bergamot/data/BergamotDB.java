@@ -78,7 +78,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 22, 0}),
+        version = @SQLVersion({3, 23, 0}),
         tables = {
             Site.class,
             Location.class,

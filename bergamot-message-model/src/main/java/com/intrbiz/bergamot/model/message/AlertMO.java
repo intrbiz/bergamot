@@ -147,6 +147,18 @@ public class AlertMO extends MessageObject implements CommentedMO
     @JsonProperty("comments")
     private List<CommentMO> comments = new LinkedList<CommentMO>();
     
+    @JsonProperty("escalated")
+    private boolean escalated;
+    
+    @JsonProperty("escalated_at")
+    private long escalatedAt;
+    
+    @JsonProperty("escalations")
+    private int escalations;
+    
+    @JsonProperty("escalations_at")
+    private List<Long> escalationsAt = new LinkedList<Long>();
+    
     public AlertMO()
     {
         super();
@@ -384,5 +396,53 @@ public class AlertMO extends MessageObject implements CommentedMO
     public void setComments(List<CommentMO> comments)
     {
         this.comments = comments;
+    }
+
+
+    public boolean isEscalated()
+    {
+        return escalated;
+    }
+
+
+    public void setEscalated(boolean escalated)
+    {
+        this.escalated = escalated;
+    }
+
+
+    public long getEscalatedAt()
+    {
+        return escalatedAt;
+    }
+
+
+    public void setEscalatedAt(long escalatedAt)
+    {
+        this.escalatedAt = escalatedAt;
+    }
+
+
+    public int getEscalations()
+    {
+        return escalations;
+    }
+
+
+    public void setEscalations(int escalations)
+    {
+        this.escalations = escalations;
+    }
+
+
+    public List<Long> getEscalationsAt()
+    {
+        return escalationsAt;
+    }
+
+
+    public void setEscalationsAt(List<Long> escalationsAt)
+    {
+        this.escalationsAt = escalationsAt;
     }
 }
