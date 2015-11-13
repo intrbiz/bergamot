@@ -1,8 +1,10 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -157,6 +159,17 @@ public class Escalation extends BergamotObject<EscalationMO>
             }
         }
         return r;
+    }
+    
+    public Set<Contact> getAllContacts()
+    {
+        Set<Contact> ret = new HashSet<Contact>();
+        ret.addAll(this.getContacts());
+        for (Team team : this.getTeams())
+        {
+            ret.addAll(team.getAllContacts());
+        }
+        return ret;
     }
     
     public TimePeriod getTimePeriod()
