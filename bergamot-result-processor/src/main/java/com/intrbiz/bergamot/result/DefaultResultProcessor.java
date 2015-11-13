@@ -171,15 +171,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // send the general state update notifications
                 this.sendCheckStateUpdate(db, check, transition);
                 // send group updates
-                if (
-                        transition.stateChange || 
-                        transition.hardChange || 
-                        transition.alert || 
-                        transition.recovery || 
-                        transition.nextState.getStatus() != transition.previousState.getStatus() || 
-                        transition.nextState.isInDowntime() != transition.previousState.isInDowntime() || 
-                        transition.nextState.isSuppressed() != transition.previousState.isSuppressed()
-                )
+                if (transition.hasChanged())
                 {
                     // group update
                     this.sendGroupStateUpdate(db, check, transition);
@@ -570,6 +562,17 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         public CheckTransition toCheckTransition(UUID id, UUID checkId, Timestamp appliedAt)
         {
             return new CheckTransition(id, checkId, appliedAt, this.stateChange, this.hardChange, this.alert, this.recovery, this.previousState, this.nextState);
+        }
+        
+        public boolean hasChanged()
+        {
+            return this.stateChange || 
+            this.hardChange || 
+            this.alert || 
+            this.recovery || 
+            this.nextState.getStatus() != this.previousState.getStatus() || 
+            this.nextState.isInDowntime() != this.previousState.isInDowntime() || 
+            this.nextState.isSuppressed() != this.previousState.isSuppressed();
         }
     }
 }
