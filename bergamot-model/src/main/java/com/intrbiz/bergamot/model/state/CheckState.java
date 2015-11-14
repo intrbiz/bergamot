@@ -228,6 +228,14 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     {
         return this.hard && this.ok;
     }
+    
+    /**
+     * Are we in a hard not OK state, IE: this.hard && ! this.ok
+     */
+    public boolean isHardNotOk()
+    {
+        return this.hard && (! this.ok);
+    }
 
     public void setHard(boolean hard)
     {

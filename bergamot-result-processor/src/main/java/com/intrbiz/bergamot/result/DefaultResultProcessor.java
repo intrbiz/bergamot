@@ -190,6 +190,14 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 {
                     this.sendRecovery(check, db);
                 }
+                else if (transition.hasGotWorse())
+                {
+                    // we should send another alert notification as the situation has gotten worse
+                }
+                else if (transition.nextState.isHardNotOk())
+                {
+                    // we are in a hard not ok state, we should check the escalation policies
+                }
                 // update any virtual checks
                 this.updateVirtualChecks(check, transition, resultMO, db);
             });
@@ -578,6 +586,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         public boolean hasSchedulingChanged()
         {
             return this.stateChange || this.hardChange;
+        }
+        
+        public boolean hasGotWorse()
+        {
+            return this.previousState.isHardNotOk() && this.nextState.isHardNotOk() && this.nextState.getStatus().isWorseThan(this.previousState.getStatus());
         }
     }
 }
