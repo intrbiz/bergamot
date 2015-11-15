@@ -19,6 +19,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
@@ -194,9 +195,10 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 {
                     // we should send another alert notification as the situation has gotten worse
                 }
-                else if (transition.nextState.isHardNotOk())
+                else if (transition.previousState.isHardNotOk() && transition.nextState.isHardNotOk())
                 {
                     // we are in a hard not ok state, we should check the escalation policies
+                    this.processEscalation(check, db);
                 }
                 // update any virtual checks
                 this.updateVirtualChecks(check, transition, resultMO, db);
@@ -321,6 +323,29 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             // publish alert update
             this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
+        }
+    }
+    
+    protected void processEscalation(Check<?,?> check, BergamotDB db)
+    {
+        // get the alert information
+        Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
+        if (alertRecord != null)
+        {
+            long alertDuration = System.currentTimeMillis() - alertRecord.getRaised().getTime();
+            logger.debug("Processing escalations for " + check.getType() + " " + check.getId() + " alert duration: " + alertDuration);
+            // evaluate the escalation policies for this check
+            for (Escalation escalation : check.getNotifications().getEscalations())
+            {
+                if (alertDuration > escalation.getAfter())
+                {
+                    logger.debug("Matched escalation " + escalation.getSequence() + " after " + escalation.getAfter());
+                }
+            }
+        }
+        else
+        {
+            logger.warn("Unable to get alert for check whilst processing escalation policy");
         }
     }
     
