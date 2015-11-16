@@ -434,6 +434,20 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         {
             resultMO.setOk(resultStatus.isOk());
         }
+        // collect the checks that we are dependent upon
+        // we cannot reach a hard state until all dependencies 
+        // checks are in a hard state
+        boolean hasDependencies = ! check.getDependsIds().isEmpty();
+        boolean dependenciesAreAllHard = true;
+        boolean dependenciesAreAllOk = true;
+        if (hasDependencies)
+        {
+            List<Check<?,?>> dependencies = check.getDepends();
+            List<CheckState> dependenciesState = dependencies.stream().map((d) -> d.getState()).collect(Collectors.toList());
+            dependenciesAreAllHard = dependenciesState.stream().allMatch(CheckState::isHard);
+            dependenciesAreAllOk   = dependenciesState.stream().allMatch(CheckState::isOk);
+            logger.debug("Dependencies for check " + check.getId() + " are all hard: " + dependenciesAreAllHard + " and all ok: " + dependenciesAreAllOk);
+        }
         // the next state
         CheckState nextState = currentState.clone();
         // apply the result to the next state
@@ -458,22 +472,24 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             // we've changed state
             nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
-            // begin or immediately transition
-            if (check.computeCurrentAttemptThreshold(nextState) > 1)
+            // immediately go to a hard state or start transitioning
+            if (check.computeCurrentAttemptThreshold(nextState) <= 1 && ((! hasDependencies) || dependenciesAreAllHard))
+            {
+                // we can only enter a hard state if we have no dependencies
+                // or all the dependencies are in a hard state
+                // immediately enter hard state
+                nextState.setHard(true);
+                nextState.setTransitioning(false);
+                nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
+                return new Transition(currentState, nextState, true, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
+            }
+            else
             {
                 // start the transition
                 nextState.setHard(false);
                 nextState.setTransitioning(true);
                 nextState.setAttempt(1);               
                 return new Transition(currentState, nextState, true, false, false, false);
-            }
-            else
-            {
-                // immediately enter hard state
-                nextState.setHard(true);
-                nextState.setTransitioning(false);
-                nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                return new Transition(currentState, nextState, true, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
             }
         }
         else if (currentState.isHard())
@@ -486,8 +502,10 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             // during transition
             nextState.setAttempt(currentState.getAttempt() + 1);
             // have we reached a hard state
-            if (nextState.getAttempt() >= check.computeCurrentAttemptThreshold(nextState))
+            if (nextState.getAttempt() >= check.computeCurrentAttemptThreshold(nextState) && ((! hasDependencies) || dependenciesAreAllHard))
             {
+                // we can only enter a hard state if we have no dependencies
+                // or all the dependencies are in a hard state
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
