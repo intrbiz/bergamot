@@ -8,27 +8,31 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
-import com.intrbiz.bergamot.accounting.model.NotificationType;
+import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
+import com.intrbiz.bergamot.model.AlertEscalation;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
+import com.intrbiz.bergamot.model.NotificationType;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.VirtualCheck;
+import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
@@ -289,7 +293,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     logger.warn("Sending recovery for " + check);
                     this.publishNotification(check, recovery);
                     // accounting
-                    this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), NotificationType.RECOVERY, recovery.getTo().size()));
+                    this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AccountingNotificationType.RECOVERY, recovery.getTo().size(), 0, null));
                 }
                 else
                 {
@@ -304,21 +308,23 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected void sendAlert(Check<?, ?> check, BergamotDB db)
     {
         logger.warn("Alert for " + check);
-        if (! check.getState().isSuppressedOrInDowntime())
+        CheckState state = check.getState();
+        if (! state.isSuppressedOrInDowntime())
         {
+            Calendar now = Calendar.getInstance();
+            // compute the contacts who should be notified
+            List<ContactMO> to = check.getContactsToNotify(NotificationType.ALERT, state.getStatus(), now);
             // record the alert
-            Alert alertRecord = new Alert(check, check.getState());
+            Alert alertRecord = new Alert(check, state, to);
             db.setAlert(alertRecord);
             // send the notifications
-            Calendar now = Calendar.getInstance();
-            // send
-            SendAlert alert = alertRecord.createAlertNotification(now);
+            SendAlert alert = alertRecord.createAlertNotification(now, to);
             if (alert != null && (! alert.getTo().isEmpty()))
             {
                 logger.warn("Sending alert for " + check);
                 this.publishNotification(check, alert);
                 // accounting
-                this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), NotificationType.ALERT, alert.getTo().size()));
+                this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AccountingNotificationType.ALERT, alert.getTo().size(), 0, null));
             }
             else
             {
@@ -337,14 +343,56 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         {
             long alertDuration = System.currentTimeMillis() - alert.getRaised().getTime();
             logger.debug("Processing escalations for " + check.getType() + " " + check.getId() + " alert duration: " + alertDuration);
+            // current check state
+            CheckState state = check.getState();
+            Calendar now = Calendar.getInstance();
             // evaluate the escalation policies for this check
-            Escalation escalation = check.getNotifications().evalEscalations(alertDuration, check.getState().getStatus(), Calendar.getInstance());
-            logger.debug("Matched escalation: after " + escalation.getAfter());
+            List<Escalation> escalations = new LinkedList<Escalation>();
+            check.getNotifications().evalEscalations(alertDuration, state.getStatus(), now, escalations);
             // evaluate the escalation policies for the contacts which were notified
-            List<Escalation> contactEscalations = new LinkedList<Escalation>();
             for (Contact notified : alert.getNotified())
             {
-                
+                notified.getNotifications().evalEscalations(alertDuration, state.getStatus(), now, escalations);
+            }
+            if (! escalations.isEmpty())
+            {
+                long after = escalations.stream().map((e) -> e.getAfter()).min(Long::compare).get();
+                // produce the list of contacts to whom the escalated alert should be sent
+                Set<ContactMO> escalateTo = new HashSet<ContactMO>();
+                for (Escalation escalation : escalations)
+                {
+                    escalateTo.addAll(escalation.getContactsToNotify(check, state.getStatus(), now));
+                }
+                // do we have anyone to escalate too
+                if (! escalateTo.isEmpty())
+                {
+                    logger.info("Raising escalation for alert " + alert.getId() + " after " + after + " to [" + escalateTo.stream().map(ContactMO::getName).collect(Collectors.joining(", ")) + "]");
+                    // record the escalation
+                    if (! alert.isEscalated())
+                    {
+                        alert.setEscalated(true);
+                        alert.setEscalatedAt(new Timestamp(System.currentTimeMillis()));
+                        db.setAlert(alert);
+                    }
+                    AlertEscalation alertEscalation = new AlertEscalation();
+                    alertEscalation.setEscalationId(UUID.randomUUID());
+                    alertEscalation.setAlertId(alert.getId());
+                    alertEscalation.setAfter(after);
+                    alertEscalation.setEscalatedAt(new Timestamp(System.currentTimeMillis()));
+                    alertEscalation.setNotifiedIds(escalateTo.stream().map((c) -> c.getId()).collect(Collectors.toList()));
+                    db.setAlertEscalation(alertEscalation);
+                    // send the notification
+                    SendAlert sendAlert = alert.createEscalatedAlertNotification(now, new LinkedList<ContactMO>(escalateTo));
+                    if (sendAlert != null && (! sendAlert.getTo().isEmpty()))
+                    {
+                        logger.warn("Sending escalated alert for " + check);
+                        this.publishNotification(check, sendAlert);
+                        // accounting
+                        this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), sendAlert.getId(), check.getId(), AccountingNotificationType.ALERT, sendAlert.getTo().size(), alertEscalation.getAfter(), alertEscalation.getEscalationId()));
+                    }
+                    // publish alert update
+                    this.publishAlertUpdate(alert, new AlertUpdate(alert.toMOUnsafe()));
+                }
             }
         }
     }

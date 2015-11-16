@@ -11,7 +11,7 @@ public class SendNotificationToContactAccountingEvent extends BergamotAccounting
     
     private UUID objectId;
     
-    private NotificationType notificationType;
+    private AccountingNotificationType notificationType;
     
     private UUID contact;
     
@@ -28,7 +28,7 @@ public class SendNotificationToContactAccountingEvent extends BergamotAccounting
         super();
     }
     
-    public SendNotificationToContactAccountingEvent(long timestamp, UUID siteId, UUID notificationId, UUID objectId, NotificationType notificationType, UUID contact, String engine, String messageType, String messageAddress, String messageId)
+    public SendNotificationToContactAccountingEvent(long timestamp, UUID siteId, UUID notificationId, UUID objectId, AccountingNotificationType notificationType, UUID contact, String engine, String messageType, String messageAddress, String messageId)
     {
         super(timestamp, siteId);
         this.notificationId = notificationId;
@@ -41,7 +41,7 @@ public class SendNotificationToContactAccountingEvent extends BergamotAccounting
         this.messageId = messageId;
     }
     
-    public SendNotificationToContactAccountingEvent(UUID siteId, UUID notificationId, UUID objectId, NotificationType notificationType, UUID contact, String engine, String messageType, String messageAddress, String messageId)
+    public SendNotificationToContactAccountingEvent(UUID siteId, UUID notificationId, UUID objectId, AccountingNotificationType notificationType, UUID contact, String engine, String messageType, String messageAddress, String messageId)
     {
         super(siteId);
         this.notificationId = notificationId;
@@ -80,12 +80,12 @@ public class SendNotificationToContactAccountingEvent extends BergamotAccounting
         this.objectId = objectId;
     }
 
-    public NotificationType getNotificationType()
+    public AccountingNotificationType getNotificationType()
     {
         return notificationType;
     }
 
-    public void setNotificationType(NotificationType notificationType)
+    public void setNotificationType(AccountingNotificationType notificationType)
     {
         this.notificationType = notificationType;
     }
@@ -166,7 +166,7 @@ public class SendNotificationToContactAccountingEvent extends BergamotAccounting
         this.notificationId = this.unpackUUID(from);
         this.objectId = this.unpackUUID(from);
         int rType = from.getInt();
-        this.notificationType = rType == -1 ? null : NotificationType.values()[rType];
+        this.notificationType = rType == -1 ? null : AccountingNotificationType.values()[rType];
         this.contact = this.unpackUUID(from);
         this.engine = this.unpackString(from);
         this.messageType = this.unpackString(from);

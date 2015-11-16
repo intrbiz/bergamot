@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
-import com.intrbiz.bergamot.accounting.model.NotificationType;
+import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
@@ -146,7 +146,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                     logger.warn("Sending acknowledge for " + alert.getId());
                     this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
                     // accounting
-                    this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), NotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size()));
+                    this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
                 }
                 else
                 {

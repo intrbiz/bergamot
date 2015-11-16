@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.VirtualCheckMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -437,6 +438,34 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
             this.setEnabled(false);
             db.setCheck(this);
         }
+    }
+    
+    /**
+     * Compute the list of contacts who should be notified
+     * @return a list of contact message objects
+     */
+    public List<ContactMO> getContactsToNotify(NotificationType type, Status status, Calendar time)
+    {
+        final Notifications checkNotifications = this.getNotifications();
+        // compute the engines available
+        final Set<String> enabledEngines = checkNotifications.getEnginesEnabledAt(type, status, time);
+        // compute the contacts to notify
+        return this.getAllContacts().stream()
+        .filter((contact) -> contact.getNotifications().isEnabledAt(type, status, time))
+        .map((contact) -> {
+            ContactMO cmo = contact.toMOUnsafe();
+            cmo.setEngines(
+                    contact.getNotifications().getEnginesEnabledAt(type, status, time).stream()
+                    .filter((engine) -> checkNotifications.isAllEnginesEnabled() || enabledEngines.contains(engine))
+                    .collect(Collectors.toSet())
+            );
+            return cmo;
+        }).collect(Collectors.toList());
+    }
+    
+    public List<ContactMO> getContactsToNotify(NotificationType type)
+    {
+        return this.getContactsToNotify(type, this.getState().getStatus(), Calendar.getInstance());
     }
     
     //

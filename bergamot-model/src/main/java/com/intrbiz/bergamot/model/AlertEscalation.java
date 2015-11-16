@@ -37,15 +37,21 @@ public class AlertEscalation extends BergamotObject<AlertEscalationMO>
     private long after;
     
     /**
+     * The unique id of this escalation
+     */
+    @SQLColumn(index = 3, name = "after", since = @SQLVersion({ 3, 26, 0 }))
+    private UUID escalationId;
+    
+    /**
      * When did this escalation happen
      */
-    @SQLColumn(index = 3, name = "escalated_at", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 4, name = "escalated_at", since = @SQLVersion({ 3, 26, 0 }))
     private Timestamp escalatedAt;
     
     /**
      * Who was notified because of this alert escalation
      */
-    @SQLColumn(index = 4, name = "notified_ids", type = "UUID[]", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 5, name = "notified_ids", type = "UUID[]", since = @SQLVersion({ 3, 26, 0 }))
     private List<UUID> notifiedIds = new LinkedList<UUID>();
     
     public AlertEscalation()
@@ -93,6 +99,16 @@ public class AlertEscalation extends BergamotObject<AlertEscalationMO>
         this.notifiedIds = notifiedIds;
     }
     
+    public UUID getEscalationId()
+    {
+        return escalationId;
+    }
+
+    public void setEscalationId(UUID escalationId)
+    {
+        this.escalationId = escalationId;
+    }
+
     public List<Contact> getNotified()
     {
         try (BergamotDB db = BergamotDB.connect())
@@ -105,6 +121,7 @@ public class AlertEscalation extends BergamotObject<AlertEscalationMO>
     public AlertEscalationMO toMO(Contact contact, EnumSet<com.intrbiz.bergamot.model.BergamotObject.MOFlag> options)
     {
         AlertEscalationMO mo = new AlertEscalationMO();
+        mo.setEscalationId(this.getEscalationId());
         mo.setAfter(this.after);
         mo.setEscalatedAt(this.getEscalatedAt().getTime());
         mo.setNotified(this.getNotified().stream().filter((c) -> contact == null || contact.hasPermission("read", c)).map((c) -> c.toStubMO(contact)).collect(Collectors.toList()));

@@ -225,6 +225,12 @@ public class Notifications extends BergamotObject<NotificationsMO>
         }
         return null;
     }
+    
+    public void evalEscalations(long alertDuration, Status status, Calendar time, List<Escalation> escalations)
+    {
+        Escalation escalation = this.evalEscalations(alertDuration, status, time);
+        if (escalation != null) escalations.add(escalation);
+    }
 
     @Override
     public NotificationsMO toMO(Contact contact, EnumSet<MOFlag> options)

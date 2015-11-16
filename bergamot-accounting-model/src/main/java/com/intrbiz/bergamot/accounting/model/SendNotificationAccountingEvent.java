@@ -11,31 +11,39 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
     
     private UUID objectId;
     
-    private NotificationType notificationType;
+    private AccountingNotificationType notificationType;
     
     private int recipientCount;
+    
+    private long escalatedAfter = 0;
+    
+    private UUID escalationId;
     
     public SendNotificationAccountingEvent()
     {
         super();
     }
     
-    public SendNotificationAccountingEvent(long timestamp, UUID siteId, UUID notificationId, UUID objectId, NotificationType notificationType, int recipientCount)
+    public SendNotificationAccountingEvent(long timestamp, UUID siteId, UUID notificationId, UUID objectId, AccountingNotificationType notificationType, int recipientCount, long escalatedAfter, UUID escalationId)
     {
         super(timestamp, siteId);
         this.notificationId = notificationId;
         this.objectId = objectId;
         this.notificationType = notificationType;
         this.recipientCount = recipientCount;
+        this.escalatedAfter = escalatedAfter;
+        this.escalationId = escalationId;
     }
     
-    public SendNotificationAccountingEvent(UUID siteId, UUID notificationId, UUID objectId, NotificationType notificationType, int recipientCount)
+    public SendNotificationAccountingEvent(UUID siteId, UUID notificationId, UUID objectId, AccountingNotificationType notificationType, int recipientCount, long escalatedAfter, UUID escalationId)
     {
         super(siteId);
         this.notificationId = notificationId;
         this.objectId = objectId;
         this.notificationType = notificationType;
         this.recipientCount = recipientCount;
+        this.escalatedAfter = escalatedAfter;
+        this.escalationId = escalationId;
     }
 
     @Override
@@ -64,12 +72,12 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
         this.objectId = objectId;
     }
 
-    public NotificationType getNotificationType()
+    public AccountingNotificationType getNotificationType()
     {
         return notificationType;
     }
 
-    public void setNotificationType(NotificationType notificationType)
+    public void setNotificationType(AccountingNotificationType notificationType)
     {
         this.notificationType = notificationType;
     }
@@ -86,7 +94,7 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
 
     public String toString()
     {
-        return super.toString() + " [" + this.notificationId + "] [" + this.objectId + "] [" + this.notificationType + "] [" + this.recipientCount + "]";
+        return super.toString() + " [" + this.notificationId + "] [" + this.objectId + "] [" + this.notificationType + "] [" + this.recipientCount + "] [" + this.escalatedAfter + "] [" + this.escalationId + "]";
     }
 
     @Override
@@ -97,6 +105,8 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
         this.packUUID(this.objectId, into);
         into.putInt(this.notificationType == null ? -1 : this.notificationType.ordinal());
         into.putInt(this.recipientCount);
+        into.putLong(this.escalatedAfter);
+        this.packUUID(this.escalationId, into);
     }
 
     @Override
@@ -106,8 +116,10 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
         this.notificationId = this.unpackUUID(from);
         this.objectId = this.unpackUUID(from);
         int rType = from.getInt();
-        this.notificationType = rType == -1 ? null : NotificationType.values()[rType];
+        this.notificationType = rType == -1 ? null : AccountingNotificationType.values()[rType];
         this.recipientCount = from.getInt();
+        this.escalatedAfter = from.getLong();
+        this.escalationId = this.unpackUUID(from);
     }
 
     @Override
@@ -115,6 +127,8 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
     {
         final int prime = 31;
         int result = super.hashCode();
+        result = prime * result + (int) (escalatedAfter ^ (escalatedAfter >>> 32));
+        result = prime * result + ((escalationId == null) ? 0 : escalationId.hashCode());
         result = prime * result + ((notificationId == null) ? 0 : notificationId.hashCode());
         result = prime * result + ((notificationType == null) ? 0 : notificationType.hashCode());
         result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
@@ -129,6 +143,12 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
         if (!super.equals(obj)) return false;
         if (getClass() != obj.getClass()) return false;
         SendNotificationAccountingEvent other = (SendNotificationAccountingEvent) obj;
+        if (escalatedAfter != other.escalatedAfter) return false;
+        if (escalationId == null)
+        {
+            if (other.escalationId != null) return false;
+        }
+        else if (!escalationId.equals(other.escalationId)) return false;
         if (notificationId == null)
         {
             if (other.notificationId != null) return false;

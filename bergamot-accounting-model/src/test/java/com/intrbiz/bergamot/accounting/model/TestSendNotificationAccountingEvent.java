@@ -29,7 +29,7 @@ public class TestSendNotificationAccountingEvent
     @Test
     public void packUnpack()
     {
-        SendNotificationAccountingEvent a = new SendNotificationAccountingEvent(siteId, alertId, checkId, NotificationType.ALERT, 13);
+        SendNotificationAccountingEvent a = new SendNotificationAccountingEvent(siteId, alertId, checkId, AccountingNotificationType.ALERT, 13);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(notNullValue()));

@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.accounting.Accounting;
-import com.intrbiz.bergamot.accounting.model.NotificationType;
+import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
@@ -71,7 +71,7 @@ public class ContactActions
             this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), resetNotification);
             logger.info("Sent password reset for contact " + contact.getSite().getName() + "::" + contact.getName() + " (" + contact.getId() + ")");
             // accounting
-            this.accounting.account(new SendNotificationAccountingEvent(contact.getSiteId(), resetNotification.getId(), contact.getId(), NotificationType.RESET, resetNotification.getTo().size()));
+            this.accounting.account(new SendNotificationAccountingEvent(contact.getSiteId(), resetNotification.getId(), contact.getId(), AccountingNotificationType.RESET, resetNotification.getTo().size(), 0, null));
         }
         return true;
     }

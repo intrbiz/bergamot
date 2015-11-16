@@ -7,7 +7,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.accounting.model.NotificationType;
+import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.HostMO;
@@ -218,13 +218,13 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
     
     // accounting helpers
     
-    public static NotificationType getNotificationType(Notification notification)
+    public static AccountingNotificationType getNotificationType(Notification notification)
     {
-        if (notification instanceof SendAlert) return NotificationType.ALERT;
-        else if (notification instanceof SendRecovery) return NotificationType.RECOVERY;
-        else if (notification instanceof SendAcknowledge) return NotificationType.ACKNOWLEDGEMENT;
-        else if (notification instanceof PasswordResetNotification) return NotificationType.RESET;
-        else if (notification instanceof RegisterContactNotification) return NotificationType.REGISTER;
+        if (notification instanceof SendAlert) return AccountingNotificationType.ALERT;
+        else if (notification instanceof SendRecovery) return AccountingNotificationType.RECOVERY;
+        else if (notification instanceof SendAcknowledge) return AccountingNotificationType.ACKNOWLEDGEMENT;
+        else if (notification instanceof PasswordResetNotification) return AccountingNotificationType.RESET;
+        else if (notification instanceof RegisterContactNotification) return AccountingNotificationType.REGISTER;
         return null;
     }
     

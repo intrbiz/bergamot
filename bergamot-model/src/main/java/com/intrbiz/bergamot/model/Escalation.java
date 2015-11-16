@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.StatusesAdapter;
+import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.EscalationMO;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -184,6 +185,29 @@ public class Escalation extends BergamotObject<EscalationMO> implements Comparab
     public boolean isStatusIgnored(Status status)
     {
         return this.ignore.stream().anyMatch((e) -> e == status);
+    }
+    
+    /**
+     * Compute the list of contacts who should be notified
+     * @return a list of contact message objects
+     */
+    public List<ContactMO> getContactsToNotify(Check<?,?> check, Status status, Calendar time)
+    {
+        final Notifications checkNotifications = check.getNotifications();
+        // compute the engines available
+        final Set<String> enabledEngines = checkNotifications.getEnginesEnabledAt(NotificationType.ALERT, status, time);
+        // compute the contacts to notify
+        return this.getAllContacts().stream()
+        .filter((contact) -> contact.getNotifications().isEnabledAt(NotificationType.ALERT, status, time))
+        .map((contact) -> {
+            ContactMO cmo = contact.toMOUnsafe();
+            cmo.setEngines(
+                    contact.getNotifications().getEnginesEnabledAt(NotificationType.ALERT, status, time).stream()
+                    .filter((engine) -> checkNotifications.isAllEnginesEnabled() || enabledEngines.contains(engine))
+                    .collect(Collectors.toSet())
+            );
+            return cmo;
+        }).collect(Collectors.toList());
     }
 
     @Override
