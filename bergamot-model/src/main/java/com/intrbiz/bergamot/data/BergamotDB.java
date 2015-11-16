@@ -763,16 +763,16 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @SQLGetter(table = Escalation.class, name = "get_escalation", since = @SQLVersion({3, 22, 0}))
-    public abstract Escalation getEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("sequence") int sequence);
+    public abstract Escalation getEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("after") long after);
     
     @Cacheable
-    @SQLGetter(table = Escalation.class, name = "get_escalations", since = @SQLVersion({3, 22, 0}))
+    @SQLGetter(table = Escalation.class, name = "get_escalations", since = @SQLVersion({3, 22, 0}), orderBy = @SQLOrder(value = "after", direction = Direction.DESC))
     public abstract List<Escalation> getEscalations(@SQLParam("notifications_id") UUID notificationId);
     
     @Cacheable
     @CacheInvalidate({"get_escalations.#{notifications_id}"})
     @SQLRemove(table = Escalation.class, name = "remove_escalation", since = @SQLVersion({3, 22, 0}))
-    public abstract void removeEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("sequence") int sequence);
+    public abstract void removeEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("after") long after);
     
     @Cacheable
     @CacheInvalidate({"get_escalations.#{notifications_id}"})

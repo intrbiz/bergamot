@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -210,6 +211,19 @@ public class Notifications extends BergamotObject<NotificationsMO>
         {
             return db.getEscalations(this.getId());
         }
+    }
+    
+    public Escalation evalEscalations(long alertDuration, Status status, Calendar time)
+    {
+        // process the escalations in descending order
+        List<Escalation> escalations = this.getEscalations();
+        Collections.sort(escalations);
+        for (Escalation escalation : escalations)
+        {
+            if (alertDuration > escalation.getAfter() && escalation.isActiveFor(status, time))
+                return escalation;
+        }
+        return null;
     }
 
     @Override

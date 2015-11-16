@@ -1087,12 +1087,10 @@ public class BergamotConfigImporter
         }
         // escalations
         db.removeEscalations(owner);
-        int seq = 0;
         for (EscalateCfg ecfg : configuration.getEscalations())
         {
             Escalation esc = new Escalation();
             esc.setNotificationsId(owner);
-            esc.setSequence(seq++);
             esc.setAfter(ecfg.getAfterTimeInterval().toMillis());
             esc.setIgnore(ecfg.getIgnore().stream().map(Status::parse).collect(Collectors.toList()));
             // load the time period

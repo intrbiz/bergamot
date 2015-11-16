@@ -330,22 +330,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     {
         // get the alert information
         Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
-        if (alertRecord != null)
+        if (alertRecord != null && (! alertRecord.isAcknowledged()) && (! alertRecord.isRecovered()))
         {
             long alertDuration = System.currentTimeMillis() - alertRecord.getRaised().getTime();
             logger.debug("Processing escalations for " + check.getType() + " " + check.getId() + " alert duration: " + alertDuration);
             // evaluate the escalation policies for this check
-            for (Escalation escalation : check.getNotifications().getEscalations())
-            {
-                if (alertDuration > escalation.getAfter())
-                {
-                    logger.debug("Matched escalation " + escalation.getSequence() + " after " + escalation.getAfter());
-                }
-            }
-        }
-        else
-        {
-            logger.warn("Unable to get alert for check whilst processing escalation policy");
+            Escalation escalation = check.getNotifications().evalEscalations(alertDuration, check.getState().getStatus(), Calendar.getInstance());
+            logger.debug("Matched escalation: after " + escalation.getAfter());
         }
     }
     

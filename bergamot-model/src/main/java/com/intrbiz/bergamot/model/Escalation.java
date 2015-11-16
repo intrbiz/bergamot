@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,7 +20,7 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "escalation", since = @SQLVersion({ 3, 22, 0 }))
-public class Escalation extends BergamotObject<EscalationMO>
+public class Escalation extends BergamotObject<EscalationMO> implements Comparable<Escalation>
 {
     private static final long serialVersionUID = 1L;
     
@@ -27,15 +28,12 @@ public class Escalation extends BergamotObject<EscalationMO>
     @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey
     private UUID notificationsId;
-    
-    @SQLColumn(index = 2, name = "sequence", since = @SQLVersion({ 3, 22, 0 }))
-    @SQLPrimaryKey
-    private int sequence;
 
     @SQLColumn(index = 2, name = "after", since = @SQLVersion({ 3, 22, 0 }))
+    @SQLPrimaryKey
     private long after;
     
-    @SQLColumn(index = 7, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 3, 22, 0 }))
+    @SQLColumn(index = 3, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 3, 22, 0 }))
     private List<Status> ignore = new LinkedList<Status>();
     
     @SQLColumn(index = 4, name = "timeperiod_id", since = @SQLVersion({ 3, 22, 0 }))
@@ -45,13 +43,13 @@ public class Escalation extends BergamotObject<EscalationMO>
     /**
      * Teams to notify
      */
-    @SQLColumn(index = 4, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 3, 22, 0 }))
+    @SQLColumn(index = 5, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 3, 22, 0 }))
     protected List<UUID> teamIds = new LinkedList<UUID>();
 
     /**
      * Contacts to notify
      */
-    @SQLColumn(index = 5, name = "contact_ids", type = "UUID[]", since = @SQLVersion({ 3, 22, 0 }))
+    @SQLColumn(index = 6, name = "contact_ids", type = "UUID[]", since = @SQLVersion({ 3, 22, 0 }))
     protected List<UUID> contactIds = new LinkedList<UUID>();
 
     public Escalation()
@@ -67,16 +65,6 @@ public class Escalation extends BergamotObject<EscalationMO>
     public void setNotificationsId(UUID notificationsId)
     {
         this.notificationsId = notificationsId;
-    }
-
-    public int getSequence()
-    {
-        return sequence;
-    }
-
-    public void setSequence(int sequence)
-    {
-        this.sequence = sequence;
     }
 
     public long getAfter()
@@ -180,6 +168,23 @@ public class Escalation extends BergamotObject<EscalationMO>
             return db.getTimePeriod(this.getTimePeriodId());
         }
     }
+    
+    /**
+     * Is this escalation active for the given check state and a point in time
+     * @param status the status of the check
+     * @param time the time
+     * @return true if this escalation is active
+     */
+    public boolean isActiveFor(Status status, Calendar time)
+    {
+        TimePeriod timePeriod = this.getTimePeriod();
+        return  (!this.isStatusIgnored(status)) && (timePeriod == null ? true : timePeriod.isInTimeRange(time));
+    }
+
+    public boolean isStatusIgnored(Status status)
+    {
+        return this.ignore.stream().anyMatch((e) -> e == status);
+    }
 
     @Override
     public EscalationMO toMO(Contact contact, EnumSet<com.intrbiz.bergamot.model.BergamotObject.MOFlag> options)
@@ -196,5 +201,37 @@ public class Escalation extends BergamotObject<EscalationMO>
         mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (after ^ (after >>> 32));
+        result = prime * result + ((notificationsId == null) ? 0 : notificationsId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        Escalation other = (Escalation) obj;
+        if (after != other.after) return false;
+        if (notificationsId == null)
+        {
+            if (other.notificationsId != null) return false;
+        }
+        else if (!notificationsId.equals(other.notificationsId)) return false;
+        return true;
+    }
+
+    @Override
+    public int compareTo(Escalation o)
+    {
+        return Long.compare(o.after, this.after);
     }
 }
