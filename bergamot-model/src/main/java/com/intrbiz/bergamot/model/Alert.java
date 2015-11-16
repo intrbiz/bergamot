@@ -685,4 +685,9 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
             return cmo;
         }).collect(Collectors.toList());
     }
+    
+    public List<ContactMO> getContactsToNotify(Calendar time)
+    {
+        return this.getContactsToNotify(this.getCheck(), this.getCheck().getState().getStatus(), time);
+    }
 }

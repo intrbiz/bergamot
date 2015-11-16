@@ -201,6 +201,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 else if (transition.hasGotWorse())
                 {
                     // we should send another alert notification as the situation has gotten worse
+                    this.resendAlert(check, db);
                 }
                 else if (transition.previousState.isHardNotOk() && transition.nextState.isHardNotOk())
                 {
@@ -332,6 +333,34 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             // publish alert update
             this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
+        }
+    }
+    
+    protected void resendAlert(Check<?, ?> check, BergamotDB db)
+    {
+        // get the alert information
+        Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
+        if (alertRecord != null && (! alertRecord.isAcknowledged()) && (! alertRecord.isRecovered()))
+        {
+            logger.warn("Resending notifications for alert " + alertRecord.getId());
+            CheckState state = check.getState();
+            if (! state.isSuppressedOrInDowntime())
+            {
+                Calendar now = Calendar.getInstance();
+                // compute the contacts who should be notified
+                List<ContactMO> to = alertRecord.getContactsToNotify(now);
+                // send the notifications
+                SendAlert alert = alertRecord.createAlertNotification(now, to);
+                if (alert != null && (! alert.getTo().isEmpty()))
+                {
+                    logger.warn("Sending alert for " + check);
+                    this.publishNotification(check, alert);
+                    // accounting
+                    this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AccountingNotificationType.ALERT, alert.getTo().size(), 0, null));
+                }
+                // publish alert update
+                this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
+            }
         }
     }
     
