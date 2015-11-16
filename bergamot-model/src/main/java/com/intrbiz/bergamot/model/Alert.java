@@ -193,16 +193,10 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     private Timestamp escalatedAt;
     
     /**
-     * How many times was this alert escalated
+     * Who was notified because of this alert
      */
-    @SQLColumn(index = 27, name = "escalations", since = @SQLVersion({ 3, 23, 0 }))
-    private int escalations;
-    
-    /**
-     * When was this alert escalated
-     */
-    @SQLColumn(index = 28, name = "escalations_at", type = "TIMESTAMP WITH TIME ZONE[]", since = @SQLVersion({ 3, 23, 0 }))
-    private List<Timestamp> escalationsAt = new LinkedList<Timestamp>();
+    @SQLColumn(index = 27, name = "notified_ids", type = "UUID[]", since = @SQLVersion({ 3, 26, 0 }))
+    private List<UUID> notifiedIds = new LinkedList<UUID>();
 
     public Alert()
     {
@@ -239,8 +233,6 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         this.recoveredBy = null;
         this.escalated = false;
         this.escalatedAt = null;
-        this.escalations = 0;
-        this.escalationsAt = new LinkedList<Timestamp>();
     }
 
     public UUID getSiteId()
@@ -503,24 +495,14 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         this.escalatedAt = escalatedAt;
     }
 
-    public int getEscalations()
+    public List<UUID> getNotifiedIds()
     {
-        return escalations;
+        return notifiedIds;
     }
 
-    public void setEscalations(int escalations)
+    public void setNotifiedIds(List<UUID> notifiedIds)
     {
-        this.escalations = escalations;
-    }
-
-    public List<Timestamp> getEscalationsAt()
-    {
-        return escalationsAt;
-    }
-
-    public void setEscalationsAt(List<Timestamp> escalationsAt)
-    {
-        this.escalationsAt = escalationsAt;
+        this.notifiedIds = notifiedIds;
     }
 
     /**
@@ -564,6 +546,22 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
             return db.getContact(this.getAcknowledgedById());
         }
     }
+    
+    public List<Contact> getNotified()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return this.getNotifiedIds().stream().map((id) -> db.getContact(id)).filter((c) -> c != null).collect(Collectors.toList());
+        }
+    }
+    
+    public List<AlertEscalation> getEscalations()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAlertEscalations(this.getId());
+        }
+    }
 
     @Override
     public AlertMO toMO(Contact contact, EnumSet<MOFlag> options)
@@ -597,8 +595,8 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         }
         mo.setEscalated(this.isEscalated());
         mo.setEscalatedAt(this.getEscalatedAt() == null ? -1 : this.getEscalatedAt().getTime());
-        mo.setEscalations(this.getEscalations());
-        if (this.getEscalationsAt() != null) mo.setEscalationsAt(this.getEscalationsAt().stream().map(Timestamp::getTime).collect(Collectors.toList()));
+        mo.setNotified(this.getNotified().stream().filter((c) -> contact == null || contact.hasPermission("read", c)).map((c) -> c.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setEscalations(this.getEscalations().stream().map((e) -> e.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
     

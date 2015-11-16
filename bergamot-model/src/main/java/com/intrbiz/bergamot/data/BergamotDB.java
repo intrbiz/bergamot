@@ -20,6 +20,7 @@ import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.AccessControl;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Alert;
+import com.intrbiz.bergamot.model.AlertEscalation;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Cluster;
@@ -78,7 +79,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 23, 0}),
+        version = @SQLVersion({3, 26, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -112,7 +113,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             AccessControl.class,
             ComputedPermission.class,
             ComputedPermissionForDomain.class,
-            Escalation.class
+            Escalation.class,
+            AlertEscalation.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -874,6 +876,33 @@ public abstract class BergamotDB extends DatabaseAdapter
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE site_id = p_site_id AND recovered = FALSE AND acknowledged = FALSE ORDER BY raised DESC")
     )
     public abstract List<Alert> listAlerts(@SQLParam("site_id") UUID siteId);
+    
+    // alert escalations
+    
+    // escalations
+    
+    @Cacheable
+    @CacheInvalidate({"get_alert_escalations.#{alert_id}"})
+    @SQLSetter(table = AlertEscalation.class, name = "set_alert_escalation", since = @SQLVersion({3, 26, 0}))
+    public abstract void setAlertEscalation(AlertEscalation alertEscalation);
+    
+    @Cacheable
+    @SQLGetter(table = AlertEscalation.class, name = "get_alert_escalation", since = @SQLVersion({3, 26, 0}))
+    public abstract AlertEscalation getAlertEscalation(@SQLParam("alert_id") UUID alertId, @SQLParam("after") long after);
+    
+    @Cacheable
+    @SQLGetter(table = AlertEscalation.class, name = "get_alert_escalations", since = @SQLVersion({3, 26, 0}), orderBy = @SQLOrder(value = "after", direction = Direction.ASC))
+    public abstract List<AlertEscalation> getAlertEscalations(@SQLParam("alert_id") UUID alertId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_alert_escalations.#{alert_id}"})
+    @SQLRemove(table = AlertEscalation.class, name = "remove_alert_escalation", since = @SQLVersion({3, 26, 0}))
+    public abstract void removeAlertEscalation(@SQLParam("alert_id") UUID alertId, @SQLParam("after") long after);
+    
+    @Cacheable
+    @CacheInvalidate({"get_alert_escalations.#{alert_id}"})
+    @SQLRemove(table = AlertEscalation.class, name = "remove_alert_escalations", since = @SQLVersion({3, 26, 0}))
+    public abstract void removeAlertEscalations(@SQLParam("alert_id") UUID alertId);
     
     // group state
     

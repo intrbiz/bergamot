@@ -3,6 +3,8 @@ package com.intrbiz.bergamot.result;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -19,6 +21,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
@@ -329,14 +332,20 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     protected void processEscalation(Check<?,?> check, BergamotDB db)
     {
         // get the alert information
-        Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
-        if (alertRecord != null && (! alertRecord.isAcknowledged()) && (! alertRecord.isRecovered()))
+        Alert alert = db.getCurrentAlertForCheck(check.getId());
+        if (alert != null && (! alert.isAcknowledged()) && (! alert.isRecovered()))
         {
-            long alertDuration = System.currentTimeMillis() - alertRecord.getRaised().getTime();
+            long alertDuration = System.currentTimeMillis() - alert.getRaised().getTime();
             logger.debug("Processing escalations for " + check.getType() + " " + check.getId() + " alert duration: " + alertDuration);
             // evaluate the escalation policies for this check
             Escalation escalation = check.getNotifications().evalEscalations(alertDuration, check.getState().getStatus(), Calendar.getInstance());
             logger.debug("Matched escalation: after " + escalation.getAfter());
+            // evaluate the escalation policies for the contacts which were notified
+            List<Escalation> contactEscalations = new LinkedList<Escalation>();
+            for (Contact notified : alert.getNotified())
+            {
+                
+            }
         }
     }
     

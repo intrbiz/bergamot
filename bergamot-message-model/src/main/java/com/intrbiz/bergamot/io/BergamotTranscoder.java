@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrbiz.bergamot.model.message.AlertEscalationMO;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.ClusterMO;
@@ -141,6 +142,7 @@ public class BergamotTranscoder
         TeamMO.class,
         TimePeriodMO.class,
         AlertMO.class,
+        AlertEscalationMO.class,
         CommentMO.class,
         DowntimeMO.class,
         SecurityDomainMO.class,
