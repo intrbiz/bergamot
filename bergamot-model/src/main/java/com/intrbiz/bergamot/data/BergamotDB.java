@@ -79,7 +79,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 26, 0}),
+        version = @SQLVersion({3, 27, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -2626,6 +2626,14 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "    RETURN FOUND;\n" +
                 "END;\n" +
                 "$$"
+        );
+    }
+    
+    @SQLPatch(name = "add_alert_indexes", index = 13, type = ScriptType.BOTH, version = @SQLVersion({3, 26, 0}), skip = false)
+    public static SQLScript addAlertIndexes()
+    {
+        return new SQLScript(
+           "CREATE INDEX alert_check_id_raised_idx ON bergamot.alert USING btree(check_id, raised)"
         );
     }
     
