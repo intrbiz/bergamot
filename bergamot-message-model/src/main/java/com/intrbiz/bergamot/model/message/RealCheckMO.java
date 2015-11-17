@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.model.message;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
 
@@ -19,6 +22,9 @@ public abstract class RealCheckMO extends CheckMO
     
     @JsonProperty("stats")
     protected CheckStatsMO stats;
+    
+    @JsonProperty("depends")
+    protected List<? extends CheckMO> depends = new LinkedList<CheckMO>();
 
     public RealCheckMO()
     {
@@ -73,5 +79,15 @@ public abstract class RealCheckMO extends CheckMO
     public void setStats(CheckStatsMO stats)
     {
         this.stats = stats;
+    }
+
+    public List<? extends CheckMO> getDepends()
+    {
+        return depends;
+    }
+
+    public void setDepends(List<? extends CheckMO> depends)
+    {
+        this.depends = depends;
     }
 }

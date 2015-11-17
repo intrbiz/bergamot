@@ -63,12 +63,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     
     @SQLColumn(index = 9, name = "external_ref", since = @SQLVersion({ 2, 1, 0 }))
     protected String externalRef;
-    
-    /**
-     * Checks which this check depends upon for reachability
-     */
-    @SQLColumn(index = 10, name = "depends", type = "UUID[]", since = @SQLVersion({ 3, 21, 0 }))
-    protected List<UUID> dependsIds = new LinkedList<UUID>();
 
     public Check()
     {
@@ -369,25 +363,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         this.externalRef = externalRef;
     }
     
-    public List<UUID> getDependsIds()
-    {
-        return dependsIds;
-    }
-
-    public void setDependsIds(List<UUID> dependsIds)
-    {
-        this.dependsIds = dependsIds;
-    }
-    
-    public List<Check<?,?>> getDepends()
-    {
-        if (this.getDependsIds() == null || this.getDependsIds().isEmpty()) return new LinkedList<Check<?,?>>();
-        try (BergamotDB db = BergamotDB.connect())
-        {
-            return this.dependsIds.stream().map((id) -> db.getCheck(id)).collect(Collectors.toList());
-        }
-    }
-    
     // some basic actions
 
     /**
@@ -485,7 +460,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         if (options.contains(MOFlag.NOTIFICATIONS)) mo.setNotifications(this.getNotifications().toMO(contact));
         if (options.contains(MOFlag.DOWNTIME)) mo.setDowntime(this.getDowntime().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         if (options.contains(MOFlag.COMMENTS)) mo.setComments(this.getComments().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
-        if (options.contains(MOFlag.DEPENDS)) mo.setDepends(this.getDepends().stream().map((c) -> c.toStubMO(contact)).collect(Collectors.toList()));
     }
     
     @Override

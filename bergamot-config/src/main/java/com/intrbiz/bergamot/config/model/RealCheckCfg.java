@@ -1,9 +1,11 @@
 package com.intrbiz.bergamot.config.model;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 
 import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
+import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 public abstract class RealCheckCfg<P extends RealCheckCfg<P>> extends CheckCfg<P>
 {
@@ -12,6 +14,8 @@ public abstract class RealCheckCfg<P extends RealCheckCfg<P>> extends CheckCfg<P
     private StateCfg state;
     
     private CheckCommandCfg checkCommand;
+    
+    private String depends;
     
     @XmlElementRef(type = CheckCommandCfg.class)
     @ResolveWith(BeanResolver.class)
@@ -40,5 +44,17 @@ public abstract class RealCheckCfg<P extends RealCheckCfg<P>> extends CheckCfg<P
     public void setState(StateCfg state)
     {
         this.state = state;
+    }
+
+    @XmlElement(name = "depends")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getDepends()
+    {
+        return depends;
+    }
+
+    public void setDepends(String depends)
+    {
+        this.depends = depends;
     }
 }

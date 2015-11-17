@@ -36,8 +36,6 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     private InitiallyCfg initialState;
     
     private String externalRef;
-    
-    private String depends;
 
     public CheckCfg()
     {
@@ -172,17 +170,5 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     public void setExternalRef(String externalRef)
     {
         this.externalRef = externalRef;
-    }
-
-    @XmlElement(name = "depends")
-    @ResolveWith(CoalesceEmptyString.class)
-    public String getDepends()
-    {
-        return depends;
-    }
-
-    public void setDepends(String depends)
-    {
-        this.depends = depends;
     }
 }

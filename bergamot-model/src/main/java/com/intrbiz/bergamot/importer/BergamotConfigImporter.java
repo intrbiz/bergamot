@@ -1715,21 +1715,17 @@ public class BergamotConfigImporter
         {
             for (TemplatedObjectCfg<?> object : objects)
             {
-                if ((! object.getTemplateBooleanValue()) && object instanceof CheckCfg<?>)
+                if ((! object.getTemplateBooleanValue()) && object instanceof RealCheckCfg<?>)
                 {
-                    CheckCfg<?> checkCfg = (CheckCfg<?>) object;
+                    RealCheckCfg<?> checkCfg = (RealCheckCfg<?>) object;
                     if (! Util.isEmpty(checkCfg.getDepends()))
                     {
                         // we only need to link dependencies on host and cluster
                         // as services auto depend on host and resources auto depend on cluster
-                        Check<?,?> check = null;
+                        RealCheck<?,?> check = null;
                         if (checkCfg instanceof HostCfg)
                         {
                             check = db.getHostByName(this.site.getId(), checkCfg.getName());
-                        }
-                        else if (checkCfg instanceof ClusterCfg)
-                        {
-                            check = db.getClusterByName(this.site.getId(), checkCfg.getName());
                         }
                         // did we find the check
                         if (check != null)
@@ -1740,7 +1736,7 @@ public class BergamotConfigImporter
                             VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId());
                             for (CheckReference chkRef : dependsOn)
                             {
-                                Check<?,?> dependsOnCheck = chkRef.resolve(vcec);
+                                RealCheck<?,?> dependsOnCheck = (RealCheck<?, ?>) chkRef.resolve(vcec);
                                 if (dependsOnCheck == null) throw new RuntimeException("The check " + checkCfg.getName() + " depends upon the check " + chkRef + " which does not exist");
                                 check.getDependsIds().add(dependsOnCheck.getId());
                             }

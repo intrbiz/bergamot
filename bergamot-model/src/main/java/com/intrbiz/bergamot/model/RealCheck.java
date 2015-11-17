@@ -1,6 +1,10 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
@@ -29,6 +33,12 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
      */
     @SQLColumn(index = 2, name = "recovery_attempt_threshold", since = @SQLVersion({ 1, 0, 0 }))
     protected int recoveryAttemptThreshold = 3;
+    
+    /**
+     * Checks which this check depends upon for reachability
+     */
+    @SQLColumn(index = 10, name = "depends", type = "UUID[]", since = @SQLVersion({ 3, 21, 0 }))
+    protected List<UUID> dependsIds = new LinkedList<UUID>();
 
     public RealCheck()
     {
@@ -65,6 +75,30 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         return currentState.isOk() ? this.getRecoveryAttemptThreshold() : this.getAlertAttemptThreshold();
     }
     
+    
+    public List<UUID> getDependsIds()
+    {
+        return dependsIds;
+    }
+
+    public void setDependsIds(List<UUID> dependsIds)
+    {
+        this.dependsIds = dependsIds;
+    }
+    
+    public List<Check<?,?>> getDepends()
+    {
+        List<Check<?,?>> depends = new LinkedList<Check<?,?>>();
+        if (this.getDependsIds() != null && (! this.getDependsIds().isEmpty()))
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                this.dependsIds.stream().map((id) -> db.getCheck(id)).filter((c) -> c != null).forEach(depends::add); 
+            }
+        }
+        return depends;
+    }
+    
     public CheckCommand getCheckCommand()
     {
         try (BergamotDB db = BergamotDB.connect())
@@ -89,6 +123,7 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         mo.setCurrentAttemptThreshold(this.getCurrentAttemptThreshold());
         if (options.contains(MOFlag.STATS)) mo.setStats(this.getStats().toMO(contact));
         if (options.contains(MOFlag.COMMAND)) mo.setCheckCommand(Util.nullable(this.getCheckCommand(), (x) -> x.toStubMO(contact)));
+        if (options.contains(MOFlag.DEPENDS)) mo.setDepends(this.getDepends().stream().map((c) -> c.toStubMO(contact)).collect(Collectors.toList()));
     }
     
     @Override
