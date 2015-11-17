@@ -58,7 +58,7 @@ public class TestBergamotAccountingTranscoder
     @Test
     public void testEncodeSendAlertAccountingEventToString()
     {
-        SendNotificationAccountingEvent original = new SendNotificationAccountingEvent(siteId, alertId, checkId, AccountingNotificationType.ALERT, 1);
+        SendNotificationAccountingEvent original = new SendNotificationAccountingEvent(siteId, alertId, checkId, AccountingNotificationType.ALERT, 1, -1, null);
         String encoded = this.codec.encodeToString(original);
         assertThat(encoded, is(notNullValue()));
         SendNotificationAccountingEvent decoded = this.codec.decodeFromString(encoded);

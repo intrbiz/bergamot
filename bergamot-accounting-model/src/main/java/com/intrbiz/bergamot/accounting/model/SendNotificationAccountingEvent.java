@@ -6,24 +6,24 @@ import java.util.UUID;
 public class SendNotificationAccountingEvent extends BergamotAccountingEvent
 {
     public static final UUID TYPE_ID = UUID.fromString("fcafd43f-1b35-43a3-96db-8094f48c664a");
-    
+
     private UUID notificationId;
-    
+
     private UUID objectId;
-    
+
     private AccountingNotificationType notificationType;
-    
+
     private int recipientCount;
-    
+
     private long escalatedAfter = 0;
-    
+
     private UUID escalationId;
-    
+
     public SendNotificationAccountingEvent()
     {
         super();
     }
-    
+
     public SendNotificationAccountingEvent(long timestamp, UUID siteId, UUID notificationId, UUID objectId, AccountingNotificationType notificationType, int recipientCount, long escalatedAfter, UUID escalationId)
     {
         super(timestamp, siteId);
@@ -34,7 +34,7 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
         this.escalatedAfter = escalatedAfter;
         this.escalationId = escalationId;
     }
-    
+
     public SendNotificationAccountingEvent(UUID siteId, UUID notificationId, UUID objectId, AccountingNotificationType notificationType, int recipientCount, long escalatedAfter, UUID escalationId)
     {
         super(siteId);
@@ -90,6 +90,26 @@ public class SendNotificationAccountingEvent extends BergamotAccountingEvent
     public void setRecipientCount(int recipientCount)
     {
         this.recipientCount = recipientCount;
+    }
+
+    public long getEscalatedAfter()
+    {
+        return escalatedAfter;
+    }
+
+    public void setEscalatedAfter(long escalatedAfter)
+    {
+        this.escalatedAfter = escalatedAfter;
+    }
+
+    public UUID getEscalationId()
+    {
+        return escalationId;
+    }
+
+    public void setEscalationId(UUID escalationId)
+    {
+        this.escalationId = escalationId;
     }
 
     public String toString()

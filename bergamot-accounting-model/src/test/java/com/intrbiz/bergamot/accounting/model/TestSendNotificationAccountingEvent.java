@@ -1,6 +1,10 @@
 package com.intrbiz.bergamot.accounting.model;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -12,7 +16,7 @@ public class TestSendNotificationAccountingEvent
     private static UUID siteId = UUID.fromString("01cf7f8e-2da3-4b5b-8764-a8cb0e1e8e6b");
     private static UUID alertId = UUID.fromString("e6fa47ea-f435-4607-b0d5-d128fe259742");
     private static UUID checkId = UUID.fromString("3640d25d-547d-40ab-8eb6-fa97155e9dbb");
-    
+    private static UUID escalationId = UUID.fromString("3a4d5be3-f373-4a78-a267-94b243fd1f1a");
     
     @Test
     public void hasTypeId()
@@ -29,7 +33,7 @@ public class TestSendNotificationAccountingEvent
     @Test
     public void packUnpack()
     {
-        SendNotificationAccountingEvent a = new SendNotificationAccountingEvent(siteId, alertId, checkId, AccountingNotificationType.ALERT, 13);
+        SendNotificationAccountingEvent a = new SendNotificationAccountingEvent(siteId, alertId, checkId, AccountingNotificationType.ALERT, 13, 600_000L, escalationId);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(notNullValue()));
@@ -37,6 +41,8 @@ public class TestSendNotificationAccountingEvent
         assertThat(a.getObjectId(), is(notNullValue()));
         assertThat(a.getNotificationType(), is(notNullValue()));
         assertThat(a.getRecipientCount(), is(equalTo(13)));
+        assertThat(a.getEscalatedAfter(), is(equalTo(600_000L)));
+        assertThat(a.getEscalationId(), is(equalTo(escalationId)));
         // pack
         ByteBuffer buf = ByteBuffer.allocate(8192);
         a.pack(buf);
@@ -51,6 +57,8 @@ public class TestSendNotificationAccountingEvent
         assertThat(b.getObjectId(), is(notNullValue()));
         assertThat(b.getNotificationType(), is(notNullValue()));
         assertThat(b.getRecipientCount(), is(equalTo(13)));
+        assertThat(b.getEscalatedAfter(), is(equalTo(600_000L)));
+        assertThat(b.getEscalationId(), is(equalTo(escalationId)));
         // compare
         assertThat(a, is(equalTo(b)));
         assertThat(a.getTypeId(), is(equalTo(b.getTypeId())));
@@ -59,13 +67,15 @@ public class TestSendNotificationAccountingEvent
         assertThat(a.getNotificationId(), is(equalTo(b.getNotificationId())));
         assertThat(a.getObjectId(), is(equalTo(b.getObjectId())));
         assertThat(a.getNotificationType(), is(equalTo(b.getNotificationType())));
-        assertThat(b.getRecipientCount(), is(equalTo(b.getRecipientCount())));
+        assertThat(a.getRecipientCount(), is(equalTo(b.getRecipientCount())));
+        assertThat(a.getEscalatedAfter(), is(equalTo(b.getEscalatedAfter())));
+        assertThat(a.getEscalationId(), is(equalTo(b.getEscalationId())));
     }
     
     @Test
     public void packUnpackWithNulls()
     {
-        SendNotificationAccountingEvent a = new SendNotificationAccountingEvent(null, null, null, null, -1);
+        SendNotificationAccountingEvent a = new SendNotificationAccountingEvent(null, null, null, null, -1, -1, null);
         assertThat(a, is(notNullValue()));
         assertThat(a.getTimestamp(), is(not(equalTo(-1L))));
         assertThat(a.getSiteId(), is(nullValue()));
@@ -73,6 +83,8 @@ public class TestSendNotificationAccountingEvent
         assertThat(a.getObjectId(), is(nullValue()));
         assertThat(a.getNotificationType(), is(nullValue()));
         assertThat(a.getRecipientCount(), is(equalTo(-1)));
+        assertThat(a.getEscalatedAfter(), is(equalTo(-1)));
+        assertThat(a.getEscalationId(), is(nullValue()));
         // pack
         ByteBuffer buf = ByteBuffer.allocate(8192);
         a.pack(buf);
@@ -86,7 +98,9 @@ public class TestSendNotificationAccountingEvent
         assertThat(b.getNotificationId(), is(nullValue()));
         assertThat(b.getObjectId(), is(nullValue()));
         assertThat(b.getNotificationType(), is(nullValue()));
-        assertThat(a.getRecipientCount(), is(equalTo(-1)));
+        assertThat(b.getRecipientCount(), is(equalTo(-1)));
+        assertThat(b.getEscalatedAfter(), is(equalTo(-1)));
+        assertThat(b.getEscalationId(), is(nullValue()));
         // compare
         assertThat(a, is(equalTo(b)));
         assertThat(a.getTypeId(), is(equalTo(b.getTypeId())));
@@ -96,5 +110,7 @@ public class TestSendNotificationAccountingEvent
         assertThat(a.getObjectId(), is(equalTo(b.getObjectId())));
         assertThat(a.getNotificationType(), is(equalTo(b.getNotificationType())));
         assertThat(a.getRecipientCount(), is(equalTo(b.getRecipientCount())));
+        assertThat(a.getEscalatedAfter(), is(equalTo(b.getEscalatedAfter())));
+        assertThat(a.getEscalationId(), is(b.getEscalationId()));
     }
 }
