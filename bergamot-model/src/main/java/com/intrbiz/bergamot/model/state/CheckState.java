@@ -129,6 +129,24 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
      */
     @SQLColumn(index = 17, name = "suppressed", since = @SQLVersion({ 3, 4, 0 }))
     private boolean suppressed;
+    
+    /**
+     * Is this check currently acknowledged
+     */
+    @SQLColumn(index = 18, name = "acknowledged", since = @SQLVersion({ 3, 28, 0 }))
+    private boolean acknowledged;
+    
+    /**
+     * Is this check currently encompassed by an alert on a dependent check
+     */
+    @SQLColumn(index = 19, name = "encompassed", since = @SQLVersion({ 3, 28, 0 }))
+    private boolean encompassed;
+    
+    /**
+     * The current alert id for this check
+     */
+    @SQLColumn(index = 20, name = "current_alert", since = @SQLVersion({ 3, 28, 0 }))
+    private UUID currentAlert;
 
     public CheckState()
     {
@@ -344,6 +362,48 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     {
         return this.suppressed || this.inDowntime;
     }
+    
+    /**
+     * Should this check currently be ignore.
+     * This means that the check is currently 
+     * suppressed, in downtime, acknowledged 
+     * or encompassed.
+     * @return true if this check should be ignored
+     */
+    public boolean isIgnored()
+    {
+        return this.suppressed || this.inDowntime || this.acknowledged || this.encompassed;
+    }
+
+    public boolean isAcknowledged()
+    {
+        return acknowledged;
+    }
+
+    public void setAcknowledged(boolean acknowledged)
+    {
+        this.acknowledged = acknowledged;
+    }
+
+    public boolean isEncompassed()
+    {
+        return encompassed;
+    }
+
+    public void setEncompassed(boolean encompassed)
+    {
+        this.encompassed = encompassed;
+    }
+
+    public UUID getCurrentAlert()
+    {
+        return currentAlert;
+    }
+
+    public void setCurrentAlert(UUID currentAlert)
+    {
+        this.currentAlert = currentAlert;
+    }
 
     @Override
     public CheckStateMO toMO(Contact contact, EnumSet<MOFlag> options)
@@ -364,6 +424,9 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
         mo.setLastHardOutput(this.getLastHardOutput());
         mo.setInDowntime(this.isInDowntime());
         mo.setSuppressed(this.isSuppressed());
+        mo.setAcknowledged(this.isAcknowledged());
+        mo.setEncompassed(this.isEncompassed());
+        mo.setCurrentAlert(this.getCurrentAlert());
         return mo;
     }
     

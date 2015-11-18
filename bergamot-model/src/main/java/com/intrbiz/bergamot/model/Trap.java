@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.UUID;
 
 import com.intrbiz.Util;
@@ -117,6 +118,14 @@ public class Trap extends PassiveCheck<TrapMO, TrapCfg>
         {
             return db.getHost(this.getHostId());
         }
+    }
+
+    @Override
+    public List<Check<?, ?>> getDepends()
+    {
+        List<Check<?, ?>> depends = super.getDepends();
+        depends.add(0, this.getHost());
+        return depends;
     }
 
     @Override
