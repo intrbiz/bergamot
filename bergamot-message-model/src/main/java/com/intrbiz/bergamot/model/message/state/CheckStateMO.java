@@ -53,6 +53,15 @@ public class CheckStateMO extends MessageObject
     
     @JsonProperty("suppressed")
     private boolean suppressed;
+    
+    @JsonProperty("acknowledged")
+    private boolean acknowledged;
+    
+    @JsonProperty("encompassed")
+    private boolean encompassed;
+    
+    @JsonProperty("current_alert")
+    private UUID currentAlert;
 
     public CheckStateMO()
     {
@@ -207,5 +216,35 @@ public class CheckStateMO extends MessageObject
     public void setSuppressed(boolean suppressed)
     {
         this.suppressed = suppressed;
+    }
+
+    public boolean isAcknowledged()
+    {
+        return acknowledged;
+    }
+
+    public void setAcknowledged(boolean acknowledged)
+    {
+        this.acknowledged = acknowledged;
+    }
+
+    public boolean isEncompassed()
+    {
+        return encompassed;
+    }
+
+    public void setEncompassed(boolean encompassed)
+    {
+        this.encompassed = encompassed;
+    }
+
+    public UUID getCurrentAlert()
+    {
+        return currentAlert;
+    }
+
+    public void setCurrentAlert(UUID currentAlert)
+    {
+        this.currentAlert = currentAlert;
     }
 }
