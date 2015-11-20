@@ -8,6 +8,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.BergamotObject;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Status;
@@ -145,8 +146,8 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     /**
      * The current alert id for this check
      */
-    @SQLColumn(index = 20, name = "current_alert", since = @SQLVersion({ 3, 28, 0 }))
-    private UUID currentAlert;
+    @SQLColumn(index = 20, name = "current_alert_id", since = @SQLVersion({ 3, 28, 0 }))
+    private UUID currentAlertId;
 
     public CheckState()
     {
@@ -395,14 +396,26 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
         this.encompassed = encompassed;
     }
 
-    public UUID getCurrentAlert()
+    public UUID getCurrentAlertId()
     {
-        return currentAlert;
+        return currentAlertId;
     }
 
-    public void setCurrentAlert(UUID currentAlert)
+    public void setCurrentAlertId(UUID currentAlertId)
     {
-        this.currentAlert = currentAlert;
+        this.currentAlertId = currentAlertId;
+    }
+    
+    public Alert getCurrentAlert()
+    {
+        if (this.getCurrentAlertId() != null)
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                return db.getAlert(this.getCheckId());
+            }
+        }
+        return null;
     }
 
     @Override
@@ -426,7 +439,7 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
         mo.setSuppressed(this.isSuppressed());
         mo.setAcknowledged(this.isAcknowledged());
         mo.setEncompassed(this.isEncompassed());
-        mo.setCurrentAlert(this.getCurrentAlert());
+        mo.setCurrentAlert(this.getCurrentAlertId());
         return mo;
     }
     
