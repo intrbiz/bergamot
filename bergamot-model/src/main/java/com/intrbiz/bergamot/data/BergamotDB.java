@@ -79,7 +79,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 28, 0}),
+        version = @SQLVersion({3, 29, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -2139,6 +2139,32 @@ public abstract class BergamotDB extends DatabaseAdapter
         });
     }
     
+    private Timer set_current_alert = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.set_current_alert(UUID,UUID)"));
+    
+    /**
+     * Update the state of a check to record the current alert
+     * @param checkId the check id
+     * @param alertId the alert id
+     * @return true if the check state was updated
+     */
+    public boolean setCurrentAlert(UUID checkId, UUID alertId)
+    {
+        return this.useTimed(
+            set_current_alert, 
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.set_current_alert(?::UUID, ?::UUID)"))
+                {
+                  stmt.setObject(1, checkId);
+                  stmt.setObject(2, alertId);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next()) return rs.getBoolean(1);
+                  }
+                }
+                return false;
+        });
+    }
+    
     // helpers
     
     /**
@@ -2634,6 +2660,22 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new SQLScript(
            "CREATE INDEX alert_check_id_raised_idx ON bergamot.alert USING btree(check_id, raised)"
+        );
+    }
+    
+    @SQLPatch(name = "add_set_current_alert", index = 14, type = ScriptType.BOTH, version = @SQLVersion({3, 29, 0}), skip = false)
+    public static SQLScript addSetCurrentAlert()
+    {
+        return new SQLScript(
+                
+                "CREATE OR REPLACE FUNCTION bergamot.set_current_alert(p_check_id UUID, p_alert_id UUID)\n" +
+                "RETURNS BOOLEAN\n" +
+                "LANGUAGE PLPGSQL AS $$\n" +
+                "BEGIN\n" +
+                "    UPDATE bergamot.check_state SET current_alert_id = p_alert_id WHERE check_id = p_check_id;\n" +
+                "    RETURN FOUND;\n" +
+                "END;\n" +
+                "$$"
         );
     }
     
