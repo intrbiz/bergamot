@@ -417,6 +417,28 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
         }
         return null;
     }
+    
+    /**
+     * Does this state represent an alert
+     * @return true if this state is an alert
+     */
+    public boolean isAlert()
+    {
+        return (this.isOk() ^ this.isLastHardOk()) 
+            && (! this.isOk())
+            && (! this.isSuppressedOrInDowntime());
+    }
+    
+    /**
+     * Does this state represent a recovery
+     * @return true if this state is a recovery
+     */
+    public boolean isRecovery()
+    {
+        return (this.isOk() ^ this.isLastHardOk()) 
+            && this.isOk()
+            && (! this.isSuppressedOrInDowntime());
+    }
 
     @Override
     public CheckStateMO toMO(Contact contact, EnumSet<MOFlag> options)

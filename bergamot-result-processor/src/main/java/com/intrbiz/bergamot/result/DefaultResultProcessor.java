@@ -310,7 +310,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     {
         logger.warn("Alert for " + check);
         CheckState state = check.getState();
-        if (! state.isSuppressedOrInDowntime())
+        if (! (state.isSuppressedOrInDowntime() || state.isEncompassed()))
         {
             Calendar now = Calendar.getInstance();
             // compute the contacts who should be notified
@@ -318,6 +318,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             // record the alert
             Alert alertRecord = new Alert(check, state, to);
             db.setAlert(alertRecord);
+            // track the alert for this check
+            db.setCurrentAlert(check.getId(), alertRecord.getId());
             // send the notifications
             SendAlert alert = alertRecord.createAlertNotification(now, to);
             if (alert != null && (! alert.getTo().isEmpty()))
@@ -333,6 +335,12 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             // publish alert update
             this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
+        }
+        else if (state.isEncompassed())
+        {
+            // we are encompassed by a dependency which has failed
+            // as such tag us into the alert for the failed dependency
+            
         }
     }
     
@@ -459,6 +467,14 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // is this check entering downtime?
         nextState.setInDowntime(check.isInDowntime());
         nextState.setSuppressed(check.isSuppressed());
+        // has the current alert been acknowledged
+        if (currentState.getCurrentAlertId() != null)
+        {
+            Alert currentAlert = currentState.getCurrentAlert();
+            currentState.setAcknowledged(currentAlert.isAcknowledged());
+        }
+        // is the status of this alert encompassed by any other check
+        nextState.setEncompassed(dependenciesAreAllHard && (! dependenciesAreAllOk));
         // compute the transition
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
@@ -481,7 +497,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                return new Transition(currentState, nextState, true, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(true)
+                    .hardChange(true)
+                    .alert(nextState.isAlert())
+                    .recovery(nextState.isRecovery());
             }
             else
             {
@@ -489,13 +511,25 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(false);
                 nextState.setTransitioning(true);
                 nextState.setAttempt(1);               
-                return new Transition(currentState, nextState, true, false, false, false);
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(true)
+                    .hardChange(false)
+                    .alert(false)
+                    .recovery(false);
             }
         }
         else if (currentState.isHard())
         {
             // steady state
-            return new Transition(currentState, nextState, false, false, false, false);
+            return new Transition()
+                .previousState(currentState)
+                .nextState(nextState)
+                .stateChange(false)
+                .hardChange(false)
+                .alert(false)
+                .recovery(false);
         }
         else
         {
@@ -509,11 +543,23 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                return new Transition(currentState, nextState, false, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(false)
+                    .hardChange(true)
+                    .alert(nextState.isAlert())
+                    .recovery(nextState.isRecovery());
             }
             else
             {
-                return new Transition(currentState, nextState, false, false, false, false);
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(false)
+                    .hardChange(false)
+                    .alert(false)
+                    .recovery(false);
             }
         }
     }
@@ -578,7 +624,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
 
     protected Transition applyVirtualResult(VirtualCheck<?, ?> check, CheckState currentState, boolean ok, Status status, boolean allHard, ResultMO cause)
     {
-     // the next state
+        // the next state
         CheckState nextState = currentState.clone();
         // apply the result to the next state
         nextState.setOk(ok);
@@ -609,7 +655,13 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(false);
                 nextState.setTransitioning(true);
                 nextState.setAttempt(0);               
-                return new Transition(currentState, nextState, true, false, false, false);
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(true)
+                    .hardChange(false)
+                    .alert(false)
+                    .recovery(false);
             }
             else
             {
@@ -617,13 +669,25 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(0);
-                return new Transition(currentState, nextState, true, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(true)
+                    .hardChange(true)
+                    .alert(nextState.isAlert())
+                    .recovery(nextState.isRecovery());
             }
         }
         else if (currentState.isHard())
         {
             // steady state
-            return new Transition(currentState, nextState, false, false, false, false);
+            return new Transition()
+                .previousState(currentState)
+                .nextState(nextState)
+                .stateChange(false)
+                .hardChange(false)
+                .alert(false)
+                .recovery(false);
         }
         else
         {
@@ -633,11 +697,23 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(0);
-                return new Transition(currentState, nextState, false, true, (nextState.isOk() ^ nextState.isLastHardOk()) && (! nextState.isOk()), (nextState.isOk() ^ nextState.isLastHardOk()) && nextState.isOk());
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(false)
+                    .hardChange(true)
+                    .alert(nextState.isAlert())
+                    .recovery(nextState.isRecovery());
             }
             else
             {
-                return new Transition(currentState, nextState, false, false, false, false);
+                return new Transition()
+                    .previousState(currentState)
+                    .nextState(nextState)
+                    .stateChange(false)
+                    .hardChange(false)
+                    .alert(false)
+                    .recovery(false);
             }
         }
     }
@@ -664,27 +740,57 @@ public class DefaultResultProcessor extends AbstractResultProcessor
  
     public static class Transition
     {
-        public final CheckState previousState;
+        public CheckState previousState;
         
-        public final CheckState nextState;
+        public CheckState nextState;
         
-        public final boolean stateChange;
+        public boolean stateChange;
         
-        public final boolean hardChange;
+        public boolean hardChange;
         
-        public final boolean alert;
+        public boolean alert;
         
-        public final boolean recovery;
+        public boolean recovery;
 
-        public Transition(CheckState previousState, CheckState nextState, boolean stateChange, boolean hardChange, boolean alert, boolean recovery)
+        public Transition()
         {
             super();
+        }
+        
+        public Transition previousState(CheckState previousState)
+        {
             this.previousState = previousState;
+            return this;
+        }
+        
+        public Transition nextState(CheckState nextState)
+        {
             this.nextState = nextState;
+            return this;
+        }
+        
+        public Transition stateChange(boolean stateChange)
+        {
             this.stateChange = stateChange;
+            return this;
+        }
+        
+        public Transition hardChange(boolean hardChange)
+        {
             this.hardChange = hardChange;
+            return this;
+        }
+        
+        public Transition alert(boolean alert)
+        {
             this.alert = alert;
+            return this;
+        }
+        
+        public Transition recovery(boolean recovery)
+        {
             this.recovery = recovery;
+            return this;
         }
         
         public CheckTransition toCheckTransition(UUID id, UUID checkId, Timestamp appliedAt)
