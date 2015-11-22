@@ -16,6 +16,10 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-check-jmx</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.util</groupId>
+			<artifactId>bootstrap</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-jmx-worker</finalName>
