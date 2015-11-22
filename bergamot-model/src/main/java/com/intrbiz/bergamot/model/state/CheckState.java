@@ -412,7 +412,7 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
         {
             try (BergamotDB db = BergamotDB.connect())
             {
-                return db.getAlert(this.getCheckId());
+                return db.getAlert(this.getCurrentAlertId());
             }
         }
         return null;
