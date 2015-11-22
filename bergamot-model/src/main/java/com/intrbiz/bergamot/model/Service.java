@@ -127,6 +127,12 @@ public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
     }
     
     @Override
+    public boolean hasDependencies()
+    {
+        return true;
+    }
+    
+    @Override
     public List<Check<?, ?>> getDepends()
     {
         List<Check<?, ?>> depends = super.getDepends();

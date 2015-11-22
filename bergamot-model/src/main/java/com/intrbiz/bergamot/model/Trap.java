@@ -119,6 +119,12 @@ public class Trap extends PassiveCheck<TrapMO, TrapCfg>
             return db.getHost(this.getHostId());
         }
     }
+    
+    @Override
+    public boolean hasDependencies()
+    {
+        return true;
+    }
 
     @Override
     public List<Check<?, ?>> getDepends()

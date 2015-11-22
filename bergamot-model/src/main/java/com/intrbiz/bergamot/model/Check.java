@@ -426,6 +426,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         final Set<String> enabledEngines = checkNotifications.getEnginesEnabledAt(type, status, time);
         // compute the contacts to notify
         return this.getAllContacts().stream()
+        .filter((c) -> c != null && c.getNotifications() != null)
         .filter((contact) -> contact.getNotifications().isEnabledAt(type, status, time))
         .map((contact) -> {
             ContactMO cmo = contact.toMOUnsafe();

@@ -87,6 +87,11 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         this.dependsIds = dependsIds;
     }
     
+    public boolean hasDependencies()
+    {
+        return ! (this.dependsIds == null || this.dependsIds.isEmpty());
+    }
+    
     public List<Check<?,?>> getDepends()
     {
         List<Check<?,?>> depends = new LinkedList<Check<?,?>>();

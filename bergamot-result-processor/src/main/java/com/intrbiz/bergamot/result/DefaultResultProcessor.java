@@ -453,7 +453,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // collect the checks that we are dependent upon
         // we cannot reach a hard state until all dependencies 
         // checks are in a hard state
-        boolean hasDependencies = ! check.getDependsIds().isEmpty();
+        boolean hasDependencies = check.hasDependencies();
         boolean dependenciesAreAllHard = true;
         boolean dependenciesAreAllOk = true;
         UUID encompassingAlertId = null;
@@ -485,7 +485,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         if (currentState.getCurrentAlertId() != null)
         {
             Alert currentAlert = currentState.getCurrentAlert();
-            currentState.setAcknowledged(currentAlert.isAcknowledged());
+            currentState.setAcknowledged(currentAlert == null ? false : currentAlert.isAcknowledged());
         }
         // is the status of this alert encompassed by any other check
         nextState.setEncompassed(dependenciesAreAllHard && (! dependenciesAreAllOk));
