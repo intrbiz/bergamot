@@ -80,7 +80,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 30, 0}),
+        version = @SQLVersion({3, 31, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -2188,6 +2188,32 @@ public abstract class BergamotDB extends DatabaseAdapter
         });
     }
     
+    private Timer acknowledge_check = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.acknowledge_check(UUID,BOOLEAN)"));
+    
+    /**
+     * Update the acknowledge state of the given check
+     * @param checkId the check id
+     * @param acknowledged is this check acknowledged
+     * @return true if the check was updated
+     */
+    public boolean acknowledgeCheck(UUID checkId, boolean acknowledged)
+    {
+        return this.useTimed(
+                acknowledge_check, 
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.acknowledge_check(?::UUID, ?::BOOLEAN)"))
+                {
+                  stmt.setObject(1, checkId);
+                  stmt.setBoolean(2, acknowledged);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next()) return rs.getBoolean(1);
+                  }
+                }
+                return false;
+        });
+    }
+    
     // helpers
     
     /**
@@ -2696,6 +2722,22 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "LANGUAGE PLPGSQL AS $$\n" +
                 "BEGIN\n" +
                 "    UPDATE bergamot.check_state SET current_alert_id = p_alert_id WHERE check_id = p_check_id;\n" +
+                "    RETURN FOUND;\n" +
+                "END;\n" +
+                "$$"
+        );
+    }
+    
+    @SQLPatch(name = "add_acknowledge_check", index = 15, type = ScriptType.BOTH, version = @SQLVersion({3, 31, 0}), skip = false)
+    public static SQLScript addAcknowledgeCheckFunction()
+    {
+        return new SQLScript(
+                
+                "CREATE OR REPLACE FUNCTION bergamot.acknowledge_check(p_check_id UUID, boolean p_acknowledged)\n" +
+                "RETURNS BOOLEAN\n" +
+                "LANGUAGE PLPGSQL AS $$\n" +
+                "BEGIN\n" +
+                "    UPDATE bergamot.check_state SET acknowledged = p_acknowledged WHERE check_id = p_check_id;\n" +
                 "    RETURN FOUND;\n" +
                 "END;\n" +
                 "$$"

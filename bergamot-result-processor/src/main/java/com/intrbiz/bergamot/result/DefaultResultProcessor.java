@@ -511,8 +511,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                if (nextState.isAlert()) nextState.setCurrentAlertId(encompassingAlertId == null ? Site.randomId(check.getSiteId()) : encompassingAlertId);
-                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
+                if (nextState.isAlert())
+                {
+                    nextState.setCurrentAlertId(encompassingAlertId == null ? Site.randomId(check.getSiteId()) : encompassingAlertId);
+                    nextState.setAcknowledged(false);
+                }
+                if (nextState.isRecovery())
+                {
+                    nextState.setCurrentAlertId(null);
+                    nextState.setAcknowledged(false);
+                }
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)
@@ -559,8 +567,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
-                if (nextState.isAlert()) nextState.setCurrentAlertId(encompassingAlertId == null ? Site.randomId(check.getSiteId()) : encompassingAlertId);
-                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
+                if (nextState.isAlert())
+                {
+                    nextState.setCurrentAlertId(encompassingAlertId == null ? Site.randomId(check.getSiteId()) : encompassingAlertId);
+                    nextState.setAcknowledged(false);
+                }
+                if (nextState.isRecovery())
+                {
+                    nextState.setCurrentAlertId(null);
+                    nextState.setAcknowledged(false);
+                }
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)
@@ -695,8 +711,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(0);
-                if (nextState.isAlert()) nextState.setCurrentAlertId(Site.randomId(check.getSiteId()));
-                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
+                if (nextState.isAlert())
+                {
+                    nextState.setCurrentAlertId(Site.randomId(check.getSiteId()));
+                    nextState.setAcknowledged(false);
+                }
+                if (nextState.isRecovery())
+                {
+                    nextState.setCurrentAlertId(null);
+                    nextState.setAcknowledged(false);
+                }
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)
@@ -725,8 +749,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(0);
-                if (nextState.isAlert()) nextState.setCurrentAlertId(Site.randomId(check.getSiteId()));
-                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
+                if (nextState.isAlert())
+                {
+                    nextState.setCurrentAlertId(Site.randomId(check.getSiteId()));
+                    nextState.setAcknowledged(false);
+                }
+                if (nextState.isRecovery())
+                {
+                    nextState.setCurrentAlertId(null);
+                    nextState.setAcknowledged(false);
+                }
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)

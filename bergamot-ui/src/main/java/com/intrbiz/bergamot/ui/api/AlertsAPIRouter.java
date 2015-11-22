@@ -136,6 +136,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 alert.setAcknowledgedAt(new Timestamp(System.currentTimeMillis()));
                 alert.setAcknowledgedById(contact.getId());
                 db.setAlert(alert);
+                db.acknowledgeCheck(alert.getCheckId(), true);
             });
             // send acknowledge notifications
             if (! alert.getCheck().getState().isSuppressedOrInDowntime())
