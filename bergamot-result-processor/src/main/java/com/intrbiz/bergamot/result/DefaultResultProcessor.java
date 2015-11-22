@@ -30,6 +30,7 @@ import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationType;
 import com.intrbiz.bergamot.model.RealCheck;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.ContactMO;
@@ -152,6 +153,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 db.logCheckTransition(transition.toCheckTransition(check.getSite().randomObjectId(), check.getId(), new Timestamp(resultMO.getProcessed())));
                 // update the check state
                 db.setCheckState(transition.nextState);
+                // make our state available as soon as possible
+                db.commit();
                 // compute the check stats
                 if (resultMO instanceof ActiveResultMO)
                 {
@@ -167,7 +170,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                         }
                     }
                 }
-                db.commit();
                 // reschedule active checks if we have changed state at all
                 if ((check instanceof ActiveCheck) && transition.hasSchedulingChanged())
                 {
@@ -318,8 +320,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             // record the alert
             Alert alertRecord = new Alert(check, state, to);
             db.setAlert(alertRecord);
-            // track the alert for this check
-            db.setCurrentAlert(check.getId(), alertRecord.getId());
             // send the notifications
             SendAlert alert = alertRecord.createAlertNotification(now, to);
             if (alert != null && (! alert.getTo().isEmpty()))
@@ -338,9 +338,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
         else if (state.isEncompassed())
         {
-            // we are encompassed by a dependency which has failed
-            // as such tag us into the alert for the failed dependency
-            
+            Alert encompassingAlert = state.getCurrentAlert();
+            // tag this check into the alert for the dependency
+            if (encompassingAlert != null)
+            {
+                
+            }
+            else
+            {
+                logger.warn("Failed to find alert which encompasses alert for check " + check.getType() + "::" + check.getId());
+            }
         }
     }
     
@@ -348,7 +355,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     {
         // get the alert information
         Alert alertRecord = db.getCurrentAlertForCheck(check.getId());
-        if (alertRecord != null && (! alertRecord.isAcknowledged()) && (! alertRecord.isRecovered()))
+        if (alertRecord != null && (! alertRecord.isAcknowledged()) && (! alertRecord.isRecovered()) && check.getId().equals(alertRecord.getCheckId()))
         {
             logger.warn("Resending notifications for alert " + alertRecord.getId());
             CheckState state = check.getState();
@@ -448,12 +455,18 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         boolean hasDependencies = ! check.getDependsIds().isEmpty();
         boolean dependenciesAreAllHard = true;
         boolean dependenciesAreAllOk = true;
+        UUID encompassingAlertId = null;
         if (hasDependencies)
         {
-            List<Check<?,?>> dependencies = check.getDepends();
-            List<CheckState> dependenciesState = dependencies.stream().map((d) -> d.getState()).collect(Collectors.toList());
-            dependenciesAreAllHard = dependenciesState.stream().allMatch(CheckState::isHard);
-            dependenciesAreAllOk   = dependenciesState.stream().allMatch(CheckState::isOk);
+            for (Check<?,?> dependency : check.getDepends())
+            {
+                CheckState dependencyState = dependency.getState();
+                dependenciesAreAllHard &= dependencyState.isHard();
+                dependenciesAreAllOk   &= dependencyState.isHardOk();
+                // get the alert id which encompasses us
+                if (dependencyState.isHardNotOk() && encompassingAlertId == null)
+                    encompassingAlertId = dependencyState.getCurrentAlertId();
+            }
             logger.debug("Dependencies for check " + check.getId() + " are all hard: " + dependenciesAreAllHard + " and all ok: " + dependenciesAreAllOk);
         }
         // the next state
@@ -488,7 +501,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             // we've changed state
             nextState.setLastStateChange(new Timestamp(System.currentTimeMillis()));
-            // immediately go to a hard state or start transitioning
+            // immediately go to a hard state or start the transition
             if (check.computeCurrentAttemptThreshold(nextState) <= 1 && ((! hasDependencies) || dependenciesAreAllHard))
             {
                 // we can only enter a hard state if we have no dependencies
@@ -497,6 +510,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
+                if (nextState.isAlert()) nextState.setCurrentAlertId(encompassingAlertId == null ? Site.randomId(check.getSiteId()) : encompassingAlertId);
+                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)
@@ -543,6 +558,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(check.computeCurrentAttemptThreshold(nextState));
+                if (nextState.isAlert()) nextState.setCurrentAlertId(encompassingAlertId == null ? Site.randomId(check.getSiteId()) : encompassingAlertId);
+                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)
@@ -677,6 +694,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(0);
+                if (nextState.isAlert()) nextState.setCurrentAlertId(Site.randomId(check.getSiteId()));
+                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)
@@ -705,6 +724,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 nextState.setHard(true);
                 nextState.setTransitioning(false);
                 nextState.setAttempt(0);
+                if (nextState.isAlert()) nextState.setCurrentAlertId(Site.randomId(check.getSiteId()));
+                if (nextState.isRecovery()) nextState.setCurrentAlertId(null);
                 return new Transition()
                     .previousState(currentState)
                     .nextState(nextState)
@@ -814,7 +835,9 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             this.recovery || 
             this.nextState.getStatus() != this.previousState.getStatus() || 
             this.nextState.isInDowntime() != this.previousState.isInDowntime() || 
-            this.nextState.isSuppressed() != this.previousState.isSuppressed();
+            this.nextState.isSuppressed() != this.previousState.isSuppressed() || 
+            this.nextState.isAcknowledged() != this.previousState.isAcknowledged() || 
+            this.nextState.isEncompassed() != this.previousState.isEncompassed();
         }
         
         public boolean hasSchedulingChanged()

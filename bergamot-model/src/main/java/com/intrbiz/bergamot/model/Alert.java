@@ -206,7 +206,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     public Alert(Check<?, ?> check, CheckState state, List<ContactMO> to)
     {
         this.siteId = check.getSiteId();
-        this.id = Site.randomId(check.getSiteId());
+        this.id = state.getCurrentAlertId();
         this.checkId = check.getId();
         this.raised = new Timestamp(System.currentTimeMillis());
         // copy the state
@@ -233,7 +233,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         this.recoveredBy = null;
         this.escalated = false;
         this.escalatedAt = null;
-        this.notifiedIds = to.stream().map((c) -> c.getId()).collect(Collectors.toList());
+        this.notifiedIds = to.stream().map(ContactMO::getId).collect(Collectors.toList());
     }
 
     public UUID getSiteId()
