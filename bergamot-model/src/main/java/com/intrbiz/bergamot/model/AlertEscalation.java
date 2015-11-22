@@ -25,7 +25,7 @@ public class AlertEscalation extends BergamotObject<AlertEscalationMO>
      * The alert
      */
     @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({ 3, 26, 0 }))
-    @SQLForeignKey(references = Alert.class, on = "alert_id", onDelete = Action.CASCADE, onUpdate = Action.CASCADE, since = @SQLVersion({ 3, 26, 0 }))
+    @SQLForeignKey(references = Alert.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.CASCADE, since = @SQLVersion({ 3, 26, 0 }))
     @SQLPrimaryKey()
     private UUID alertId;
     
@@ -39,7 +39,7 @@ public class AlertEscalation extends BergamotObject<AlertEscalationMO>
     /**
      * The unique id of this escalation
      */
-    @SQLColumn(index = 3, name = "after", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 3, name = "escalation_id", since = @SQLVersion({ 3, 26, 0 }))
     private UUID escalationId;
     
     /**

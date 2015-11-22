@@ -2733,7 +2733,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new SQLScript(
                 
-                "CREATE OR REPLACE FUNCTION bergamot.acknowledge_check(p_check_id UUID, boolean p_acknowledged)\n" +
+                "CREATE OR REPLACE FUNCTION bergamot.acknowledge_check(p_check_id UUID, p_acknowledged BOOLEAN)\n" +
                 "RETURNS BOOLEAN\n" +
                 "LANGUAGE PLPGSQL AS $$\n" +
                 "BEGIN\n" +

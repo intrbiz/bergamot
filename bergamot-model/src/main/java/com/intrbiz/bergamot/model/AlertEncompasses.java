@@ -22,7 +22,7 @@ public class AlertEncompasses extends BergamotObject<AlertEncompassesMO>
      * The alert
      */
     @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({ 3, 30, 0 }) )
-    @SQLForeignKey(references = Alert.class, on = "alert_id", onDelete = Action.CASCADE, onUpdate = Action.CASCADE, since = @SQLVersion({ 3, 30, 0 }) )
+    @SQLForeignKey(references = Alert.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.CASCADE, since = @SQLVersion({ 3, 30, 0 }) )
     @SQLPrimaryKey()
     private UUID alertId;
 
