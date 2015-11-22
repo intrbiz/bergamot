@@ -83,7 +83,7 @@ public class TestSendNotificationAccountingEvent
         assertThat(a.getObjectId(), is(nullValue()));
         assertThat(a.getNotificationType(), is(nullValue()));
         assertThat(a.getRecipientCount(), is(equalTo(-1)));
-        assertThat(a.getEscalatedAfter(), is(equalTo(-1)));
+        assertThat(a.getEscalatedAfter(), is(equalTo(-1L)));
         assertThat(a.getEscalationId(), is(nullValue()));
         // pack
         ByteBuffer buf = ByteBuffer.allocate(8192);
@@ -99,7 +99,7 @@ public class TestSendNotificationAccountingEvent
         assertThat(b.getObjectId(), is(nullValue()));
         assertThat(b.getNotificationType(), is(nullValue()));
         assertThat(b.getRecipientCount(), is(equalTo(-1)));
-        assertThat(b.getEscalatedAfter(), is(equalTo(-1)));
+        assertThat(b.getEscalatedAfter(), is(equalTo(-1L)));
         assertThat(b.getEscalationId(), is(nullValue()));
         // compare
         assertThat(a, is(equalTo(b)));
