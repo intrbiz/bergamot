@@ -267,6 +267,30 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
      */
     @SQLColumn(index = 39, name = "next_suppressed", since = @SQLVersion({ 3, 4, 0 }))
     private boolean nextSuppressed;
+
+    /**
+     * Previous State: Was the check previously acknowledged
+     */
+    @SQLColumn(index = 40, name = "previous_acknowledged", since = @SQLVersion({ 3, 32, 0 }))
+    private boolean previousAcknowledged;
+
+    /**
+     * Next State: Is the check now acknowledged
+     */
+    @SQLColumn(index = 41, name = "next_acknowledged", since = @SQLVersion({ 3, 32, 0 }))
+    private boolean nextAcknowledged;
+    
+    /**
+     * Previous State: Was the check previously encompassed
+     */
+    @SQLColumn(index = 42, name = "previous_encompassed", since = @SQLVersion({ 3, 32, 0 }))
+    private boolean previousEncompassed;
+
+    /**
+     * Next State: Is the check now encompassed
+     */
+    @SQLColumn(index = 43, name = "next_encompassed", since = @SQLVersion({ 3, 32, 0 }))
+    private boolean nextEncompassed;
     
     public CheckTransition()
     {
@@ -676,8 +700,46 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
     {
         this.nextSuppressed = nextSuppressed;
     }
-    
-    // helpers
+
+    public boolean isPreviousAcknowledged()
+    {
+        return previousAcknowledged;
+    }
+
+    public void setPreviousAcknowledged(boolean previousAcknowledged)
+    {
+        this.previousAcknowledged = previousAcknowledged;
+    }
+
+    public boolean isNextAcknowledged()
+    {
+        return nextAcknowledged;
+    }
+
+    public void setNextAcknowledged(boolean nextAcknowledged)
+    {
+        this.nextAcknowledged = nextAcknowledged;
+    }
+
+    public boolean isPreviousEncompassed()
+    {
+        return previousEncompassed;
+    }
+
+    public void setPreviousEncompassed(boolean previousEncompassed)
+    {
+        this.previousEncompassed = previousEncompassed;
+    }
+
+    public boolean isNextEncompassed()
+    {
+        return nextEncompassed;
+    }
+
+    public void setNextEncompassed(boolean nextEncompassed)
+    {
+        this.nextEncompassed = nextEncompassed;
+    }
 
     public CheckState toPreviousState()
     {
@@ -699,6 +761,8 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         state.setTransitioning(this.previousTransitioning);
         state.setInDowntime(this.previousInDowntime);
         state.setSuppressed(this.previousSuppressed);
+        state.setAcknowledged(this.previousAcknowledged);
+        state.setEncompassed(this.previousEncompassed);
         return state;
     }
     
@@ -720,6 +784,8 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         this.previousTransitioning = state.isTransitioning();
         this.previousInDowntime = state.isInDowntime();
         this.previousSuppressed = state.isSuppressed();
+        this.previousAcknowledged = state.isAcknowledged();
+        this.previousEncompassed = state.isEncompassed();
     }
     
     public CheckState toNextState()
@@ -742,6 +808,8 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         state.setTransitioning(this.nextTransitioning);
         state.setInDowntime(this.nextInDowntime);
         state.setSuppressed(this.nextSuppressed);
+        state.setAcknowledged(this.nextAcknowledged);
+        state.setEncompassed(this.nextEncompassed);
         return state;
     }
     
@@ -763,6 +831,8 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         this.nextTransitioning = state.isTransitioning();
         this.nextInDowntime = state.isInDowntime();
         this.nextSuppressed = state.isSuppressed();
+        this.nextAcknowledged = state.isAcknowledged();
+        this.nextEncompassed = state.isEncompassed();
     }
     
     @Override
@@ -790,6 +860,8 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         mo.setPreviousLastHardOutput(this.getPreviousLastHardOutput());
         mo.setPreviousInDowntime(this.isPreviousInDowntime());
         mo.setPreviousSuppressed(this.isPreviousSuppressed());
+        mo.setPreviousAcknowledged(this.isPreviousAcknowledged());
+        mo.setPreviousEncompassed(this.isPreviousEncompassed());
         mo.setNextOk(this.isNextOk());
         mo.setNextStatus(this.getNextStatus().toString());
         mo.setNextOutput(this.getNextOutput());
@@ -806,6 +878,8 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
         mo.setNextLastHardOutput(this.getNextLastHardOutput());
         mo.setNextInDowntime(this.isNextInDowntime());
         mo.setNextSuppressed(this.isNextSuppressed());
+        mo.setNextAcknowledged(this.isNextAcknowledged());
+        mo.setNextEncompassed(this.isNextEncompassed());
         mo.setAlert(this.isAlert());
         mo.setRecovery(this.isRecovery());
         return mo;

@@ -256,6 +256,30 @@ public class CheckTransitionMO extends MessageObject
     @JsonProperty("next_suppressed")
     private boolean nextSuppressed;
     
+    /**
+     * Previous State: Was the check previously acknowledged
+     */
+    @JsonProperty("previous_acknowledged")
+    private boolean previousAcknowledged;
+
+    /**
+     * Next State: Is the check now acknowledged
+     */
+    @JsonProperty("next_acknowledged")
+    private boolean nextAcknowledged;
+    
+    /**
+     * Previous State: Was the check previously encompassed
+     */
+    @JsonProperty("previous_encompassed")
+    private boolean previousEncompassed;
+
+    /**
+     * Next State: Is the check now encompassed
+     */
+    @JsonProperty("next_encompassed")
+    private boolean nextEncompassed;
+    
     public CheckTransitionMO()
     {
         super();
@@ -649,5 +673,45 @@ public class CheckTransitionMO extends MessageObject
     public void setNextSuppressed(boolean nextSuppressed)
     {
         this.nextSuppressed = nextSuppressed;
+    }
+
+    public boolean isPreviousAcknowledged()
+    {
+        return previousAcknowledged;
+    }
+
+    public void setPreviousAcknowledged(boolean previousAcknowledged)
+    {
+        this.previousAcknowledged = previousAcknowledged;
+    }
+
+    public boolean isNextAcknowledged()
+    {
+        return nextAcknowledged;
+    }
+
+    public void setNextAcknowledged(boolean nextAcknowledged)
+    {
+        this.nextAcknowledged = nextAcknowledged;
+    }
+
+    public boolean isPreviousEncompassed()
+    {
+        return previousEncompassed;
+    }
+
+    public void setPreviousEncompassed(boolean previousEncompassed)
+    {
+        this.previousEncompassed = previousEncompassed;
+    }
+
+    public boolean isNextEncompassed()
+    {
+        return nextEncompassed;
+    }
+
+    public void setNextEncompassed(boolean nextEncompassed)
+    {
+        this.nextEncompassed = nextEncompassed;
     }
 }
