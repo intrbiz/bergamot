@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.RealCheckMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
@@ -123,7 +124,7 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         mo.setCurrentAttemptThreshold(this.getCurrentAttemptThreshold());
         if (options.contains(MOFlag.STATS)) mo.setStats(this.getStats().toMO(contact));
         if (options.contains(MOFlag.COMMAND)) mo.setCheckCommand(Util.nullable(this.getCheckCommand(), (x) -> x.toStubMO(contact)));
-        if (options.contains(MOFlag.DEPENDS)) mo.setDepends(this.getDepends().stream().map((c) -> c.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.DEPENDS)) mo.setDepends(this.getDepends().stream().map((c) -> (CheckMO) c.toStubMO(contact)).collect(Collectors.toList()));
     }
     
     @Override
