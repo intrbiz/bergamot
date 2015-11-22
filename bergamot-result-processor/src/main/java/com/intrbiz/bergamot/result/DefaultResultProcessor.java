@@ -21,6 +21,7 @@ import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
+import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Contact;
@@ -340,9 +341,9 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         {
             Alert encompassingAlert = state.getCurrentAlert();
             // tag this check into the alert for the dependency
-            if (encompassingAlert != null)
+            if (encompassingAlert != null && (! check.getId().equals(encompassingAlert.getCheckId())))
             {
-                
+                db.setAlertEncompasses(new AlertEncompasses(encompassingAlert.getId(), check.getId(), new Timestamp(System.currentTimeMillis())));
             }
             else
             {

@@ -20,6 +20,7 @@ import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.AccessControl;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Alert;
+import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
@@ -79,7 +80,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 29, 0}),
+        version = @SQLVersion({3, 30, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -114,7 +115,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ComputedPermission.class,
             ComputedPermissionForDomain.class,
             Escalation.class,
-            AlertEscalation.class
+            AlertEscalation.class,
+            AlertEncompasses.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -903,6 +905,27 @@ public abstract class BergamotDB extends DatabaseAdapter
     @CacheInvalidate({"get_alert_escalations.#{alert_id}"})
     @SQLRemove(table = AlertEscalation.class, name = "remove_alert_escalations", since = @SQLVersion({3, 26, 0}))
     public abstract void removeAlertEscalations(@SQLParam("alert_id") UUID alertId);
+    
+    // encompasses
+    
+    @Cacheable
+    @CacheInvalidate({"get_alert_encompasses.#{alert_id}"})
+    @SQLSetter(table = AlertEncompasses.class, name = "set_alert_encompasses", since = @SQLVersion({3, 30, 0}))
+    public abstract void setAlertEncompasses(AlertEncompasses alertEncompasses);
+    
+    @Cacheable
+    @SQLGetter(table = AlertEncompasses.class, name = "get_alert_encompasses", since = @SQLVersion({3, 30, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
+    public abstract List<AlertEncompasses> getAlertEncompasses(@SQLParam("alert_id") UUID alertId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_alert_encompasses.#{alert_id}"})
+    @SQLRemove(table = AlertEncompasses.class, name = "remove_an_alert_encompasses", since = @SQLVersion({3, 30, 0}))
+    public abstract void removeAnAlertEncompasses(@SQLParam("alert_id") UUID alertId, @SQLParam("check_id") UUID checkId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_alert_encompasses.#{alert_id}"})
+    @SQLRemove(table = AlertEncompasses.class, name = "remove_alert_encompasses", since = @SQLVersion({3, 30, 0}))
+    public abstract void removeAlertEncompasses(@SQLParam("alert_id") UUID alertId);
     
     // group state
     

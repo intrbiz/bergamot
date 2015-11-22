@@ -158,6 +158,9 @@ public class AlertMO extends MessageObject implements CommentedMO
 
     @JsonProperty("notified")
     private List<ContactMO> notified = new LinkedList<ContactMO>();
+    
+    @JsonProperty("encompassed")
+    private List<AlertEncompassesMO> encompassed = new LinkedList<AlertEncompassesMO>();
 
     public AlertMO()
     {
@@ -434,5 +437,15 @@ public class AlertMO extends MessageObject implements CommentedMO
     public void setNotified(List<ContactMO> notified)
     {
         this.notified = notified;
+    }
+
+    public List<AlertEncompassesMO> getEncompassed()
+    {
+        return encompassed;
+    }
+
+    public void setEncompassed(List<AlertEncompassesMO> encompassed)
+    {
+        this.encompassed = encompassed;
     }
 }

@@ -563,6 +563,14 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
             return db.getAlertEscalations(this.getId());
         }
     }
+    
+    public List<AlertEncompasses> getEncompasses()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAlertEncompasses(this.getId());
+        }
+    }
 
     @Override
     public AlertMO toMO(Contact contact, EnumSet<MOFlag> options)
@@ -598,6 +606,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         mo.setEscalatedAt(this.getEscalatedAt() == null ? -1 : this.getEscalatedAt().getTime());
         mo.setNotified(this.getNotified().stream().filter((c) -> contact == null || contact.hasPermission("read", c)).map((c) -> c.toStubMO(contact)).collect(Collectors.toList()));
         mo.setEscalations(this.getEscalations().stream().map((e) -> e.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setEncompassed(this.getEncompasses().stream().map((e) -> e.toStubMO(contact)).collect(Collectors.toList()));
         return mo;
     }
     
