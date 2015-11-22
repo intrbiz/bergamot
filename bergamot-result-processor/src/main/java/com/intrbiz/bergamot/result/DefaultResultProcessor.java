@@ -635,6 +635,14 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // is this check entering downtime?
         nextState.setInDowntime(check.isInDowntime());
         nextState.setSuppressed(check.isSuppressed());
+        // has the current alert been acknowledged
+        if (currentState.getCurrentAlertId() != null)
+        {
+            Alert currentAlert = currentState.getCurrentAlert();
+            currentState.setAcknowledged(currentAlert.isAcknowledged());
+        }
+        // a virtual check can never be encompassed
+        nextState.setEncompassed(false);
         // compute the transition
         // do we have a state change
         if (currentState.isOk() ^ nextState.isOk())
