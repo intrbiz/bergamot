@@ -26,9 +26,18 @@ public class StaticExecutor extends AbstractExecutor<DummyEngine>
     {
         long start = System.nanoTime();
         ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
-        result.setOk(executeCheck.getBooleanParameter("ok", true));
-        result.setStatus(executeCheck.getParameter("status", "OK"));
-        result.setOutput(executeCheck.getParameter("output", ""));
+        if (Boolean.getBoolean("dummy.static.critical"))
+        {
+            result.setOk(false);
+            result.setStatus("CRITICAL");
+            result.setOutput("Something went wrong there");   
+        }
+        else
+        {
+            result.setOk(executeCheck.getBooleanParameter("ok", true));
+            result.setStatus(executeCheck.getParameter("status", "OK"));
+            result.setOutput(executeCheck.getParameter("output", ""));
+        }
         result.setRuntime(((double)(System.nanoTime() - start)) / 1_000_000D);
         this.publishActiveResult(executeCheck, result);
     }
