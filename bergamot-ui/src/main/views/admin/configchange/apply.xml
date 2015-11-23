@@ -1,6 +1,6 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
-<fragment xmlns="com.intrbiz.balsa" title="Applied change #{change.summary}">
+<fragment xmlns="com.intrbiz.balsa" title="Applying change #{change.summary}">
     <div class="row">
 		<h3 id="report_title">The minions are busy applying this configuration change, please be patient</h3>
 		<p class="text-body">#{coalesce(change.description, '')}</p>
