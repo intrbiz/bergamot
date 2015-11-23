@@ -482,6 +482,7 @@ span.info {
 	background-color: #EEE;
 	border-radius: 3px;
 	padding: 0px 4px;
+	margin: 0 3px;
 }
 
 span.indent {
@@ -782,16 +783,20 @@ a.remove:hover {
 
 /* State icons */
 
+span.icon_set {
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 32px;
+}
 
 span.suppressed {
     background: transparent url('../../images/icons/32/suppressed.png') top left no-repeat;
     height: 32px;
 	width: 32px;
-    overflow: hidden;
-    display: block;
-    position: absolute;
-    top: 5px;
-    right: 0px;
+	overflow: hidden;
+	display: block;
 }
 
 span.downtime {
@@ -800,9 +805,22 @@ span.downtime {
 	width: 32px;
     overflow: hidden;
     display: block;
-    position: absolute;
-    top: 5px;
-    right: 37px;
+}
+
+span.acknowledged {
+    background: transparent url('../../images/icons/32/acknowledged.png') top left no-repeat;
+    height: 32px;
+	width: 32px;
+    overflow: hidden;
+    display: block;
+}
+
+span.encompassed {
+    background: transparent url('../../images/icons/32/encompassed.png') top left no-repeat;
+    height: 32px;
+	width: 32px;
+    overflow: hidden;
+    display: block;
 }
 
 span.disabled {
@@ -811,9 +829,14 @@ span.disabled {
 	width: 32px;
     overflow: hidden;
     display: block;
-    position: absolute;
-    top: 5px;
-    right: 74px;
+}
+
+span.escalated {
+    background: transparent url('../../images/icons/32/escalated.png') top left no-repeat;
+    height: 32px;
+	width: 32px;
+    overflow: hidden;
+    display: block;
 }
 
 /* Create forms */

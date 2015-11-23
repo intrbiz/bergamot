@@ -12,9 +12,7 @@
 
 	<div class="row">
 		<div class="col4 dash_icon check" data-check-id="#{resource.id}">
-			<span class="suppressed" rendered="#{resource.suppressed}" title="This resource is suppressed, notifications will not be sent"></span>
-			<span class="downtime" rendered="#{resource.isInDowntime()}" title="This resource is in downtime, notifications will not be sent"></span>
-			<span class="disabled" rendered="#{! resource.enabled}" title="This resource is disabled and will not be actively checked"></span>
+			<include view="include/iconset" data-check="#{resource}" data-checkstate="#{resource.state}" data-alert="#{null}"/>
 			<h3>
 				<span class="dash_img status_#{resource.state.status.toString().toLowerCase()}" title="The resource is #{resource.state.status.toString().toLowerCase()}">
 					<img src="#{public(coalesce(resource.getParameter('ui-icon'), resource.getCheckCommand().getCommand().getParameter('ui-icon'), '/images/icons/64/resource.png'))}" />

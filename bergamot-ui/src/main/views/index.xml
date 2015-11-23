@@ -5,8 +5,8 @@
 		<!-- Alerts -->
 		<div class="row" id="alerts">
 			<h2>Alerts</h2>
-			<data-set var="check" value="#{alerts}">
-				<include view="include/check" data-alert="#{true}"/>
+			<data-set var="alert" value="#{alerts}">
+				<include view="include/check" data-check="#{alert.check}"/>
 			</data-set>
 		</div>
 		

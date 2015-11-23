@@ -2,58 +2,58 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
-	<a href="/#{check.type}/id/#{check.id}">
-		<div class="col3 dash_icon check" data-check-id="#{check.id}">
-			<span class="suppressed" rendered="#{check.suppressed}" title="This check is suppressed, notifications will not be sent"></span>
-			<span class="downtime" rendered="#{check.isInDowntime()}" title="This check is in downtime, notifications will not be sent"></span>
-			<span class="disabled" rendered="#{! check.enabled}" title="This check is disabled and will not be actively checked"></span>
-			<h3>
-				<span class="dash_img status_#{check.state.status.toString().toLowerCase()}" title="The check is #{check.state.status.toString().toLowerCase()}">
-					<img src="#{public(if(alert, '/images/icons/64/alert.png', coalesce(check.getParameter('ui-icon'), check.getCheckCommand().getCommand().getParameter('ui-icon'), '/images/icons/64/' + check.type + '.png')))}" />
-				</span>
-				<span class="name">#{check.summary}</span>
-		    </h3>
-		    <p class="field-status">
-			    <span class="label">Status: </span>
-			    <span class="value">#{check.state.status.toString().substring(0,1) + check.state.status.toString().substring(1).toLowerCase()}</span>
-		    </p>
-		    <p rendered="#{(check.type == 'service' or check.type == 'trap') and host == null}">
-			    <span class="label">Host: </span>
-			    <span class="value">#{check.host.summary}</span>
-		    </p>
-		    <p rendered="#{check.type == 'resource' and cluster == null}">
-			    <span class="label">Cluster: </span>
-			    <span class="value">#{check.cluster.summary}</span>
-		    </p>
-		    <p rendered="#{check.type == 'host'}">
-		    	<span class="label">Name: </span>
-		   		<span class="value">#{check.name}</span>
-	    	</p>
-		    <p rendered="#{check.type == 'host' || check.type == 'service' || check.type == 'trap'}" class="field-attempt">
-			    <span class="label">Attempt: </span>
-			    <span class="value">
-			    	<span>#{check.state.attempt} of #{check.currentAttemptThreshold}</span>
-			    	<span class="info" rendered="#{check.state.transitioning}" title="The check is changing state">Changing</span>
-			    	<span class="info" rendered="#{check.state.hard}" title="The check is in a steady state">Steady</span>
-			    </span>
-		    </p>				    
-		    <p class="field-last-checked">
-			    <span class="label">Last checked: </span>
-			    <span class="value">#{dateformat('HH:mm:ss', check.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', check.state.lastCheckTime)}</span>
-		    </p>
-		    <p class="output field-output">
-			    <span class="label">Output: </span>
-			    <span class="value">#{coalesce(check.state.output, '')}</span>
-		    </p>
-		    <!-- TODO: Spacer -->
-		   	<p rendered="#{check.type == 'cluster'}">
-		    	<span class="label">&nbsp;</span>
-		   		<span class="value">&nbsp;</span>
-	    	</p>
-	    	<p rendered="#{check.type == 'cluster'}">
-		    	<span class="label">&nbsp;</span>
-		   		<span class="value">&nbsp;</span>
-	    	</p>
-		</div>
-	</a>
+	<container data-checkstate="#{check.state}">
+		<a href="/#{check.type}/id/#{check.id}">
+			<div class="col3 dash_icon check" data-check-id="#{check.id}">
+				<include view="include/iconset"/>
+				<h3>
+					<span class="dash_img status_#{checkstate.status.toString().toLowerCase()}" title="The check is #{checkstate.status.toString().toLowerCase()}">
+						<img src="#{public(if(alert != null, '/images/icons/64/alert.png', coalesce(check.getParameter('ui-icon'), check.getCheckCommand().getCommand().getParameter('ui-icon'), '/images/icons/64/' + check.type + '.png')))}" />
+					</span>
+					<span class="name">#{check.summary}</span>
+			    </h3>
+			    <p class="field-status">
+				    <span class="label">Status: </span>
+				    <span class="value">#{checkstate.status.toString().substring(0,1) + check.state.status.toString().substring(1).toLowerCase()}</span>
+			    </p>
+			    <p rendered="#{(check.type == 'service' or check.type == 'trap') and host == null}">
+				    <span class="label">Host: </span>
+				    <span class="value">#{check.host.summary}</span>
+			    </p>
+			    <p rendered="#{check.type == 'resource' and cluster == null}">
+				    <span class="label">Cluster: </span>
+				    <span class="value">#{check.cluster.summary}</span>
+			    </p>
+			    <p rendered="#{check.type == 'host'}">
+			    	<span class="label">Name: </span>
+			   		<span class="value">#{check.name}</span>
+		    	</p>
+			    <p rendered="#{check.type == 'host' || check.type == 'service' || check.type == 'trap'}" class="field-attempt">
+				    <span class="label">Attempt: </span>
+				    <span class="value">
+				    	<span>#{check.state.attempt} of #{check.currentAttemptThreshold}</span>
+				    	<span class="info" rendered="#{checkstate.transitioning}" title="The check is changing state">Changing</span>
+				    	<span class="info" rendered="#{checkstate.hard}" title="The check is in a steady state">Steady</span>
+				    </span>
+			    </p>				    
+			    <p class="field-last-checked">
+				    <span class="label">Last checked: </span>
+				    <span class="value">#{dateformat('HH:mm:ss', checkstate.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', checkstate.lastCheckTime)}</span>
+			    </p>
+			    <p class="output field-output">
+				    <span class="label">Output: </span>
+				    <span class="value">#{coalesce(checkstate.output, '')}</span>
+			    </p>
+			    <!-- TODO: Spacer -->
+			   	<p rendered="#{check.type == 'cluster'}">
+			    	<span class="label">&nbsp;</span>
+			   		<span class="value">&nbsp;</span>
+		    	</p>
+		    	<p rendered="#{check.type == 'cluster'}">
+			    	<span class="label">&nbsp;</span>
+			   		<span class="value">&nbsp;</span>
+		    	</p>
+			</div>
+		</a>
+	</container>
 </fragment>
