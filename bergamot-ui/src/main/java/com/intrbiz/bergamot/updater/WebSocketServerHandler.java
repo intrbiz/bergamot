@@ -143,11 +143,11 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         try
         {
             this.authenticateContext(req);
-            logger.info("Authenticated websock connection for principal: " + this.context.getPrincipal());
+            logger.debug("Authenticated websock connection for principal: " + this.context.getPrincipal());
         }
         catch (BalsaSecurityException e)
         {
-            logger.error("Denying access for websocket", e);
+            logger.warn("Denying access for websocket", e);
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
             return;
         }

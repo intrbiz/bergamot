@@ -46,7 +46,7 @@ public class RegisterForUpdatesHandler extends RequestHandler
             {
                 // the bindings
                 Set<UpdateKey> bindings = this.computeBindings(context, rfsn);
-                logger.info("Reigster for updates: " + bindings);
+                logger.debug("Reigster for updates: " + bindings);
                 // setup the queue
                 UpdateQueue queue = context.var("updateQueue", UpdateQueue.open());
                 context.var("updateConsumer", queue.consumeUpdates((u) -> { this.sendUpdate(context, u); }, bindings));
@@ -73,12 +73,12 @@ public class RegisterForUpdatesHandler extends RequestHandler
             try
             {
                 Set<UpdateKey> bindings = this.computeBindings(context, rfsn);
-                logger.info("Reigster for updates: " + bindings);
+                logger.debug("Reigster for updates: " + bindings);
                 // update the bindings
                 Consumer<Update, UpdateKey> updateConsumer = context.var("updateConsumer");
                 for (UpdateKey binding : bindings)
                 {
-                    logger.info("Updating bindings, adding: " + binding);
+                    logger.debug("Updating bindings, adding: " + binding);
                     updateConsumer.addBinding(binding);
                 }
                 context.send(new RegisteredForUpdates(rfsn));

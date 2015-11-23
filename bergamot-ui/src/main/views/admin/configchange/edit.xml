@@ -16,7 +16,7 @@
 				</p>
 			</div>
 	   		<div class="col12">
-	   			<input type="submit" name="save" id="save" value="Save Change"/>
+	   			<input type="submit" name="save" id="save" value="Save Change" style="margin-left: 0px;"/>
 	   		</div>
    		</form>
     </div>

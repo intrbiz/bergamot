@@ -4,65 +4,69 @@
 <fragment xmlns="com.intrbiz.balsa" title="Configuration Changes">
     
     <div clas="row" style="margin-bottom: 20px;">
-    	<p class="text-body">
-    		A change set contain a number of configuration changes.  This allows for configuration changes to be made transactionally.
-    	</p>
-    	<table>
-    		<tr>
-    			<th>Summary</th>
-    			<th>Created By</th>
-    			<th>Created On</th>
-    			<th>Pending</th>
-    			<th>Applied By</th>
-    			<th>Applied On</th>
-    			<th></th>
-    			<th></th>
-    			<th></th>
-    			<th></th>
-    		</tr>
-    		<data-set var="change" value="#{changes}">
-    			<tr>
-    				<td>#{change.summary}</td>
-    				<td>#{coalesce(change.createdBy.summary, 'Unknown')}</td>
-    				<td>#{dateformat('EEEE dd/MM/yyyy', change.created) + ' at ' + dateformat('HH:mm:ss', change.created)}</td>
-    				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
-    				<td>#{if(change.appliedAt != null, coalesce(change.appliedBy.summary, 'Unknown'), '')}</td>
-    				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt)  + ' at ' + dateformat('HH:mm:ss', change.appliedAt), '')}</td>
-    				<td>
-    					<a href="/admin/configchange/view/id/#{change.id}">View Change</a>
-    				</td>
-    				<td>
-    					<a href="/admin/configchange/edit/id/#{change.id}" rendered="#{! change.applied}">Edit Change</a>
-    				</td>
-    				<td>
-    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{(! change.applied) and Balsa().permission('config.change.apply')}">Apply Change</a>
-    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{(! change.applied) and (! Balsa().permission('config.change.apply'))}">Validate Change</a>
-    				</td>
-    				<td>
-    					<a href="/admin/configchange/remove/id/#{change.id}" rendered="#{(! change.applied)}">Cancel Change</a>
-    				</td>
-    			</tr>
-    		</data-set>
-    	</table>
+    	<div class="col12">
+	    	<p>
+				<a href="/admin/configchange/history?offset=0&amp;limit=100" style="float: right;">Applied Configuration Changes</a>
+			</p>
+	    	<table style="width: 100%;">
+	    		<tr>
+	    			<th>Summary</th>
+	    			<th>Created By</th>
+	    			<th>Created On</th>
+	    			<th>Pending</th>
+	    			<th>Applied By</th>
+	    			<th>Applied On</th>
+	    			<th></th>
+	    			<th></th>
+	    			<th></th>
+	    			<th></th>
+	    		</tr>
+	    		<data-set var="change" value="#{changes}">
+	    			<tr>
+	    				<td>#{change.summary}</td>
+	    				<td>#{coalesce(change.createdBy.summary, 'Unknown')}</td>
+	    				<td>#{dateformat('EEEE dd/MM/yyyy', change.created) + ' at ' + dateformat('HH:mm:ss', change.created)}</td>
+	    				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
+	    				<td>#{if(change.appliedAt != null, coalesce(change.appliedBy.summary, 'Unknown'), '')}</td>
+	    				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt)  + ' at ' + dateformat('HH:mm:ss', change.appliedAt), '')}</td>
+	    				<td>
+	    					<a href="/admin/configchange/view/id/#{change.id}">View Change</a>
+	    				</td>
+	    				<td>
+	    					<a href="/admin/configchange/edit/id/#{change.id}" rendered="#{! change.applied}">Edit Change</a>
+	    				</td>
+	    				<td>
+	    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{(! change.applied) and Balsa().permission('config.change.apply')}">Apply Change</a>
+	    					<a href="/admin/configchange/validate/id/#{change.id}" rendered="#{(! change.applied) and (! Balsa().permission('config.change.apply'))}">Validate Change</a>
+	    				</td>
+	    				<td>
+	    					<a href="/admin/configchange/remove/id/#{change.id}" rendered="#{(! change.applied)}">Cancel Change</a>
+	    				</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
     </div>
     
     <div clas="row">
-    	<h3>Create Configuration Change</h3>
-    	<form method="post" action="#{path('/admin/configchange/create')}">
-    		<div class="col12">
-				<p class="field">
-					<label for="summary">Change Summary</label>
-					<input type="text" name="summary" id="summary" placeholder="Adding new web server" value=""/>
-				</p>
-				<p class="field area">
-					<label for="description">Change Description</label>
-					<textarea name="description" id="description"></textarea>
-				</p>
-			</div>
-			<div class="col12">
-				<input type="submit" name="create" id="create" value="Create Change"/>
-			</div>
-		</form>
+    	<div class="col12">
+	    	<h3>Create Configuration Change</h3>
+	    	<form method="post" action="#{path('/admin/configchange/create')}">
+	    		<div class="col8">
+					<p class="field">
+						<label for="summary">Change Summary</label>
+						<input type="text" name="summary" id="summary" placeholder="Adding new web server" value=""/>
+					</p>
+					<p class="field area">
+						<label for="description">Change Description</label>
+						<textarea name="description" id="description"></textarea>
+					</p>
+				</div>
+				<div class="col8">
+					<input type="submit" name="create" id="create" value="Create Change" style="margin-left: 0px;"/>
+				</div>
+			</form>
+		</div>
     </div>
     
 </fragment>

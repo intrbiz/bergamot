@@ -36,7 +36,7 @@ public class RegisterForNotificationsHandler extends RequestHandler
         else if (context.var("notificationConsumer") == null)
         {
             // listen for notifications
-            logger.info("Registering for notifications, for site: " + rfns.getSiteId());
+            logger.debug("Registering for notifications, for site: " + rfns.getSiteId());
             try
             {
                 NotificationQueue notificationQueue = context.var("notificationQueue", NotificationQueue.open());

@@ -1,10 +1,13 @@
 package com.intrbiz.bergamot.ui.router.admin;
 
-import static com.intrbiz.Util.*;
-import static com.intrbiz.balsa.BalsaContext.*;
+import static com.intrbiz.Util.coalesceEmpty;
+import static com.intrbiz.Util.nullable;
+import static com.intrbiz.balsa.BalsaContext.Balsa;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
@@ -33,7 +36,9 @@ import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Catch;
+import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.IsaLong;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
@@ -54,8 +59,27 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db, @SessionVar("site") Site site)
     {
-        var("changes", db.listConfigChanges(site.getId()));
+        List<ConfigChange> pending = var("pending_changes", db.getPendingConfigChanges(site.getId()));
+        List<ConfigChange> applied = var("applied_changes", db.pageConfigChanges(site.getId(), true, 5, 0));
+        List<ConfigChange> changes = var("changes", new LinkedList<ConfigChange>());
+        changes.addAll(pending);
+        changes.addAll(applied);
         encode("admin/configchange/index");
+    }
+    
+    @Any("/history")
+    @WithDataAdapter(BergamotDB.class)
+    public void history(
+            BergamotDB db, 
+            @SessionVar("site") Site site,
+            @Param("offset") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L)   long offset,
+            @Param("limit")  @IsaLong(min = 1, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 100L) long limit
+    )
+    {
+        var("changes", db.pageConfigChanges(site.getId(), true, limit, offset));
+        var("offset", offset);
+        var("limit", limit);
+        encode("admin/configchange/history");
     }
     
     @Any("/create")

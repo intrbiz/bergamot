@@ -80,7 +80,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 32, 0}),
+        version = @SQLVersion({3, 33, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -299,6 +299,16 @@ public abstract class BergamotDB extends DatabaseAdapter
             orderBy = { @SQLOrder(value = "applied", direction = Direction.ASC), @SQLOrder(value = "created", direction = Direction.DESC) }
     )
     public abstract List<ConfigChange> listConfigChanges(@SQLParam("site_id") UUID siteId);
+    
+    @SQLGetter(table = ConfigChange.class, name = "page_all_config_changes", since = @SQLVersion({3, 33, 0}), 
+            orderBy = { @SQLOrder(value = "applied", direction = Direction.ASC), @SQLOrder(value = "created", direction = Direction.DESC) }
+    )
+    public abstract List<ConfigChange> pageAllConfigChanges(@SQLParam("site_id") UUID siteId, @SQLLimit long limit, @SQLOffset long offset);
+    
+    @SQLGetter(table = ConfigChange.class, name = "page_config_changes", since = @SQLVersion({3, 33, 0}), 
+            orderBy = { @SQLOrder(value = "applied", direction = Direction.ASC), @SQLOrder(value = "created", direction = Direction.DESC) }
+    )
+    public abstract List<ConfigChange> pageConfigChanges(@SQLParam("site_id") UUID siteId, @SQLParam("applied") boolean applied, @SQLLimit long limit, @SQLOffset long offset);
     
     @SQLGetter(table = ConfigChange.class, name = "list_pending_config_changes", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.config_change WHERE site_id = p_site_id AND applied = FALSE"),

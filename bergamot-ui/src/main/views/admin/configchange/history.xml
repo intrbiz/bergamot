@@ -1,0 +1,39 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Applied Configuration Changes">
+    
+    <div clas="row">
+    	<div class="col12">
+		    <p>
+				<a href="/admin/configchange/history?offset=#{offset - limit}&amp;limit=#{limit}" rendered="#{offset > 0}">Newer</a>
+				<a href="/admin/configchange/history?offset=#{offset + limit}&amp;limit=#{limit}" rendered="#{changes.size() > 0}" style="float: right;">Older</a>
+			</p>
+	    	<table style="width: 100%;">
+	    		<tr>
+	    			<th>Summary</th>
+	    			<th>Created By</th>
+	    			<th>Created On</th>
+	    			<th>Pending</th>
+	    			<th>Applied By</th>
+	    			<th>Applied On</th>
+	    			<th></th>
+	    		</tr>
+	    		<data-set var="change" value="#{changes}">
+	    			<tr>
+	    				<td>#{change.summary}</td>
+	    				<td>#{coalesce(change.createdBy.summary, 'Unknown')}</td>
+	    				<td>#{dateformat('EEEE dd/MM/yyyy', change.created) + ' at ' + dateformat('HH:mm:ss', change.created)}</td>
+	    				<td>#{if(change.applied, 'Applied', 'Pending')}</td>
+	    				<td>#{if(change.appliedAt != null, coalesce(change.appliedBy.summary, 'Unknown'), '')}</td>
+	    				<td>#{if(change.appliedAt != null, dateformat('EEEE dd/MM/yyyy', change.appliedAt)  + ' at ' + dateformat('HH:mm:ss', change.appliedAt), '')}</td>
+	    				<td>
+	    					<a href="/admin/configchange/view/id/#{change.id}">View Change</a>
+	    				</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>
