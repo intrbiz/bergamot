@@ -80,7 +80,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 33, 0}),
+        version = @SQLVersion({3, 34, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -2165,7 +2165,11 @@ public abstract class BergamotDB extends DatabaseAdapter
                   stmt.setBoolean(2, suppressed);
                   try (ResultSet rs = stmt.executeQuery())
                   {
-                    if (rs.next()) return rs.getBoolean(1);
+                    if (rs.next())
+                    {
+                        this.getAdapterCache().remove("check_state." + checkId);
+                        return rs.getBoolean(1);
+                    }
                   }
                 }
                 return false;
@@ -2191,7 +2195,11 @@ public abstract class BergamotDB extends DatabaseAdapter
                   stmt.setObject(2, alertId);
                   try (ResultSet rs = stmt.executeQuery())
                   {
-                    if (rs.next()) return rs.getBoolean(1);
+                    if (rs.next())
+                    {
+                        this.getAdapterCache().remove("check_state." + checkId);
+                        return rs.getBoolean(1);
+                    }
                   }
                 }
                 return false;
@@ -2217,7 +2225,41 @@ public abstract class BergamotDB extends DatabaseAdapter
                   stmt.setBoolean(2, acknowledged);
                   try (ResultSet rs = stmt.executeQuery())
                   {
-                    if (rs.next()) return rs.getBoolean(1);
+                    if (rs.next())
+                    {
+                        this.getAdapterCache().remove("check_state." + checkId);
+                        return rs.getBoolean(1);
+                    }
+                  }
+                }
+                return false;
+        });
+    }
+    
+    private Timer set_alert_escalation_threshold = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.set_alert_escalation_threshold(UUID,BIGINT)"));
+    
+    /**
+     * Update the acknowledge state of the given check
+     * @param checkId the check id
+     * @param acknowledged is this check acknowledged
+     * @return true if the check was updated
+     */
+    public boolean setAlertEscalationThreshold(UUID alertId, long escalationThreshold)
+    {
+        return this.useTimed(
+            set_alert_escalation_threshold, 
+            (with) -> {
+                try (PreparedStatement stmt = with.prepareStatement("SELECT bergamot.set_alert_escalation_threshold(?::UUID, ?::BIGINT)"))
+                {
+                  stmt.setObject(1, alertId);
+                  stmt.setLong(2, escalationThreshold);
+                  try (ResultSet rs = stmt.executeQuery())
+                  {
+                    if (rs.next())
+                    {
+                        this.getAdapterCache().remove("alert." + alertId);
+                        return rs.getBoolean(1);
+                    }
                   }
                 }
                 return false;
@@ -2748,6 +2790,22 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "LANGUAGE PLPGSQL AS $$\n" +
                 "BEGIN\n" +
                 "    UPDATE bergamot.check_state SET acknowledged = p_acknowledged WHERE check_id = p_check_id;\n" +
+                "    RETURN FOUND;\n" +
+                "END;\n" +
+                "$$"
+        );
+    }
+    
+    @SQLPatch(name = "add_set_alert_escalation_threshold", index = 15, type = ScriptType.BOTH, version = @SQLVersion({3, 34, 0}), skip = false)
+    public static SQLScript addSetAlertEscalationThresholdFunction()
+    {
+        return new SQLScript(
+                
+                "CREATE OR REPLACE FUNCTION bergamot.set_alert_escalation_threshold(p_alert_id UUID, p_escalation_threshold BIGINT)\n" +
+                "RETURNS BOOLEAN\n" +
+                "LANGUAGE PLPGSQL AS $$\n" +
+                "BEGIN\n" +
+                "    UPDATE bergamot.alert SET escalation_threshold = p_escalation_threshold WHERE id = p_alert_id;\n" +
                 "    RETURN FOUND;\n" +
                 "END;\n" +
                 "$$"

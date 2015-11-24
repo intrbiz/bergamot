@@ -197,6 +197,12 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
      */
     @SQLColumn(index = 27, name = "notified_ids", type = "UUID[]", since = @SQLVersion({ 3, 26, 0 }))
     private List<UUID> notifiedIds = new LinkedList<UUID>();
+    
+    /**
+     * The threshold for the next escalation
+     */
+    @SQLColumn(index = 28, name = "escalation_threshold", since = @SQLVersion({ 3, 34, 0 }))
+    private long escalationThreshold = 0L;
 
     public Alert()
     {
@@ -570,6 +576,16 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         {
             return db.getAlertEncompasses(this.getId());
         }
+    }
+
+    public long getEscalationThreshold()
+    {
+        return escalationThreshold;
+    }
+
+    public void setEscalationThreshold(long escalationThreshold)
+    {
+        this.escalationThreshold = escalationThreshold;
     }
 
     @Override
