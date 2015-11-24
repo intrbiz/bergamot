@@ -401,42 +401,54 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             if (! escalations.isEmpty())
             {
-                long after = escalations.stream().map((e) -> e.getAfter()).min(Long::compare).get();
-                // produce the list of contacts to whom the escalated alert should be sent
-                Set<ContactMO> escalateTo = new HashSet<ContactMO>();
-                for (Escalation escalation : escalations)
+                // compute the minimum escalation threshold we found
+                long after = escalations.stream().map((e) -> e.getAfter()).filter((a) -> a > alert.getEscalationThreshold()).min(Long::compare).orElse(-1L);
+                if (after > 0 && after > alert.getEscalationThreshold())
                 {
-                    escalateTo.addAll(escalation.getContactsToNotify(check, state.getStatus(), now));
-                }
-                // do we have anyone to escalate too
-                if (! escalateTo.isEmpty())
-                {
-                    logger.info("Raising escalation for alert " + alert.getId() + " after " + after + " to [" + escalateTo.stream().map(ContactMO::getName).collect(Collectors.joining(", ")) + "]");
-                    // record the escalation
-                    if (! alert.isEscalated())
+                    // produce the list of contacts to whom the escalated alert should be sent
+                    Set<ContactMO> escalateTo = new HashSet<ContactMO>();
+                    for (Escalation escalation : escalations)
                     {
-                        alert.setEscalated(true);
-                        alert.setEscalatedAt(new Timestamp(System.currentTimeMillis()));
-                        db.setAlert(alert);
+                        if (escalation.getAfter() == after) 
+                            escalateTo.addAll(escalation.getContactsToNotify(check, state.getStatus(), now));
                     }
-                    AlertEscalation alertEscalation = new AlertEscalation();
-                    alertEscalation.setEscalationId(UUID.randomUUID());
-                    alertEscalation.setAlertId(alert.getId());
-                    alertEscalation.setAfter(after);
-                    alertEscalation.setEscalatedAt(new Timestamp(System.currentTimeMillis()));
-                    alertEscalation.setNotifiedIds(escalateTo.stream().map((c) -> c.getId()).collect(Collectors.toList()));
-                    db.setAlertEscalation(alertEscalation);
-                    // send the notification
-                    SendAlert sendAlert = alert.createEscalatedAlertNotification(now, new LinkedList<ContactMO>(escalateTo));
-                    if (sendAlert != null && (! sendAlert.getTo().isEmpty()))
+                    // do we have anyone to escalate too
+                    if (! escalateTo.isEmpty())
                     {
-                        logger.warn("Sending escalated alert for " + check);
-                        this.publishNotification(check, sendAlert);
-                        // accounting
-                        this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), sendAlert.getId(), check.getId(), AccountingNotificationType.ALERT, sendAlert.getTo().size(), alertEscalation.getAfter(), alertEscalation.getEscalationId()));
+                        logger.info("Raising escalation for alert " + alert.getId() + " after " + after + " to [" + escalateTo.stream().map(ContactMO::getName).collect(Collectors.joining(", ")) + "]");
+                        // record the escalation
+                        if (! alert.isEscalated())
+                        {
+                            alert.setEscalated(true);
+                            alert.setEscalatedAt(new Timestamp(System.currentTimeMillis()));
+                            alert.setEscalationThreshold(after);
+                            db.setAlert(alert);
+                        }
+                        else
+                        {
+                            // update the escalation threshold
+                            db.setAlertEscalationThreshold(alert.getId(), after);
+                            alert.setEscalationThreshold(after);
+                        }
+                        AlertEscalation alertEscalation = new AlertEscalation();
+                        alertEscalation.setEscalationId(UUID.randomUUID());
+                        alertEscalation.setAlertId(alert.getId());
+                        alertEscalation.setAfter(after);
+                        alertEscalation.setEscalatedAt(new Timestamp(System.currentTimeMillis()));
+                        alertEscalation.setNotifiedIds(escalateTo.stream().map((c) -> c.getId()).collect(Collectors.toList()));
+                        db.setAlertEscalation(alertEscalation);
+                        // send the notification
+                        SendAlert sendAlert = alert.createEscalatedAlertNotification(now, new LinkedList<ContactMO>(escalateTo));
+                        if (sendAlert != null && (! sendAlert.getTo().isEmpty()))
+                        {
+                            logger.warn("Sending escalated alert for " + check);
+                            this.publishNotification(check, sendAlert);
+                            // accounting
+                            this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), sendAlert.getId(), check.getId(), AccountingNotificationType.ALERT, sendAlert.getTo().size(), alertEscalation.getAfter(), alertEscalation.getEscalationId()));
+                        }
+                        // publish alert update
+                        this.publishAlertUpdate(alert, new AlertUpdate(alert.toMOUnsafe()));
                     }
-                    // publish alert update
-                    this.publishAlertUpdate(alert, new AlertUpdate(alert.toMOUnsafe()));
                 }
             }
         }
