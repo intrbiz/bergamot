@@ -947,45 +947,48 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return
      */
     @SQLGetter(table = GroupState.class, name = "compute_group_state", since = @SQLVersion({1, 0, 0}),
-            query = @SQLQuery("WITH RECURSIVE group_graph(id) AS ( " +
-                              "    SELECT g.id " +
-                              "    FROM bergamot.group g " +
-                              "    WHERE g.id = p_group_id " +
-                              "  UNION " +
-                              "    SELECT g.id " +
-                              "    FROM bergamot.group g, group_graph gg " +
-                              "    WHERE g.group_ids @> ARRAY[gg.id] " +
-                              ") " +
-                              "SELECT " + 
-                              "  p_group_id, " +
-                              "  bool_and(s.ok OR s.suppressed OR s.in_downtime) AS ok, " +
-                              "  max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER AS status, " +
-                              "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS pending_count, " +  
-                              "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS ok_count, " +
-                              "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS warning_count, " +
-                              "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS critical_count, " +
-                              "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, " +
-                              "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, " +
-                              "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS error_count, " +
-                              "  count(CASE WHEN s.suppressed                                         THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, " + 
-                              "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, " +
-                              "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, " +
-                              "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count, " +  
-                              "  count(s.check_id)::INTEGER                                                                          AS total_checks, " +
-                              "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count " +
-                              "FROM bergamot.check_state s " +
-                              "JOIN ( " +
-                              "    SELECT id, group_ids FROM bergamot.host " +
-                              "  UNION " + 
-                              "    SELECT id, group_ids FROM bergamot.service " +
-                              "  UNION  " +
-                              "    SELECT id, group_ids FROM bergamot.trap " +
-                              "  UNION " +
-                              "    SELECT id, group_ids FROM bergamot.cluster " +
-                              "  UNION " +
-                              "    SELECT id, group_ids FROM bergamot.resource " +
-                              ") q ON (s.check_id = q.id) " +
-                              "JOIN group_graph g ON (q.group_ids @> ARRAY[g.id])")
+        query = @SQLQuery("WITH RECURSIVE group_graph(id) AS ( \n" +
+                "    SELECT g.id \n" +
+                "    FROM bergamot.group g \n" +
+                "    WHERE g.id = p_group_id \n" +
+                "  UNION \n" +
+                "    SELECT g.id \n" +
+                "    FROM bergamot.group g, group_graph gg \n" +
+                "    WHERE g.group_ids @> ARRAY[gg.id] \n" +
+                ") \n" +
+                "SELECT  \n" +
+                "  p_group_id, \n" +
+                "  bool_and(s.ok OR s.suppressed OR s.in_downtime) AS ok, \n" +
+                "  max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER AS status, \n" +
+                "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS pending_count,   \n" +
+                "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS ok_count, \n" +
+                "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS warning_count, \n" +
+                "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS critical_count, \n" +
+                "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, \n" +
+                "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, \n" +
+                "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS error_count, \n" +
+                "  count(CASE WHEN s.suppressed                                                                            THEN 1 ELSE NULL END)::INTEGER AS suppressed_count,  \n" +
+                "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS info_count, \n" +
+                "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS action_count, \n" +
+                "  count(CASE WHEN s.in_downtime                                                                           THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,   \n" +
+                "  count(s.check_id)::INTEGER                                                                                                             AS total_checks, \n" +
+                "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count,\n" +
+                "  count(CASE WHEN s.acknowledged                                                                          THEN 1 ELSE NULL END)::INTEGER AS acknowledged_count,\n" +
+                "  count(CASE WHEN s.encompassed                                                                           THEN 1 ELSE NULL END)::INTEGER AS encompassed_count\n" +
+                "FROM bergamot.check_state s \n" +
+                "JOIN ( \n" +
+                "    SELECT id, group_ids FROM bergamot.host \n" +
+                "  UNION  \n" +
+                "    SELECT id, group_ids FROM bergamot.service \n" +
+                "  UNION  \n" +
+                "    SELECT id, group_ids FROM bergamot.trap \n" +
+                "  UNION \n" +
+                "    SELECT id, group_ids FROM bergamot.cluster \n" +
+                "  UNION \n" +
+                "    SELECT id, group_ids FROM bergamot.resource \n" +
+                ") q ON (s.check_id = q.id) \n" +
+                "JOIN group_graph g ON (q.group_ids @> ARRAY[g.id])\n"
+            )
     )
     public abstract GroupState computeGroupState(@SQLParam(value = "group_id", virtual = true) UUID groupId);
     
