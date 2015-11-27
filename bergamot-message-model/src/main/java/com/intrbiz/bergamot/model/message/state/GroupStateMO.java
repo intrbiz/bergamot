@@ -51,6 +51,12 @@ public class GroupStateMO extends MessageObject
     
     @JsonProperty("disconnected_count")
     private int disconnectedCount;
+    
+    @JsonProperty("acknowledged_count")
+    private int acknowledgedCount;
+    
+    @JsonProperty("encompassed_count")
+    private int encompassedCount;
 
     public GroupStateMO()
     {
@@ -205,5 +211,25 @@ public class GroupStateMO extends MessageObject
     public void setDisconnectedCount(int disconnectedCount)
     {
         this.disconnectedCount = disconnectedCount;
+    }
+
+    public int getAcknowledgedCount()
+    {
+        return acknowledgedCount;
+    }
+
+    public void setAcknowledgedCount(int acknowledgedCount)
+    {
+        this.acknowledgedCount = acknowledgedCount;
+    }
+
+    public int getEncompassedCount()
+    {
+        return encompassedCount;
+    }
+
+    public void setEncompassedCount(int encompassedCount)
+    {
+        this.encompassedCount = encompassedCount;
     }
 }
