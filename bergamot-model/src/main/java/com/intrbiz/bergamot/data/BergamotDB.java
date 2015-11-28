@@ -959,8 +959,8 @@ public abstract class BergamotDB extends DatabaseAdapter
             ") \n" +
             "SELECT  \n" +
             "  p_group_id, \n" +
-            "  bool_and(s.ok OR s.suppressed OR s.in_downtime) AS ok, \n" +
-            "  max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER AS status, \n" +
+            "  bool_and(s.ok OR s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) AS ok, \n" +
+            "  max(CASE WHEN s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed THEN 0 ELSE s.status END)::INTEGER AS status, \n" +
             "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS pending_count,\n" +
             "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS ok_count,\n" +
             "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS warning_count,\n" +
@@ -1030,8 +1030,8 @@ public abstract class BergamotDB extends DatabaseAdapter
             ")  \n" +
             "SELECT   \n" +
             "  p_group_id,  \n" +
-            "  coalesce(bool_and(s.ok OR s.suppressed OR s.in_downtime), true) AS ok,  \n" +
-            "  coalesce(max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER, 0) AS status,  \n" +
+            "  coalesce(bool_and(s.ok OR s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed), true) AS ok,  \n" +
+            "  coalesce(max(CASE WHEN s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed THEN 0 ELSE s.status END)::INTEGER, 0) AS status,  \n" +
             "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS pending_count,\n" +
             "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS ok_count,\n" +
             "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS warning_count,\n" +
@@ -1069,49 +1069,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             "  WHERE cpfd3.permission = 'read' AND cpfd3.contact_id = p_contact_id \n" +
             "  GROUP BY sdm3.check_id \n" +
             ") q3 ON (q3.check_id = s.check_id) \n" +
-            "WHERE coalesce(q3.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n" +
-            "\n" +
-            "WITH RECURSIVE group_graph(id) AS ( \n" +
-            "    SELECT g.id \n" +
-            "    FROM bergamot.group g \n" +
-            "    WHERE g.id = p_group_id \n" +
-            "  UNION \n" +
-            "    SELECT g.id \n" +
-            "    FROM bergamot.group g, group_graph gg \n" +
-            "    WHERE g.group_ids @> ARRAY[gg.id] \n" +
-            ") \n" +
-            "SELECT  \n" +
-            "  p_group_id, \n" +
-            "  bool_and(s.ok OR s.suppressed OR s.in_downtime) AS ok, \n" +
-            "  max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER AS status, \n" +
-            "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS pending_count,   \n" +
-            "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS ok_count, \n" +
-            "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS warning_count, \n" +
-            "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS critical_count, \n" +
-            "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, \n" +
-            "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, \n" +
-            "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS error_count, \n" +
-            "  count(CASE WHEN s.suppressed                                                                            THEN 1 ELSE NULL END)::INTEGER AS suppressed_count,  \n" +
-            "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS info_count, \n" +
-            "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS action_count, \n" +
-            "  count(CASE WHEN s.in_downtime                                                                           THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,   \n" +
-            "  count(s.check_id)::INTEGER                                                                                                             AS total_checks, \n" +
-            "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count,\n" +
-            "  count(CASE WHEN s.acknowledged                                                                          THEN 1 ELSE NULL END)::INTEGER AS acknowledged_count,\n" +
-            "  count(CASE WHEN s.encompassed                                                                           THEN 1 ELSE NULL END)::INTEGER AS encompassed_count\n" +
-            "FROM bergamot.check_state s \n" +
-            "JOIN ( \n" +
-            "    SELECT id, group_ids FROM bergamot.host \n" +
-            "  UNION  \n" +
-            "    SELECT id, group_ids FROM bergamot.service \n" +
-            "  UNION  \n" +
-            "    SELECT id, group_ids FROM bergamot.trap \n" +
-            "  UNION \n" +
-            "    SELECT id, group_ids FROM bergamot.cluster \n" +
-            "  UNION \n" +
-            "    SELECT id, group_ids FROM bergamot.resource \n" +
-            ") q ON (s.check_id = q.id) \n" +
-            "JOIN group_graph g ON (q.group_ids @> ARRAY[g.id])\n"
+            "WHERE coalesce(q3.allowed, false) OR bergamot.has_permission(p_contact_id, 'read')\n"
         )
     )
     public abstract GroupState computeGroupStateForContact(@SQLParam(value = "group_id", virtual = true) UUID groupId, @SQLParam(value = "contact_id", virtual = true) UUID contactId);
@@ -1124,35 +1082,39 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return
      */
     @SQLGetter(table = GroupState.class, name = "compute_location_state", since = @SQLVersion({1, 0, 0}),
-            query = @SQLQuery("WITH RECURSIVE location_graph(id) AS ( "+
-                              "    SELECT l.id "+
-                              "    FROM bergamot.location l "+
-                              "    WHERE l.id = p_location_id "+
-                              "  UNION "+
-                              "    SELECT l.id "+
-                              "    FROM bergamot.location l, location_graph lg "+
-                              "    WHERE l.location_id = lg.id "+
-                              ") "+
-                              "SELECT "+ 
-                              "  p_location_id, "+
-                              "  bool_and(s.ok OR s.suppressed OR s.in_downtime) AS ok, " +
-                              "  max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER AS status, " +
-                              "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS pending_count, " +  
-                              "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS ok_count, " +
-                              "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS warning_count, " +
-                              "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS critical_count, " +
-                              "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, " +
-                              "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, " +
-                              "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS error_count, " +
-                              "  count(CASE WHEN s.suppressed                                         THEN 1 ELSE NULL END)::INTEGER AS suppressed_count, " + 
-                              "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, " +
-                              "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, " +
-                              "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count, " +  
-                              "  count(s.check_id)::INTEGER                                                                          AS total_checks, " +
-                              "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count " +
-                              "FROM bergamot.check_state s " +
-                              "JOIN bergamot.host h ON (s.check_id = h.id) "+
-                              "JOIN location_graph lg ON (h.location_id = lg.id)")
+        query = @SQLQuery(
+            "WITH RECURSIVE location_graph(id) AS ( \n"+
+            "    SELECT l.id \n"+
+            "    FROM bergamot.location l \n"+
+            "    WHERE l.id = p_location_id \n"+
+            "  UNION \n"+
+            "    SELECT l.id \n"+
+            "    FROM bergamot.location l, location_graph lg \n"+
+            "    WHERE l.location_id = lg.id \n"+
+            ") \n"+
+            "SELECT \n"+ 
+            "  p_location_id,\n"+
+            "  bool_and(s.ok OR s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) AS ok,\n" +
+            "  max(CASE WHEN s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed THEN 0 ELSE s.status END)::INTEGER AS status,\n" +
+            "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS pending_count,\n" +  
+            "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS ok_count,\n" +
+            "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS warning_count,\n" +
+            "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS critical_count,\n" +
+            "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS unknown_count,\n" +
+            "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS timeout_count,\n" +
+            "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS error_count,\n" +
+            "  count(CASE WHEN s.suppressed                                                                            THEN 1 ELSE NULL END)::INTEGER AS suppressed_count,\n" + 
+            "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS info_count,\n" +
+            "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS action_count,\n" +
+            "  count(CASE WHEN s.in_downtime                                                                           THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,\n" +  
+            "  count(s.check_id)::INTEGER                                                                                                             AS total_checks,\n" +
+            "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count,\n" +
+            "  count(CASE WHEN s.acknowledged                                                                          THEN 1 ELSE NULL END)::INTEGER AS acknowledged_count,\n" +
+            "  count(CASE WHEN s.encompassed                                                                           THEN 1 ELSE NULL END)::INTEGER AS encompassed_count\n" +
+            "FROM bergamot.check_state s \n" +
+            "JOIN bergamot.host h ON (s.check_id = h.id) \n"+
+            "JOIN location_graph lg ON (h.location_id = lg.id)\n"
+        )
     )
     public abstract GroupState computeLocationState(@SQLParam(value = "location_id", virtual = true) UUID locationId);
     
@@ -1193,21 +1155,23 @@ public abstract class BergamotDB extends DatabaseAdapter
             ") \n" +
             "SELECT\n" +
             "  p_location_id,\n" +
-            "  coalesce(bool_and(s.ok OR s.suppressed OR s.in_downtime), true) AS ok, \n" +
-            "  coalesce(max(CASE WHEN s.suppressed OR s.in_downtime THEN 0 ELSE s.status END)::INTEGER, 0) AS status, \n" +
-            "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS pending_count,   \n" +
-            "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS ok_count, \n" +
-            "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS warning_count, \n" +
-            "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS critical_count, \n" +
-            "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, \n" +
-            "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, \n" +
-            "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS error_count, \n" +
-            "  count(CASE WHEN s.suppressed                                         THEN 1 ELSE NULL END)::INTEGER AS suppressed_count,  \n" +
-            "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS info_count, \n" +
-            "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS action_count, \n" +
-            "  count(CASE WHEN s.in_downtime                                        THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,   \n" +
-            "  count(s.check_id)::INTEGER                                                                          AS total_checks,   \n" +
-            "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count " +
+            "  coalesce(bool_and(s.ok OR s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed), true) AS ok, \n" +
+            "  coalesce(max(CASE WHEN s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed THEN 0 ELSE s.status END)::INTEGER, 0) AS status, \n" +
+            "  count(CASE WHEN s.status = 0 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS pending_count,   \n" +
+            "  count(CASE WHEN s.status = 2 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS ok_count, \n" +
+            "  count(CASE WHEN s.status = 3 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS warning_count, \n" +
+            "  count(CASE WHEN s.status = 4 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS critical_count, \n" +
+            "  count(CASE WHEN s.status = 5 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS unknown_count, \n" +
+            "  count(CASE WHEN s.status = 6 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS timeout_count, \n" +
+            "  count(CASE WHEN s.status = 7 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS error_count, \n" +
+            "  count(CASE WHEN s.suppressed                                                                            THEN 1 ELSE NULL END)::INTEGER AS suppressed_count,  \n" +
+            "  count(CASE WHEN s.status = 1 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS info_count, \n" +
+            "  count(CASE WHEN s.status = 9 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS action_count, \n" +
+            "  count(CASE WHEN s.in_downtime                                                                           THEN 1 ELSE NULL END)::INTEGER AS in_downtime_count,   \n" +
+            "  count(s.check_id)::INTEGER                                                                                                             AS total_checks,   \n" +
+            "  count(CASE WHEN s.status = 8 AND NOT (s.suppressed OR s.in_downtime OR s.acknowledged OR s.encompassed) THEN 1 ELSE NULL END)::INTEGER AS disconnected_count,\n" +
+            "  count(CASE WHEN s.acknowledged                                                                          THEN 1 ELSE NULL END)::INTEGER AS acknowledged_count,\n" +
+            "  count(CASE WHEN s.encompassed                                                                           THEN 1 ELSE NULL END)::INTEGER AS encompassed_count\n" +
             "FROM bergamot.check_state s \n" +
             "JOIN bergamot.host h ON (s.check_id = h.id)\n" +
             "JOIN location_graph lg ON (h.location_id = lg.id)\n" +
