@@ -26,9 +26,13 @@ public interface VirtualCheckExpressionContext
     
     Service lookupService(Host on, String name);
     
+    Service lookupAnonymousService(String name);
+    
     Service lookupService(UUID id);
     
     Trap lookupTrap(Host on, String name);
+    
+    Trap lookupAnonymousTrap(String name);
     
     Trap lookupTrap(UUID id);
     

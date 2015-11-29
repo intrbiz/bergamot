@@ -1844,7 +1844,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     //
     
-    public VirtualCheckExpressionContext createVirtualCheckContext(final UUID siteId)
+    public VirtualCheckExpressionContext createVirtualCheckContext(final UUID siteId, final Host contextualHost)
     {      
         return new VirtualCheckExpressionContext()
         {
@@ -1912,7 +1912,19 @@ public abstract class BergamotDB extends DatabaseAdapter
             public Resource lookupResource(UUID id)
             {
                 return getResource(Site.setSiteId(siteId, id));
-            }           
+            }
+
+            @Override
+            public Service lookupAnonymousService(String name)
+            {
+                return contextualHost == null ? null : contextualHost.getService(name);
+            }
+
+            @Override
+            public Trap lookupAnonymousTrap(String name)
+            {
+                return contextualHost == null ? null : contextualHost.getTrap(name);
+            }  
         };
     }
     

@@ -628,7 +628,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             processedVirtualChecks.add(referencedBy.getId());
             // update the status of the check
-            VirtualCheckExpressionContext context = db.createVirtualCheckContext(check.getSiteId());
+            VirtualCheckExpressionContext context = db.createVirtualCheckContext(check.getSiteId(), null);
             boolean ok = referencedBy.getCondition().computeOk(context);
             Status status = referencedBy.getCondition().computeStatus(context);
             boolean allHard = referencedBy.getCondition().isAllDependenciesHard(context);

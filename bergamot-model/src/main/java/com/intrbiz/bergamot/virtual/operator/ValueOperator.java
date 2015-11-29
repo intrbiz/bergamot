@@ -44,6 +44,6 @@ public class ValueOperator extends VirtualCheckOperator
     
     public String toString()
     {
-       return this.check.toString();
+       return this.check == null ? "null" : this.check.toString();
     }
 }

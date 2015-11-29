@@ -1518,7 +1518,7 @@ public class BergamotConfigImporter
             if (cond != null)
             {
                 // context to use
-                VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId());
+                VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId(), null);
                 // validate the condition
                 for (CheckReference chkRef : cond.computeDependencies())
                 {
@@ -1722,28 +1722,27 @@ public class BergamotConfigImporter
                     {
                         // we only need to link dependencies on host and cluster
                         // as services auto depend on host and resources auto depend on cluster
-                        RealCheck<?,?> check = null;
                         if (checkCfg instanceof HostCfg)
                         {
-                            check = db.getHostByName(this.site.getId(), checkCfg.getName());
-                        }
-                        // did we find the check
-                        if (check != null)
-                        {
-                            // parse the dependencies
-                            List<CheckReference> dependsOn = VirtualCheckExpressionParser.parseParentsExpression(checkCfg.getDepends());
-                            // validate the references and link
-                            VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId());
-                            for (CheckReference chkRef : dependsOn)
+                            Host host = db.getHostByName(this.site.getId(), checkCfg.getName());
+                            // did we find the check
+                            if (host != null)
                             {
-                                RealCheck<?,?> dependsOnCheck = (RealCheck<?, ?>) chkRef.resolve(vcec);
-                                if (dependsOnCheck == null) throw new RuntimeException("The check " + checkCfg.getName() + " depends upon the check " + chkRef + " which does not exist");
-                                check.getDependsIds().add(dependsOnCheck.getId());
+                                // parse the dependencies
+                                List<CheckReference> dependsOn = VirtualCheckExpressionParser.parseParentsExpression(checkCfg.getDepends());
+                                // validate the references and link
+                                VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId(), host);
+                                for (CheckReference chkRef : dependsOn)
+                                {
+                                    Check<?,?> dependsOnCheck = chkRef.resolve(vcec);
+                                    if (dependsOnCheck == null) throw new RuntimeException("The check " + checkCfg.getName() + " depends upon the check " + chkRef + " which does not exist");
+                                    host.getDependsIds().add(dependsOnCheck.getId());
+                                }
+                                //
+                                this.report.info("The check " + checkCfg.getName() + "(" + host.getId() + ") depends upon " + host.getDependsIds());
+                                // update
+                                db.setCheck(host);
                             }
-                            //
-                            this.report.info("The check " + checkCfg.getName() + "(" + check.getId() + ") depends upon " + check.getDependsIds());
-                            // update
-                            db.setCheck(check);
                         }
                     }
                 }

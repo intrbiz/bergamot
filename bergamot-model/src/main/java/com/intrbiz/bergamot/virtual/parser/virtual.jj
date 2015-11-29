@@ -143,21 +143,60 @@ private ValueOperator readService() :
 	    	) |
 	    	(
 				name = readString()
-				(
-		    		<LON>
-		    		(<HOST>)?
-		    		(
-				    	(
-							id = readUUID()
-							{ host = new HostById(id); }
-				    	) |
-				    	(
-							name = readString()
-							{ host = new HostByName(name); }
-				    	)
-					)
-		      		{ service = new ServiceByName(host, name); }
-				)?
+	    		<LON>
+	    		(<HOST>)?
+	    		(
+			    	(
+						id = readUUID()
+						{ host = new HostById(id); }
+			    	) |
+			    	(
+						hostName = readString()
+						{ host = new HostByName(hostName); }
+			    	)
+				)
+	      		{ service = new ServiceByName(host, name); }
+	    	)
+		)
+    )
+    { return new ValueOperator(service); }
+}
+
+private ValueOperator readParentService() :
+{
+    String name = null;
+    String hostName = null;
+    UUID id = null;
+    ServiceReference service = null;
+    HostReference host = null;
+}
+{
+    ( 
+		<SERVICE>
+		(
+	    	(
+				id = readUUID()
+				{ service = new ServiceById(id); }
+	    	) |
+	    	LOOKAHEAD(2) (
+	    		name = readString()
+	    		<LON>
+	    		(<HOST>)?
+	    		(
+			    	(
+						id = readUUID()
+						{ host = new HostById(id); }
+			    	) |
+			    	(
+						hostName = readString()
+						{ host = new HostByName(hostName); }
+			    	)
+				)
+	      		{ service = new ServiceByName(host, name); }
+	    	) |
+	    	(
+				name = readString()
+	    		{ service = new AnonymousService(name); }
 	    	)
 		)
     )
@@ -182,21 +221,60 @@ private ValueOperator readTrap() :
 	    	) |
 	    	(
 				name = readString()
+	    		<LON>
+	    		(<HOST>)?
 				(
-		    		<LON>
-		    		(<HOST>)?
-					(
-				    	(
-							id = readUUID()
-							{ host = new HostById(id); }
-				    	) |
-				    	(
-							name = readString()
-							{ host = new HostByName(name); }
-				    	)
-					)
-		      		{ trap = new TrapByName(host, name); }
-				)?
+			    	(
+						id = readUUID()
+						{ host = new HostById(id); }
+			    	) |
+			    	(
+						hostName = readString()
+						{ host = new HostByName(hostName); }
+			    	)
+				)
+	      		{ trap = new TrapByName(host, name); }
+	    	)
+		)
+    )
+    { return new ValueOperator(trap); }
+}
+
+private ValueOperator readParentTrap() :
+{
+    String name = null;
+    String hostName = null;
+    UUID id;
+    TrapReference trap = null;
+    HostReference host = null;
+}
+{
+    ( 
+		<TRAP>
+		(
+	    	(
+				id = readUUID()
+				{ trap = new TrapById(id); }
+	    	) |
+	    	LOOKAHEAD(2) (
+				name = readString()
+	    		<LON>
+	    		(<HOST>)?
+				(
+			    	(
+						id = readUUID()
+						{ host = new HostById(id); }
+			    	) |
+			    	(
+						hostName = readString()
+						{ host = new HostByName(hostName); }
+			    	)
+				)
+	      		{ trap = new TrapByName(host, name); }
+	    	) |
+	    	(
+	    		name = readString()
+	    		{ trap = new AnonymousTrap(name); }
 	    	)
 		)
     )
@@ -309,11 +387,23 @@ public List<CheckReference> readParents() :
 }
 {
     (
-		check = readCheck()
+		( 
+	        check = readHost()             |
+	        check = readCluster()          |
+	        check = readResource()         |
+	        check = readParentService()    |
+    		check = readParentTrap()
+		)
 		{ checks.add(check.getCheck()); }
 		(
 			<SEP>
-			check = readCheck()
+			( 
+		        check = readHost()             |
+		        check = readCluster()          |
+		        check = readResource()         |
+		        check = readParentService()    |
+	    		check = readParentTrap()
+			)
 			{ checks.add(check.getCheck()); }
 		)*
     )
