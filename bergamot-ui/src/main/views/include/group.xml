@@ -27,6 +27,14 @@
 				    <span class="label">Suppressed: </span>
 				    <span class="value" data-bind="suppressed_count" style="width: 60px;">#{groupstate.suppressedCount}</span>
 			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">Acknowledged: </span>
+				    <span class="value" data-bind="acknowledged_count" style="width: 60px;">#{groupstate.acknowledgedCount}</span>
+			    </p>
+			    <p style="width: 205px;">
+				    <span class="label">Encompassed: </span>
+				    <span class="value" data-bind="encompassed_count" style="width: 60px;">#{groupstate.encompassedCount}</span>
+			    </p>
 			</div>
 		</a>
 	</container>
