@@ -125,6 +125,11 @@ public class HealthTracker
                     handler.accept(daemon);
                 }
             }
+            else if ((! daemon.isAlive()) && daemon.isDaemonLongGone())
+            {
+                // remove the daemon from our list
+                this.knownDaemons.remove(daemon.getInstanceId());
+            }
         }
     }
     

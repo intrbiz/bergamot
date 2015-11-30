@@ -146,6 +146,12 @@ public class KnownDaemon implements Comparable<KnownDaemon>
         // was the heartbeat over 30 seconds ago
         return this.getLastHeartbeatAge() > 30_000L;
     }
+    
+    public boolean isDaemonLongGone()
+    {
+        // did we last see this daemon over a day ago
+        return this.getLastHeartbeatAge() > 86400_000L;
+    }
 
     public boolean isAlive()
     {
