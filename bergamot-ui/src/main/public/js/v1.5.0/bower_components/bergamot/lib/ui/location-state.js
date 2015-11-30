@@ -29,6 +29,8 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.$node.find("span[data-bind=critical_count]").text(location.state.critical_count);
 		this.$node.find("span[data-bind=in_downtime_count]").text(location.state.in_downtime_count);
 		this.$node.find("span[data-bind=suppressed_count]").text(location.state.suppressed_count);
+        this.$node.find("span[data-bind=encompassed_count]").text(location.state.encompassed_count);
+        this.$node.find("span[data-bind=acknowledged_count]").text(location.state.acknowledged_count);
 		this.$node.find("span[data-bind=total_checks]").text(location.state.total_checks);
         this.$node.find("span[data-bind=not_ok_count]").text(location.state.warning_count + location.state.critical_count + location.state.unknown_count + location.state.timeout_count + location.state.error_count + location.state.action_count);
 	    // animate the update
