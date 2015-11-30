@@ -279,6 +279,11 @@ public class GroupState extends BergamotObject<GroupStateMO>
     {
         this.encompassedCount = encompassedCount;
     }
+    
+    public int getNotOkCount()
+    {
+        return this.warningCount + this.criticalCount + this.unknownCount + this.timeoutCount + this.disconnectedCount + this.actionCount + this.errorCount;
+    }
 
     @Override
     public GroupStateMO toMO(Contact contact, EnumSet<MOFlag> options)
