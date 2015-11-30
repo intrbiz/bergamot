@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.health.HealthAgent;
+import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
@@ -102,6 +103,7 @@ public class DefaultNotifier extends AbstractNotifier
         logger.info("Bergamot notifier starting.");
         // start the health agent
         HealthAgent.getInstance().init(this.getDaemonName());
+        HealthTracker.getInstance().init();
         // start the notifier
         super.start();
     }

@@ -2,13 +2,14 @@ package com.intrbiz.bergamot.notification;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.config.NotificationEngineCfg;
+import com.intrbiz.bergamot.health.model.KnownDaemon;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
@@ -115,7 +116,7 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
 
     public void addTemplate(String name, String template)
     {
-        this.addTemplate(name, new ValueExpression(this.createContext(null), template));
+        this.addTemplate(name, new ValueExpression(this.createContext((Notification) null), template));
     }
 
     public void addTemplate(String name, ValueExpression template)
@@ -202,6 +203,42 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
                     else if ("cluster".equals(name) && (((CheckNotification) notification).getCheck() instanceof ResourceMO))
                     { 
                         return ((ResourceMO) ((CheckNotification) notification).getCheck()).getCluster(); 
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public ActionHandler getAction(String name, Object source)
+            {
+                return null;
+            }
+        });
+        return ctx;
+    }
+    
+    public String applyTemplate(String name, KnownDaemon daemon)
+    {
+        ValueExpression vexp = this.getTemplate(name);
+        if (vexp != null)
+        {
+            return String.valueOf(vexp.get(this.createContext(daemon), daemon));
+        }
+        throw new NotificationException("Failed to find template: " + name);
+    }
+    
+    protected ExpressContext createContext(KnownDaemon daemon)
+    {
+        ExpressContext ctx = new DefaultContext(this.expressExtensions, new ExpressEntityResolver()
+        {
+            @Override
+            public Object getEntity(String name, Object source)
+            {
+                if (daemon != null)
+                {
+                    if ("this".equals(name) || "daemon".equals(name))
+                    {
+                        return daemon;
                     }
                 }
                 return null;
