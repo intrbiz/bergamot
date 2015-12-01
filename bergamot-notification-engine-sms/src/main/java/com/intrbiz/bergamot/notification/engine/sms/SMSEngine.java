@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.notification.engine.sms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
+import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.QueueException;
@@ -47,6 +49,8 @@ public class SMSEngine extends AbstractNotificationEngine
     private final Counter smsSendErrors;
     
     private Accounting accounting = Accounting.create(SMSEngine.class);
+    
+    private List<String> healthcheckAdmins = new LinkedList<String>();
 
     public SMSEngine()
     {
@@ -70,6 +74,13 @@ public class SMSEngine extends AbstractNotificationEngine
         logger.info("Using the Twillo account: " + this.accountSid + ", from: " + this.from);
         this.client = new TwilioRestClient(this.accountSid, this.authToken);
         this.messageFactory = client.getAccount().getMessageFactory();
+        // who to contact in the event we get a warning from the healthcheck subsystem
+        for (CfgParameter param : this.config.getParameters())
+        {
+            if ("healthcheck.admin".equals(param.getName()) && (! Util.isEmpty(param.getValueOrText())))
+                this.healthcheckAdmins.add(param.getValueOrText());
+        }
+        logger.info("Healthcheck alerts will be sent to " + this.healthcheckAdmins);
     }
 
     @Override
