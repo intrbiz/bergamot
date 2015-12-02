@@ -16,6 +16,8 @@ import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
+import com.intrbiz.bergamot.health.HealthTracker;
+import com.intrbiz.bergamot.health.model.KnownDaemon;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
@@ -81,6 +83,48 @@ public class SMSEngine extends AbstractNotificationEngine
                 this.healthcheckAdmins.add(param.getValueOrText());
         }
         logger.info("Healthcheck alerts will be sent to " + this.healthcheckAdmins);
+        // setup healthchecking
+        HealthTracker.getInstance().addAlertHandler(this::raiseHealthcheckAlert);
+    }
+    
+    public void raiseHealthcheckAlert(KnownDaemon failed)
+    {
+        logger.error("Got healthcheck alert for " + failed.getDaemonName() + " [" + failed.getInstanceId() + "] on host " + failed.getHostName() + " [" + failed.getHostId() + "]");
+        if (! this.healthcheckAdmins.isEmpty())
+        {
+            // really try to send
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    String message = this.buildMessage(failed);
+                    // send the SMSes
+                    for (String admin : this.healthcheckAdmins)
+                    {
+                        try
+                        {
+                            // send the SMS
+                            List<NameValuePair> params = new ArrayList<NameValuePair>();
+                            params.add(new BasicNameValuePair("To", admin));
+                            params.add(new BasicNameValuePair("From", this.from));
+                            params.add(new BasicNameValuePair("Body", message));
+                            Message sms = this.messageFactory.create(params);
+                            logger.info("Sent SMS, Id: " + sms.getSid());
+                        }
+                        catch (Exception e)
+                        {
+                            logger.error("Failed to send SMS notification to " + admin);
+                        }
+                    }
+                    // successfully sent
+                    break;
+                }
+                catch (Exception e)
+                {
+                    logger.error("Failed to send SMS healthcheck notification", e);
+                }
+            }
+        }
     }
 
     @Override
@@ -164,6 +208,11 @@ public class SMSEngine extends AbstractNotificationEngine
             return this.applyTemplate(notification.getNotificationType() + ".message", notification);
         }
     }
+    
+    protected String buildMessage(KnownDaemon daemon) throws Exception
+    {
+        return this.applyTemplate("healthcheck.alert.message", daemon);
+    }
 
     @Override
     protected Map<String, String> getDefaultTemplates()
@@ -189,6 +238,8 @@ public class SMSEngine extends AbstractNotificationEngine
         templates.put("resource.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for resource #{resource.summary} on the cluster #{cluster.summary}");
         templates.put("resource.alert.message", "Alert for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
         templates.put("resource.recovery.message", "Recovery for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
+        // healthcheck
+        templates.put("healthcheck.alert.message", "The daemon #{daemon.daemonName} (instance #{daemon.instanceId}) on the host #{daemon.hostName} (#{daemon.hostId}) has failed");
         return templates;
     }
 }
