@@ -7,11 +7,13 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.adapter.CSVAdapter;
+import com.intrbiz.bergamot.config.adapter.YesNoAdapter;
 import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
@@ -32,6 +34,8 @@ public class EscalateCfg implements Serializable
     private Set<String> ignore = new LinkedHashSet<String>();
     
     private NotifyCfg notify;
+    
+    private Boolean renotify;
     
     public EscalateCfg()
     {
@@ -100,5 +104,24 @@ public class EscalateCfg implements Serializable
     public boolean isIgnore(String state)
     {
         return this.getIgnore().contains(state);
+    }
+
+    @XmlJavaTypeAdapter(YesNoAdapter.class)
+    @XmlAttribute(name = "renotify")
+    @ResolveWith(Coalesce.class)
+    public Boolean isRenotify()
+    {
+        return renotify;
+    }
+
+    public void setRenotify(Boolean renotify)
+    {
+        this.renotify = renotify;
+    }
+    
+    @XmlTransient
+    public boolean getRenotifyBooleanValue()
+    {
+        return this.renotify == null ? false : this.renotify.booleanValue();
     }
 }
