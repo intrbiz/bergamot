@@ -52,6 +52,12 @@ public class Escalation extends BergamotObject<EscalationMO> implements Comparab
      */
     @SQLColumn(index = 6, name = "contact_ids", type = "UUID[]", since = @SQLVersion({ 3, 22, 0 }))
     protected List<UUID> contactIds = new LinkedList<UUID>();
+    
+    /**
+     * Should we renotify the original contacts
+     */
+    @SQLColumn(index = 6, name = "contact_ids", type = "UUID[]", since = @SQLVersion({ 3, 36, 0 }))
+    protected boolean renotify = false;
 
     public Escalation()
     {
@@ -118,6 +124,16 @@ public class Escalation extends BergamotObject<EscalationMO> implements Comparab
         this.contactIds = contactIds;
     }
     
+    public boolean isRenotify()
+    {
+        return renotify;
+    }
+
+    public void setRenotify(boolean renotify)
+    {
+        this.renotify = renotify;
+    }
+
     public List<Team> getTeams()
     {
         List<Team> r = new LinkedList<Team>();
