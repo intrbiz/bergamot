@@ -26,6 +26,9 @@ public class EscalationMO extends MessageObject
     @JsonProperty("teams")
     protected List<TeamMO> teams = new LinkedList<TeamMO>();
     
+    @JsonProperty("renotify")
+    protected boolean renotify;
+    
     public EscalationMO()
     {
         super();
@@ -79,5 +82,15 @@ public class EscalationMO extends MessageObject
     public void setTeams(List<TeamMO> teams)
     {
         this.teams = teams;
+    }
+
+    public boolean isRenotify()
+    {
+        return renotify;
+    }
+
+    public void setRenotify(boolean renotify)
+    {
+        this.renotify = renotify;
     }
 }

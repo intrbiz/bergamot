@@ -231,6 +231,7 @@ public class Escalation extends BergamotObject<EscalationMO> implements Comparab
     {
         EscalationMO mo = new EscalationMO();
         mo.setAfter(this.after);
+        mo.setRenotify(this.renotify);
         mo.setIgnore(this.ignore.stream().map(Status::toString).collect(Collectors.toSet()));
         TimePeriod timePeriod = this.getTimePeriod();
         if (timePeriod != null)
