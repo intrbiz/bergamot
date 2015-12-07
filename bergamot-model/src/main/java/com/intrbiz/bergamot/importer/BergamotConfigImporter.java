@@ -1092,6 +1092,7 @@ public class BergamotConfigImporter
             Escalation esc = new Escalation();
             esc.setNotificationsId(owner);
             esc.setAfter(ecfg.getAfterTimeInterval().toMillis());
+            esc.setRenotify(ecfg.getRenotifyBooleanValue());
             esc.setIgnore(ecfg.getIgnore().stream().map(Status::parse).collect(Collectors.toList()));
             // load the time period
             if (! Util.isEmpty(ecfg.getEscalationPeriod()))
