@@ -409,8 +409,23 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     Set<ContactMO> escalateTo = new HashSet<ContactMO>();
                     for (Escalation escalation : escalations)
                     {
-                        if (escalation.getAfter() == after) 
+                        if (escalation.getAfter() == after)
+                        {
+                            // should we renotify the original contacts of the alert
+                            if (escalation.isRenotify())
+                            {
+                                /* 
+                                 * TODO: Should we apply the notification settings again, or is this 
+                                 *       an explicit override.  For example if a contact was originally 
+                                 *       notified, but now is not to be notified, should we renotify?
+                                 *       
+                                 *       Currently we forcefully renotify all original contacts
+                                 */
+                                alert.getNotified().stream().map(Contact::toMOUnsafe).forEach(escalateTo::add);
+                            }
+                            // compute any new contacts to notify
                             escalateTo.addAll(escalation.getContactsToNotify(check, state.getStatus(), now));
+                        }
                     }
                     // do we have anyone to escalate too
                     if (! escalateTo.isEmpty())
