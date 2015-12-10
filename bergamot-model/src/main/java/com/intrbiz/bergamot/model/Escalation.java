@@ -56,7 +56,7 @@ public class Escalation extends BergamotObject<EscalationMO> implements Comparab
     /**
      * Should we renotify the original contacts
      */
-    @SQLColumn(index = 7, name = "contact_ids", since = @SQLVersion({ 3, 36, 0 }))
+    @SQLColumn(index = 7, name = "renotify", since = @SQLVersion({ 3, 36, 0 }))
     protected boolean renotify = false;
 
     public Escalation()
