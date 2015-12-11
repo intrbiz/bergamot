@@ -52,6 +52,10 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-agent-server-config</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-healthcheck-tracker</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-cli</finalName>
