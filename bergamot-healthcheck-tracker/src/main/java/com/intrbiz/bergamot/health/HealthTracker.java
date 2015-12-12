@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.health.model.KnownDaemon;
 import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
+import com.intrbiz.bergamot.model.message.health.HealthCheckKill;
 import com.intrbiz.bergamot.model.message.health.HealthCheckMessage;
 import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
@@ -40,7 +41,9 @@ public class HealthTracker
     @SuppressWarnings("unused")
     private com.intrbiz.queue.Consumer<HealthCheckMessage, NullKey> healthcheckConsumer;
     
-    private Producer<HealthCheckMessage> healthcheckProducer;
+    private Producer<HealthCheckMessage> healthcheckControlProducer;
+    
+    private Producer<HealthCheckMessage> healthcheckEventProducer;
     
     private Logger logger = Logger.getLogger(HealthTracker.class);
     
@@ -95,6 +98,35 @@ public class HealthTracker
         this.alertHandlers.remove(alertHandler);
     }
     
+    /**
+     * Unjoin the given instance from this health check cluster
+     * @param instanceId the instance id to unjoin
+     * @param daemonName the daemon name
+     */
+    public void unjoinDaemon(UUID instanceId, String daemonName)
+    {
+        this.healthcheckEventProducer.publish(new HealthCheckUnjoin(instanceId, daemonName));
+    }
+    
+    /**
+     * Unjoin the given instance from this health check cluster
+     * @param instanceId the instance id to unjoin
+     */
+    public void unjoinDaemon(UUID instanceId)
+    {
+        this.unjoinDaemon(instanceId, "unknown");
+    }
+    
+    /**
+     * Request that the given running daemon with the given instance and runtime id immediately terminates
+     * @param instanceId the daemon instance id
+     * @param runtimeId the daemon runtime id
+     */
+    public void killDaemon(UUID instanceId, UUID runtimeId)
+    {
+        this.healthcheckControlProducer.publish(new HealthCheckKill(instanceId, runtimeId));
+    }
+    
     private void setupTimer()
     {
         this.timer = new Timer();
@@ -136,7 +168,8 @@ public class HealthTracker
     private void setupQueue()
     {
         this.queue = HealthCheckQueue.open();
-        this.healthcheckProducer = this.queue.publishHealthCheckControlEvents();
+        this.healthcheckControlProducer = this.queue.publishHealthCheckControlEvents();
+        this.healthcheckEventProducer = this.queue.publishHealthCheckEvents();
         this.healthcheckConsumer = this.queue.consumeHealthCheckEvents(this::handleMessage);
     }
     
@@ -203,6 +236,6 @@ public class HealthTracker
     
     private void requestJoin()
     {
-        this.healthcheckProducer.publish(new HealthCheckRequestJoin());
+        this.healthcheckControlProducer.publish(new HealthCheckRequestJoin());
     }
 }

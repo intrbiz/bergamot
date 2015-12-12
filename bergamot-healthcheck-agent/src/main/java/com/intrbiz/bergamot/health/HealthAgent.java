@@ -5,8 +5,11 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
+import com.intrbiz.bergamot.model.message.health.HealthCheckKill;
 import com.intrbiz.bergamot.model.message.health.HealthCheckMessage;
 import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
@@ -182,6 +185,20 @@ public final class HealthAgent
         if (message instanceof HealthCheckRequestJoin)
         {
             this.joinHealthCheckCluster();
+        }
+        else if (message instanceof HealthCheckKill)
+        {
+            this.commitSeppuku((HealthCheckKill) message);
+        }
+    }
+    
+    private void commitSeppuku(HealthCheckKill message)
+    {
+        if (this.instanceId.equals(message.getInstanceId()) && this.runtimeId.equals(message.getRuntimeId()))
+        {
+            Logger.getLogger(HealthAgent.class).fatal("Received request to terminate via health check, exiting immediately");
+            System.err.println("Received request to terminate via health check, exiting immediately");
+            System.exit(-1);
         }
     }
     
