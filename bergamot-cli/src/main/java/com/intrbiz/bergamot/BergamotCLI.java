@@ -28,9 +28,11 @@ import com.intrbiz.bergamot.command.admin.DBInstallCommand;
 import com.intrbiz.bergamot.command.admin.DBVersionCommand;
 import com.intrbiz.bergamot.command.admin.DiscoverDaemonsCommand;
 import com.intrbiz.bergamot.command.admin.GenerateSiteCAsCommand;
+import com.intrbiz.bergamot.command.admin.KillDaemonCommand;
 import com.intrbiz.bergamot.command.admin.ListSitesCommand;
 import com.intrbiz.bergamot.command.admin.SecurityKeyCommand;
 import com.intrbiz.bergamot.command.admin.ServerCommand;
+import com.intrbiz.bergamot.command.admin.UnjoinDaemonCommand;
 
 public class BergamotCLI
 {
@@ -65,6 +67,8 @@ public class BergamotCLI
         this.addCommand(new ServerCommand());
         this.addCommand(new SecurityKeyCommand());
         this.addCommand(new DiscoverDaemonsCommand());
+        this.addCommand(new KillDaemonCommand());
+        this.addCommand(new UnjoinDaemonCommand());
     }
 
     public void addCommand(BergamotCLICommand command)
