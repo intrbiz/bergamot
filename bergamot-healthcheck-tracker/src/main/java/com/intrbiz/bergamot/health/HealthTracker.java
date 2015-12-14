@@ -218,7 +218,8 @@ public class HealthTracker
         }
         else
         {
-            logger.warn("Got heartbeat for unkown daemon " + heartbeat.getInstanceId());
+            logger.warn("Got heartbeat for unkown daemon " + heartbeat.getInstanceId() + ", requesting join");
+            this.requestJoin();
         }
     }
     
