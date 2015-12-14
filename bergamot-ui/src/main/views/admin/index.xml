@@ -32,6 +32,10 @@
 				    <span class="label">Instance Id:</span>
 				    <span class="value" style="font-size: 13px;">#{daemon.instanceId}</span>
 			    </p>
+			    <p>
+				    <span class="label">Runtime Id:</span>
+				    <span class="value" style="font-size: 13px;">#{daemon.runtimeId}</span>
+			    </p>
 			</div>
 		</data-set>
     </div>
