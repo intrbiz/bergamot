@@ -20,7 +20,28 @@ import com.intrbiz.metadata.Var;
 @Prefix("/api/util")
 @RequireValidPrincipal()
 public class UtilAPIRouter extends Router<BergamotApp>
-{    
+{   
+    @Get("/version")
+    @JSON()
+    public String version()
+    {
+        return BergamotApp.VERSION.NUMBER + " (" + BergamotApp.VERSION.CODE_NAME + ")";
+    }
+    
+    @Get("/version/number")
+    @JSON()
+    public String versionNumber()
+    {
+        return BergamotApp.VERSION.NUMBER;
+    }
+    
+    @Get("/version/codename")
+    @JSON()
+    public String versionCodeName()
+    {
+        return BergamotApp.VERSION.CODE_NAME;
+    }
+    
     @Get("/id/new")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
