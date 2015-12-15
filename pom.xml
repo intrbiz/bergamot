@@ -424,7 +424,7 @@
   		<dependency>
   			<groupId>com.intrbiz.accounting</groupId>
   			<artifactId>accounting</artifactId>
-  			<version>1.0.0-SNAPSHOT</version>
+  			<version>[1.0,)</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
