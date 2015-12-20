@@ -40,8 +40,8 @@
 	</div>
 	
 	<div class="row">
+		<h3>Notifications</h3>
 		<div class="col4 dash_icon">
-			<h3>Notifications</h3>
 			<p>
 				<span class="label wide">Notifications enabled</span>
 				<span class="value">#{if(the_contact.notifications.enabled, 'yes', 'no')}</span>
@@ -50,6 +50,68 @@
 				<span class="label wide">Notification period</span>
 				<span class="value"><a href="/timeperiod/id/#{the_contact.notifications.timePeriod.id}">#{the_contact.notifications.timePeriod.summary}</a></span>
 			</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<h3>Notification Engines</h3>
+		<div class="col8">
+			<table>
+				<tr>
+					<th>Engine</th>
+					<th>Enabled</th>
+					<th>Notification Period</th>
+					<th>Ignores</th>
+					<th>Alerts</th>
+					<th>Recoveries</th>
+					<th>Acknowledgements</th>
+				</tr>
+				<data-set var="engine" value="#{the_contact.notifications.engines}">
+					<tr>
+						<td>#{engine.engine}</td>
+						<td>#{if(engine.enabled, 'yes', 'no')}</td>
+						<td><a rendered="#{engine.timePeriodId != null}" href="/timeperiod/id/#{engine.timePeriod.id}">#{engine.timePeriod.summary}</a></td>
+						<td><data-set var="ignore" value="#{engine.ignore}"><span class="info">#{ucfirst(lc(ignore))}</span></data-set></td>
+						<td>#{if(engine.alertsEnabled, 'yes', 'no')}</td>
+						<td>#{if(engine.recoveryEnabled, 'yes', 'no')}</td>
+						<td>#{if(engine.acknowledgeEnabled, 'yes', 'no')}</td>
+					</tr>
+				</data-set>
+			</table>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col8">
+			<h3>Escalations</h3>
+			<table>
+				<tr>
+					<th>After</th>
+					<th>Notification Period</th>
+					<th>Ignores</th>
+					<th>Renotify</th>
+					<th>Teams</th>
+					<th>Contacts</th>
+				</tr>
+				<data-set var="escalation" value="#{the_contact.notifications.escalations}">
+					<tr>
+						<td>#{if(escalation.after >= 3600000, (escalation.after/ 3600000) + 'h', (escalation.after / 60000) + 'm')}</td>
+						<td><a rendered="#{escalation.timePeriodId != null}" href="/timeperiod/id/#{escalation.timePeriod.id}">#{escalation.timePeriod.summary}</a></td>
+						<td><data-set var="ignore" value="#{escalation.ignore}"><span class="info">#{ucfirst(lc(ignore))}</span></data-set></td>
+						<td>#{if(escalation.renotify, 'yes', 'no')}</td>
+						<td>
+							<data-set var="to_team" value="#{escalation.getTeams()}">
+								<a href="/team/id/#{to_team.id}">#{to_team.summary}</a>
+							</data-set>
+						</td>
+						<td>
+							<data-set var="to_contact" value="#{escalation.getContacts()}">
+								<a href="/contact/id/#{to_contact.id}">#{to_contact.summary}</a>
+							</data-set>
+						</td>
+					</tr>
+				</data-set>
+			</table>
 		</div>
 	</div>
 	
