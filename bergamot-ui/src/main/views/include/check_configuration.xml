@@ -66,6 +66,66 @@
 				</data-set>
 			</div>
 		</div>
+		<div class="row" rendered="#{! isempty(check.notifications.engines)}">
+			<h3>Notification Engines</h3>
+			<div class="col8">
+				<table>
+					<tr>
+						<th>Engine</th>
+						<th>Enabled</th>
+						<th>Notification Period</th>
+						<th>Ignores</th>
+						<th>Alerts</th>
+						<th>Recoveries</th>
+						<th>Acknowledgements</th>
+					</tr>
+					<data-set var="engine" value="#{check.notifications.engines}">
+						<tr>
+							<td>#{engine.engine}</td>
+							<td>#{if(engine.enabled, 'yes', 'no')}</td>
+							<td><a rendered="#{engine.timePeriodId != null}" href="/timeperiod/id/#{engine.timePeriod.id}">#{engine.timePeriod.summary}</a></td>
+							<td><data-set var="ignore" value="#{engine.ignore}"><span class="info">#{ucfirst(lc(ignore))}</span></data-set></td>
+							<td>#{if(engine.alertsEnabled, 'yes', 'no')}</td>
+							<td>#{if(engine.recoveryEnabled, 'yes', 'no')}</td>
+							<td>#{if(engine.acknowledgeEnabled, 'yes', 'no')}</td>
+						</tr>
+					</data-set>
+				</table>
+			</div>
+		</div>
+		<div class="row" rendered="#{! isempty(check.notifications.escalations)}">
+			<div class="col8">
+				<h3>Escalations</h3>
+				<table>
+					<tr>
+						<th>After</th>
+						<th>Notification Period</th>
+						<th>Ignores</th>
+						<th>Renotify</th>
+						<th>Teams</th>
+						<th>Contacts</th>
+					</tr>
+					<data-set var="escalation" value="#{check.notifications.escalations}">
+						<tr>
+							<td>#{if(escalation.after >= 3600000, (escalation.after/ 3600000) + 'h', (escalation.after / 60000) + 'm')}</td>
+							<td><a rendered="#{escalation.timePeriodId != null}" href="/timeperiod/id/#{escalation.timePeriod.id}">#{escalation.timePeriod.summary}</a></td>
+							<td><data-set var="ignore" value="#{escalation.ignore}"><span class="info">#{ucfirst(lc(ignore))}</span></data-set></td>
+							<td>#{if(escalation.renotify, 'yes', 'no')}</td>
+							<td>
+								<data-set var="to_team" value="#{escalation.getTeams()}">
+									<a href="/team/id/#{to_team.id}">#{to_team.summary}</a>
+								</data-set>
+							</td>
+							<td>
+								<data-set var="to_contact" value="#{escalation.getContacts()}">
+									<a href="/contact/id/#{to_contact.id}">#{to_contact.summary}</a>
+								</data-set>
+							</td>
+						</tr>
+					</data-set>
+				</table>
+			</div>
+		</div>
 	</container>
 	<container rendered="#{Balsa().permission('read.config', check) and Balsa().permission('read', check.checkCommand.command) and (check.type == 'host' or check.type == 'service' or check.type == 'trap')}">
 		<div class="row">
