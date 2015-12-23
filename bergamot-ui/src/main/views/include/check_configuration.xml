@@ -94,8 +94,8 @@
 			</div>
 		</div>
 		<div class="row" rendered="#{! isempty(check.notifications.escalations)}">
+			<h3>Escalations</h3>
 			<div class="col8">
-				<h3>Escalations</h3>
 				<table>
 					<tr>
 						<th>After</th>
@@ -124,6 +124,24 @@
 						</tr>
 					</data-set>
 				</table>
+			</div>
+		</div>
+		<div class="row" rendered="#{(! isempty(check.groups)) or (check.type == 'host' and check.location != null)}">
+			<div class="col4 dash_icon" rendered="#{! isempty(check.groups)}">
+				<h3>Groups</h3>
+				<data-set var="group" value="#{check.groups}">
+					<p>
+						<span class="label wide">Group</span>
+						<span class="value"><a href="/group/id/#{group.id}">#{group.summary}</a></span>
+					</p>
+				</data-set>
+			</div>
+			<div class="col4 dash_icon" rendered="#{check.type == 'host' and check.location != null}">
+				<h3>Location</h3>
+				<p>
+					<span class="label wide">Location</span>
+					<span class="value"><a href="/location/id/#{check.location.id}">#{check.location.summary}</a></span>
+				</p>
 			</div>
 		</div>
 	</container>
