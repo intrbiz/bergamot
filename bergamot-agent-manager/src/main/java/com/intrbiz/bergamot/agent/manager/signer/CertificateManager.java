@@ -101,45 +101,96 @@ public class CertificateManager
     public Certificate signAgent(UUID siteId, UUID agentId, String commonName, PublicKey key)
     {
         if (! this.keyStore.hasSiteCA(siteId)) throw new RuntimeException("No certificate exists for site: " + siteId);
-        if (this.keyStore.hasAgent(siteId, agentId)) throw new RuntimeException("Certificate already exists for agent " + siteId + "::" + agentId);
-        // first we need the root CA
-        CertificatePair site = this.keyStore.loadSiteCA(siteId);
-        // sign the agent cert
-        try
+        // do we already have a agent cert
+        if (this.keyStore.hasAgent(siteId, agentId))
         {
-            logger.info("Signing Agent: " + siteId + "::" + agentId + " " + this.buildDN(commonName));
-            // sign the agent
-            CertificatePair agent = RSAUtil.generateCertificate(this.buildDN(commonName), new SerialNum(agentId, 1), 365 * 5, 2048, KeyType.CLIENT, key, site);
-            // store
-            this.keyStore.storeAgent(siteId, agentId, agent);
-            // return the cert
-            return agent.getCertificate();
+            // load the current cert to get the serial number to revision
+            CertificatePair currentCrt = this.keyStore.loadAgent(siteId, agentId);
+            SerialNum currentSerial = SerialNum.fromBigInt(currentCrt.getCertificate().getSerialNumber());
+            // we need the CA to sign
+            CertificatePair site = this.keyStore.loadSiteCA(siteId);
+            // sign the agent cert
+            try
+            {
+                logger.info("Signing Agent: " + siteId + "::" + agentId + " " + this.buildDN(commonName));
+                // sign the agent
+                CertificatePair agent = RSAUtil.generateCertificate(this.buildDN(commonName), currentSerial.revision(), 365 * 5, 2048, KeyType.CLIENT, key, site);
+                // store
+                this.keyStore.storeAgent(siteId, agentId, agent);
+                // return the cert
+                return agent.getCertificate();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Failed to sign agent", e);
+            }
         }
-        catch (Exception e)
+        else
         {
-            throw new RuntimeException("Failed to sign agent", e);
+            // first we need the root CA
+            CertificatePair site = this.keyStore.loadSiteCA(siteId);
+            // sign the agent cert
+            try
+            {
+                logger.info("Signing Agent: " + siteId + "::" + agentId + " " + this.buildDN(commonName));
+                // sign the agent
+                CertificatePair agent = RSAUtil.generateCertificate(this.buildDN(commonName), new SerialNum(agentId, 1), 365 * 5, 2048, KeyType.CLIENT, key, site);
+                // store
+                this.keyStore.storeAgent(siteId, agentId, agent);
+                // return the cert
+                return agent.getCertificate();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Failed to sign agent", e);
+            }
         }
     }
     
     public Certificate signServer(String commonName, PublicKey key)
     {
-        if (this.keyStore.hasServer(commonName)) throw new RuntimeException("Certificate already exists for server " + commonName);
-        // first we need the root CA
-        CertificatePair root = this.keyStore.loadRootCA();
-        // sign the server cert
-        try
+        if (this.keyStore.hasServer(commonName))
         {
-            logger.info("Signing Server: " + commonName + " " + this.buildDN(commonName));
-            // sign the agent
-            CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), SerialNum.randomSerialNum(), 365 * 5, 2048, KeyType.SERVER, key, root);
-            // store
-            this.keyStore.storeServer(commonName, server);
-            // return the cert
-            return server.getCertificate();
+            // load the old cert to revision the serial
+            CertificatePair current = this.keyStore.loadServer(commonName);
+            SerialNum currentSerial = SerialNum.fromBigInt(current.getCertificate().getSerialNumber());
+            // we need the root CA to sign
+            CertificatePair root = this.keyStore.loadRootCA();
+            // sign the cert incrementing the serial
+            try
+            {
+                logger.info("Signing Server: " + commonName + " " + this.buildDN(commonName));
+                // sign the agent
+                CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), currentSerial.revision(), 365 * 5, 2048, KeyType.SERVER, key, root);
+                // store
+                this.keyStore.storeServer(commonName, server);
+                // return the cert
+                return server.getCertificate();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Failed to sign agent", e);
+            }
         }
-        catch (Exception e)
+        else
         {
-            throw new RuntimeException("Failed to sign agent", e);
+            // first we need the root CA
+            CertificatePair root = this.keyStore.loadRootCA();
+            // sign the server cert
+            try
+            {
+                logger.info("Signing Server: " + commonName + " " + this.buildDN(commonName));
+                // sign the agent
+                CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), SerialNum.randomSerialNum(), 365 * 5, 2048, KeyType.SERVER, key, root);
+                // store
+                this.keyStore.storeServer(commonName, server);
+                // return the cert
+                return server.getCertificate();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Failed to sign agent", e);
+            }
         }
     }
 }
