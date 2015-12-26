@@ -84,6 +84,8 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
     {
         // ensure we have a root cert
         this.certificateManager.generateRootCA();
+        // verify the keystore
+        this.keyStore.check();
         // setup the RPC server
         this.queue  = BergamotAgentManagerQueue.open();
         this.server = this.queue.createBergamotAgentManagerRPCServer(this);

@@ -2,7 +2,11 @@ package com.intrbiz.bergamot.agent.manager.store.impl;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+
+import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.manager.store.BergamotKeyStore;
 import com.intrbiz.bergamot.crypto.util.CertificatePair;
@@ -16,9 +20,33 @@ import com.intrbiz.bergamot.crypto.util.SerialNum;
  * If using this key store, it is suggested to use an 
  * encrypted file system.
  * 
+ * On disk layout
+ * 
+ * base/
+ *     /root/
+ *          /ca.crt
+ *          /ca.key
+ *     /site/
+ *          /<site_uuid>.crt
+ *          /<site_uuid>.key
+ *     /server/
+ *            /<crt_uuid>/
+ *                       /<crt_uuid>.<rev>.crt
+ *                       /<crt_uuid>.<rev>.key
+ *            /<common_name>.crt -> /server/<crt_uuid>/<crt_uuid>.<rev>.crt
+ *            /<common_name>.key -> /server/<crt_uuid>/<crt_uuid>.<rev>.key
+ *     /agent/
+ *           /<crt_uuid>/
+ *                      /<crt_uuid>.<rev>.crt
+ *                      /<crt_uuid>.<rev>.key
+ *           /<agent_uuid>.crt -> /agent/<crt_uuid>/<crt_uuid>.<rev>.crt
+ *           /<agent_uuid>.key -> /agent/<crt_uuid>/<crt_uuid>.<rev>.key
+ * 
  */
 public class FileKeyStore implements BergamotKeyStore
 {
+    private Logger logger = Logger.getLogger(FileKeyStore.class);
+    
     private final File base;
     
     private final File root;
@@ -42,6 +70,134 @@ public class FileKeyStore implements BergamotKeyStore
         if (! this.site.exists())   this.site.mkdirs();
         if (! this.server.exists()) this.server.mkdirs();
         if (! this.agent.exists())  this.agent.mkdirs();
+    }
+    
+    /**
+     * Check this keystore structure is ok
+     */
+    public void check()
+    {
+        // validate the root
+        if (! this.hasRootCA())
+        {
+            logger.error("No root CA keypair exists");
+        }
+        // sites
+        File[] sites = this.site.listFiles();
+        if (sites != null)
+        {
+            for (File site : sites)
+            {
+                if (site.isFile() && site.getName().endsWith(".crt"))
+                {
+                    try
+                    {
+                        UUID siteId = UUID.fromString(site.getName().replace(".crt", ""));
+                        if (! this.hasSiteCA(siteId))
+                        {
+                            logger.error("No site CA keypair exists for site " + siteId);
+                        }
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                    }
+                }
+            }
+        }
+        // servers
+        File[] servers = this.server.listFiles();
+        if (servers != null)
+        {
+            for (File server : servers)
+            {
+                if ((! Files.isSymbolicLink(server.toPath())) && (! server.isDirectory()) && server.getName().endsWith(".crt"))
+                {
+                    try
+                    {
+                        // get the common name
+                        String commonName = server.getName().replace(".crt", "");
+                        // looks like we have a regular file, convert to links
+                        logger.info("Migrating server " + commonName + " into V2 file layout");
+                        // migrate
+                        CertificatePair crtPair = new CertificatePair(server, null);
+                        SerialNum crtSerial = SerialNum.fromBigInt(crtPair.getCertificate().getSerialNumber());
+                        File crtFile = this.serverCrtFile(crtSerial);
+                        File keyFile = this.serverKeyFile(crtSerial);
+                        File crtLink = this.serverCrtFile(commonName);
+                        File keyLink = this.serverKeyFile(commonName);
+                        // move stuff
+                        crtFile.getParentFile().mkdirs();
+                        Files.move(server.toPath(), crtFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        Files.createSymbolicLink(crtLink.toPath(), crtFile.toPath());
+                        if (keyLink.exists())
+                        {
+                            keyFile.getParentFile().mkdirs();
+                            Files.move(keyLink.toPath(), keyFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                            Files.createSymbolicLink(keyLink.toPath(), keyFile.toPath());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.error("Failed to migrate server " + server.getName() + " to V2 file layout");
+                    }
+                }
+            }
+        }
+        // agents
+        File[] agentSites = this.agent.listFiles();
+        if (agentSites != null)
+        {
+            for (File agentSite : agentSites)
+            {
+                if (agentSite.isDirectory())
+                {
+                    try
+                    {
+                        UUID agentSiteId = UUID.fromString(agentSite.getName());
+                        File[] agents = agentSite.listFiles();
+                        if (agents != null)
+                        {
+                            for (File agent : agents)
+                            {
+                                if ((! Files.isSymbolicLink(agent.toPath())) && (! agent.isDirectory()) && agent.getName().endsWith(".crt"))
+                                {
+                                    try
+                                    {
+                                        // get the agent id
+                                        UUID agentId = UUID.fromString(agent.getName().replace(".crt", ""));
+                                        logger.info("Migrating agent " + agentId + " into V2 file layout");
+                                        // migrate
+                                        CertificatePair crtPair = new CertificatePair(agent, null);
+                                        SerialNum crtSerial = SerialNum.fromBigInt(crtPair.getCertificate().getSerialNumber());
+                                        File crtFile = this.agentCrtFile(agentSiteId, crtSerial);
+                                        File keyFile = this.agentKeyFile(agentSiteId, crtSerial);
+                                        File crtLink = this.agentCrtFile(agentSiteId, agentId);
+                                        File keyLink = this.agentKeyFile(agentSiteId, agentId);
+                                        // move stuff
+                                        crtFile.getParentFile().mkdirs();
+                                        Files.move(server.toPath(), crtFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                        Files.createSymbolicLink(crtLink.toPath(), crtFile.toPath());
+                                        if (keyLink.exists())
+                                        {
+                                            keyFile.getParentFile().mkdirs();
+                                            Files.move(keyLink.toPath(), keyFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                                            Files.createSymbolicLink(keyLink.toPath(), keyFile.toPath());
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        logger.error("Failed to migrate agent " + agent.getName() + " to V2 file layout");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                    }
+                }
+            }
+        }
     }
     
     @Override
@@ -125,7 +281,7 @@ public class FileKeyStore implements BergamotKeyStore
     
     private File agentCrtFile(UUID siteId, SerialNum agentSerial)
     {
-        return new File(new File(this.agent, siteId.toString()), agentSerial.getId() + "." + agentSerial.getRev() + ".crt");
+        return new File(new File(new File(this.agent, siteId.toString()), agentSerial.getId().toString()), agentSerial.getId() + "." + agentSerial.getRev() + ".crt");
     }
     
     private File agentKeyFile(UUID siteId, UUID agentId)
@@ -135,7 +291,7 @@ public class FileKeyStore implements BergamotKeyStore
     
     private File agentKeyFile(UUID siteId, SerialNum agentSerial)
     {
-        return new File(new File(this.agent, siteId.toString()), agentSerial.getId() + "." + agentSerial.getRev() + ".key");
+        return new File(new File(new File(this.agent, siteId.toString()), agentSerial.getId().toString()), agentSerial.getId() + "." + agentSerial.getRev() + ".key");
     }
 
     @Override
@@ -169,23 +325,28 @@ public class FileKeyStore implements BergamotKeyStore
     {
         synchronized (this)
         {
-            new File(this.agent, siteId.toString()).mkdirs();
             try
             {
                 SerialNum serial = SerialNum.fromBigInt(pair.getCertificate().getSerialNumber());
                 // store the certificate under the serial number
                 File crtFile = this.agentCrtFile(siteId, serial);
+                crtFile.getParentFile().mkdirs();
                 pair.saveCertificate(crtFile);
                 // link the certificate to the agent
-                Files.createSymbolicLink(this.agentCrtFile(siteId, agentId).toPath(), crtFile.toPath());
+                Path crtLink = this.agentCrtFile(siteId, agentId).toPath();
+                Files.delete(crtLink);
+                Files.createSymbolicLink(crtLink, crtFile.toPath());
                 // key?
                 if (pair.getKey() != null)
                 {
                     // store the key under the serial number
                     File keyFile = this.agentKeyFile(siteId, serial);
+                    keyFile.getParentFile().mkdirs();
                     pair.saveKey(keyFile);
                     // link the key to the agent
-                    Files.createSymbolicLink(this.agentKeyFile(siteId, agentId).toPath(), keyFile.toPath());
+                    Path keyLink = this.agentKeyFile(siteId, agentId).toPath();
+                    Files.delete(keyLink);
+                    Files.createSymbolicLink(keyLink, keyFile.toPath());
                 }
             }
             catch (Exception e)
@@ -202,7 +363,7 @@ public class FileKeyStore implements BergamotKeyStore
     
     private File serverCrtFile(SerialNum serverSerial)
     {
-        return new File(this.server, serverSerial.getId() + "." + serverSerial.getRev() + ".crt");
+        return new File(new File(this.server, serverSerial.getId().toString()), serverSerial.getId() + "." + serverSerial.getRev() + ".crt");
     }
     
     private File serverKeyFile(String commonName)
@@ -212,7 +373,7 @@ public class FileKeyStore implements BergamotKeyStore
     
     private File serverKeyFile(SerialNum serverSerial)
     {
-        return new File(this.server, serverSerial.getId() + "." + serverSerial.getRev() + ".key");
+        return new File(new File(this.server, serverSerial.getId().toString()), serverSerial.getId() + "." + serverSerial.getRev() + ".key");
     }
 
     @Override
@@ -251,14 +412,20 @@ public class FileKeyStore implements BergamotKeyStore
                 SerialNum serial = SerialNum.fromBigInt(pair.getCertificate().getSerialNumber());
                 // store and link the certificate
                 File crtFile = this.serverCrtFile(serial);
+                crtFile.getParentFile().mkdirs();
                 pair.saveCertificate(crtFile);
-                Files.createSymbolicLink(this.serverCrtFile(commonName).toPath(), crtFile.toPath());
+                Path crtLink = this.serverCrtFile(commonName).toPath();
+                Files.delete(crtLink);
+                Files.createSymbolicLink(crtLink, crtFile.toPath());
                 // store and link the key
                 if (pair.getKey() != null)
                 {
                     File keyFile = this.serverKeyFile(serial);
+                    keyFile.getParentFile().mkdirs();
                     pair.saveKey(keyFile);
-                    Files.createSymbolicLink(this.serverKeyFile(commonName).toPath(), keyFile.toPath());
+                    Path keyLink = this.serverKeyFile(commonName).toPath();
+                    Files.delete(keyLink);
+                    Files.createSymbolicLink(keyLink, keyFile.toPath());
                 }
             }
             catch (Exception e)

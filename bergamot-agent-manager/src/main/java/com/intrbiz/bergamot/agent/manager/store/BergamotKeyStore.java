@@ -11,6 +11,11 @@ import com.intrbiz.bergamot.crypto.util.CertificatePair;
 public interface BergamotKeyStore
 {
     /**
+     * Sanity check this keystore
+     */
+    void check();
+    
+    /**
      * Do we have a Root CA stored
      */
     boolean hasRootCA();
