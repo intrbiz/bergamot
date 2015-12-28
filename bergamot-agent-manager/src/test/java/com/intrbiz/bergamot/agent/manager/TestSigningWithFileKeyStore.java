@@ -1,0 +1,107 @@
+package com.intrbiz.bergamot.agent.manager;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import com.intrbiz.bergamot.agent.manager.config.CertDNCfg;
+import com.intrbiz.bergamot.agent.manager.signer.CertificateManager;
+import com.intrbiz.bergamot.agent.manager.store.impl.FileKeyStore;
+import com.intrbiz.bergamot.crypto.util.CertificatePair;
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class TestSigningWithFileKeyStore
+{
+    public static final UUID SITE_ID = UUID.fromString("ffcaf844-8592-4a47-91ef-5f0ab4fb3ce8");
+    
+    public static final String SITE_NAME = "bergamot.unit.test";
+    
+    private static File base;
+    
+    private FileKeyStore keyStore;
+    
+    private CertDNCfg config;
+    
+    private CertificateManager certManager;
+    
+    @BeforeClass
+    public static void setupBaseFile() throws IOException
+    {
+        base = new File(System.getProperty("java.io.tmpdir"), "test_file_key_store_" + System.currentTimeMillis() + "_base");
+        base.mkdirs();
+    }
+    
+    @Before
+    public void setup()
+    {
+        System.out.println("Using keystore base: " + base.getAbsolutePath());
+        this.keyStore = new FileKeyStore(base);
+        this.config = new CertDNCfg();
+        this.config.setCountry("GB");
+        this.config.setState("Somewhere");
+        this.config.setLocality("Sometown");
+        this.config.setOrganisation("Somecompany");
+        this.certManager = new CertificateManager(this.keyStore, this.config);
+    }
+    
+    @AfterClass
+    public static void cleanupFiles()
+    {
+        
+    }
+    
+    @Test
+    public void test01SetupDirs()
+    {
+        assertThat(new File(base, "root").isDirectory(), is(equalTo(true)));
+        assertThat(new File(base, "site").isDirectory(), is(equalTo(true)));
+        assertThat(new File(base, "server").isDirectory(), is(equalTo(true)));
+        assertThat(new File(base, "agent").isDirectory(), is(equalTo(true)));
+    }
+    
+    @Test
+    public void test02GenerateRootCA()
+    {
+        this.certManager.generateRootCA();
+        assertThat(this.keyStore.hasRootCA(), is(equalTo(true)));
+        // do the files exist
+        assertThat(new File(new File(base, "root"), "ca.crt").exists(), is(equalTo(true)));
+        assertThat(new File(new File(base, "root"), "ca.key").exists(), is(equalTo(true)));
+        // load the cert
+        CertificatePair caPair = this.keyStore.loadRootCA();
+        assertThat(caPair, is(notNullValue()));
+        assertThat(caPair.getCertificate(), is(notNullValue()));
+        assertThat(caPair.getKey(), is(notNullValue()));
+        assertThat(caPair.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Bergamot Monitoring Root CA")));
+        assertThat(caPair.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Bergamot Monitoring Root CA")));
+        assertThat(caPair.getCertificate().getPublicKey().getAlgorithm(), is(equalTo("RSA")));
+        assertThat(caPair.getKey().getAlgorithm(), is(equalTo("RSA")));
+    }
+    
+    @Test
+    public void test03GenerateSiteCA()
+    {
+        this.certManager.generateSiteCA(SITE_ID, SITE_NAME);
+        assertThat(this.keyStore.hasSiteCA(SITE_ID), is(equalTo(true)));
+        // do the files exist
+        assertThat(new File(new File(base, "site"), SITE_ID.toString() + ".crt").exists(), is(equalTo(true)));
+        assertThat(new File(new File(base, "site"), SITE_ID.toString() + ".key").exists(), is(equalTo(true)));
+        // load the cert
+        CertificatePair sitePair = this.keyStore.loadSiteCA(SITE_ID);
+        assertThat(sitePair, is(notNullValue()));
+        assertThat(sitePair.getCertificate(), is(notNullValue()));
+        assertThat(sitePair.getKey(), is(notNullValue()));
+        assertThat(sitePair.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=bergamot.unit.test Site CA")));
+        assertThat(sitePair.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Bergamot Monitoring Root CA")));
+    }
+}
