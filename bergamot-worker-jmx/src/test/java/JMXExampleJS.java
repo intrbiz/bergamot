@@ -26,8 +26,14 @@ public class JMXExampleJS
                 "  print('Connected');" +
                 "  var mbeans = con.getMBeans();" +
                 "  for (var i = 0; i < mbeans.length; i++) {" +
-                "    print(mbeans[i].getName());" +
+                "    var theBean = mbeans[i];" +
+                "    print(theBean.getName());" +
+                "    for (var i = 0; i < theBean.getAttributes().length; i++) {" +
+                "      print('Attr: ' + theBean.getAttributes()[i].getName() + ' :: ' + theBean.getAttributes()[i].getType());" +
+                "      print('  -> ' + theBean.getAttributes()[i].getValue());" +
+                "    }" +
                 "  }" +
+                "  print();" +
                 "  var memBean = con.getMBean('java.lang:type=Memory');" +
                 "  for (var i = 0; i < memBean.getAttributes().length; i++) {" +
                 "    print('Attr: ' + memBean.getAttributes()[i].getName() + ' :: ' + memBean.getAttributes()[i].getType());" +
