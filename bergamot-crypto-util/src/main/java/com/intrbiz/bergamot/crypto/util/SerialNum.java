@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.crypto.util;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.UUID;
 
 import org.bouncycastle.util.encoders.Hex;
@@ -117,5 +118,11 @@ public final class SerialNum
     public static SerialNum randomSerialNum()
     {
         return new SerialNum(UUID.randomUUID(), 1);
+    }
+    
+    public static SerialNum fromName(String name)
+    {
+        // build UUID from the name
+        return new SerialNum(UUID.nameUUIDFromBytes(name.getBytes(Charset.forName("UTF8"))), 1);
     }
 }
