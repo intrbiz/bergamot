@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.security.KeyPair;
 import java.util.UUID;
 
 import org.junit.AfterClass;
@@ -18,6 +20,8 @@ import com.intrbiz.bergamot.agent.manager.config.CertDNCfg;
 import com.intrbiz.bergamot.agent.manager.signer.CertificateManager;
 import com.intrbiz.bergamot.agent.manager.store.impl.FileKeyStore;
 import com.intrbiz.bergamot.crypto.util.CertificatePair;
+import com.intrbiz.bergamot.crypto.util.RSAUtil;
+import com.intrbiz.bergamot.crypto.util.SerialNum;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestSigningWithFileKeyStore
@@ -25,6 +29,8 @@ public class TestSigningWithFileKeyStore
     public static final UUID SITE_ID = UUID.fromString("ffcaf844-8592-4a47-91ef-5f0ab4fb3ce8");
     
     public static final String SITE_NAME = "bergamot.unit.test";
+    
+    public static final String SERVER_NAME = "hub.bergamot.unit.test";
     
     private static File base;
     
@@ -103,5 +109,53 @@ public class TestSigningWithFileKeyStore
         assertThat(sitePair.getKey(), is(notNullValue()));
         assertThat(sitePair.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=bergamot.unit.test Site CA")));
         assertThat(sitePair.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Bergamot Monitoring Root CA")));
+    }
+    
+    @Test
+    public void test04GenerateServer()
+    {
+        // generate RSA keypair
+        KeyPair serverKeyPair = RSAUtil.generateRSAKeyPair(2048);
+        SerialNum expectedSerial = SerialNum.fromName(SERVER_NAME);
+        // sign
+        this.certManager.signServer(SERVER_NAME, serverKeyPair.getPublic());
+        assertThat(this.keyStore.hasServer(SERVER_NAME), is(equalTo(true)));
+        // do the files exist
+        assertThat(Files.isSymbolicLink(new File(new File(base, "server"), SERVER_NAME + ".crt").toPath()), is(equalTo(true)));
+        assertThat(new File(new File(base, "server"), expectedSerial.getId().toString()).isDirectory(), is(equalTo(true)));
+        assertThat(new File(new File(new File(base, "server"), expectedSerial.getId().toString()), expectedSerial.getId() + "." + expectedSerial.getRev() + ".crt").exists(), is(equalTo(true)));
+        // load the cert
+        CertificatePair serverCrt = this.keyStore.loadServer(SERVER_NAME);
+        assertThat(serverCrt, is(notNullValue()));
+        assertThat(serverCrt.getCertificate(), is(notNullValue()));
+        assertThat(serverCrt.getKey(), is(nullValue()));
+        assertThat(serverCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=hub.bergamot.unit.test")));
+        assertThat(serverCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Bergamot Monitoring Root CA")));
+        assertThat(serverCrt.getCertificate().getPublicKey(), is(equalTo(serverKeyPair.getPublic())));
+        assertThat(SerialNum.fromBigInt(serverCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
+    }
+    
+    @Test
+    public void test05RegenerateServer()
+    {
+        // generate RSA keypair
+        KeyPair serverKeyPair = RSAUtil.generateRSAKeyPair(2048);
+        SerialNum expectedSerial = SerialNum.fromName(SERVER_NAME).revision();
+        // sign
+        this.certManager.signServer(SERVER_NAME, serverKeyPair.getPublic());
+        assertThat(this.keyStore.hasServer(SERVER_NAME), is(equalTo(true)));
+        // do the files exist
+        assertThat(Files.isSymbolicLink(new File(new File(base, "server"), SERVER_NAME + ".crt").toPath()), is(equalTo(true)));
+        assertThat(new File(new File(base, "server"), expectedSerial.getId().toString()).isDirectory(), is(equalTo(true)));
+        assertThat(new File(new File(new File(base, "server"), expectedSerial.getId().toString()), expectedSerial.getId() + "." + expectedSerial.getRev() + ".crt").exists(), is(equalTo(true)));
+        // load the cert
+        CertificatePair serverCrt = this.keyStore.loadServer(SERVER_NAME);
+        assertThat(serverCrt, is(notNullValue()));
+        assertThat(serverCrt.getCertificate(), is(notNullValue()));
+        assertThat(serverCrt.getKey(), is(nullValue()));
+        assertThat(serverCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=hub.bergamot.unit.test")));
+        assertThat(serverCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Bergamot Monitoring Root CA")));
+        assertThat(serverCrt.getCertificate().getPublicKey(), is(equalTo(serverKeyPair.getPublic())));
+        assertThat(SerialNum.fromBigInt(serverCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
     }
 }
