@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.agent.manager.store.impl;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
@@ -311,7 +312,7 @@ public class FileKeyStore implements BergamotKeyStore
             }
             else
             {
-                return new CertificatePair(this.agentCrtFile(siteId, agentId), null);
+                return new CertificatePair(this.agentCrtFile(siteId, agentId));
             }
         }
         catch (Exception e)
@@ -334,7 +335,13 @@ public class FileKeyStore implements BergamotKeyStore
                 pair.saveCertificate(crtFile);
                 // link the certificate to the agent
                 Path crtLink = this.agentCrtFile(siteId, agentId).toPath();
-                Files.delete(crtLink);
+                try
+                {
+                    Files.delete(crtLink);
+                }
+                catch (NoSuchFileException e)
+                {
+                }
                 Files.createSymbolicLink(crtLink, crtFile.toPath());
                 // key?
                 if (pair.getKey() != null)
@@ -345,7 +352,13 @@ public class FileKeyStore implements BergamotKeyStore
                     pair.saveKey(keyFile);
                     // link the key to the agent
                     Path keyLink = this.agentKeyFile(siteId, agentId).toPath();
-                    Files.delete(keyLink);
+                    try
+                    {
+                        Files.delete(keyLink);
+                    }
+                    catch (NoSuchFileException e)
+                    {
+                    }
                     Files.createSymbolicLink(keyLink, keyFile.toPath());
                 }
             }
@@ -368,7 +381,7 @@ public class FileKeyStore implements BergamotKeyStore
     
     private File serverKeyFile(String commonName)
     {
-        return new File(this.server, commonName + ".crt");
+        return new File(this.server, commonName + ".key");
     }
     
     private File serverKeyFile(SerialNum serverSerial)
@@ -393,7 +406,7 @@ public class FileKeyStore implements BergamotKeyStore
             }
             else
             {
-                return new CertificatePair(this.serverCrtFile(commonName), null);
+                return new CertificatePair(this.serverCrtFile(commonName));
             }
         }
         catch (Exception e)
@@ -415,7 +428,13 @@ public class FileKeyStore implements BergamotKeyStore
                 crtFile.getParentFile().mkdirs();
                 pair.saveCertificate(crtFile);
                 Path crtLink = this.serverCrtFile(commonName).toPath();
-                Files.delete(crtLink);
+                try
+                {
+                    Files.delete(crtLink);
+                }
+                catch (NoSuchFileException e)
+                {
+                }
                 Files.createSymbolicLink(crtLink, crtFile.toPath());
                 // store and link the key
                 if (pair.getKey() != null)
@@ -424,7 +443,13 @@ public class FileKeyStore implements BergamotKeyStore
                     keyFile.getParentFile().mkdirs();
                     pair.saveKey(keyFile);
                     Path keyLink = this.serverKeyFile(commonName).toPath();
-                    Files.delete(keyLink);
+                    try
+                    {
+                        Files.delete(keyLink);
+                    }
+                    catch (NoSuchFileException e)
+                    {
+                    }
                     Files.createSymbolicLink(keyLink, keyFile.toPath());
                 }
             }

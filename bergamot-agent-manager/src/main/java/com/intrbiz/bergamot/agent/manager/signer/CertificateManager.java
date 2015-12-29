@@ -181,7 +181,7 @@ public class CertificateManager
             {
                 logger.info("Signing Server: " + commonName + " " + this.buildDN(commonName));
                 // sign the agent
-                CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), SerialNum.randomSerialNum(), 365 * 5, 2048, KeyType.SERVER, key, root);
+                CertificatePair server = RSAUtil.generateCertificate(this.buildDN(commonName), SerialNum.fromName(commonName), 365 * 5, 2048, KeyType.SERVER, key, root);
                 // store
                 this.keyStore.storeServer(commonName, server);
                 // return the cert
