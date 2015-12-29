@@ -66,7 +66,23 @@ public class TestSigningWithFileKeyStore
     @AfterClass
     public static void cleanupFiles()
     {
-        
+        cleanup(base);
+    }
+    
+    private static void cleanup(File file)
+    {
+        if (file.isDirectory())
+        {
+            File[] files = file.listFiles();
+            if (files != null)
+            {
+                for (File child : files)
+                {
+                    cleanup(child);
+                }
+            }
+        }
+        file.delete();
     }
     
     @Test
