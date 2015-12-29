@@ -15,6 +15,7 @@ import com.intrbiz.bergamot.agent.manager.config.BergamotAgentManagerCfg;
 import com.intrbiz.bergamot.agent.manager.signer.CertificateManager;
 import com.intrbiz.bergamot.agent.manager.store.BergamotKeyStore;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
+import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
@@ -89,6 +90,8 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
         // setup the RPC server
         this.queue  = BergamotAgentManagerQueue.open();
         this.server = this.queue.createBergamotAgentManagerRPCServer(this);
+        // start the health agent
+        HealthAgent.getInstance().init("bergamot-agent-manager");
         // whoo all up
         logger.info("Bergamot Agent Manager started!");
     }
