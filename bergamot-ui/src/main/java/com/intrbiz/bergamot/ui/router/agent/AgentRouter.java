@@ -63,10 +63,9 @@ public class AgentRouter extends Router<BergamotApp>
     public void generateAgentConfig(BergamotDB db, @SessionVar("site") Site site, @Param("common-name") @CheckStringLength(min = 1, max = 255, mandatory = true) String commonName)
     {
         // is an agent already registered
-        AgentRegistration agentReg = db.getAgentRegistrationByName(site.getId(), commonName);
-        if (agentReg != null) throw new RuntimeException("Cannot generate configuration for an agent which already exists!");
+        AgentRegistration existingAgent = db.getAgentRegistrationByName(site.getId(), commonName);
         // assign id
-        UUID agentId = var("agentId", Site.randomId(site.getId()));
+        UUID agentId = var("agentId", existingAgent != null ? existingAgent.getId() : Site.randomId(site.getId()));
         var("commonName", commonName);
         // generate
         Certificate     rootCert = action("get-root-ca");
@@ -94,10 +93,9 @@ public class AgentRouter extends Router<BergamotApp>
         // parse the certificate request
         CertificateRequest req = PEMUtil.loadCertificateRequest(certReq);
         // is an agent already registered
-        AgentRegistration agentReg = db.getAgentRegistrationByName(site.getId(), req.getCommonName());
-        if (agentReg != null) throw new RuntimeException("Cannot generate configuration for an agent which already exists!");
+        AgentRegistration existingAgent = db.getAgentRegistrationByName(site.getId(), req.getCommonName());
         // generate agent it
-        UUID agentId = var("agentId", Site.randomId(site.getId()));
+        UUID agentId = var("agentId", existingAgent != null ? existingAgent.getId() : Site.randomId(site.getId()));
         // sign
         Certificate rootCrt  = action("get-root-ca");
         Certificate siteCrt  = action("get-site-ca", site.getId());
