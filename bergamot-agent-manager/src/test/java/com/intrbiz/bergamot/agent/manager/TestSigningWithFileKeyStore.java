@@ -32,6 +32,10 @@ public class TestSigningWithFileKeyStore
     
     public static final String SERVER_NAME = "hub.bergamot.unit.test";
     
+    public static final UUID AGENT_ID = UUID.fromString("ec459826-d941-419f-8889-a5782609830d");
+    
+    public static final String AGENT_NAME = "agent.site.bergamot.unit.test";
+    
     private static File base;
     
     private FileKeyStore keyStore;
@@ -50,7 +54,6 @@ public class TestSigningWithFileKeyStore
     @Before
     public void setup()
     {
-        System.out.println("Using keystore base: " + base.getAbsolutePath());
         this.keyStore = new FileKeyStore(base);
         this.config = new CertDNCfg();
         this.config.setCountry("GB");
@@ -138,6 +141,8 @@ public class TestSigningWithFileKeyStore
     @Test
     public void test05RegenerateServer()
     {
+        // precondition
+        assertThat(this.keyStore.hasServer(SERVER_NAME), is(equalTo(true)));
         // generate RSA keypair
         KeyPair serverKeyPair = RSAUtil.generateRSAKeyPair(2048);
         SerialNum expectedSerial = SerialNum.fromName(SERVER_NAME).revision();
@@ -157,5 +162,63 @@ public class TestSigningWithFileKeyStore
         assertThat(serverCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Bergamot Monitoring Root CA")));
         assertThat(serverCrt.getCertificate().getPublicKey(), is(equalTo(serverKeyPair.getPublic())));
         assertThat(SerialNum.fromBigInt(serverCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
+    }
+    
+    @Test
+    public void test06GenerateAgent()
+    {
+        // generate RSA keypair
+        KeyPair agentKeyPair = RSAUtil.generateRSAKeyPair(2048);
+        SerialNum expectedSerial = new SerialNum(AGENT_ID, 1);
+        // sign
+        this.certManager.signAgent(SITE_ID, AGENT_ID, AGENT_NAME, agentKeyPair.getPublic());
+        assertThat(this.keyStore.hasAgent(SITE_ID, AGENT_ID), is(equalTo(true)));
+        // do the files exist
+        assertThat(Files.isSymbolicLink(new File(new File(new File(base, "agent"), SITE_ID.toString()), AGENT_ID + ".crt").toPath()), is(equalTo(true)));
+        assertThat(new File(new File(new File(base, "agent"), SITE_ID.toString()), expectedSerial.getId().toString()).isDirectory(), is(equalTo(true)));
+        assertThat(new File(new File(new File(new File(base, "agent"), SITE_ID.toString()), expectedSerial.getId().toString()), expectedSerial.getId() + "." + expectedSerial.getRev() + ".crt").exists(), is(equalTo(true)));
+        // load the cert
+        CertificatePair agentCrt = this.keyStore.loadAgent(SITE_ID, AGENT_ID);
+        assertThat(agentCrt, is(notNullValue()));
+        assertThat(agentCrt.getCertificate(), is(notNullValue()));
+        assertThat(agentCrt.getKey(), is(nullValue()));
+        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=agent.site.bergamot.unit.test")));
+        assertThat(agentCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=bergamot.unit.test Site CA")));
+        assertThat(agentCrt.getCertificate().getPublicKey(), is(equalTo(agentKeyPair.getPublic())));
+        assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
+        assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()).getId(), is(equalTo(AGENT_ID)));
+    }
+    
+    @Test
+    public void test07RegenerateAgent()
+    {
+        // precondition
+        assertThat(this.keyStore.hasAgent(SITE_ID, AGENT_ID), is(equalTo(true)));
+        // generate RSA keypair
+        KeyPair agentKeyPair = RSAUtil.generateRSAKeyPair(2048);
+        SerialNum expectedSerial = new SerialNum(AGENT_ID, 1).revision();
+        // sign
+        this.certManager.signAgent(SITE_ID, AGENT_ID, AGENT_NAME, agentKeyPair.getPublic());
+        assertThat(this.keyStore.hasAgent(SITE_ID, AGENT_ID), is(equalTo(true)));
+        // do the files exist
+        assertThat(Files.isSymbolicLink(new File(new File(new File(base, "agent"), SITE_ID.toString()), AGENT_ID + ".crt").toPath()), is(equalTo(true)));
+        assertThat(new File(new File(new File(base, "agent"), SITE_ID.toString()), expectedSerial.getId().toString()).isDirectory(), is(equalTo(true)));
+        assertThat(new File(new File(new File(new File(base, "agent"), SITE_ID.toString()), expectedSerial.getId().toString()), expectedSerial.getId() + "." + expectedSerial.getRev() + ".crt").exists(), is(equalTo(true)));
+        // load the cert
+        CertificatePair agentCrt = this.keyStore.loadAgent(SITE_ID, AGENT_ID);
+        assertThat(agentCrt, is(notNullValue()));
+        assertThat(agentCrt.getCertificate(), is(notNullValue()));
+        assertThat(agentCrt.getKey(), is(nullValue()));
+        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=agent.site.bergamot.unit.test")));
+        assertThat(agentCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=bergamot.unit.test Site CA")));
+        assertThat(agentCrt.getCertificate().getPublicKey(), is(equalTo(agentKeyPair.getPublic())));
+        assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
+        assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()).getId(), is(equalTo(AGENT_ID)));
+    }
+    
+    @Test
+    public void test08Check()
+    {
+        this.keyStore.check();
     }
 }
