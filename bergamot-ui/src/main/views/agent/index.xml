@@ -26,7 +26,14 @@
 	    				<td>#{agent.id}</td>
 	    				<td>#{agent.certificateSerial}</td>
 	    				<td>#{dateformat('HH:mm:ss', agent.created)} on #{dateformat('EEEE dd/MM/yyyy', agent.created)}</td>
-	    				<td>#{if(agent.revoked, dateformat('HH:mm:ss', agent.revokedOn) + ' on ' + dateformat('EEEE dd/MM/yyyy', agent.revokedOn), 'no')}</td>
+	    				<td>
+	    					<span rendered="#{agent.revoked}">#{dateformat('HH:mm:ss', agent.revokedOn) + ' on ' + dateformat('EEEE dd/MM/yyyy', agent.revokedOn)}</span>
+	    					<!-- Revoke -->
+							<form action="#{path('/agent/revoke')}" method="post" rendered="#{! agent.revoked}">
+								<input type="hidden" name="id" value="#{agent.id}"/>
+								<input type="submit" name="lock" value="Revoke" class="danger"/>
+							</form>
+	    				</td>
 	    			</tr>
 	    		</data-set>
 	    	</table>
