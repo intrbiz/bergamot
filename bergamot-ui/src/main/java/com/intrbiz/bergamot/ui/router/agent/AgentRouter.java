@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.ui.router.agent;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
@@ -14,6 +15,7 @@ import com.intrbiz.bergamot.crypto.util.CertificateRequest;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
@@ -107,6 +109,23 @@ public class AgentRouter extends Router<BergamotApp>
         var("siteCaCrt", PEMUtil.saveCertificate(siteCrt));
         var("caCrt",     PEMUtil.saveCertificate(rootCrt));
         encode("agent/signed-agent");
+    }
+    
+    @Post("/revoke")
+    @WithDataAdapter(BergamotDB.class)
+    public void revokeAgent(BergamotDB db, @SessionVar("site") Site site, @Param("id") @IsaObjectId() UUID agentId) throws Exception
+    {
+        // lookup the agent registration
+        AgentRegistration agent = db.getAgentRegistration(agentId);
+        if (agent != null)
+        {
+            agent.setRevoked(true);
+            agent.setRevokedOn(new Timestamp(System.currentTimeMillis()));
+            db.setAgentRegistration(agent);
+            // TODO: we should publish a CRL to the agent workers and force a disconnect
+        }
+        // encode the index
+        redirect(path("/agent/"));
     }
     
     public static String padCert(String cert)
