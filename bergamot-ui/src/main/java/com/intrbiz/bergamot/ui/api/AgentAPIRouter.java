@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
@@ -105,5 +107,21 @@ public class AgentAPIRouter extends Router<BergamotApp>
                 PEMUtil.saveCertificate(siteCrt),
                 PEMUtil.saveCertificate(rootCrt),
         });
+    }
+    
+    /**
+     * Revoke an agent certificate
+     */
+    @Any("/revoke-agent")   
+    @JSON
+    @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
+    public String revokeAgent(BergamotDB db, @Var("site") Site site, @Param("id") @IsaObjectId UUID agentId) throws IOException
+    {
+        AgentRegistration agent = notNull(db.getAgentRegistration(agentId), "No such agent: " + agentId);
+        agent.setRevoked(true);
+        agent.setRevokedOn(new Timestamp(System.currentTimeMillis()));
+        db.setAgentRegistration(agent);
+        return "revoked";
     }
 }
