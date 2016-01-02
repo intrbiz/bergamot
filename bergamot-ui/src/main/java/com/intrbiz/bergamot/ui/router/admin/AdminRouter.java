@@ -21,7 +21,8 @@ public class AdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db)
     {
-        var("daemons", HealthTracker.getInstance().getDaemons());
+        boolean showDaemons = var("showDaemons", ! "no".equalsIgnoreCase(System.getProperty("admin.show.daemons", "yes")));
+        if (showDaemons) var("daemons", HealthTracker.getInstance().getDaemons());
         encode("admin/index");
     }
 }

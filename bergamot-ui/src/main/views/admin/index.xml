@@ -2,9 +2,9 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Admin">
-    <div class="row">
+    <div class="row" rendered="#{showDaemons}">
 		<h3>System Status</h3>
-		<data-set var="daemon" value="#{daemons}">				
+		<data-set var="daemon" value="#{daemons}">
 			<div class="col3 dash_icon check">
 				<h3>
 					<span class="dash_img status_#{if(daemon.isAlive(),'ok', 'critical')}" title="Daemon #{if(daemon.isAlive(), 'is alive', 'has failed')}">
