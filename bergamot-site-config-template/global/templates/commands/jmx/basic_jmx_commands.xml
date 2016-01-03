@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="java_process_cpu_usage" extends="jmx_script_check">
+        <summary>Java CPU Usage</summary>
+        <parameter name="warning">80</parameter>
+        <parameter name="critical">90</parameter>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* Params */
+            var warning = check.getDoubleParameter('warning');
+            var critical = check.getDoubleParameter('critical');
+            /* Execute */
+            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), function(con) {
+                /* Fetch the CPU mbean */
+                var sysBean = con.getMBean('java.lang:type=OperatingSystem');
+                var processCPU = sysBean.getAttribute('ProcessCpuLoad').getValue() * 100.0;
+                /* Result */
+                if (processCPU > critical) {
+                    bergamot.critical('Java CPU Usage: ' + processCPU + '%');
+                } else if (processCPU > warning) {
+                    bergamot.warning('Java CPU Usage: ' + processCPU + '%');
+                } else {
+                    bergamot.ok('Java CPU Usage: ' + processCPU + '%');
+                }
+                /* Readings */
+                bergamot.publishReadings(
+                    bergamot.createDoubleGaugeReading('CPU Usage', '%', processCPU, warning, critical, 0, 100)
+                );
+            });
+        ]]>
+        </script>
+        <description>Check the CPU usage of a Java process</description>
+    </command>
+    
+</bergamot>
