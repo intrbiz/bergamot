@@ -75,6 +75,7 @@ define(['flight/lib/component','lamplighter/lib/chart/chart', 'lamplighter/lib/c
 				} );
 				// mid points
 				var xSample = this.attr["axis-x-sample"].apply(this, [this.attr.data.x.length]);
+                if (xSample <= 0) xSample = 1;
 				for (var i = xSample; i < (len - (xSample /2)); i+= xSample)
 				{
 					xl.push( { 
