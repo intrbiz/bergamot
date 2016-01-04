@@ -28,9 +28,13 @@ public class JMXExampleJS
                 "  for (var i = 0; i < mbeans.length; i++) {" +
                 "    var theBean = mbeans[i];" +
                 "    print(theBean.getName());" +
-                "    for (var i = 0; i < theBean.getAttributes().length; i++) {" +
-                "      print('Attr: ' + theBean.getAttributes()[i].getName() + ' :: ' + theBean.getAttributes()[i].getType());" +
-                "      print('  -> ' + theBean.getAttributes()[i].getValue());" +
+                "    for (var j = 0; j < theBean.getAttributes().length; j++) {" +
+                "      print('    Attr: ' + theBean.getAttributes()[j].getName() + ' :: ' + theBean.getAttributes()[j].getType());" +
+                "      try {" +
+                "        print('      -> ' + theBean.getAttributes()[j].getValue());" +
+                "      } catch(e) {" +
+                "        print('      -> Error: ' + e);" +
+                "      }" +
                 "    }" +
                 "  }" +
                 "  print();" +
