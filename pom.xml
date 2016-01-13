@@ -12,6 +12,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<intrbiz.util.version>1.1.2-SNAPSHOT</intrbiz.util.version>
 	</properties>
 
 	<build>
@@ -287,42 +288,42 @@
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-annotations</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-manager</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>data-database-adapter-compiler</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>cache-hazelcast</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>queue</artifactId>
-  			<version>1.1.1-SNAPSHOT</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>crypto</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>scripting</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.util</groupId>
   			<artifactId>bootstrap</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.util.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.3p.sigar</groupId>
