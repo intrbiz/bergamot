@@ -14,6 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<intrbiz.util.version>1.1.2-SNAPSHOT</intrbiz.util.version>
 		<intrbiz.snmpib.version>[1.0,)</intrbiz.snmpib.version>
+		<intrbiz.gerald.version>[1.1,)</intrbiz.gerald.version>
 	</properties>
 
 	<build>
@@ -274,12 +275,12 @@
   		<dependency>
   			<groupId>com.intrbiz.gerald</groupId>
   			<artifactId>gerald-the-mole</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.gerald.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.gerald</groupId>
   			<artifactId>polyakov-model</artifactId>
-  			<version>[1.1,)</version>
+  			<version>${intrbiz.gerald.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.snmp-ib</groupId>
