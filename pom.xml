@@ -15,6 +15,7 @@
 		<intrbiz.util.version>1.1.2-SNAPSHOT</intrbiz.util.version>
 		<intrbiz.snmpib.version>[1.0,)</intrbiz.snmpib.version>
 		<intrbiz.gerald.version>[1.1,)</intrbiz.gerald.version>
+		<intrbiz.balsa.version>[4.2,)</intrbiz.balsa.version>
 	</properties>
 
 	<build>
@@ -260,17 +261,17 @@
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-core</artifactId>
-  			<version>[4.2,)</version>
+  			<version>${intrbiz.balsa.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-data</artifactId>
-  			<version>[4.2,)</version>
+  			<version>${intrbiz.balsa.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.balsa</groupId>
   			<artifactId>balsa-hazelcast</artifactId>
-  			<version>[4.2,)</version>
+  			<version>${intrbiz.balsa.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.gerald</groupId>
