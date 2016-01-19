@@ -17,6 +17,7 @@
 		<intrbiz.gerald.version>[1.1,)</intrbiz.gerald.version>
 		<intrbiz.balsa.version>[4.2,)</intrbiz.balsa.version>
 		<intrbiz.express.version>[4.0,)</intrbiz.express.version>
+		<intrbiz.core.version>[1.0,)</intrbiz.core.version>
 	</properties>
 
 	<build>
@@ -252,7 +253,7 @@
   		<dependency>
   			<groupId>com.intrbiz.core</groupId>
   			<artifactId>core</artifactId>
-  			<version>[1.0,)</version>
+  			<version>${intrbiz.core.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.express</groupId>
