@@ -116,6 +116,7 @@
     <module>bergamot-accounting-consumer</module>
     <module>bergamot-check-jmx</module>
     <module>bergamot-worker-jmx</module>
+    <module>bergamot-worker-ssh</module>
   </modules>
   
   <dependencyManagement>
