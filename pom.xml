@@ -117,6 +117,7 @@
     <module>bergamot-check-jmx</module>
     <module>bergamot-worker-jmx</module>
     <module>bergamot-worker-ssh</module>
+    <module>bergamot-check-ssh</module>
   </modules>
   
   <dependencyManagement>
@@ -457,6 +458,16 @@
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-check-jmx</artifactId>
   			<version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.jcraft</groupId>
+  			<artifactId>jsch</artifactId>
+  			<version>0.1.53</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-check-ssh</artifactId>
+  			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>

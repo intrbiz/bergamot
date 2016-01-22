@@ -5,15 +5,11 @@
     <artifactId>bergamot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>bergamot-worker-ssh</artifactId>
+  <artifactId>bergamot-check-ssh</artifactId>
   <dependencies>
   	<dependency>
-  		<groupId>com.intrbiz.bergamot</groupId>
-  		<artifactId>bergamot-worker-api</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.intrbiz.bergamot</groupId>
-  		<artifactId>bergamot-check-ssh</artifactId>
+  		<groupId>com.jcraft</groupId>
+  		<artifactId>jsch</artifactId>
   	</dependency>
   </dependencies>
 </project>
