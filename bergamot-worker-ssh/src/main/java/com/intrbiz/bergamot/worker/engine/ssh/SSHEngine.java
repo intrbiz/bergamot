@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.worker.engine.ssh;
 
+import com.intrbiz.bergamot.check.ssh.SSHChecker;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 
 /**
@@ -8,10 +9,17 @@ import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 public class SSHEngine extends AbstractEngine
 {
     public static final String NAME = "ssh";
+    
+    private SSHChecker checker;
 
     public SSHEngine()
     {
         super(NAME);
+    }
+    
+    public SSHChecker getChecker()
+    {
+        return this.checker;
     }
 
     @Override
@@ -22,5 +30,6 @@ public class SSHEngine extends AbstractEngine
         {
             this.addExecutor(new SSHExecutor());
         }
+        this.checker = new SSHChecker();
     }
 }
