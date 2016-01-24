@@ -11,5 +11,9 @@
   		<groupId>com.jcraft</groupId>
   		<artifactId>jsch</artifactId>
   	</dependency>
+  	<dependency>
+  		<groupId>com.intrbiz.util</groupId>
+  		<artifactId>crypto</artifactId>
+  	</dependency>
   </dependencies>
 </project>
