@@ -7,7 +7,7 @@ import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
-import com.intrbiz.bergamot.worker.engine.ssh.SSHExecutor;
+import com.intrbiz.bergamot.worker.engine.ssh.NagiosSSHExecutor;
 
 @XmlType(name = "worker")
 @XmlRootElement(name = "worker")
@@ -24,7 +24,7 @@ public class SSHWorkerCfg extends WorkerCfg
     public void applyDefaults()
     {
         // add our default engines to avoid needing to configure them
-        this.getEngines().add(new EngineCfg(SSHEngine.class, new ExecutorCfg(SSHExecutor.class)));
+        this.getEngines().add(new EngineCfg(SSHEngine.class, new ExecutorCfg(NagiosSSHExecutor.class)));
         // apply defaults from super class
         super.applyDefaults();
     }
