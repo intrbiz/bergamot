@@ -32,6 +32,8 @@ public class SSHCheckExample
             System.out.println("Exit: " + stat.getExit());
             System.out.println(stat.getStdOut());
         });
+        // exit
+        System.exit(0);
     }
     
     private static byte[] readFile(File file) throws IOException
