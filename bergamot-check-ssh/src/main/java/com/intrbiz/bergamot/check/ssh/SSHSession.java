@@ -2,6 +2,8 @@ package com.intrbiz.bergamot.check.ssh;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import com.intrbiz.util.Hash;
 import com.jcraft.jsch.ChannelExec;
@@ -23,21 +25,28 @@ public class SSHSession
         try
         {
             ChannelExec exec = (ChannelExec) this.session.openChannel("exec");
+            // execute
+            exec.setCommand(command);
             // input
             if (command != null && command.length() > 0)
                 exec.setInputStream(new ByteArrayInputStream(Hash.asUTF8(command)));
             // outputs
-            // TODO: limit max buffering
-            ByteArrayOutputStream stdErr = new ByteArrayOutputStream();
             ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
-            exec.setOutputStream(stdOut);
-            exec.setExtOutputStream(stdErr);
-            // execute
-            exec.setCommand(command);
+            ByteArrayOutputStream stdErr = new ByteArrayOutputStream();
+            InputStream stdOutStream = exec.getInputStream();
+            InputStream stdErrStream = exec.getExtInputStream();
             try
             {
                 exec.connect();
-                // get the exit
+                // process the streams
+                while (! exec.isClosed())
+                {
+                    delicateCopy(stdOutStream, stdOut);
+                    delicateCopy(stdErrStream, stdErr);
+                }
+                delicateCopy(stdOutStream, stdOut);
+                delicateCopy(stdErrStream, stdErr);
+                // should be done now
                 int exit = exec.getExitStatus();
                 return new ExecStat(exit, new String(stdOut.toByteArray()), new String(stdErr.toByteArray()));
             }
@@ -49,6 +58,21 @@ public class SSHSession
         catch (JSchException e)
         {
             throw new SSHException(e);
+        }
+        catch (Exception e)
+        {
+            throw new SSHException(e);
+        }
+    }
+    
+    private static final void delicateCopy(InputStream from, ByteArrayOutputStream to) throws IOException
+    {
+        byte[] buf = new byte[1024];
+        int r;
+        if (from.available() > 0)
+        {
+            r = from.read(buf);
+            if (r > 0) to.write(buf, 0, r);
         }
     }
 }

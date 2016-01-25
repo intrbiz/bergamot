@@ -37,6 +37,11 @@ public class SSHCheckContext
         }
     }
     
+    public void connect(String username, String host, Consumer<SSHSession> onConnected)
+    {
+        this.connect(username, host, 22, onConnected);
+    }
+    
     public void connect(String username, String host, int port, Consumer<SSHSession> onConnected)
     {
         try
