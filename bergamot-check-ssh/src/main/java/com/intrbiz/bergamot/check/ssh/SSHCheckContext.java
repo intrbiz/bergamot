@@ -52,7 +52,7 @@ public class SSHCheckContext
                 session = this.jsch.getSession(username, host, port);
                 this.applyDefaultConfiguration(session);
                 session.connect();
-                onConnected.accept(new SSHSession(session));
+                onConnected.accept(new SSHSession(this.jsch, session));
             }
             finally
             {

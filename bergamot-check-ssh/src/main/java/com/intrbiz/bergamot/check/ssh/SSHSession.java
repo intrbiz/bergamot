@@ -7,18 +7,26 @@ import java.io.InputStream;
 
 import com.intrbiz.util.Hash;
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 public class SSHSession
 {
+    private final JSch jsch;
+    
     private final Session session;
     
-    public SSHSession(Session session)
+    public SSHSession(JSch jsch, Session session)
     {
+        this.jsch = jsch;
         this.session = session;
     }
     
+    public String hostId()
+    {
+        return session.getHostKey().getFingerPrint(this.jsch);
+    }
     
     public ExecStat exec(String command)
     {
