@@ -29,6 +29,7 @@ public class SSHEngine extends AbstractEngine
         if (this.executors.isEmpty())
         {
             this.addExecutor(new NagiosSSHExecutor());
+            this.addExecutor(new ScriptedSSHExecutor());
         }
         this.checker = new SSHChecker();
     }
