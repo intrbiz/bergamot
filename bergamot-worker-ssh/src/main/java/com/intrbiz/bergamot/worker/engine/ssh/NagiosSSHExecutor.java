@@ -43,13 +43,13 @@ public class NagiosSSHExecutor extends BaseSSHExecutor
         {
             // validate the task
             this.validateSSHParameters(executeCheck);
-            if (Util.isEmpty(executeCheck.getParameter("command"))) throw new RuntimeException("The 'command' parameter must be given");
+            if (Util.isEmpty(executeCheck.getParameter("command_line"))) throw new RuntimeException("The 'command_line' parameter must be given");
             // create our context
             SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e)); });
             // connect to the host
             context.connect(this.getSSHUsername(executeCheck), this.getSSHHost(executeCheck), this.getSSHPort(executeCheck), (session) -> {
                 // the command to execute
-                String command = executeCheck.getParameter("command");
+                String command = executeCheck.getParameter("command_line");
                 logger.debug("Executing Nagios plugin via SSH, command: " + command);
                 // execute the command
                 long start = System.currentTimeMillis();
