@@ -144,6 +144,10 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
         }
         this.publishResult(new ActiveResultKey(task.getSiteId(), task.getProcessingPool()), new ActiveResultMO().fromCheck(task).error("No executor found to execute check"));
     }
+    
+    protected void startEngineServices() throws Exception
+    {
+    }
 
     @Override
     public void start() throws Exception
@@ -159,6 +163,8 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
         {
             ex.start();
         }
+        // start any services needed for this engine
+        this.startEngineServices();
         // start all the consumers
         for (int i = 0; i < this.getWorker().getConfiguration().getThreads(); i ++)
         {
