@@ -31,6 +31,11 @@ public class SSHEngine extends AbstractEngine
             this.addExecutor(new NagiosSSHExecutor());
             this.addExecutor(new ScriptedSSHExecutor());
         }
+    }
+    
+    @Override
+    protected void startEngineServices() throws Exception
+    {
         this.checker = new SSHChecker();
     }
 }
