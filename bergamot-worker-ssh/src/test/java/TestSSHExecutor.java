@@ -77,7 +77,6 @@ public class TestSSHExecutor
             executeCheck, 
             (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
-                System.out.println(result);
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -87,6 +86,79 @@ public class TestSSHExecutor
                 assertThat(result.getStatus(), is(equalTo("OK")));
                 assertThat(result.getOutput(), is(equalTo("OK: Test")));
                 assertThat(result.getRuntime(), is(greaterThan(0D)));
+                assertThat(result.getExecuted(), is(not(nullValue())));
+                assertThat(result.getProcessed(), is(equalTo(0L)));
+            }
+        );
+    }
+    
+    @Test
+    public void testBadAuth()
+    {
+        ExecuteCheck executeCheck = nagiosSSHCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
+        executeCheck.removeParameter("public_key");
+        executeCheck.removeParameter("private_key");
+        executeCheck.removeParameter("password");
+        this.runner.test(
+            executeCheck, 
+            (key, res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
+                assertThat(result, is(not(nullValue())));
+                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
+                assertThat(result.getCheck(), is(equalTo(executeCheck)));
+                assertThat(result.isOk(), is(equalTo(false)));
+                assertThat(result.getStatus(), is(equalTo("ERROR")));
+                assertThat(result.getOutput(), is(notNullValue()));
+                assertThat(result.getExecuted(), is(not(nullValue())));
+                assertThat(result.getProcessed(), is(equalTo(0L)));
+            }
+        );
+    }
+    
+    @Test
+    public void testBadCommand()
+    {
+        ExecuteCheck executeCheck = nagiosSSHCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
+        executeCheck.removeParameter("command_line");
+        this.runner.test(
+            executeCheck, 
+            (key, res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
+                assertThat(result, is(not(nullValue())));
+                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
+                assertThat(result.getCheck(), is(equalTo(executeCheck)));
+                assertThat(result.isOk(), is(equalTo(false)));
+                assertThat(result.getStatus(), is(equalTo("ERROR")));
+                assertThat(result.getOutput(), is(equalTo("The 'command_line' parameter must be given")));
+                assertThat(result.getExecuted(), is(not(nullValue())));
+                assertThat(result.getProcessed(), is(equalTo(0L)));
+            }
+        );
+    }
+    
+    @Test
+    public void testBadPasswordAuth()
+    {
+        ExecuteCheck executeCheck = nagiosSSHCheck("check_dummy", "/usr/lib/nagios/plugins/check_dummy 0 Test");
+        executeCheck.removeParameter("public_key");
+        executeCheck.removeParameter("private_key");
+        executeCheck.addParameter("password", "password");
+        this.runner.test(
+            executeCheck, 
+            (key, res) -> {
+                ActiveResultMO result = (ActiveResultMO) res;
+                assertThat(result, is(not(nullValue())));
+                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
+                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
+                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
+                assertThat(result.getCheck(), is(equalTo(executeCheck)));
+                assertThat(result.isOk(), is(equalTo(false)));
+                assertThat(result.getStatus(), is(equalTo("ERROR")));
+                assertThat(result.getOutput(), is(equalTo("Auth cancel")));
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
