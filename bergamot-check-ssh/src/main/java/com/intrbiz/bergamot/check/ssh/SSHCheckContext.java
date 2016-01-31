@@ -13,6 +13,8 @@ public class SSHCheckContext
     
     private JSch jsch;
     
+    private String password = null;
+    
     public SSHCheckContext(Consumer<Throwable> onError)
     {
         this.onError = onError;
@@ -37,6 +39,11 @@ public class SSHCheckContext
         }
     }
     
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+    
     public void connect(String username, String host, Consumer<SSHSession> onConnected)
     {
         this.connect(username, host, 22, onConnected);
@@ -51,6 +58,10 @@ public class SSHCheckContext
             {
                 session = this.jsch.getSession(username, host, port);
                 this.applyDefaultConfiguration(session);
+                if (this.password != null)
+                {
+                    session.setPassword(this.password);
+                }
                 session.connect();
                 onConnected.accept(new SSHSession(this.jsch, session));
             }
