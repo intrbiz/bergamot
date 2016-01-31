@@ -21,7 +21,7 @@ import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.worker.engine.ssh.NagiosSSHExecutor;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
 
-public class TestSSHExecutor
+public class TestNagiosSSHExecutor
 {
     private SSHEngine engine;
     
