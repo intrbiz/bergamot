@@ -24,8 +24,9 @@ public abstract class BaseSSHExecutor extends AbstractExecutor<SSHEngine>
     protected void validateSSHParameters(ExecuteCheck task)
     {
         if (Util.isEmpty(task.getParameter("host"))) throw new RuntimeException("The 'host' parameter must be given");
-        if (Util.isEmpty(task.getParameter("private_key"))) throw new RuntimeException("The SSH 'private_key' parameter must be given");
-        if (Util.isEmpty(task.getParameter("public_key"))) throw new RuntimeException("The SSH 'public_key' parameter must be given");
+        if (Util.isEmpty(task.getParameter("private_key")) && Util.isEmpty(task.getParameter("password"))) throw new RuntimeException("The SSH 'private_key' parameter must be given");
+        if (Util.isEmpty(task.getParameter("public_key")) && Util.isEmpty(task.getParameter("password"))) throw new RuntimeException("The SSH 'public_key' parameter must be given");
+        if (Util.isEmpty(task.getParameter("password")) && Util.isEmpty(task.getParameter("public_key")) && Util.isEmpty(task.getParameter("private_key"))) throw new RuntimeException("No authentication details provided, please use: 'private_key' and 'public_key' or 'password'");
     }
     
     protected String getSSHUsername(ExecuteCheck task)
@@ -45,9 +46,17 @@ public abstract class BaseSSHExecutor extends AbstractExecutor<SSHEngine>
     
     protected void setupSSHCheckContext(ExecuteCheck task, SSHCheckContext context)
     {
-        // setup the identity
-        String privateKey = task.getParameter("private_key");
-        String publicKey  = task.getParameter("public_key");
-        context.addIdentity(privateKey, publicKey);
+        if ((! Util.isEmpty(task.getParameter("private_key"))) && (! Util.isEmpty(task.getParameter("public_key"))))
+        {
+            // setup the identity
+            String privateKey = task.getParameter("private_key");
+            String publicKey  = task.getParameter("public_key");
+            context.addIdentity(privateKey, publicKey);
+        }
+        else if ((! Util.isEmpty(task.getParameter("password"))))
+        {
+            // use password
+            context.setPassword(task.getParameter("password"));
+        }
     }    
 }

@@ -77,6 +77,7 @@ public class TestSSHExecutor
             executeCheck, 
             (key, res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
+                System.out.println(result);
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
