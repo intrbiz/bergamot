@@ -46,6 +46,8 @@ public class NagiosSSHExecutor extends BaseSSHExecutor
             if (Util.isEmpty(executeCheck.getParameter("command_line"))) throw new RuntimeException("The 'command_line' parameter must be given");
             // create our context
             SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e)); });
+            // setup the context - this will add SSH keys etc
+            this.setupSSHCheckContext(executeCheck, context);
             // connect to the host
             context.connect(this.getSSHUsername(executeCheck), this.getSSHHost(executeCheck), this.getSSHPort(executeCheck), (session) -> {
                 // the command to execute
