@@ -28,4 +28,25 @@
   		<artifactId>hamcrest-all</artifactId>
   	</dependency>
   </dependencies>
+  <build>
+		<finalName>bergamot-worker-ssh</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.intrbiz.util</groupId>
+				<artifactId>packaging</artifactId>
+				<version>1.1.1</version>
+				<configuration>
+					<appClass>com.intrbiz.bergamot.worker.SSHWorker</appClass>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>intrbiz-package</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
