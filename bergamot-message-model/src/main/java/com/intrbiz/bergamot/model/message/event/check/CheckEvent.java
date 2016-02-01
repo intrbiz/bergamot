@@ -33,7 +33,15 @@ public class CheckEvent extends Message implements ParameterisedMO
     private int processingPool;
 
     @JsonProperty("parameters")
-    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>(); 
+    
+    /**
+     * An id added to adhoc checks to correlate 
+     * them with with the originator.  This must 
+     * be null for normal check executions
+     */
+    @JsonProperty("adhoc_id")
+    private UUID adhocId;
     
     public CheckEvent()
     {
@@ -120,5 +128,16 @@ public class CheckEvent extends Message implements ParameterisedMO
     public void setProcessingPool(int processingPool)
     {
         this.processingPool = processingPool;
+    }
+    
+
+    public UUID getAdhocId()
+    {
+        return adhocId;
+    }
+
+    public void setAdhocId(UUID adhocId)
+    {
+        this.adhocId = adhocId;
     }
 }

@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model.message.result;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,6 +37,14 @@ public abstract class ResultMO extends Message implements ParameterisedMO
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
+    
+    /**
+     * An id added to adhoc checks to correlate 
+     * them with with the originator.  This must 
+     * be null for normal check executions
+     */
+    @JsonProperty("adhoc_id")
+    private UUID adhocId;
 
     public ResultMO()
     {
@@ -152,6 +161,16 @@ public abstract class ResultMO extends Message implements ParameterisedMO
             if (name.equals(parameter.getName())) return parameter.getValue();
         }
         return defaultValue;
+    }
+
+    public UUID getAdhocId()
+    {
+        return adhocId;
+    }
+
+    public void setAdhocId(UUID adhocId)
+    {
+        this.adhocId = adhocId;
     }
     
     // constructor helpers

@@ -6,7 +6,6 @@ import java.util.function.BiPredicate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 
 /**
@@ -32,14 +31,6 @@ public class ActiveResultMO extends ResultMO
     
     @JsonProperty("saved_state")
     private String savedState;
-    
-    /**
-     * An id added to adhoc checks to correlate 
-     * them with with the originator.  This must 
-     * be null for normal check executions
-     */
-    @JsonProperty("adhoc_id")
-    private UUID adhocId;
 
     public ActiveResultMO()
     {
@@ -107,16 +98,6 @@ public class ActiveResultMO extends ResultMO
         this.savedState = savedState;
     }
 
-    public UUID getAdhocId()
-    {
-        return adhocId;
-    }
-
-    public void setAdhocId(UUID adhocId)
-    {
-        this.adhocId = adhocId;
-    }
-
     /**
      * Create a Result with the details of this check
      * 
@@ -132,10 +113,7 @@ public class ActiveResultMO extends ResultMO
         this.setProcessingPool(check.getProcessingPool());
         this.setCheck(check);
         this.setExecuted(System.currentTimeMillis());
-        if (check instanceof ExecuteCheck)
-        {
-            this.setAdhocId(((ExecuteCheck) check).getAdhocId());
-        }
+        this.setAdhocId(check.getAdhocId());
         return this;
     }
     
