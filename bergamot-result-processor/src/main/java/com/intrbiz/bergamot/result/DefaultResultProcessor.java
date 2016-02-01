@@ -126,6 +126,19 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     {
         // stamp in processed time
         resultMO.setProcessed(System.currentTimeMillis());
+        // is this an adhoc result
+        if (resultMO.getAdhocId() != null)
+        {
+            // rather than processing this result we should 
+            // dispatch it to the adhoc originator
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Got adhoc result, result processing will be skipped");
+                logger.trace(resultMO);
+            }
+            // skip any processing
+            return;
+        }
         // start the transaction
         try (BergamotDB db = BergamotDB.connect())
         {
