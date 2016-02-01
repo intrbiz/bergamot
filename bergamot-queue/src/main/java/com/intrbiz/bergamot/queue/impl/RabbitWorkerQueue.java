@@ -9,6 +9,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.WorkerQueue;
+import com.intrbiz.bergamot.queue.key.AdhocResultKey;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
@@ -320,6 +321,39 @@ public class RabbitWorkerQueue extends WorkerQueue
                 on.exchangeDeclare("bergamot.reading.fallback", "fanout", true, false, null);
                 on.queueBind("bergamot.reading.fallback_queue", "bergamot.reading.fallback", "");
                 return "bergamot.reading.fallback_queue";
+            }
+        };
+    }
+    
+    // adhoc
+    
+    @Override
+    public RoutedProducer<ResultMO, AdhocResultKey> publishAdhocResults()
+    {
+        return new RabbitProducer<ResultMO, AdhocResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), null, this.source.getRegistry().timer("publish-result"))
+        {
+            protected String setupExchange(Channel on) throws IOException
+            {
+                // the result exchange
+                on.exchangeDeclare("bergamot.adhocresult", "topic", true, false, null);
+                return "bergamot.adhocresult";
+            }
+        };
+    }
+
+    @Override
+    public Consumer<ResultMO, AdhocResultKey> consumeAdhocResults(UUID adhocId, DeliveryHandler<ResultMO> handler)
+    {
+        return new RabbitConsumer<ResultMO, AdhocResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"))
+        {
+            public String setupQueue(Channel on) throws IOException
+            {
+                String queueName = on.queueDeclare().getQueue();
+                // the result exchange
+                on.exchangeDeclare("bergamot.adhocresult", "topic", true, false, null);
+                // bind
+                on.queueBind(queueName, "bergamot.adhocresult", new AdhocResultKey(adhocId).toString());
+                return queueName;
             }
         };
     }

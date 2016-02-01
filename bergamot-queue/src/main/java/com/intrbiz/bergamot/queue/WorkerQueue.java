@@ -7,6 +7,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.queue.impl.RabbitWorkerQueue;
+import com.intrbiz.bergamot.queue.key.AdhocResultKey;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
 import com.intrbiz.bergamot.queue.key.WorkerKey;
@@ -91,4 +92,17 @@ public abstract class WorkerQueue extends QueueAdapter
      * @return
      */
     public abstract Consumer<ReadingParcelMO, ReadingKey> consumeFallbackReadings(DeliveryHandler<ReadingParcelMO> handler);
+    
+    // adhoc checks
+    
+    /**
+     * Publish adhoc results
+     */
+    public abstract RoutedProducer<ResultMO, AdhocResultKey> publishAdhocResults();
+    
+    /**
+     * Consume adhoc results
+     * @param handler
+     */
+    public abstract Consumer<ResultMO, AdhocResultKey> consumeAdhocResults(UUID adhocId, DeliveryHandler<ResultMO> handler);
 }
