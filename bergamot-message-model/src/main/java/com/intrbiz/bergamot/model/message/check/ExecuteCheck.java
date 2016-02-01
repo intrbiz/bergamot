@@ -26,6 +26,14 @@ public class ExecuteCheck extends CheckEvent
     
     @JsonProperty("saved_state")
     private String savedState;
+    
+    /**
+     * An id added to adhoc checks to correlate 
+     * them with with the originator.  This must 
+     * be null for normal check executions
+     */
+    @JsonProperty("adhoc_id")
+    private UUID adhocId;
 
     public ExecuteCheck()
     {
@@ -80,5 +88,15 @@ public class ExecuteCheck extends CheckEvent
     public void setSavedState(String savedState)
     {
         this.savedState = savedState;
+    }
+
+    public UUID getAdhocId()
+    {
+        return adhocId;
+    }
+
+    public void setAdhocId(UUID adhocId)
+    {
+        this.adhocId = adhocId;
     }
 }
