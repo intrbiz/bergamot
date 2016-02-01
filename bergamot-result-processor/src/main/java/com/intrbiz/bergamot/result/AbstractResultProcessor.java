@@ -26,6 +26,7 @@ import com.intrbiz.bergamot.queue.SchedulerQueue;
 import com.intrbiz.bergamot.queue.UpdateQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ActiveResultKey;
+import com.intrbiz.bergamot.queue.key.AdhocResultKey;
 import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.bergamot.queue.key.PassiveResultKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
@@ -63,6 +64,8 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     private UpdateQueue updateQueue;
 
     private RoutedProducer<Update, UpdateKey> updateProducer;
+    
+    private RoutedProducer<ResultMO, AdhocResultKey> adhocProducer;
 
     private int threads = Runtime.getRuntime().availableProcessors();
 
@@ -150,6 +153,13 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         // updates
         this.updateQueue = UpdateQueue.open();
         this.updateProducer = this.updateQueue.publishUpdates();
+        // adhoc
+        this.adhocProducer = this.workerQueue.publishAdhocResults();
+    }
+    
+    protected void publishAdhocResult(ResultMO result)
+    {
+        this.adhocProducer.publish(new AdhocResultKey(result.getAdhocId()), result);
     }
 
     protected void rescheduleCheck(ActiveCheck<?, ?> check, long interval)

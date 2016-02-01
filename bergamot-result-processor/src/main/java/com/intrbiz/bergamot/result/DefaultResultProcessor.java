@@ -129,13 +129,14 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         // is this an adhoc result
         if (resultMO.getAdhocId() != null)
         {
-            // rather than processing this result we should 
-            // dispatch it to the adhoc originator
             if (logger.isTraceEnabled())
             {
                 logger.trace("Got adhoc result, result processing will be skipped");
                 logger.trace(resultMO);
             }
+            // rather than processing this result we should 
+            // dispatch it to the adhoc originator
+            this.publishAdhocResult(resultMO);
             // skip any processing
             return;
         }
