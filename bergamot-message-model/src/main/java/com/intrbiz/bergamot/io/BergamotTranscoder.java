@@ -59,10 +59,15 @@ import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
 import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
+import com.intrbiz.bergamot.model.message.api.check.ExecuteAdhocCheck;
+import com.intrbiz.bergamot.model.message.api.check.ExecutedAdhocCheck;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
 import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
 import com.intrbiz.bergamot.model.message.api.notification.RegisteredForNotifications;
+import com.intrbiz.bergamot.model.message.api.result.AdhocResultEvent;
+import com.intrbiz.bergamot.model.message.api.result.RegisterForAdhocResults;
+import com.intrbiz.bergamot.model.message.api.result.RegisteredForAdhocResults;
 import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
@@ -196,6 +201,11 @@ public class BergamotTranscoder
         NotificationEvent.class,
         RegisterForNotifications.class,
         RegisteredForNotifications.class,
+        RegisterForAdhocResults.class,
+        RegisteredForAdhocResults.class,
+        AdhocResultEvent.class,
+        ExecuteAdhocCheck.class,
+        ExecutedAdhocCheck.class,
         // control
         RegisterWatcher.class,
         // watcher
