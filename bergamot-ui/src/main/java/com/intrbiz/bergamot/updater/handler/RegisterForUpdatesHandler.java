@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.message.api.APIRequest;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
@@ -26,7 +25,7 @@ import com.intrbiz.bergamot.updater.context.ClientContext;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.QueueException;
 
-public class RegisterForUpdatesHandler extends RequestHandler
+public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates>
 {
     private Logger logger = Logger.getLogger(RegisterForUpdatesHandler.class);
     
@@ -36,16 +35,15 @@ public class RegisterForUpdatesHandler extends RequestHandler
     }
 
     @Override
-    public void onRequest(ClientContext context, APIRequest request)
+    public void onRequest(ClientContext context, RegisterForUpdates request)
     {
-        RegisterForUpdates rfsn = (RegisterForUpdates) request;
         // setup the queue
         if (context.var("updateConsumer") == null)
         {
             try
             {
                 // the bindings
-                Set<UpdateKey> bindings = this.computeBindings(context, rfsn);
+                Set<UpdateKey> bindings = this.computeBindings(context, request);
                 logger.debug("Reigster for updates: " + bindings);
                 // setup the queue
                 UpdateQueue queue = context.var("updateQueue", UpdateQueue.open());
@@ -58,7 +56,7 @@ public class RegisterForUpdatesHandler extends RequestHandler
                     if (q != null) q.close();
                 });
                 // done
-                context.send(new RegisteredForUpdates(rfsn));
+                context.send(new RegisteredForUpdates(request));
             }
             catch (QueueException e)
             {
@@ -72,7 +70,7 @@ public class RegisterForUpdatesHandler extends RequestHandler
         {
             try
             {
-                Set<UpdateKey> bindings = this.computeBindings(context, rfsn);
+                Set<UpdateKey> bindings = this.computeBindings(context, request);
                 logger.debug("Reigster for updates: " + bindings);
                 // update the bindings
                 Consumer<Update, UpdateKey> updateConsumer = context.var("updateConsumer");
@@ -81,7 +79,7 @@ public class RegisterForUpdatesHandler extends RequestHandler
                     logger.debug("Updating bindings, adding: " + binding);
                     updateConsumer.addBinding(binding);
                 }
-                context.send(new RegisteredForUpdates(rfsn));
+                context.send(new RegisteredForUpdates(request));
             }
             catch (QueueException e)
             {

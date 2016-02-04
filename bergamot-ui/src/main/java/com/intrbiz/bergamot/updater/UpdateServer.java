@@ -1,16 +1,5 @@
 package com.intrbiz.bergamot.updater;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -21,6 +10,17 @@ import com.intrbiz.bergamot.updater.handler.PingHandler;
 import com.intrbiz.bergamot.updater.handler.RegisterForNotificationsHandler;
 import com.intrbiz.bergamot.updater.handler.RegisterForUpdatesHandler;
 import com.intrbiz.bergamot.updater.handler.RequestHandler;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
 
 public class UpdateServer implements Runnable
 {
@@ -34,9 +34,9 @@ public class UpdateServer implements Runnable
 
     private Thread runner = null;
     
-    private ConcurrentMap<Class<?>, RequestHandler> handlers = new ConcurrentHashMap<Class<?>, RequestHandler>();
+    private ConcurrentMap<Class<?>, RequestHandler<?>> handlers = new ConcurrentHashMap<Class<?>, RequestHandler<?>>();
     
-    private RequestHandler defaultHandler;
+    private RequestHandler<?> defaultHandler;
 
     public UpdateServer(int port)
     {
@@ -49,7 +49,7 @@ public class UpdateServer implements Runnable
         this.registerHandler(new RegisterForNotificationsHandler());
     }
     
-    public void registerHandler(RequestHandler handler)
+    public void registerHandler(RequestHandler<?> handler)
     {
        for (Class<?> type : handler.getRequestTypes())
        {
@@ -57,14 +57,14 @@ public class UpdateServer implements Runnable
        }
     }
     
-    public void registerDefaultHandler(RequestHandler handler)
+    public void registerDefaultHandler(RequestHandler<?> handler)
     {
         this.defaultHandler = handler;
     }
     
-    public RequestHandler getHandler(Class<?> type)
+    public RequestHandler<?> getHandler(Class<?> type)
     {
-        RequestHandler handler = this.handlers.get(type);
+        RequestHandler<?> handler = this.handlers.get(type);
         return handler == null ? this.defaultHandler : handler;
     }
 

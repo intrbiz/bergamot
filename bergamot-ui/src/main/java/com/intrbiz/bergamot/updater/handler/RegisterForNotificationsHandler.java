@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.updater.handler;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.model.message.api.APIRequest;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.notification.NotificationEvent;
 import com.intrbiz.bergamot.model.message.api.notification.RegisterForNotifications;
@@ -15,7 +14,7 @@ import com.intrbiz.bergamot.updater.context.ClientContext;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.QueueException;
 
-public class RegisterForNotificationsHandler extends RequestHandler
+public class RegisterForNotificationsHandler extends RequestHandler<RegisterForNotifications>
 {
     private Logger logger = Logger.getLogger(RegisterForNotificationsHandler.class);
     
@@ -25,22 +24,21 @@ public class RegisterForNotificationsHandler extends RequestHandler
     }
 
     @Override
-    public void onRequest(ClientContext context, APIRequest request)
+    public void onRequest(ClientContext context, RegisterForNotifications request)
     {
-        RegisterForNotifications rfns = (RegisterForNotifications) request;
         // validate the site id
-        if (! context.getSite().getId().equals(rfns.getSiteId()))
+        if (! context.getSite().getId().equals(request.getSiteId()))
         {
             context.send(new APIError("Invalid site id given"));
         }
         else if (context.var("notificationConsumer") == null)
         {
             // listen for notifications
-            logger.debug("Registering for notifications, for site: " + rfns.getSiteId());
+            logger.debug("Registering for notifications, for site: " + request.getSiteId());
             try
             {
                 NotificationQueue notificationQueue = context.var("notificationQueue", NotificationQueue.open());
-                context.var("notificationConsumer", notificationQueue.consumeNotifications((n) -> { this.sendNotification(context, n); }, rfns.getSiteId()));
+                context.var("notificationConsumer", notificationQueue.consumeNotifications((n) -> { this.sendNotification(context, n); }, request.getSiteId()));
                 // on close
                 context.onClose((ctx) -> {
                     Consumer<Notification, NotificationKey> c = ctx.var("notificationConsumer");
@@ -49,7 +47,7 @@ public class RegisterForNotificationsHandler extends RequestHandler
                     if (q != null) q.close();
                 });
                 // done
-                context.send(new RegisteredForNotifications(rfns));
+                context.send(new RegisteredForNotifications(request));
             }
             catch (QueueException e)
             {
@@ -62,7 +60,7 @@ public class RegisterForNotificationsHandler extends RequestHandler
         else
         {
             // done
-            context.send(new RegisteredForNotifications(rfns));
+            context.send(new RegisteredForNotifications(request));
         }
     }
     

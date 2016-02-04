@@ -6,7 +6,7 @@ import com.intrbiz.bergamot.model.message.api.APIRequest;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.updater.context.ClientContext;
 
-public class DefaultHandler extends RequestHandler
+public class DefaultHandler extends RequestHandler<APIRequest>
 {
     private Logger logger = Logger.getLogger(DefaultHandler.class);
     
@@ -19,6 +19,6 @@ public class DefaultHandler extends RequestHandler
     public void onRequest(ClientContext context, APIRequest request)
     {
         logger.warn("Unhandled request: " + request);
-        context.send(new APIError("Not found"));
+        context.send(new APIError(request, "Not found"));
     }
 }
