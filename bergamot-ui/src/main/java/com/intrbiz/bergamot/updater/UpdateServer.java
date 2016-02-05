@@ -6,7 +6,9 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.updater.handler.DefaultHandler;
+import com.intrbiz.bergamot.updater.handler.ExecuteAdhocChecksHandler;
 import com.intrbiz.bergamot.updater.handler.PingHandler;
+import com.intrbiz.bergamot.updater.handler.RegisterForAdhocResultsHandler;
 import com.intrbiz.bergamot.updater.handler.RegisterForNotificationsHandler;
 import com.intrbiz.bergamot.updater.handler.RegisterForUpdatesHandler;
 import com.intrbiz.bergamot.updater.handler.RequestHandler;
@@ -47,6 +49,8 @@ public class UpdateServer implements Runnable
         this.registerHandler(new PingHandler());
         this.registerHandler(new RegisterForUpdatesHandler());
         this.registerHandler(new RegisterForNotificationsHandler());
+        this.registerHandler(new RegisterForAdhocResultsHandler());
+        this.registerHandler(new ExecuteAdhocChecksHandler());
     }
     
     public void registerHandler(RequestHandler<?> handler)
