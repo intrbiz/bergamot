@@ -61,6 +61,12 @@ public abstract class ClientContext
     {
         return (T) this.vars.get(name);
     }
+    
+    @SuppressWarnings("unchecked")
+    public <T> T removeVar(String name)
+    {
+        return (T) this.vars.remove(name);
+    }
 
     public <T> T var(String name, T value)
     {
