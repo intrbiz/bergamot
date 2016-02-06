@@ -16,7 +16,7 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
         "bergamot.api.register_for_adhoc_results": { request: true },
         "bergamot.api.registered_for_adhoc_results": { response: true },
         "bergamot.api.event.adhoc_result": { event: true, raise_event: "bergamot-api-adhoc-result"},
-        "bergamot.api.bergamot.api.execute_adhoc_check": { request: true },
+        "bergamot.api.execute_adhoc_check": { request: true },
         "bergamot.api.executed_adhoc_check": { response: true },
 	};
 	
@@ -38,6 +38,8 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
 	    this.on('bergamot-api-ping', this.onPing);
 	    this.on('bergamot-api-register-for-updates', this.onRegisterForUpdates);
         this.on('bergamot-api-register-for-notifications', this.onRegisterForNotifications);
+        this.on('bergamot-api-register-for-adhoc-results', this.onRegisterForAdhocResults);
+        this.on('bergamot-api-execute-adhoc-check', this.onExecuteAdhocCheck);
 	    // setup internal on connected handler
 	    this.on('bergamot-api-connected', this.pingOnConnected);
 	    // connect the websocket
@@ -248,8 +250,27 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
     this.onRegisterForNotifications = function(/*Event*/ ev, /*Object*/ data)
     {
         this.doAPISend({
-        type: "bergamot.api.register_for_notifications", 
-        site_id: data.site_id
+            type: "bergamot.api.register_for_notifications", 
+            site_id: data.site_id
+        }, data.onResponse, data.onError);
+    };
+    
+    this.onRegisterForAdhocResults = function(/*Event*/ ev, /*Object*/ data)
+    {
+        this.doAPISend({
+            type: "bergamot.api.register_for_adhoc_results"
+        }, data.onResponse, data.onError);
+    };
+    
+    this.onExecuteAdhocCheck = function(/*Event*/ ev, /*Object*/ data)
+    {
+        this.doAPISend({
+            type: "bergamot.api.execute_adhoc_check",
+            check: data.check,
+            worker_pool: data.worker_pool,
+            engine: data.engine,
+            agent_id: data.agent_id,
+            ttl: data.ttl
         }, data.onResponse, data.onError);
     };
 	
