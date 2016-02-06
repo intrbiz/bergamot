@@ -13,6 +13,11 @@ define(['flight/lib/component', 'bergamot/lib/util/logger'], function (defineCom
         "bergamot.api.register_for_notifications": { request: true },
         "bergamot.api.registered_for_notifications": { response: true },
         "bergamot.api.event.notification": { event: true, raise_event: "bergamot-api-notification" },
+        "bergamot.api.register_for_adhoc_results": { request: true },
+        "bergamot.api.registered_for_adhoc_results": { response: true },
+        "bergamot.api.event.adhoc_result": { event: true, raise_event: "bergamot-api-adhoc-result"},
+        "bergamot.api.bergamot.api.execute_adhoc_check": { request: true },
+        "bergamot.api.executed_adhoc_check": { response: true },
 	};
 	
 	this.defaultAttrs({
