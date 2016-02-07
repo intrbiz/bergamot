@@ -59,6 +59,7 @@ import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
 import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
+import com.intrbiz.bergamot.model.message.api.call.VerifiedCommand;
 import com.intrbiz.bergamot.model.message.api.check.ExecuteAdhocCheck;
 import com.intrbiz.bergamot.model.message.api.check.ExecutedAdhocCheck;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
@@ -79,6 +80,7 @@ import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.ClusterManagerError;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.FlushedGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
+import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
@@ -241,6 +243,8 @@ public class BergamotTranscoder
         // util models
         BergamotImportReportMO.class,
         AppliedConfigChange.class,
+        BergamotValidationReportMO.class,
+        VerifiedCommand.class,
         // heathchecks
         HealthCheckJoin.class,
         HealthCheckHeartbeat.class,

@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.model.message.importer;
+package com.intrbiz.bergamot.model.message.config;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,29 +8,31 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.import.report")
-public class BergamotImportReportMO extends MessageObject
+public class BergamotValidationReportMO extends MessageObject
 {
     @JsonProperty("site")
     private String site;
     
-    @JsonProperty("successful")
-    private boolean successful = true;
+    @JsonProperty("valid")
+    private boolean valid = true;
     
-    @JsonProperty("infos")
-    private List<String> info = new LinkedList<String>();
+    @JsonProperty("warnings")
+    private List<String> warnings = new LinkedList<String>();
 
     @JsonProperty("errors")
     private List<String> errors = new LinkedList<String>();
 
-    public BergamotImportReportMO()
+    public BergamotValidationReportMO()
     {
+        super();
     }
     
-    public BergamotImportReportMO(String site, boolean successful, List<String> info, List<String> errors)
+    public BergamotValidationReportMO(String site, boolean valid, List<String> warnings, List<String> errors)
     {
+        super();
         this.site = site;
-        this.successful = successful;
-        this.info.addAll(info);
+        this.valid = valid;
+        this.warnings.addAll(warnings);
         this.errors.addAll(errors);
     }
 
@@ -44,24 +46,24 @@ public class BergamotImportReportMO extends MessageObject
         this.site = site;
     }
 
-    public boolean isSuccessful()
+    public boolean isValid()
     {
-        return successful;
+        return valid;
     }
 
-    public void setSuccessful(boolean successful)
+    public void setValid(boolean valid)
     {
-        this.successful = successful;
+        this.valid = valid;
+    }
+    
+    public List<String> getWarnings()
+    {
+        return warnings;
     }
 
-    public List<String> getInfo()
+    public void setWarnings(List<String> warnings)
     {
-        return info;
-    }
-
-    public void setInfo(List<String> info)
-    {
-        this.info = info;
+        this.warnings = warnings;
     }
 
     public List<String> getErrors()
