@@ -1,0 +1,63 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Command Editor">
+
+	<div class="row">
+		<div class="col12">
+			<input type="button" id="show_source" value="Source"/>
+			<input type="button" id="show_verify" value="Verify"/>
+		</div>
+		<div class="col12" id="source">
+			<h3>Create Your Command</h3>
+			<pre id="command" style="width: 95%; min-height: 400px;"><![CDATA[
+<command name="my_command" engine="" executor="" extends="" security-domains="global">
+    <summary>My Commnad</summary>
+    <parameter name="test" description="An example parameter">value</parameter>
+    <script></script>
+    <description>An example command</description>
+</command>
+			]]></pre>
+		</div>
+		<div class="col12" id="verify">
+			<div id="verify_progress">
+				<h3>Verifying Command</h3>
+				<img src="#{public('images/admin/apply_change.gif')}"/>
+			</div>
+			<div id="verify_success">
+				<h3>Verified Command</h3>
+				<p>Your command looks good, would you like to try it out?</p>
+				<form id="test_command">
+					<div id="test_command_parameters">
+					</div>
+					<div>
+						<h4>Execution Details</h4>
+						<p>
+							<label for="worker_pool">Worker Pool (Optional):</label>
+							<input type="text" id="worker_pool" name="worker_pool"/>
+						</p>
+					</div>
+					<div>
+						<input type="submit" value="Test Command" name="go_test_command"/>
+					</div>
+				</form>
+			</div>
+			<div id="verify_failed">
+				<h3>Command Verification Failed</h3>
+				<p>Your command is invalid, we detected the following errors</p>
+				<ul id="verify_failed_errors">
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- ACE text editor -->
+    <script type="text/javascript">
+		<![CDATA[
+		/* setup the command editor */
+		require(["bergamot/lib/ui/command_editor"], function(bergamot_command_editor)
+		{
+		    bergamot_command_editor.attachTo(document, {});
+		});
+		]]>
+	</script>
+</fragment>

@@ -19,7 +19,10 @@
 			/* Configure require js */
 			require.config({
 			    baseUrl: "/js/v1.5.0/bower_components",
-			    waitSeconds: 15
+			    waitSeconds: 15,
+			    paths: {
+			    	ace: '/js/v1.5.0/bower_components/ace/lib/ace'
+			    }
 			});
             ]]>
 		</script>
