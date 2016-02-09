@@ -127,12 +127,12 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         {
             // consume results, currently for all sites
             this.resultConsumers.add(this.workerQueue.consumeResults((r) -> {
-                logger.trace("Processing pooled/site result");
+                if (logger.isTraceEnabled()) logger.trace("Processing pooled/site result: " + r);
                 processExecuted(r);
             }, this.instanceId.toString()));
             // consume results, currently for all sites
             this.fallbackConsumers.add(this.workerQueue.consumeFallbackResults((r) -> {
-                logger.debug("Processing fallback result");
+                if (logger.isDebugEnabled()) logger.debug("Processing fallback result: " + r);
                 processExecuted(r);
             }));
             // consume dead checks, currently for all sites
