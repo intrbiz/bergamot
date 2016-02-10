@@ -15,7 +15,7 @@ public class VerifiedCommand extends APIResponse
     @JsonProperty("parameters_view")
     private String parametersView;
     
-    @JsonProperty("skelton_check")
+    @JsonProperty("skeleton_check")
     private ExecuteCheck skeletonCheck;
     
     public VerifiedCommand()
