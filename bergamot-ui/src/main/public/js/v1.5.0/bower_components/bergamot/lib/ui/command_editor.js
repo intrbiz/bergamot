@@ -4,14 +4,16 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger', 
     {
 	
 	this.after('initialize', function() {
-        /* Setup Tabs */
+        /* Event handlers */
+        this.on('bergamot-api-adhoc-result', this.onAdhocResult);
+        /* Setup tabs */
 	    $('#verify').hide();
         $('#source').show();
 	    /* Setup the command editor */
 		this.editor = ace.edit("command");
     	this.editor.setTheme("ace/theme/github");
     	this.editor.getSession().setMode("ace/mode/xml");
-    	/* Tab Actions */
+    	/* Tab actions */
     	$('#show_source').click(function(ev) {
     		ev.preventDefault();
     		$('#verify').hide();
@@ -26,11 +28,49 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger', 
     		$('#verify').show();
     		this.verifyCommand();
     	}).bind(this));
+        /* Test command */
+        $('#test_command').submit((function(ev) {
+            ev.preventDefault();
+            // run the test
+            this.testCommand();
+        }).bind(this));
 	});
+    
+    this.testCommand = function() {
+        // build our check
+        var check = this.skeletonCheck;
+        $('#test_command').find('input[type=text]').each(function(i, e) {
+            check.parameters.push({
+                "type": "bergamot.parameter",
+                "name": $(e).attr('name').substring(10),
+                "value": $(e).val()
+            });
+        });
+        // parameters
+        var workerPool = $('#worker_pool').val();
+        var agentId = $('#agent_id').val();
+        // setup our adhoc results queue
+        if (this.adhocId == null)
+        {
+            this.registerForAdhocResults((function(response) {
+                this.adhocId = response.adhoc_id;
+                // execute the check
+                this.executeAdhocCheck(check, { "worker_pool": workerPool, "agent_id": agentId });
+            }).bind(this));
+        }
+        else
+        {
+            this.executeAdhocCheck(check, { "worker_pool": workerPool, "agent_id": agentId });
+        }
+    };
+    
+    this.onAdhocResult = function(event) {
+        $('#test_results').text(JSON.stringify(event.result));
+    };
     
     this.verifyCommand = function() {
         /* Verify the command */
-        $.getJSON('/command/editor/verify?command=' + escape(this.editor.getValue()), (function(data) {
+        $.getJSON('/command/editor/verify?command=' + encodeURIComponent(this.editor.getValue()), (function(data) {
             if (data.stat == 'OK')
             {
                 $('#verify_progress').hide();
@@ -38,7 +78,8 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger', 
                 // replace the parameters view
                 var view = $.parseHTML(data.parameters_view);
                 $('#test_command_parameters').replaceWith(view);
-                // attach our skeleton execution to the test form
+                // store our skeleton check
+                this.skeletonCheck = data.skeleton_check;
             }
             else
             {
@@ -61,12 +102,6 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger', 
                 $('#verify_progress').hide();
                 $('#verify_failed').show();
             }
-        }).bind(this));
-        /* Test command */
-        $('#test_command').submit((function(ev) {
-            ev.preventDefault();
-            // setup an adhoc result queue
-            // submit the check for execution
         }).bind(this));
     };
 

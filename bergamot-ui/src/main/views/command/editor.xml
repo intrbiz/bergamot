@@ -36,11 +36,18 @@
 							<label for="worker_pool">Worker Pool (Optional):</label>
 							<input type="text" id="worker_pool" name="worker_pool"/>
 						</p>
+						<p>
+							<label for="agent_id">Agent Id (Advanced):</label>
+							<input type="text" id="agent_id" name="agent_id"/>
+						</p>
 					</div>
 					<div>
 						<input type="submit" value="Test Command" name="go_test_command"/>
 					</div>
 				</form>
+				<div>
+					<pre id="test_results" style="width: 95%; min-height: 400px;"></pre>
+				</div>
 			</div>
 			<div id="verify_failed">
 				<h3>Command Verification Failed</h3>
