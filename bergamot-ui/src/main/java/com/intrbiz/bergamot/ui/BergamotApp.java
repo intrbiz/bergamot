@@ -45,6 +45,8 @@ import com.intrbiz.bergamot.ui.api.TestAPIRouter;
 import com.intrbiz.bergamot.ui.api.TimePeriodAPIRouter;
 import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.api.UtilAPIRouter;
+import com.intrbiz.bergamot.ui.express.BergamotCSSVersion;
+import com.intrbiz.bergamot.ui.express.BergamotJSVersion;
 import com.intrbiz.bergamot.ui.express.BergamotUpdateURL;
 import com.intrbiz.bergamot.ui.router.AboutRouter;
 import com.intrbiz.bergamot.ui.router.AlertsRouter;
@@ -105,6 +107,15 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         public static final String NUMBER = "3.0.0";
         
         public static final String CODE_NAME = "Red Snow";
+        
+        public static final class COMPONENTS
+        {
+        
+            public static final String JS = "v1.5.0";
+            
+            public static final String CSS = "v1.7.0";
+        
+        }
     }
     
     private UICfg config;
@@ -175,6 +186,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         this.updateServer = new UpdateServer(Integer.getInteger("bergamot.websocket.port", 8081));
         // express functions
         immutableFunction(new BergamotUpdateURL());
+        immutableFunction(new BergamotJSVersion());
+        immutableFunction(new BergamotCSSVersion());
         // some actions
         action(new ExecuteCheckAction());
         action(new SchedulerActions());
