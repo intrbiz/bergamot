@@ -37,7 +37,7 @@
     	</table>
     </div>
     <!-- ACE text editor -->
-    <script src="#{public('/js/v1.5.0/bower_components/ace-builds/src-noconflict/ace.js')}" />
+    <script src="#{public('/js/' + bergamot_js_version() + '/bower_components/ace-builds/src-noconflict/ace.js')}" />
     <script type="text/javascript">
 	  <![CDATA[
 		var editor1 = ace.edit("view_config");
