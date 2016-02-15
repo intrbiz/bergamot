@@ -10,14 +10,12 @@
 		</div>
 		<div class="col12" id="source">
 			<h3>Create Your Command</h3>
-			<pre id="command" style="width: 95%; min-height: 400px;"><![CDATA[
-<command name="my_command" engine="" executor="" extends="" security-domains="global">
+			<pre id="command" style="width: 95%; min-height: 400px;"><![CDATA[<command name="my_command" engine="" executor="" extends="" security-domains="global">
     <summary>My Commnad</summary>
     <parameter name="test" description="An example parameter">value</parameter>
     <script></script>
     <description>An example command</description>
-</command>
-			]]></pre>
+</command>]]></pre>
 		</div>
 		<div class="col12" id="verify">
 			<div id="verify_progress">
@@ -45,7 +43,8 @@
 						<input type="submit" value="Test Command" name="go_test_command"/>
 					</div>
 				</form>
-				<div>
+				<div style="clear: both;">
+					<h4>Result:</h4>
 					<pre id="test_results" style="width: 95%; min-height: 400px;"></pre>
 				</div>
 			</div>

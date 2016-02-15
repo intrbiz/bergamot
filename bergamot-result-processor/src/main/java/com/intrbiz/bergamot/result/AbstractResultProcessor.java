@@ -159,6 +159,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     
     protected void publishAdhocResult(ResultMO result)
     {
+        if (logger.isTraceEnabled()) logger.trace("Publishing adhoc result to " + result.getAdhocId() + " with message " + result);
         this.adhocProducer.publish(new AdhocResultKey(result.getAdhocId()), result);
     }
 

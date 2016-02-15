@@ -40,6 +40,7 @@ public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAd
             {
                 // setup cleanup task
                 context.onClose((ctx) -> {
+                    if (logger.isTraceEnabled()) logger.trace("Got disconnect, closing adhoc result queue");
                     Consumer<ResultMO, ResultKey> c = ctx.removeVar("adhocResultsConsumer");
                     if (c != null) c.close();
                     RoutedProducer<ExecuteCheck, WorkerKey> p = ctx.removeVar("adhocCheckProducer");
@@ -52,6 +53,7 @@ public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAd
                 if (queue == null) queue = context.var("workerQueue", WorkerQueue.open());
                 // open the result consumer
                 context.var("adhocResultsConsumer", queue.consumeAdhocResults(adhocId, (result) -> {
+                    if (logger.isTraceEnabled()) logger.trace("Publishing adhoc result to client: " + result);
                     context.send(new AdhocResultEvent(result));
                 }));
                 // setup the producer while we are here

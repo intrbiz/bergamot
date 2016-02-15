@@ -5,7 +5,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger', 
 	
 	this.after('initialize', function() {
         /* Event handlers */
-        this.on('bergamot-api-adhoc-result', this.onAdhocResult);
+        this.on(document, 'bergamot-api-adhoc-result', this.onAdhocResult);
         /* Setup tabs */
 	    $('#verify').hide();
         $('#source').show();
@@ -50,22 +50,16 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger', 
         var workerPool = $('#worker_pool').val();
         var agentId = $('#agent_id').val();
         // setup our adhoc results queue
-        if (this.adhocId == null)
-        {
-            this.registerForAdhocResults((function(response) {
-                this.adhocId = response.adhoc_id;
-                // execute the check
-                this.executeAdhocCheck(check, { "worker_pool": workerPool, "agent_id": agentId });
-            }).bind(this));
-        }
-        else
-        {
+        $('#test_results').text('');
+        this.registerForAdhocResults((function(response) {
+            this.adhocId = response.adhoc_id;
+            // execute the check
             this.executeAdhocCheck(check, { "worker_pool": workerPool, "agent_id": agentId });
-        }
+        }).bind(this));
     };
     
-    this.onAdhocResult = function(event) {
-        $('#test_results').text(JSON.stringify(event.result));
+    this.onAdhocResult = function(event, /*Object*/ data) {
+        $('#test_results').text(JSON.stringify(data.result, null, "    "));
     };
     
     this.verifyCommand = function() {
