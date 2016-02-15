@@ -18,7 +18,7 @@
             <![CDATA[
 			/* Configure require js */
 			require.config({
-			    baseUrl: #{'"' + public('/js/' + bergamot_js_version() + '/bower_components' + '"'},
+			    baseUrl: #{'"' + public('/js/' + bergamot_js_version() + '/bower_components') + '"'},
 			    waitSeconds: 15,
 			    paths: {
 			    	ace: #{'"' + public('/js/' + bergamot_js_version() + '/bower_components/ace/lib/ace') + '"'}
