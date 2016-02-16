@@ -71,7 +71,8 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger', 
                 $('#verify_success').show();
                 // replace the parameters view
                 var view = $.parseHTML(data.parameters_view);
-                $('#test_command_parameters').replaceWith(view);
+                $('#test_command').find('.test_parameter').remove();
+                $('#test_parameters').after(view);
                 // store our skeleton check
                 this.skeletonCheck = data.skeleton_check;
             }

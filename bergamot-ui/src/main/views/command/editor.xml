@@ -4,13 +4,9 @@
 <fragment xmlns="com.intrbiz.balsa" title="Command Editor">
 
 	<div class="row">
-		<div class="col12">
-			<input type="button" id="show_source" value="Source"/>
-			<input type="button" id="show_verify" value="Verify"/>
-		</div>
 		<div class="col12" id="source">
 			<h3>Create Your Command</h3>
-			<pre id="command" style="width: 95%; min-height: 400px;"><![CDATA[<command name="my_command" engine="" executor="" extends="" security-domains="global">
+			<pre id="command" style="width: 95%; min-height: 350px;"><![CDATA[<command name="my_command" engine="" executor="" extends="" security-domains="global">
     <summary>My Commnad</summary>
     <parameter name="test" description="An example parameter">value</parameter>
     <script></script>
@@ -26,25 +22,22 @@
 				<h3>Verified Command</h3>
 				<p>Your command looks good, would you like to try it out?</p>
 				<form id="test_command">
-					<div id="test_command_parameters">
+					<h4 id="test_parameters">Parameters</h4>
+					<h4 style="padding-top: 20px; clear: both;">Execution Details</h4>
+					<div>
+						<label for="worker_pool">Worker Pool (Optional):</label>
+						<input type="text" id="worker_pool" name="worker_pool"/>
 					</div>
 					<div>
-						<h4>Execution Details</h4>
-						<p>
-							<label for="worker_pool">Worker Pool (Optional):</label>
-							<input type="text" id="worker_pool" name="worker_pool"/>
-						</p>
-						<p>
-							<label for="agent_id">Agent Id (Advanced):</label>
-							<input type="text" id="agent_id" name="agent_id"/>
-						</p>
+						<label for="agent_id">Agent Id (Advanced):</label>
+						<input type="text" id="agent_id" name="agent_id"/>
 					</div>
 					<div>
 						<input type="submit" value="Test Command" name="go_test_command"/>
 					</div>
 				</form>
 				<div style="clear: both;">
-					<h4>Result:</h4>
+					<h4 style="padding-top: 20px;">Result</h4>
 					<pre id="test_results" style="width: 95%; min-height: 400px;"></pre>
 				</div>
 			</div>
@@ -55,6 +48,10 @@
 				</ul>
 			</div>
 		</div>
+	</div>
+	<div class="col12">
+		<input type="button" id="show_source" value="Source"/>
+		<input type="button" id="show_verify" value="Verify"/>
 	</div>
 	<!-- ACE text editor -->
     <script type="text/javascript">

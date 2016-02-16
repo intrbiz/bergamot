@@ -2,14 +2,11 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa">
-	<div  id="test_command_parameters">
-		<h4>Parameters</h4>
-		<data-set var="parameter" value="#{command.parameters}">
-			<p>
-				<label for="parameter_#{parameter.name}">#{parameter.name}</label>
-				<input type="text" id="parameter_#{parameter.name}" name="parameter_#{parameter.name}" value=""/>
-				<span class="info" rendered="#{parameter.description != null}">#{coalesce(parameter.description, '')}</span>
-			</p>
-		</data-set>
-	</div>
+	<data-set var="parameter" value="#{command.parameters}">
+		<div class="test_parameter">
+			<label for="parameter_#{parameter.name}">#{parameter.name}</label>
+			<input type="text" id="parameter_#{parameter.name}" name="parameter_#{parameter.name}" value=""/>
+			<span class="info" rendered="#{parameter.description != null}">#{coalesce(parameter.description, '')}</span>
+		</div>
+	</data-set>
 </fragment>
