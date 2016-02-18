@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
@@ -89,6 +90,7 @@ import com.intrbiz.bergamot.virtual.reference.CheckReference;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataException;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.RoutedProducer;
 
 public class BergamotConfigImporter
@@ -118,6 +120,8 @@ public class BergamotConfigImporter
     private boolean rebuildPermissions = false;
     
     private boolean clearPermissionsCache = false;
+    
+    private Timer importTimer = Witchcraft.get().source("com.intrbiz.config.bergamot").getRegistry().timer(Witchcraft.name(BergamotConfigImporter.class, "import_time"));
     
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
@@ -153,101 +157,109 @@ public class BergamotConfigImporter
     {
         if (this.report == null)
         {
-            this.report = new BergamotImportReport(this.config.getSite());
+            Timer.Context tctx = this.importTimer.time();
             try
             {
-                // update database
-                try (BergamotDB db = BergamotDB.connect())
+                this.report = new BergamotImportReport(this.config.getSite());
+                try
                 {
-                    db.execute(()-> {
-                        // setup the site
-                        this.loadSite(db);
-                        // compute any cascading changes
-                        this.computeCascade(db);
-                        // load any security domains
-                        this.loadSecurityDomains(db);
-                        // templates
-                        this.loadTemplates(db);
-                        // load the commands
-                        this.loadCommands(db);
-                        // time periods
-                        this.loadTimePeriods(db);
-                        // teams
-                        this.loadTeams(db);
-                        // contacts
-                        this.loadContacts(db);
-                        // load the locations
-                        this.loadLocations(db);
-                        // groups
-                        this.loadGroups(db);
-                        // hosts
-                        this.loadHosts(db);
-                        // clusters
-                        this.loadClusters(db);
-                        // link any check to check dependencies
-                        this.linkDependencies(db);
-                        // rebuild computed permissions
-                        if (this.rebuildPermissions)
-                        {
-                            this.report.info("Rebuilding computed permissions");
-                            db.buildPermissions(this.site.getId());
-                        }
-                        if (this.clearPermissionsCache)
-                        {
-                            this.report.info("Clearing permissions cache");
-                            db.invalidatePermissionsCache(this.site.getId());
-                        }
-                    });
-                    // delayed actions
-                    if (this.online)
+                    // update database
+                    try (BergamotDB db = BergamotDB.connect())
                     {
-                        // we must publish any scheduling changes after we have committed the transaction
-                        // publish all scheduling changes
-                        try (SchedulerQueue queue = SchedulerQueue.open())
-                        {
-                            try (RoutedProducer<SchedulerAction, SchedulerKey> producer = queue.publishSchedulerActions())
+                        db.execute(()-> {
+                            // setup the site
+                            this.loadSite(db);
+                            // compute any cascading changes
+                            this.computeCascade(db);
+                            // load any security domains
+                            this.loadSecurityDomains(db);
+                            // templates
+                            this.loadTemplates(db);
+                            // load the commands
+                            this.loadCommands(db);
+                            // time periods
+                            this.loadTimePeriods(db);
+                            // teams
+                            this.loadTeams(db);
+                            // contacts
+                            this.loadContacts(db);
+                            // load the locations
+                            this.loadLocations(db);
+                            // groups
+                            this.loadGroups(db);
+                            // hosts
+                            this.loadHosts(db);
+                            // clusters
+                            this.loadClusters(db);
+                            // link any check to check dependencies
+                            this.linkDependencies(db);
+                            // rebuild computed permissions
+                            if (this.rebuildPermissions)
                             {
-                                for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
+                                this.report.info("Rebuilding computed permissions");
+                                db.buildPermissions(this.site.getId());
+                            }
+                            if (this.clearPermissionsCache)
+                            {
+                                this.report.info("Clearing permissions cache");
+                                db.invalidatePermissionsCache(this.site.getId());
+                            }
+                        });
+                        // delayed actions
+                        if (this.online)
+                        {
+                            // we must publish any scheduling changes after we have committed the transaction
+                            // publish all scheduling changes
+                            try (SchedulerQueue queue = SchedulerQueue.open())
+                            {
+                                try (RoutedProducer<SchedulerAction, SchedulerKey> producer = queue.publishSchedulerActions())
                                 {
-                                    producer.publish(delayedAction.key, delayedAction.action);
+                                    for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
+                                    {
+                                        producer.publish(delayedAction.key, delayedAction.action);
+                                    }
                                 }
                             }
-                        }
-                        // we must publish and contact registration notifications
-                        try (NotificationQueue notificationQueue = NotificationQueue.open())
-                        {
-                            try (RoutedProducer<Notification, NotificationKey> notificationsProducer = notificationQueue.publishNotifications())
+                            // we must publish and contact registration notifications
+                            try (NotificationQueue notificationQueue = NotificationQueue.open())
                             {
-                                for (Contact contact : this.delayedContactRegistrations)
+                                try (RoutedProducer<Notification, NotificationKey> notificationsProducer = notificationQueue.publishNotifications())
                                 {
-                                    try
+                                    for (Contact contact : this.delayedContactRegistrations)
                                     {
-                                        // get the registration url
-                                        String url = this.registrationURLSupplier.apply(contact);
-                                        // send a notification, only via email
-                                        notificationsProducer.publish(
-                                                new NotificationKey(contact.getSite().getId()),
-                                                new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) 
-                                        );
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Logger.getLogger(BergamotConfigImporter.class).error("Failed to send registration notification", e);
-                                        throw e;
+                                        try
+                                        {
+                                            // get the registration url
+                                            String url = this.registrationURLSupplier.apply(contact);
+                                            // send a notification, only via email
+                                            notificationsProducer.publish(
+                                                    new NotificationKey(contact.getSite().getId()),
+                                                    new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) 
+                                            );
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Logger.getLogger(BergamotConfigImporter.class).error("Failed to send registration notification", e);
+                                            throw e;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                catch (Throwable e)
+                {
+                    Logger.getLogger(BergamotConfigImporter.class).error("Failed to import configuration", e);
+                    this.report.error("Configuration change aborted due to unhandled error: " + e.getMessage());
+                    StringWriter sw = new StringWriter();
+                    e.printStackTrace(new PrintWriter(sw));
+                    this.report.error(sw.toString());
+                }
             }
-            catch (Throwable e)
+            finally
             {
-                Logger.getLogger(BergamotConfigImporter.class).error("Failed to import configuration", e);
-                this.report.error("Configuration change aborted due to unhandled error: " + e.getMessage());
-                StringWriter sw = new StringWriter();
-                e.printStackTrace(new PrintWriter(sw));
-                this.report.error(sw.toString());
+                tctx.stop();
             }
         }
         return this.report;
