@@ -266,7 +266,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Config> listAllDependentConfigObjects(@SQLParam("site_id") UUID siteId, @SQLParam(value = "qualified_template_name", virtual = true) String qualifiedTemplateName);
     
-        
+    protected final Timer objectLocatorLookupTimer = Witchcraft.get().source("com.intrbiz.data.bergamot").getRegistry().timer(Witchcraft.name(BergamotDB.class, "bergamot.object_locator.lookup"));
     
     public BergamotObjectLocator getObjectLocator(final UUID siteId)
     {
@@ -276,7 +276,10 @@ public abstract class BergamotDB extends DatabaseAdapter
             @SuppressWarnings("unchecked")
             public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
             {
-                return (T) Util.nullable(BergamotDB.this.getConfigByName(siteId, Configuration.getRootElement(type), name), Config::getConfiguration);
+                try (Timer.Context tctx = objectLocatorLookupTimer.time())
+                {
+                    return (T) Util.nullable(BergamotDB.this.getConfigByName(siteId, Configuration.getRootElement(type), name), Config::getConfiguration);
+                }
             }
         };
     }

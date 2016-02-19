@@ -157,8 +157,7 @@ public class BergamotConfigImporter
     {
         if (this.report == null)
         {
-            Timer.Context tctx = this.importTimer.time();
-            try
+            try (Timer.Context tctx = this.importTimer.time())
             {
                 this.report = new BergamotImportReport(this.config.getSite());
                 try
@@ -256,10 +255,6 @@ public class BergamotConfigImporter
                     e.printStackTrace(new PrintWriter(sw));
                     this.report.error(sw.toString());
                 }
-            }
-            finally
-            {
-                tctx.stop();
             }
         }
         return this.report;
