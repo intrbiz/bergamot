@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Logger;
 
@@ -80,7 +82,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 36, 0}),
+        version = @SQLVersion({3, 37, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -272,13 +274,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new BergamotObjectLocator()
         {
+            private ConcurrentMap<String, TemplatedObjectCfg<?>> localConfigCache = new ConcurrentHashMap<String, TemplatedObjectCfg<?>>();
+            
             @Override
             @SuppressWarnings("unchecked")
             public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
             {
                 try (Timer.Context tctx = objectLocatorLookupTimer.time())
                 {
-                    return (T) Util.nullable(BergamotDB.this.getConfigByName(siteId, Configuration.getRootElement(type), name), Config::getConfiguration);
+                    // try our local cache first
+                    String key = type.getSimpleName() + "::" + name;
+                    T cfg = (T) this.localConfigCache.get(key);                    
+                    if (cfg == null)
+                    {
+                        cfg = (T) Util.nullable(BergamotDB.this.getConfigByName(siteId, Configuration.getRootElement(type), name), Config::getConfiguration);
+                        if (cfg != null) this.localConfigCache.putIfAbsent(key, cfg);
+                    }
+                    return cfg;
                 }
             }
         };
@@ -2836,6 +2848,14 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "    RETURN FOUND;\n" +
                 "END;\n" +
                 "$$"
+        );
+    }
+
+    @SQLPatch(name = "add_config_name_idx", index = 16, type = ScriptType.BOTH, version = @SQLVersion({3, 37, 0}), skip = false)
+    public static SQLScript addConfigNameIndex()
+    {
+        return new SQLScript(
+                "CREATE INDEX config_name_idx ON bergamot.config (site_id ASC NULLS LAST, type ASC NULLS LAST, name ASC NULLS LAST)"
         );
     }
     
