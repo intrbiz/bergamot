@@ -469,6 +469,11 @@
   			<artifactId>bergamot-check-ssh</artifactId>
   			<version>0.0.1-SNAPSHOT</version>
   		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.gerald</groupId>
+  			<artifactId>gerald-witchcraft</artifactId>
+  			<version>1.1.0</version>
+  		</dependency>
   	</dependencies>
   </dependencyManagement>
   

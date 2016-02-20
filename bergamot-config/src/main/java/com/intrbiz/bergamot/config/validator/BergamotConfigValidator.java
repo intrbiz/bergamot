@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.config.validator;
 
 import java.util.List;
 
+import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -19,10 +20,15 @@ import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
+import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 public class BergamotConfigValidator extends BergamotConfigResolver
 {
     private final BergamotCfg cfg;
+    
+    private final Timer validateTimer = Witchcraft.get().source("com.intrbiz.config.bergamot").getRegistry().timer(Witchcraft.name(BergamotConfigValidator.class, "validate"));
+    
+    private final Timer computeInheritenanceTimer = Witchcraft.get().source("com.intrbiz.config.bergamot").getRegistry().timer(Witchcraft.name(BergamotConfigValidator.class, "computeInheritenance"));
     
     public  BergamotConfigValidator(BergamotCfg cfg)
     {
@@ -42,32 +48,38 @@ public class BergamotConfigValidator extends BergamotConfigResolver
      */
     public ValidatedBergamotConfiguration validate()
     {
-        BergamotValidationReport report = new BergamotValidationReport(this.cfg.getSite());
-        // compute the inheritance
-        this.computeInheritenance(report);
-        // validate the objects
-        this.validateGroups(report);
-        this.validateLocations(report);
-        this.validateHosts(report);
-        this.validateClusters(report);
-        this.validateResources(report);
-        this.validateServices(report);
-        this.validateTraps(report);
-        this.validateTeams(report);
-        this.validateContacts(report);
-        this.validateCommands(report);
-        return new ValidatedBergamotConfiguration(this.cfg, report);
+        try (Timer.Context tctx = validateTimer.time())
+        {
+            BergamotValidationReport report = new BergamotValidationReport(this.cfg.getSite());
+            // compute the inheritance
+            this.computeInheritenance(report);
+            // validate the objects
+            this.validateGroups(report);
+            this.validateLocations(report);
+            this.validateHosts(report);
+            this.validateClusters(report);
+            this.validateResources(report);
+            this.validateServices(report);
+            this.validateTraps(report);
+            this.validateTeams(report);
+            this.validateContacts(report);
+            this.validateCommands(report);
+            return new ValidatedBergamotConfiguration(this.cfg, report);
+        }
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private void computeInheritenance(BergamotValidationReport report)
     {
-        // walk the object tree and compute the inheritance graph
-        for (List<? extends TemplatedObjectCfg<?>> objects : this.cfg.getAllObjects())
+        try (Timer.Context tctx = computeInheritenanceTimer.time())
         {
-            for (TemplatedObjectCfg object : objects)
+            // walk the object tree and compute the inheritance graph
+            for (List<? extends TemplatedObjectCfg<?>> objects : this.cfg.getAllObjects())
             {
-                this.computeInheritenance(object, report);
+                for (TemplatedObjectCfg object : objects)
+                {
+                    this.computeInheritenance(object, report);
+                }
             }
         }
     }
