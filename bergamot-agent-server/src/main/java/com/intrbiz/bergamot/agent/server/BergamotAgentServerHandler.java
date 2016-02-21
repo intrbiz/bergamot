@@ -352,7 +352,12 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             // check the serial numbers
             this.agentId = SerialNum.fromBigInt(((X509Certificate) this.agentCertificate).getSerialNumber()).getId();
             this.siteId  = SerialNum.fromBigInt(((X509Certificate) this.siteCertificate).getSerialNumber()).getId();
-            // TODO: validate that the Agent Id is masked by the Site Id
+            // validate that the Agent Id is masked by the Site Id
+            if ((this.agentId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) != (this.siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L))
+            {
+                logger.info("The agent id " + this.agentId + " is not masked by the site id " + this.siteId + ", refusing: " + this.agentCertificateInfo.getSubject().getCommonName());
+                return false;
+            }
             // log
             logger.info("Connection from client: " + this.agentCertificateInfo.getSubject().getCommonName() + " of site " + this.siteCertificateInfo.getSubject().getCommonName());
             return true;
