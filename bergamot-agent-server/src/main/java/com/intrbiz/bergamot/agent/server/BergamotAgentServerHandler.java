@@ -194,7 +194,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         if (this.validateAgentCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()))
         {
             // got a good client certificate, start the WS handshake
-            logger.trace("Handshaking websocket request url: " + req.getUri());
+            if (logger.isTraceEnabled()) logger.trace("Handshaking websocket request url: " + req.getUri());
             WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, false);
             this.handshaker = wsFactory.newHandshaker(req);
             if (this.handshaker == null)
@@ -249,13 +249,13 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         {
             this.hello = (AgentHello) request;
             this.remoteAddress = ctx.channel().remoteAddress();
-            logger.info("Got hello from " + this.remoteAddress + " " + this.agentId + " " + this.agentCertificateInfo.getSubject().getCommonName());
+            if (logger.isInfoEnabled()) logger.info("Got hello from " + this.remoteAddress + " " + this.agentId + " " + this.agentCertificateInfo.getSubject().getCommonName());
             // register ourselves
             this.server.registerAgent(this);
         }
         else if (request instanceof AgentPing)
         {
-            logger.debug("Got ping from agent");
+            if (logger.isTraceEnabled()) logger.trace("Got ping from agent");
             this.server.fireAgentPing(this);
             writeMessage(ctx, new AgentPong((AgentPing) request));
         }
@@ -268,7 +268,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             }
             else
             {
-                logger.debug("Got pong from agent");
+                if (logger.isInfoEnabled()) logger.trace("Got pong from agent");
             }
         }
         else
@@ -334,7 +334,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         // assert that we have a certificate
         if (clientPrincipal == null || clientCertificates == null || clientCertificates.length < 2)
         {
-            logger.debug("Invalid agent certificate chain, not valid!");
+            if (logger.isDebugEnabled()) logger.debug("Invalid agent certificate chain, not valid!");
             return false;
         }
         try
@@ -355,11 +355,11 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             // validate that the Agent Id is masked by the Site Id
             if ((this.agentId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) != (this.siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L))
             {
-                logger.info("The agent id " + this.agentId + " is not masked by the site id " + this.siteId + ", refusing: " + this.agentCertificateInfo.getSubject().getCommonName());
+                logger.warn("The agent id " + this.agentId + " is not masked by the site id " + this.siteId + ", refusing: " + this.agentCertificateInfo.getSubject().getCommonName());
                 return false;
             }
             // log
-            logger.info("Connection from client: " + this.agentCertificateInfo.getSubject().getCommonName() + " of site " + this.siteCertificateInfo.getSubject().getCommonName());
+            if (logger.isInfoEnabled()) logger.info("Connection from client: " + this.agentCertificateInfo.getSubject().getCommonName() + " of site " + this.siteCertificateInfo.getSubject().getCommonName());
             return true;
         }
         catch (Exception e)
