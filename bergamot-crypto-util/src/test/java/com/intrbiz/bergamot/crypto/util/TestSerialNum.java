@@ -50,8 +50,11 @@ public class TestSerialNum
         short rev = 13;
         // create our serial
         SerialNum sn1 = new SerialNum(id, rev);
+        assertThat(sn1.getVersion(), is(equalTo((byte) 0)));
         // encode
         byte[] ba = sn1.toBytes();
+        assertThat(ba, is(notNullValue()));
+        assertThat(ba.length, is(equalTo(18)));
         // decode
         SerialNum sn2 = SerialNum.fromBytes(ba);
         // assert they match
@@ -82,6 +85,22 @@ public class TestSerialNum
         short rev = 16;
         // create our serial
         SerialNum sn1 = new SerialNum(id, rev);
+        // encode
+        BigInteger bi = sn1.toBigInt();
+        // decode
+        SerialNum sn2 = SerialNum.fromBigInt(bi);
+        // assert they match
+        assertThat(sn1, is(equalTo(sn2)));
+        assertThat(bi, is(equalTo(sn2.toBigInt())));
+    }
+    
+    @Test()
+    public void testSerialNumToBigIntV2()
+    {
+        UUID id = UUID.randomUUID();
+        short rev = 16;
+        // create our serial
+        SerialNum sn1 = new SerialNum(id, rev, SerialNum.VERSION_2, 0x0001);
         // encode
         BigInteger bi = sn1.toBigInt();
         // decode
