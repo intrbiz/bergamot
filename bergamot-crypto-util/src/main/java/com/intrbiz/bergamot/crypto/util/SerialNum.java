@@ -21,6 +21,12 @@ public final class SerialNum
     
     public static final byte VERSION_2 = 0x42;
     
+    public static final short MODE_NONE = 0x0000;
+    
+    public static final short MODE_AGENT = 0x0001;
+    
+    public static final short MODE_TEMPLATE = 0x0002;
+    
     private static final byte V2_FORMAT_PREFIX = (byte) 0x5A;
     
     private final UUID id;
@@ -82,6 +88,16 @@ public final class SerialNum
     public short getMode()
     {
         return this.mode;
+    }
+    
+    public boolean isAgent()
+    {
+        return (this.mode & MODE_AGENT) == MODE_AGENT;
+    }
+    
+    public boolean isTemplate()
+    {
+        return (this.mode & MODE_TEMPLATE) == MODE_TEMPLATE;
     }
 
     /**
