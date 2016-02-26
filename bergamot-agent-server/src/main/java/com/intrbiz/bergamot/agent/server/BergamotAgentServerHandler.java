@@ -76,6 +76,10 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     
     private CertInfo siteCertificateInfo;
     
+    private SerialNum agentSerial;
+    
+    private SerialNum siteSerial;
+    
     private UUID agentId;
     
     private UUID siteId;
@@ -350,12 +354,20 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             this.siteCertificate = clientCertificates[1];
             this.siteCertificateInfo = CertInfo.fromCertificate(this.siteCertificate);
             // check the serial numbers
-            this.agentId = SerialNum.fromBigInt(((X509Certificate) this.agentCertificate).getSerialNumber()).getId();
-            this.siteId  = SerialNum.fromBigInt(((X509Certificate) this.siteCertificate).getSerialNumber()).getId();
+            this.agentSerial = SerialNum.fromBigInt(((X509Certificate) this.agentCertificate).getSerialNumber());
+            this.agentId = this.agentSerial.getId();
+            this.siteSerial  = SerialNum.fromBigInt(((X509Certificate) this.siteCertificate).getSerialNumber());
+            this.siteId = this.siteSerial.getId();
             // validate that the Agent Id is masked by the Site Id
             if ((this.agentId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) != (this.siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L))
             {
                 logger.warn("The agent id " + this.agentId + " is not masked by the site id " + this.siteId + ", refusing: " + this.agentCertificateInfo.getSubject().getCommonName());
+                return false;
+            }
+            // assert that the agent serial number is an actual agent
+            if (this.agentSerial.isVersion2() && (! this.agentSerial.isAgent()))
+            {
+                logger.warn("The agent id " + this.agentId + " has the wrong mode");
                 return false;
             }
             // log
