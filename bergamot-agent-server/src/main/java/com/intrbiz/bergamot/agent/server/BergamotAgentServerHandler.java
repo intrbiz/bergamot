@@ -195,7 +195,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             return;
         }
         // validate the certificate
-        if (this.validateAgentCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()))
+        if (this.validateAgentCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()) == AgentVerificationResult.GOOD)
         {
             // got a good client certificate, start the WS handshake
             if (logger.isTraceEnabled()) logger.trace("Handshaking websocket request url: " + req.getUri());
@@ -320,6 +320,8 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         }
     }
     
+    public enum AgentVerificationResult { GOOD, BAD, TEMPLATE }
+    
     /**
      * Validate the agent client auth certificate.
      * 
@@ -333,13 +335,13 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
      * @param clientPrincipal
      * @param clientCertificates
      */
-    private boolean validateAgentCertificate(Principal clientPrincipal, Certificate[] clientCertificates)
+    private AgentVerificationResult validateAgentCertificate(Principal clientPrincipal, Certificate[] clientCertificates)
     {
         // assert that we have a certificate
         if (clientPrincipal == null || clientCertificates == null || clientCertificates.length < 2)
         {
             if (logger.isDebugEnabled()) logger.debug("Invalid agent certificate chain, not valid!");
-            return false;
+            return AgentVerificationResult.BAD;
         }
         try
         {
@@ -362,23 +364,29 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             if ((this.agentId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) != (this.siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L))
             {
                 logger.warn("The agent id " + this.agentId + " is not masked by the site id " + this.siteId + ", refusing: " + this.agentCertificateInfo.getSubject().getCommonName());
-                return false;
+                return AgentVerificationResult.BAD;
+            }
+            // is the presented certificate a template rather than an actual agent
+            if (this.agentSerial.isVersion2() && this.agentSerial.isTemplate())
+            {
+                logger.info("Got agent connection with template id: " + this.agentId);
+                return AgentVerificationResult.TEMPLATE;
             }
             // assert that the agent serial number is an actual agent
             if (this.agentSerial.isVersion2() && (! this.agentSerial.isAgent()))
             {
                 logger.warn("The agent id " + this.agentId + " has the wrong mode");
-                return false;
+                return AgentVerificationResult.BAD;
             }
             // log
             if (logger.isInfoEnabled()) logger.info("Connection from client: " + this.agentCertificateInfo.getSubject().getCommonName() + " of site " + this.siteCertificateInfo.getSubject().getCommonName());
-            return true;
+            return AgentVerificationResult.GOOD;
         }
         catch (Exception e)
         {
             logger.error("Error validating client certificate", e);
         }
-        return false;
+        return AgentVerificationResult.BAD;
     }
 
     @Override
