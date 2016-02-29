@@ -84,6 +84,8 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     
     private UUID siteId;
     
+    private AgentVerificationResult certificateVerification;
+    
     public BergamotAgentServerHandler(BergamotAgentServer server, SSLEngine engine)
     {
         super();
@@ -195,7 +197,10 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             return;
         }
         // validate the certificate
-        if (this.validateAgentCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()) == AgentVerificationResult.GOOD)
+        // allow the WebSocket channel to open even if the certificate presented 
+        // is a template certificate this allows the registration protocol to happen
+        this.certificateVerification = this.validateAgentCertificate(this.engine.getSession().getPeerPrincipal(), this.engine.getSession().getPeerCertificates()); 
+        if (this.certificateVerification == AgentVerificationResult.GOOD || this.certificateVerification == AgentVerificationResult.TEMPLATE)
         {
             // got a good client certificate, start the WS handshake
             if (logger.isTraceEnabled()) logger.trace("Handshaking websocket request url: " + req.getUri());
