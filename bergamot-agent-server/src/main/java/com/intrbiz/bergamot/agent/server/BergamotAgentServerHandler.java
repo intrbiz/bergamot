@@ -4,24 +4,6 @@ import static io.netty.handler.codec.http.HttpHeaders.*;
 import static io.netty.handler.codec.http.HttpHeaders.Names.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
-import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
-import io.netty.util.CharsetUtil;
 
 import java.net.SocketAddress;
 import java.security.Principal;
@@ -44,6 +26,26 @@ import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+import io.netty.util.CharsetUtil;
 
 
 public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Object>
@@ -253,6 +255,37 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     }
     
     private void processMessage(final ChannelHandlerContext ctx, final AgentMessage request) throws Exception
+    {
+        if (this.certificateVerification == AgentVerificationResult.GOOD)
+        {
+            // allow the full agent protocol
+            this.processAgentMessage(ctx, request);
+        }
+        else if (this.certificateVerification == AgentVerificationResult.BAD)
+        {
+            this.processRegistrationMessage(ctx, request);
+        }
+        else
+        {
+            // should never get here
+            throw new IllegalStateException("WebSocket established given a bad certificate, not processing messaged");
+        }
+    }
+    
+    private void processRegistrationMessage(final ChannelHandlerContext ctx, final AgentMessage request) throws Exception
+    {
+        if (request instanceof AgentRegistrationMessage)
+        {
+            // TODO: process the registration request
+        }
+        else
+        {
+            logger.warn("Got message from unregister agent: " + this.remoteAddress);
+            writeMessage(ctx, new GeneralError(request, "Please register before sending messages"));
+        }
+    }
+    
+    private void processAgentMessage(final ChannelHandlerContext ctx, final AgentMessage request) throws Exception
     {
         if (request instanceof AgentHello)
         {
