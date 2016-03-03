@@ -1,5 +1,20 @@
 package com.intrbiz.bergamot.agent;
 
+import java.net.URI;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+
+import org.apache.log4j.Logger;
+
+import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
+import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
+import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
+import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
+import com.intrbiz.bergamot.util.AgentUtil;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -13,20 +28,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
-
-import java.net.URI;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
-
-import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
-import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
-import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
-import com.intrbiz.bergamot.util.AgentUtil;
 
 public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
 {
@@ -64,7 +65,12 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
         return this.hello;
     }
     
-    protected abstract AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request);
+    protected AgentMessage processRegistrationMessage(final ChannelHandlerContext ctx, final AgentMessage request)
+    {
+        return null;
+    }
+    
+    protected abstract AgentMessage processAgentMessage(final ChannelHandlerContext ctx, final AgentMessage request);
 
     @Override
     public void channelActive(ChannelHandlerContext ctx)
@@ -123,8 +129,17 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
                     // process the request
                     if (request instanceof AgentMessage)
                     {
-                        // process the message and respond
-                        AgentMessage response = this.processMessage(ctx, request);
+                        // process the message
+                        AgentMessage response = null;
+                        if (request instanceof AgentRegistrationMessage)
+                        {
+                            this.processRegistrationMessage(ctx, request);
+                        }
+                        else
+                        {
+                            response = this.processAgentMessage(ctx, request);
+                        }
+                        // respond
                         if (response != null)
                         {
                             ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(response)));

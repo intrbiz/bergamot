@@ -262,7 +262,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server)
                 {
                     @Override
-                    protected AgentMessage processMessage(final ChannelHandlerContext ctx, final AgentMessage request)
+                    protected AgentMessage processAgentMessage(final ChannelHandlerContext ctx, final AgentMessage request)
                     {
                         if (request instanceof AgentPing)
                         {

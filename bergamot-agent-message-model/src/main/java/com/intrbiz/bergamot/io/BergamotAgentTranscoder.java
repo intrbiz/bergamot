@@ -38,6 +38,7 @@ import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequired;
 import com.intrbiz.bergamot.model.message.agent.stat.AgentStat;
 import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
@@ -133,7 +134,9 @@ public class BergamotAgentTranscoder
         CheckDiskIO.class,
         DiskIOStat.class,
         DiskIOInfo.class,
-        DiskIORateInfo.class
+        DiskIORateInfo.class,
+        // registration
+        AgentRegistrationRequired.class
     };
     
     private static final BergamotAgentTranscoder US = new BergamotAgentTranscoder();

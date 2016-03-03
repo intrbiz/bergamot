@@ -27,6 +27,7 @@ import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequired;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -280,8 +281,8 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         }
         else
         {
-            logger.warn("Got message from unregister agent: " + this.remoteAddress);
-            writeMessage(ctx, new GeneralError(request, "Please register before sending messages"));
+            // tell the agent it needs to register
+            writeMessage(ctx, new AgentRegistrationRequired(request));
         }
     }
     
