@@ -42,6 +42,12 @@ import com.intrbiz.bergamot.crypto.util.SerialNum;
  *                      /<crt_uuid>.<rev>.key
  *           /<agent_uuid>.crt -> /agent/<crt_uuid>/<crt_uuid>.<rev>.crt
  *           /<agent_uuid>.key -> /agent/<crt_uuid>/<crt_uuid>.<rev>.key
+ *     /template/
+ *           /<crt_uuid>/
+ *                      /<crt_uuid>.<rev>.crt
+ *                      /<crt_uuid>.<rev>.key
+ *           /<template_uuid>.crt -> /template/<crt_uuid>/<crt_uuid>.<rev>.crt
+ *           /<template_uuid>.key -> /template/<crt_uuid>/<crt_uuid>.<rev>.key
  * 
  */
 public class FileKeyStore implements BergamotKeyStore
@@ -58,6 +64,8 @@ public class FileKeyStore implements BergamotKeyStore
     
     private final File agent;
     
+    private final File template;
+    
     public FileKeyStore(File base)
     {
         this.base   = base;
@@ -65,12 +73,14 @@ public class FileKeyStore implements BergamotKeyStore
         this.site   = new File(this.base, "site");
         this.server = new File(this.base, "server");
         this.agent  = new File(this.base, "agent");
+        this.template  = new File(this.base, "template");
         // ensure dirs exists
         if (! this.base.exists())   this.base.mkdirs();
         if (! this.root.exists())   this.root.mkdirs();
         if (! this.site.exists())   this.site.mkdirs();
         if (! this.server.exists()) this.server.mkdirs();
         if (! this.agent.exists())  this.agent.mkdirs();
+        if (! this.template.exists())  this.template.mkdirs();
     }
     
     /**
@@ -456,6 +466,100 @@ public class FileKeyStore implements BergamotKeyStore
             catch (Exception e)
             {
                 throw new RuntimeException("Failed to store server certificate: " + commonName, e);
+            }
+        }
+    }
+    
+    private File templateCrtFile(UUID siteId, UUID templateId)
+    {
+        return new File(new File(this.template, siteId.toString()), templateId + ".crt");
+    }
+    
+    private File templateCrtFile(UUID siteId, SerialNum templateSerial)
+    {
+        return new File(new File(new File(this.template, siteId.toString()), templateSerial.getId().toString()), templateSerial.getId() + "." + templateSerial.getRev() + ".crt");
+    }
+    
+    private File templateKeyFile(UUID siteId, UUID templateId)
+    {
+        return new File(new File(this.template, siteId.toString()), templateId + ".key");
+    }
+    
+    private File templateKeyFile(UUID siteId, SerialNum templateSerial)
+    {
+        return new File(new File(new File(this.template, siteId.toString()), templateSerial.getId().toString()), templateSerial.getId() + "." + templateSerial.getRev() + ".key");
+    }
+    
+    @Override
+    public boolean hasTemplate(UUID siteId, UUID templateId)
+    {
+        return this.templateCrtFile(siteId, templateId).exists();
+    }
+
+    @Override
+    public CertificatePair loadTemplate(UUID siteId, UUID templateId)
+    {
+        try
+        {
+            if (this.templateKeyFile(siteId, templateId).exists())
+            {
+                return new CertificatePair(this.templateCrtFile(siteId, templateId), this.templateKeyFile(siteId, templateId));
+            }
+            else
+            {
+                return new CertificatePair(this.templateCrtFile(siteId, templateId));
+            }
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to load certificate for template: " + siteId + "::" + templateId, e);
+        }
+    }
+
+    @Override
+    public void storeTemplate(UUID siteId, UUID templateId, CertificatePair pair)
+    {
+        synchronized (this)
+        {
+            try
+            {
+                SerialNum serial = SerialNum.fromBigInt(pair.getCertificate().getSerialNumber());
+                // store the certificate under the serial number
+                File crtFile = this.templateCrtFile(siteId, serial);
+                crtFile.getParentFile().mkdirs();
+                pair.saveCertificate(crtFile);
+                // link the certificate to the template
+                Path crtLink = this.templateCrtFile(siteId, templateId).toPath();
+                try
+                {
+                    Files.delete(crtLink);
+                }
+                catch (NoSuchFileException e)
+                {
+                }
+                Files.createSymbolicLink(crtLink, crtFile.toPath());
+                // key?
+                if (pair.getKey() != null)
+                {
+                    // store the key under the serial number
+                    File keyFile = this.templateKeyFile(siteId, serial);
+                    keyFile.getParentFile().mkdirs();
+                    pair.saveKey(keyFile);
+                    // link the key to the template
+                    Path keyLink = this.templateKeyFile(siteId, templateId).toPath();
+                    try
+                    {
+                        Files.delete(keyLink);
+                    }
+                    catch (NoSuchFileException e)
+                    {
+                    }
+                    Files.createSymbolicLink(keyLink, keyFile.toPath());
+                }
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Failed to store certificate for template: " + siteId + "::" + templateId, e);
             }
         }
     }

@@ -61,6 +61,21 @@ public interface BergamotKeyStore
     void storeAgent(UUID siteId, UUID agentId, CertificatePair pair);
     
     /**
+     * Do we have an template stored for the given site and id
+     */
+    boolean hasTemplate(UUID siteId, UUID templateId);
+    
+    /**
+     * Load the template certificate, private key is optional
+     */
+    CertificatePair loadTemplate(UUID siteId, UUID templateId);
+    
+    /**
+     * Store the given template certificate, private key is optional
+     */
+    void storeTemplate(UUID siteId, UUID templateId, CertificatePair pair);
+    
+    /**
      * Do we have a server stored for the given site and name
      */
     boolean hasServer(String commonName);
