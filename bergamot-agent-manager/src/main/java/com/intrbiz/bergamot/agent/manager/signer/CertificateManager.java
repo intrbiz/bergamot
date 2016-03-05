@@ -112,9 +112,10 @@ public class CertificateManager
             // sign the agent cert
             try
             {
-                logger.info("Signing Agent: " + siteId + "::" + agentId + " " + this.buildDN(commonName));
+                String dn = this.buildDN(commonName);
+                logger.info("Signing Agent: " + siteId + "::" + agentId + " " + dn);
                 // sign the agent
-                CertificatePair agent = RSAUtil.generateCertificate(this.buildDN(commonName), currentSerial.revision(), 365 * 5, 2048, KeyType.CLIENT, key, site);
+                CertificatePair agent = RSAUtil.generateCertificate(dn, currentSerial.revision(), 365 * 5, 2048, KeyType.CLIENT, key, site);
                 // store
                 this.keyStore.storeAgent(siteId, agentId, agent);
                 // return the cert
@@ -132,11 +133,63 @@ public class CertificateManager
             // sign the agent cert
             try
             {
-                logger.info("Signing Agent: " + siteId + "::" + agentId + " " + this.buildDN(commonName));
+                String dn = this.buildDN(commonName);
+                logger.info("Signing Agent: " + siteId + "::" + agentId + " " + dn);
                 // sign the agent
-                CertificatePair agent = RSAUtil.generateCertificate(this.buildDN(commonName), new SerialNum(agentId, 1), 365 * 5, 2048, KeyType.CLIENT, key, site);
+                CertificatePair agent = RSAUtil.generateCertificate(dn, SerialNum.version2(agentId, 1, SerialNum.MODE_AGENT), 365 * 5, 2048, KeyType.CLIENT, key, site);
                 // store
                 this.keyStore.storeAgent(siteId, agentId, agent);
+                // return the cert
+                return agent.getCertificate();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Failed to sign agent", e);
+            }
+        }
+    }
+    
+    public Certificate signTemplate(UUID siteId, UUID templateId, String templateName, PublicKey key)
+    {
+        if (! this.keyStore.hasSiteCA(siteId)) throw new RuntimeException("No certificate exists for site: " + siteId);
+        // do we already have a agent cert
+        if (this.keyStore.hasTemplate(siteId, templateId))
+        {
+            // load the current cert to get the serial number to revision
+            CertificatePair currentCrt = this.keyStore.loadTemplate(siteId, templateId);
+            SerialNum currentSerial = SerialNum.fromBigInt(currentCrt.getCertificate().getSerialNumber());
+            // we need the CA to sign
+            CertificatePair site = this.keyStore.loadSiteCA(siteId);
+            // sign the agent cert
+            try
+            {
+                String dn = this.buildDN("Template: " + templateName);
+                logger.info("Signing Template: " + siteId + "::" + templateId + " " + dn);
+                // sign the agent
+                CertificatePair agent = RSAUtil.generateCertificate(dn, currentSerial.revision(), 365 * 5, 2048, KeyType.CLIENT, key, site);
+                // store
+                this.keyStore.storeTemplate(siteId, templateId, agent);
+                // return the cert
+                return agent.getCertificate();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException("Failed to sign template", e);
+            }
+        }
+        else
+        {
+            // first we need the root CA
+            CertificatePair site = this.keyStore.loadSiteCA(siteId);
+            // sign the agent cert
+            try
+            {
+                String dn = this.buildDN("Template: " + templateName);
+                logger.info("Signing Template: " + siteId + "::" + templateId + " " + dn);
+                // sign the agent
+                CertificatePair agent = RSAUtil.generateCertificate(dn, SerialNum.version2(templateId, 1, SerialNum.MODE_TEMPLATE), 365 * 5, 2048, KeyType.CLIENT, key, site);
+                // store
+                this.keyStore.storeTemplate(siteId, templateId, agent);
                 // return the cert
                 return agent.getCertificate();
             }
