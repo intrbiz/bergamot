@@ -50,6 +50,7 @@ import com.intrbiz.bergamot.model.message.agent.manager.request.GetServer;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.request.SignAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.request.SignServer;
+import com.intrbiz.bergamot.model.message.agent.manager.request.SignTemplate;
 import com.intrbiz.bergamot.model.message.agent.manager.response.AgentManagerError;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotAgent;
@@ -58,6 +59,7 @@ import com.intrbiz.bergamot.model.message.agent.manager.response.GotServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
+import com.intrbiz.bergamot.model.message.agent.manager.response.SignedTemplate;
 import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 import com.intrbiz.bergamot.model.message.api.call.VerifiedCommand;
 import com.intrbiz.bergamot.model.message.api.check.ExecuteAdhocCheck;
@@ -234,6 +236,8 @@ public class BergamotTranscoder
         SignServer.class,
         SignedServer.class,
         AgentManagerError.class,
+        SignTemplate.class,
+        SignedTemplate.class,
         // cluster manager
         ClusterManagerError.class,
         InitSite.class,
