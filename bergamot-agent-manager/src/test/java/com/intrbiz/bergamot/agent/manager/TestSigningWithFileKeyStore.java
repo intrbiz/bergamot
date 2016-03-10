@@ -185,7 +185,7 @@ public class TestSigningWithFileKeyStore
     {
         // generate RSA keypair
         KeyPair agentKeyPair = RSAUtil.generateRSAKeyPair(2048);
-        SerialNum expectedSerial = new SerialNum(AGENT_ID, 1);
+        SerialNum expectedSerial = SerialNum.version2(AGENT_ID, 1, SerialNum.MODE_AGENT);
         // sign
         this.certManager.signAgent(SITE_ID, AGENT_ID, AGENT_NAME, agentKeyPair.getPublic());
         assertThat(this.keyStore.hasAgent(SITE_ID, AGENT_ID), is(equalTo(true)));
