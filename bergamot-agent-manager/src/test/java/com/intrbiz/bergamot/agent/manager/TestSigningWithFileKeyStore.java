@@ -36,6 +36,10 @@ public class TestSigningWithFileKeyStore
     
     public static final String AGENT_NAME = "agent.site.bergamot.unit.test";
     
+public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-bfbe4a3cbdda");
+    
+    public static final String TEMPLATE_NAME = "dummy_host_template";
+    
     private static File base;
     
     private FileKeyStore keyStore;
@@ -233,8 +237,35 @@ public class TestSigningWithFileKeyStore
     }
     
     @Test
-    public void test08Check()
+    public void test08GenerateTemplate()
+    {
+        // generate RSA keypair
+        KeyPair agentKeyPair = RSAUtil.generateRSAKeyPair(2048);
+        SerialNum expectedSerial = SerialNum.version2(TEMPLATE_ID, 1, SerialNum.MODE_TEMPLATE);
+        // sign
+        this.certManager.signTemplate(SITE_ID, TEMPLATE_ID, TEMPLATE_NAME, agentKeyPair.getPublic());
+        assertThat(this.keyStore.hasTemplate(SITE_ID, TEMPLATE_ID), is(equalTo(true)));
+        // do the files exist
+        assertThat(Files.isSymbolicLink(new File(new File(new File(base, "template"), SITE_ID.toString()), TEMPLATE_ID + ".crt").toPath()), is(equalTo(true)));
+        assertThat(new File(new File(new File(base, "template"), SITE_ID.toString()), expectedSerial.getId().toString()).isDirectory(), is(equalTo(true)));
+        assertThat(new File(new File(new File(new File(base, "template"), SITE_ID.toString()), expectedSerial.getId().toString()), expectedSerial.getId() + "." + expectedSerial.getRev() + ".crt").exists(), is(equalTo(true)));
+        // load the cert
+        CertificatePair agentCrt = this.keyStore.loadTemplate(SITE_ID, TEMPLATE_ID);
+        assertThat(agentCrt, is(notNullValue()));
+        assertThat(agentCrt.getCertificate(), is(notNullValue()));
+        assertThat(agentCrt.getKey(), is(nullValue()));
+        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=Template: dummy_host_template")));
+        assertThat(agentCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB,ST=Somewhere,L=Sometown,O=Somecompany,OU=Bergamot Monitoring,CN=bergamot.unit.test Site CA")));
+        assertThat(agentCrt.getCertificate().getPublicKey(), is(equalTo(agentKeyPair.getPublic())));
+        assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
+        assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()).getId(), is(equalTo(TEMPLATE_ID)));
+    }
+    
+    @Test
+    public void test09heck()
     {
         this.keyStore.check();
     }
+    
+    
 }
