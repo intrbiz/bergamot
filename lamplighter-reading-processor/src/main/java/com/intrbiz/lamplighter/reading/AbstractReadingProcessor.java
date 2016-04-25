@@ -72,12 +72,12 @@ public abstract class AbstractReadingProcessor implements ReadingProcessor
         for (int i = 0; i < this.getThreads(); i++)
         {
             // consume results, currently for all sites
-            this.readingConsumers.add(this.workerQueue.consumeReadings((r) -> {
+            this.readingConsumers.add(this.workerQueue.consumeReadings((h, r) -> {
                 logger.trace("Processing pooled/site readings");
                 processReadings(r);
             }, this.instanceId.toString()));
             // consume results, currently for all sites
-            this.fallbackConsumers.add(this.workerQueue.consumeFallbackReadings((r) -> {
+            this.fallbackConsumers.add(this.workerQueue.consumeFallbackReadings((h, r) -> {
                 logger.debug("Processing fallback readings");
                 processReadings(r);
             }));

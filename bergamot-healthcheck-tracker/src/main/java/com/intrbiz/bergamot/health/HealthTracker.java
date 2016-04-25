@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.health;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -173,7 +174,7 @@ public class HealthTracker
         this.healthcheckConsumer = this.queue.consumeHealthCheckEvents(this::handleMessage);
     }
     
-    private void handleMessage(HealthCheckMessage message)
+    private void handleMessage(Map<String, Object> headers, HealthCheckMessage message)
     {
         if (message instanceof HealthCheckHeartbeat)
         {

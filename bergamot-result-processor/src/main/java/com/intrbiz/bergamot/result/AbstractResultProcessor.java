@@ -126,21 +126,21 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         for (int i = 0; i < this.getThreads(); i++)
         {
             // consume results, currently for all sites
-            this.resultConsumers.add(this.workerQueue.consumeResults((r) -> {
+            this.resultConsumers.add(this.workerQueue.consumeResults((h, r) -> {
                 if (logger.isTraceEnabled()) logger.trace("Processing pooled/site result: " + r);
                 processExecuted(r);
             }, this.instanceId.toString()));
             // consume results, currently for all sites
-            this.fallbackConsumers.add(this.workerQueue.consumeFallbackResults((r) -> {
+            this.fallbackConsumers.add(this.workerQueue.consumeFallbackResults((h, r) -> {
                 if (logger.isDebugEnabled()) logger.debug("Processing fallback result: " + r);
                 processExecuted(r);
             }));
             // consume dead checks, currently for all sites
-            this.deadConsumers.add(this.workerQueue.consumeDeadChecks((e) -> {
+            this.deadConsumers.add(this.workerQueue.consumeDeadChecks((h, e) -> {
                 processDead(e);
             }));
             // consume dead agent checks, currently for all sites
-            this.deadAgentConsumers.add(this.workerQueue.consumeDeadAgentChecks((e) -> {
+            this.deadAgentConsumers.add(this.workerQueue.consumeDeadAgentChecks((h, e) -> {
                 processDeadAgent(e);
             }));
         }

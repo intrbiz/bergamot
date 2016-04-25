@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.cluster.controller;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -45,7 +46,7 @@ public class BergamotController implements DeliveryHandler<ControlEvent>
     }
 
     @Override
-    public void handleDevliery(ControlEvent event) throws IOException
+    public void handleDevliery(Map<String, Object> headers, ControlEvent event) throws IOException
     {
         if (event instanceof RegisterWatcher)
         {

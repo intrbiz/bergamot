@@ -93,7 +93,7 @@ public abstract class AbstractNotifier implements Notifier
         for (int i = 0; i < this.configuration.getThreads(); i++)
         {
             logger.info("Creating consumer " + i);
-            this.consumers.add(this.queue.consumeNotifications(this::sendNotification, this.getSite(), this.getNotifierName()));
+            this.consumers.add(this.queue.consumeNotifications((h, n) -> this.sendNotification(n), this.getSite(), this.getNotifierName()));
         }
     }
 

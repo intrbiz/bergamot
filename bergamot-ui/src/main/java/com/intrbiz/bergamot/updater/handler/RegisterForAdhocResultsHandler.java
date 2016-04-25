@@ -52,7 +52,7 @@ public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAd
                 WorkerQueue queue = context.var("workerQueue");
                 if (queue == null) queue = context.var("workerQueue", WorkerQueue.open());
                 // open the result consumer
-                context.var("adhocResultsConsumer", queue.consumeAdhocResults(adhocId, (result) -> {
+                context.var("adhocResultsConsumer", queue.consumeAdhocResults(adhocId, (headers, result) -> {
                     if (logger.isTraceEnabled()) logger.trace("Publishing adhoc result to client: " + result);
                     context.send(new AdhocResultEvent(result));
                 }));

@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.health;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -180,7 +181,7 @@ public final class HealthAgent
         this.healthcheckProducer.publish(new HealthCheckHeartbeat(this.instanceId, System.currentTimeMillis(), this.nextHeartbeatSequence()));
     }
     
-    private void handleHealthCheckMessage(HealthCheckMessage message)
+    private void handleHealthCheckMessage(Map<String, Object> headers, HealthCheckMessage message)
     {
         if (message instanceof HealthCheckRequestJoin)
         {

@@ -43,7 +43,7 @@ public abstract class AbstractScheduler implements Scheduler
         this.executeCheckProducer = this.workerQueue.publishChecks();
         this.schedulerQueue = SchedulerQueue.open();
         // TODO scheduler names
-        this.schedulerActionConsumer = this.schedulerQueue.consumeSchedulerActions((a) -> { executeAction(a); });
+        this.schedulerActionConsumer = this.schedulerQueue.consumeSchedulerActions((h, a) -> { executeAction(a); });
     }
     
     public void start() throws Exception

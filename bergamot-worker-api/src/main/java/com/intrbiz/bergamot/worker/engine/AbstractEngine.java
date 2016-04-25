@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -210,7 +211,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     }
 
     @Override
-    public void handleDevliery(ExecuteCheck event) throws IOException
+    public void handleDevliery(Map<String, Object> headers, ExecuteCheck event) throws IOException
     {
         if (logger.isTraceEnabled())
             logger.trace("Got task: " + event);
