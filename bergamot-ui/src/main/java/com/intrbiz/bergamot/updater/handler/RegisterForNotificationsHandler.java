@@ -38,7 +38,7 @@ public class RegisterForNotificationsHandler extends RequestHandler<RegisterForN
             try
             {
                 NotificationQueue notificationQueue = context.var("notificationQueue", NotificationQueue.open());
-                context.var("notificationConsumer", notificationQueue.consumeNotifications((n) -> { this.sendNotification(context, n); }, request.getSiteId()));
+                context.var("notificationConsumer", notificationQueue.consumeNotifications((h, n) -> { this.sendNotification(context, n); }, request.getSiteId()));
                 // on close
                 context.onClose((ctx) -> {
                     Consumer<Notification, NotificationKey> c = ctx.var("notificationConsumer");

@@ -47,7 +47,7 @@ public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates
                 logger.debug("Reigster for updates: " + bindings);
                 // setup the queue
                 UpdateQueue queue = context.var("updateQueue", UpdateQueue.open());
-                context.var("updateConsumer", queue.consumeUpdates((u) -> { this.sendUpdate(context, u); }, bindings));
+                context.var("updateConsumer", queue.consumeUpdates((h, u) -> { this.sendUpdate(context, u); }, bindings));
                 // on close handler
                 context.onClose((ctx) -> {
                     Consumer<Update, UpdateKey> c = ctx.var("updateConsumer");
