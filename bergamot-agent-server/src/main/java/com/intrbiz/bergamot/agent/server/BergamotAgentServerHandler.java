@@ -26,7 +26,11 @@ import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationComplete;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed.ErrorCode;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequest;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequired;
 
 import io.netty.buffer.ByteBuf;
@@ -262,7 +266,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             // allow the full agent protocol
             this.processAgentMessage(ctx, request);
         }
-        else if (this.certificateVerification == AgentVerificationResult.BAD)
+        else if (this.certificateVerification == AgentVerificationResult.TEMPLATE)
         {
             this.processRegistrationMessage(ctx, request);
         }
@@ -277,7 +281,20 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     {
         if (request instanceof AgentRegistrationMessage)
         {
-            // TODO: process the registration request
+            if (request instanceof AgentRegistrationRequest)
+            {
+                // start the registration process
+                String certificate = this.server.requestAgentRegistration(this.agentSerial.getId(), ((AgentRegistrationRequest) request).getCertificateRequest());
+                if (certificate != null)
+                {
+                    writeMessage(ctx, new AgentRegistrationComplete(request, certificate));
+                }
+                else
+                {
+                    // not supported
+                    writeMessage(ctx, new AgentRegistrationFailed(request, ErrorCode.NOT_AVAILABLE, null));
+                }
+            }
         }
         else
         {

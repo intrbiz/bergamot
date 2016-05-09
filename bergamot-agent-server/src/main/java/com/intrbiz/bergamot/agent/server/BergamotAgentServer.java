@@ -1,19 +1,5 @@
 package com.intrbiz.bergamot.agent.server;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-
 import java.io.FileReader;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -21,6 +7,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -50,6 +37,20 @@ import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.configuration.Configurable;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
+
 public class BergamotAgentServer implements Runnable, Configurable<BergamotAgentServerCfg>
 {
     private Logger logger = Logger.getLogger(BergamotAgentServer.class);
@@ -67,6 +68,8 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     private Consumer<BergamotAgentServerHandler> onAgentUnregister = null;
     
     private Consumer<BergamotAgentServerHandler> onAgentPing;
+    
+    private BiFunction<UUID, String, String> onRequestAgentRegistration;
     
     private SSLContext sslContext;
     
@@ -134,6 +137,14 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         {
             throw new RuntimeException("Failed to init SSLEngine", e);
         }
+    }
+    
+    public String requestAgentRegistration(UUID templateId, String csr)
+    {
+        logger.info("Starting registration process of agent under template: " + templateId + " with CSR:\n" + csr);
+        if (this.onRequestAgentRegistration != null)
+            return this.onRequestAgentRegistration.apply(templateId, csr);
+        return null;
     }
     
     public void registerAgent(BergamotAgentServerHandler agent)
@@ -212,6 +223,16 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     public Consumer<BergamotAgentServerHandler> getOnAgentPing()
     {
         return this.onAgentPing;
+    }
+
+    public BiFunction<UUID, String, String> getOnRequestAgentRegistration()
+    {
+        return onRequestAgentRegistration;
+    }
+
+    public void setOnRequestAgentRegistration(BiFunction<UUID, String, String> onRequestAgentRegistration)
+    {
+        this.onRequestAgentRegistration = onRequestAgentRegistration;
     }
 
     public void run()
