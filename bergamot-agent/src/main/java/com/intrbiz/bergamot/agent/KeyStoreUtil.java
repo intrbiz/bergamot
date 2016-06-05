@@ -4,16 +4,19 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
@@ -212,4 +215,71 @@ public class KeyStoreUtil
             pr.close();
         }
     }
+    
+    public static String savePublicKey(PublicKey key)
+    {
+        try
+        {
+            StringWriter sw = new StringWriter();
+            PEMWriter pw = new PEMWriter(sw);
+            try
+            {
+                pw.writeObject(key);
+                return sw.toString();
+            }
+            finally
+            {
+                pw.close();
+            }
+        }
+        catch (IOException e)
+        {
+        }
+        return null;
+    }
+    
+    public static String saveKey(PrivateKey key)
+    {
+        try
+        {
+            StringWriter sw = new StringWriter();
+            PEMWriter pw = new PEMWriter(sw);
+            try
+            {
+                pw.writeObject(key);
+                return sw.toString();
+            }
+            finally
+            {
+                pw.close();
+            }
+        }
+        catch (IOException e)
+        {
+        }
+        return null;
+    }
+    
+    public static String saveCertificate(Certificate cert)
+    {
+        try
+        {
+            StringWriter sw = new StringWriter();
+            PEMWriter pw = new PEMWriter(sw);
+            try
+            {
+                pw.writeObject(cert);
+                return sw.toString();
+            }
+            finally
+            {
+                pw.close();
+            }
+        }
+        catch (IOException e)
+        {
+        }
+        return null;
+    }
+    
 }
