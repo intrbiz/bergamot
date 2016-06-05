@@ -31,6 +31,8 @@ import com.intrbiz.bergamot.cluster.migration.DeregisterPoolTask;
 import com.intrbiz.bergamot.cluster.migration.RegisterPoolTask;
 import com.intrbiz.bergamot.cluster.model.ProcessingPool;
 import com.intrbiz.bergamot.cluster.util.OwnerPredicate;
+import com.intrbiz.bergamot.command.CommandProcessor;
+import com.intrbiz.bergamot.command.DefaultCommandProcessor;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
@@ -117,6 +119,11 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
     private ReadingProcessor readingProcessor;
     
     /**
+     * Our command processor
+     */
+    private CommandProcessor commandProcessor;
+    
+    /**
      * Our controller
      */
     private BergamotController controller;
@@ -137,6 +144,7 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
         this.scheduler = new WheelScheduler();
         this.resultProcessor = new DefaultResultProcessor();
         this.readingProcessor = new DefaultReadingProcessor();
+        this.commandProcessor = new DefaultCommandProcessor();
         this.controller = new BergamotController();
         this.queue = BergamotClusterManagerQueue.open();
         this.server = this.queue.createBergamotClusterManagerRPCServer(this);
@@ -155,6 +163,11 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
     public ReadingProcessor getReadingProcessor()
     {
         return readingProcessor;
+    }
+    
+    public CommandProcessor getCommandProcessor()
+    {
+        return this.commandProcessor;
     }
 
     public String getLocalMemberUUID()
@@ -249,6 +262,8 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
                     }
                 });
                 // start our scheduler and result processor
+                logger.info("Starting command processor");
+                this.commandProcessor.start();
                 logger.info("Starting result processor");
                 this.resultProcessor.start();
                 logger.info("Starting reading processor");

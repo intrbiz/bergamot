@@ -118,6 +118,7 @@
     <module>bergamot-worker-jmx</module>
     <module>bergamot-worker-ssh</module>
     <module>bergamot-check-ssh</module>
+    <module>bergamot-command-processor</module>
   </modules>
   
   <dependencyManagement>
@@ -467,12 +468,17 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-check-ssh</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<version>${project.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.gerald</groupId>
   			<artifactId>gerald-witchcraft</artifactId>
   			<version>1.1.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-command-processor</artifactId>
+  			<version>${project.version}</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>

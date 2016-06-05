@@ -88,6 +88,10 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-accounting-consumer</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-command-processor</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>
