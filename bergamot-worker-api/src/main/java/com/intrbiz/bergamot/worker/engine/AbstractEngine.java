@@ -12,9 +12,12 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.command.CommandRequest;
+import com.intrbiz.bergamot.model.message.command.CommandResponse;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.queue.BergamotCommandQueue;
 import com.intrbiz.bergamot.queue.WorkerQueue;
 import com.intrbiz.bergamot.queue.key.ActiveResultKey;
 import com.intrbiz.bergamot.queue.key.AgentBinding;
@@ -25,7 +28,9 @@ import com.intrbiz.bergamot.worker.Worker;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.QueueException;
+import com.intrbiz.queue.RPCClient;
 import com.intrbiz.queue.RoutedProducer;
+import com.intrbiz.queue.name.RoutingKey;
 
 public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
 {
@@ -46,6 +51,10 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     protected RoutedProducer<ResultMO, ResultKey> resultProducer;
     
     protected RoutedProducer<ReadingParcelMO, ReadingKey> readingProducer;
+    
+    private BergamotCommandQueue commandQueue;
+    
+    private RPCClient<CommandRequest, CommandResponse, RoutingKey> commandRPCClient;
 
     public AbstractEngine(final String name)
     {
@@ -153,6 +162,10 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     @Override
     public void start() throws Exception
     {
+        // open the command queue
+        this.commandQueue = BergamotCommandQueue.open();
+        // create an RPC client
+        this.commandRPCClient = this.commandQueue.createBergamotCommandRPCClient();
         // open the queue
         this.queue = WorkerQueue.open();
         // the result producer
@@ -216,5 +229,10 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
         if (logger.isTraceEnabled())
             logger.trace("Got task: " + event);
         this.execute(event);
+    }
+    
+    public RPCClient<CommandRequest, CommandResponse, RoutingKey> getCommandRPCClient()
+    {
+        return this.commandRPCClient;
     }
 }
