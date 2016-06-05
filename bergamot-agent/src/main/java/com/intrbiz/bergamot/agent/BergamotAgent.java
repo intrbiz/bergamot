@@ -1,22 +1,5 @@
 package com.intrbiz.bergamot.agent;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-import io.netty.util.concurrent.GenericFutureListener;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,6 +29,7 @@ import org.hyperic.sigar.SigarException;
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.config.Configurable;
 import com.intrbiz.bergamot.agent.handler.AgentInfoHandler;
+import com.intrbiz.bergamot.agent.handler.AgentRegistrationHandler;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskIOHandler;
@@ -63,6 +47,23 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
+import io.netty.util.concurrent.GenericFutureListener;
 
 /**
  */
@@ -110,6 +111,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         }, 30000L, 30000L);
         // handlers
         this.setDefaultHandler(new DefaultHandler());
+        this.registerHandler(new AgentRegistrationHandler());
         this.registerHandler(new CPUInfoHandler());
         this.registerHandler(new MemInfoHandler());
         this.registerHandler(new DiskInfoHandler());
