@@ -34,6 +34,8 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
+import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequest;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.configuration.Configurable;
 
@@ -69,7 +71,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     
     private Consumer<BergamotAgentServerHandler> onAgentPing;
     
-    private BiFunction<UUID, String, String> onRequestAgentRegistration;
+    private BiFunction<UUID, AgentRegistrationRequest, AgentRegistrationMessage> onRequestAgentRegistration;
     
     private SSLContext sslContext;
     
@@ -139,11 +141,11 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         }
     }
     
-    public String requestAgentRegistration(UUID templateId, String csr)
+    public AgentRegistrationMessage requestAgentRegistration(UUID templateId, AgentRegistrationRequest request)
     {
-        logger.info("Starting registration process of agent under template: " + templateId + " with CSR:\n" + csr);
+        logger.info("Starting registration process of agent under template: " + templateId + " with request:\n" + request);
         if (this.onRequestAgentRegistration != null)
-            return this.onRequestAgentRegistration.apply(templateId, csr);
+            return this.onRequestAgentRegistration.apply(templateId, request);
         return null;
     }
     
@@ -225,12 +227,12 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         return this.onAgentPing;
     }
 
-    public BiFunction<UUID, String, String> getOnRequestAgentRegistration()
+    public BiFunction<UUID, AgentRegistrationRequest, AgentRegistrationMessage> getOnRequestAgentRegistration()
     {
         return onRequestAgentRegistration;
     }
 
-    public void setOnRequestAgentRegistration(BiFunction<UUID, String, String> onRequestAgentRegistration)
+    public void setOnRequestAgentRegistration(BiFunction<UUID, AgentRegistrationRequest, AgentRegistrationMessage> onRequestAgentRegistration)
     {
         this.onRequestAgentRegistration = onRequestAgentRegistration;
     }

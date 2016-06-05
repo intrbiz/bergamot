@@ -26,7 +26,6 @@ import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
-import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationComplete;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed.ErrorCode;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
@@ -284,10 +283,10 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             if (request instanceof AgentRegistrationRequest)
             {
                 // start the registration process
-                String certificate = this.server.requestAgentRegistration(this.agentSerial.getId(), ((AgentRegistrationRequest) request).getCertificateRequest());
-                if (certificate != null)
+                AgentRegistrationMessage response = this.server.requestAgentRegistration(this.agentSerial.getId(), (AgentRegistrationRequest) request);
+                if (response != null)
                 {
-                    writeMessage(ctx, new AgentRegistrationComplete(request, certificate));
+                    writeMessage(ctx, response);
                 }
                 else
                 {
