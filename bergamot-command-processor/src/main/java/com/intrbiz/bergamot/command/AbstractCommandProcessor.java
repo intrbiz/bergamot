@@ -22,7 +22,7 @@ public abstract class AbstractCommandProcessor implements CommandProcessor
     
     private List<RPCServer<CommandRequest, CommandResponse>> commandServers;
     
-    private ConcurrentMap<Class<? extends CommandRequest>, BergamotCommandHandler> handlers = new ConcurrentHashMap<Class<? extends CommandRequest>, BergamotCommandHandler>();
+    private ConcurrentMap<Class<? extends CommandRequest>, BergamotCommandHandler<?>> handlers = new ConcurrentHashMap<Class<? extends CommandRequest>, BergamotCommandHandler<?>>();
     
     public AbstractCommandProcessor()
     {
@@ -41,7 +41,7 @@ public abstract class AbstractCommandProcessor implements CommandProcessor
         this.threads = threads;
     }
     
-    public void registerHandler(BergamotCommandHandler handler)
+    public void registerHandler(BergamotCommandHandler<?> handler)
     {
         for (Class<? extends CommandRequest> handles : handler.handles())
         {
@@ -49,11 +49,12 @@ public abstract class AbstractCommandProcessor implements CommandProcessor
         }
     }
     
-    public BergamotCommandHandler getHandler(Class<? extends CommandRequest> forRequestType)
+    public BergamotCommandHandler<?> getHandler(Class<? extends CommandRequest> forRequestType)
     {
         return this.handlers.get(forRequestType);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void start()
     {

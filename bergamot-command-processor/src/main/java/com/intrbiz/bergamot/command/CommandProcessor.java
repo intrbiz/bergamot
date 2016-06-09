@@ -11,7 +11,7 @@ public interface CommandProcessor
     
     void start();
     
-    void registerHandler(BergamotCommandHandler handler);
+    void registerHandler(BergamotCommandHandler<?> handler);
     
-    BergamotCommandHandler getHandler(Class<? extends CommandRequest> forRequestType);
+    BergamotCommandHandler<?> getHandler(Class<? extends CommandRequest> forRequestType);
 }

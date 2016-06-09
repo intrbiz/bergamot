@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -20,6 +19,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.agent.server.BergamotAgentServer.RegisterAgentCallback.SendAgentRegistrationMessage;
 import com.intrbiz.bergamot.agent.server.config.BergamotAgentServerCfg;
 import com.intrbiz.bergamot.crypto.util.KeyStoreUtil;
 import com.intrbiz.bergamot.crypto.util.TLSConstants;
@@ -71,7 +71,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
     
     private Consumer<BergamotAgentServerHandler> onAgentPing;
     
-    private BiFunction<UUID, AgentRegistrationRequest, AgentRegistrationMessage> onRequestAgentRegistration;
+    private RegisterAgentCallback onRequestAgentRegistration;
     
     private SSLContext sslContext;
     
@@ -141,12 +141,11 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         }
     }
     
-    public AgentRegistrationMessage requestAgentRegistration(UUID templateId, AgentRegistrationRequest request)
+    public void requestAgentRegistration(UUID templateId, AgentRegistrationRequest request, SendAgentRegistrationMessage callback) throws Exception
     {
         logger.info("Starting registration process of agent under template: " + templateId + " with request:\n" + request);
         if (this.onRequestAgentRegistration != null)
-            return this.onRequestAgentRegistration.apply(templateId, request);
-        return null;
+            this.onRequestAgentRegistration.register(templateId, request, callback);
     }
     
     public void registerAgent(BergamotAgentServerHandler agent)
@@ -227,12 +226,12 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         return this.onAgentPing;
     }
 
-    public BiFunction<UUID, AgentRegistrationRequest, AgentRegistrationMessage> getOnRequestAgentRegistration()
+    public RegisterAgentCallback getOnRequestAgentRegistration()
     {
         return onRequestAgentRegistration;
     }
 
-    public void setOnRequestAgentRegistration(BiFunction<UUID, AgentRegistrationRequest, AgentRegistrationMessage> onRequestAgentRegistration)
+    public void setOnRequestAgentRegistration(RegisterAgentCallback onRequestAgentRegistration)
     {
         this.onRequestAgentRegistration = onRequestAgentRegistration;
     }
@@ -355,5 +354,15 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         });
         // go go go
         server.start();
+    }
+    
+    public static interface RegisterAgentCallback
+    {
+        public static interface SendAgentRegistrationMessage
+        {
+            void send(AgentRegistrationMessage response);
+        }
+        
+        void register(UUID templateId, AgentRegistrationRequest request, SendAgentRegistrationMessage callback) throws Exception;
     }
 }

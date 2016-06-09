@@ -283,16 +283,23 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             if (request instanceof AgentRegistrationRequest)
             {
                 // start the registration process
-                AgentRegistrationMessage response = this.server.requestAgentRegistration(this.agentSerial.getId(), (AgentRegistrationRequest) request);
-                if (response != null)
-                {
-                    writeMessage(ctx, response);
-                }
-                else
-                {
-                    // not supported
-                    writeMessage(ctx, new AgentRegistrationFailed(request, ErrorCode.NOT_AVAILABLE, null));
-                }
+                this.server.requestAgentRegistration(this.agentSerial.getId(), (AgentRegistrationRequest) request, (response) -> {
+                    try
+                    {
+                        if (response != null)
+                        {
+                            writeMessage(ctx, response);
+                        }
+                        else
+                        {
+                            writeMessage(ctx, new AgentRegistrationFailed(request, ErrorCode.NOT_AVAILABLE, null));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        ctx.fireExceptionCaught(e);
+                    }
+                });
             }
         }
         else

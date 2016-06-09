@@ -3,9 +3,9 @@ package com.intrbiz.bergamot.command.handler;
 import com.intrbiz.bergamot.model.message.command.CommandRequest;
 import com.intrbiz.bergamot.model.message.command.CommandResponse;
 
-public interface BergamotCommandHandler
+public interface BergamotCommandHandler<T extends CommandRequest>
 {
-    CommandResponse process(CommandRequest request);
+    CommandResponse process(T request);
     
-    Class<? extends CommandRequest>[] handles();
+    Class<? extends T>[] handles();
 }
