@@ -6,14 +6,13 @@ import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskStat;
 import com.intrbiz.bergamot.model.message.agent.stat.disk.DiskInfo;
 
-public class DiskInfoHandler implements AgentHandler
+public class DiskInfoHandler extends AbstractAgentHandler
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
 

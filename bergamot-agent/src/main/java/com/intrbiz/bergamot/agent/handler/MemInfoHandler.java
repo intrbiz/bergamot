@@ -5,13 +5,12 @@ import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.MemStat;
 
-public class MemInfoHandler implements AgentHandler
+public class MemInfoHandler extends AbstractAgentHandler
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
 

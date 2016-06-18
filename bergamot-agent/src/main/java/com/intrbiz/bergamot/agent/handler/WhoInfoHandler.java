@@ -5,14 +5,13 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 import org.hyperic.sigar.Who;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.WhoStat;
 import com.intrbiz.bergamot.model.message.agent.stat.who.WhoInfo;
 
-public class WhoInfoHandler implements AgentHandler
+public class WhoInfoHandler extends AbstractAgentHandler
 {    
     private SigarProxy sigar = Humidor.getInstance().getSigar();
 

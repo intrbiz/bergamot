@@ -7,7 +7,6 @@ import org.hyperic.sigar.NetRoute;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
@@ -15,7 +14,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.NetIfStat;
 import com.intrbiz.bergamot.model.message.agent.stat.netif.NetIfInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.netif.NetRouteInfo;
 
-public class NetIfInfoHandler implements AgentHandler
+public class NetIfInfoHandler extends AbstractAgentHandler
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
 

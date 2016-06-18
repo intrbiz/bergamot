@@ -7,4 +7,6 @@ public interface AgentHandler
     Class<?>[] getMessages();
     
     AgentMessage handle(AgentMessage request);
+    
+    void init(BergamotAgent agent);
 }

@@ -5,13 +5,12 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 import org.hyperic.sigar.Uptime;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
 
-public class UptimeInfoHandler implements AgentHandler
+public class UptimeInfoHandler extends AbstractAgentHandler
 {
     private SigarProxy sigar = Humidor.getInstance().getSigar();
 

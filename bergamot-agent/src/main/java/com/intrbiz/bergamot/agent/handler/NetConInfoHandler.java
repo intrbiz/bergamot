@@ -6,7 +6,6 @@ import org.hyperic.sigar.NetFlags;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
@@ -14,7 +13,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.NetConStat;
 import com.intrbiz.bergamot.model.message.agent.stat.netcon.NetConInfo;
 import com.intrbiz.bergamot.util.AgentUtil;
 
-public class NetConInfoHandler implements AgentHandler
+public class NetConInfoHandler extends AbstractAgentHandler
 {    
     private SigarProxy sigar = Humidor.getInstance().getSigar();
 

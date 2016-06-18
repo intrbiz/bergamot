@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.agent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.security.KeyStore;
@@ -11,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -212,12 +214,14 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         for (Class<?> cls : handler.getMessages())
         {
             this.handlers.put(cls, handler);
+            handler.init(this);
         }
     }
     
     public void setDefaultHandler(AgentHandler handler)
     {
         this.defaultHandler = handler;
+        if (this.defaultHandler != null) this.defaultHandler.init(this);
     }
     
     public AgentHandler getHandler(Class<?> messageType)
@@ -354,6 +358,39 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         }
     }
     
+    public void terminate()
+    {
+        try
+        {
+            this.eventLoop.shutdownGracefully(1, 2, TimeUnit.SECONDS).await();
+        }
+        catch (InterruptedException e)
+        {
+        }
+    }
+    
+    public void restart(final BergamotAgentCfg newConfig)
+    {
+        this.timer.schedule(new TimerTask() {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    BergamotAgent.this.terminate();
+                    // reconfigure
+                    BergamotAgent.this.configure(newConfig);
+                    // start
+                    BergamotAgent.this.start();
+                }
+                catch (Exception e)
+                {
+                    BergamotAgent.this.logger.error("Failed to restart BergamotAgent", e);
+                }
+            }
+        }, 500L);
+    }
+    
     private static void configureLogging() throws Exception
     {
         String logging = System.getProperty("bergamot.logging", "console");
@@ -370,7 +407,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         }
     }
     
-    private static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
+    public static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
     {
         FileInputStream input = new FileInputStream(new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml")));
         try
@@ -383,6 +420,55 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         }
     }
     
+    public static void saveConfig(BergamotAgentCfg newConfig) throws JAXBException, FileNotFoundException, IOException
+    {
+        File configFile = new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml"));
+        // backup the configuration file
+        try
+        {
+            copyFile(configFile, new File(configFile.getAbsolutePath() + "." + System.currentTimeMillis()));
+        }
+        catch (Exception e)
+        {
+            Logger.getLogger(BergamotAgent.class).warn("Failed to write backup configuration file.");
+        }
+        // write the file
+        FileOutputStream output = new FileOutputStream(configFile);
+        try
+        {
+            BergamotAgentCfg.write(BergamotAgentCfg.class, newConfig, output);
+        }
+        finally
+        {
+            output.close();
+        }
+    }
+    
+    private static void copyFile(File from, File to) throws FileNotFoundException, IOException
+    {
+        FileInputStream input = new FileInputStream(from);
+        try
+        {
+            FileOutputStream output = new FileOutputStream(to);
+            try
+            {
+                byte[] buffer = new byte[8192];
+                int r;
+                while ((r = input.read(buffer)) != -1)
+                {
+                    output.write(buffer, 0, r);
+                }
+            }
+            finally
+            {
+                output.close();
+            }
+        }
+        finally
+        {
+            input.close();
+        }
+    }
 
     public static void main(String[] args) throws Exception
     {

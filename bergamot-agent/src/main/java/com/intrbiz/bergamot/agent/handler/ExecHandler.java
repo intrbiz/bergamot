@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
@@ -16,7 +15,7 @@ import com.intrbiz.bergamot.nagios.model.NagiosResult;
 import com.intrbiz.bergamot.util.AgentUtil;
 import com.intrbiz.gerald.polyakov.Reading;
 
-public class ExecHandler implements AgentHandler
+public class ExecHandler extends AbstractAgentHandler
 {
     private Logger logger = Logger.getLogger(ExecHandler.class);
     

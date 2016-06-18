@@ -46,6 +46,7 @@ public abstract class AbstractCommandProcessor implements CommandProcessor
         for (Class<? extends CommandRequest> handles : handler.handles())
         {
             this.handlers.put(handles, handler);
+            handler.init(this);
         }
     }
     

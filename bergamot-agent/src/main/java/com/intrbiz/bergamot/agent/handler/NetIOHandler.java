@@ -18,7 +18,6 @@ import org.hyperic.sigar.NetInterfaceStat;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.agent.util.SampleRingBuffer;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIO;
@@ -26,7 +25,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.NetIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.netio.NetIOInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.netio.NetIORateInfo;
 
-public class NetIOHandler implements AgentHandler
+public class NetIOHandler extends AbstractAgentHandler
 {
     private Logger logger = Logger.getLogger(NetIOHandler.class);
     

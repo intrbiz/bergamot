@@ -2,12 +2,11 @@ package com.intrbiz.bergamot.agent.handler;
 
 import org.hyperic.sigar.OperatingSystem;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.stat.OSStat;
 
-public class OSInfoHandler implements AgentHandler
+public class OSInfoHandler extends AbstractAgentHandler
 {
 
     public OSInfoHandler()

@@ -13,15 +13,17 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
+import com.intrbiz.bergamot.agent.BergamotAgent;
 import com.intrbiz.bergamot.agent.KeyStoreUtil;
+import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
+import com.intrbiz.bergamot.agent.config.CfgParameter;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationComplete;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequest;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequired;
 
-public class AgentRegistrationHandler implements AgentHandler
+public class AgentRegistrationHandler extends AbstractAgentHandler
 {
     private Logger logger = Logger.getLogger(AgentRegistrationHandler.class);
     
@@ -85,7 +87,30 @@ public class AgentRegistrationHandler implements AgentHandler
         }
         else if (request instanceof AgentRegistrationComplete)
         {
-            logger.info("Successfully got signed agent certificate");
+            AgentRegistrationComplete complete = ((AgentRegistrationComplete) request);
+            logger.info("Successfully got signed agent certificate:\n" + complete.getCertificate());
+            // build the new configuration file
+            BergamotAgentCfg currentConfig = this.getAgent().getConfiguration();
+            // set the id
+            currentConfig.getParameters().clear();
+            currentConfig.addParameter(new CfgParameter("agent-id", null, null, complete.getAgentId().toString()));
+            // set the name
+            currentConfig.setName(complete.getCommonName());
+            // update the certificates
+            currentConfig.setCertificate(complete.getCertificate());
+            currentConfig.setKey(KeyStoreUtil.saveKey(this.currentKeyPair.getPrivate()));
+            currentConfig.addParameter(new CfgParameter("public-key", null, null, KeyStoreUtil.savePublicKey(this.currentKeyPair.getPublic())));
+            // save the config
+            try
+            {
+                BergamotAgent.saveConfig(currentConfig);
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to save Bergamot Agent configuration after registration");
+            }
+            // restart the agent to reconnect
+            this.getAgent().restart(currentConfig);
         }
         else if (request instanceof AgentRegistrationFailed)
         {

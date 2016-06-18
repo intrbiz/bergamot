@@ -20,7 +20,6 @@ import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.agent.util.SampleRingBuffer;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
@@ -28,7 +27,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIOInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIORateInfo;
 
-public class DiskIOHandler implements AgentHandler
+public class DiskIOHandler extends AbstractAgentHandler
 {
     private Logger logger = Logger.getLogger(DiskIOHandler.class);
     

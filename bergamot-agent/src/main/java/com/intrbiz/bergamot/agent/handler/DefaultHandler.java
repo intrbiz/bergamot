@@ -2,11 +2,10 @@ package com.intrbiz.bergamot.agent.handler;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.agent.AgentHandler;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 
-public class DefaultHandler implements AgentHandler
+public class DefaultHandler extends AbstractAgentHandler
 {
     private Logger logger = Logger.getLogger(DefaultHandler.class);
 
