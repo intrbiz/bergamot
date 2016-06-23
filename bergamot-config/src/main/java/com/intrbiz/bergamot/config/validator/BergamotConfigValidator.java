@@ -346,6 +346,13 @@ public class BergamotConfigValidator extends BergamotConfigResolver
     
     private void checkGroupExists(String name, NamedObjectCfg<?> user, BergamotValidationReport report)
     {
+        if (name != null && name.length() > 0)
+        {
+            if (name.startsWith("-") || name.startsWith("+"))
+            {
+                name = name.substring(1);
+            }
+        }
         GroupCfg group = this.lookup(GroupCfg.class, name);
         if (group == null)
         {
