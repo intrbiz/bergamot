@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.command;
 
 import java.util.List;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -20,7 +21,7 @@ public abstract class AbstractCommandProcessor implements CommandProcessor
     
     private BergamotCommandQueue commandQueue;
     
-    private List<RPCServer<CommandRequest, CommandResponse>> commandServers;
+    private List<RPCServer<CommandRequest, CommandResponse>> commandServers = new LinkedList<RPCServer<CommandRequest, CommandResponse>>();
     
     private ConcurrentMap<Class<? extends CommandRequest>, BergamotCommandHandler<?>> handlers = new ConcurrentHashMap<Class<? extends CommandRequest>, BergamotCommandHandler<?>>();
     
