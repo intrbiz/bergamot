@@ -34,7 +34,7 @@
         <notify teams="web-admins"/>
     </service>
     
-    <service name="db-service" groups="db-services" extends="generic-service" template="yes" security-domains="database">
+    <service name="db-service" groups="db-services" extends="generic-service" template="yes" security-domains="db">
         <notify teams="db-admins"/>
     </service>
     

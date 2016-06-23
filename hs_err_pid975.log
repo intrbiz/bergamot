@@ -1,0 +1,925 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 158859264 bytes for committing reserved memory.
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   In 32 bit mode, the process size limit was hit
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Use 64 bit Java on a 64 bit OS
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (os_linux.cpp:2671), pid=975, tid=139998626522880
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_25-b17) (build 1.8.0_25-b17)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.25-b02 mixed mode linux-amd64 compressed oops)
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007f5408071000):  VMThread [stack: 0x00007f53f8572000,0x00007f53f8673000] [id=985]
+
+Stack: [0x00007f53f8572000,0x00007f53f8673000],  sp=0x00007f53f8671210,  free space=1020k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.so+0xa7923a]  VMError::report_and_die()+0x2ca
+V  [libjvm.so+0x4e552b]  report_vm_out_of_memory(char const*, int, unsigned long, VMErrorType, char const*)+0x8b
+V  [libjvm.so+0x8e5613]  os::Linux::commit_memory_impl(char*, unsigned long, bool)+0x103
+V  [libjvm.so+0x8e5b69]  os::pd_commit_memory(char*, unsigned long, unsigned long, bool)+0x29
+V  [libjvm.so+0x8df83a]  os::commit_memory(char*, unsigned long, unsigned long, bool)+0x2a
+V  [libjvm.so+0x94f923]  PSVirtualSpace::expand_by(unsigned long)+0x53
+V  [libjvm.so+0x940640]  PSOldGen::expand(unsigned long)+0x170
+V  [libjvm.so+0x94084b]  PSOldGen::resize(unsigned long)+0x1cb
+V  [libjvm.so+0x948441]  PSParallelCompact::invoke_no_policy(bool)+0x9d1
+V  [libjvm.so+0x948733]  PSParallelCompact::invoke(bool)+0x63
+V  [libjvm.so+0x471e64]  CollectedHeap::collect_as_vm_thread(GCCause::Cause)+0x114
+V  [libjvm.so+0xa7a1d1]  VM_CollectForMetadataAllocation::doit()+0x131
+V  [libjvm.so+0xa81fd5]  VM_Operation::evaluate()+0x55
+V  [libjvm.so+0xa803aa]  VMThread::evaluate_operation(VM_Operation*)+0xba
+V  [libjvm.so+0xa8072e]  VMThread::loop()+0x1ce
+V  [libjvm.so+0xa80ba0]  VMThread::run()+0x70
+V  [libjvm.so+0x8e7d48]  java_start(Thread*)+0x108
+
+VM_Operation (0x00007f5410936e20): CollectForMetadataAllocation, mode: safepoint, requested by thread 0x00007f5408007800
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x00007f5408370000 JavaThread "resolver-5" daemon [_thread_blocked, id=1110, stack(0x00007f53e97cb000,0x00007f53e98cc000)]
+  0x00007f5408e07800 JavaThread "resolver-4" daemon [_thread_blocked, id=1009, stack(0x00007f53eac75000,0x00007f53ead76000)]
+  0x00007f5408e13800 JavaThread "resolver-3" daemon [_thread_blocked, id=1008, stack(0x00007f53eab74000,0x00007f53eac75000)]
+  0x00007f5408e13000 JavaThread "resolver-2" daemon [_thread_blocked, id=1007, stack(0x00007f53eb4d5000,0x00007f53eb5d6000)]
+  0x00007f5408e16800 JavaThread "resolver-1" daemon [_thread_blocked, id=1006, stack(0x00007f53eb3d4000,0x00007f53eb4d5000)]
+  0x00007f5408615000 JavaThread "process reaper" daemon [_thread_blocked, id=997, stack(0x00007f53f8003000,0x00007f53f803c000)]
+  0x00007f54080ca800 JavaThread "Service Thread" daemon [_thread_blocked, id=992, stack(0x00007f53ebeff000,0x00007f53ec000000)]
+  0x00007f54080b2800 JavaThread "C1 CompilerThread2" daemon [_thread_blocked, id=991, stack(0x00007f53f00bd000,0x00007f53f01be000)]
+  0x00007f54080b0800 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=990, stack(0x00007f53f01be000,0x00007f53f02bf000)]
+  0x00007f54080ad800 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=989, stack(0x00007f53f02bf000,0x00007f53f03c0000)]
+  0x00007f54080ab800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=988, stack(0x00007f53f80f1000,0x00007f53f81f2000)]
+  0x00007f540807a000 JavaThread "Finalizer" daemon [_thread_blocked, id=987, stack(0x00007f53f8370000,0x00007f53f8471000)]
+  0x00007f5408078000 JavaThread "Reference Handler" daemon [_thread_blocked, id=986, stack(0x00007f53f8471000,0x00007f53f8572000)]
+  0x00007f5408007800 JavaThread "main" [_thread_blocked, id=980, stack(0x00007f541083f000,0x00007f5410940000)]
+
+Other Threads:
+=>0x00007f5408071000 VMThread [stack: 0x00007f53f8572000,0x00007f53f8673000] [id=985]
+  0x00007f54080cc800 WatcherThread [stack: 0x00007f53ebdfe000,0x00007f53ebeff000] [id=993]
+
+VM state:at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x00007f5408005a20] ExpandHeap_lock - owner thread: 0x00007f5408071000
+[0x00007f54080060a0] Threads_lock - owner thread: 0x00007f5408071000
+[0x00007f54080065a0] Heap_lock - owner thread: 0x00007f5408007800
+
+Heap:
+ PSYoungGen      total 518144K, used 0K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 421376K, 0% used [0x00000000d7d80000,0x00000000d7d80000,0x00000000f1900000)
+  from space 96768K, 0% used [0x00000000fa180000,0x00000000fa180000,0x0000000100000000)
+  to   space 118272K, 0% used [0x00000000f1900000,0x00000000f1900000,0x00000000f8c80000)
+ ParOldGen       total 345600K, used 302461K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 87% used [0x0000000087800000,0x0000000099f5f540,0x000000009c980000)
+ Metaspace       used 269139K, capacity 272840K, committed 273000K, reserved 1290240K
+  class space    used 31255K, capacity 32415K, committed 32512K, reserved 1048576K
+
+Card table byte_map: [0x00007f540db0f000,0x00007f540ded4000] byte_map_base: 0x00007f540d6d3000
+
+Marking Bits: (ParMarkBitMap*) 0x00007f540fd512c0
+ Begin Bits: [0x00007f53f03c0000, 0x00007f53f21e0000)
+ End Bits:   [0x00007f53f21e0000, 0x00007f53f4000000)
+
+Polling page: 0x00007f5410975000
+
+CodeCache: size=245760Kb used=131818Kb max_used=131818Kb free=113941Kb
+ bounds [0x00007f53f9000000, 0x00007f5401160000, 0x00007f5408000000]
+ total_blobs=38808 nmethods=38416 adapters=305
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 208.821 Thread 0x00007f54080b2800 nmethod 46503 0x00007f540114ee90 code [0x00007f540114f020, 0x00007f540114f488]
+Event: 208.821 Thread 0x00007f54080b2800 46504   !   3       com.sun.tools.javac.file.ZipFileIndex$DirectoryEntry::initEntries (345 bytes)
+Event: 208.824 Thread 0x00007f54080b2800 nmethod 46504 0x00007f540114f690 code [0x00007f540114fa40, 0x00007f5401151868]
+Event: 208.824 Thread 0x00007f54080b2800 46506       3       com.sun.tools.javac.util.BaseFileManager::getKind (55 bytes)
+Event: 208.825 Thread 0x00007f54080b2800 nmethod 46506 0x00007f5401152f90 code [0x00007f5401153160, 0x00007f54011538c8]
+Event: 208.825 Thread 0x00007f54080b2800 46512       3       com.sun.tools.javac.file.Locations::lazy (72 bytes)
+Event: 208.826 Thread 0x00007f54080b2800 nmethod 46512 0x00007f5401153c50 code [0x00007f5401153e40, 0x00007f5401154678]
+Event: 208.826 Thread 0x00007f54080b2800 46511       3       com.sun.tools.javac.file.Locations::getHandler (23 bytes)
+Event: 208.826 Thread 0x00007f54080b2800 nmethod 46511 0x00007f5401154950 code [0x00007f5401154ae0, 0x00007f5401154ed8]
+Event: 208.826 Thread 0x00007f54080b2800 46507       3       com.sun.tools.javac.file.JavacFileManager::getLocation (14 bytes)
+
+GC Heap History (10 events):
+Event: 138.565 GC heap after
+Heap after GC invocations=25 (full 5):
+ PSYoungGen      total 571904K, used 46098K [0x00000000d7d80000, 0x00000000ff280000, 0x0000000100000000)
+  eden space 514560K, 0% used [0x00000000d7d80000,0x00000000d7d80000,0x00000000f7400000)
+  from space 57344K, 80% used [0x00000000fb100000,0x00000000fde04ad8,0x00000000fe900000)
+  to   space 62464K, 0% used [0x00000000f7400000,0x00000000f7400000,0x00000000fb100000)
+ ParOldGen       total 345600K, used 168521K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 48% used [0x0000000087800000,0x0000000091c924a0,0x000000009c980000)
+ Metaspace       used 187923K, capacity 190698K, committed 190936K, reserved 1218560K
+  class space    used 21626K, capacity 22491K, committed 22528K, reserved 1048576K
+}
+Event: 158.123 GC heap before
+{Heap before GC invocations=26 (full 5):
+ PSYoungGen      total 571904K, used 560658K [0x00000000d7d80000, 0x00000000ff280000, 0x0000000100000000)
+  eden space 514560K, 100% used [0x00000000d7d80000,0x00000000f7400000,0x00000000f7400000)
+  from space 57344K, 80% used [0x00000000fb100000,0x00000000fde04ad8,0x00000000fe900000)
+  to   space 62464K, 0% used [0x00000000f7400000,0x00000000f7400000,0x00000000fb100000)
+ ParOldGen       total 345600K, used 168521K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 48% used [0x0000000087800000,0x0000000091c924a0,0x000000009c980000)
+ Metaspace       used 195527K, capacity 198382K, committed 198616K, reserved 1224704K
+  class space    used 22381K, capacity 23238K, committed 23296K, reserved 1048576K
+Event: 158.185 GC heap after
+Heap after GC invocations=26 (full 5):
+ PSYoungGen      total 577024K, used 52639K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 514560K, 0% used [0x00000000d7d80000,0x00000000d7d80000,0x00000000f7400000)
+  from space 62464K, 84% used [0x00000000f7400000,0x00000000fa767cb0,0x00000000fb100000)
+  to   space 69120K, 0% used [0x00000000fbc80000,0x00000000fbc80000,0x0000000100000000)
+ ParOldGen       total 345600K, used 168537K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 48% used [0x0000000087800000,0x0000000091c964a0,0x000000009c980000)
+ Metaspace       used 195527K, capacity 198382K, committed 198616K, reserved 1224704K
+  class space    used 22381K, capacity 23238K, committed 23296K, reserved 1048576K
+}
+Event: 185.040 GC heap before
+{Heap before GC invocations=27 (full 5):
+ PSYoungGen      total 577024K, used 567199K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 514560K, 100% used [0x00000000d7d80000,0x00000000f7400000,0x00000000f7400000)
+  from space 62464K, 84% used [0x00000000f7400000,0x00000000fa767cb0,0x00000000fb100000)
+  to   space 69120K, 0% used [0x00000000fbc80000,0x00000000fbc80000,0x0000000100000000)
+ ParOldGen       total 345600K, used 168537K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 48% used [0x0000000087800000,0x0000000091c964a0,0x000000009c980000)
+ Metaspace       used 239211K, capacity 242586K, committed 242776K, reserved 1263616K
+  class space    used 27650K, capacity 28686K, committed 28800K, reserved 1048576K
+Event: 185.167 GC heap after
+Heap after GC invocations=27 (full 5):
+ PSYoungGen      total 541696K, used 69116K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 472576K, 0% used [0x00000000d7d80000,0x00000000d7d80000,0x00000000f4b00000)
+  from space 69120K, 99% used [0x00000000fbc80000,0x00000000fffff2d8,0x0000000100000000)
+  to   space 92672K, 0% used [0x00000000f4b00000,0x00000000f4b00000,0x00000000fa580000)
+ ParOldGen       total 345600K, used 202253K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 58% used [0x0000000087800000,0x0000000093d837b8,0x000000009c980000)
+ Metaspace       used 239211K, capacity 242586K, committed 242776K, reserved 1263616K
+  class space    used 27650K, capacity 28686K, committed 28800K, reserved 1048576K
+}
+Event: 208.503 GC heap before
+{Heap before GC invocations=28 (full 5):
+ PSYoungGen      total 541696K, used 541692K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 472576K, 100% used [0x00000000d7d80000,0x00000000f4b00000,0x00000000f4b00000)
+  from space 69120K, 99% used [0x00000000fbc80000,0x00000000fffff2d8,0x0000000100000000)
+  to   space 92672K, 0% used [0x00000000f4b00000,0x00000000f4b00000,0x00000000fa580000)
+ ParOldGen       total 345600K, used 202253K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 58% used [0x0000000087800000,0x0000000093d837b8,0x000000009c980000)
+ Metaspace       used 268575K, capacity 272296K, committed 272472K, reserved 1290240K
+  class space    used 31217K, capacity 32383K, committed 32384K, reserved 1048576K
+Event: 208.589 GC heap after
+Heap after GC invocations=28 (full 5):
+ PSYoungGen      total 561152K, used 88205K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 472576K, 0% used [0x00000000d7d80000,0x00000000d7d80000,0x00000000f4b00000)
+  from space 88576K, 99% used [0x00000000f4b00000,0x00000000fa123628,0x00000000fa180000)
+  to   space 96768K, 0% used [0x00000000fa180000,0x00000000fa180000,0x0000000100000000)
+ ParOldGen       total 345600K, used 225706K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 65% used [0x0000000087800000,0x000000009546a9c8,0x000000009c980000)
+ Metaspace       used 268575K, capacity 272296K, committed 272472K, reserved 1290240K
+  class space    used 31217K, capacity 32383K, committed 32384K, reserved 1048576K
+}
+Event: 208.827 GC heap before
+{Heap before GC invocations=29 (full 5):
+ PSYoungGen      total 561152K, used 112957K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 472576K, 5% used [0x00000000d7d80000,0x00000000d95abfa0,0x00000000f4b00000)
+  from space 88576K, 99% used [0x00000000f4b00000,0x00000000fa123628,0x00000000fa180000)
+  to   space 96768K, 0% used [0x00000000fa180000,0x00000000fa180000,0x0000000100000000)
+ ParOldGen       total 345600K, used 225706K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 65% used [0x0000000087800000,0x000000009546a9c8,0x000000009c980000)
+ Metaspace       used 269139K, capacity 272840K, committed 273000K, reserved 1290240K
+  class space    used 31255K, capacity 32415K, committed 32512K, reserved 1048576K
+Event: 208.911 GC heap after
+Heap after GC invocations=29 (full 5):
+ PSYoungGen      total 518144K, used 90560K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 421376K, 0% used [0x00000000d7d80000,0x00000000d7d80000,0x00000000f1900000)
+  from space 96768K, 93% used [0x00000000fa180000,0x00000000ff9f0110,0x0000000100000000)
+  to   space 118272K, 0% used [0x00000000f1900000,0x00000000f1900000,0x00000000f8c80000)
+ ParOldGen       total 345600K, used 225706K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 65% used [0x0000000087800000,0x000000009546a9c8,0x000000009c980000)
+ Metaspace       used 269139K, capacity 272840K, committed 273000K, reserved 1290240K
+  class space    used 31255K, capacity 32415K, committed 32512K, reserved 1048576K
+}
+Event: 208.911 GC heap before
+{Heap before GC invocations=30 (full 6):
+ PSYoungGen      total 518144K, used 90560K [0x00000000d7d80000, 0x0000000100000000, 0x0000000100000000)
+  eden space 421376K, 0% used [0x00000000d7d80000,0x00000000d7d80000,0x00000000f1900000)
+  from space 96768K, 93% used [0x00000000fa180000,0x00000000ff9f0110,0x0000000100000000)
+  to   space 118272K, 0% used [0x00000000f1900000,0x00000000f1900000,0x00000000f8c80000)
+ ParOldGen       total 345600K, used 225706K [0x0000000087800000, 0x000000009c980000, 0x00000000d7d80000)
+  object space 345600K, 65% used [0x0000000087800000,0x000000009546a9c8,0x000000009c980000)
+ Metaspace       used 269139K, capacity 272840K, committed 273000K, reserved 1290240K
+  class space    used 31255K, capacity 32415K, committed 32512K, reserved 1048576K
+
+Deoptimization events (10 events):
+Event: 197.451 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400ecfac8 method=com.sun.tools.javac.code.Types$SameTypeVisitor.visitType(Lcom/sun/tools/javac/code/Type;Lcom/sun/tools/javac/code/Type;)Ljava/lang/Boolean; @ 31
+Event: 197.456 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400ecfac8 method=com.sun.tools.javac.code.Types$SameTypeVisitor.visitType(Lcom/sun/tools/javac/code/Type;Lcom/sun/tools/javac/code/Type;)Ljava/lang/Boolean; @ 31
+Event: 197.456 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400ecfac8 method=com.sun.tools.javac.code.Types$SameTypeVisitor.visitType(Lcom/sun/tools/javac/code/Type;Lcom/sun/tools/javac/code/Type;)Ljava/lang/Boolean; @ 31
+Event: 197.457 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400ecfac8 method=com.sun.tools.javac.code.Types$SameTypeVisitor.visitType(Lcom/sun/tools/javac/code/Type;Lcom/sun/tools/javac/code/Type;)Ljava/lang/Boolean; @ 31
+Event: 197.457 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400ed81a8 method=com.sun.tools.javac.code.Types$SameTypeVisitor.visitType(Lcom/sun/tools/javac/code/Type;Lcom/sun/tools/javac/code/Type;)Ljava/lang/Boolean; @ 31
+Event: 197.493 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400cd294c method=com.sun.tools.javac.code.Types$26.visitType(Lcom/sun/tools/javac/code/Type;Ljava/lang/Void;)Ljava/lang/Integer; @ 1
+Event: 197.493 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400cd294c method=com.sun.tools.javac.code.Types$26.visitType(Lcom/sun/tools/javac/code/Type;Ljava/lang/Void;)Ljava/lang/Integer; @ 1
+Event: 197.494 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400cd294c method=com.sun.tools.javac.code.Types$26.visitType(Lcom/sun/tools/javac/code/Type;Ljava/lang/Void;)Ljava/lang/Integer; @ 1
+Event: 197.494 Thread 0x00007f5408007800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5400cd294c method=com.sun.tools.javac.code.Types$26.visitType(Lcom/sun/tools/javac/code/Type;Ljava/lang/Void;)Ljava/lang/Integer; @ 1
+Event: 202.376 Thread 0x00007f5408007800 Uncommon trap: reason=unreached action=reinterpret pc=0x00007f540102a510 method=com.sun.tools.javac.code.Types$18.visitClassType(Lcom/sun/tools/javac/code/Type$ClassType;Ljava/lang/Void;)Lcom/sun/tools/javac/code/Type; @ 43
+
+Internal exceptions (10 events):
+Event: 208.607 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d82a9380) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+Event: 208.607 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d82acf10) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+Event: 208.612 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d82ecc10) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+Event: 208.624 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d831c850) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+Event: 208.734 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d86889d0) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+Event: 208.735 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d8689450) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+Event: 208.736 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d868a0d0) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+Event: 208.776 Thread 0x00007f5408007800 Exception <a 'java/io/FileNotFoundException'> (0x00000000d8b255a0) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jni.cpp, line 716]
+Event: 208.780 Thread 0x00007f5408007800 Exception <a 'java/io/FileNotFoundException'> (0x00000000d8b58670) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jni.cpp, line 716]
+Event: 208.808 Thread 0x00007f5408007800 Exception <a 'java/security/PrivilegedActionException'> (0x00000000d8ffd228) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u25/1514/hotspot/src/share/vm/prims/jvm.cpp, line 1312]
+
+Events (10 events):
+Event: 205.542 Thread 0x00007f5408dba000 Thread added: 0x00007f5408dba000
+Event: 207.149 Thread 0x00007f5408dba000 Thread exited: 0x00007f5408dba000
+Event: 207.149 Thread 0x00007f5408db9800 Thread exited: 0x00007f5408db9800
+Event: 208.366 loading class com/sun/tools/javac/resources/compiler_en
+Event: 208.366 loading class com/sun/tools/javac/resources/compiler_en done
+Event: 208.366 loading class com/sun/tools/javac/resources/compiler_en_GB
+Event: 208.366 loading class com/sun/tools/javac/resources/compiler_en_GB done
+Event: 208.503 Executing VM operation: ParallelGCFailedAllocation
+Event: 208.589 Executing VM operation: ParallelGCFailedAllocation done
+Event: 208.827 Executing VM operation: CollectForMetadataAllocation
+
+
+Dynamic libraries:
+00400000-00401000 r-xp 00000000 08:02 277350166                          /home/cellis/bin/jdk1.8.0_25/bin/java
+00600000-00601000 rw-p 00000000 08:02 277350166                          /home/cellis/bin/jdk1.8.0_25/bin/java
+00b65000-00b86000 rw-p 00000000 00:00 0                                  [heap]
+87800000-9c980000 rw-p 00000000 00:00 0 
+a6100000-d7d80000 ---p 00000000 00:00 0 
+d7d80000-100000000 rw-p 00000000 00:00 0 
+100000000-101fc0000 rw-p 00000000 00:00 0 
+101fc0000-140000000 ---p 00000000 00:00 0 
+7f537fb97000-7f538044c000 rw-p 00000000 00:00 0 
+7f538044c000-7f5380568000 ---p 00000000 00:00 0 
+7f5380568000-7f5380768000 rw-p 00000000 00:00 0 
+7f5380768000-7f5380968000 rw-p 00000000 00:00 0 
+7f5380968000-7f5380b68000 rw-p 00000000 00:00 0 
+7f5380b68000-7f5380d68000 rw-p 00000000 00:00 0 
+7f5380d68000-7f5380f68000 rw-p 00000000 00:00 0 
+7f5380f68000-7f5381168000 rw-p 00000000 00:00 0 
+7f5381168000-7f5381368000 rw-p 00000000 00:00 0 
+7f5381368000-7f5381568000 rw-p 00000000 00:00 0 
+7f5381568000-7f5381768000 rw-p 00000000 00:00 0 
+7f5381768000-7f5381968000 rw-p 00000000 00:00 0 
+7f5381968000-7f5381b68000 rw-p 00000000 00:00 0 
+7f5381b68000-7f5381d68000 rw-p 00000000 00:00 0 
+7f5381d68000-7f5381f68000 rw-p 00000000 00:00 0 
+7f5381f68000-7f5382168000 rw-p 00000000 00:00 0 
+7f5382168000-7f5382368000 rw-p 00000000 00:00 0 
+7f5382368000-7f5382568000 rw-p 00000000 00:00 0 
+7f5382568000-7f5382768000 rw-p 00000000 00:00 0 
+7f5382768000-7f5382968000 rw-p 00000000 00:00 0 
+7f5382968000-7f5382b68000 rw-p 00000000 00:00 0 
+7f5382b68000-7f5382d68000 rw-p 00000000 00:00 0 
+7f5382d68000-7f5382f68000 rw-p 00000000 00:00 0 
+7f5382f68000-7f5383168000 rw-p 00000000 00:00 0 
+7f5383168000-7f5383368000 rw-p 00000000 00:00 0 
+7f5383368000-7f5383568000 rw-p 00000000 00:00 0 
+7f5383568000-7f5383768000 rw-p 00000000 00:00 0 
+7f5383768000-7f5383968000 rw-p 00000000 00:00 0 
+7f5383968000-7f5383b68000 rw-p 00000000 00:00 0 
+7f5383b68000-7f5383d68000 rw-p 00000000 00:00 0 
+7f5383d68000-7f5383f68000 rw-p 00000000 00:00 0 
+7f5383f68000-7f5384168000 rw-p 00000000 00:00 0 
+7f5384168000-7f5384368000 rw-p 00000000 00:00 0 
+7f5384368000-7f5384568000 rw-p 00000000 00:00 0 
+7f5384600000-7f5384800000 rw-p 00000000 00:00 0 
+7f5384800000-7f5384a00000 rw-p 00000000 00:00 0 
+7f5384a00000-7f5384c00000 rw-p 00000000 00:00 0 
+7f5384c00000-7f5384e00000 rw-p 00000000 00:00 0 
+7f5384e00000-7f5385000000 rw-p 00000000 00:00 0 
+7f5385000000-7f5385200000 rw-p 00000000 00:00 0 
+7f5385200000-7f5385400000 rw-p 00000000 00:00 0 
+7f5385400000-7f5385600000 rw-p 00000000 00:00 0 
+7f5385600000-7f5385800000 rw-p 00000000 00:00 0 
+7f5385800000-7f5385a00000 rw-p 00000000 00:00 0 
+7f5385a00000-7f5385c00000 rw-p 00000000 00:00 0 
+7f5385c00000-7f5385e00000 rw-p 00000000 00:00 0 
+7f5385e00000-7f5386000000 rw-p 00000000 00:00 0 
+7f5386000000-7f5386200000 rw-p 00000000 00:00 0 
+7f5386200000-7f5386400000 rw-p 00000000 00:00 0 
+7f5386400000-7f5386600000 rw-p 00000000 00:00 0 
+7f5386600000-7f5386800000 rw-p 00000000 00:00 0 
+7f5386800000-7f5386a00000 rw-p 00000000 00:00 0 
+7f5386a00000-7f5386c00000 rw-p 00000000 00:00 0 
+7f5386c00000-7f5386e00000 rw-p 00000000 00:00 0 
+7f5386e00000-7f5387000000 rw-p 00000000 00:00 0 
+7f5387000000-7f5387200000 rw-p 00000000 00:00 0 
+7f5387200000-7f5387400000 rw-p 00000000 00:00 0 
+7f5387400000-7f5387600000 rw-p 00000000 00:00 0 
+7f5387600000-7f5387800000 rw-p 00000000 00:00 0 
+7f5387800000-7f5387a00000 rw-p 00000000 00:00 0 
+7f5387a00000-7f5387c00000 rw-p 00000000 00:00 0 
+7f5387c00000-7f5387e00000 rw-p 00000000 00:00 0 
+7f5387e00000-7f5388000000 rw-p 00000000 00:00 0 
+7f5388000000-7f5388021000 rw-p 00000000 00:00 0 
+7f5388021000-7f538c000000 ---p 00000000 00:00 0 
+7f538c000000-7f538c021000 rw-p 00000000 00:00 0 
+7f538c021000-7f5390000000 ---p 00000000 00:00 0 
+7f5390067000-7f5390267000 rw-p 00000000 00:00 0 
+7f5390267000-7f5390467000 rw-p 00000000 00:00 0 
+7f5390467000-7f5390667000 rw-p 00000000 00:00 0 
+7f5390667000-7f5390867000 rw-p 00000000 00:00 0 
+7f5390867000-7f5390a67000 rw-p 00000000 00:00 0 
+7f5390a67000-7f5390c67000 rw-p 00000000 00:00 0 
+7f5390c67000-7f5390e67000 rw-p 00000000 00:00 0 
+7f5390e67000-7f5391067000 rw-p 00000000 00:00 0 
+7f5391067000-7f5391267000 rw-p 00000000 00:00 0 
+7f5391267000-7f5391467000 rw-p 00000000 00:00 0 
+7f5391467000-7f5391667000 rw-p 00000000 00:00 0 
+7f5391667000-7f5391867000 rw-p 00000000 00:00 0 
+7f53918d7000-7f53918ff000 r--s 001a3000 08:02 464648360                  /home/cellis/.m2/repository/org/bouncycastle/bcprov-jdk16/1.46/bcprov-jdk16-1.46.jar
+7f53918ff000-7f5391aff000 rw-p 00000000 00:00 0 
+7f5391aff000-7f5391cff000 rw-p 00000000 00:00 0 
+7f5391cff000-7f5391eff000 rw-p 00000000 00:00 0 
+7f5391eff000-7f53920ff000 rw-p 00000000 00:00 0 
+7f53920ff000-7f53922ff000 rw-p 00000000 00:00 0 
+7f53922ff000-7f53924ff000 rw-p 00000000 00:00 0 
+7f53924ff000-7f53926ff000 rw-p 00000000 00:00 0 
+7f53926ff000-7f53928ff000 rw-p 00000000 00:00 0 
+7f53928ff000-7f5392aff000 rw-p 00000000 00:00 0 
+7f5392aff000-7f5392cff000 rw-p 00000000 00:00 0 
+7f5392cff000-7f5392eff000 rw-p 00000000 00:00 0 
+7f5392eff000-7f53930ff000 rw-p 00000000 00:00 0 
+7f53930ff000-7f53932ff000 rw-p 00000000 00:00 0 
+7f53932ff000-7f53934ff000 rw-p 00000000 00:00 0 
+7f53934ff000-7f53936ff000 rw-p 00000000 00:00 0 
+7f53936ff000-7f53938ff000 rw-p 00000000 00:00 0 
+7f53938ff000-7f5393902000 ---p 00000000 00:00 0 
+7f5393902000-7f5393c00000 rw-p 00000000 00:00 0 
+7f5393c00000-7f5393e00000 rw-p 00000000 00:00 0 
+7f5393e00000-7f5394000000 rw-p 00000000 00:00 0 
+7f5394000000-7f5394021000 rw-p 00000000 00:00 0 
+7f5394021000-7f5398000000 ---p 00000000 00:00 0 
+7f5398000000-7f5398021000 rw-p 00000000 00:00 0 
+7f5398021000-7f539c000000 ---p 00000000 00:00 0 
+7f539c000000-7f539c021000 rw-p 00000000 00:00 0 
+7f539c021000-7f53a0000000 ---p 00000000 00:00 0 
+7f53a0000000-7f53a0021000 rw-p 00000000 00:00 0 
+7f53a0021000-7f53a4000000 ---p 00000000 00:00 0 
+7f53a4000000-7f53a4034000 rw-p 00000000 00:00 0 
+7f53a4034000-7f53a8000000 ---p 00000000 00:00 0 
+7f53a8000000-7f53a8021000 rw-p 00000000 00:00 0 
+7f53a8021000-7f53ac000000 ---p 00000000 00:00 0 
+7f53ac000000-7f53ac0b0000 rw-p 00000000 00:00 0 
+7f53ac0b0000-7f53b0000000 ---p 00000000 00:00 0 
+7f53b0000000-7f53b02be000 rw-p 00000000 00:00 0 
+7f53b02be000-7f53b4000000 ---p 00000000 00:00 0 
+7f53b4000000-7f53b4021000 rw-p 00000000 00:00 0 
+7f53b4021000-7f53b8000000 ---p 00000000 00:00 0 
+7f53b8000000-7f53b8021000 rw-p 00000000 00:00 0 
+7f53b8021000-7f53bc000000 ---p 00000000 00:00 0 
+7f53bc000000-7f53bc021000 rw-p 00000000 00:00 0 
+7f53bc021000-7f53c0000000 ---p 00000000 00:00 0 
+7f53c0000000-7f53c0021000 rw-p 00000000 00:00 0 
+7f53c0021000-7f53c4000000 ---p 00000000 00:00 0 
+7f53c4000000-7f53c56a5000 rw-p 00000000 00:00 0 
+7f53c56a5000-7f53c8000000 ---p 00000000 00:00 0 
+7f53c8000000-7f53ca151000 rw-p 00000000 00:00 0 
+7f53ca151000-7f53cc000000 ---p 00000000 00:00 0 
+7f53cc000000-7f53cc021000 rw-p 00000000 00:00 0 
+7f53cc021000-7f53d0000000 ---p 00000000 00:00 0 
+7f53d0000000-7f53d1881000 rw-p 00000000 00:00 0 
+7f53d1881000-7f53d4000000 ---p 00000000 00:00 0 
+7f53d4000000-7f53d4021000 rw-p 00000000 00:00 0 
+7f53d4021000-7f53d8000000 ---p 00000000 00:00 0 
+7f53d8000000-7f53d8021000 rw-p 00000000 00:00 0 
+7f53d8021000-7f53dc000000 ---p 00000000 00:00 0 
+7f53dc000000-7f53dc021000 rw-p 00000000 00:00 0 
+7f53dc021000-7f53e0000000 ---p 00000000 00:00 0 
+7f53e0000000-7f53e07d8000 rw-p 00000000 00:00 0 
+7f53e07d8000-7f53e4000000 ---p 00000000 00:00 0 
+7f53e4000000-7f53e4021000 rw-p 00000000 00:00 0 
+7f53e4021000-7f53e8000000 ---p 00000000 00:00 0 
+7f53e801c000-7f53e801e000 r--s 00026000 08:02 415763825                  /home/cellis/Intrbiz/workspace/bergamot/bergamot-crypto-util/target/bergamot-crypto-util-3.0.0-A1.jar
+7f53e801e000-7f53e8020000 r--s 0000e000 08:02 317282951                  /home/cellis/.m2/repository/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar
+7f53e8020000-7f53e8027000 r--s 0003a000 08:02 317237890                  /home/cellis/.m2/repository/commons-codec/commons-codec/1.8/commons-codec-1.8.jar
+7f53e8027000-7f53e802d000 r--s 0003f000 08:02 27888356                   /home/cellis/.m2/repository/org/apache/httpcomponents/httpcore/4.3/httpcore-4.3.jar
+7f53e802d000-7f53e8038000 r--s 00084000 08:02 464647958                  /home/cellis/.m2/repository/org/apache/httpcomponents/httpclient/4.3.1/httpclient-4.3.1.jar
+7f53e8038000-7f53e8039000 r--s 00005000 08:02 27881269                   /home/cellis/.m2/repository/org/apache/httpcomponents/fluent-hc/4.3.1/fluent-hc-4.3.1.jar
+7f53e8039000-7f53e803a000 r--s 00005000 08:02 28189064                   /home/cellis/.m2/repository/com/intrbiz/gerald/polyakov-model/1.1.0/polyakov-model-1.1.0.jar
+7f53e803a000-7f53e8044000 r--s 00058000 08:02 317237807                  /home/cellis/.m2/repository/com/rabbitmq/amqp-client/3.4.3/amqp-client-3.4.3.jar
+7f53e8044000-7f53e8047000 r--s 00019000 08:02 27906962                   /home/cellis/.m2/repository/commons-pool/commons-pool/1.6/commons-pool-1.6.jar
+7f53e8047000-7f53e804a000 r--s 00025000 08:02 157665023                  /home/cellis/.m2/repository/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar
+7f53e804a000-7f53e804b000 r--s 00002000 08:02 542859499                  /home/cellis/.m2/repository/com/intrbiz/util/database-pool/1.2.0/database-pool-1.2.0.jar
+7f53e804b000-7f53e804d000 r--s 00009000 08:02 299135798                  /home/cellis/.m2/repository/com/intrbiz/util/queue/1.2.0/queue-1.2.0.jar
+7f53e804d000-7f53e804f000 r--s 00007000 08:02 280570858                  /home/cellis/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.1.2/jackson-annotations-2.1.2.jar
+7f53e804f000-7f53e805f000 r--s 000d2000 08:02 459765031                  /home/cellis/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.1.3/jackson-databind-2.1.3.jar
+7f53e805f000-7f53e8063000 r--s 0002f000 08:02 459765023                  /home/cellis/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.1.3/jackson-core-2.1.3.jar
+7f53e8063000-7f53e8068000 r--s 00021000 08:02 671101153                  /home/cellis/Intrbiz/workspace/bergamot/bergamot-message-model/target/bergamot-message-model-3.0.0-A1.jar
+7f53e8068000-7f53e8268000 rw-p 00000000 00:00 0 
+7f53e8268000-7f53e8468000 rw-p 00000000 00:00 0 
+7f53e8468000-7f53e846a000 r--s 00005000 08:02 405763370                  /home/cellis/.m2/repository/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar
+7f53e846a000-7f53e846d000 r--s 00012000 08:02 317144795                  /home/cellis/.m2/repository/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1.jar
+7f53e846d000-7f53e846f000 r--s 00001000 08:02 28184531                   /home/cellis/.m2/repository/com/intrbiz/gerald/gerald-witchcraft/1.1.0/gerald-witchcraft-1.1.0.jar
+7f53e846f000-7f53e8471000 r--s 00009000 08:02 542824379                  /home/cellis/Intrbiz/workspace/bergamot/bergamot-timerange/target/bergamot-timerange-3.0.0-A1.jar
+7f53e8471000-7f53e8671000 rw-p 00000000 00:00 0 
+7f53e8671000-7f53e8871000 rw-p 00000000 00:00 0 
+7f53e8871000-7f53e8a71000 rw-p 00000000 00:00 0 
+7f53e8a71000-7f53e8c71000 rw-p 00000000 00:00 0 
+7f53e8c71000-7f53e8e71000 rw-p 00000000 00:00 0 
+7f53e8e71000-7f53e8e74000 r--s 00019000 08:02 27599146                   /home/cellis/.m2/repository/com/intrbiz/core/core/1.0.1/core-1.0.1.jar
+7f53e8e74000-7f53e8e77000 r--s 00012000 08:02 414906993                  /home/cellis/Intrbiz/workspace/bergamot/bergamot-config/target/bergamot-config-3.0.0-A1.jar
+7f53e8e77000-7f53e8e79000 r--s 00009000 08:02 157831173                  /home/cellis/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
+7f53e8e79000-7f53e8e7b000 r--s 00007000 08:02 157394053                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.1/plexus-interpolation-1.1.jar
+7f53e8e7b000-7f53e8e80000 r--s 00039000 08:02 27595397                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-utils/1.5.6/plexus-utils-1.5.6.jar
+7f53e8e80000-7f53e8e82000 r--s 00001000 08:02 299078693                  /home/cellis/.m2/repository/com/intrbiz/util/packaging/1.1.1/packaging-1.1.1.jar
+7f53e8e82000-7f53e9082000 rw-p 00000000 00:00 0 
+7f53e9082000-7f53e9278000 rw-p 00000000 00:00 0 
+7f53e9278000-7f53e9285000 ---p 00000000 00:00 0 
+7f53e9285000-7f53e9383000 rw-p 00000000 00:00 0 
+7f53e9383000-7f53e9386000 ---p 00000000 00:00 0 
+7f53e9386000-7f53e9484000 rw-p 00000000 00:00 0 
+7f53e9484000-7f53e9487000 ---p 00000000 00:00 0 
+7f53e9487000-7f53e9785000 rw-p 00000000 00:00 0 
+7f53e9785000-7f53e97ba000 r--s 00000000 00:13 23593                      /run/nscd/group
+7f53e97ba000-7f53e97be000 r--s 00034000 08:02 27595420                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.jar
+7f53e97be000-7f53e97c2000 r--s 0002f000 08:02 316220628                  /home/cellis/.m2/repository/commons-lang/commons-lang/2.1/commons-lang-2.1.jar
+7f53e97c2000-7f53e97c5000 r--s 0000c000 08:02 157459058                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-io/2.0.1/plexus-io-2.0.1.jar
+7f53e97c5000-7f53e97c9000 r--s 00028000 08:02 27259889                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-archiver/2.0.1/plexus-archiver-2.0.1.jar
+7f53e97c9000-7f53e97ca000 r--s 00004000 08:02 459534820                  /home/cellis/.m2/repository/org/apache/maven/maven-archiver/2.4.2/maven-archiver-2.4.2.jar
+7f53e97ca000-7f53e97cb000 r--s 00007000 08:02 154108806                  /home/cellis/.m2/repository/org/apache/maven/plugins/maven-jar-plugin/2.3.2/maven-jar-plugin-2.3.2.jar
+7f53e97cb000-7f53e97ce000 ---p 00000000 00:00 0 
+7f53e97ce000-7f53e98cc000 rw-p 00000000 00:00 0 
+7f53e98cc000-7f53e98cf000 ---p 00000000 00:00 0 
+7f53e98cf000-7f53e99cd000 rw-p 00000000 00:00 0 
+7f53e99cd000-7f53e99d0000 ---p 00000000 00:00 0 
+7f53e99d0000-7f53e9ace000 rw-p 00000000 00:00 0 
+7f53e9ace000-7f53e9acf000 r--s 00002000 08:02 459535379                  /home/cellis/.m2/repository/org/apache/maven/reporting/maven-reporting-api/2.0.9/maven-reporting-api-2.0.9.jar
+7f53e9acf000-7f53e9ccf000 rw-p 00000000 00:00 0 
+7f53e9ccf000-7f53e9cd2000 r--s 00034000 08:02 316220547                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-utils/2.1/plexus-utils-2.1.jar
+7f53e9cd2000-7f53e9cd4000 r--s 0000d000 08:02 157459041                  /home/cellis/.m2/repository/org/apache/maven/surefire/maven-surefire-common/2.10/maven-surefire-common-2.10.jar
+7f53e9cd4000-7f53e9cd9000 r--s 00023000 08:02 459534750                  /home/cellis/.m2/repository/org/apache/maven/surefire/surefire-api/2.10/surefire-api-2.10.jar
+7f53e9cd9000-7f53e9cdb000 r--s 00007000 08:02 157459037                  /home/cellis/.m2/repository/org/apache/maven/surefire/surefire-booter/2.10/surefire-booter-2.10.jar
+7f53e9cdb000-7f53e9cdd000 r--s 00006000 08:02 320103918                  /home/cellis/.m2/repository/org/apache/maven/plugins/maven-surefire-plugin/2.10/maven-surefire-plugin-2.10.jar
+7f53e9cdd000-7f53e9edd000 rw-p 00000000 00:00 0 
+7f53e9edd000-7f53ea0dd000 rw-p 00000000 00:00 0 
+7f53ea0dd000-7f53ea0de000 r--p 00000000 00:25 2888694                    /usr/share/locale/en_GB/LC_MESSAGES/libc.mo
+7f53ea0de000-7f53ea0df000 r--s 00001000 08:02 419010247                  /home/cellis/Intrbiz/workspace/bergamot/bergamot-util/target/bergamot-util.jar
+7f53ea0df000-7f53ea2df000 rw-p 00000000 00:00 0 
+7f53ea2df000-7f53ea4df000 rw-p 00000000 00:00 0 
+7f53ea4df000-7f53ea6df000 rw-p 00000000 00:00 0 
+7f53ea6df000-7f53ea8df000 rw-p 00000000 00:00 0 
+7f53ea8df000-7f53ea958000 r--s 010df000 08:02 277492227                  /home/cellis/bin/jdk1.8.0_25/lib/tools.jar
+7f53ea958000-7f53ea959000 r--s 00003000 08:02 280569817                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-compiler-javac/1.5.3/plexus-compiler-javac-1.5.3.jar
+7f53ea959000-7f53ea95b000 r--s 00000000 08:02 27350469                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-compiler-manager/1.5.3/plexus-compiler-manager-1.5.3.jar
+7f53ea95b000-7f53ea95c000 r--s 00004000 08:02 28170248                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-compiler-api/1.5.3/plexus-compiler-api-1.5.3.jar
+7f53ea95c000-7f53ea95e000 r--s 00026000 08:02 280569740                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-utils/1.0.4/plexus-utils-1.0.4.jar
+7f53ea95e000-7f53ea95f000 r--s 00004000 08:02 5688                       /home/cellis/.m2/repository/org/apache/maven/plugins/maven-compiler-plugin/2.0.2/maven-compiler-plugin-2.0.2.jar
+7f53ea95f000-7f53ea961000 r--s 0000d000 08:02 459534931                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.13/plexus-interpolation-1.13.jar
+7f53ea961000-7f53ea962000 r--s 00001000 08:02 405766794                  /home/cellis/.m2/repository/org/sonatype/plexus/plexus-build-api/0.0.4/plexus-build-api-0.0.4.jar
+7f53ea962000-7f53ea964000 r--s 00009000 08:02 316254021                  /home/cellis/.m2/repository/org/apache/maven/shared/maven-filtering/1.0/maven-filtering-1.0.jar
+7f53ea964000-7f53ea966000 r--s 00005000 08:02 27888648                   /home/cellis/.m2/repository/org/apache/maven/plugins/maven-resources-plugin/2.5/maven-resources-plugin-2.5.jar
+7f53ea966000-7f53ea967000 r--s 00002000 08:02 316257575                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.jar
+7f53ea967000-7f53ea96b000 r--s 00035000 08:02 464648466                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-utils/3.0.5/plexus-utils-3.0.5.jar
+7f53ea96b000-7f53ea970000 r--s 00029000 08:02 27349111                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-archiver/2.1.2/plexus-archiver-2.1.2.jar
+7f53ea970000-7f53ea974000 r--s 00028000 08:02 154103766                  /home/cellis/.m2/repository/com/thoughtworks/qdox/qdox/1.12.1/qdox-1.12.1.jar
+7f53ea974000-7f53eab74000 rw-p 00000000 00:00 0 
+7f53eab74000-7f53eab77000 ---p 00000000 00:00 0 
+7f53eab77000-7f53eac75000 rw-p 00000000 00:00 0 
+7f53eac75000-7f53eac78000 ---p 00000000 00:00 0 
+7f53eac78000-7f53eaf76000 rw-p 00000000 00:00 0 
+7f53eaf76000-7f53eaf8c000 r-xp 00000000 00:25 2786568                    /lib64/libgcc_s.so.1
+7f53eaf8c000-7f53eb18b000 ---p 00016000 00:25 2786568                    /lib64/libgcc_s.so.1
+7f53eb18b000-7f53eb18c000 r--p 00015000 00:25 2786568                    /lib64/libgcc_s.so.1
+7f53eb18c000-7f53eb18d000 rw-p 00016000 00:25 2786568                    /lib64/libgcc_s.so.1
+7f53eb18d000-7f53eb1bf000 r-xp 00000000 08:02 277411873                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libsunec.so
+7f53eb1bf000-7f53eb3be000 ---p 00032000 08:02 277411873                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libsunec.so
+7f53eb3be000-7f53eb3c4000 rw-p 00031000 08:02 277411873                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libsunec.so
+7f53eb3c4000-7f53eb3d4000 rw-p 00000000 00:00 0 
+7f53eb3d4000-7f53eb3d7000 ---p 00000000 00:00 0 
+7f53eb3d7000-7f53eb4d5000 rw-p 00000000 00:00 0 
+7f53eb4d5000-7f53eb4d8000 ---p 00000000 00:00 0 
+7f53eb4d8000-7f53eb5d6000 rw-p 00000000 00:00 0 
+7f53eb5d6000-7f53eb5e7000 r-xp 00000000 08:02 277411830                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libnio.so
+7f53eb5e7000-7f53eb7e6000 ---p 00011000 08:02 277411830                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libnio.so
+7f53eb7e6000-7f53eb7e7000 rw-p 00010000 08:02 277411830                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libnio.so
+7f53eb7e7000-7f53eb7fd000 r-xp 00000000 08:02 277411829                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libnet.so
+7f53eb7fd000-7f53eb9fd000 ---p 00016000 08:02 277411829                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libnet.so
+7f53eb9fd000-7f53eb9fe000 rw-p 00016000 08:02 277411829                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libnet.so
+7f53eb9fe000-7f53ebbfe000 rw-p 00000000 00:00 0 
+7f53ebbfe000-7f53ebdfe000 rw-p 00000000 00:00 0 
+7f53ebdfe000-7f53ebdff000 ---p 00000000 00:00 0 
+7f53ebdff000-7f53ebeff000 rw-p 00000000 00:00 0 
+7f53ebeff000-7f53ebf02000 ---p 00000000 00:00 0 
+7f53ebf02000-7f53ec000000 rw-p 00000000 00:00 0 
+7f53ec000000-7f53ec021000 rw-p 00000000 00:00 0 
+7f53ec021000-7f53f0000000 ---p 00000000 00:00 0 
+7f53f0000000-7f53f0001000 r--s 00005000 08:02 464648186                  /home/cellis/.m2/repository/org/apache/maven/plugins/maven-install-plugin/2.3.1/maven-install-plugin-2.3.1.jar
+7f53f0001000-7f53f0008000 r--s 00053000 08:02 155166984                  /home/cellis/.m2/repository/log4j/log4j/1.2.14/log4j-1.2.14.jar
+7f53f0008000-7f53f000a000 r--s 0000d000 08:02 316220615                  /home/cellis/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar
+7f53f000a000-7f53f0010000 r--s 00033000 08:02 157665007                  /home/cellis/.m2/repository/commons-codec/commons-codec/1.6/commons-codec-1.6.jar
+7f53f0010000-7f53f0016000 r--s 00031000 08:02 154107892                  /home/cellis/.m2/repository/org/apache/httpcomponents/httpcore/4.2.2/httpcore-4.2.2.jar
+7f53f0016000-7f53f001f000 r--s 00061000 08:02 320103632                  /home/cellis/.m2/repository/org/apache/httpcomponents/httpclient/4.2.3/httpclient-4.2.3.jar
+7f53f001f000-7f53f0023000 r--s 00027000 08:02 27282665                   /home/cellis/.m2/repository/commons-io/commons-io/2.2/commons-io-2.2.jar
+7f53f0023000-7f53f0027000 r--s 0003c000 08:02 459688503                  /home/cellis/.m2/repository/commons-lang/commons-lang/2.4/commons-lang-2.4.jar
+7f53f0027000-7f53f0029000 r--s 00004000 08:02 464648054                  /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-module-xhtml/1.0/doxia-module-xhtml-1.0.jar
+7f53f0029000-7f53f002a000 r--s 00006000 08:02 320103752                  /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-module-xdoc/1.0/doxia-module-xdoc-1.0.jar
+7f53f002a000-7f53f002b000 r--s 00004000 08:02 28170220                   /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-module-fml/1.0/doxia-module-fml-1.0.jar
+7f53f002b000-7f53f002d000 r--s 0000a000 08:02 464648048                  /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-module-apt/1.0/doxia-module-apt-1.0.jar
+7f53f002d000-7f53f003a000 r--s 0007f000 08:02 459753944                  /home/cellis/.m2/repository/commons-collections/commons-collections/3.2/commons-collections-3.2.jar
+7f53f003a000-7f53f003b000 r--s 0000b000 08:02 154108656                  /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-decoration-model/1.0/doxia-decoration-model-1.0.jar
+7f53f003b000-7f53f003d000 r--s 0000e000 08:02 154103718                  /home/cellis/.m2/repository/oro/oro/2.0.8/oro-2.0.8.jar
+7f53f003d000-7f53f0045000 r--s 00058000 08:02 459753917                  /home/cellis/.m2/repository/org/apache/velocity/velocity/1.5/velocity-1.5.jar
+7f53f0045000-7f53f0046000 r--s 00001000 08:02 459753909                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-velocity/1.1.7/plexus-velocity-1.1.7.jar
+7f53f0046000-7f53f0047000 r--s 00002000 08:02 27282516                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-i18n/1.0-beta-7/plexus-i18n-1.0-beta-7.jar
+7f53f0047000-7f53f004a000 r--s 0000b000 08:02 27888460                   /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-core/1.0/doxia-core-1.0.jar
+7f53f004a000-7f53f004c000 r--s 0000a000 08:02 27881345                   /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-site-renderer/1.0/doxia-site-renderer-1.0.jar
+7f53f004c000-7f53f004d000 r--s 00002000 08:02 27970665                   /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-sink-api/1.0/doxia-sink-api-1.0.jar
+7f53f004d000-7f53f004f000 r--s 00006000 08:02 459534791                  /home/cellis/.m2/repository/org/apache/maven/shared/maven-common-artifact-filters/1.3/maven-common-artifact-filters-1.3.jar
+7f53f004f000-7f53f0050000 r--s 00006000 08:02 27970669                   /home/cellis/.m2/repository/org/apache/maven/shared/maven-invoker/2.0.9/maven-invoker-2.0.9.jar
+7f53f0050000-7f53f0051000 r--s 00002000 08:02 316254022                  /home/cellis/.m2/repository/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar
+7f53f0051000-7f53f0059000 r--s 00049000 08:02 153923922                  /home/cellis/.m2/repository/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar
+7f53f0059000-7f53f005b000 r--s 0000b000 08:02 459534878                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.jar
+7f53f005b000-7f53f005d000 r--s 00002000 08:02 27260003                   /home/cellis/.m2/repository/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.jar
+7f53f005d000-7f53f005e000 r--s 00006000 08:02 459539327                  /home/cellis/.m2/repository/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar
+7f53f005e000-7f53f0060000 r--s 00009000 08:02 459535010                  /home/cellis/.m2/repository/commons-cli/commons-cli/1.2/commons-cli-1.2.jar
+7f53f0060000-7f53f0062000 r--s 00003000 08:02 27260010                   /home/cellis/.m2/repository/org/slf4j/jcl-over-slf4j/1.5.6/jcl-over-slf4j-1.5.6.jar
+7f53f0062000-7f53f0064000 r--s 00004000 08:02 316220746                  /home/cellis/.m2/repository/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.jar
+7f53f0064000-7f53f0066000 r--s 00001000 08:02 27260004                   /home/cellis/.m2/repository/org/slf4j/slf4j-jdk14/1.5.6/slf4j-jdk14-1.5.6.jar
+7f53f0066000-7f53f0068000 r--s 00058000 08:02 464648191                  /home/cellis/.m2/repository/org/apache/maven/plugins/maven-javadoc-plugin/2.9.1/maven-javadoc-plugin-2.9.1.jar
+7f53f0068000-7f53f006c000 r--s 00035000 08:02 157394089                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-utils/3.0.8/plexus-utils-3.0.8.jar
+7f53f006c000-7f53f006f000 r--s 0000c000 08:02 459754821                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-io/2.0.4/plexus-io-2.0.4.jar
+7f53f006f000-7f53f0074000 r--s 00029000 08:02 157394007                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-archiver/2.2/plexus-archiver-2.2.jar
+7f53f0074000-7f53f0076000 r--s 0000d000 08:02 459754819                  /home/cellis/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.15/plexus-interpolation-1.15.jar
+7f53f0076000-7f53f0078000 r--s 00002000 08:02 27350510                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.jar
+7f53f0078000-7f53f007a000 r--s 00006000 08:02 27906910                   /home/cellis/.m2/repository/commons-cli/commons-cli/1.0/commons-cli-1.0.jar
+7f53f007a000-7f53f007b000 r--s 00001000 08:02 154108684                  /home/cellis/.m2/repository/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-7/doxia-sink-api-1.0-alpha-7.jar
+7f53f007b000-7f53f007c000 r--s 00002000 08:02 27259790                   /home/cellis/.m2/repository/org/apache/maven/reporting/maven-reporting-api/2.0.6/maven-reporting-api-2.0.6.jar
+7f53f007c000-7f53f007e000 r--s 00004000 08:02 27888505                   /home/cellis/.m2/repository/org/apache/maven/maven-archiver/2.5/maven-archiver-2.5.jar
+7f53f007e000-7f53f0081000 r--s 0001b000 08:02 459623890                  /home/cellis/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar
+7f53f0081000-7f53f0083000 r--s 00006000 08:02 27888657                   /home/cellis/.m2/repository/org/apache/maven/plugins/maven-source-plugin/2.2.1/maven-source-plugin-2.2.1.jar
+7f53f0083000-7f53f0087000 r--s 00033000 08:02 27595413                   /home/cellis/.m2/repository/org/codehaus/plexus/plexus-utils/2.0.5/plexus-utils-2.0.5.jar
+7f53f0087000-7f53f0088000 r--s 00005000 08:02 154108781                  /home/cellis/.m2/repository/org/apache/maven/plugins/maven-clean-plugin/2.4.1/maven-clean-plugin-2.4.1.jar
+7f53f0088000-7f53f00bd000 r--s 00000000 00:13 23594                      /run/nscd/dbD4ivxR (deleted)
+7f53f00bd000-7f53f00c0000 ---p 00000000 00:00 0 
+7f53f00c0000-7f53f01be000 rw-p 00000000 00:00 0 
+7f53f01be000-7f53f01c1000 ---p 00000000 00:00 0 
+7f53f01c1000-7f53f02bf000 rw-p 00000000 00:00 0 
+7f53f02bf000-7f53f02c2000 ---p 00000000 00:00 0 
+7f53f02c2000-7f53f4000000 rw-p 00000000 00:00 0 
+7f53f4000000-7f53f4021000 rw-p 00000000 00:00 0 
+7f53f4021000-7f53f8000000 ---p 00000000 00:00 0 
+7f53f8000000-7f53f8001000 r--s 00009000 08:02 404011023                  /home/cellis/bin/jdk1.8.0_25/jre/lib/ext/sunec.jar
+7f53f8001000-7f53f8003000 r--s 0001a000 08:02 5585893                    /home/cellis/bin/jdk1.8.0_25/jre/lib/jce.jar
+7f53f8003000-7f53f8006000 ---p 00000000 00:00 0 
+7f53f8006000-7f53f803c000 rw-p 00000000 00:00 0 
+7f53f803c000-7f53f803d000 r--p 00000000 00:00 0 
+7f53f803d000-7f53f8041000 r--s 00093000 08:02 5585897                    /home/cellis/bin/jdk1.8.0_25/jre/lib/jsse.jar
+7f53f8041000-7f53f8043000 r--s 0000b000 08:02 268666013                  /home/cellis/bin/apache-maven-3.0.4/lib/wagon-provider-api-2.2.jar
+7f53f8043000-7f53f8056000 r--s 000af000 08:02 268666012                  /home/cellis/bin/apache-maven-3.0.4/lib/wagon-http-2.2-shaded.jar
+7f53f8056000-7f53f8057000 r--s 00002000 08:02 268666011                  /home/cellis/bin/apache-maven-3.0.4/lib/wagon-file-2.2.jar
+7f53f8057000-7f53f8061000 r--s 00116000 08:02 404011034                  /home/cellis/bin/jdk1.8.0_25/jre/lib/ext/localedata.jar
+7f53f8061000-7f53f807d000 r--s 00393000 08:02 404011031                  /home/cellis/bin/jdk1.8.0_25/jre/lib/ext/cldrdata.jar
+7f53f807d000-7f53f8083000 r--s 0002c000 08:02 268666010                  /home/cellis/bin/apache-maven-3.0.4/lib/sisu-inject-plexus-2.3.0.jar
+7f53f8083000-7f53f808a000 r--s 00040000 08:02 268666009                  /home/cellis/bin/apache-maven-3.0.4/lib/sisu-inject-bean-2.3.0.jar
+7f53f808a000-7f53f8092000 r--s 00050000 08:02 268666008                  /home/cellis/bin/apache-maven-3.0.4/lib/sisu-guice-3.1.0-no_aop.jar
+7f53f8092000-7f53f80b1000 r--s 00152000 08:02 268666007                  /home/cellis/bin/apache-maven-3.0.4/lib/sisu-guava-0.9.9.jar
+7f53f80b1000-7f53f80b5000 r--s 00033000 08:02 268666006                  /home/cellis/bin/apache-maven-3.0.4/lib/plexus-utils-2.0.6.jar
+7f53f80b5000-7f53f80b6000 r--s 00006000 08:02 268666005                  /home/cellis/bin/apache-maven-3.0.4/lib/plexus-sec-dispatcher-1.3.jar
+7f53f80b6000-7f53f80b8000 r--s 0000d000 08:02 268666004                  /home/cellis/bin/apache-maven-3.0.4/lib/plexus-interpolation-1.14.jar
+7f53f80b8000-7f53f80ba000 r--s 00000000 08:02 268666003                  /home/cellis/bin/apache-maven-3.0.4/lib/plexus-component-annotations-1.5.5.jar
+7f53f80ba000-7f53f80bc000 r--s 00002000 08:02 268666002                  /home/cellis/bin/apache-maven-3.0.4/lib/plexus-cipher-1.7.jar
+7f53f80bc000-7f53f80bf000 r--s 00008000 08:02 268666001                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-settings-builder-3.0.4.jar
+7f53f80bf000-7f53f80c1000 r--s 0000a000 08:02 268666000                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-settings-3.0.4.jar
+7f53f80c1000-7f53f80c3000 r--s 00006000 08:02 268665999                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-repository-metadata-3.0.4.jar
+7f53f80c3000-7f53f80c5000 r--s 0000b000 08:02 268665998                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-plugin-api-3.0.4.jar
+7f53f80c5000-7f53f80c9000 r--s 00021000 08:02 268665997                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-model-builder-3.0.4.jar
+7f53f80c9000-7f53f80cb000 r--s 00026000 08:02 268665996                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-model-3.0.4.jar
+7f53f80cb000-7f53f80cc000 r--s 0000a000 08:02 268665995                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-embedder-3.0.4.jar
+7f53f80cc000-7f53f80d8000 r--s 0007d000 08:02 268665994                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-core-3.0.4.jar
+7f53f80d8000-7f53f80de000 r--s 0003f000 08:02 268665993                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-compat-3.0.4.jar
+7f53f80de000-7f53f80e0000 r--s 0000b000 08:02 268665992                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-artifact-3.0.4.jar
+7f53f80e0000-7f53f80e2000 r--s 0000c000 08:02 268665991                  /home/cellis/bin/apache-maven-3.0.4/lib/maven-aether-provider-3.0.4.jar
+7f53f80e2000-7f53f80e4000 r--s 00009000 08:02 268665990                  /home/cellis/bin/apache-maven-3.0.4/lib/commons-cli-1.2.jar
+7f53f80e4000-7f53f80e8000 r--s 0001c000 08:02 268665989                  /home/cellis/bin/apache-maven-3.0.4/lib/aether-util-1.13.1.jar
+7f53f80e8000-7f53f80e9000 r--s 00003000 08:02 268665988                  /home/cellis/bin/apache-maven-3.0.4/lib/aether-spi-1.13.1.jar
+7f53f80e9000-7f53f80ec000 r--s 0001d000 08:02 268665987                  /home/cellis/bin/apache-maven-3.0.4/lib/aether-impl-1.13.1.jar
+7f53f80ec000-7f53f80ee000 r--s 00006000 08:02 268665986                  /home/cellis/bin/apache-maven-3.0.4/lib/aether-connector-wagon-1.13.1.jar
+7f53f80ee000-7f53f80f1000 r--s 00013000 08:02 268665983                  /home/cellis/bin/apache-maven-3.0.4/lib/aether-api-1.13.1.jar
+7f53f80f1000-7f53f80f4000 ---p 00000000 00:00 0 
+7f53f80f4000-7f53f81f2000 rw-p 00000000 00:00 0 
+7f53f81f2000-7f53f8240000 r--p 00000000 00:25 2888722                    /usr/lib/locale/en_GB.utf8/LC_CTYPE
+7f53f8240000-7f53f8370000 r--p 00000000 00:25 2888728                    /usr/lib/locale/en_GB.utf8/LC_COLLATE
+7f53f8370000-7f53f8373000 ---p 00000000 00:00 0 
+7f53f8373000-7f53f8471000 rw-p 00000000 00:00 0 
+7f53f8471000-7f53f8474000 ---p 00000000 00:00 0 
+7f53f8474000-7f53f8572000 rw-p 00000000 00:00 0 
+7f53f8572000-7f53f8573000 ---p 00000000 00:00 0 
+7f53f8573000-7f53f9000000 rw-p 00000000 00:00 0 
+7f53f9000000-7f5401160000 rwxp 00000000 00:00 0 
+7f5401160000-7f5408000000 ---p 00000000 00:00 0 
+7f5408000000-7f540a61e000 rw-p 00000000 00:00 0 
+7f540a61e000-7f540c000000 ---p 00000000 00:00 0 
+7f540c000000-7f540c002000 r--s 0000a000 08:02 24905                      /home/cellis/bin/apache-maven-3.0.4/boot/plexus-classworlds-2.4.jar
+7f540c002000-7f540c678000 rw-p 00000000 00:00 0 
+7f540c678000-7f540c84e000 r--s 03caa000 08:02 5585907                    /home/cellis/bin/jdk1.8.0_25/jre/lib/rt.jar
+7f540c84e000-7f540d488000 rw-p 00000000 00:00 0 
+7f540d488000-7f540d489000 ---p 00000000 00:00 0 
+7f540d489000-7f540d589000 rw-p 00000000 00:00 0 
+7f540d589000-7f540d58a000 ---p 00000000 00:00 0 
+7f540d58a000-7f540d68a000 rw-p 00000000 00:00 0 
+7f540d68a000-7f540d68b000 ---p 00000000 00:00 0 
+7f540d68b000-7f540d78b000 rw-p 00000000 00:00 0 
+7f540d78b000-7f540d78c000 ---p 00000000 00:00 0 
+7f540d78c000-7f540d935000 rw-p 00000000 00:00 0 
+7f540d935000-7f540db0f000 ---p 00000000 00:00 0 
+7f540db0f000-7f540dbb8000 rw-p 00000000 00:00 0 
+7f540dbb8000-7f540dd91000 ---p 00000000 00:00 0 
+7f540dd91000-7f540ded3000 rw-p 00000000 00:00 0 
+7f540ded3000-7f540e0da000 rw-p 00000000 00:00 0 
+7f540e0da000-7f540e294000 ---p 00000000 00:00 0 
+7f540e294000-7f540e2ae000 r-xp 00000000 08:02 277411909                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libzip.so
+7f540e2ae000-7f540e4ae000 ---p 0001a000 08:02 277411909                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libzip.so
+7f540e4ae000-7f540e4af000 rw-p 0001a000 08:02 277411909                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libzip.so
+7f540e4af000-7f540e4d9000 r-xp 00000000 08:02 277350234                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libjava.so
+7f540e4d9000-7f540e6d9000 ---p 0002a000 08:02 277350234                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libjava.so
+7f540e6d9000-7f540e6db000 rw-p 0002a000 08:02 277350234                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libjava.so
+7f540e6db000-7f540e6e8000 r-xp 00000000 08:02 277411907                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libverify.so
+7f540e6e8000-7f540e8e8000 ---p 0000d000 08:02 277411907                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libverify.so
+7f540e8e8000-7f540e8ea000 rw-p 0000d000 08:02 277411907                  /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/libverify.so
+7f540e8ea000-7f540e8f1000 r-xp 00000000 00:25 2869932                    /lib64/librt-2.23.so
+7f540e8f1000-7f540eaf0000 ---p 00007000 00:25 2869932                    /lib64/librt-2.23.so
+7f540eaf0000-7f540eaf1000 r--p 00006000 00:25 2869932                    /lib64/librt-2.23.so
+7f540eaf1000-7f540eaf2000 rw-p 00007000 00:25 2869932                    /lib64/librt-2.23.so
+7f540eaf2000-7f540ebf6000 r-xp 00000000 00:25 2869906                    /lib64/libm-2.23.so
+7f540ebf6000-7f540edf5000 ---p 00104000 00:25 2869906                    /lib64/libm-2.23.so
+7f540edf5000-7f540edf6000 r--p 00103000 00:25 2869906                    /lib64/libm-2.23.so
+7f540edf6000-7f540edf7000 rw-p 00104000 00:25 2869906                    /lib64/libm-2.23.so
+7f540edf7000-7f540fa64000 r-xp 00000000 08:02 5784576                    /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/server/libjvm.so
+7f540fa64000-7f540fc63000 ---p 00c6d000 08:02 5784576                    /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/server/libjvm.so
+7f540fc63000-7f540fd39000 rw-p 00c6c000 08:02 5784576                    /home/cellis/bin/jdk1.8.0_25/jre/lib/amd64/server/libjvm.so
+7f540fd39000-7f540fd7c000 rw-p 00000000 00:00 0 
+7f540fd7c000-7f540ff14000 r-xp 00000000 00:25 2869898                    /lib64/libc-2.23.so
+7f540ff14000-7f5410114000 ---p 00198000 00:25 2869898                    /lib64/libc-2.23.so
+7f5410114000-7f5410118000 r--p 00198000 00:25 2869898                    /lib64/libc-2.23.so
+7f5410118000-7f541011a000 rw-p 0019c000 00:25 2869898                    /lib64/libc-2.23.so
+7f541011a000-7f541011e000 rw-p 00000000 00:00 0 
+7f541011e000-7f5410120000 r-xp 00000000 00:25 2869904                    /lib64/libdl-2.23.so
+7f5410120000-7f5410320000 ---p 00002000 00:25 2869904                    /lib64/libdl-2.23.so
+7f5410320000-7f5410321000 r--p 00002000 00:25 2869904                    /lib64/libdl-2.23.so
+7f5410321000-7f5410322000 rw-p 00003000 00:25 2869904                    /lib64/libdl-2.23.so
+7f5410322000-7f5410337000 r-xp 00000000 08:02 277492245                  /home/cellis/bin/jdk1.8.0_25/lib/amd64/jli/libjli.so
+7f5410337000-7f5410536000 ---p 00015000 08:02 277492245                  /home/cellis/bin/jdk1.8.0_25/lib/amd64/jli/libjli.so
+7f5410536000-7f5410537000 rw-p 00014000 08:02 277492245                  /home/cellis/bin/jdk1.8.0_25/lib/amd64/jli/libjli.so
+7f5410537000-7f541054f000 r-xp 00000000 00:25 2869928                    /lib64/libpthread-2.23.so
+7f541054f000-7f541074e000 ---p 00018000 00:25 2869928                    /lib64/libpthread-2.23.so
+7f541074e000-7f541074f000 r--p 00017000 00:25 2869928                    /lib64/libpthread-2.23.so
+7f541074f000-7f5410750000 rw-p 00018000 00:25 2869928                    /lib64/libpthread-2.23.so
+7f5410750000-7f5410754000 rw-p 00000000 00:00 0 
+7f5410754000-7f5410778000 r-xp 00000000 00:25 2869890                    /lib64/ld-2.23.so
+7f5410778000-7f5410779000 r--p 00000000 00:25 2888747                    /usr/lib/locale/en_GB.utf8/LC_NUMERIC
+7f5410779000-7f541077a000 r--p 00000000 00:25 2888924                    /usr/lib/locale/en_GB.utf8/LC_TIME
+7f541077a000-7f541077b000 r--p 00000000 00:25 2888869                    /usr/lib/locale/en_GB.utf8/LC_MONETARY
+7f541077b000-7f541077c000 r--p 00000000 00:25 2888756                    /usr/lib/locale/en_GB.utf8/LC_MESSAGES/SYS_LC_MESSAGES
+7f541077c000-7f541077d000 r--p 00000000 00:25 2888726                    /usr/lib/locale/en_GB.utf8/LC_PAPER
+7f541077d000-7f541077e000 r--p 00000000 00:25 2888870                    /usr/lib/locale/en_GB.utf8/LC_NAME
+7f541077e000-7f541077f000 r--p 00000000 00:25 2886780                    /usr/lib/locale/en_GB.utf8/LC_ADDRESS
+7f541077f000-7f5410780000 r--p 00000000 00:25 2888871                    /usr/lib/locale/en_GB.utf8/LC_TELEPHONE
+7f5410780000-7f5410787000 r--s 00000000 00:25 2889134                    /usr/lib64/gconv/gconv-modules.cache
+7f5410787000-7f541080a000 rw-p 00000000 00:00 0 
+7f541080a000-7f541083f000 r--s 00000000 00:13 23592                      /run/nscd/passwd
+7f541083f000-7f5410842000 ---p 00000000 00:00 0 
+7f5410842000-7f5410944000 rw-p 00000000 00:00 0 
+7f5410944000-7f5410945000 r--p 00000000 00:25 2888723                    /usr/lib/locale/en_GB.utf8/LC_MEASUREMENT
+7f5410945000-7f5410946000 r--p 00000000 00:25 2886781                    /usr/lib/locale/en_GB.utf8/LC_IDENTIFICATION
+7f5410946000-7f541096c000 rw-p 00000000 00:00 0 
+7f541096c000-7f5410974000 rw-s 00000000 00:2a 659066                     /tmp/hsperfdata_cellis/975
+7f5410974000-7f5410975000 rw-p 00000000 00:00 0 
+7f5410975000-7f5410976000 ---p 00000000 00:00 0 
+7f5410976000-7f5410977000 rw-p 00000000 00:00 0 
+7f5410977000-7f5410978000 r--p 00023000 00:25 2869890                    /lib64/ld-2.23.so
+7f5410978000-7f5410979000 rw-p 00024000 00:25 2869890                    /lib64/ld-2.23.so
+7f5410979000-7f541097a000 rw-p 00000000 00:00 0 
+7ffea7fd2000-7ffea7ff3000 rw-p 00000000 00:00 0                          [stack]
+7ffea7ff9000-7ffea7ffc000 r--p 00000000 00:00 0                          [vvar]
+7ffea7ffc000-7ffea7ffe000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+
+VM Arguments:
+jvm_args: -Dclassworlds.conf=/home/cellis/bin/apache-maven-3.0.4/bin/m2.conf -Dmaven.home=/home/cellis/bin/apache-maven-3.0.4 
+java_command: org.codehaus.plexus.classworlds.launcher.Launcher clean install package
+java_class_path (initial): /home/cellis/bin/apache-maven-3.0.4/boot/plexus-classworlds-2.4.jar
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+JAVA_HOME=/home/cellis/bin/jdk
+JRE_HOME=/usr/lib64/jvm/java/jre
+PATH=/home/cellis/bin/bin:/home/cellis/bin/jdk/bin:/home/cellis/bin/bin:/home/cellis/bin/jdk/bin:/home/cellis/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games
+SHELL=/bin/bash
+DISPLAY=:0
+HOSTTYPE=x86_64
+OSTYPE=linux
+MACHTYPE=x86_64-suse-linux
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0xa79a80], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGBUS: [libjvm.so+0xa79a80], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGFPE: [libjvm.so+0x8e24e0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGPIPE: [libjvm.so+0x8e24e0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGXFSZ: [libjvm.so+0x8e24e0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGILL: [libjvm.so+0x8e24e0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGUSR1: SIG_DFL, sa_mask[0]=00000000000000000000000000000000, sa_flags=none
+SIGUSR2: [libjvm.so+0x8e3d10], sa_mask[0]=00000000000000000000000000000000, sa_flags=SA_RESTART|SA_SIGINFO
+SIGHUP: [libjvm.so+0x8e50d0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGINT: [libjvm.so+0x8e50d0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGTERM: [libjvm.so+0x8e50d0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGQUIT: [libjvm.so+0x8e50d0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+
+
+---------------  S Y S T E M  ---------------
+
+OS:LSB_VERSION="core-2.0-noarch:core-3.2-noarch:core-4.0-noarch:core-2.0-x86_64:core-3.2-x86_64:core-4.0-x86_64"
+DISTRIB_ID="openSUSE"
+DISTRIB_RELEASE="20160422"
+DISTRIB_CODENAME="Tumbleweed"
+DISTRIB_DESCRIPTION="openSUSE Tumbleweed (20160422) (x86_64)"
+
+uname:Linux 4.6.2-1-default #1 SMP PREEMPT Fri Jun 10 08:12:44 UTC 2016 (2a68ef0) x86_64
+libc:glibc 2.23 NPTL 2.23 
+rlimit: STACK 8192k, CORE 0k, NPROC 1200, NOFILE 4096, AS infinity
+load average:2.78 1.89 1.27
+
+/proc/meminfo:
+MemTotal:        7892296 kB
+MemFree:          131888 kB
+MemAvailable:      78256 kB
+Buffers:              16 kB
+Cached:           327780 kB
+SwapCached:            0 kB
+Active:          7166604 kB
+Inactive:         245604 kB
+Active(anon):    7106472 kB
+Inactive(anon):   187248 kB
+Active(file):      60132 kB
+Inactive(file):    58356 kB
+Unevictable:          48 kB
+Mlocked:              48 kB
+SwapTotal:             0 kB
+SwapFree:              0 kB
+Dirty:               688 kB
+Writeback:             0 kB
+AnonPages:       7084984 kB
+Mapped:           183576 kB
+Shmem:            208828 kB
+Slab:             127052 kB
+SReclaimable:      43996 kB
+SUnreclaim:        83056 kB
+KernelStack:       18576 kB
+PageTables:       110748 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     3946148 kB
+Committed_AS:   15479792 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:           0 kB
+VmallocChunk:          0 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:   2375680 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:      442876 kB
+DirectMap2M:     7661568 kB
+
+
+CPU:total 4 (2 cores per cpu, 2 threads per core) family 6 model 58 stepping 9, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, aes, clmul, erms, ht, tsc, tscinvbit, tscinv
+
+/proc/cpuinfo:
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 58
+model name	: Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz
+stepping	: 9
+microcode	: 0x1c
+cpu MHz		: 3234.765
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5188.26
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 58
+model name	: Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz
+stepping	: 9
+microcode	: 0x1c
+cpu MHz		: 3155.750
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 1
+initial apicid	: 1
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5189.48
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 58
+model name	: Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz
+stepping	: 9
+microcode	: 0x1c
+cpu MHz		: 3099.890
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 1
+cpu cores	: 2
+apicid		: 2
+initial apicid	: 2
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5189.17
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 58
+model name	: Intel(R) Core(TM) i5-3320M CPU @ 2.60GHz
+stepping	: 9
+microcode	: 0x1c
+cpu MHz		: 3099.992
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 1
+cpu cores	: 2
+apicid		: 3
+initial apicid	: 3
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 13
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm epb tpr_shadow vnmi flexpriority ept vpid fsgsbase smep erms xsaveopt dtherm ida arat pln pts
+bugs		:
+bogomips	: 5189.17
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+
+
+Memory: 4k page, physical 7892296k(131888k free), swap 0k(0k free)
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (25.25-b02) for linux-amd64 JRE (1.8.0_25-b17), built on Sep 17 2014 17:32:11 by "java_re" with gcc 4.3.0 20080428 (Red Hat 4.3.0-8)
+
+time: Thu Jun 23 15:12:06 2016
+elapsed time: 209 seconds (0d 0h 3m 29s)
+
