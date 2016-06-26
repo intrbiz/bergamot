@@ -11,7 +11,7 @@ public class BergamotConfigResolver
 {   
     private Logger logger = Logger.getLogger(BergamotConfigResolver.class);
     
-    protected final BergamotObjectLocator locator;
+    private final BergamotObjectLocator locator;
     
     private final Timer lookupTimer = Witchcraft.get().source("com.intrbiz.config.bergamot").getRegistry().timer(Witchcraft.name(BergamotConfigResolver.class, "lookup"));
     
@@ -36,10 +36,17 @@ public class BergamotConfigResolver
         return this.locator;
     }
     
+    private String stipSmartMergePrefix(String name)
+    {
+        return (name != null && name.length() > 1 && (name.startsWith("-") || name.startsWith("+"))) ? name.substring(1) : name; 
+    }
+    
     public <T extends TemplatedObjectCfg<T>> T lookup(Class<T> type, String name)
     {
         try (Timer.Context tctx = lookupTimer.time())
         {
+            // sanitize the name
+            name = this.stipSmartMergePrefix(name);
             T inherited = this.locator.lookup(type, name);
             logger.debug("Looked up inherited object: " + type.getSimpleName() + "::" + name + " ==> " + inherited);
             return inherited;
