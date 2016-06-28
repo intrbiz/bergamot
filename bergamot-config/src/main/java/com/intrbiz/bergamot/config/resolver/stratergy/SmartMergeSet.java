@@ -7,6 +7,28 @@ import com.intrbiz.bergamot.config.resolver.ObjectResolver;
 
 public class SmartMergeSet implements ObjectResolver<Set<String>>
 {
+    public Set<String> finish(Set<String> resolved)
+    {
+        if (resolved == null || resolved.isEmpty()) return resolved;
+        // stip off any merge prefixes
+        Set<String> finished = new LinkedHashSet<String>();
+        for (String item : resolved)
+        {
+            if (item != null && item.length() > 0)
+            {
+                if (item.startsWith("-") || item.startsWith("+"))
+                {
+                    finished.add(item.substring(1));
+                }
+                else
+                {
+                    finished.add(item);
+                }
+            }
+        }
+        return finished;
+    }
+    
     public Set<String> resolve(Set<String> m, Set<String> l)
     {
         Set<String> r = new LinkedHashSet<String>();

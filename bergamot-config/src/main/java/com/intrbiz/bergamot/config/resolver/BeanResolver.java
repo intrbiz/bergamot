@@ -145,7 +145,12 @@ public class BeanResolver<T> implements ObjectResolver<T>
         @SuppressWarnings("unchecked")
         public void resolve(B into, B most, B least) throws Exception
         {
-            setter.invoke(into, (Object) this.resolver.resolve(this.getter.invoke(most), this.getter.invoke(least)));
+            // resolve the property
+            Object resolved = (Object) this.resolver.resolve(this.getter.invoke(most), this.getter.invoke(least));
+            // finish the resolution
+            resolved = this.resolver.finish(resolved);
+            // set it
+            setter.invoke(into, resolved);
         }
     }
 }

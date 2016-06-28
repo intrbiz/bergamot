@@ -7,6 +7,28 @@ import com.intrbiz.bergamot.config.resolver.ObjectResolver;
 
 public class SmartMergeList implements ObjectResolver<List<String>>
 {
+    public List<String> finish(List<String> resolved)
+    {
+        if (resolved == null || resolved.isEmpty()) return resolved;
+        // stip off any merge prefixes
+        List<String> finished = new LinkedList<String>();
+        for (String item : resolved)
+        {
+            if (item != null && item.length() > 0)
+            {
+                if (item.startsWith("-") || item.startsWith("+"))
+                {
+                    finished.add(item.substring(1));
+                }
+                else
+                {
+                    finished.add(item);
+                }
+            }
+        }
+        return finished;
+    }
+    
     public List<String> resolve(List<String> m, List<String> l)
     {
         List<String> r = new LinkedList<String>();
