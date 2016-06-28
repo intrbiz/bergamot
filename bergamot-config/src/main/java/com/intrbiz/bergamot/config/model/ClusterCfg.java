@@ -1,14 +1,20 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
+import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 @XmlType(name = "cluster")
 @XmlRootElement(name = "cluster")
@@ -17,6 +23,8 @@ public class ClusterCfg extends VirtualCheckCfg<ClusterCfg>
     private static final long serialVersionUID = 1L;
     
     private List<ResourceCfg> resources = new LinkedList<ResourceCfg>();
+    
+    private Set<String> resoruceGroups = new LinkedHashSet<String>();
 
     public ClusterCfg()
     {
@@ -40,6 +48,19 @@ public class ClusterCfg extends VirtualCheckCfg<ClusterCfg>
         return this.resources.stream().filter((r) -> { return name.equals(r.getName()); }).findFirst().get();
     }
     
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "resource-groups")
+    @ResolveWith(SmartMergeSet.class)
+    public Set<String> getResoruceGroups()
+    {
+        return resoruceGroups;
+    }
+
+    public void setResoruceGroups(Set<String> resoruceGroups)
+    {
+        this.resoruceGroups = resoruceGroups;
+    }
+
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
     {
         List<TemplatedObjectCfg<?>> r = super.getTemplatedChildObjects();

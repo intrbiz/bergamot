@@ -1,16 +1,21 @@
 package com.intrbiz.bergamot.config.model;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.intrbiz.bergamot.config.adapter.CSVAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 import com.intrbiz.bergamot.config.resolver.stratergy.MergeList;
+import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 @XmlType(name = "host")
 @XmlRootElement(name = "host")
@@ -25,6 +30,8 @@ public class HostCfg extends ActiveCheckCfg<HostCfg>
     private String location;
 
     private String address;
+    
+    private Set<String> serviceGroups = new LinkedHashSet<String>();
 
     public HostCfg()
     {
@@ -92,6 +99,19 @@ public class HostCfg extends ActiveCheckCfg<HostCfg>
     {
         this.address = address;
     }
+    
+    @XmlJavaTypeAdapter(CSVAdapter.class)
+    @XmlAttribute(name = "service-groups")
+    @ResolveWith(SmartMergeSet.class)
+    public Set<String> getServiceGroups()
+    {
+        return serviceGroups;
+    }
+
+    public void setServiceGroups(Set<String> serviceGroups)
+    {
+        this.serviceGroups = serviceGroups;
+    }
 
     public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
     {
@@ -102,7 +122,7 @@ public class HostCfg extends ActiveCheckCfg<HostCfg>
             r.addAll(this.traps);
         return r;
     }
-    
+
     @Override
     protected void resolveChildren(HostCfg resolved)
     {
