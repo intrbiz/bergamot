@@ -8,18 +8,19 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.jce.X509Principal;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
-import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
-import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
-@SuppressWarnings("deprecation")
 public class RSAUtil
 {   
     public enum KeyType {
@@ -79,48 +80,54 @@ public class RSAUtil
             pair = generateRSAKeyPair(keySize);
             key = pair.getPublic();
         }
-        // expiry time
+        // not before
         Calendar now = Calendar.getInstance();
+        // not after
         Calendar expiry = Calendar.getInstance();
         expiry.add(Calendar.DAY_OF_YEAR, days);
-        // generate the certificate
-        X509Name subject = new X509Name(DN);
-        X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-        certGen.setSerialNumber(serial.toBigInt());
-        certGen.setIssuerDN(issuer == null ? subject : ((X509Principal) issuer.getCertificate().getSubjectDN()));
-        certGen.setNotBefore(now.getTime());
-        certGen.setNotAfter(expiry.getTime());
-        certGen.setSubjectDN(subject);
-        certGen.setPublicKey(key);
-        certGen.setSignatureAlgorithm("SHA256WithRSA");
+        // subject DN
+        X500Name subjectDN = new X500Name(DN);
+        // issuer DN
+        X500Name issuerDN = issuer == null ? subjectDN : new X500Name(issuer.getCertificate().getIssuerX500Principal().getName());
+        
+        // build the certificate
+        JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(issuerDN, serial.toBigInt(), now.getTime(), expiry.getTime(), subjectDN, key);
         // set extensions
-        certGen.addExtension(X509Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(key));
+        JcaX509ExtensionUtils utils = new JcaX509ExtensionUtils();
+        // subject public key
+        builder.addExtension(Extension.subjectKeyIdentifier, false, utils.createSubjectKeyIdentifier(key));
+        // issuer public key
         if (issuer == null)
         {
-            certGen.addExtension(X509Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(key));
+            builder.addExtension(Extension.authorityKeyIdentifier, false, utils.createAuthorityKeyIdentifier(key));
         }
         else
         {
-            certGen.addExtension(X509Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(issuer.getCertificate()));
+            builder.addExtension(Extension.authorityKeyIdentifier, false, utils.createAuthorityKeyIdentifier(issuer.getCertificate()));
         }
+        // constraints
         if (KeyType.CA == type || KeyType.INTERMEDIATE == type)
         {
-            certGen.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(true));
-            certGen.addExtension(X509Extension.keyUsage, true, new KeyUsage(KeyUsage.keyEncipherment | KeyUsage.cRLSign | KeyUsage.dataEncipherment | KeyUsage.digitalSignature | KeyUsage.keyCertSign));
-            certGen.addExtension(X509Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.anyExtendedKeyUsage));
+            builder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+            builder.addExtension(Extension.keyUsage, true, new KeyUsage(KeyUsage.keyEncipherment | KeyUsage.cRLSign | KeyUsage.dataEncipherment | KeyUsage.digitalSignature | KeyUsage.keyCertSign));
+            builder.addExtension(Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.anyExtendedKeyUsage));
         }
         else if (KeyType.SERVER == type)
         {
-            certGen.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(false));
-            certGen.addExtension(X509Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
+            builder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+            builder.addExtension(Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_serverAuth));
         }
         else if (KeyType.CLIENT == type)
         {
-            certGen.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(false));
-            certGen.addExtension(X509Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth));
+            builder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+            builder.addExtension(Extension.extendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeId.id_kp_clientAuth));
         }
+        // the signer
+        ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(issuer == null ? pair.getPrivate() : issuer.getKey()); 
         // go go go
-        X509Certificate theCert = certGen.generate(issuer == null ? pair.getPrivate() : issuer.getKey());
+        X509CertificateHolder theCertHolder = builder.build(signer);
+        // extract the actual fucking certificate
+        X509Certificate theCert = new JcaX509CertificateConverter().getCertificate(theCertHolder);
         // check
         theCert.verify(issuer == null ? key : issuer.getCertificate().getPublicKey());
         // encode

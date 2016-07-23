@@ -20,8 +20,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.bouncycastle</groupId>
-    	<artifactId>bcprov-jdk16</artifactId>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk15on</artifactId>
     </dependency>
     <dependency>
     	<groupId>log4j</groupId>

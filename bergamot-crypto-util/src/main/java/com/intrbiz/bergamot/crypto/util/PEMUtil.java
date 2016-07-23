@@ -20,17 +20,16 @@ import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
-import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
-@SuppressWarnings("deprecation")
 public class PEMUtil
 {
     static
@@ -42,7 +41,7 @@ public class PEMUtil
     public static String saveCertificate(Certificate cert)
     {
         StringWriter sw = new StringWriter();
-        try (PEMWriter pw = new PEMWriter(sw))
+        try (JcaPEMWriter pw = new JcaPEMWriter(sw))
         {
             pw.writeObject(cert);
         }
@@ -54,7 +53,7 @@ public class PEMUtil
     
     public static void saveCertificate(Certificate cert, Writer to) throws IOException
     {
-        try (PEMWriter pw = new PEMWriter(to))
+        try (JcaPEMWriter pw = new JcaPEMWriter(to))
         {
             pw.writeObject(cert);
         }
@@ -62,7 +61,7 @@ public class PEMUtil
     
     public static void saveCertificate(Certificate cert, File to) throws IOException
     {
-        try (PEMWriter pw = new PEMWriter(new FileWriter(to)))
+        try (JcaPEMWriter pw = new JcaPEMWriter(new FileWriter(to)))
         {
             pw.writeObject(cert);
         }
@@ -70,7 +69,7 @@ public class PEMUtil
     
     public static Certificate loadCertificate(File file) throws IOException
     {
-        try (PEMReader pr = new PEMReader(new FileReader(file)))
+        try (PEMParser pr = new PEMParser(new FileReader(file)))
         {
             return (Certificate) pr.readObject();
         }
@@ -78,7 +77,7 @@ public class PEMUtil
     
     public static Certificate loadCertificate(String data) throws IOException
     {
-        try (PEMReader pr = new PEMReader(new StringReader(data)))
+        try (PEMParser pr = new PEMParser(new StringReader(data)))
         {
             return (Certificate) pr.readObject();
         }
@@ -127,7 +126,7 @@ public class PEMUtil
     public static String saveKey(PrivateKey key)
     {
         StringWriter sw = new StringWriter();
-        try (PEMWriter pw = new PEMWriter(sw))
+        try (JcaPEMWriter pw = new JcaPEMWriter(sw))
         {
             pw.writeObject(key);
         }
@@ -139,7 +138,7 @@ public class PEMUtil
     
     public static void saveKey(PrivateKey key, Writer to) throws IOException
     {
-        try (PEMWriter pw = new PEMWriter(to))
+        try (JcaPEMWriter pw = new JcaPEMWriter(to))
         {
             pw.writeObject(key);
         }
@@ -147,7 +146,7 @@ public class PEMUtil
     
     public static void saveKey(PrivateKey key, File to) throws IOException
     {
-        try (PEMWriter pw = new PEMWriter(new FileWriter(to)))
+        try (JcaPEMWriter pw = new JcaPEMWriter(new FileWriter(to)))
         {
             pw.writeObject(key);
         }
@@ -155,16 +154,16 @@ public class PEMUtil
     
     public static CertificateRequest loadCertificateRequest(Reader reader) throws IOException
     {
-        try (PEMReader pr = new PEMReader(reader))
+        try (PEMParser pr = new PEMParser(reader))
         {
             CertificationRequest req = (CertificationRequest) pr.readObject();
             // get the CN
-            String cn = (String) ((X509Name) req.getCertificationRequestInfo().getSubject()).getValues(new DERObjectIdentifier("2.5.4.3")).get(0);
+            String cn = IETFUtils.valueToString(req.getCertificationRequestInfo().getSubject().getRDNs(BCStyle.CN)[0].getFirst().getValue());
             // build the key
             KeyFactory kf = KeyFactory.getInstance("RSA");
             PublicKey key = kf.generatePublic(new RSAPublicKeySpec(
-                    ((ASN1Integer)((DERSequence) req.getCertificationRequestInfo().getSubjectPublicKeyInfo().getPublicKey()).getObjectAt(0)).getValue(), 
-                    ((ASN1Integer)((DERSequence) req.getCertificationRequestInfo().getSubjectPublicKeyInfo().getPublicKey()).getObjectAt(1)).getValue()
+                    ((ASN1Integer)((DERSequence) req.getCertificationRequestInfo().getSubjectPublicKeyInfo().parsePublicKey()).getObjectAt(0)).getValue(), 
+                    ((ASN1Integer)((DERSequence) req.getCertificationRequestInfo().getSubjectPublicKeyInfo().parsePublicKey()).getObjectAt(1)).getValue()
             ));
             return new CertificateRequest(cn, key);
         }
@@ -187,7 +186,7 @@ public class PEMUtil
     public static String savePublicKey(PublicKey key) throws IOException
     {
         StringWriter sw = new StringWriter();
-        try (PEMWriter pw = new PEMWriter(sw))
+        try (JcaPEMWriter pw = new JcaPEMWriter(sw))
         {
             pw.writeObject(key);
         }
@@ -196,7 +195,7 @@ public class PEMUtil
     
     public static void savePublicKey(PublicKey key, Writer to) throws IOException
     {
-        try (PEMWriter pw = new PEMWriter(to))
+        try (JcaPEMWriter pw = new JcaPEMWriter(to))
         {
             pw.writeObject(key);
         }

@@ -480,6 +480,21 @@
   			<artifactId>bergamot-command-processor</artifactId>
   			<version>${project.version}</version>
   		</dependency>
+  		<dependency>
+  			<groupId>com.yubico</groupId>
+  			<artifactId>u2flib-server-core</artifactId>
+  			<version>0.16.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.yubico</groupId>
+  			<artifactId>u2flib-server-attestation</artifactId>
+  			<version>0.16.0</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>org.bouncycastle</groupId>
+  			<artifactId>bcpkix-jdk15on</artifactId>
+  			<version>1.54</version>
+  		</dependency>
   	</dependencies>
   </dependencyManagement>
   
