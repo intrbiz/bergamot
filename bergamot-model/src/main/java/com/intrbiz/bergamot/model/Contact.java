@@ -323,6 +323,14 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
     }
     
+    public List<U2FDeviceRegistration> getU2FDeviceRegistrations()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getU2FDeviceRegistrationsForContact(this.getId());
+        }
+    }
+    
     public List<AccessControl> getAccessControls()
     {
         try (BergamotDB db = BergamotDB.connect())

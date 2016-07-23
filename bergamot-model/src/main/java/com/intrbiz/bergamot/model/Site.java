@@ -204,6 +204,11 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     {
         return this.id.equals(getSiteId(objectId));
     }
+    
+    public String getU2FAppId()
+    {
+        return "https://" + this.getName();
+    }
 
     public String toString()
     {

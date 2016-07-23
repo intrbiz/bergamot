@@ -49,6 +49,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
+import com.intrbiz.bergamot.model.U2FDeviceRegistration;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
@@ -82,7 +83,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 37, 0}),
+        version = @SQLVersion({3, 38, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -118,7 +119,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ComputedPermissionForDomain.class,
             Escalation.class,
             AlertEscalation.class,
-            AlertEncompasses.class
+            AlertEncompasses.class,
+            U2FDeviceRegistration.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -741,6 +743,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = APIToken.class, name = "get_api_tokens_for_contact", since = @SQLVersion({1, 0, 0}))
     public abstract List<APIToken> getAPITokensForContact(@SQLParam("contact_id") UUID contactId);
+    
+    // U2F devices
+    
+    @Cacheable
+    @SQLSetter(table = U2FDeviceRegistration.class, name = "set_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    public abstract void setU2FDeviceRegistration(U2FDeviceRegistration device);
+    
+    @Cacheable
+    @SQLGetter(table = U2FDeviceRegistration.class, name = "get_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    public abstract U2FDeviceRegistration getU2FDeviceRegistration(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLRemove(table = U2FDeviceRegistration.class, name = "remove_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    public abstract void removeU2FDeviceRegistration(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = U2FDeviceRegistration.class, name = "get_u2f_device_registrations_for_contact", since = @SQLVersion({3, 38, 0}))
+    public abstract List<U2FDeviceRegistration> getU2FDeviceRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
     
     // notifications
     
