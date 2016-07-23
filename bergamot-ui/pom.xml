@@ -92,6 +92,14 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-command-processor</artifactId>
 		</dependency>
+		<dependency>
+		  <groupId>com.yubico</groupId>
+		  <artifactId>u2flib-server-core</artifactId>
+		</dependency>
+		<dependency>
+		   <groupId>com.yubico</groupId>
+		   <artifactId>u2flib-server-attestation</artifactId>
+		 </dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>
