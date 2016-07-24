@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.ui.router;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
@@ -18,6 +19,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.U2FDeviceRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.bergamot.ui.security.password.check.BadPassword;
 import com.intrbiz.bergamot.ui.security.password.check.PasswordCheckEngine;
@@ -36,6 +38,10 @@ import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
+import com.yubico.u2f.U2F;
+import com.yubico.u2f.data.DeviceRegistration;
+import com.yubico.u2f.data.messages.AuthenticateRequestData;
+import com.yubico.u2f.data.messages.AuthenticateResponse;
 
 @Prefix("/")
 @Template("layout/single")
@@ -44,6 +50,8 @@ public class LoginRouter extends Router<BergamotApp>
     private Logger logger = Logger.getLogger(LoginRouter.class);
     
     private Accounting accounting = Accounting.create(LoginRouter.class);
+    
+    private final U2F u2f = new U2F();
     
     @Get("/login")
     public void login(@Param("redirect") String redirect) throws IOException
@@ -88,11 +96,12 @@ public class LoginRouter extends Router<BergamotApp>
     @Post("/login")
     @RequireValidAccessTokenForURL()
     @WithDataAdapter(BergamotDB.class)
-    public void doLogin(BergamotDB db, @Param("username") String username, @Param("password") String password, @Param("redirect") String redirect, @Param("remember_me") @AsBoolean(defaultValue = false, coalesce = CoalesceMode.ALWAYS) Boolean rememberMe) throws IOException
+    public void doLogin(BergamotDB db, @Param("username") String username, @Param("password") String password, @Param("redirect") String redirect, @Param("remember_me") @AsBoolean(defaultValue = false, coalesce = CoalesceMode.ALWAYS) Boolean rememberMe) throws Exception
     {
         logger.info("Login: " + username);
         authenticate(username, password);
         // assert that the contact is permitted UI access
+        require(principal());
         require(permission("ui.access"));
         // store the current site and contact
         Contact contact = sessionVar("contact", currentPrincipal());
@@ -109,8 +118,19 @@ public class LoginRouter extends Router<BergamotApp>
             var("forced", true);
             encode("login/force_change_password");
         }
+        else if (! contact.getU2FDeviceRegistrations().isEmpty())
+        {
+            // start the U2F login
+            AuthenticateRequestData authData = this.u2f.startAuthentication(contact.getSite().getU2FAppId(), contact.getU2FDeviceRegistrations().stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
+            // encode the U2F login view
+            var("redirect", redirect);
+            var("u2fauthenticate", authData);
+            encode("login/u2fauthenticate");
+        }
         else
         {
+            // require that the principal is strongly valid
+            require(validPrincipal());
             // if remember me is selected then push a long term auth cookie
             if (rememberMe)
             {
@@ -133,6 +153,24 @@ public class LoginRouter extends Router<BergamotApp>
             // redirect
             redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
         }
+    }
+    
+    @Post("/finish-u2f-authentication")
+    @RequirePrincipal()
+    @RequireValidAccessTokenForURL()
+    public void finishU2FAuthentication(@Param("u2f-authenticate-request") String u2fAuthenticateRequest, @Param("u2f-authenticate-response") String u2fAuthenticateResponse, @Param("redirect") String redirect) throws Exception
+    {
+        // the principal
+        Contact contact = currentPrincipal();
+        // parse the auth data
+        AuthenticateRequestData req = AuthenticateRequestData.fromJson(u2fAuthenticateRequest);
+        AuthenticateResponse resp = AuthenticateResponse.fromJson(u2fAuthenticateResponse);
+        DeviceRegistration device = this.u2f.finishAuthentication(req, resp, contact.getU2FDeviceRegistrations().stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
+        System.out.println("U2F auth complete: " + device.getCounter() + " " + device);
+        sessionVar("doneU2F", true);
+        sessionVar("u2fDevice", device);
+        // redirect
+        redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
     }
     
     @Get("/change-password")

@@ -53,7 +53,15 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     public boolean isValidPrincipal(Principal principal, ValidationLevel validationLevel)
     {
         if (validationLevel == ValidationLevel.STRONG)
-            return principal instanceof Contact && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
+        {
+            // validate that the principal is in a good state
+            boolean  goodPrincipal = principal instanceof Contact && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
+            if (! goodPrincipal) return goodPrincipal;
+            // look at the U2F status
+            boolean doneU2F = Balsa().sessionVar("doneU2F");
+            boolean needU2F  = ! ((Contact) principal).getU2FDeviceRegistrations().isEmpty();
+            return needU2F ? doneU2F : goodPrincipal;
+        }
         return principal instanceof Contact;
     }
 

@@ -1,0 +1,46 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa" title="Insert U2F Device">
+
+    <script src="#{public('/js/' + bergamot_js_version() + '/u2f-api.js')}"></script>
+
+	<div id="login-box">
+		<img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Insert U2F Device</h4>
+        <p class="centre">
+			Please insert your U2F device.
+        </p>
+		<form id="u2f-authenticate" method="post" action="#{path('/finish-u2f-authentication')}">
+			<p>
+				<access-token-for-url path="#{path('/finish-u2f-authentication')}"/>
+				<input type="hidden" id="u2f-authenticate-request" name="u2f-authenticate-request" value="#{u2fauthenticate.toJson()}"/>
+				<input type="hidden" id="u2f-authenticate-response" name="u2f-authenticate-response" value=""/>
+				<input type="hidden" id="redirect" name="redirect" value="#{coalesce(redirect, '')}" />
+				<input class="centre" type="submit" name="u2f-authenticate-go" value="Authenticate With My U2F Device"/>
+			</p>
+		</form>
+		<script>
+    			$(document).ready(function() {
+    				$('#u2f-authenticate').submit(function(ev) {
+    				    if ($('#u2f-authenticate').attr('data-state') != 'go')
+    				    {
+	    				    ev.preventDefault();
+	    				    var req = JSON.parse($('#u2f-authenticate-request').val());
+	    				    /*alert('Please insert your U2F device');*/
+	    				    u2f.sign(req.authenticateRequests,
+						    function(data) {
+						        if(data.errorCode)
+						        {
+						            alert("U2F failed with error: " + data.errorCode);
+						            return;
+						        }
+						        $('#u2f-authenticate-response').val(JSON.stringify(data));
+						        $('#u2f-authenticate').attr('data-state', 'go');
+						        $('#u2f-authenticate').submit();
+						    });
+					    }
+    				});
+    			});
+    		</script>
+	</div>
+</fragment>

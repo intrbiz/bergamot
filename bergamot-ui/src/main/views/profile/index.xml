@@ -139,7 +139,7 @@
     		<form id="u2f-register" action="#{path('/profile/register-u2f-device')}" method="post">
     			<input id="u2f-register-request" name="u2f-register-request" type="hidden" value="#{u2fregister.toJson()}" />
     			<input id="u2f-register-response" name="u2f-register-response" type="hidden" value="" />
-    			<input type="submit" name="registerdevice" value="Register My Device"/>
+    			<input type="submit" name="u2f-register-go" value="Register My Device"/>
     		</form>
     		<script>
     			$(document).ready(function() {
@@ -148,7 +148,7 @@
     				    {
 	    				    ev.preventDefault();
 	    				    var req = JSON.parse($('#u2f-register-request').val());
-	    				    alert('Please insert your U2F device');
+	    				    /*alert('Please insert your U2F device');*/
 	    				    u2f.register(req.registerRequests, req.authenticateRequests,
 						    function(data) {
 						        if(data.errorCode)

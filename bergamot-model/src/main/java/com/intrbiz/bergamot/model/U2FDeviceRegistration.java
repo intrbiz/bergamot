@@ -274,7 +274,9 @@ public class U2FDeviceRegistration implements Serializable
     {
         try
         {
-            return new DeviceRegistration(this.keyHandle, this.publicKey, this.loadAttestationCert(), this.counter);
+            DeviceRegistration dev = new DeviceRegistration(this.keyHandle, this.publicKey, this.loadAttestationCert(), this.counter);
+            if (this.isRevoked()) dev.markCompromised();
+            return dev;
         }
         catch (Exception e)
         {
