@@ -95,11 +95,18 @@
 	</div>
 	
 	<div class="row">
-    	<h3>Your U2F Devices</h3>
+    	<h3>Your Securit Keys</h3>
     	<p class="text-body">
-    		These are the U2F devices which are registered against your account, you can use these as a 2nd authentication 
-    		factor when logging in.
+    		Security Keys help prevent unauthorised access to your account. 
+        </p>
+        <p class="text-body">
+            Once a Security Key is registered to your account 
+            you will have to use it as well as your password to login.
     	</p>
+        <p class="text-body">
+            Your Security Key will need to be compatible with the U2F protocol 
+            and you will need to use a supported browser.
+        </p>
     	<div class="col12">
 	    	<table>
 	    		<tr>
@@ -134,8 +141,8 @@
 			</table>
 		</div>
 		<p class="text-body">
-    		<h4>Register a new U2F device</h4>
-    		<span>Please insert your U2F device to register it.</span>
+    		<h4>Register your Security Key</h4>
+    		<span>Please insert your Security Key to register it.</span>
     		<form id="u2f-register" action="#{path('/profile/register-u2f-device')}" method="post">
     			<input id="u2f-register-request" name="u2f-register-request" type="hidden" value="#{u2fregister.toJson()}" />
     			<input id="u2f-register-response" name="u2f-register-response" type="hidden" value="" />
