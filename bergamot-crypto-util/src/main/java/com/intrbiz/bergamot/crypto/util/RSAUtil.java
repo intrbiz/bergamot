@@ -88,7 +88,7 @@ public class RSAUtil
         // subject DN
         X500Name subjectDN = new X500Name(DN);
         // issuer DN
-        X500Name issuerDN = issuer == null ? subjectDN : new X500Name(issuer.getCertificate().getIssuerX500Principal().getName());
+        X500Name issuerDN = issuer == null ? subjectDN : new X500Name(issuer.getCertificate().getSubjectX500Principal().getName());
         
         // build the certificate
         JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(issuerDN, serial.toBigInt(), now.getTime(), expiry.getTime(), subjectDN, key);

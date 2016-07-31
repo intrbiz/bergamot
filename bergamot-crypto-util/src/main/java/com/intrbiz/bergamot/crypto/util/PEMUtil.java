@@ -14,6 +14,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
@@ -24,6 +25,8 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
@@ -67,20 +70,32 @@ public class PEMUtil
         }
     }
     
+    public static Certificate loadCertificate(Reader reader) throws IOException
+    {
+        try
+        {
+            try (PEMParser pr = new PEMParser(reader))
+            {
+                X509CertificateHolder theCertHolder = (X509CertificateHolder) pr.readObject();
+                // extract the actual fucking certificate
+                X509Certificate theCert = new JcaX509CertificateConverter().getCertificate(theCertHolder);
+                return theCert;
+            }
+        }
+        catch (Exception e)
+        {
+            throw new IOException("Failed to parse PEM formatted certificate", e);
+        }
+    }
+    
     public static Certificate loadCertificate(File file) throws IOException
     {
-        try (PEMParser pr = new PEMParser(new FileReader(file)))
-        {
-            return (Certificate) pr.readObject();
-        }
+        return loadCertificate(new FileReader(file));
     }
     
     public static Certificate loadCertificate(String data) throws IOException
     {
-        try (PEMParser pr = new PEMParser(new StringReader(data)))
-        {
-            return (Certificate) pr.readObject();
-        }
+        return loadCertificate(new StringReader(data));
     }
     
     public static PrivateKey loadKey(File file) throws IOException
