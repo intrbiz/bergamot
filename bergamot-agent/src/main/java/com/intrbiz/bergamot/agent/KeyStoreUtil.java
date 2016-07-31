@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.agent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.Key;
@@ -12,11 +13,14 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMReader;
-import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
@@ -189,31 +193,37 @@ public class KeyStoreUtil
         }
     }
     
+    public static Certificate loadCertificate(Reader reader) throws IOException
+    {
+        try
+        {
+            PEMParser pr = new PEMParser(reader);
+            try
+            {
+                X509CertificateHolder theCertHolder = (X509CertificateHolder) pr.readObject();
+                // extract the actual fucking certificate
+                X509Certificate theCert = new JcaX509CertificateConverter().getCertificate(theCertHolder);
+                return theCert;
+            }
+            finally
+            {
+                pr.close();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new IOException("Failed to parse PEM formatted certificate", e);
+        }
+    }
     
     public static Certificate loadCertificate(File file) throws IOException
     {
-        PEMReader pr = new PEMReader(new FileReader(file));
-        try
-        {
-            return (Certificate) pr.readObject();
-        }
-        finally
-        {
-            pr.close();
-        }
+        return loadCertificate(new FileReader(file));
     }
     
     public static Certificate loadCertificate(String data) throws IOException
     {
-        PEMReader pr = new PEMReader(new StringReader(data));
-        try
-        {
-            return (Certificate) pr.readObject();
-        }
-        finally
-        {
-            pr.close();
-        }
+        return loadCertificate(new StringReader(data));
     }
     
     public static String savePublicKey(PublicKey key)
@@ -221,7 +231,7 @@ public class KeyStoreUtil
         try
         {
             StringWriter sw = new StringWriter();
-            PEMWriter pw = new PEMWriter(sw);
+            JcaPEMWriter pw = new JcaPEMWriter(sw);
             try
             {
                 pw.writeObject(key);
@@ -243,7 +253,7 @@ public class KeyStoreUtil
         try
         {
             StringWriter sw = new StringWriter();
-            PEMWriter pw = new PEMWriter(sw);
+            JcaPEMWriter pw = new JcaPEMWriter(sw);
             try
             {
                 pw.writeObject(key);
@@ -265,7 +275,7 @@ public class KeyStoreUtil
         try
         {
             StringWriter sw = new StringWriter();
-            PEMWriter pw = new PEMWriter(sw);
+            JcaPEMWriter pw = new JcaPEMWriter(sw);
             try
             {
                 pw.writeObject(cert);
