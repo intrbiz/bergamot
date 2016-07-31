@@ -747,6 +747,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     // U2F devices
     
     @Cacheable
+    @CacheInvalidate({"get_u2f_device_registrations_for_contact.#{contact_id}"})
     @SQLSetter(table = U2FDeviceRegistration.class, name = "set_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
     public abstract void setU2FDeviceRegistration(U2FDeviceRegistration device);
     
@@ -755,9 +756,11 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract U2FDeviceRegistration getU2FDeviceRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
+    @CacheInvalidate({"get_u2f_device_registrations_for_contact.*"})
     @SQLRemove(table = U2FDeviceRegistration.class, name = "remove_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
     public abstract void removeU2FDeviceRegistration(@SQLParam("id") UUID id);
     
+    @Cacheable
     @SQLGetter(table = U2FDeviceRegistration.class, name = "get_u2f_device_registrations_for_contact", since = @SQLVersion({3, 38, 0}))
     public abstract List<U2FDeviceRegistration> getU2FDeviceRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
     
