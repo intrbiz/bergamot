@@ -95,13 +95,16 @@
 	</div>
 	
 	<div class="row">
-    	<h3>Your Securit Keys</h3>
+    	<h3>Your Security Keys</h3>
     	<p class="text-body">
-    		Security Keys help prevent unauthorised access to your account. 
+    		Security Keys help to prevent unauthorised access to your account. 
         </p>
         <p class="text-body">
-            Once a Security Key is registered to your account 
-            you will have to use it as well as your password to login.
+            Once a Security Key is registered to your account you will have to 
+            use it as well as your password to login. You can register as many 
+            Security Keys as you wish and can use any of them to complete the 
+            authentication process.  It is reccomended to have more than one 
+            Security Key registered incase you forget or loose one.
     	</p>
         <p class="text-body">
             Your Security Key will need to be compatible with the U2F protocol 
@@ -110,7 +113,9 @@
     	<div class="col12">
 	    	<table>
 	    		<tr>
-	    		    <th>Device</th>
+	    		    <th>Security Key</th>
+	    		    <th>Authentication Count</th>
+	    		    <th>Last Used</th>
 	    			<th>Registered</th>
 	    			<th>Revoked</th>
 	    			<th></th>
@@ -120,8 +125,10 @@
 					<tr>
 						<td>
 							<img rendered="#{device.deviceImage != null}" src="#{device.deviceImage}"/>
-							<span>Your #{coalesce(device.device, 'U2F Device')} by #{coalesce(device.vendor, 'Unknown')}</span>
+							<span>Your #{coalesce(device.device, 'Unknown U2F Device')}</span>
 						</td>
+						<td>#{device.counter}</td>
+						<td>#{if(device.updated != null, dateformat('yyyy-MM-dd', device.updated) + ' at ' + dateformat('hh:mm:ss', device.updated),'Never')}</td>
 						<td>#{dateformat('yyyy-MM-dd', device.created)} at #{dateformat('hh:mm:ss', device.created)}</td>
 						<td>#{if(device.revoked, 'On ' + dateformat('yyyy-MM-dd', device.revokedAt) + ' at ' + dateformat('hh:mm:ss', device.revokedAt), 'No')}</td>
 						<td>
@@ -146,7 +153,7 @@
     		<form id="u2f-register" action="#{path('/profile/register-u2f-device')}" method="post">
     			<input id="u2f-register-request" name="u2f-register-request" type="hidden" value="#{u2fregister.toJson()}" />
     			<input id="u2f-register-response" name="u2f-register-response" type="hidden" value="" />
-    			<input type="submit" name="u2f-register-go" value="Register My Device"/>
+    			<input type="submit" name="u2f-register-go" value="Register My Security Key"/>
     		</form>
     		<script>
     			$(document).ready(function() {

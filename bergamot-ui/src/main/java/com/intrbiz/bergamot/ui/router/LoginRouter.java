@@ -1,6 +1,8 @@
 package com.intrbiz.bergamot.ui.router;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,7 @@ import com.intrbiz.metadata.AsBoolean;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
+import com.intrbiz.metadata.Cookie;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
@@ -54,10 +57,8 @@ public class LoginRouter extends Router<BergamotApp>
     private final U2F u2f = new U2F();
     
     @Get("/login")
-    public void login(@Param("redirect") String redirect) throws IOException
+    public void login(@Param("redirect") String redirect, @Cookie("bergamot.auto.login") String autoAuthToken) throws Exception
     {
-        // check for an auto auth cookie
-        String autoAuthToken = cookie("bergamot.auto.login");
         if (! Util.isEmpty(autoAuthToken))
         {
             // try the given auth token and assert the contact has ui.access permission
@@ -78,6 +79,15 @@ public class LoginRouter extends Router<BergamotApp>
                     var("redirect", redirect);
                     var("forced", true);
                     encode("login/force_change_password");
+                }
+                else if (! contact.getU2FDeviceRegistrations().isEmpty())
+                {
+                    // start the U2F login
+                    AuthenticateRequestData authData = this.u2f.startAuthentication(contact.getSite().getU2FAppId(), contact.getU2FDeviceRegistrations().stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
+                    // encode the U2F login view
+                    var("redirect", redirect);
+                    var("u2fauthenticate", authData);
+                    encode("login/u2fauthenticate");
                 }
                 else
                 {
@@ -111,6 +121,25 @@ public class LoginRouter extends Router<BergamotApp>
         this.accounting.account(new LoginAccountingEvent(contact.getSiteId(), contact.getId(), request().getServerName(), username, balsa().session().id(), false, true, request().getRemoteAddress()));
         // set a cookie of the username, to remember the user
         cookie().name("bergamot.username").value(username).path(path("/login")).expiresAfter(90, TimeUnit.DAYS).httpOnly().set();
+        // if remember me is selected then push a long term auth cookie
+        if (rememberMe)
+        {
+            // generate the token
+            String autoAuthToken = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(contact);
+            // store the token
+            db.setAPIToken(new APIToken(autoAuthToken, contact, "Auto login for " + request().getRemoteAddress()));
+            // set the cookie
+            cookie()
+            .name("bergamot.auto.login")
+            .value(autoAuthToken)
+            .path(path("/login"))
+            .expiresAfter(90, TimeUnit.DAYS)
+            .httpOnly()
+            .secure(request().isSecure())
+            .set();
+            // record the token in the session for removal on logout
+            sessionVar("bergamot.auto.login", autoAuthToken);
+        }
         // force a password change
         if (contact.isForcePasswordChange())
         {
@@ -131,25 +160,6 @@ public class LoginRouter extends Router<BergamotApp>
         {
             // require that the principal is strongly valid
             require(validPrincipal());
-            // if remember me is selected then push a long term auth cookie
-            if (rememberMe)
-            {
-                // generate the token
-                String autoAuthToken = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(contact);
-                // store the token
-                db.setAPIToken(new APIToken(autoAuthToken, contact, "Auto login for " + request().getRemoteAddress()));
-                // set the cookie
-                cookie()
-                .name("bergamot.auto.login")
-                .value(autoAuthToken)
-                .path(path("/login"))
-                .expiresAfter(90, TimeUnit.DAYS)
-                .httpOnly()
-                .secure(request().isSecure())
-                .set();
-                // record the token in the session for removal on logout
-                sessionVar("bergamot.auto.login", autoAuthToken);
-            }
             // redirect
             redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
         }
@@ -158,15 +168,28 @@ public class LoginRouter extends Router<BergamotApp>
     @Post("/finish-u2f-authentication")
     @RequirePrincipal()
     @RequireValidAccessTokenForURL()
-    public void finishU2FAuthentication(@Param("u2f-authenticate-request") String u2fAuthenticateRequest, @Param("u2f-authenticate-response") String u2fAuthenticateResponse, @Param("redirect") String redirect) throws Exception
+    @WithDataAdapter(BergamotDB.class)
+    public void finishU2FAuthentication(BergamotDB db, @Param("u2f-authenticate-request") String u2fAuthenticateRequest, @Param("u2f-authenticate-response") String u2fAuthenticateResponse, @Param("redirect") String redirect) throws Exception
     {
         // the principal
         Contact contact = currentPrincipal();
         // parse the auth data
+        List<U2FDeviceRegistration> u2fDevices = contact.getU2FDeviceRegistrations();
         AuthenticateRequestData req = AuthenticateRequestData.fromJson(u2fAuthenticateRequest);
         AuthenticateResponse resp = AuthenticateResponse.fromJson(u2fAuthenticateResponse);
-        DeviceRegistration device = this.u2f.finishAuthentication(req, resp, contact.getU2FDeviceRegistrations().stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
-        System.out.println("U2F auth complete: " + device.getCounter() + " " + device);
+        // process the authentication
+        DeviceRegistration device = this.u2f.finishAuthentication(req, resp, u2fDevices.stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
+        // validate the registration counter
+        U2FDeviceRegistration authenticatedUsing = u2fDevices.stream()
+                                                    .filter((d) -> d.getKeyHandle().equals(device.getKeyHandle()) && d.getPublicKey().equals(device.getPublicKey()))
+                                                    .findFirst().orElse(null);
+        require(! authenticatedUsing.isRevoked(), "Your Security Key has been revoked!");
+        require(authenticatedUsing.getCounter() < device.getCounter(), "Your Security Key counter is in the past!");
+        // ensure we update the registration counter
+        authenticatedUsing.setCounter(device.getCounter());
+        authenticatedUsing.setUpdated(new Timestamp(System.currentTimeMillis()));
+        db.setU2FDeviceRegistration(authenticatedUsing);;
+        // done
         sessionVar("doneU2F", true);
         sessionVar("u2fDevice", device);
         // redirect

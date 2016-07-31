@@ -64,7 +64,7 @@ public class U2FDeviceRegistration implements Serializable
      * When was this last updated
      */
     @SQLColumn(index = 8, name = "updated", since = @SQLVersion({ 3, 38, 0 }))
-    private Timestamp updated = new Timestamp(System.currentTimeMillis());
+    private Timestamp updated = null;
     
     /**
      * Has this device been revoked
@@ -97,6 +97,7 @@ public class U2FDeviceRegistration implements Serializable
         this.id = Site.randomId(contact.getSiteId());
         this.contactId = contact.getId();
         this.created = new Timestamp(System.currentTimeMillis());
+        this.updated = null;
         this.revoked = false;
         this.fromDeviceRegistration(devReg);
         this.vendor = vendor;
