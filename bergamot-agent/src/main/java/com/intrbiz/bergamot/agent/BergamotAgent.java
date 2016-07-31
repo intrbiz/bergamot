@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -94,6 +95,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     private BergamotAgentCfg configuration;
     
     private volatile Channel channel;
+    
+    private AtomicInteger connectionAttempt = new AtomicInteger(0);
     
     public BergamotAgent()
     {
@@ -299,6 +302,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             }
         });
         // connect the client
+        logger.info("Connecting to: " + this.server);
+        connectionAttempt.incrementAndGet();
         b.connect(this.server.getHost(), (this.server.getPort() <= 0 ? 443 : this.server.getPort())).addListener(new GenericFutureListener<ChannelFuture>() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception
@@ -308,18 +313,22 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 {
                     // stash the channel
                     BergamotAgent.this.channel = channel;
+                    // reset fail counter
+                    connectionAttempt.set(0);
                     // setup close listener
                     channel.closeFuture().addListener(new GenericFutureListener<ChannelFuture>() {
                         @Override
                         public void operationComplete(ChannelFuture future) throws Exception
                         {
                             BergamotAgent.this.channel = null;
+                            logger.info("Connection closed.");
                             BergamotAgent.this.scheduleReconnect();
                         }
                     });
                 }
                 else
                 {
+                    logger.info("Failed to connect to: " + server + "");
                     // schedule reconnect
                     BergamotAgent.this.scheduleReconnect();
                 }
@@ -329,7 +338,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     protected void scheduleReconnect()
     {
-        this.logger.info("Scheduling reconnection shortly");
+        long wait = Math.min(Math.max(connectionAttempt.get(), 1) * 1000L, 15000L);
+        this.logger.info("Scheduling reconnection in " + wait + "ms");
         this.timer.schedule(new TimerTask() {
             @Override
             public void run()
@@ -344,7 +354,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                     BergamotAgent.this.scheduleReconnect();
                 }
             }
-        }, 15000L);
+        }, wait);
     }
 
     public void shutdown()
