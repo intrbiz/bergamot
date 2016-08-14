@@ -18,6 +18,9 @@
 				<input type="hidden" id="redirect" name="redirect" value="#{coalesce(redirect, '')}" />
 			</p>
 		</form>
+		<p rendered="#{! contact.getHOTPRegistrations().isEmpty()}" class="centre">
+			Or authenticate using <a style="color: #ddd" href="#{path('/start-hotp-authentication') + '?redirect=' + urlencode(coalesce(redirect, ''))}">Google Authenticator</a> instead
+		</p>
 		<script>
     			$(document).ready(function() {
     				setTimeout(function() {

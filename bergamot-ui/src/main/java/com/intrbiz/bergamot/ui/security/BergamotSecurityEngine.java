@@ -57,10 +57,10 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
             // validate that the principal is in a good state
             boolean  goodPrincipal = principal instanceof Contact && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
             if (! goodPrincipal) return goodPrincipal;
-            // look at the U2F status
-            boolean doneU2F = Balsa().sessionVar("doneU2F");
-            boolean needU2F  = ((Contact) principal).isTwoFactorConfigured();
-            return needU2F ? doneU2F : goodPrincipal;
+            // look at the 2FA status
+            boolean done2FA = Balsa().sessionVar("done2FA");
+            boolean need2FA  = ((Contact) principal).isTwoFactorConfigured();
+            return need2FA ? done2FA : goodPrincipal;
         }
         return principal instanceof Contact;
     }

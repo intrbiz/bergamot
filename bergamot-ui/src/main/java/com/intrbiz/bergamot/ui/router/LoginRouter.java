@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.ui.router;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -20,6 +19,7 @@ import com.intrbiz.bergamot.accounting.model.LoginAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.HOTPRegistration;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.U2FDeviceRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -33,14 +33,17 @@ import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Cookie;
 import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
-import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
+import com.intrbiz.util.CounterHOTP;
+import com.intrbiz.util.CounterHOTP.CounterHOTPState;
+import com.intrbiz.util.HOTP.VerificationResult;
 import com.yubico.u2f.U2F;
 import com.yubico.u2f.data.DeviceRegistration;
 import com.yubico.u2f.data.messages.AuthenticateRequestData;
@@ -55,6 +58,8 @@ public class LoginRouter extends Router<BergamotApp>
     private Accounting accounting = Accounting.create(LoginRouter.class);
     
     private final U2F u2f = new U2F();
+    
+    private final CounterHOTP hotp = new CounterHOTP();
     
     @Get("/login")
     public void login(@Param("redirect") String redirect, @Cookie("bergamot.auto.login") String autoAuthToken) throws Exception
@@ -73,27 +78,8 @@ public class LoginRouter extends Router<BergamotApp>
                 sessionVar("site", contact.getSite());
                 // record the token in the session for removal on logout
                 sessionVar("bergamot.auto.login", autoAuthToken);
-                // now we can redirect
-                if (contact.isForcePasswordChange())
-                {
-                    var("redirect", redirect);
-                    var("forced", true);
-                    encode("login/force_change_password");
-                }
-                else if (! contact.getU2FDeviceRegistrations().isEmpty())
-                {
-                    // start the U2F login
-                    AuthenticateRequestData authData = this.u2f.startAuthentication(contact.getSite().getU2FAppId(), contact.getU2FDeviceRegistrations().stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
-                    // encode the U2F login view
-                    var("redirect", redirect);
-                    var("u2fauthenticate", authData);
-                    encode("login/u2fauthenticate");
-                }
-                else
-                {
-                    // redirect
-                    redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
-                }
+                // complete the login
+                this.completeLogin(contact, redirect);
                 return;
             }
         }
@@ -140,21 +126,35 @@ public class LoginRouter extends Router<BergamotApp>
             // record the token in the session for removal on logout
             sessionVar("bergamot.auto.login", autoAuthToken);
         }
-        // force a password change
+        // complete the login
+        this.completeLogin(contact, redirect);
+    }
+    
+    private void completeLogin(Contact contact, String redirect) throws Exception
+    {
         if (contact.isForcePasswordChange())
         {
             var("redirect", redirect);
             var("forced", true);
             encode("login/force_change_password");
         }
-        else if (! contact.getU2FDeviceRegistrations().isEmpty())
+        else if (contact.isTwoFactorConfigured())
         {
-            // start the U2F login
-            AuthenticateRequestData authData = this.u2f.startAuthentication(contact.getSite().getU2FAppId(), contact.getU2FDeviceRegistrations().stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
-            // encode the U2F login view
-            var("redirect", redirect);
-            var("u2fauthenticate", authData);
-            encode("login/u2fauthenticate");
+            // should we use a U2F device?
+            List<U2FDeviceRegistration> u2fDevices = contact.getU2FDeviceRegistrations();
+            if (! u2fDevices.isEmpty())
+            {
+                // start the U2F login
+                AuthenticateRequestData authData = this.u2f.startAuthentication(contact.getSite().getU2FAppId(), u2fDevices.stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
+                // encode the U2F login view
+                var("redirect", redirect);
+                var("u2fauthenticate", authData);
+                encode("login/u2fauthenticate");
+            }
+            else
+            {
+                this.startHOTPAuthentication(redirect);
+            }
         }
         else
         {
@@ -163,6 +163,57 @@ public class LoginRouter extends Router<BergamotApp>
             // redirect
             redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
         }
+    }
+    
+    @Get("/start-hotp-authentication")
+    @RequirePrincipal()
+    public void startHOTPAuthentication(@Param("redirect") String redirect) throws Exception
+    {
+        // start the HOTP login
+        var("redirect", redirect);
+        encode("login/hotp_authenticate");
+    }
+    
+    @Post("/finish-hotp-authentication")
+    @RequirePrincipal()
+    @RequireValidAccessTokenForURL()
+    @WithDataAdapter(BergamotDB.class)
+    public void finishHOTPAuthentication(BergamotDB db, @Param("code") @IsaInt(min = 0, max = 999999, mandatory = true) int code, @Param("redirect") String redirect) throws Exception
+    {
+        Contact contact = currentPrincipal();
+        // try each configured application to verify the given code
+        for (HOTPRegistration device : contact.getHOTPRegistrations())
+        {
+            VerificationResult<CounterHOTPState> result = this.hotp.verifyOTP(device.toHOTPSecret(), device.toHOTPState(), code);
+            if (result.isValid())
+            {
+                // ensure we update the registration counter
+                db.setHOTPRegistration(device.used(result.getNextState()));
+                // done
+                sessionVar("done2FA", true);
+                sessionVar("hotpDevice", device);
+                // redirect
+                redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
+                return;
+            }
+        }
+        // all HOTP methods failed
+        var("redirect", redirect);
+        var("failed", true);
+        encode("login/hotp_authenticate");
+    }
+    
+    @Catch(BalsaValidationError.class)
+    @Catch(BalsaConversionError.class)
+    @Post("/finish-hotp-authentication")
+    @RequirePrincipal()
+    @RequireValidAccessTokenForURL()
+    public void finishHOTPAuthenticationError(@Param("redirect") String redirect) throws Exception
+    {
+        // error during HOTP
+        var("redirect", redirect);
+        var("failed", true);
+        encode("login/hotp_authenticate");
     }
     
     @Post("/finish-u2f-authentication")
@@ -186,12 +237,10 @@ public class LoginRouter extends Router<BergamotApp>
         require(! authenticatedUsing.isRevoked(), "Your Security Key has been revoked!");
         require(authenticatedUsing.getCounter() < device.getCounter(), "Your Security Key counter is in the past!");
         // ensure we update the registration counter
-        authenticatedUsing.setCounter(device.getCounter());
-        authenticatedUsing.setUpdated(new Timestamp(System.currentTimeMillis()));
-        db.setU2FDeviceRegistration(authenticatedUsing);;
+        db.setU2FDeviceRegistration(authenticatedUsing.used(device.getCounter()));
         // done
-        sessionVar("doneU2F", true);
-        sessionVar("u2fDevice", device);
+        sessionVar("done2FA", true);
+        sessionVar("u2fDevice", authenticatedUsing);
         // redirect
         redirect(Util.isEmpty(redirect) ? "/" : path(redirect));
     }
@@ -256,12 +305,16 @@ public class LoginRouter extends Router<BergamotApp>
     }
 
     @Get("/logout")
-    @RequireValidPrincipal()
+    @RequirePrincipal()
     @WithDataAdapter(BergamotDB.class)
     public void logout(BergamotDB db) throws IOException
     {
         // deauth the current session
         deauthenticate();
+        // clean up the session
+        sessionVar("u2fDevice", null);
+        sessionVar("hotpDevice", null);
+        sessionVar("done2FA", false);
         // clean up any auto auth
         String autoAuthToken = sessionVar("bergamot.auto.login");
         if (! Util.isEmpty(autoAuthToken))

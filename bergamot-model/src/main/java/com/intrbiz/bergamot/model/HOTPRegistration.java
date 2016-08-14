@@ -203,6 +203,13 @@ public class HOTPRegistration implements Serializable
         return this;
     }
     
+    public HOTPRegistration used(CounterHOTPState newState)
+    {
+        this.counter = newState.getCounter();
+        this.updated = new Timestamp(System.currentTimeMillis());
+        return this;
+    }
+    
     public String toString()
     {
         return "HOTPToken { secret=" + Arrays.toString(this.secret) + ", counter=" + this.counter + "}";

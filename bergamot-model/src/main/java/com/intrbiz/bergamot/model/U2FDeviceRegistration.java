@@ -306,6 +306,13 @@ public class U2FDeviceRegistration implements Serializable
         return this;
     }
     
+    public U2FDeviceRegistration used(long newCounter)
+    {
+        this.counter = newCounter;
+        this.updated = new Timestamp(System.currentTimeMillis());
+        return this;
+    }
+    
     public String toString()
     {
         return "U2FDevice { " + this.keyHandle + ", " + this.publicKey + "}";

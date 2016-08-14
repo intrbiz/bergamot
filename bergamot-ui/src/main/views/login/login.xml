@@ -2,11 +2,11 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa" title="Login">
 	<div id="login-box">
-                 <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+        <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
 		<h4 class="centre">Please login to continue</h4>
 		<p rendered="#{error == 'invalid'}" class="error centre">
-                 	The username or password you entered was incorrect, please try again.
-                 </p>
+        	The username or password you entered was incorrect, please try again.
+        </p>
 		<form method="post" action="#{path('/login')}">
 			<p>
 				<input type="text" id="username" name="username" placeholder="Enter your username" value="#{coalesce(username, '')}" title="Enter your username or email address"/>

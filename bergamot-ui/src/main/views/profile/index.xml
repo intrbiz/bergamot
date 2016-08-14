@@ -112,7 +112,13 @@
         <div class="col12">
 	        <h4 rendered="#{contact.isTwoFactorConfigured()}">Well Done!</h4>
 	        <p class="text-body" rendered="#{contact.isTwoFactorConfigured()}">
-	        	Currently have two factor authentication enabled :)
+	        	You currently have two factor authentication enabled :)
+	        </p>
+	        <p class="text-body" rendered="#{u2fDevice != null}">
+	        	Your logged in using your #{u2fDevice.summary}, a #{coalesce(u2fDevice.device, 'Unknown')} Security Key.
+	        </p>
+	        <p class="text-body" rendered="#{hotpDevice != null}">
+	        	Your logged in using Google Authenticator running on #{hotpDevice.summary}.
 	        </p>
         </div>
     </div>
@@ -147,9 +153,9 @@
 				<data-set var="device" value="#{contact.getU2FDeviceRegistrations()}">
 					<tr>
 						<td>
+							<img style="float: right; margin-left: 10px;" rendered="#{device.deviceImage != null}" src="#{device.deviceImage}"/>
 							<h4 style="margin: 0;">#{device.summary}</h4>
-							<span>A #{coalesce(device.device, 'Unknown U2F Device')}</span>
-							<img rendered="#{device.deviceImage != null}" src="#{device.deviceImage}"/>
+							<p>A #{coalesce(device.device, 'Unknown')} Security Key</p>
 						</td>
 						<td>#{device.counter}</td>
 						<td>#{if(device.updated != null, dateformat('yyyy-MM-dd', device.updated) + ' at ' + dateformat('hh:mm:ss', device.updated),'Never')}</td>
