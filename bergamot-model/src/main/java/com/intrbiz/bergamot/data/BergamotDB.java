@@ -37,6 +37,7 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
+import com.intrbiz.bergamot.model.HOTPRegistration;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationEngine;
@@ -83,7 +84,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 38, 0}),
+        version = @SQLVersion({3, 39, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -120,7 +121,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             Escalation.class,
             AlertEscalation.class,
             AlertEncompasses.class,
-            U2FDeviceRegistration.class
+            U2FDeviceRegistration.class,
+            HOTPRegistration.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -763,6 +765,26 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLGetter(table = U2FDeviceRegistration.class, name = "get_u2f_device_registrations_for_contact", since = @SQLVersion({3, 38, 0}))
     public abstract List<U2FDeviceRegistration> getU2FDeviceRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
+
+    // HOTP
+    
+    @Cacheable
+    @CacheInvalidate({"get_hotp_registrations_for_contact.#{contact_id}"})
+    @SQLSetter(table = HOTPRegistration.class, name = "set_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    public abstract void setHOTPRegistration(HOTPRegistration device);
+    
+    @Cacheable
+    @SQLGetter(table = HOTPRegistration.class, name = "get_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    public abstract HOTPRegistration getHOTPRegistration(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @CacheInvalidate({"get_hotp_registrations_for_contact.*"})
+    @SQLRemove(table = HOTPRegistration.class, name = "remove_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    public abstract void removeHOTPRegistration(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLGetter(table = HOTPRegistration.class, name = "get_hotp_registrations_for_contact", since = @SQLVersion({3, 39, 0}))
+    public abstract List<HOTPRegistration> getHOTPRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
     
     // notifications
     

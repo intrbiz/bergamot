@@ -28,9 +28,6 @@ public class U2FDeviceRegistration implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    /**
-     * The API Token which will be used for perpetual authentication of external things
-     */
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3,38, 0 }))
     @SQLPrimaryKey
     private UUID id;
@@ -87,12 +84,18 @@ public class U2FDeviceRegistration implements Serializable
     @SQLColumn(index = 13, name = "device_image", since = @SQLVersion({ 3, 38, 0 }))
     private String deviceImage;
     
+    /**
+     * A name for this method
+     */
+    @SQLColumn(index = 14, name = "summary", since = @SQLVersion({ 3, 39, 0 }))
+    private String summary;
+    
     public U2FDeviceRegistration()
     {
         super();
     }
     
-    public U2FDeviceRegistration(Contact contact, DeviceRegistration devReg, String vendor, String device, String deviceImage)
+    public U2FDeviceRegistration(Contact contact, DeviceRegistration devReg, String vendor, String device, String deviceImage, String name)
     {
         this.id = Site.randomId(contact.getSiteId());
         this.contactId = contact.getId();
@@ -103,6 +106,7 @@ public class U2FDeviceRegistration implements Serializable
         this.vendor = vendor;
         this.device = device;
         this.deviceImage = deviceImage;
+        this.summary = name;
     }
 
     public UUID getContactId()
@@ -245,6 +249,16 @@ public class U2FDeviceRegistration implements Serializable
     public void setDeviceImage(String deviceImage)
     {
         this.deviceImage = deviceImage;
+    }
+
+    public String getSummary()
+    {
+        return summary;
+    }
+
+    public void setSummary(String summary)
+    {
+        this.summary = summary;
     }
 
     public Contact getContact()

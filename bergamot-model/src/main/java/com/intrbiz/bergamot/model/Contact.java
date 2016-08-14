@@ -331,6 +331,19 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
     }
     
+    public List<HOTPRegistration> getHOTPRegistrations()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getHOTPRegistrationsForContact(this.getId());
+        }
+    }
+    
+    public boolean isTwoFactorConfigured()
+    {
+        return ! (this.getU2FDeviceRegistrations().isEmpty() && this.getHOTPRegistrations().isEmpty());
+    }
+    
     public List<AccessControl> getAccessControls()
     {
         try (BergamotDB db = BergamotDB.connect())

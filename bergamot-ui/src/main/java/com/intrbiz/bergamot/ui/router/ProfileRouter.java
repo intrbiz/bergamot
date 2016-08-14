@@ -10,6 +10,7 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.HOTPRegistration;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.U2FDeviceRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -22,6 +23,8 @@ import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
+import com.intrbiz.util.CounterHOTP;
+import com.intrbiz.util.HOTP.HOTPSecret;
 import com.yubico.u2f.U2F;
 import com.yubico.u2f.attestation.Attestation;
 import com.yubico.u2f.attestation.MetadataService;
@@ -37,6 +40,8 @@ public class ProfileRouter extends Router<BergamotApp>
     private final U2F u2f = new U2F();
     
     private final MetadataService u2fMetadata = new MetadataService();
+    
+    private final CounterHOTP hotp = new CounterHOTP();
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
@@ -81,8 +86,12 @@ public class ProfileRouter extends Router<BergamotApp>
     
     @Any("/register-u2f-device")
     @WithDataAdapter(BergamotDB.class)
-    public void registerU2FDevice(BergamotDB db, @SessionVar("site") Site site, @Param("u2f-register-request") String request, @Param("u2f-register-response") String response) throws Exception
+    public void registerU2FDevice(BergamotDB db, @SessionVar("site") Site site, @Param("u2f-register-request") String request, @Param("u2f-register-response") String response, @Param("summary") String summary) throws Exception
     {
+        // the contact
+        Contact contact = currentPrincipal();
+        // the name
+        String name = Util.coalesceEmpty(summary, "Security Key " + (contact.getHOTPRegistrations().size() + 1));
         // register
         DeviceRegistration reg = this.u2f.finishRegistration(RegisterRequestData.fromJson(request), RegisterResponse.fromJson(response));
         // lookup the device metadata
@@ -90,11 +99,12 @@ public class ProfileRouter extends Router<BergamotApp>
         System.out.println("Trusted: " + (attestation == null ? null : attestation.isTrusted()) + " " + attestation);
         // store the registration
         db.setU2FDeviceRegistration(new U2FDeviceRegistration(
-                currentPrincipal(), 
+                contact, 
                 reg,
                 attestation == null ? null : attestation.getVendorProperties().get("name"),
                 attestation == null ? null : attestation.getDeviceProperties().get("displayName"),
-                attestation == null ? null : attestation.getDeviceProperties().get("imageUrl")
+                attestation == null ? null : attestation.getDeviceProperties().get("imageUrl"),
+                name
         ));
         // done
         redirect(path("/profile/"));
@@ -118,5 +128,42 @@ public class ProfileRouter extends Router<BergamotApp>
     {
         db.removeU2FDeviceRegistration(id);
         redirect(path("/profile/"));
+    }
+    
+    @Any("/revoke-hotp")
+    @WithDataAdapter(BergamotDB.class)
+    public void revokeHOTPDevice(BergamotDB db, @Param("id") @IsaUUID UUID id) throws IOException
+    {
+        HOTPRegistration device = db.getHOTPRegistration(id);
+        if (device != null)
+        {
+            db.setHOTPRegistration(device.revoke());
+        }
+        redirect(path("/profile/"));
+    }
+    
+    @Any("/remove-hotp")
+    @WithDataAdapter(BergamotDB.class)
+    public void removeHOTPDevice(BergamotDB db, @Param("id") @IsaUUID UUID id) throws IOException
+    {
+        db.removeHOTPRegistration(id);
+        redirect(path("/profile/"));
+    }
+    
+    @Any("/setup-hotp")
+    @WithDataAdapter(BergamotDB.class)
+    public void setupHOTPDevice(BergamotDB db, @SessionVar("site") Site site, @Param("summary") String summary) throws Exception
+    {
+        // the contact
+        Contact contact = currentPrincipal();
+        // the name
+        String name = Util.coalesceEmpty(summary, "Authenticator " + (contact.getHOTPRegistrations().size() + 1));
+        // generate a HOTP secret
+        HOTPSecret secret = this.hotp.newOTPSecret();
+        // store our HOTP registration
+        HOTPRegistration registration = var("hotp", new HOTPRegistration(contact, secret, name));
+        db.setHOTPRegistration(registration);
+        // done
+        encode("/profile/setuphotp");
     }
 }

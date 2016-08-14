@@ -76,5 +76,9 @@
 			<groupId>com.yubico</groupId>
 			<artifactId>u2flib-server-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.util</groupId>
+			<artifactId>crypto</artifactId>
+		</dependency>
 	</dependencies>
 </project>

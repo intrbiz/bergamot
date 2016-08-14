@@ -1,0 +1,27 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Setup Google Authenticator">
+
+	<div class="row">
+		<div class="col12">
+			<ul style="list-style: inside none disc;">
+				<li>Install the Google Authenticator app from the Play store</li>
+				<li>Goto Setup Account</li>
+				<li>Select Enter key provided</li>
+				<li>Enter the key shown below</li>
+			</ul>
+	    	<p class="text-body" style="margin-top: 15px;">
+	    		<h4 style="width: 400px; text-align: center; background: #eee; border: 2px solid #2c2c2c; margin: 10px; padding: 10px; font-size: 24px">#{hotp.toHOTPSecret().toPrettyFormat()}</h4>
+	    	</p>
+	    	<p class="text-body">
+	    		Make sure you select 'Counter based'
+	    	</p>
+	    	<p class="text-body" style="margin-top: 15px">
+	    		You should now be ready to login using Google Authenticator
+	    	</p>
+	    	<a href="#{path('/profile/')}">Back to your account</a>
+    	</div>
+    </div>
+    
+</fragment>

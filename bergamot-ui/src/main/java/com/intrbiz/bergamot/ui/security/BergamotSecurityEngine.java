@@ -59,7 +59,7 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
             if (! goodPrincipal) return goodPrincipal;
             // look at the U2F status
             boolean doneU2F = Balsa().sessionVar("doneU2F");
-            boolean needU2F  = ! ((Contact) principal).getU2FDeviceRegistrations().isEmpty();
+            boolean needU2F  = ((Contact) principal).isTwoFactorConfigured();
             return needU2F ? doneU2F : goodPrincipal;
         }
         return principal instanceof Contact;
