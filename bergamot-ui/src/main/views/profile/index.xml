@@ -115,10 +115,13 @@
 	        	You currently have two factor authentication enabled :)
 	        </p>
 	        <p class="text-body" rendered="#{u2fDevice != null}">
-	        	Your logged in using your #{u2fDevice.summary}, a #{coalesce(u2fDevice.device, 'Unknown')} Security Key.
+	        	You logged in using your #{u2fDevice.summary}, a #{coalesce(u2fDevice.device, 'Unknown')} Security Key.
 	        </p>
 	        <p class="text-body" rendered="#{hotpDevice != null}">
-	        	Your logged in using Google Authenticator running on #{hotpDevice.summary}.
+	        	You logged in using Google Authenticator running on #{hotpDevice.summary}.
+	        </p>
+	        <p class="text-body" rendered="#{backupCode != null}">
+	        	You logged in using the backup code <code>#{backupCode.code}</code>.  Please register a new second factor authentication method. 
 	        </p>
         </div>
     </div>
@@ -275,7 +278,7 @@
     	</div>
     </div>
     
-    <div class="row">
+    <div class="row" rendered="#{backupCode == null}">
     	<h3>Backup Codes</h3>
     	<div class="col12">
 	    	<p class="text-body">
@@ -298,7 +301,7 @@
 							<code>#{code.code}</code>
 						</td>
 						<td>#{dateformat('yyyy-MM-dd', code.created)} at #{dateformat('hh:mm:ss', code.created)}</td>
-						<td>#{if(code.used, 'On ' + dateformat('yyyy-MM-dd', code.revokedAt) + ' at ' + dateformat('hh:mm:ss', code.revokedAt), 'No')}</td>
+						<td>#{if(code.used, 'On ' + dateformat('yyyy-MM-dd', code.usedAt) + ' at ' + dateformat('hh:mm:ss', code.usedAt), 'No')}</td>
 					</tr>
 				</data-set>
 			</table>

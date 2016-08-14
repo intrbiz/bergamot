@@ -21,6 +21,9 @@
 		<p rendered="#{! contact.getHOTPRegistrations().isEmpty()}" class="centre">
 			Or authenticate using <a style="color: #ddd" href="#{path('/start-hotp-authentication') + '?redirect=' + urlencode(coalesce(redirect, ''))}">Google Authenticator</a> instead
 		</p>
+		<p class="centre">
+			Or recover your account using <a style="color: #ddd" href="#{path('/start-backup-code-authentication')}">Backup code</a> instead
+		</p>
 		<script>
     			$(document).ready(function() {
     				setTimeout(function() {

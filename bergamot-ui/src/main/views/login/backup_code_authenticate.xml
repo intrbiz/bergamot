@@ -1,0 +1,22 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa" title="Enter Backup Code">
+
+	<div id="login-box">
+		<img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Enter Backup Code</h4>
+		<p rendered="#{failed}" class="error centre">
+       		The code you entered was not valid, please try again.
+        </p>
+        <p class="centre">
+			Please enter one of your backup codes
+        </p>
+		<form id="hotp-authenticate" method="post" action="#{path('/finish-backup-code-authentication')}">
+			<p>
+				<access-token-for-url path="#{path('/finish-backup-code-authentication')}"/>
+				<input type="text" id="code" name="code" title="Enter your backup code"/>
+				<input type="submit" id="verify"   name="verify"   value="Verify Backup Code"/>
+			</p>
+		</form>
+	</div>
+</fragment>

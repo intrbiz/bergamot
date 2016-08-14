@@ -18,6 +18,7 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.accounting.model.LoginAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
+import com.intrbiz.bergamot.model.BackupCode;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.HOTPRegistration;
 import com.intrbiz.bergamot.model.Site;
@@ -149,7 +150,7 @@ public class LoginRouter extends Router<BergamotApp>
                 // encode the U2F login view
                 var("redirect", redirect);
                 var("u2fauthenticate", authData);
-                encode("login/u2fauthenticate");
+                encode("login/u2f_authenticate");
             }
             else
             {
@@ -165,7 +166,7 @@ public class LoginRouter extends Router<BergamotApp>
         }
     }
     
-    @Get("/start-hotp-authentication")
+    @Any("/start-hotp-authentication")
     @RequirePrincipal()
     public void startHOTPAuthentication(@Param("redirect") String redirect) throws Exception
     {
@@ -214,6 +215,52 @@ public class LoginRouter extends Router<BergamotApp>
         var("redirect", redirect);
         var("failed", true);
         encode("login/hotp_authenticate");
+    }
+    
+    @Any("/start-backup-code-authentication")
+    @RequirePrincipal()
+    public void startBackupCodeAuthentication() throws Exception
+    {
+        encode("login/backup_code_authenticate");
+    }
+    
+    @Post("/finish-backup-code-authentication")
+    @RequirePrincipal()
+    @RequireValidAccessTokenForURL()
+    @WithDataAdapter(BergamotDB.class)
+    public void finishBackupCodeAuthentication(BergamotDB db, @Param("code") String code) throws Exception
+    {
+        Contact contact = currentPrincipal();
+        // try each configured application to verify the given code
+        for (BackupCode backup : contact.getBackupCodes())
+        {
+            if ((! backup.isUsed()) && backup.getCode().equals(code.toLowerCase()))
+            {
+                // ensure we update the registration counter
+                db.setBackupCode(backup.used());
+                // done
+                sessionVar("done2FA", true);
+                sessionVar("backupCode", backup);
+                // redirect to the profile
+                redirect(path("/profile/"));
+                return;
+            }
+        }
+        // backup codes failed
+        var("failed", true);
+        encode("login/backup_code_authenticate");
+    }
+    
+    @Catch(BalsaValidationError.class)
+    @Catch(BalsaConversionError.class)
+    @Post("/finish-backup-code-authentication")
+    @RequirePrincipal()
+    @RequireValidAccessTokenForURL()
+    public void finishBackupCodeAuthenticationError() throws Exception
+    {
+        // error during backup code
+        var("failed", true);
+        encode("login/backup_code_authenticate");
     }
     
     @Post("/finish-u2f-authentication")
@@ -314,6 +361,7 @@ public class LoginRouter extends Router<BergamotApp>
         // clean up the session
         sessionVar("u2fDevice", null);
         sessionVar("hotpDevice", null);
+        sessionVar("backupCode", null);
         sessionVar("done2FA", false);
         // clean up any auto auth
         String autoAuthToken = sessionVar("bergamot.auto.login");
