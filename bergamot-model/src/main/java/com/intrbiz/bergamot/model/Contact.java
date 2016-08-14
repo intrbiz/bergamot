@@ -339,6 +339,28 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
     }
     
+    public List<BackupCode> getBackupCodes()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getBackupCodesForContact(this.getId());
+        }
+    }
+    
+    public void generateMoreBackupCodes()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            // home many active codes do we have?
+            int count = (int) this.getBackupCodes().stream().filter((bc) -> ! bc.isUsed()).count();
+            // generate 5 mode backup codes
+            for (int i = 0; i < (10 - count); i++)
+            {
+                db.setBackupCode(new BackupCode(this));
+            }
+        }
+    }
+    
     public boolean isTwoFactorConfigured()
     {
         return ! (this.getU2FDeviceRegistrations().isEmpty() && this.getHOTPRegistrations().isEmpty());

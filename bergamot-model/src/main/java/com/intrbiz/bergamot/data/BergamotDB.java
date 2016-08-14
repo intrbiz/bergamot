@@ -24,6 +24,7 @@ import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
+import com.intrbiz.bergamot.model.BackupCode;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Cluster;
@@ -84,7 +85,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 39, 0}),
+        version = @SQLVersion({3, 40, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -122,7 +123,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             AlertEscalation.class,
             AlertEncompasses.class,
             U2FDeviceRegistration.class,
-            HOTPRegistration.class
+            HOTPRegistration.class,
+            BackupCode.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -785,6 +787,26 @@ public abstract class BergamotDB extends DatabaseAdapter
     @Cacheable
     @SQLGetter(table = HOTPRegistration.class, name = "get_hotp_registrations_for_contact", since = @SQLVersion({3, 39, 0}))
     public abstract List<HOTPRegistration> getHOTPRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
+    
+    // Backup Codes
+    
+    @Cacheable
+    @CacheInvalidate({"get_backup_codes_for_contact.#{contact_id}"})
+    @SQLSetter(table = BackupCode.class, name = "set_backup_code", since = @SQLVersion({3, 40, 0}))
+    public abstract void setBackupCode(BackupCode device);
+    
+    @Cacheable
+    @SQLGetter(table = BackupCode.class, name = "get_backup_code", since = @SQLVersion({3, 40, 0}))
+    public abstract BackupCode getBackupCode(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @CacheInvalidate({"get_backup_codes_for_contact.*"})
+    @SQLRemove(table = BackupCode.class, name = "remove_backup_code", since = @SQLVersion({3, 40, 0}))
+    public abstract void removeBackupCode(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLGetter(table = BackupCode.class, name = "get_backup_codes_for_contact", since = @SQLVersion({3, 40, 0}))
+    public abstract List<BackupCode> getBackupCodesForContact(@SQLParam("contact_id") UUID contactId);
     
     // notifications
     

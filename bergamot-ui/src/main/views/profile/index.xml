@@ -275,4 +275,39 @@
     	</div>
     </div>
     
+    <div class="row">
+    	<h3>Backup Codes</h3>
+    	<div class="col12">
+	    	<p class="text-body">
+	    		 Backup codes allow you to recover access to your account in the event that all other second factor authentication methods are lost.
+	        </p>
+	        <p class="text-body">
+	        	Each backup code can be used once and only once.  Please store them in a safe and secure location, preferable written down on papper.
+	        </p>
+        </div>
+    	<div class="col12">
+    		<table>
+	    		<tr>
+	    		    <th>Code</th>
+	    			<th>Created</th>
+	    			<th>Used</th>
+	    		</tr>
+				<data-set var="code" value="#{contact.getBackupCodes()}">
+					<tr>
+						<td>
+							<code>#{code.code}</code>
+						</td>
+						<td>#{dateformat('yyyy-MM-dd', code.created)} at #{dateformat('hh:mm:ss', code.created)}</td>
+						<td>#{if(code.used, 'On ' + dateformat('yyyy-MM-dd', code.revokedAt) + ' at ' + dateformat('hh:mm:ss', code.revokedAt), 'No')}</td>
+					</tr>
+				</data-set>
+			</table>
+    	</div>
+    	<div class="col12">
+    		<p>
+    			<a href="#{path('/profile/more-backup-codes')}">Create more backup codes</a>
+    		</p>
+    	</div>
+    </div>
+    
 </fragment>

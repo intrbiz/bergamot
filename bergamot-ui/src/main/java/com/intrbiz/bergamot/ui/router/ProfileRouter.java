@@ -106,6 +106,8 @@ public class ProfileRouter extends Router<BergamotApp>
                 attestation == null ? null : attestation.getDeviceProperties().get("imageUrl"),
                 name
         ));
+        // do we need more backup codes
+        contact.generateMoreBackupCodes();
         // done
         redirect(path("/profile/"));
     }
@@ -163,7 +165,18 @@ public class ProfileRouter extends Router<BergamotApp>
         // store our HOTP registration
         HOTPRegistration registration = var("hotp", new HOTPRegistration(contact, secret, name));
         db.setHOTPRegistration(registration);
+        // do we need more backup codes
+        contact.generateMoreBackupCodes();
         // done
         encode("/profile/setuphotp");
+    }
+    
+    @Any("/more-backup-codes")
+    @WithDataAdapter(BergamotDB.class)
+    public void moreBackupCodes(BergamotDB db) throws IOException
+    {
+        Contact contact = currentPrincipal();
+        contact.generateMoreBackupCodes();
+        redirect(path("/profile/"));
     }
 }
