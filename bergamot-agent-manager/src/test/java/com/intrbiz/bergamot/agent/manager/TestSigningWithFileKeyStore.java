@@ -27,34 +27,34 @@ import com.intrbiz.bergamot.crypto.util.SerialNum;
 public class TestSigningWithFileKeyStore
 {
     public static final UUID SITE_ID = UUID.fromString("ffcaf844-8592-4a47-91ef-5f0ab4fb3ce8");
-    
+
     public static final String SITE_NAME = "bergamot.unit.test";
-    
+
     public static final String SERVER_NAME = "hub.bergamot.unit.test";
-    
+
     public static final UUID AGENT_ID = UUID.fromString("ec459826-d941-419f-8889-a5782609830d");
-    
+
     public static final String AGENT_NAME = "agent.site.bergamot.unit.test";
-    
-public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-bfbe4a3cbdda");
-    
+
+    public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-bfbe4a3cbdda");
+
     public static final String TEMPLATE_NAME = "dummy_host_template";
-    
+
     private static File base;
-    
+
     private FileKeyStore keyStore;
-    
+
     private CertDNCfg config;
-    
+
     private CertificateManager certManager;
-    
+
     @BeforeClass
     public static void setupBaseFile() throws IOException
     {
         base = new File(System.getProperty("java.io.tmpdir"), "test_file_key_store_" + System.currentTimeMillis() + "_base");
         base.mkdirs();
     }
-    
+
     @Before
     public void setup()
     {
@@ -66,13 +66,13 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         this.config.setOrganisation("Somecompany");
         this.certManager = new CertificateManager(this.keyStore, this.config);
     }
-    
+
     @AfterClass
     public static void cleanupFiles()
     {
         cleanup(base);
     }
-    
+
     private static void cleanup(File file)
     {
         if (file.isDirectory())
@@ -88,7 +88,7 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         }
         file.delete();
     }
-    
+
     @Test
     public void test01SetupDirs()
     {
@@ -97,7 +97,7 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(new File(base, "server").isDirectory(), is(equalTo(true)));
         assertThat(new File(base, "agent").isDirectory(), is(equalTo(true)));
     }
-    
+
     @Test
     public void test02GenerateRootCA()
     {
@@ -111,12 +111,12 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(caPair, is(notNullValue()));
         assertThat(caPair.getCertificate(), is(notNullValue()));
         assertThat(caPair.getKey(), is(notNullValue()));
-        assertThat(caPair.getCertificate().getSubjectDN().getName(), is(equalTo("CN=Bergamot Monitoring Root CA, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
-        assertThat(caPair.getCertificate().getIssuerDN().getName(), is(equalTo("CN=Bergamot Monitoring Root CA, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(caPair.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=Bergamot Monitoring Root CA")));
+        assertThat(caPair.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=Bergamot Monitoring Root CA")));
         assertThat(caPair.getCertificate().getPublicKey().getAlgorithm(), is(equalTo("RSA")));
         assertThat(caPair.getKey().getAlgorithm(), is(equalTo("RSA")));
     }
-    
+
     @Test
     public void test03GenerateSiteCA()
     {
@@ -130,10 +130,10 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(sitePair, is(notNullValue()));
         assertThat(sitePair.getCertificate(), is(notNullValue()));
         assertThat(sitePair.getKey(), is(notNullValue()));
-        assertThat(sitePair.getCertificate().getSubjectDN().getName(), is(equalTo("CN=bergamot.unit.test Site CA, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(sitePair.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=bergamot.unit.test Site CA")));
         assertThat(sitePair.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=Bergamot Monitoring Root CA")));
     }
-    
+
     @Test
     public void test04GenerateServer()
     {
@@ -152,12 +152,12 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(serverCrt, is(notNullValue()));
         assertThat(serverCrt.getCertificate(), is(notNullValue()));
         assertThat(serverCrt.getKey(), is(nullValue()));
-        assertThat(serverCrt.getCertificate().getSubjectDN().getName(), is(equalTo("CN=hub.bergamot.unit.test, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(serverCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=hub.bergamot.unit.test")));
         assertThat(serverCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=Bergamot Monitoring Root CA")));
         assertThat(serverCrt.getCertificate().getPublicKey(), is(equalTo(serverKeyPair.getPublic())));
         assertThat(SerialNum.fromBigInt(serverCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
     }
-    
+
     @Test
     public void test05RegenerateServer()
     {
@@ -178,12 +178,12 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(serverCrt, is(notNullValue()));
         assertThat(serverCrt.getCertificate(), is(notNullValue()));
         assertThat(serverCrt.getKey(), is(nullValue()));
-        assertThat(serverCrt.getCertificate().getSubjectDN().getName(), is(equalTo("CN=hub.bergamot.unit.test, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(serverCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=hub.bergamot.unit.test")));
         assertThat(serverCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=Bergamot Monitoring Root CA")));
         assertThat(serverCrt.getCertificate().getPublicKey(), is(equalTo(serverKeyPair.getPublic())));
         assertThat(SerialNum.fromBigInt(serverCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
     }
-    
+
     @Test
     public void test06GenerateAgent()
     {
@@ -202,13 +202,13 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(agentCrt, is(notNullValue()));
         assertThat(agentCrt.getCertificate(), is(notNullValue()));
         assertThat(agentCrt.getKey(), is(nullValue()));
-        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("CN=agent.site.bergamot.unit.test, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=agent.site.bergamot.unit.test")));
         assertThat(agentCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=bergamot.unit.test Site CA")));
         assertThat(agentCrt.getCertificate().getPublicKey(), is(equalTo(agentKeyPair.getPublic())));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()).getId(), is(equalTo(AGENT_ID)));
     }
-    
+
     @Test
     public void test07RegenerateAgent()
     {
@@ -229,13 +229,13 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(agentCrt, is(notNullValue()));
         assertThat(agentCrt.getCertificate(), is(notNullValue()));
         assertThat(agentCrt.getKey(), is(nullValue()));
-        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("CN=agent.site.bergamot.unit.test, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=agent.site.bergamot.unit.test")));
         assertThat(agentCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=bergamot.unit.test Site CA")));
         assertThat(agentCrt.getCertificate().getPublicKey(), is(equalTo(agentKeyPair.getPublic())));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()).getId(), is(equalTo(AGENT_ID)));
     }
-    
+
     @Test
     public void test08GenerateTemplate()
     {
@@ -254,13 +254,13 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(agentCrt, is(notNullValue()));
         assertThat(agentCrt.getCertificate(), is(notNullValue()));
         assertThat(agentCrt.getKey(), is(nullValue()));
-        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("CN=Template: dummy_host_template, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=Template: dummy_host_template")));
         assertThat(agentCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=bergamot.unit.test Site CA")));
         assertThat(agentCrt.getCertificate().getPublicKey(), is(equalTo(agentKeyPair.getPublic())));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()).getId(), is(equalTo(TEMPLATE_ID)));
     }
-    
+
     @Test
     public void test09RegenerateTemplate()
     {
@@ -279,18 +279,17 @@ public static final UUID TEMPLATE_ID = UUID.fromString("568dece2-0e27-474e-9473-
         assertThat(agentCrt, is(notNullValue()));
         assertThat(agentCrt.getCertificate(), is(notNullValue()));
         assertThat(agentCrt.getKey(), is(nullValue()));
-        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("CN=Template: dummy_host_template, OU=Bergamot Monitoring, O=Somecompany, L=Sometown, ST=Somewhere, C=GB")));
+        assertThat(agentCrt.getCertificate().getSubjectDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=Template: dummy_host_template")));
         assertThat(agentCrt.getCertificate().getIssuerDN().getName(), is(equalTo("C=GB, ST=Somewhere, L=Sometown, O=Somecompany, OU=Bergamot Monitoring, CN=bergamot.unit.test Site CA")));
         assertThat(agentCrt.getCertificate().getPublicKey(), is(equalTo(agentKeyPair.getPublic())));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()), is(equalTo(expectedSerial)));
         assertThat(SerialNum.fromBigInt(agentCrt.getCertificate().getSerialNumber()).getId(), is(equalTo(TEMPLATE_ID)));
     }
-    
+
     @Test
     public void test10heck()
     {
         this.keyStore.check();
     }
-    
-    
+
 }

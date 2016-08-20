@@ -8,7 +8,8 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 
-import org.bouncycastle.asn1.x500.X500Name;
+import javax.security.auth.x500.X500Principal;
+
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
@@ -86,10 +87,9 @@ public class RSAUtil
         Calendar expiry = Calendar.getInstance();
         expiry.add(Calendar.DAY_OF_YEAR, days);
         // subject DN
-        X500Name subjectDN = new X500Name(DN);
+        X500Principal subjectDN = new X500Principal(DN);
         // issuer DN
-        X500Name issuerDN = issuer == null ? subjectDN : new X500Name(issuer.getCertificate().getSubjectX500Principal().getName());
-        
+        X500Principal issuerDN = issuer == null ? subjectDN : issuer.getCertificate().getSubjectX500Principal();
         // build the certificate
         JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(issuerDN, serial.toBigInt(), now.getTime(), expiry.getTime(), subjectDN, key);
         // set extensions
