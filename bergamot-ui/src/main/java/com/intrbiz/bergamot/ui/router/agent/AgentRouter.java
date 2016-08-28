@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
+import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
 import com.intrbiz.bergamot.agent.config.CfgParameter;
@@ -17,6 +18,8 @@ import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.AgentRegistration;
+import com.intrbiz.bergamot.model.AgentTemplate;
+import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -43,7 +46,16 @@ public class AgentRouter extends Router<BergamotApp>
     public void listAgents(BergamotDB db, @SessionVar("site") Site site)
     {
         model("agents", db.listAgentRegistrations(site.getId()));
+        model("agentTemplates", db.listAgentTemplates(site.getId()));
         encode("agent/index");
+    }
+    
+    @Get("/generate-template")
+    @WithDataAdapter(BergamotDB.class)
+    public void showGenerateAgentTemplate(BergamotDB db, @SessionVar("site") Site site)
+    {
+        model("hostTemplates", db.listHostTemplatesWithoutCertificates(site.getId()));
+        encode("agent/generate-template");
     }
     
     @Get("/generate-config")
@@ -57,6 +69,54 @@ public class AgentRouter extends Router<BergamotApp>
     public void showSignAgentConfig()
     {
         encode("agent/sign-agent");
+    }
+    
+    @Get("/show-template/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void showGenerateAgentTemplate(BergamotDB db, @SessionVar("site") Site site, @IsaObjectId() UUID id)
+    {
+        // get the template
+        AgentTemplate template = db.getAgentTemplate(id);
+        // get the certs
+        Certificate     rootCert = action("get-root-ca");
+        Certificate     siteCert = action("get-site-ca", site.getId());
+        // build the config
+        BergamotAgentCfg cfg = new BergamotAgentCfg();
+        cfg.setCaCertificate(padCert(PEMUtil.saveCertificate(rootCert)));
+        cfg.setSiteCaCertificate(padCert(PEMUtil.saveCertificate(siteCert)));
+        cfg.setCertificate(padCert(template.getCertificate()));
+        cfg.setKey(padCert(template.getCertificate()));
+        cfg.setName(template.getName());
+        cfg.addParameter(new CfgParameter("template-id", null, null, id.toString()));
+        // display
+        var("agentConfig", cfg.toString() + "\n<!-- Template: UUID=" + id + " CN=" + template.getName() + " -->");
+        encode("agent/generated-template");
+    }
+    
+    @Post("/generate-template")
+    @WithDataAdapter(BergamotDB.class)
+    public void generateTemplate(BergamotDB db, @SessionVar("site") Site site, @Param("template") @IsaObjectId() UUID templateId)
+    {
+        // get the template
+        Config hostTemplate = notNull(db.getConfig(templateId), "Invalid host template");
+        if (! "host".equals(hostTemplate.getType())) throw new BalsaNotFound("Invalid host template");
+        // generate
+        Certificate     rootCert = action("get-root-ca");
+        Certificate     siteCert = action("get-site-ca", site.getId());
+        CertificatePair pair     = action("generate-template", site.getId(), hostTemplate, ((Contact) currentPrincipal()).getId());
+        // build the config
+        BergamotAgentCfg cfg = new BergamotAgentCfg();
+        cfg.setCaCertificate(padCert(PEMUtil.saveCertificate(rootCert)));
+        cfg.setSiteCaCertificate(padCert(PEMUtil.saveCertificate(siteCert)));
+        cfg.setCertificate(padCert(pair.getCertificateAsPEM()));
+        cfg.setKey(padCert(pair.getKeyAsPEM()));
+        cfg.setName(hostTemplate.getName());
+        cfg.addParameter(new CfgParameter("template-id", null, null, templateId.toString()));
+        // store the agent registration
+        db.setAgentTemplate(new AgentTemplate(site.getId(), templateId, hostTemplate.getName(), hostTemplate.getSummary(), SerialNum.fromBigInt(pair.getCertificate().getSerialNumber()).toString(), pair.getCertificateAsPEM(), pair.getKeyAsPEM()));
+        // display
+        var("agentConfig", cfg.toString() + "\n<!-- Template: UUID=" + templateId + " CN=" + hostTemplate.getName() + " -->");
+        encode("agent/generated-template");
     }
     
     @Post("/generate-config")

@@ -18,14 +18,17 @@ import com.intrbiz.bergamot.crypto.util.CertificatePair;
 import com.intrbiz.bergamot.crypto.util.CertificateRequest;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.RSAUtil;
+import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetRootCA;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.request.SignAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.request.SignTemplate;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
+import com.intrbiz.bergamot.model.message.agent.manager.response.SignedTemplate;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.metadata.Action;
 import com.intrbiz.queue.RPCClient;
@@ -156,6 +159,34 @@ public class BergamotAgentActions
         catch (IOException | InterruptedException | ExecutionException | TimeoutException e)
         {
             throw new RuntimeException("Failed to get root CA", e);
+        }
+    }
+    
+    @Action("generate-template")
+    public CertificatePair generateTemplate(UUID siteId, Config hostTemplate, UUID contactId)
+    {
+        try
+        {
+            String templateName = hostTemplate.getName();
+            UUID templateId = hostTemplate.getId();
+            // generate the key pair
+            KeyPair pair = RSAUtil.generateRSAKeyPair(2048);
+            // sign the cert
+            logger.info("Generating Bergamot Agent certificate pair: " + templateName);
+            AgentManagerResponse response = this.client.publish(new SignTemplate(siteId, templateId, templateName, PEMUtil.savePublicKey(pair.getPublic()))).get(10, TimeUnit.SECONDS);
+            if (response instanceof SignedTemplate)
+            {
+                CertificatePair crtPair = new CertificatePair((X509Certificate) PEMUtil.loadCertificate(((SignedTemplate) response).getCertificatePEM()), pair.getPrivate());
+                // account
+                this.accounting.account(new SignAgentAccountingEvent(siteId, templateId, templateName, ((X509Certificate) crtPair.getCertificate()).getSerialNumber().toString(), contactId));
+                // done
+                return crtPair;
+            }
+            throw new RuntimeException("Failed to sign template");
+        }
+        catch (IOException | InterruptedException | ExecutionException | TimeoutException e)
+        {
+            throw new RuntimeException("Failed to sign template", e);
         }
     }
 }

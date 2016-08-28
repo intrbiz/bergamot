@@ -5,13 +5,44 @@
 
     <div clas="row">
     	<p class="pull-right">
+    		<a style="margin-left: 15px;" href="/agent/generate-template">Generate Template Certificate</a>
     		<a style="margin-left: 15px;" href="/agent/sign">Sign Agent Certificate</a>
 	    	<a style="margin-left: 15px;" href="/agent/generate-config" rendered="#{Balsa().permission('ui.generate.agent')}">Generate Agent Configuration</a>
     	</p>
-    	<p class="text-body">
-			
-    	</p>
+    </div>
+    
+       <div clas="row">
     	<div class="col12">
+    		<h3>Bergamot Agent Template Certificates</h3>
+    		<p class="text-body">
+    			These are certificates which can bed used to automatically register a Bergamot Agent upon first 
+    			connection and instance of the template.
+    		</p>
+    		<table>
+	    		<tr>
+		    		<th>Name</th>
+	    			<th>Template Id</th>
+	    			<th>Generated</th>
+	    			<th></th>
+	    		</tr>
+	    		<data-set var="agentTemplate" value="#{agentTemplates}">
+	    			<tr>
+	    				<td><a href="/admin/config/id/#{agentTemplate.id}">#{agentTemplate.summary}</a></td>
+	    				<td>#{agentTemplate.id}</td>
+	    				<td>#{dateformat('HH:mm:ss', agentTemplate.created)} on #{dateformat('EEEE dd/MM/yyyy', agentTemplate.created)}</td>
+	    				<td><a href="/agent/show-template/#{agentTemplate.id}">View Agent Configuration</a></td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+    <div clas="row">
+    	<div class="col12">
+    		<h3>Bergamot Agent Certificates</h3>
+    		<p class="text-body">
+    			These are certificates that have been generated and assigned to hosts running the Bergamot Agent
+    		</p>
 	    	<table>
 	    		<tr>
 		    		<th>Name</th>

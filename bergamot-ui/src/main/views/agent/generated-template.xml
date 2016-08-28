@@ -3,17 +3,17 @@
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Bergamot Agent Manager">
 
-	<div clas="row">
+    <div clas="row">
     	<p class="pull-right">
     		<a style="margin-left: 15px;" href="/agent/">Back</a>
     	</p>
     </div>
 
     <div clas="row">
-    	<h3>Agent Configuration</h3>
+    	<h3>Bergamot Agent Template Configuration</h3>
     	<p>
-    		The generated agent configuration is below, this includes 
-    		the TLS certificates and private keys.
+    		Below is the Bergamot Agent configuration required to automatically register a 
+    		Bergamot Agent instance upon first connection.
     	</p>
     	<div class="col12">
     		<pre>#{agentConfig}</pre>

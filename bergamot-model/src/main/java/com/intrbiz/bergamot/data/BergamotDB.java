@@ -21,6 +21,7 @@ import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.AccessControl;
 import com.intrbiz.bergamot.model.AgentRegistration;
+import com.intrbiz.bergamot.model.AgentTemplate;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
@@ -85,7 +86,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 40, 0}),
+        version = @SQLVersion({3, 42, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -124,7 +125,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             AlertEncompasses.class,
             U2FDeviceRegistration.class,
             HOTPRegistration.class,
-            BackupCode.class
+            BackupCode.class,
+            AgentTemplate.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -1811,6 +1813,28 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = AgentRegistration.class, name = "list_agent_registrations", since = @SQLVersion({2, 2, 0}))
     public abstract List<AgentRegistration> listAgentRegistrations(@SQLParam("site_id") UUID siteId);
+    
+    // agent template
+    
+    @SQLSetter(table = AgentTemplate.class, name = "set_agent_template", since = @SQLVersion({3, 41, 0}))
+    public abstract void setAgentTemplate(AgentTemplate reg);
+    
+    @SQLGetter(table = AgentTemplate.class, name = "get_agent_template", since = @SQLVersion({3, 41, 0}))
+    public abstract AgentTemplate getAgentTemplate(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = AgentTemplate.class, name ="get_agent_template_by_name", since = @SQLVersion({3, 41, 0}))
+    public abstract AgentTemplate getAgentTemplateByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
+    
+    @SQLRemove(table = AgentTemplate.class, name = "remove_agent_template", since = @SQLVersion({3, 41, 0}))
+    public abstract void removeAgentTemplate(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = AgentTemplate.class, name = "list_agent_templates", since = @SQLVersion({3, 41, 0}))
+    public abstract List<AgentTemplate> listAgentTemplates(@SQLParam("site_id") UUID siteId);
+    
+    @SQLGetter(table = Config.class, name = "list_host_templates_without_certificates", since = @SQLVersion({3, 42, 0}),
+            query = @SQLQuery("SELECT c.* FROM bergamot.config c LEFT JOIN bergamot.agent_template t ON (c.id = t.id) WHERE c.type = 'host'  AND c.template AND t.id IS NULL")
+    )
+    public abstract List<Config> listHostTemplatesWithoutCertificates(@SQLParam("site_id") UUID siteId);
     
     // generic
     
