@@ -100,7 +100,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
         {
             String pass = "abc123";
             // create the keystore
-            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, this.configuration.getKeyTrimmed(), this.configuration.getCertificateTrimmed(), this.configuration.getCaCertificateTrimmed());
+            KeyStore sks = KeyStoreUtil.loadServerKeyStore(pass, this.configuration.getKeyTrimmed(), this.configuration.getCertificateTrimmed(), this.configuration.getCaCertificateTrimmed());
             KeyStore tks = KeyStoreUtil.loadTrustKeyStore(this.configuration.getCaCertificateTrimmed());
             // the key manager
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
