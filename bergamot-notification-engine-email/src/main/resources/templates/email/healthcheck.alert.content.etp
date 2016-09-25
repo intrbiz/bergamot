@@ -1,0 +1,7 @@
+Hello
+
+Bergamot Monitoring has detected that an internal component has failed.
+
+The daemon #{daemon.daemonName} (instance #{daemon.instanceId}) on the host #{daemon.hostName} (#{daemon.hostId}) has failed.
+
+Thank you, Bergamot

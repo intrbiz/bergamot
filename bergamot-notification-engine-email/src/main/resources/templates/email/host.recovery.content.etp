@@ -1,0 +1,9 @@
+Recovery for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}
+
+Check output: #{host.state.output}
+
+Last checked at #{dateformat('HH:mm:ss', host.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime)}
+
+For more information: https://#{site.name}/host/id/#{host.id}
+
+Thank you, Bergamot

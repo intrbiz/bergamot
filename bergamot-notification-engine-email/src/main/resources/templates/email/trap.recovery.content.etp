@@ -1,0 +1,9 @@
+Recovery for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}
+
+Check output: #{trap.state.output}
+
+Last checked at #{dateformat('HH:mm:ss', trap.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime)}
+
+For more information: https://#{site.name}/trap/id/#{trap.id}
+
+Thank you, Bergamot

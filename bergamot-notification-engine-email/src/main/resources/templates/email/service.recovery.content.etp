@@ -1,0 +1,9 @@
+Recovery for service #{service.summary} on the host #{host.summary} is #{service.state.status}
+
+Check output: #{service.state.output}
+
+Last checked at #{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}
+
+For more information: https://#{site.name}/service/id/#{service.id}
+
+Thank you, Bergamot

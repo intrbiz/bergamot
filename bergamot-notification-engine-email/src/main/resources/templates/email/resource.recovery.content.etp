@@ -1,0 +1,7 @@
+Recovery for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}
+
+Last checked at #{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}
+
+For more information: https://#{site.name}/resource/id/#{resource.id}
+
+Thank you, Bergamot

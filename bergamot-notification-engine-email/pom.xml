@@ -32,6 +32,11 @@
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>bootstrap</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.25-incubating</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-notification-engine-email</finalName>

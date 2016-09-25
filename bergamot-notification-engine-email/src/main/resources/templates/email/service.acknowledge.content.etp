@@ -1,0 +1,6 @@
+The alert for service #{service.summary} on the host #{host.summary} has been acknowledged by #{notification.acknowledgedBy.summary} #{dateformat('HH:mm:ss', notification.raised)} on #{dateformat('EEEE dd/MM/yyyy', notification.raised)} with the following comment:
+
+#{notification.acknowledgeSummary}
+
+#{notification.acknowledgeComment}
+Thank you, Bergamot

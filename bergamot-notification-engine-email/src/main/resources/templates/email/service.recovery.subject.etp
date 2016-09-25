@@ -1,0 +1,1 @@
+Recovery for service #{service.summary} on the host #{host.summary} is #{service.state.status}

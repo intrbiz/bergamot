@@ -1,0 +1,7 @@
+Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}
+
+Last checked at #{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}
+
+For more information: https://#{site.name}/cluster/id/#{cluster.id}
+
+Thank you, Bergamot

@@ -1,10 +1,8 @@
 package com.intrbiz.bergamot.notification.engine.sms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.http.NameValuePair;
@@ -73,7 +71,7 @@ public class SMSEngine extends AbstractNotificationEngine
         // from number
         this.from = this.config.getStringParameterValue("from", "");
         // setup the client
-        logger.info("Using the Twillo account: " + this.accountSid + ", from: " + this.from);
+        logger.info("Using the Twilio account: " + this.accountSid + ", from: " + this.from);
         this.client = new TwilioRestClient(this.accountSid, this.authToken);
         this.messageFactory = client.getAccount().getMessageFactory();
         // who to contact in the event we get a warning from the healthcheck subsystem
@@ -212,34 +210,5 @@ public class SMSEngine extends AbstractNotificationEngine
     protected String buildMessage(KnownDaemon daemon) throws Exception
     {
         return this.applyTemplate("healthcheck.alert.message", daemon);
-    }
-
-    @Override
-    protected Map<String, String> getDefaultTemplates()
-    {        
-        Map<String, String> templates = new HashMap<String, String>();
-        // host
-        templates.put("host.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for host #{host.summary}");
-        templates.put("host.alert.message", "Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
-        templates.put("host.recovery.message", "Recovery for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}");
-        // cluster
-        templates.put("cluster.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for cluster #{cluster.summary}");
-        templates.put("cluster.alert.message", "Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
-        templates.put("cluster.recovery.message", "Recovery for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}");
-        // service
-        templates.put("service.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for service #{service.summary} on the host #{host.summary}");
-        templates.put("service.alert.message", "Alert for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
-        templates.put("service.recovery.message", "Recovery for service #{service.summary} on the host #{host.summary} is #{service.state.status}");
-        // trap
-        templates.put("trap.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for trap #{trap.summary} on the host #{host.summary}");
-        templates.put("trap.alert.message", "Alert for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
-        templates.put("trap.recovery.message", "Recovery for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}");
-        // resource
-        templates.put("resource.acknowledge.message", "#{notification.acknowledgedBy.summary} has acknowledged an alert for resource #{resource.summary} on the cluster #{cluster.summary}");
-        templates.put("resource.alert.message", "Alert for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
-        templates.put("resource.recovery.message", "Recovery for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}");
-        // healthcheck
-        templates.put("healthcheck.alert.message", "The daemon #{daemon.daemonName} (instance #{daemon.instanceId}) on the host #{daemon.hostName} (#{daemon.hostId}) has failed");
-        return templates;
     }
 }

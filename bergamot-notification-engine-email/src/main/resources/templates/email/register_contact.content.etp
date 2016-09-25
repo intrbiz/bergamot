@@ -1,0 +1,9 @@
+Hello #{coalesce(contact.summary, contact.name)}
+
+Welcome to Bergamot Monitoring.  To activate your account on #{coalesce(site.summary, site.name)}, please follow the link below:
+
+#{notification.url}
+
+You can login at: https://#{site.name}/
+
+Thank you, Bergamot

@@ -1,0 +1,1 @@
+Recovery for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}
