@@ -197,7 +197,7 @@ public class EmailEngine extends AbstractNotificationEngine
         {
             if (! this.checkAtLeastOneRecipient(notification)) return;
             // build the message
-            Message message = this.buildMessage(this.session, notification);
+            Message message = this.buildMessage(notification);
             logger.debug("Built message");
             // send the message
             Transport transport = null;
@@ -269,22 +269,22 @@ public class EmailEngine extends AbstractNotificationEngine
         return false;
     }
     
-    protected Message buildMessage(Session session, Notification notification) throws Exception
+    protected Message buildMessage(Notification notification) throws Exception
     {
         if (notification instanceof CheckNotification)
         {
-            return this.buildCheckMessage(session, (CheckNotification) notification);
+            return this.buildCheckMessage((CheckNotification) notification);
         }
         else if (notification instanceof GenericNotification)
         {
-            return this.buildGenericMessage(session, (GenericNotification) notification);
+            return this.buildGenericMessage((GenericNotification) notification);
         }
         return null;
     }
     
-    protected Message buildGenericMessage(Session session, GenericNotification notification) throws Exception
+    protected Message buildGenericMessage(GenericNotification notification) throws Exception
     {
-        Message message = new MimeMessage(session);
+        Message message = new MimeMessage(this.session);
         // from
         message.setFrom(new InternetAddress(this.fromAddress));
         // to address
@@ -304,9 +304,9 @@ public class EmailEngine extends AbstractNotificationEngine
         return message;
     }
 
-    protected Message buildCheckMessage(Session session, CheckNotification notification) throws Exception
+    protected Message buildCheckMessage(CheckNotification notification) throws Exception
     {
-        Message message = new MimeMessage(session) {
+        Message message = new MimeMessage(this.session) {
             @Override
             protected void updateMessageID() throws MessagingException
             {
