@@ -82,9 +82,9 @@ import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.ClusterManagerError;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.FlushedGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
-import com.intrbiz.bergamot.model.message.command.RegisteredBergamotAgent;
 import com.intrbiz.bergamot.model.message.command.GeneralCommandError;
 import com.intrbiz.bergamot.model.message.command.RegisterBergamotAgent;
+import com.intrbiz.bergamot.model.message.command.RegisteredBergamotAgent;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
@@ -95,11 +95,13 @@ import com.intrbiz.bergamot.model.message.health.HealthCheckKill;
 import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.model.message.importer.BergamotImportReportMO;
+import com.intrbiz.bergamot.model.message.notification.BackupCodeUsed;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.model.message.notification.U2FADeviceRegistered;
 import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
@@ -185,6 +187,8 @@ public class BergamotTranscoder
         PasswordResetNotification.class,
         RegisterContactNotification.class,
         SendAcknowledge.class,
+        U2FADeviceRegistered.class,
+        BackupCodeUsed.class,
         // updates
         CheckUpdate.class,
         GroupUpdate.class,
