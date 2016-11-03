@@ -23,6 +23,7 @@ import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
 import com.intrbiz.bergamot.ui.action.SchedulerActions;
 import com.intrbiz.bergamot.ui.action.TeamActions;
 import com.intrbiz.bergamot.ui.action.TimePeriodActions;
+import com.intrbiz.bergamot.ui.action.U2FAActions;
 import com.intrbiz.bergamot.ui.api.APIRouter;
 import com.intrbiz.bergamot.ui.api.AgentAPIRouter;
 import com.intrbiz.bergamot.ui.api.AlertsAPIRouter;
@@ -198,6 +199,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new ConfigChangeActions());
         action(new CheckActions());
         action(new BergamotAgentActions());
+        action(new U2FAActions());
         // Setup the application routers
         router(new ErrorRouter());
         router(new LoginRouter());

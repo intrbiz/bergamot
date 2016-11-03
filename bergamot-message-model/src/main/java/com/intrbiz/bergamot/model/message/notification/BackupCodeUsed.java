@@ -16,6 +16,9 @@ public class BackupCodeUsed extends GenericNotification
 
     @JsonProperty("code")
     private String code;
+    
+    @JsonProperty("registered_at")
+    private long registeredAt;
 
     public BackupCodeUsed()
     {
@@ -30,6 +33,7 @@ public class BackupCodeUsed extends GenericNotification
         this.setContact(contact);
         this.getTo().add(contact);
         this.code = code;
+        this.registeredAt = System.currentTimeMillis();
     }
 
     @Override
@@ -56,5 +60,15 @@ public class BackupCodeUsed extends GenericNotification
     public void setContact(ContactMO contact)
     {
         this.contact = contact;
+    }
+
+    public long getRegisteredAt()
+    {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(long registeredAt)
+    {
+        this.registeredAt = registeredAt;
     }
 }

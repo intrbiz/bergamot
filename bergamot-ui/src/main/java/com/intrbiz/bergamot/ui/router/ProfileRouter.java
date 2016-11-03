@@ -108,6 +108,8 @@ public class ProfileRouter extends Router<BergamotApp>
         ));
         // do we need more backup codes
         contact.generateMoreBackupCodes();
+        // notifications
+        action("u2fa-device-registered", contact, name, attestation == null ? "Unknown Device" : attestation.getDeviceProperties().get("displayName"));
         // done
         redirect(path("/profile/"));
     }
@@ -167,6 +169,8 @@ public class ProfileRouter extends Router<BergamotApp>
         db.setHOTPRegistration(registration);
         // do we need more backup codes
         contact.generateMoreBackupCodes();
+        // notifications
+        action("u2fa-device-registered", contact, name, "HOTP Authenticator");
         // done
         encode("/profile/setuphotp");
     }

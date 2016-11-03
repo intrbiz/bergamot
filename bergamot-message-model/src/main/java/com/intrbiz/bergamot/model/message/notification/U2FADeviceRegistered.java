@@ -19,6 +19,9 @@ public class U2FADeviceRegistered extends GenericNotification
 
     @JsonProperty("device_type")
     private String deviceType;
+    
+    @JsonProperty("registered_at")
+    private long registeredAt;
 
     public U2FADeviceRegistered()
     {
@@ -34,6 +37,7 @@ public class U2FADeviceRegistered extends GenericNotification
         this.getTo().add(contact);
         this.deviceName = deviceName;
         this.deviceType = deviceType;
+        this.registeredAt = System.currentTimeMillis(); 
     }
 
     @Override
@@ -70,5 +74,15 @@ public class U2FADeviceRegistered extends GenericNotification
     public void setContact(ContactMO contact)
     {
         this.contact = contact;
+    }
+
+    public long getRegisteredAt()
+    {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(long registeredAt)
+    {
+        this.registeredAt = registeredAt;
     }
 }

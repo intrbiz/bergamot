@@ -241,6 +241,8 @@ public class LoginRouter extends Router<BergamotApp>
                 // done
                 sessionVar("done2FA", true);
                 sessionVar("backupCode", backup);
+                // send backup code used notification
+                action("backup-code-used", contact, code);
                 // redirect to the profile
                 redirect(path("/profile/"));
                 return;
