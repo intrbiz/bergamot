@@ -43,7 +43,7 @@ public class U2FADeviceRegistered extends GenericNotification
     @Override
     public String getNotificationType()
     {
-        return "u2fa.device_registered";
+        return "u2fa_device_registered";
     }
 
     public String getDeviceName()

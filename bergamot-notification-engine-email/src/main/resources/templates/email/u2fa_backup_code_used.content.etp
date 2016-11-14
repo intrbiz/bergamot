@@ -1,0 +1,7 @@
+Hello #{coalesce(contact.summary, contact.name)}
+
+The backup code #{notification.code} was used to login to your account.
+
+If you did not use this backup code, please contact your site administration immediately.
+
+Thank you, Bergamot

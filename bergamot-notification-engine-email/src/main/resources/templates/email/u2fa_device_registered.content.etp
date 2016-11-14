@@ -1,0 +1,7 @@
+Hello #{coalesce(contact.summary, contact.name)}
+
+A new security key #{notification.deviceName} (#{notification.deviceType}) has been registered for your account.
+
+If you did not register this security key, please contact your site administration immediately.
+
+Thank you, Bergamot

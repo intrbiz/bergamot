@@ -39,7 +39,7 @@ public class BackupCodeUsed extends GenericNotification
     @Override
     public String getNotificationType()
     {
-        return "u2fa.backup_code_used";
+        return "u2fa_backup_code_used";
     }
 
     public String getCode()
