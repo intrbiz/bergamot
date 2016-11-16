@@ -1,21 +1,22 @@
 package com.intrbiz.bergamot.check.http;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.ssl.SslHandshakeCompletionEvent;
-
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.crypto.util.TLSInfo;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.ssl.SslHandshakeCompletionEvent;
 
 public class HTTPClientHandler extends ChannelInboundHandlerAdapter
 {
@@ -123,6 +124,13 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
     {
         logger.debug("Connection closed: " + ctx.channel().remoteAddress());
         if (this.timeoutTask != null) this.timeoutTask.cancel();
+        // forcefully invalidate our session
+        // we don't want to reuse any negotiated ciphers etc, this might break tests
+        if (this.sslEngine != null)
+        {
+            SSLSession session = this.sslEngine.getSession();
+            if (session != null) session.invalidate();
+        }
     }
 
     @Override

@@ -125,6 +125,9 @@ public class HTTPChecker
              */
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, new TrustManager[] { new BergamotTrustManager(permitInvalidCerts) }, new SecureRandom());
+            // we want to invalidate sessions as soon as possible, to avoid reuse
+            context.getClientSessionContext().setSessionTimeout(1);
+            context.getServerSessionContext().setSessionTimeout(1);
             return context;
         }
         catch (Exception e)
