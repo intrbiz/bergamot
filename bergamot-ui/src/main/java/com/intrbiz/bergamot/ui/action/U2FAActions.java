@@ -26,7 +26,7 @@ public class U2FAActions
     {
         synchronized (this)
         {
-            this.notificationProducer.publish(new NotificationKey(contact.getSiteId()), new U2FADeviceRegistered(contact.getSite().toMO(contact), contact.toMO(contact), deviceName, deviceType));
+            this.notificationProducer.publish(new NotificationKey(contact.getSiteId()), new U2FADeviceRegistered(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email").addEngine("sms"), deviceName, deviceType));
         }
     }
     
@@ -35,7 +35,7 @@ public class U2FAActions
     {
         synchronized (this)
         {
-            this.notificationProducer.publish(new NotificationKey(contact.getSiteId()), new BackupCodeUsed(contact.getSite().toMO(contact), contact.toMO(contact), code));
+            this.notificationProducer.publish(new NotificationKey(contact.getSiteId()), new BackupCodeUsed(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email").addEngine("sms"), code));
         }
     }
 }
