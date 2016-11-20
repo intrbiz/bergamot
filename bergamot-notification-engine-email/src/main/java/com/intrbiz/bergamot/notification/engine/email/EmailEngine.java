@@ -195,7 +195,11 @@ public class EmailEngine extends AbstractNotificationEngine
         Timer.Context tctx = this.emailSendTimer.time();
         try
         {
-            if (! this.checkAtLeastOneRecipient(notification)) return;
+            if (! this.checkAtLeastOneRecipient(notification))
+            {
+                logger.info("Not sending email, no recipients");
+                return;
+            }
             // build the message
             Message message = this.buildMessage(notification);
             logger.debug("Built message");
