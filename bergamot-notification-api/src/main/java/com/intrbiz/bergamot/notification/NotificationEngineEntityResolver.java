@@ -6,9 +6,8 @@ import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
+import com.intrbiz.bergamot.model.message.notification.ContactNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
-import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
 import com.intrbiz.express.ExpressEntityResolver;
 import com.intrbiz.express.action.ActionHandler;
 
@@ -36,11 +35,8 @@ public class NotificationEngineEntityResolver extends ExpressEntityResolver
             }
             else if ("contact".equals(name))
             {
-                if (notification instanceof PasswordResetNotification)
-                {
-                    return ((PasswordResetNotification) notification).getContact();
-                }
-                else if (notification instanceof RegisterContactNotification) { return ((RegisterContactNotification) notification).getContact(); }
+                if (notification instanceof ContactNotification)
+                    return ((ContactNotification) notification).getContact();
                 return null;
             }
             else if ("check".equals(name))

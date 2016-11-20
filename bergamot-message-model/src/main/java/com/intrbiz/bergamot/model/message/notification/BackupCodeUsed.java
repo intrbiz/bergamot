@@ -9,11 +9,8 @@ import com.intrbiz.bergamot.model.message.SiteMO;
  * Sent when a backup code is used to login for a contact
  */
 @JsonTypeName("bergamot.u2fa.backup_code_used")
-public class BackupCodeUsed extends GenericNotification
+public class BackupCodeUsed extends ContactNotification
 {
-    @JsonProperty("contact")
-    private ContactMO contact;
-
     @JsonProperty("code")
     private String code;
     
@@ -27,10 +24,9 @@ public class BackupCodeUsed extends GenericNotification
 
     public BackupCodeUsed(SiteMO site, ContactMO contact, String code)
     {
-        super();
+        super(contact);
         this.setRaised(System.currentTimeMillis());
         this.setSite(site);
-        this.setContact(contact);
         this.getTo().add(contact);
         this.code = code;
         this.registeredAt = System.currentTimeMillis();
@@ -50,16 +46,6 @@ public class BackupCodeUsed extends GenericNotification
     public void setCode(String code)
     {
         this.code = code;
-    }
-
-    public ContactMO getContact()
-    {
-        return contact;
-    }
-
-    public void setContact(ContactMO contact)
-    {
-        this.contact = contact;
     }
 
     public long getRegisteredAt()

@@ -9,11 +9,8 @@ import com.intrbiz.bergamot.model.message.SiteMO;
  * Sent when a new U2FA device is registered by a contact
  */
 @JsonTypeName("bergamot.u2fa.device_registered")
-public class U2FADeviceRegistered extends GenericNotification
+public class U2FADeviceRegistered extends ContactNotification
 {
-    @JsonProperty("contact")
-    private ContactMO contact;
-
     @JsonProperty("device_name")
     private String deviceName;
 
@@ -30,10 +27,9 @@ public class U2FADeviceRegistered extends GenericNotification
 
     public U2FADeviceRegistered(SiteMO site, ContactMO contact, String deviceName, String deviceType)
     {
-        super();
+        super(contact);
         this.setRaised(System.currentTimeMillis());
         this.setSite(site);
-        this.setContact(contact);
         this.getTo().add(contact);
         this.deviceName = deviceName;
         this.deviceType = deviceType;
@@ -64,16 +60,6 @@ public class U2FADeviceRegistered extends GenericNotification
     public void setDeviceType(String deviceType)
     {
         this.deviceType = deviceType;
-    }
-
-    public ContactMO getContact()
-    {
-        return contact;
-    }
-
-    public void setContact(ContactMO contact)
-    {
-        this.contact = contact;
     }
 
     public long getRegisteredAt()

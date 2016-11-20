@@ -6,13 +6,10 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.SiteMO;
 
 @JsonTypeName("bergamot.register_contact")
-public class RegisterContactNotification extends GenericNotification
+public class RegisterContactNotification extends ContactNotification
 {
     @JsonProperty("url")
     private String url;
-    
-    @JsonProperty("contact")
-    private ContactMO contact;
 
     public RegisterContactNotification()
     {
@@ -21,10 +18,9 @@ public class RegisterContactNotification extends GenericNotification
     
     public RegisterContactNotification(SiteMO site, ContactMO contact, String url)
     {
-        super();
+        super(contact);
         this.setRaised(System.currentTimeMillis());
         this.setSite(site);
-        this.setContact(contact);
         this.getTo().add(contact);
         this.setUrl(url);
     }
@@ -43,15 +39,5 @@ public class RegisterContactNotification extends GenericNotification
     public void setUrl(String url)
     {
         this.url = url;
-    }
-
-    public ContactMO getContact()
-    {
-        return contact;
-    }
-
-    public void setContact(ContactMO contact)
-    {
-        this.contact = contact;
     }
 }
