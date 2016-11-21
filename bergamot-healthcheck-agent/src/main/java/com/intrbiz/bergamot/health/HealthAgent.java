@@ -45,6 +45,8 @@ public final class HealthAgent
     
     private String hostName;
     
+    private String daemonKind;
+    
     private HealthCheckQueue queue;
     
     private Producer<HealthCheckMessage> healthcheckProducer;
@@ -59,7 +61,7 @@ public final class HealthAgent
         super();
     }
     
-    public void init(UUID instanceId, String daemonName, UUID hostId, String hostName)
+    public void init(UUID instanceId, String daemonKind, String daemonName, UUID hostId, String hostName)
     {
         synchronized (this)
         {
@@ -67,6 +69,7 @@ public final class HealthAgent
             {
                 this.inited = true;
                 this.instanceId = instanceId;
+                this.daemonKind = daemonKind;
                 this.daemonName = daemonName;
                 this.hostId = hostId;
                 this.hostName = hostName;
@@ -83,16 +86,21 @@ public final class HealthAgent
         }
     }
     
-    public void init(String daemonName)
+    public void init(String daemonKind, String daemonName)
     {
         Node node = Node.service(daemonName);
-        this.init(computeInstanceId(), daemonName, node.getHostId(), node.getHostName());
+        this.init(computeInstanceId(), daemonKind, daemonName, node.getHostId(), node.getHostName());
     }
     
     public void init()
     {
         Node node = Node.service();
-        this.init(computeInstanceId(), node.getServiceName(), node.getHostId(), node.getHostName());
+        this.init(computeInstanceId(), null, node.getServiceName(), node.getHostId(), node.getHostName());
+    }
+    
+    public String getDaemonKind()
+    {
+        return this.daemonKind;
     }
     
     public String getDaemonName()
@@ -167,13 +175,13 @@ public final class HealthAgent
     private void joinHealthCheckCluster()
     {
         // send a join message
-        this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.runtimeId, this.daemonName, this.startedAt, this.hostId, this.hostName));
+        this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.runtimeId, this.daemonKind, this.daemonName, this.startedAt, this.hostId, this.hostName));
     }
     
     private void unjoinHealthCheckCluster()
     {
         // send a join message
-        this.healthcheckProducer.publish(new HealthCheckUnjoin(this.instanceId, this.daemonName));
+        this.healthcheckProducer.publish(new HealthCheckUnjoin(this.instanceId, this.daemonKind, this.daemonName));
     }
     
     private void sendHeartbeat()

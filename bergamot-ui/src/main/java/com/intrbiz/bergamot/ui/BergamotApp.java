@@ -164,7 +164,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         // setup healthcheck tracker
         HealthTracker.getInstance().init();
         // setup healthcheck agent
-        HealthAgent.getInstance().init("bergamot-ui");
+        HealthAgent.getInstance().init("ui", "bergamot-ui");
         // session engine
         sessionEngine(new HazelcastSessionEngine());
         // security engine

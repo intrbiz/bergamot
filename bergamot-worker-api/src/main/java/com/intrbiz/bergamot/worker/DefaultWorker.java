@@ -96,7 +96,7 @@ public class DefaultWorker extends AbstractWorker
         // go go go
         logger.info("Bergamot worker starting.");
         // start the health agent
-        HealthAgent.getInstance().init(this.getDaemonName());
+        HealthAgent.getInstance().init("worker", this.getDaemonName());
         // start the actual worker
         super.start();
     }

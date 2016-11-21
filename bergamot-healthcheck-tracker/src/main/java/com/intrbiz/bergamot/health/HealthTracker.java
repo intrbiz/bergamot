@@ -102,11 +102,12 @@ public class HealthTracker
     /**
      * Unjoin the given instance from this health check cluster
      * @param instanceId the instance id to unjoin
+     * @param daemonKind the daemin kind
      * @param daemonName the daemon name
      */
-    public void unjoinDaemon(UUID instanceId, String daemonName)
+    public void unjoinDaemon(UUID instanceId, String daemonKind, String daemonName)
     {
-        this.healthcheckEventProducer.publish(new HealthCheckUnjoin(instanceId, daemonName));
+        this.healthcheckEventProducer.publish(new HealthCheckUnjoin(instanceId, daemonKind, daemonName));
     }
     
     /**
@@ -115,7 +116,7 @@ public class HealthTracker
      */
     public void unjoinDaemon(UUID instanceId)
     {
-        this.unjoinDaemon(instanceId, "unknown");
+        this.unjoinDaemon(instanceId, null, "unknown");
     }
     
     /**
@@ -232,8 +233,8 @@ public class HealthTracker
     
     private void processJoin(HealthCheckJoin join)
     {
-        this.knownDaemons.put(join.getInstanceId(), new KnownDaemon(join.getInstanceId(), join.getRuntimeId(), join.getDaemonName(), join.getStarted(), join.getHostId(), join.getHostName()));
-        logger.info("Received join event from " + join.getInstanceId() + " daemon " + join.getDaemonName());
+        this.knownDaemons.put(join.getInstanceId(), new KnownDaemon(join.getInstanceId(), join.getRuntimeId(), join.getDaemonKind(), join.getDaemonName(), join.getStarted(), join.getHostId(), join.getHostName()));
+        logger.info("Received join event from " + join.getInstanceId() + " daemon " + join.getDaemonKind() + "::" + join.getDaemonName());
     }
     
     private void requestJoin()

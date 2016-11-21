@@ -14,6 +14,9 @@ public class HealthCheckUnjoin extends HealthCheckMessage
     @JsonProperty("instance-id")
     private UUID instanceId;
     
+    @JsonProperty("daemon-kind")
+    private String daemonKind;
+    
     @JsonProperty("daemon-name")
     private String daemonName;
     
@@ -22,10 +25,11 @@ public class HealthCheckUnjoin extends HealthCheckMessage
         super();
     }
     
-    public HealthCheckUnjoin(UUID instanceId, String daemonName)
+    public HealthCheckUnjoin(UUID instanceId, String daemonKind, String daemonName)
     {
         super();
         this.instanceId = instanceId;
+        this.daemonKind = daemonKind;
         this.daemonName = daemonName;
     }
 
@@ -37,6 +41,16 @@ public class HealthCheckUnjoin extends HealthCheckMessage
     public void setInstanceId(UUID instanceId)
     {
         this.instanceId = instanceId;
+    }
+    
+    public String getDaemonKind()
+    {
+        return daemonKind;
+    }
+
+    public void setDaemonKind(String daemonKind)
+    {
+        this.daemonKind = daemonKind;
     }
 
     public String getDaemonName()

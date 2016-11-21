@@ -102,7 +102,7 @@ public class DefaultNotifier extends AbstractNotifier
         // go go go
         logger.info("Bergamot notifier starting.");
         // start the health agent
-        HealthAgent.getInstance().init(this.getDaemonName());
+        HealthAgent.getInstance().init("notifier", this.getDaemonName());
         HealthTracker.getInstance().init();
         // start the notifier
         super.start();

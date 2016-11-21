@@ -6,40 +6,43 @@ import java.util.UUID;
 public class KnownDaemon implements Comparable<KnownDaemon>
 {
     private final UUID instanceId;
-    
+
     private final UUID runtimeId;
-    
+
+    private final String daemonKind;
+
     private final String daemonName;
-    
+
     private final long startedAt;
-    
+
     private final UUID hostId;
-    
+
     private final String hostName;
-    
+
     private volatile long lastHeartbeatAt = System.nanoTime();
-    
+
     private volatile long lastHeartbeatTime = System.currentTimeMillis();
-    
+
     private volatile long lastHeartbeatSequence = 0;
-    
+
     private volatile int alertCount = 0;
-    
+
     private volatile int recoveryCount = 0;
-    
+
     private volatile int recoveryHeartbeatCount = 0;
-    
+
     private volatile long lastRecoveryTime = System.currentTimeMillis();
-    
+
     private volatile long lastAlertTime = -1;
-    
+
     private volatile boolean alive = true;
-    
-    public KnownDaemon(UUID instanceId, UUID runtimeId, String daemonName, long startedAt, UUID hostId, String hostName)
+
+    public KnownDaemon(UUID instanceId, UUID runtimeId, String daemonKind, String daemonName, long startedAt, UUID hostId, String hostName)
     {
         Objects.requireNonNull(instanceId);
         this.instanceId = instanceId;
         this.runtimeId = runtimeId;
+        this.daemonKind = daemonKind;
         this.daemonName = daemonName;
         this.startedAt = startedAt;
         this.hostId = hostId;
@@ -70,10 +73,15 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     {
         return instanceId;
     }
-    
+
     public UUID getRuntimeId()
     {
         return this.runtimeId;
+    }
+
+    public String getDaemonKind()
+    {
+        return daemonKind;
     }
 
     public String getDaemonName()
@@ -85,7 +93,7 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     {
         return startedAt;
     }
-    
+
     public UUID getHostId()
     {
         return this.hostId;
@@ -115,7 +123,7 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     {
         this.alertCount = alertCount;
     }
-    
+
     public int incAlertCount()
     {
         this.alertCount++;
@@ -131,11 +139,12 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     {
         this.lastAlertTime = lastAlertTime;
     }
-    
+
     /**
      * How long ago was the last heartbeat
+     * 
      * @return the number of milliseconds since the last heartbeat
-     */ 
+     */
     public long getLastHeartbeatAge()
     {
         return (System.nanoTime() - this.lastHeartbeatAt) / 1_000_000L;
@@ -146,7 +155,7 @@ public class KnownDaemon implements Comparable<KnownDaemon>
         // was the heartbeat over 30 seconds ago
         return this.getLastHeartbeatAge() > 30_000L;
     }
-    
+
     public boolean isDaemonLongGone()
     {
         // did we last see this daemon over a day ago
@@ -172,10 +181,10 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     {
         this.recoveryCount = recoveryCount;
     }
-    
+
     public int incRecoveryCount()
     {
-        this.recoveryCount ++;
+        this.recoveryCount++;
         return this.recoveryCount;
     }
 
@@ -188,7 +197,7 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     {
         this.recoveryHeartbeatCount = recoveryHeartbeatCount;
     }
-    
+
     public int incRecoveryHeartbeatCount()
     {
         this.recoveryHeartbeatCount++;

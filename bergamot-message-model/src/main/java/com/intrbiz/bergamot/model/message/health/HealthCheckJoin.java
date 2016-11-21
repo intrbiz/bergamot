@@ -13,32 +13,36 @@ public class HealthCheckJoin extends HealthCheckMessage
 {
     @JsonProperty("instance-id")
     private UUID instanceId;
-    
+
     @JsonProperty("runtime-id")
     private UUID runtimeId;
-    
+
+    @JsonProperty("daemon-kind")
+    private String daemonKind;
+
     @JsonProperty("daemon-name")
     private String daemonName;
-    
+
     @JsonProperty("started")
     private long started;
-    
+
     @JsonProperty("host-id")
     private UUID hostId;
-    
+
     @JsonProperty("host-name")
     private String hostName;
-    
+
     public HealthCheckJoin()
     {
         super();
     }
-    
-    public HealthCheckJoin(UUID instanceId, UUID runtimeId, String daemonName, long started, UUID hostId, String hostName)
+
+    public HealthCheckJoin(UUID instanceId, UUID runtimeId, String daemonKind, String daemonName, long started, UUID hostId, String hostName)
     {
         super();
         this.instanceId = instanceId;
         this.runtimeId = runtimeId;
+        this.daemonKind = daemonKind;
         this.daemonName = daemonName;
         this.started = started;
         this.hostId = hostId;
@@ -63,6 +67,16 @@ public class HealthCheckJoin extends HealthCheckMessage
     public void setRuntimeId(UUID runtimeId)
     {
         this.runtimeId = runtimeId;
+    }
+
+    public String getDaemonKind()
+    {
+        return daemonKind;
+    }
+
+    public void setDaemonKind(String daemonKind)
+    {
+        this.daemonKind = daemonKind;
     }
 
     public String getDaemonName()
