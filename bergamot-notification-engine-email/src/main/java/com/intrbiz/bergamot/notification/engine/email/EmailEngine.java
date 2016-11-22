@@ -166,6 +166,10 @@ public class EmailEngine extends AbstractNotificationEngine
                 }
             }
         }
+        else
+        {
+            logger.info("No admins configured, not sending health check alert");
+        }
     }
     
     protected Message buildHealhCheckMessage(Session session, KnownDaemon daemon) throws Exception
