@@ -11,6 +11,7 @@
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
 					<span class="name">#{ucFirst(daemon.daemonName.replace('-', ' '))}</span>
+					<span class="name">(#{ucFirst(coalesce(daemon.daemonKind, ''))})</span>
 			    </h3>
 			    <p>
 				    <span class="label">Host: </span>
