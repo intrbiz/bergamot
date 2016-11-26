@@ -93,7 +93,7 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
         this.queue  = BergamotAgentManagerQueue.open();
         this.server = this.queue.createBergamotAgentManagerRPCServer(this);
         // start the health agent
-        HealthAgent.getInstance().init("bergamot-agent-manager");
+        HealthAgent.getInstance().init("agent-manager", "bergamot-agent-manager");
         // whoo all up
         logger.info("Bergamot Agent Manager started!");
     }
