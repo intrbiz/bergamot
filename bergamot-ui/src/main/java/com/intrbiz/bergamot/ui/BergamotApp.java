@@ -150,7 +150,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     }
 
     @Override
-    protected void setup() throws Exception
+    protected void setupEngines() throws Exception
     {
         // TODO: Don't bother sending metric yet
         // Setup Gerald - Service name: Bergamot.UI, send every minute
@@ -161,10 +161,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
          * serialising Apache Log4J Loggers
          * taskEngine(new HazelcastTaskEngine());
          */
-        // setup healthcheck tracker
-        HealthTracker.getInstance().init();
-        // setup healthcheck agent
-        HealthAgent.getInstance().init("ui", "bergamot-ui");
         // session engine
         sessionEngine(new HazelcastSessionEngine());
         // security engine
@@ -185,10 +181,20 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         this.clusterManager = new ClusterManager();
         // websocket update server
         this.updateServer = new UpdateServer(Integer.getInteger("bergamot.websocket.port", 8081));
+    }
+
+    @Override
+    protected void setupFunctions() throws Exception
+    {
         // express functions
         immutableFunction(new BergamotUpdateURL());
         immutableFunction(new BergamotJSVersion());
         immutableFunction(new BergamotCSSVersion());
+    }
+    
+    @Override
+    protected void setupActions() throws Exception
+    {
         // some actions
         action(new ExecuteCheckAction());
         action(new SchedulerActions());
@@ -200,6 +206,11 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new CheckActions());
         action(new BergamotAgentActions());
         action(new U2FAActions());
+    }
+    
+    @Override
+    protected void setupRouters() throws Exception
+    {
         // Setup the application routers
         router(new ErrorRouter());
         router(new LoginRouter());
@@ -270,6 +281,10 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void startApplication() throws Exception
     {
+        // setup healthcheck tracker
+        HealthTracker.getInstance().init();
+        // setup healthcheck agent
+        HealthAgent.getInstance().init("ui", "bergamot-ui");
         // setup the database
         BergamotDB.install();
         try (BergamotDB db = BergamotDB.connect())

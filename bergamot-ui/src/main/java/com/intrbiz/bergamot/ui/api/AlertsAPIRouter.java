@@ -63,12 +63,17 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     
     public AlertsAPIRouter()
     {
+    }
+    
+    @Override
+    public void start() throws Exception
+    {
         // notifications
         this.notificationQueue = NotificationQueue.open();
         this.notificationsProducer = this.notificationQueue.publishNotifications();
         // updates
         this.updateQueue = UpdateQueue.open();
-        this.updateProducer = this.updateQueue.publishUpdates();
+        this.updateProducer = this.updateQueue.publishUpdates();   
     }
     
     @Get("/")
