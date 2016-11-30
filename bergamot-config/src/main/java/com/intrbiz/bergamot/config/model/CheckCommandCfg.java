@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.config.model;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -19,6 +20,8 @@ public class CheckCommandCfg extends Configuration
     private static final long serialVersionUID = 1L;
     
     private String command;
+    
+    private String script;
 
     public CheckCommandCfg()
     {
@@ -42,5 +45,17 @@ public class CheckCommandCfg extends Configuration
     public List<CfgParameter> getParameters()
     {
         return super.getParameters();
+    }
+    
+    @XmlElement(name = "script")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getScript()
+    {
+        return script;
+    }
+
+    public void setScript(String script)
+    {
+        this.script = script;
     }
 }
