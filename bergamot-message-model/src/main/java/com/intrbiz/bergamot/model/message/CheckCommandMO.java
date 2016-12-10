@@ -17,6 +17,9 @@ public class CheckCommandMO extends NamedObjectMO implements ParameterisedMO
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
+    
+    @JsonProperty("script")
+    private String script;
 
     public CheckCommandMO()
     {
@@ -43,5 +46,15 @@ public class CheckCommandMO extends NamedObjectMO implements ParameterisedMO
     public void setParameters(List<ParameterMO> parameters)
     {
         this.parameters = parameters;
+    }
+
+    public String getScript()
+    {
+        return script;
+    }
+
+    public void setScript(String script)
+    {
+        this.script = script;
     }
 }

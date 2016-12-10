@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CheckCommandCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.adapter.ParametersAdapter;
@@ -38,6 +39,9 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
 
     @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     private List<Parameter> parameters = new LinkedList<Parameter>();
+    
+    @SQLColumn(index = 4, name = "script", since = @SQLVersion({ 3, 43, 0 }))
+    private String script;
 
     public CheckCommand()
     {
@@ -74,6 +78,8 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
 
     public void configure(CheckCommandCfg cfg)
     {
+        // script
+        this.setScript(cfg.getScript());
         // load the parameters
         this.clearParameters();
         for (CfgParameter cp : cfg.getParameters())
@@ -94,9 +100,19 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
         this.parameters = parameters;
     }
     
+    public String getScript()
+    {
+        return script;
+    }
+
+    public void setScript(String script)
+    {
+        this.script = script;
+    }
+
     /**
      * Resolve the parameters between the command and this check definition
-     * @return
+     * @return the check parameters
      */
     public List<Parameter> resolveCheckParameters()
     {
@@ -117,6 +133,16 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
             }
         }
         return r;
+    }
+    
+    /**
+     * Resolve the check script between the command and this check definition
+     * @return the check script
+     */
+    public String resolveCheckScript()
+    {
+        Command command = this.getCommand();
+        return command == null ? this.script : Util.coalesceEmpty(this.script, command.getScript());
     }
 
     @Override
@@ -153,11 +179,12 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
             if (contact == null || contact.hasPermission("read", command)) mo.setCommand(command.toStubMO(contact));
         }
         mo.setParameters(this.getParameters().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
+        mo.setScript(this.getScript());
         return mo;
     }
     
     public String toString()
     {
-        return "CheckCommand { command => " + this.getCommand() +  ", parameters => " + this.getParameters() + "}"; 
+        return "CheckCommand { command => " + this.getCommand() +  ", parameters => " + this.getParameters() + ", script => " + this.getScript() + "}"; 
     }
 }
