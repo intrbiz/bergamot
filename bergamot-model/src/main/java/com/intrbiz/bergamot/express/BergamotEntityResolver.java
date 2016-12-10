@@ -7,7 +7,6 @@ import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
-import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.converter.Converter;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.ExpressEntityResolver;
