@@ -136,6 +136,25 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
     }
     
     /**
+     * Find the resolved value of a check parameter
+     * @return the check parameter
+     */
+    public String resolveCheckParameter(String name)
+    {
+        // check our parameters first
+        String value = this.getParameter(name);
+        if (value == null)
+        {
+            Command command = this.getCommand();
+            if (command != null)
+            {
+                value = command.getParameter(name);
+            }
+        }
+        return value;
+    }
+    
+    /**
      * Resolve the check script between the command and this check definition
      * @return the check script
      */

@@ -116,14 +116,7 @@ public class BergamotEntityResolver extends ExpressEntityResolver
         {
             RealCheck<?, ?> check = (RealCheck<?, ?>) source;
             CheckCommand checkCommand = check.getCheckCommand();
-            if (check.getCheckCommand() != null)
-            {
-                for (Parameter param : checkCommand.resolveCheckParameters())
-                {
-                    if (name.equals(param.getName())) 
-                        return param.getValue();
-                }
-            }
+            return checkCommand.resolveCheckParameter(name);
         }
         return null;
     }
