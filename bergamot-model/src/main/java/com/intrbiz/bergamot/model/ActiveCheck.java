@@ -213,7 +213,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         executeCheck.setEngine(command.getEngine());
         executeCheck.setExecutor(command.getExecutor());
         executeCheck.setName(command.getName());
-        executeCheck.setScript(command.getScript());
+        executeCheck.setScript(checkCommand.resolveCheckScript());
         // saved state?
         CheckSavedState state = this.getSavedState();
         if (state != null) executeCheck.setSavedState(state.getSavedState());
