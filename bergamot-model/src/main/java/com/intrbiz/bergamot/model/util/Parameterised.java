@@ -37,7 +37,7 @@ public interface Parameterised
     default String getParameter(String name, String defaultValue)
     {
         return this.getParameters().stream()
-                .filter((p) -> {return name.equals(p.getName());})
+                .filter((p) -> name.equals(p.getName()))
                 .findFirst()
                 .map(Parameter::getValue)
                 .orElse(defaultValue);
