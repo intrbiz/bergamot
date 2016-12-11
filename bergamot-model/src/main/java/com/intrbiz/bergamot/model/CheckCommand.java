@@ -115,13 +115,17 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
      */
     public LinkedHashMap<String, Parameter> resolveCheckParameters()
     {
+        return this.resolveCheckParameters(this.getCommand());
+    }
+    
+    public LinkedHashMap<String, Parameter> resolveCheckParameters(Command command)
+    {
         LinkedHashMap<String, Parameter> r = new LinkedHashMap<String, Parameter>();
-        Command command = this.getCommand();
-        if (this.getParameters() != null)
-        {
-            r.putAll(this.getParameters());
-        }
         if (command != null && command.getParameters() != null)
+        {
+            r.putAll(command.getParameters());
+        }
+        if (this.getParameters() != null)
         {
             r.putAll(this.getParameters());
         }
@@ -134,11 +138,15 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
      */
     public String resolveCheckParameter(String name)
     {
+        return this.resolveCheckParameter(this.getCommand(), name);
+    }
+    
+    public String resolveCheckParameter(Command command, String name)
+    {
         // check our parameters first
         String value = this.getParameter(name);
         if (value == null)
         {
-            Command command = this.getCommand();
             if (command != null)
             {
                 value = command.getParameter(name);
