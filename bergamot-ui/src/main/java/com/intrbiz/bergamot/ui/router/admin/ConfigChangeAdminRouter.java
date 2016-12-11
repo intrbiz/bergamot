@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
@@ -163,9 +164,9 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
         ConfigChange change = currentChangeId == null ? new ConfigChange(site.getId(), user, new BergamotCfg(site.getName(), "Edit site parameters", null)) : db.getConfigChange(currentChangeId);
         // copy the site parameters into the config change
         BergamotCfg cfg = ((BergamotCfg) change.getConfiguration());
-        for (Parameter param : site.getParameters())
+        for (Entry<String, Parameter> param : site.getParameters().entrySet())
         {
-            cfg.addParameter(new CfgParameter(param.getName(), null, null, param.getValue()));
+            cfg.addParameter(new CfgParameter(param.getKey(), param.getValue().getDescription(), null, param.getValue().getValue()));
         }
         // update
         db.setConfigChange(change);

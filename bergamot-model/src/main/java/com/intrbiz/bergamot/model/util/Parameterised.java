@@ -1,27 +1,26 @@
 package com.intrbiz.bergamot.model.util;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 public interface Parameterised
 {
-    List<Parameter> getParameters();
+    LinkedHashMap<String, Parameter> getParameters();
 
-    void setParameters(List<Parameter> parameters);
+    void setParameters(LinkedHashMap<String, Parameter> parameters);
 
     default void addParameter(String name, String value)
     {
-        this.getParameters().add(new Parameter(name, value));
+        this.getParameters().put(name, new Parameter(name, value));
     }
 
     default void setParameter(String name, String value)
     {
-        this.removeParameter(name);
-        this.addParameter(name, value);
+        this.getParameters().put(name, new Parameter(name, value));
     }
 
     default void removeParameter(String name)
     {
-        this.getParameters().removeIf((p) -> {return name.equals(p.getName());});
+        this.getParameters().remove(name);
     }
 
     default void clearParameters()
@@ -31,15 +30,13 @@ public interface Parameterised
 
     default String getParameter(String name)
     {
-        return this.getParameter(name, null);
+        Parameter parameter = this.getParameters().get(name);
+        return parameter == null ? null : parameter.getValue();
     }
 
     default String getParameter(String name, String defaultValue)
     {
-        return this.getParameters().stream()
-                .filter((p) -> name.equals(p.getName()))
-                .findFirst()
-                .map(Parameter::getValue)
-                .orElse(defaultValue);
+        Parameter parameter = this.getParameters().get(name);
+        return parameter == null ? defaultValue : parameter.getValue();
     }
 }

@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model;
 
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -49,12 +50,19 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
         registerCheck.setName(command.getName());
         ExpressContext context = new DefaultContext(new BergamotEntityResolver());
         // configured parameters
-        for (Parameter parameter : checkCommand.resolveCheckParameters())
+        for (Entry<String, Parameter> parameter : checkCommand.resolveCheckParameters().entrySet())
         {
-            ValueExpression vexp = new ValueExpression(context, parameter.getValue());
-            String value = (String) vexp.get(context, this);
-            if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
-            registerCheck.setParameter(parameter.getName(), value);
+            try
+            {
+                ValueExpression vexp = new ValueExpression(context, parameter.getValue().getValue());
+                String value = (String) vexp.get(context, this);
+                if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getKey() + " => " + value + " (" + parameter.getValue().getValue() + ")");
+                registerCheck.setParameter(parameter.getKey(), value);
+            }
+            catch (Exception e)
+            {
+                logger.error("Error computing parameter value, for check: " + this.getType() + "::" + this.getId() + " " + this.getName() , e);
+            }
         }
         if (logger.isTraceEnabled()) logger.trace("Register check: " + new BergamotTranscoder().encodeAsString(registerCheck));
         return registerCheck;
@@ -82,12 +90,19 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
         unregisterCheck.setName(command.getName());
         ExpressContext context = new DefaultContext(new BergamotEntityResolver());
         // configured parameters
-        for (Parameter parameter : checkCommand.resolveCheckParameters())
+        for (Entry<String, Parameter> parameter : checkCommand.resolveCheckParameters().entrySet())
         {
-            ValueExpression vexp = new ValueExpression(context, parameter.getValue());
-            String value = (String) vexp.get(context, this);
-            if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getName() + " => " + value + " (" + parameter.getValue() + ")");
-            unregisterCheck.setParameter(parameter.getName(), value);
+            try
+            {
+                ValueExpression vexp = new ValueExpression(context, parameter.getValue().getValue());
+                String value = (String) vexp.get(context, this);
+                if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getKey() + " => " + value + " (" + parameter.getValue().getValue() + ")");
+                unregisterCheck.setParameter(parameter.getKey(), value);
+            }
+            catch (Exception e)
+            {
+                logger.error("Error computing parameter value, for check: " + this.getType() + "::" + this.getId() + " " + this.getName() , e);
+            }
         }
         if (logger.isTraceEnabled()) logger.trace("Unregister check: " + new BergamotTranscoder().encodeAsString(unregisterCheck));
         return unregisterCheck;

@@ -137,7 +137,7 @@ public class Command extends SecuredObject<CommandMO, CommandCfg>
         CommandMO mo = new CommandMO();
         super.toMO(mo, contact, options);
         mo.setEngine(this.getEngine());
-        mo.setParameters(this.getParameters().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
+        mo.setParameters(this.getParameters().entrySet().stream().map((x) -> x.getValue().toMO(contact)).collect(Collectors.toList()));
         mo.setApplication(this.getApplication());
         mo.setCategory(this.getCategory());
         mo.setScript(this.getScript());

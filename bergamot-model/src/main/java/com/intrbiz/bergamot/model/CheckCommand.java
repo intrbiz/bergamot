@@ -1,8 +1,7 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,7 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
     private UUID commandId;
 
     @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    private List<Parameter> parameters = new LinkedList<Parameter>();
+    private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
     
     @SQLColumn(index = 4, name = "script", since = @SQLVersion({ 3, 43, 0 }))
     private String script;
@@ -89,13 +88,13 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
     }
 
     @Override
-    public List<Parameter> getParameters()
+    public LinkedHashMap<String, Parameter> getParameters()
     {
         return parameters;
     }
 
     @Override
-    public void setParameters(List<Parameter> parameters)
+    public void setParameters(LinkedHashMap<String, Parameter> parameters)
     {
         this.parameters = parameters;
     }
@@ -114,23 +113,17 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
      * Resolve the parameters between the command and this check definition
      * @return the check parameters
      */
-    public List<Parameter> resolveCheckParameters()
+    public LinkedHashMap<String, Parameter> resolveCheckParameters()
     {
-        List<Parameter> r = new LinkedList<Parameter>();
+        LinkedHashMap<String, Parameter> r = new LinkedHashMap<String, Parameter>();
         Command command = this.getCommand();
         if (this.getParameters() != null)
         {
-            for (Parameter e : this.getParameters())
-            {
-                if (! r.contains(e)) r.add(e);
-            }
+            r.putAll(this.getParameters());
         }
         if (command != null && command.getParameters() != null)
         {
-            for (Parameter e : command.getParameters())
-            {
-                if (! r.contains(e)) r.add(e);
-            }
+            r.putAll(this.getParameters());
         }
         return r;
     }
@@ -197,7 +190,7 @@ public class CheckCommand extends BergamotObject<CheckCommandMO> implements Para
         {
             if (contact == null || contact.hasPermission("read", command)) mo.setCommand(command.toStubMO(contact));
         }
-        mo.setParameters(this.getParameters().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
+        mo.setParameters(this.getParameters().entrySet().stream().map((x) -> x.getValue().toMO(contact)).collect(Collectors.toList()));
         mo.setScript(this.getScript());
         return mo;
     }

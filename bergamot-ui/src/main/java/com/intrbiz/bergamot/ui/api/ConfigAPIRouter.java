@@ -1,9 +1,10 @@
 package com.intrbiz.bergamot.ui.api;
 
-import static com.intrbiz.balsa.BalsaContext.*;
+import static com.intrbiz.balsa.BalsaContext.Balsa;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.publicresource.PublicResource;
@@ -69,9 +70,9 @@ public class ConfigAPIRouter extends Router<BergamotApp>
         siteCfg.setSite(site.getName());
         siteCfg.setDescription(site.getDescription());
         siteCfg.setSummary(site.getSummary());
-        for (Parameter parameter : site.getParameters())
+        for (Entry<String, Parameter> parameter : site.getParameters().entrySet())
         {
-            siteCfg.addParameter(new CfgParameter(parameter.getName(), null, null, parameter.getValue()));
+            siteCfg.addParameter(new CfgParameter(parameter.getKey(), parameter.getValue().getDescription(), null, parameter.getValue().getValue()));
         }
         // add objects
         if (types.isEmpty())

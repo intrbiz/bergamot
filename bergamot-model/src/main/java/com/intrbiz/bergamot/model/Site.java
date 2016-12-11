@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model;
 
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
      * Arbitrary parameters of an object
      */
     @SQLColumn(index = 7, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 2, 0, 0 }))
-    private List<Parameter> parameters = new LinkedList<Parameter>();
+    private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
 
     public Site()
     {
@@ -129,15 +130,15 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     }
     
     @Override
-    public List<Parameter> getParameters()
+    public LinkedHashMap<String, Parameter> getParameters()
     {
         return parameters;
     }
 
     @Override
-    public void setParameters(List<Parameter> parameters)
+    public void setParameters(LinkedHashMap<String, Parameter> parameters)
     {
-        if (parameters == null) parameters = new LinkedList<Parameter>();
+        if (parameters == null) parameters = new LinkedHashMap<String, Parameter>();
         this.parameters = parameters;
     }
 

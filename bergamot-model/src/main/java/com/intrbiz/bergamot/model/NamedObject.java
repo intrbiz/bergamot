@@ -2,8 +2,7 @@ package com.intrbiz.bergamot.model;
 
 import java.sql.Timestamp;
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -55,7 +54,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
      * Arbitrary parameters of an object
      */
     @SQLColumn(index = 8, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
-    private List<Parameter> parameters = new LinkedList<Parameter>();
+    private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
 
     public NamedObject()
     {
@@ -80,7 +79,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         this.parameters.clear();
         for (CfgParameter param : resolvedConfiguration.getParameters())
         {
-            this.parameters.add(new Parameter(param.getName(), param.getDescription(), param.getValueOrText()));
+            this.parameters.put(param.getName(), new Parameter(param.getName(), param.getDescription(), param.getValueOrText()));
         }
         // store the config
         this.setConfiguration(configuration);
@@ -182,15 +181,15 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
     }
     
     @Override
-    public List<Parameter> getParameters()
+    public LinkedHashMap<String, Parameter> getParameters()
     {
         return parameters;
     }
 
     @Override
-    public void setParameters(List<Parameter> parameters)
+    public void setParameters(LinkedHashMap<String, Parameter> parameters)
     {
-        if (parameters == null) parameters = new LinkedList<Parameter>();
+        if (parameters == null) parameters = new LinkedHashMap<String, Parameter>();
         this.parameters = parameters;
     }
 
@@ -201,7 +200,7 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
         mo.setName(this.getName());
         mo.setSummary(this.getSummary());
         if (options.contains(MOFlag.DESCRIPTION)) mo.setDescription(this.getDescription());
-        if (options.contains(MOFlag.PARAMETERS)) mo.setParameters(this.getParameters().stream().map((x) -> x.toMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.PARAMETERS)) mo.setParameters(this.getParameters().entrySet().stream().map((x) -> x.getValue().toMO(contact)).collect(Collectors.toList()));
     }
 
     @Override

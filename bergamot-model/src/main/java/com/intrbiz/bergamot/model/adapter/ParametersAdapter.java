@@ -3,18 +3,19 @@ package com.intrbiz.bergamot.model.adapter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.data.DataException;
 import com.intrbiz.data.db.util.DBTypeAdapter;
 
-public class ParametersAdapter implements DBTypeAdapter<String, List<Parameter>>
+public class ParametersAdapter implements DBTypeAdapter<String, LinkedHashMap<String, Parameter>>
 {
     private final ObjectMapper factory = new ObjectMapper();
     
@@ -27,7 +28,7 @@ public class ParametersAdapter implements DBTypeAdapter<String, List<Parameter>>
     }
     
     @Override
-    public String toDB(List<Parameter> value)
+    public String toDB(LinkedHashMap<String, Parameter> value)
     {
         // default to an empty list
         if (value == null) return "[]";
@@ -36,9 +37,9 @@ public class ParametersAdapter implements DBTypeAdapter<String, List<Parameter>>
         try (JsonGenerator g = this.factory.getFactory().createGenerator(sw))
         {
             g.writeStartArray();
-            for (Parameter p : value)
+            for (Entry<String, Parameter> p : value.entrySet())
             {
-                this.factory.writeValue(g, p);
+                this.factory.writeValue(g, p.getValue());
             }
             g.writeEndArray();
         }
@@ -50,19 +51,29 @@ public class ParametersAdapter implements DBTypeAdapter<String, List<Parameter>>
     }
 
     @Override
-    public List<Parameter> fromDB(String value)
+    public LinkedHashMap<String, Parameter> fromDB(String value)
     {
         // default to an empty list
-        if (value == null) return new LinkedList<Parameter>();
-        // decode
-        try (JsonParser p = this.factory.getFactory().createParser(new StringReader(value)))
+        LinkedHashMap<String, Parameter> ret = new LinkedHashMap<String, Parameter>();
+        if (value != null)
         {
-            List<Parameter> params = this.factory.readValue(p, this.factory.getTypeFactory().constructCollectionType(List.class, Parameter.class));
-            return params == null ? new LinkedList<Parameter>() : params;
+            try (JsonParser p = this.factory.getFactory().createParser(new StringReader(value)))
+            {
+                Parameter parameter;
+                if (p.nextToken() == JsonToken.START_ARRAY)
+                {
+                    while (p.nextToken() == JsonToken.START_OBJECT)
+                    {
+                        parameter = this.factory.readValue(p, Parameter.class);
+                        ret.put(parameter.getName(), parameter);
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                throw new DataException("Failed to decode parameter", e);
+            }
         }
-        catch (IOException e)
-        {
-            throw new DataException("Failed to decode parameter", e);
-        }
+        return ret;
     }
 }
