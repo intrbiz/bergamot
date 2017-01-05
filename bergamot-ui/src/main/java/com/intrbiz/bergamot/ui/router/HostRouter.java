@@ -22,6 +22,7 @@ import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Config;
@@ -43,7 +44,6 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/host")
@@ -55,7 +55,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Any("/name/:name")
     @WithDataAdapter(BergamotDB.class)
-    public void host(BergamotDB db, String name, @SessionVar("site") Site site)
+    public void host(BergamotDB db, String name, @GetBergamotSite() Site site)
     {
         Host host = model("host", notNull(db.getHostByName(site.getId(), name)));
         require(permission("read", host));
@@ -178,7 +178,7 @@ public class HostRouter extends Router<BergamotApp>
     
     @Get("/create")
     @WithDataAdapter(BergamotDB.class)
-    public void create(BergamotDB db, @SessionVar("site") Site site)
+    public void create(BergamotDB db, @GetBergamotSite() Site site)
     {
         var("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(HostCfg.class)).stream().filter((t) -> permission("read", t.getId())).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
         var("locations", db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
@@ -190,7 +190,7 @@ public class HostRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void doCreate(
             BergamotDB db, 
-            @SessionVar("site") Site site,
+            @GetBergamotSite() Site site,
             @CurrentPrincipal() Contact user,
             @Param("host_extends") @IsaObjectId(mandatory = true) UUID templateId,
             @Param("host_summary") @CheckStringLength(mandatory = true, max = 255) String summary,

@@ -38,7 +38,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ServiceMO getService(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ServiceMO getService(BergamotDB db, @IsaObjectId() UUID id)
     {
         Service service = notNull(db.getService(id));
         require(permission("read", service));
@@ -48,7 +48,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getServiceState(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CheckStateMO getServiceState(BergamotDB db, @IsaObjectId() UUID id)
     {
         Service service = notNull(db.getService(id));
         require(permission("read", service));
@@ -68,7 +68,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeService(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String executeService(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Service service = notNull(db.getService(id));
         require(permission("execute", service));
@@ -79,7 +79,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressService(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressService(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Service service = notNull(db.getService(id));
         require(permission("suppress", service));
@@ -90,7 +90,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressService(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressService(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Service service = notNull(db.getService(id));
         require(permission("unsuppress", service));
@@ -113,7 +113,7 @@ public class ServiceAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ServiceCfg getServiceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ServiceCfg getServiceConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Service service = notNull(db.getService(id));
         require(permission("read.config", service));

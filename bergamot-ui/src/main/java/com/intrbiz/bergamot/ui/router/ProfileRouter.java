@@ -8,11 +8,12 @@ import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.model.HOTPRegistration;
+import com.intrbiz.bergamot.model.ContactHOTPRegistration;
+import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.U2FDeviceRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsString;
@@ -21,7 +22,6 @@ import com.intrbiz.metadata.IsaUUID;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 import com.intrbiz.util.CounterHOTP;
 import com.intrbiz.util.HOTP.HOTPSecret;
@@ -45,11 +45,11 @@ public class ProfileRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @SessionVar("site") Site site)
+    public void index(BergamotDB db, @GetBergamotSite() Site site)
     {
         // generate a new U2F registration token
         Contact contact = currentPrincipal();
-        RegisterRequestData registerRequestData = this.u2f.startRegistration(site.getU2FAppId(), contact.getU2FDeviceRegistrations().stream().map(U2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
+        RegisterRequestData registerRequestData = this.u2f.startRegistration(site.getU2FAppId(), contact.getU2FDeviceRegistrations().stream().map(ContactU2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList()));
         var("u2fregister", registerRequestData);
         // encode the profile view
         encode("profile/index");
@@ -86,7 +86,7 @@ public class ProfileRouter extends Router<BergamotApp>
     
     @Any("/register-u2f-device")
     @WithDataAdapter(BergamotDB.class)
-    public void registerU2FDevice(BergamotDB db, @SessionVar("site") Site site, @Param("u2f-register-request") String request, @Param("u2f-register-response") String response, @Param("summary") String summary) throws Exception
+    public void registerU2FDevice(BergamotDB db, @GetBergamotSite() Site site, @Param("u2f-register-request") String request, @Param("u2f-register-response") String response, @Param("summary") String summary) throws Exception
     {
         // the contact
         Contact contact = currentPrincipal();
@@ -98,7 +98,7 @@ public class ProfileRouter extends Router<BergamotApp>
         Attestation attestation = this.u2fMetadata.getAttestation(reg.getAttestationCertificate());
         System.out.println("Trusted: " + (attestation == null ? null : attestation.isTrusted()) + " " + attestation);
         // store the registration
-        db.setU2FDeviceRegistration(new U2FDeviceRegistration(
+        db.setU2FDeviceRegistration(new ContactU2FDeviceRegistration(
                 contact, 
                 reg,
                 attestation == null ? null : attestation.getVendorProperties().get("name"),
@@ -118,7 +118,7 @@ public class ProfileRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void revokeU2FDevice(BergamotDB db, @Param("id") @IsaUUID UUID id) throws IOException
     {
-        U2FDeviceRegistration device = db.getU2FDeviceRegistration(id);
+        ContactU2FDeviceRegistration device = db.getU2FDeviceRegistration(id);
         if (device != null)
         {
             db.setU2FDeviceRegistration(device.revoke());
@@ -138,7 +138,7 @@ public class ProfileRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void revokeHOTPDevice(BergamotDB db, @Param("id") @IsaUUID UUID id) throws IOException
     {
-        HOTPRegistration device = db.getHOTPRegistration(id);
+        ContactHOTPRegistration device = db.getHOTPRegistration(id);
         if (device != null)
         {
             db.setHOTPRegistration(device.revoke());
@@ -156,7 +156,7 @@ public class ProfileRouter extends Router<BergamotApp>
     
     @Any("/setup-hotp")
     @WithDataAdapter(BergamotDB.class)
-    public void setupHOTPDevice(BergamotDB db, @SessionVar("site") Site site, @Param("summary") String summary) throws Exception
+    public void setupHOTPDevice(BergamotDB db, @GetBergamotSite() Site site, @Param("summary") String summary) throws Exception
     {
         // the contact
         Contact contact = currentPrincipal();
@@ -165,7 +165,7 @@ public class ProfileRouter extends Router<BergamotApp>
         // generate a HOTP secret
         HOTPSecret secret = this.hotp.newOTPSecret();
         // store our HOTP registration
-        HOTPRegistration registration = var("hotp", new HOTPRegistration(contact, secret, name));
+        ContactHOTPRegistration registration = var("hotp", new ContactHOTPRegistration(contact, secret, name));
         db.setHOTPRegistration(registration);
         // do we need more backup codes
         contact.generateMoreBackupCodes();

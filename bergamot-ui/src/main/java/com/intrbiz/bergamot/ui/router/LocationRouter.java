@@ -16,6 +16,7 @@ import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
@@ -33,7 +34,6 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/location")
@@ -45,7 +45,7 @@ public class LocationRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void showLocations(BergamotDB db, @SessionVar("site") Site site)
+    public void showLocations(BergamotDB db, @GetBergamotSite() Site site)
     {
         model("locations", orderLocationsByStatus(permission("read", db.getRootLocations(site.getId()))));
         encode("location/index");
@@ -53,7 +53,7 @@ public class LocationRouter extends Router<BergamotApp>
     
     @Any("/name/:name")
     @WithDataAdapter(BergamotDB.class)
-    public void showLocationByName(BergamotDB db, String name, @SessionVar("site") Site site)
+    public void showLocationByName(BergamotDB db, String name, @GetBergamotSite() Site site)
     {
         Location location = model("location", notNull(db.getLocationByName(site.getId(), name)));
         require(permission("read", location));
@@ -86,7 +86,7 @@ public class LocationRouter extends Router<BergamotApp>
     
     @Get("/create")
     @WithDataAdapter(BergamotDB.class)
-    public void create(BergamotDB db, @SessionVar("site") Site site)
+    public void create(BergamotDB db, @GetBergamotSite() Site site)
     {
         var("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(LocationCfg.class)).stream().filter((t) -> permission("read", t.getId())).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
         var("locations", db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
@@ -97,7 +97,7 @@ public class LocationRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void doCreate(
             BergamotDB db, 
-            @SessionVar("site") Site site,
+            @GetBergamotSite() Site site,
             @CurrentPrincipal() Contact user,
             @Param("location_extends") @IsaObjectId(mandatory = false) UUID templateId,
             @Param("location_summary") @CheckStringLength(mandatory = true, max = 255) String summary,

@@ -37,7 +37,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CommentMO getComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CommentMO getComment(BergamotDB db, @IsaObjectId() UUID id)
     {
         Comment comment = notNull(db.getComment(id));
         require(permission("read.comment", comment.getObjectId()));
@@ -47,7 +47,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/remove")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public Boolean removeComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public Boolean removeComment(BergamotDB db, @IsaObjectId() UUID id)
     {
         Comment comment = db.getComment(id);
         if (comment != null)
@@ -64,7 +64,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @ListOf(CommentMO.class)
     public List<CommentMO> getCommentsForObject(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id, 
+            @IsaObjectId() UUID id, 
             @Param("offset") @IsaLong(min = 0, max = 1000, mandatory = true, defaultValue = 0, coalesce = CoalesceMode.ON_NULL) Long offset, 
             @Param("limit") @IsaLong(min = 0, max = 1000, mandatory = true, defaultValue = 10, coalesce = CoalesceMode.ON_NULL) Long limit
     )
@@ -78,7 +78,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public CommentMO addCommentToCheck(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id, 
+            @IsaObjectId() UUID id, 
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
             @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
     )
@@ -95,7 +95,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public CommentMO addCommentToAlert(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id, 
+            @IsaObjectId() UUID id, 
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
             @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
     )
@@ -112,7 +112,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public CommentMO addCommentToDowntime(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id, 
+            @IsaObjectId() UUID id, 
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
             @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
     )
@@ -131,7 +131,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     public CommentMO addCommentToObject(
             BergamotDB db, 
             @Var("site") Site site,
-            @IsaObjectId(session = false) UUID id, 
+            @IsaObjectId() UUID id, 
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
             @Param("comment") @CheckStringLength(min = 1, max = 4096, mandatory = true) String message
     )
@@ -147,7 +147,7 @@ public class CommentsAPIRouter extends Router<BergamotApp>
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public String renderComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String renderComment(BergamotDB db, @IsaObjectId() UUID id)
     {
         Comment comment = var("comment", notNull(db.getComment(id)));
         require(permission("read.comment", comment.getObjectId()));

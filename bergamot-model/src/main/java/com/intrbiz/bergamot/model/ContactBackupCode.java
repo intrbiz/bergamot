@@ -19,7 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A single use backup code for as a two factor auth fall back
  */
 @SQLTable(schema = BergamotDB.class, name = "backup_code", since = @SQLVersion({ 3, 40, 0 }))
-public class BackupCode implements Serializable
+public class ContactBackupCode implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
@@ -61,12 +61,12 @@ public class BackupCode implements Serializable
     @SQLColumn(index = 7, name = "used_at", since = @SQLVersion({ 3, 40, 0 }))
     private Timestamp usedAt = null;
     
-    public BackupCode()
+    public ContactBackupCode()
     {
         super();
     }
     
-    public BackupCode(Contact contact)
+    public ContactBackupCode(Contact contact)
     {
         this.id = Site.randomId(contact.getSiteId());
         this.contactId = contact.getId();
@@ -158,7 +158,7 @@ public class BackupCode implements Serializable
         }
     }
     
-    public BackupCode used()
+    public ContactBackupCode used()
     {
         this.used = true;
         this.usedAt = new Timestamp(System.currentTimeMillis());

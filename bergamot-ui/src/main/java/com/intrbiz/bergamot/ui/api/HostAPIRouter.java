@@ -65,7 +65,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public HostMO getHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public HostMO getHost(BergamotDB db, @IsaObjectId() UUID id)
     {
         Host host = notNull(db.getHost(id));
         require(permission("read", host));
@@ -75,7 +75,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getHostState(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CheckStateMO getHostState(BergamotDB db, @IsaObjectId() UUID id)
     {
         Host host = notNull(db.getHost(id));
         require(permission("read", host));
@@ -97,7 +97,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(ServiceMO.class)
-    public List<ServiceMO> getHostServices(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<ServiceMO> getHostServices(BergamotDB db, @IsaObjectId() UUID id)
     {
         Host host = notNull(db.getHost(id));
         require(permission("read", host));
@@ -119,7 +119,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(TrapMO.class)
-    public List<TrapMO> getHostTraps(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<TrapMO> getHostTraps(BergamotDB db, @IsaObjectId() UUID id)
     {
         Host host = notNull(db.getHost(id));
         require(permission("read", host));
@@ -129,7 +129,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String executeHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         require(permission("execute", host));
@@ -140,7 +140,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppress(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppress(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         require(permission("suppress", host));
@@ -151,7 +151,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppress(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppress(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         require(permission("unsuppress", host));
@@ -162,7 +162,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String executeServicesOnHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         int executed = 0;
@@ -180,7 +180,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressServicesOnHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         int suppressed = 0;
@@ -200,7 +200,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @RequirePermission("api.write.host.unsuppress")
     @RequirePermission("api.write.service.unsuppress")
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressServicesOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressServicesOnHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         int unsuppressed = 0;
@@ -218,7 +218,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-traps")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressTrapsOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressTrapsOnHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         int suppressed = 0;
@@ -236,7 +236,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress-traps")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressTrapsOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressTrapsOnHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         int unsuppressed = 0;
@@ -254,7 +254,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-all")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressAllOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressAllOnHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         int suppressed = 0;
@@ -280,7 +280,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress-all")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressAllOnHost(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressAllOnHost(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Host host = notNull(db.getHost(id));
         int unsuppressed = 0;
@@ -318,7 +318,7 @@ public class HostAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public HostCfg getHostConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public HostCfg getHostConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Host host = notNull(db.getHost(id));
         require(permission("read.config", host));

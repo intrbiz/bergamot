@@ -93,13 +93,9 @@
 			<artifactId>bergamot-command-processor</artifactId>
 		</dependency>
 		<dependency>
-		  <groupId>com.yubico</groupId>
-		  <artifactId>u2flib-server-core</artifactId>
+			<groupId>com.intrbiz.balsa</groupId>
+			<artifactId>balsa-2fa</artifactId>
 		</dependency>
-		<dependency>
-		   <groupId>com.yubico</groupId>
-		   <artifactId>u2flib-server-attestation</artifactId>
-		 </dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>
@@ -107,7 +103,7 @@
             <plugin>
                 <groupId>com.intrbiz.balsa</groupId>
                 <artifactId>balsa-executor-compiler-plugin</artifactId>
-                <version>4.3.0-SNAPSHOT</version>
+                <version>${intrbiz.balsa.version}</version>
                 <configuration>
                 	<appClass>com.intrbiz.bergamot.ui.BergamotApp</appClass>
                 </configuration>
@@ -123,7 +119,7 @@
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>packaging</artifactId>
-				<version>1.1.1</version>
+				<version>${intrbiz.util.version}</version>
 				<configuration>
 					<appClass>com.intrbiz.bergamot.ui.BergamotApp</appClass>
 				</configuration>

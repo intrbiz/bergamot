@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
@@ -13,7 +14,6 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/trap")
@@ -23,7 +23,7 @@ public class TrapRouter extends Router<BergamotApp>
 {    
     @Any("/name/:host/:trap")
     @WithDataAdapter(BergamotDB.class)
-    public void trap(BergamotDB db, String hostName, String trapName, @SessionVar("site") Site site)
+    public void trap(BergamotDB db, String hostName, String trapName, @GetBergamotSite() Site site)
     {
         Trap trap = model("trap", notNull(db.getTrapOnHostByName(site.getId(), hostName, trapName)));
         require(permission("read", trap));

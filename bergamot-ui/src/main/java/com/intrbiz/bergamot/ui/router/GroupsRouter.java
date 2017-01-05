@@ -16,6 +16,7 @@ import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
@@ -35,7 +36,6 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/group")
@@ -47,7 +47,7 @@ public class GroupsRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void showGroups(BergamotDB db, @SessionVar("site") Site site)
+    public void showGroups(BergamotDB db, @GetBergamotSite() Site site)
     {
         model("groups", orderGroupsByStatus(permission("read", db.getRootGroups(site.getId()))));
         encode("group/index");
@@ -55,7 +55,7 @@ public class GroupsRouter extends Router<BergamotApp>
     
     @Any("/name/:name")
     @WithDataAdapter(BergamotDB.class)
-    public void showHostGroupByName(BergamotDB db, String name, @SessionVar("site") Site site)
+    public void showHostGroupByName(BergamotDB db, String name, @GetBergamotSite() Site site)
     {
         Group group = model("group", notNull(db.getGroupByName(site.getId(), name)));
         require(permission("read", group));
@@ -91,7 +91,7 @@ public class GroupsRouter extends Router<BergamotApp>
     
     @Get("/create")
     @WithDataAdapter(BergamotDB.class)
-    public void create(BergamotDB db, @SessionVar("site") Site site)
+    public void create(BergamotDB db, @GetBergamotSite() Site site)
     {
         var("templates", db.listConfigTemplates(site.getId(), Configuration.getRootElement(GroupCfg.class)).stream().filter((t) -> permission("read", t.getId())).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
         var("locations", db.listLocations(site.getId()).stream().filter((l) -> permission("read", l)).sorted((a, b) -> a.getSummary().compareTo(b.getSummary())).collect(Collectors.toList()));
@@ -103,7 +103,7 @@ public class GroupsRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void doCreate(
             BergamotDB db, 
-            @SessionVar("site") Site site,
+            @GetBergamotSite() Site site,
             @CurrentPrincipal() Contact user,
             @Param("group_extends") @IsaObjectId(mandatory = false) UUID templateId,
             @Param("group_summary") @CheckStringLength(mandatory = true, max = 255) String summary,

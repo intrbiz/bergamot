@@ -10,6 +10,7 @@ import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.api.APIResponse;
 import com.intrbiz.bergamot.model.message.api.APIResponse.Stat;
@@ -25,7 +26,6 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/command/editor")
@@ -38,7 +38,7 @@ public class CommandEditorRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @SessionVar("site") Site site)
+    public void index(BergamotDB db, @GetBergamotSite() Site site)
     {
         encode("command/editor");
     }
@@ -46,7 +46,7 @@ public class CommandEditorRouter extends Router<BergamotApp>
     @Any("/verify")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public APIResponse verifyCommand(BergamotDB db, @SessionVar("site") Site site, @Param("command") String commandDef)
+    public APIResponse verifyCommand(BergamotDB db, @GetBergamotSite() Site site, @Param("command") String commandDef)
     {
         try
         {

@@ -1,7 +1,7 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Hello #{Balsa().currentPrincipal().summary}">
+<fragment xmlns="com.intrbiz.balsa" title="Hello #{currentPrincipal.summary}">
 
     <script src="#{public('/js/' + bergamot_js_version() + '/u2f-api.js')}"></script>
 
@@ -14,31 +14,31 @@
 			<h3>Your details</h3>
 		    <p>
 			    <span class="label">Username: </span>
-			    <span class="value">#{contact.name}</span>
+			    <span class="value">#{currentPrincipal.name}</span>
 		    </p>
 		    <p>
 			    <span class="label">Email: </span>
-			    <span class="value">#{coalesce(contact.email, '')}</span>
+			    <span class="value">#{coalesce(currentPrincipal.email, '')}</span>
 		    </p>
 		    <p>
 			    <span class="label">Pager: </span>
-			    <span class="value">#{coalesce(contact.pager, '')}</span>
+			    <span class="value">#{coalesce(currentPrincipal.pager, '')}</span>
 		    </p>
 		    <p>
 			    <span class="label">Mobile: </span>
-			    <span class="value">#{coalesce(contact.mobile, '')}</span>
+			    <span class="value">#{coalesce(currentPrincipal.mobile, '')}</span>
 		    </p>
 		    <p>
 			    <span class="label">Phone: </span>
-			    <span class="value">#{coalesce(contact.phone, '')}</span>
+			    <span class="value">#{coalesce(currentPrincipal.phone, '')}</span>
 		    </p>
 		    <p class="description">
-			    #{coalesce(contact.description, '')}
+			    #{coalesce(currentPrincipal.description, '')}
 		    </p>
 		</div>
 		<div class="col4">
 			<h3>Member of</h3>
-			<data-set var="team" value="#{contact.teams}">
+			<data-set var="team" value="#{currentPrincipal.teams}">
 				<p>
 					<span>#{team.summary}</span>
 				</p>
@@ -64,7 +64,7 @@
 	    			<th></th>
 	    			<th></th>
 	    		</tr>
-				<data-set var="token" value="#{contact.getAPITokens()}">
+				<data-set var="token" value="#{currentPrincipal.getAPITokens()}">
 					<tr>
 						<td>#{token.token}</td>
 						<td>#{token.summary}</td>
@@ -110,18 +110,18 @@
 	        </p>
         </div>
         <div class="col12">
-	        <h4 rendered="#{contact.isTwoFactorConfigured()}">Well Done!</h4>
-	        <p class="text-body" rendered="#{contact.isTwoFactorConfigured()}">
+	        <h4 rendered="#{currentPrincipal.isTwoFactorConfigured()}">Well Done!</h4>
+	        <p class="text-body" rendered="#{currentPrincipal.isTwoFactorConfigured()}">
 	        	You currently have two factor authentication enabled :)
 	        </p>
-	        <p class="text-body" rendered="#{u2fDevice != null}">
-	        	You logged in using your #{u2fDevice.summary}, a #{coalesce(u2fDevice.device, 'Unknown')} Security Key.
+	        <p class="text-body" rendered="#{balsa.authenticationInfo().secondaryAuthenticationMethodName() == 'u2f'}">
+	        	You logged in using your #{balsa.authenticationInfo().secondaryAuthenticationMethodDetail().u2fDevice.summary}, a #{coalesce(balsa.authenticationInfo().secondaryAuthenticationMethodDetail().u2fDevice.device, 'Unknown')} Security Key.
 	        </p>
-	        <p class="text-body" rendered="#{hotpDevice != null}">
-	        	You logged in using Google Authenticator running on #{hotpDevice.summary}.
+	        <p class="text-body" rendered="#{balsa.authenticationInfo().secondaryAuthenticationMethodName() == 'hotp'}">
+	        	You logged in using Google Authenticator running on #{balsa.authenticationInfo().secondaryAuthenticationMethodDetail().hotp.summary}.
 	        </p>
-	        <p class="text-body" rendered="#{backupCode != null}">
-	        	You logged in using the backup code <code>#{backupCode.code}</code>.  Please register a new second factor authentication method. 
+	        <p class="text-body" rendered="#{balsa.authenticationInfo().secondaryAuthenticationMethodName() == 'backup_code'}">
+	        	You logged in using the backup code <code>#{balsa.authenticationInfo().secondaryAuthenticationMethodDetail().backupCode}</code>.  Please register a new second factor authentication method. 
 	        </p>
         </div>
     </div>
@@ -153,7 +153,7 @@
 	    			<th></th>
 	    			<th></th>
 	    		</tr>
-				<data-set var="device" value="#{contact.getU2FDeviceRegistrations()}">
+				<data-set var="device" value="#{currentPrincipal.getU2FDeviceRegistrations()}">
 					<tr>
 						<td>
 							<img style="float: right; margin-left: 10px;" rendered="#{device.deviceImage != null}" src="#{device.deviceImage}"/>
@@ -240,7 +240,7 @@
 	    			<th></th>
 	    			<th></th>
 	    		</tr>
-				<data-set var="device" value="#{contact.getHOTPRegistrations()}">
+				<data-set var="device" value="#{currentPrincipal.getHOTPRegistrations()}">
 					<tr>
 						<td>
 							<h4 style="margin: 0;">#{device.summary}</h4>
@@ -295,7 +295,7 @@
 	    			<th>Created</th>
 	    			<th>Used</th>
 	    		</tr>
-				<data-set var="code" value="#{contact.getBackupCodes()}">
+				<data-set var="code" value="#{currentPrincipal.getBackupCodes()}">
 					<tr>
 						<td>
 							<code>#{code.code}</code>

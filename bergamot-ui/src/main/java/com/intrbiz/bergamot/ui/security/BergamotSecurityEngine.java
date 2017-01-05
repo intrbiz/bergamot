@@ -5,24 +5,37 @@ import static com.intrbiz.balsa.BalsaContext.*;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.balsa.BalsaException;
-import com.intrbiz.balsa.engine.impl.security.SecurityEngineImpl;
+import com.intrbiz.balsa.engine.impl.security.BaseTwoFactorSecurityEngine;
+import com.intrbiz.balsa.engine.impl.security.method.BackupCodeAuthenticationMethod;
+import com.intrbiz.balsa.engine.impl.security.method.HOTPAuthenticationMethod;
+import com.intrbiz.balsa.engine.impl.security.method.PasswordAuthenticationMethod;
+import com.intrbiz.balsa.engine.impl.security.method.TokenAuthenticationMethod;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.ContactBackupCode;
+import com.intrbiz.bergamot.model.ContactHOTPRegistration;
+import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
 import com.intrbiz.bergamot.model.Permission;
 import com.intrbiz.bergamot.model.SecuredObject;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.ui.security.method.BergamotU2FAuthenticationMethod;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.data.DataException;
+import com.intrbiz.util.CounterHOTP.CounterHOTPState;
+import com.intrbiz.util.HOTP.HOTPState;
+import com.intrbiz.util.HOTPRegistration;
+import com.yubico.u2f.data.DeviceRegistration;
 
-public class BergamotSecurityEngine extends SecurityEngineImpl
+public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
 {
     private Logger logger = Logger.getLogger(BergamotSecurityEngine.class);
     
@@ -44,9 +57,24 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
         return "com.intrbiz.bergamot";
     }
 
+    /**
+     * Override the authentication methods registered by default
+     */
     @Override
-    public void start() throws BalsaException
+    protected void setupDefaultAuthenticationMethods()
     {
+        this.registerAuthenticationMethod(new PasswordAuthenticationMethod());
+        this.registerAuthenticationMethod(new TokenAuthenticationMethod());
+        // register 2FA authentication methods
+        this.registerAuthenticationMethod(new BergamotU2FAuthenticationMethod());
+        this.registerAuthenticationMethod(new HOTPAuthenticationMethod());
+        this.registerAuthenticationMethod(new BackupCodeAuthenticationMethod());
+    }
+
+    @Override
+    public boolean isTwoFactorAuthenticationRequiredForPrincipal(Principal principal)
+    {
+        return ((Contact) principal).isTwoFactorConfigured();
     }
     
     @Override
@@ -55,18 +83,13 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
         if (validationLevel == ValidationLevel.STRONG)
         {
             // validate that the principal is in a good state
-            boolean  goodPrincipal = principal instanceof Contact && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
-            if (! goodPrincipal) return goodPrincipal;
-            // look at the 2FA status
-            boolean done2FA = Balsa().sessionVar("done2FA");
-            boolean need2FA  = ((Contact) principal).isTwoFactorConfigured();
-            return need2FA ? done2FA : goodPrincipal;
+            return principal instanceof Contact && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
         }
         return principal instanceof Contact;
     }
 
     @Override
-    protected byte[] tokenForPrincipal(Principal principal)
+    public byte[] tokenForPrincipal(Principal principal)
     {
         // we combine the UUID with a NONCE,
         // packed as: nonce1, nonce1 ^ msb, nonce2, nonce2 ^ lsb
@@ -89,7 +112,7 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     }
 
     @Override
-    protected Principal principalForToken(byte[] token)
+    public Principal principalForToken(byte[] token)
     {
         ByteBuffer bb = ByteBuffer.wrap(token);
         // extract the data we need
@@ -107,7 +130,7 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     }
 
     @Override
-    protected Principal doPasswordLogin(String username, char[] password) throws BalsaSecurityException
+    public Principal doPasswordLogin(String username, char[] password) throws BalsaSecurityException
     {
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -147,7 +170,7 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
     }
     
     @Override
-    protected void validateAccessToken(String token, CryptoCookie cookie, Principal principal, CryptoCookie.Flag[] requiredFlags) throws BalsaSecurityException
+    public void validateAccessToken(String token, CryptoCookie cookie, Principal principal, CryptoCookie.Flag[] requiredFlags) throws BalsaSecurityException
     {
         // validate the flags
         if (requiredFlags != null)
@@ -227,5 +250,87 @@ public class BergamotSecurityEngine extends SecurityEngineImpl
             }
         }
         return false;
-    }    
+    }
+
+    @Override
+    public void verifyBackupCode(Principal principal, String backupCode) throws BalsaSecurityException
+    {
+        ContactBackupCode contactBackupCode = ((Contact) principal).getBackupCodes().stream()
+                                                    .filter((bc) -> bc.getCode().equals(backupCode)).findFirst().orElse(null);
+        if (contactBackupCode == null || contactBackupCode.isUsed())
+            throw new BalsaSecurityException("The given backup code is invalid");
+    }
+
+    @Override
+    public void updateBackupCode(Principal principal, String backupCode) throws BalsaSecurityException
+    {
+        ContactBackupCode contactBackupCode = ((Contact) principal).getBackupCodes().stream()
+                .filter((bc) -> bc.getCode().equals(backupCode)).findFirst().orElse(null);
+        contactBackupCode.used();
+        // update in the DB
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.setBackupCode(contactBackupCode);
+        }
+    }
+
+    @Override
+    public List<DeviceRegistration> getDeviceRegistrationsForPrincipal(Principal principal) throws BalsaSecurityException
+    {
+        return ((Contact) principal).getU2FDeviceRegistrations().stream()
+                        .map(ContactU2FDeviceRegistration::toDeviceRegistration).collect(Collectors.toList());
+    }
+
+    @Override
+    public String getAppIdForPrincipal(Principal principal) throws BalsaSecurityException
+    {
+        return ((Contact) principal).getSite().getU2FAppId();
+    }
+
+    @Override
+    public void validateDeviceRegistration(Principal principal, DeviceRegistration device) throws BalsaSecurityException
+    {
+        // all validations are handled by U2F
+    }
+
+    @Override
+    public void updateDeviceRegistration(Principal principal, DeviceRegistration device) throws BalsaSecurityException
+    {
+        ContactU2FDeviceRegistration authenticatedUsing = ((Contact) principal).getU2FDeviceRegistrations().stream()
+                .filter((d) -> d.getKeyHandle().equals(device.getKeyHandle()) && d.getPublicKey().equals(device.getPublicKey()))
+                .findFirst().get();
+        // update the U2F state
+        authenticatedUsing.used(device.getCounter());
+        // update in the DB
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.setU2FDeviceRegistration(authenticatedUsing);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<HOTPRegistration> getHOTPRegistrationsForPrincipal(Principal principal) throws BalsaSecurityException
+    {
+        return (List<HOTPRegistration>) (List<?>) ((Contact) principal).getHOTPRegistrations();
+    }
+
+    @Override
+    public void updateHOTPRegistration(Principal principal, HOTPRegistration registration, HOTPState nextState) throws BalsaSecurityException
+    {   
+        ContactHOTPRegistration chr = (ContactHOTPRegistration) registration;
+        chr.used((CounterHOTPState) nextState);
+        // update in the DB
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.setHOTPRegistration(chr);
+        }
+    }
+
+    @Override
+    public void validateHOTPRegistration(Principal principal, HOTPRegistration registration) throws BalsaSecurityException
+    {
+        if (((ContactHOTPRegistration) registration).isRevoked())
+            throw new BalsaSecurityException("The HOTP registration is revoked");
+    }
 }

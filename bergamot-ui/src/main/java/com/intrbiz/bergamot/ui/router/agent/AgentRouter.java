@@ -16,6 +16,7 @@ import com.intrbiz.bergamot.crypto.util.CertificateRequest;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.AgentTemplate;
@@ -31,7 +32,6 @@ import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/agent")
@@ -43,7 +43,7 @@ public class AgentRouter extends Router<BergamotApp>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void listAgents(BergamotDB db, @SessionVar("site") Site site)
+    public void listAgents(BergamotDB db, @GetBergamotSite() Site site)
     {
         model("agents", db.listAgentRegistrations(site.getId()));
         model("agentTemplates", db.listAgentTemplates(site.getId()));
@@ -52,7 +52,7 @@ public class AgentRouter extends Router<BergamotApp>
     
     @Get("/generate-template")
     @WithDataAdapter(BergamotDB.class)
-    public void showGenerateAgentTemplate(BergamotDB db, @SessionVar("site") Site site)
+    public void showGenerateAgentTemplate(BergamotDB db, @GetBergamotSite() Site site)
     {
         model("hostTemplates", db.listHostTemplatesWithoutCertificates(site.getId()));
         encode("agent/generate-template");
@@ -73,7 +73,7 @@ public class AgentRouter extends Router<BergamotApp>
     
     @Get("/show-template/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void showGenerateAgentTemplate(BergamotDB db, @SessionVar("site") Site site, @IsaObjectId() UUID id)
+    public void showGenerateAgentTemplate(BergamotDB db, @GetBergamotSite() Site site, @IsaObjectId() UUID id)
     {
         // get the template
         AgentTemplate template = db.getAgentTemplate(id);
@@ -95,7 +95,7 @@ public class AgentRouter extends Router<BergamotApp>
     
     @Post("/generate-template")
     @WithDataAdapter(BergamotDB.class)
-    public void generateTemplate(BergamotDB db, @SessionVar("site") Site site, @Param("template") @IsaObjectId() UUID templateId)
+    public void generateTemplate(BergamotDB db, @GetBergamotSite() Site site, @Param("template") @IsaObjectId() UUID templateId)
     {
         // get the template
         Config hostTemplate = notNull(db.getConfig(templateId), "Invalid host template");
@@ -122,7 +122,7 @@ public class AgentRouter extends Router<BergamotApp>
     @Post("/generate-config")
     @RequirePermission("ui.generate.agent")
     @WithDataAdapter(BergamotDB.class)
-    public void generateAgentConfig(BergamotDB db, @SessionVar("site") Site site, @Param("common-name") @CheckStringLength(min = 1, max = 255, mandatory = true) String commonName)
+    public void generateAgentConfig(BergamotDB db, @GetBergamotSite() Site site, @Param("common-name") @CheckStringLength(min = 1, max = 255, mandatory = true) String commonName)
     {
         // is an agent already registered
         AgentRegistration existingAgent = db.getAgentRegistrationByName(site.getId(), commonName);
@@ -150,7 +150,7 @@ public class AgentRouter extends Router<BergamotApp>
     
     @Post("/sign")
     @WithDataAdapter(BergamotDB.class)
-    public void signAgent(BergamotDB db, @SessionVar("site") Site site, @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq) throws IOException
+    public void signAgent(BergamotDB db, @GetBergamotSite() Site site, @Param("certificate-request") @CheckStringLength(min = 1, max = 16384, mandatory = true) String certReq) throws IOException
     {
         // parse the certificate request
         CertificateRequest req = PEMUtil.loadCertificateRequest(certReq);
@@ -173,7 +173,7 @@ public class AgentRouter extends Router<BergamotApp>
     
     @Post("/revoke")
     @WithDataAdapter(BergamotDB.class)
-    public void revokeAgent(BergamotDB db, @SessionVar("site") Site site, @Param("id") @IsaObjectId() UUID agentId) throws Exception
+    public void revokeAgent(BergamotDB db, @GetBergamotSite() Site site, @Param("id") @IsaObjectId() UUID agentId) throws Exception
     {
         // lookup the agent registration
         AgentRegistration agent = db.getAgentRegistration(agentId);

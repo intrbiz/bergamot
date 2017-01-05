@@ -323,7 +323,7 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
     }
     
-    public List<U2FDeviceRegistration> getU2FDeviceRegistrations()
+    public List<ContactU2FDeviceRegistration> getU2FDeviceRegistrations()
     {
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -331,7 +331,7 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
     }
     
-    public List<HOTPRegistration> getHOTPRegistrations()
+    public List<ContactHOTPRegistration> getHOTPRegistrations()
     {
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -339,7 +339,7 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
     }
     
-    public List<BackupCode> getBackupCodes()
+    public List<ContactBackupCode> getBackupCodes()
     {
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -356,7 +356,7 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
             // generate 5 mode backup codes
             for (int i = 0; i < (10 - count); i++)
             {
-                db.setBackupCode(new BackupCode(this));
+                db.setBackupCode(new ContactBackupCode(this));
             }
         }
     }

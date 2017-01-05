@@ -42,7 +42,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public TrapMO getTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public TrapMO getTrap(BergamotDB db, @IsaObjectId() UUID id)
     {
         Trap trap = notNull(db.getTrap(id));
         require(permission("read", trap));
@@ -52,7 +52,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getTrapState(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CheckStateMO getTrapState(BergamotDB db, @IsaObjectId() UUID id)
     {
         Trap trap = notNull(db.getTrap(id));
         require(permission("read", trap));
@@ -72,7 +72,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Any("/id/:id/submit")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public String submitTrapStatus(BergamotDB db, @Var("site") Site site, @IsaObjectId(session = false) UUID id, @Param("status") String status, @Param("output") String output)
+    public String submitTrapStatus(BergamotDB db, @Var("site") Site site, @IsaObjectId() UUID id, @Param("status") String status, @Param("output") String output)
     {   
         Trap trap = notNull(db.getTrap(id));
         require(permission("submit", trap));
@@ -95,7 +95,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressTrap(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Trap trap = notNull(db.getTrap(id));
         require(permission("suppress", trap));
@@ -106,7 +106,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressTrap(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressTrap(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Trap trap = notNull(db.getTrap(id));
         require(permission("unsuppress", trap));
@@ -129,7 +129,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public TrapCfg getTrapConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public TrapCfg getTrapConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Trap trap = notNull(db.getTrap(id));
         require(permission("read.config", trap));

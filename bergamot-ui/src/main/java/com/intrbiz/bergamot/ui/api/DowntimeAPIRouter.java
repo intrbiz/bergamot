@@ -35,7 +35,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public DowntimeMO getDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public DowntimeMO getDowntime(BergamotDB db, @IsaObjectId() UUID id)
     {
         Downtime downtime = notNull(db.getDowntime(id));
         require(permission("read.downtime", downtime.getCheckId()));
@@ -45,7 +45,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/remove")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public Boolean removeDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public Boolean removeDowntime(BergamotDB db, @IsaObjectId() UUID id)
     {
         Downtime downtime = db.getDowntime(id);
         if (downtime != null)
@@ -62,7 +62,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @ListOf(DowntimeMO.class)
     public List<DowntimeMO> getDowntimeForObject(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id, 
+            @IsaObjectId() UUID id, 
             @Param("past") @IsaInt(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer pastDays, 
             @Param("future") @IsaInt(min = 0, max = 365, mandatory = true, defaultValue = 7, coalesce = CoalesceMode.ON_NULL) Integer futureDays
     )
@@ -76,7 +76,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public DowntimeMO addDowntimeToCheck(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id,
+            @IsaObjectId() UUID id,
             @Param("starts") @AsDate("yyyy-MM-dd HH:mm") Date startTime,
             @Param("ends") @AsDate("yyyy-MM-dd HH:mm") Date endTime,
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary,
@@ -99,7 +99,7 @@ public class DowntimeAPIRouter extends Router<BergamotApp>
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public String renderDowntime(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String renderDowntime(BergamotDB db, @IsaObjectId() UUID id)
     {
         Downtime downtime = var("downtime", notNull(db.getDowntime(id)));
         require(permission("read.downtime", downtime.getCheckId()));

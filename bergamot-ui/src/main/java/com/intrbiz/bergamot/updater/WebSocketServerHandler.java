@@ -4,6 +4,23 @@ import static io.netty.handler.codec.http.HttpHeaders.*;
 import static io.netty.handler.codec.http.HttpHeaders.Names.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
+
+import org.apache.log4j.Logger;
+
+import com.intrbiz.Util;
+import com.intrbiz.balsa.BalsaApplication;
+import com.intrbiz.balsa.BalsaContext;
+import com.intrbiz.balsa.engine.session.BalsaSession;
+import com.intrbiz.balsa.error.BalsaSecurityException;
+import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.message.api.APIObject;
+import com.intrbiz.bergamot.model.message.api.APIRequest;
+import com.intrbiz.bergamot.model.message.api.error.APIError;
+import com.intrbiz.bergamot.updater.context.ClientContext;
+import com.intrbiz.bergamot.updater.handler.RequestHandler;
+import com.intrbiz.bergamot.updater.util.CookieJar;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -23,21 +40,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
-
-import org.apache.log4j.Logger;
-
-import com.intrbiz.Util;
-import com.intrbiz.balsa.BalsaApplication;
-import com.intrbiz.balsa.BalsaContext;
-import com.intrbiz.balsa.engine.session.BalsaSession;
-import com.intrbiz.balsa.error.BalsaSecurityException;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
-import com.intrbiz.bergamot.model.message.api.APIObject;
-import com.intrbiz.bergamot.model.message.api.APIRequest;
-import com.intrbiz.bergamot.model.message.api.error.APIError;
-import com.intrbiz.bergamot.updater.context.ClientContext;
-import com.intrbiz.bergamot.updater.handler.RequestHandler;
-import com.intrbiz.bergamot.updater.util.CookieJar;
 
 /**
  * Handles handshakes and messages
@@ -114,9 +116,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         // lookup the site and principal
         try
         {
+            Contact contact = session.authenticationState().currentPrincipal();
             BalsaContext.withContext(application, session, () -> {
-                WebSocketServerHandler.this.context.setSite(session.var("site"));
-                WebSocketServerHandler.this.context.setPrincipal(session.currentPrincipal());
+                WebSocketServerHandler.this.context.setSite(contact.getSite());
+                WebSocketServerHandler.this.context.setPrincipal(contact);
                 return null;
             });
         }

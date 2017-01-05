@@ -53,14 +53,14 @@
 					 .done(function(data) {
 					 	$('#acknowledge_modal').trigger('reveal:close');
 					 	// fetch the rerendered content
-					 	$.get(#{'"' + path('/api/alert/id') + '/"')} + alert_id + '/render', function(data) {
+					 	$.get(#{'"' + path('/api/alert/id') + '/"'} + alert_id + '/render', function(data) {
 					 		$('#alert-' + alert_id).replaceWith(data);
 					 		// comment handlers
 							$('#alert-' + alert_id).find('a[data-comment-id]').click(function(ev) {
 								ev.preventDefault();
 								var comment_id = $(this).attr('data-comment-id');
 								// get the comment content
-								$.get(#{'"' + path('/api/comment/id') + '/"')} + comment_id + '/render', function(data) {
+								$.get(#{'"' + path('/api/comment/id') + '/"'} + comment_id + '/render', function(data) {
 								 	$('#comment_container').html(data);
 									$('#comment_modal').reveal();
 								});
@@ -76,7 +76,7 @@
 					ev.preventDefault();
 					var comment_id = $(this).attr('data-comment-id');
 					// get the comment content
-					$.get(#{'"' + path('/api/comment/id') + '/"')} + comment_id + '/render', function(data) {
+					$.get(#{'"' + path('/api/comment/id') + '/"'} + comment_id + '/render', function(data) {
 					 	$('#comment_container').html(data);
 						$('#comment_modal').reveal();
 					});

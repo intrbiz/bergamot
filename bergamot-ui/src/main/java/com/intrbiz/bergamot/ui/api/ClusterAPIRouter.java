@@ -63,7 +63,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ClusterMO getCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ClusterMO getCluster(BergamotDB db, @IsaObjectId() UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
@@ -73,7 +73,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getClusterState(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CheckStateMO getClusterState(BergamotDB db, @IsaObjectId() UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
@@ -95,7 +95,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(ResourceMO.class)
-    public List<ResourceMO> getClusterResources(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<ResourceMO> getClusterResources(BergamotDB db, @IsaObjectId() UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
@@ -117,7 +117,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(CheckMO.class)
-    public List<CheckMO> getClusterReferences(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<CheckMO> getClusterReferences(BergamotDB db, @IsaObjectId() UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
@@ -139,7 +139,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ClusterCfg getClusterConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ClusterCfg getClusterConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read.config", cluster));
@@ -149,7 +149,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressCluster(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("suppress", cluster));
@@ -160,7 +160,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressCluster(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("unsuppress", cluster));
@@ -171,7 +171,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress-resources")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressResourcesOnCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressResourcesOnCluster(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));
@@ -190,7 +190,7 @@ public class ClusterAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress-resources")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressResourcesOnCluster(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressResourcesOnCluster(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Cluster cluster = notNull(db.getCluster(id));
         require(permission("read", cluster));

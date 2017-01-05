@@ -24,7 +24,7 @@ import com.yubico.u2f.data.messages.key.util.U2fB64Encoding;
  * A U2F device which has been registered to a user
  */
 @SQLTable(schema = BergamotDB.class, name = "u2f_device_registration", since = @SQLVersion({ 3, 38, 0 }))
-public class U2FDeviceRegistration implements Serializable
+public class ContactU2FDeviceRegistration implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
@@ -90,12 +90,12 @@ public class U2FDeviceRegistration implements Serializable
     @SQLColumn(index = 14, name = "summary", since = @SQLVersion({ 3, 39, 0 }))
     private String summary;
     
-    public U2FDeviceRegistration()
+    public ContactU2FDeviceRegistration()
     {
         super();
     }
     
-    public U2FDeviceRegistration(Contact contact, DeviceRegistration devReg, String vendor, String device, String deviceImage, String name)
+    public ContactU2FDeviceRegistration(Contact contact, DeviceRegistration devReg, String vendor, String device, String deviceImage, String name)
     {
         this.id = Site.randomId(contact.getSiteId());
         this.contactId = contact.getId();
@@ -299,14 +299,14 @@ public class U2FDeviceRegistration implements Serializable
         }
     }
     
-    public U2FDeviceRegistration revoke()
+    public ContactU2FDeviceRegistration revoke()
     {
         this.revoked = true;
         this.revokedAt = new Timestamp(System.currentTimeMillis());
         return this;
     }
     
-    public U2FDeviceRegistration used(long newCounter)
+    public ContactU2FDeviceRegistration used(long newCounter)
     {
         this.counter = newCounter;
         this.updated = new Timestamp(System.currentTimeMillis());

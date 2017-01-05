@@ -25,7 +25,7 @@ import com.intrbiz.bergamot.model.AgentTemplate;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
-import com.intrbiz.bergamot.model.BackupCode;
+import com.intrbiz.bergamot.model.ContactBackupCode;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Cluster;
@@ -39,7 +39,7 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
-import com.intrbiz.bergamot.model.HOTPRegistration;
+import com.intrbiz.bergamot.model.ContactHOTPRegistration;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationEngine;
@@ -52,7 +52,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
-import com.intrbiz.bergamot.model.U2FDeviceRegistration;
+import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
@@ -123,9 +123,9 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             Escalation.class,
             AlertEscalation.class,
             AlertEncompasses.class,
-            U2FDeviceRegistration.class,
-            HOTPRegistration.class,
-            BackupCode.class,
+            ContactU2FDeviceRegistration.class,
+            ContactHOTPRegistration.class,
+            ContactBackupCode.class,
             AgentTemplate.class
         }
 )
@@ -754,61 +754,61 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_u2f_device_registrations_for_contact.#{contact_id}"})
-    @SQLSetter(table = U2FDeviceRegistration.class, name = "set_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
-    public abstract void setU2FDeviceRegistration(U2FDeviceRegistration device);
+    @SQLSetter(table = ContactU2FDeviceRegistration.class, name = "set_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    public abstract void setU2FDeviceRegistration(ContactU2FDeviceRegistration device);
     
     @Cacheable
-    @SQLGetter(table = U2FDeviceRegistration.class, name = "get_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
-    public abstract U2FDeviceRegistration getU2FDeviceRegistration(@SQLParam("id") UUID id);
+    @SQLGetter(table = ContactU2FDeviceRegistration.class, name = "get_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    public abstract ContactU2FDeviceRegistration getU2FDeviceRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_u2f_device_registrations_for_contact.*"})
-    @SQLRemove(table = U2FDeviceRegistration.class, name = "remove_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    @SQLRemove(table = ContactU2FDeviceRegistration.class, name = "remove_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
     public abstract void removeU2FDeviceRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = U2FDeviceRegistration.class, name = "get_u2f_device_registrations_for_contact", since = @SQLVersion({3, 38, 0}))
-    public abstract List<U2FDeviceRegistration> getU2FDeviceRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
+    @SQLGetter(table = ContactU2FDeviceRegistration.class, name = "get_u2f_device_registrations_for_contact", since = @SQLVersion({3, 38, 0}))
+    public abstract List<ContactU2FDeviceRegistration> getU2FDeviceRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
 
     // HOTP
     
     @Cacheable
     @CacheInvalidate({"get_hotp_registrations_for_contact.#{contact_id}"})
-    @SQLSetter(table = HOTPRegistration.class, name = "set_hotp_registration", since = @SQLVersion({3, 39, 0}))
-    public abstract void setHOTPRegistration(HOTPRegistration device);
+    @SQLSetter(table = ContactHOTPRegistration.class, name = "set_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    public abstract void setHOTPRegistration(ContactHOTPRegistration device);
     
     @Cacheable
-    @SQLGetter(table = HOTPRegistration.class, name = "get_hotp_registration", since = @SQLVersion({3, 39, 0}))
-    public abstract HOTPRegistration getHOTPRegistration(@SQLParam("id") UUID id);
+    @SQLGetter(table = ContactHOTPRegistration.class, name = "get_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    public abstract ContactHOTPRegistration getHOTPRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_hotp_registrations_for_contact.*"})
-    @SQLRemove(table = HOTPRegistration.class, name = "remove_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    @SQLRemove(table = ContactHOTPRegistration.class, name = "remove_hotp_registration", since = @SQLVersion({3, 39, 0}))
     public abstract void removeHOTPRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = HOTPRegistration.class, name = "get_hotp_registrations_for_contact", since = @SQLVersion({3, 39, 0}))
-    public abstract List<HOTPRegistration> getHOTPRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
+    @SQLGetter(table = ContactHOTPRegistration.class, name = "get_hotp_registrations_for_contact", since = @SQLVersion({3, 39, 0}))
+    public abstract List<ContactHOTPRegistration> getHOTPRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
     
     // Backup Codes
     
     @Cacheable
     @CacheInvalidate({"get_backup_codes_for_contact.#{contact_id}"})
-    @SQLSetter(table = BackupCode.class, name = "set_backup_code", since = @SQLVersion({3, 40, 0}))
-    public abstract void setBackupCode(BackupCode device);
+    @SQLSetter(table = ContactBackupCode.class, name = "set_backup_code", since = @SQLVersion({3, 40, 0}))
+    public abstract void setBackupCode(ContactBackupCode device);
     
     @Cacheable
-    @SQLGetter(table = BackupCode.class, name = "get_backup_code", since = @SQLVersion({3, 40, 0}))
-    public abstract BackupCode getBackupCode(@SQLParam("id") UUID id);
+    @SQLGetter(table = ContactBackupCode.class, name = "get_backup_code", since = @SQLVersion({3, 40, 0}))
+    public abstract ContactBackupCode getBackupCode(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_backup_codes_for_contact.*"})
-    @SQLRemove(table = BackupCode.class, name = "remove_backup_code", since = @SQLVersion({3, 40, 0}))
+    @SQLRemove(table = ContactBackupCode.class, name = "remove_backup_code", since = @SQLVersion({3, 40, 0}))
     public abstract void removeBackupCode(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = BackupCode.class, name = "get_backup_codes_for_contact", since = @SQLVersion({3, 40, 0}))
-    public abstract List<BackupCode> getBackupCodesForContact(@SQLParam("contact_id") UUID contactId);
+    @SQLGetter(table = ContactBackupCode.class, name = "get_backup_codes_for_contact", since = @SQLVersion({3, 40, 0}))
+    public abstract List<ContactBackupCode> getBackupCodesForContact(@SQLParam("contact_id") UUID contactId);
     
     // notifications
     

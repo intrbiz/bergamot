@@ -83,7 +83,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public LocationMO getLocation(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public LocationMO getLocation(BergamotDB db, @IsaObjectId() UUID id)
     {
         Location location = notNull(db.getLocation(id));
         require(permission("read", location));
@@ -94,7 +94,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(LocationMO.class)
-    public List<LocationMO> getLocationChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<LocationMO> getLocationChildren(BergamotDB db, @IsaObjectId() UUID id)
     {
         Location location = notNull(db.getLocation(id));
         require(permission("read", location));
@@ -105,7 +105,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(HostMO.class)
-    public List<HostMO> getLocationHosts(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<HostMO> getLocationHosts(BergamotDB db, @IsaObjectId() UUID id)
     {
         Location location = notNull(db.getLocation(id));
         require(permission("read", location));
@@ -115,7 +115,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute-all-hosts")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeHostsInLocation(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String executeHostsInLocation(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Location location = notNull(db.getLocation(id));
         int executed = 0;
@@ -145,7 +145,7 @@ public class LocationAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public LocationCfg getLocationConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public LocationCfg getLocationConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Location location = notNull(db.getLocation(id));
         require(permission("read.config", location));

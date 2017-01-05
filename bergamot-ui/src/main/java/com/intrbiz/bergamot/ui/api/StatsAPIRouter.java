@@ -29,7 +29,7 @@ public class StatsAPIRouter extends Router<BergamotApp>
     @ListOf(CheckTransitionMO.class)
     public List<CheckTransitionMO> getCheckTransitions(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id, 
+            @IsaObjectId() UUID id, 
             @Param("offset") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L) Long offset,
             @Param("limit")  @IsaLong(min = 1L, max = 1001L, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 100L) Long limit
     )

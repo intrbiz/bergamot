@@ -49,7 +49,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ContactMO getContact(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ContactMO getContact(BergamotDB db, @IsaObjectId() UUID id)
     {
         Contact contact = notNull(db.getContact(id));
         require(permission("read", contact));
@@ -91,7 +91,7 @@ public class ContactAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ContactCfg getContactConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ContactCfg getContactConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Contact contact = notNull(db.getContact(id));
         require(permission("read.config", contact));

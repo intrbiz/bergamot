@@ -72,7 +72,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public TeamMO getTeam(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public TeamMO getTeam(BergamotDB db, @IsaObjectId() UUID id)
     {
         Team team = notNull(db.getTeam(id));
         require(permission("read", team));
@@ -83,7 +83,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(TeamMO.class)
-    public List<TeamMO> getTeamChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<TeamMO> getTeamChildren(BergamotDB db, @IsaObjectId() UUID id)
     {
         Team team = notNull(db.getTeam(id));
         require(permission("read", team));
@@ -94,7 +94,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(ContactMO.class)
-    public List<ContactMO> getTeamContacts(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<ContactMO> getTeamContacts(BergamotDB db, @IsaObjectId() UUID id)
     {
         Team team = notNull(db.getTeam(id));
         require(permission("read", team));
@@ -116,7 +116,7 @@ public class TeamAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public TeamCfg getTeamConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public TeamCfg getTeamConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Team team = notNull(db.getTeam(id));
         require(permission("read.config", team));

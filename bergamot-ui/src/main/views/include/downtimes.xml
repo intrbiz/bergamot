@@ -66,7 +66,7 @@
 						 .done(function(theDowntime) {
 						 	$('#downtime_modal').trigger('reveal:close');
 						 	// render the added downtime
-						 	$.get(#{'"' + path('/api') + '"')} + '/downtime/id/' + theDowntime.id + '/render', function(downtimeHtml) {
+						 	$.get(#{'"' + path('/api') + '"'} + '/downtime/id/' + theDowntime.id + '/render', function(downtimeHtml) {
 							 	// container
 							 	var dwtdiv = document.createElement('div');
 							 	$(dwtdiv).attr('class', 'row');
@@ -77,7 +77,7 @@
 									ev.preventDefault();
 									// remove the downtime
 									var downtime_id = $(this).attr('data-downtime-id');
-									$.get(#{'"' + path('/api') + '"')} + '/downtime/id/' + downtime_id + '/remove', function(removed) {
+									$.get(#{'"' + path('/api') + '"'} + '/downtime/id/' + downtime_id + '/remove', function(removed) {
 										if (removed) $('#downtime-' + downtime_id).remove();
 									});
 								});
@@ -93,7 +93,7 @@
 						ev.preventDefault();
 						// remove the downtime
 						var downtime_id = $(this).attr('data-downtime-id');
-						$.get(#{'"' + path('/api') + '"')} + '/downtime/id/' + downtime_id + '/remove', function(removed) {
+						$.get(#{'"' + path('/api') + '"'} + '/downtime/id/' + downtime_id + '/remove', function(removed) {
 							if (removed) $('#downtime-' + downtime_id).remove();
 						});
 					});

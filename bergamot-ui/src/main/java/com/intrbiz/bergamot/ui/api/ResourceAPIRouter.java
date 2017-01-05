@@ -38,7 +38,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public ResourceMO getResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ResourceMO getResource(BergamotDB db, @IsaObjectId() UUID id)
     {
         Resource resource = notNull(db.getResource(id));
         require(permission("read", resource));
@@ -48,7 +48,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CheckStateMO getResourceState(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CheckStateMO getResourceState(BergamotDB db, @IsaObjectId() UUID id)
     {
         Resource resource = notNull(db.getResource(id));
         require(permission("read", resource));
@@ -80,7 +80,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public ResourceCfg getResourceConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public ResourceCfg getResourceConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Resource resource = notNull(db.getResource(id));
         require(permission("read.config", resource));
@@ -90,7 +90,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String suppressResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String suppressResource(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Resource resource = notNull(db.getResource(id));
         require(permission("suppress", resource));
@@ -101,7 +101,7 @@ public class ResourceAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String unsuppressResource(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String unsuppressResource(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Resource resource = notNull(db.getResource(id));
         require(permission("unsuppress", resource));

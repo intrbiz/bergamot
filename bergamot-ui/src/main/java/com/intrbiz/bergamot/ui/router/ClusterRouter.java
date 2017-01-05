@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
@@ -14,7 +15,6 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/cluster")
@@ -24,7 +24,7 @@ public class ClusterRouter extends Router<BergamotApp>
 {    
     @Any("/name/:name")
     @WithDataAdapter(BergamotDB.class)
-    public void showClusterByName(BergamotDB db, String name, @SessionVar("site") Site site)
+    public void showClusterByName(BergamotDB db, String name, @GetBergamotSite() Site site)
     {
         Cluster cluster = model("cluster", notNull(db.getClusterByName(site.getId(), name)));
         require(permission("read", cluster));

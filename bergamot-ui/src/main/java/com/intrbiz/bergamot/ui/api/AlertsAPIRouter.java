@@ -88,7 +88,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public AlertMO getAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public AlertMO getAlert(BergamotDB db, @IsaObjectId() UUID id)
     {
         Alert alert = notNull(db.getAlert(id));
         require(permission("read", alert.getCheckId()));
@@ -99,7 +99,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     @ListOf(AlertMO.class)
-    public List<AlertMO> getAlertsForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<AlertMO> getAlertsForCheck(BergamotDB db, @IsaObjectId() UUID id)
     {
         require(permission("read", id));
         return db.getAlertsForCheck(id).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
@@ -108,7 +108,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @Get("/current/for-check/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public AlertMO getCurrentAlertForCheck(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public AlertMO getCurrentAlertForCheck(BergamotDB db, @IsaObjectId() UUID id)
     {
         Alert alert = notNull(db.getCurrentAlertForCheck(id));
         require(permission("read", alert.getCheckId()));
@@ -120,7 +120,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public AlertMO acknowledgeAlert(
             BergamotDB db, 
-            @IsaObjectId(session = false) UUID id,
+            @IsaObjectId() UUID id,
             @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
             @Param("comment") @CheckStringLength(min = 0, max = 4096, mandatory = false) String comment
     )
@@ -169,7 +169,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @JSON
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public String renderAlert(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String renderAlert(BergamotDB db, @IsaObjectId() UUID id)
     {
         Alert alert = var("alert", notNull(db.getAlert(id)));
         require(permission("read", alert.getCheckId()));
@@ -181,7 +181,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     @RequirePermission("api.read.alert")
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public String renderComment(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String renderComment(BergamotDB db, @IsaObjectId() UUID id)
     {
         Alert alert = notNull(db.getAlert(id));
         require(permission("read", alert.getCheckId()));

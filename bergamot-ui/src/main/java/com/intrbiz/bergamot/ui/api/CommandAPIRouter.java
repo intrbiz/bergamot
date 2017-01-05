@@ -49,7 +49,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public CommandMO getCommand(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CommandMO getCommand(BergamotDB db, @IsaObjectId() UUID id)
     {
         Command command = notNull(db.getCommand(id));
         require(permission("read", command));
@@ -71,7 +71,7 @@ public class CommandAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public CommandCfg getCommandConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public CommandCfg getCommandConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Command command = notNull(db.getCommand(id));
         require(permission("read.config", command));

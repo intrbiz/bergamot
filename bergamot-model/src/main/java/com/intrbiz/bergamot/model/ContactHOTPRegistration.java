@@ -14,68 +14,70 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.util.CounterHOTP.CounterHOTPState;
 import com.intrbiz.util.HOTP.HOTPSecret;
+import com.intrbiz.util.HOTP.HOTPState;
+import com.intrbiz.util.HOTPRegistration;
 
 /**
  * A (counter) HOTP based system which can been configured for the contract
  */
 @SQLTable(schema = BergamotDB.class, name = "hotp_registration", since = @SQLVersion({ 3, 39, 0 }))
-public class HOTPRegistration implements Serializable
+public class ContactHOTPRegistration implements Serializable, HOTPRegistration
 {
     private static final long serialVersionUID = 1L;
-    
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3,39, 0 }))
+
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3, 39, 0 }))
     @SQLPrimaryKey
     private UUID id;
-    
+
     /**
      * The contact whom this token represents
      */
     @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({ 3, 39, 0 }))
     @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
     private UUID contactId;
-    
+
     @SQLColumn(index = 3, name = "secret", notNull = true, since = @SQLVersion({ 3, 39, 0 }))
     private byte[] secret;
-    
+
     @SQLColumn(index = 4, name = "counter", notNull = true, since = @SQLVersion({ 3, 39, 0 }))
     private long counter;
-    
+
     /**
      * When did we register this device
      */
     @SQLColumn(index = 5, name = "created", since = @SQLVersion({ 3, 39, 0 }))
     private Timestamp created = new Timestamp(System.currentTimeMillis());
-    
+
     /**
      * When was this last updated
      */
     @SQLColumn(index = 6, name = "updated", since = @SQLVersion({ 3, 39, 0 }))
     private Timestamp updated = null;
-    
+
     /**
      * Has this device been revoked
      */
     @SQLColumn(index = 7, name = "revoked", since = @SQLVersion({ 3, 39, 0 }))
     private boolean revoked = false;
-    
+
     /**
      * When was it revoked
      */
     @SQLColumn(index = 8, name = "revoked_at", since = @SQLVersion({ 3, 39, 0 }))
     private Timestamp revokedAt = null;
-    
+
     /**
      * A name for this method
      */
     @SQLColumn(index = 9, name = "summary", since = @SQLVersion({ 3, 39, 0 }))
     private String summary;
-    
-    public HOTPRegistration()
+
+    public ContactHOTPRegistration()
     {
         super();
     }
-    
-    public HOTPRegistration(Contact contact, HOTPSecret secret, String summary)
+
+    public ContactHOTPRegistration(Contact contact, HOTPSecret secret, String summary)
     {
         this.id = Site.randomId(contact.getSiteId());
         this.contactId = contact.getId();
@@ -185,31 +187,44 @@ public class HOTPRegistration implements Serializable
             return db.getContact(this.getContactId());
         }
     }
-    
+
     public HOTPSecret toHOTPSecret()
     {
         return new HOTPSecret(this.secret);
     }
-    
+
     public CounterHOTPState toHOTPState()
     {
         return new CounterHOTPState(this.counter);
     }
-    
-    public HOTPRegistration revoke()
+
+    public ContactHOTPRegistration revoke()
     {
         this.revoked = true;
         this.revokedAt = new Timestamp(System.currentTimeMillis());
         return this;
     }
-    
-    public HOTPRegistration used(CounterHOTPState newState)
+
+    public ContactHOTPRegistration used(CounterHOTPState newState)
     {
         this.counter = newState.getCounter();
         this.updated = new Timestamp(System.currentTimeMillis());
         return this;
     }
-    
+
+    @Override
+    public HOTPSecret getHOTPSecret()
+    {
+        return this.toHOTPSecret();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends HOTPState> T getHOTPState()
+    {
+        return (T) this.toHOTPState();
+    }
+
     public String toString()
     {
         return "HOTPToken { secret=" + Arrays.toString(this.secret) + ", counter=" + this.counter + "}";

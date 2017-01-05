@@ -33,7 +33,7 @@
 					$.post(#{'"' + path('/api/comment/add-comment-to-object/id/') + check.id + '"'}, $("#comment_form").serialize())
 					 .done(function(theComment) {
 					 	// render the comment
-					 	$.get(#{'"' + path('/api/comment/id') + '/"')} + theComment.id + '/render', function(commentHtml) {
+					 	$.get(#{'"' + path('/api/comment/id') + '/"'} + theComment.id + '/render', function(commentHtml) {
 						 	// container
 						 	var comdiv = document.createElement('div');
 						 	$(comdiv).attr('class', 'row');

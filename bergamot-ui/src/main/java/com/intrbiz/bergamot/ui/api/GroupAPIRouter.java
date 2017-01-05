@@ -51,7 +51,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    public GroupMO getGroup(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public GroupMO getGroup(BergamotDB db, @IsaObjectId() UUID id)
     {
         Group group = notNull(db.getGroup(id));
         require(permission("read", group));
@@ -62,7 +62,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(GroupMO.class)
-    public List<GroupMO> getGroupChildren(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<GroupMO> getGroupChildren(BergamotDB db, @IsaObjectId() UUID id)
     {
         Group group = notNull(db.getGroup(id));
         require(permission("read", group));
@@ -73,7 +73,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @ListOf(CheckMO.class)
-    public List<CheckMO> getGroupChecks(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public List<CheckMO> getGroupChecks(BergamotDB db, @IsaObjectId() UUID id)
     {
         Group group = notNull(db.getGroup(id));
         require(permission("read", group));
@@ -115,7 +115,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @Get("/id/:id/execute-all-checks")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
-    public String executeChecksInGroup(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public String executeChecksInGroup(BergamotDB db, @IsaObjectId() UUID id)
     { 
         Group group = notNull(db.getGroup(id));
         int executed = 0;
@@ -148,7 +148,7 @@ public class GroupAPIRouter extends Router<BergamotApp>
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
     @IgnoreBinding
-    public GroupCfg getGroupConfig(BergamotDB db, @IsaObjectId(session = false) UUID id)
+    public GroupCfg getGroupConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Group group = notNull(db.getGroup(id));
         require(permission("read.config", group));

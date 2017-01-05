@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
@@ -13,7 +14,6 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/resource")
@@ -23,7 +23,7 @@ public class ResourceRouter extends Router<BergamotApp>
 {   
     @Any("/name/:host/:resource")
     @WithDataAdapter(BergamotDB.class)
-    public void showResourceByName(BergamotDB db, String clusterName, String resourceName, @SessionVar("site") Site site)
+    public void showResourceByName(BergamotDB db, String clusterName, String resourceName, @GetBergamotSite() Site site)
     {
         Resource resource = model("resource", notNull(db.getResourceOnClusterByName(site.getId(), clusterName, resourceName)));
         require(permission("read", resource));

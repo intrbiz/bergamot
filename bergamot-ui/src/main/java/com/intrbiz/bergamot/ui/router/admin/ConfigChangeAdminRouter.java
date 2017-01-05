@@ -1,8 +1,7 @@
 package com.intrbiz.bergamot.ui.router.admin;
 
-import static com.intrbiz.Util.coalesceEmpty;
-import static com.intrbiz.Util.nullable;
-import static com.intrbiz.balsa.BalsaContext.Balsa;
+import static com.intrbiz.Util.*;
+import static com.intrbiz.balsa.BalsaContext.*;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -27,6 +26,7 @@ import com.intrbiz.bergamot.config.model.TemplatedObjectCfg.ObjectState;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
@@ -45,7 +45,6 @@ import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
-import com.intrbiz.metadata.SessionVar;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/admin/configchange")
@@ -58,7 +57,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @SessionVar("site") Site site)
+    public void index(BergamotDB db, @GetBergamotSite() Site site)
     {
         List<ConfigChange> pending = var("pending_changes", db.getPendingConfigChanges(site.getId()));
         List<ConfigChange> applied = var("applied_changes", db.pageConfigChanges(site.getId(), true, 5, 0));
@@ -72,7 +71,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void history(
             BergamotDB db, 
-            @SessionVar("site") Site site,
+            @GetBergamotSite() Site site,
             @Param("offset") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L)   long offset,
             @Param("limit")  @IsaLong(min = 1, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 100L) long limit
     )
@@ -87,7 +86,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void create(
             BergamotDB db, 
-            @SessionVar("site") Site site,
+            @GetBergamotSite() Site site,
             @Param("summary") String summary,
             @Param("description") String description
     ) throws IOException
@@ -117,7 +116,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Post("/edit/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void save(BergamotDB db, @IsaObjectId UUID id, @Param("change_configuration") String configuration, @SessionVar("site") Site site) throws IOException, JAXBException
+    public void save(BergamotDB db, @IsaObjectId UUID id, @Param("change_configuration") String configuration, @GetBergamotSite() Site site) throws IOException, JAXBException
     {
         BergamotCfg cfg = Configuration.read(BergamotCfg.class, new StringReader(configuration));
         // update
@@ -135,7 +134,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Any("/add/:type/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void add(BergamotDB db, @SessionVar("site") Site site, String type, @IsaObjectId UUID id) throws IOException
+    public void add(BergamotDB db, @GetBergamotSite() Site site, String type, @IsaObjectId UUID id) throws IOException
     {
         TemplatedObjectCfg<?> cfg = (TemplatedObjectCfg<?>) db.getConfig(id).getConfiguration();
         // update the change
@@ -154,7 +153,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Any("/add/site-parameters")
     @WithDataAdapter(BergamotDB.class)
-    public void add(BergamotDB db, @SessionVar("site") Site site) throws IOException
+    public void add(BergamotDB db, @GetBergamotSite() Site site) throws IOException
     {
         // make sure we have a fresh copy of the site
         site = db.getSite(site.getId());
@@ -176,7 +175,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Any("/remove/:type/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void remove(BergamotDB db, @SessionVar("site") Site site, String type, @IsaObjectId UUID id) throws Exception
+    public void remove(BergamotDB db, @GetBergamotSite() Site site, String type, @IsaObjectId UUID id) throws Exception
     {
         TemplatedObjectCfg<?> cfg = (TemplatedObjectCfg<?>) db.getConfig(id).getConfiguration();
         // update the change
@@ -212,7 +211,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Any("/validate/id/:id")
     @WithDataAdapter(BergamotDB.class)
-    public void validate(BergamotDB db, @SessionVar("site") Site site, @IsaObjectId UUID id)
+    public void validate(BergamotDB db, @GetBergamotSite() Site site, @IsaObjectId UUID id)
     {
         // nullify any current change
         sessionVar("current_change", null);
@@ -230,7 +229,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     @Any("/apply/id/:id")
     @RequirePermission("config.change.apply")
     @WithDataAdapter(BergamotDB.class)
-    public void apply(BergamotDB db, @SessionVar("site") Site site, @IsaObjectId UUID id)
+    public void apply(BergamotDB db, @GetBergamotSite() Site site, @IsaObjectId UUID id)
     {
         Contact user = currentPrincipal();
         // nullify any current change
@@ -250,7 +249,7 @@ public class ConfigChangeAdminRouter extends Router<BergamotApp>
     
     @Any("/poll/apply/id/:id")
     @RequirePermission("config.change.apply")
-    public void pollApply(@SessionVar("site") Site site, @IsaObjectId UUID id) throws IOException
+    public void pollApply(@GetBergamotSite() Site site, @IsaObjectId UUID id) throws IOException
     {
         // get the task state
         BalsaTaskState state = pollDeferredAction(id.toString());
