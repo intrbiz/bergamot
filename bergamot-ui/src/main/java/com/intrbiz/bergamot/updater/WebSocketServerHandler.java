@@ -116,8 +116,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         // lookup the site and principal
         try
         {
-            Contact contact = session.authenticationState().currentPrincipal();
             BalsaContext.withContext(application, session, () -> {
+                Contact contact = session.authenticationState().currentPrincipal();
                 WebSocketServerHandler.this.context.setSite(contact.getSite());
                 WebSocketServerHandler.this.context.setPrincipal(contact);
                 return null;
@@ -159,7 +159,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         this.handshaker = wsFactory.newHandshaker(req);
         if (this.handshaker == null)
         {
-            WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+            WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
         }
         else
         {

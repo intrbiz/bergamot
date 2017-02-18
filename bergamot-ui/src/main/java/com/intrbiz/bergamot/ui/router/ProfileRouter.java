@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.ui.router;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,8 @@ import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsString;
 import com.intrbiz.metadata.CheckStringLength;
+import com.intrbiz.metadata.CurrentPrincipal;
+import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaUUID;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
@@ -31,6 +34,9 @@ import com.yubico.u2f.attestation.MetadataService;
 import com.yubico.u2f.data.DeviceRegistration;
 import com.yubico.u2f.data.messages.RegisterRequestData;
 import com.yubico.u2f.data.messages.RegisterResponse;
+
+import net.glxn.qrgen.core.image.ImageType;
+import net.glxn.qrgen.javase.QRCode;
 
 @Prefix("/profile")
 @Template("layout/main")
@@ -173,6 +179,24 @@ public class ProfileRouter extends Router<BergamotApp>
         action("u2fa-device-registered", contact, name, "HOTP Authenticator");
         // done
         encode("/profile/setuphotp");
+    }
+    
+    @Get("/hotp-qr-code")
+    @WithDataAdapter(BergamotDB.class)
+    public void generateHOTPQRCode(BergamotDB db, @Param("id") @IsaUUID UUID hotpRegistrationId, @CurrentPrincipal Contact contact, @GetBergamotSite Site site) throws IOException
+    {
+        // get the HOTP registration
+        ContactHOTPRegistration registration = notNull(db.getHOTPRegistration(hotpRegistrationId));
+        // assert that this registration is owned by the current principal
+        require(registration.getContactId().equals(contact.getId()));
+        // generate the QR Code
+        String account = Util.urlEncode(contact.getName(), Util.UTF8);
+        String issuer  = Util.urlEncode(site.getSummary(), Util.UTF8);
+        String secret  = registration.getHOTPSecret().toString();
+        String otpQRData = "otpauth://hotp/" + account + "?secret=" + secret + "&issuer=" + issuer + "&algorithm=SHA1&digits=6&counter=0";
+        // generate the QR code
+        OutputStream stream = response().ok().contentType("image/png").getOutput();
+        QRCode.from(otpQRData).withCharset("UTF-8").withSize(350, 350).to(ImageType.PNG).writeTo(stream);
     }
     
     @Any("/more-backup-codes")

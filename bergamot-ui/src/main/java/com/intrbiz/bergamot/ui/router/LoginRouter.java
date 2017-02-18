@@ -132,7 +132,7 @@ public class LoginRouter extends Router<BergamotApp>
         else
         {
             // trigger the two factor authentication
-            U2FAuthenticationChallenge u2fChallenge = (U2FAuthenticationChallenge) authResp.getChallenges().get(AuthenticationMethod.NAMES.U2F);
+            U2FAuthenticationChallenge u2fChallenge = (U2FAuthenticationChallenge) authResp.getChallenges().get(AuthenticationMethod.U2F);
             if (u2fChallenge != null)
             {
                 // encode the U2F login view
@@ -230,7 +230,7 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireValidAccessTokenForURL()
     public void finishU2FAuthenticationError(@Param("redirect") String redirect) throws Exception
     {
-        U2FAuthenticationChallenge u2fChallenge = (U2FAuthenticationChallenge) authenticationState().challenges().get(AuthenticationMethod.NAMES.U2F);
+        U2FAuthenticationChallenge u2fChallenge = (U2FAuthenticationChallenge) authenticationState().challenges().get(AuthenticationMethod.U2F);
         // encode the U2F login view
         var("failed", true);
         var("redirect", redirect);

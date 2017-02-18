@@ -2,6 +2,10 @@ package com.intrbiz.bergamot.ui;
 
 import java.util.UUID;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
@@ -92,7 +96,6 @@ import com.intrbiz.configuration.Configurable;
 import com.intrbiz.crypto.SecretKey;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
-import com.intrbiz.gerald.Gerald;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.rabbit.RabbitPool;
@@ -127,6 +130,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     private final UUID id = UUID.randomUUID();
     
+    private boolean loggingConfigured = false;
+    
     public BergamotApp()
     {
         super();
@@ -147,6 +152,34 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     public UICfg getConfiguration()
     {
         return this.config;
+    }
+    
+    /**
+     * Override the default configuration method
+     */
+    protected void configureLogging()
+    {
+        if (! this.loggingConfigured)
+        {
+            // TODO
+            // configure logging to terminal
+            BasicConfigurator.configure();
+            Logger.getRootLogger().setLevel(Level.toLevel(this.config.getLogging().getLevel().toUpperCase()));
+            // only run logging config once
+            this.loggingConfigured = true;
+        }
+    }
+    
+    protected int getListenerPort(String listenerType, int defaultPort)
+    {
+        if ("scgi".equalsIgnoreCase(listenerType)) return this.config.getListen().getScgiPort();
+        return Integer.getInteger("balsa." + listenerType + ".port", defaultPort);
+    }
+    
+    protected int getListenerThreadCount(String listenerType, int defaultThreadCount)
+    {
+        if ("scgi".equalsIgnoreCase(listenerType)) return this.config.getListen().getScgiWorkers();
+        return Integer.getInteger("balsa." + listenerType + ".workers", Integer.getInteger("balsa.workers", defaultThreadCount));
     }
 
     @Override
@@ -180,7 +213,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         // resources across the cluster
         this.clusterManager = new ClusterManager();
         // websocket update server
-        this.updateServer = new UpdateServer(Integer.getInteger("bergamot.websocket.port", 8081));
+        this.updateServer = new UpdateServer(this.config.getListen().getWebsocketPort());
     }
 
     @Override
@@ -313,7 +346,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         // start the update websocket server
         this.updateServer.start();
         // Start Gerald
-        Gerald.theMole().start();
+        // Gerald.theMole().start();
+        System.out.println("Application startup finished");
     }
     
     public ClusterManager getClusterManager()
@@ -334,6 +368,11 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             UICfg config = UICfg.loadConfiguration();
             System.out.println("Using configuration: ");
             System.out.println(config.toString());
+            // create the application
+            BergamotApp bergamotApp = new BergamotApp();
+            bergamotApp.configure(config);
+            // Setup logging ASAP
+            bergamotApp.configureLogging();
             // compile database
             System.out.println("Compiling DB");
             BergamotDB.load();
@@ -350,8 +389,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());
             // start the app
             System.out.println("Starting Bergamot UI");
-            BergamotApp bergamotApp = new BergamotApp();
-            bergamotApp.configure(config);
             bergamotApp.start();
         }
         catch (Exception e)

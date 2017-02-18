@@ -5,6 +5,9 @@
 
 	<div class="row">
 		<div class="col12">
+			<h4>Scan the QR code below to setup Google Authenticator</h4>
+	    	<img src="#{path('/profile/hotp-qr-code?id=' + hotp.id)}" style="margin-top: 15px;"/>
+	    	<h4>Alternatively configure Google Authenticator manually</h4>
 			<ul style="list-style: inside none disc;">
 				<li>Install the Google Authenticator app from the Play store</li>
 				<li>Goto Setup Account</li>
