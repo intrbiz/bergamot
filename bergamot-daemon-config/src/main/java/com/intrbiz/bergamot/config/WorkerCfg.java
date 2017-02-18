@@ -28,6 +28,8 @@ public abstract class WorkerCfg extends Configuration
     private String workerPool;
 
     private List<EngineCfg> engines = new LinkedList<EngineCfg>();
+    
+    private LoggingCfg logging;
 
     public WorkerCfg()
     {
@@ -99,6 +101,17 @@ public abstract class WorkerCfg extends Configuration
     {
         this.broker = broker;
     }
+    
+    @XmlElementRef(type = LoggingCfg.class)
+    public LoggingCfg getLogging()
+    {
+        return logging;
+    }
+
+    public void setLogging(LoggingCfg logging)
+    {
+        this.logging = logging;
+    }
 
     @Override
     public void applyDefaults()
@@ -118,6 +131,11 @@ public abstract class WorkerCfg extends Configuration
         for (EngineCfg engine : this.engines)
         {
             engine.applyDefaults();
+        }
+        // logging defaults
+        if (this.logging == null)
+        {
+            this.logging = new LoggingCfg();
         }
     }
     

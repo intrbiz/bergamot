@@ -24,6 +24,8 @@ public abstract class NotifierCfg extends Configuration
     private UUID site = null;
     
     private int sleepTime = 6;
+    
+    private LoggingCfg logging;
 
     public NotifierCfg()
     {
@@ -93,6 +95,17 @@ public abstract class NotifierCfg extends Configuration
     {
         this.sleepTime = sleepTime;
     }
+    
+    @XmlElementRef(type = LoggingCfg.class)
+    public LoggingCfg getLogging()
+    {
+        return logging;
+    }
+
+    public void setLogging(LoggingCfg logging)
+    {
+        this.logging = logging;
+    }
 
     @Override
     public void applyDefaults()
@@ -106,6 +119,11 @@ public abstract class NotifierCfg extends Configuration
         if (this.getThreads() <= 0)
         {
             this.setThreads(Runtime.getRuntime().availableProcessors());
+        }
+        // logging defaults
+        if (this.logging == null)
+        {
+            this.logging = new LoggingCfg();
         }
     }
 }

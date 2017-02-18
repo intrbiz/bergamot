@@ -26,6 +26,10 @@ public class UICfg extends Configuration
     private DatabaseCfg database;
 
     private String securityKey;
+    
+    private UIListenCfg listen;
+    
+    private LoggingCfg logging;
 
     public UICfg()
     {
@@ -65,6 +69,28 @@ public class UICfg extends Configuration
         this.securityKey = securityKey;
     }
 
+    @XmlElementRef(type = UIListenCfg.class)
+    public UIListenCfg getListen()
+    {
+        return listen;
+    }
+
+    public void setListen(UIListenCfg listen)
+    {
+        this.listen = listen;
+    }
+
+    @XmlElementRef(type = LoggingCfg.class)
+    public LoggingCfg getLogging()
+    {
+        return logging;
+    }
+
+    public void setLogging(LoggingCfg logging)
+    {
+        this.logging = logging;
+    }
+
     @Override
     public void applyDefaults()
     {
@@ -82,6 +108,16 @@ public class UICfg extends Configuration
         if (Util.isEmpty(securityKey))
         {
             this.securityKey = SecretKey.generate().toString();
+        }
+        // listen defaults
+        if (this.listen == null)
+        {
+            this.listen = new UIListenCfg();
+        }
+        // logging defaults
+        if (this.logging == null)
+        {
+            this.logging = new LoggingCfg();
         }
     }
 
