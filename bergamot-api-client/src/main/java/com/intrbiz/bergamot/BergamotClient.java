@@ -1,13 +1,8 @@
 package com.intrbiz.bergamot;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import org.apache.http.client.fluent.Response;
-
-import com.intrbiz.bergamot.credentials.ClientCredentials;
+import com.intrbiz.bergamot.credentials.*;
+import com.intrbiz.bergamot.*;
+import com.intrbiz.bergamot.model.message.*;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.CheckMO;
@@ -27,6 +22,15 @@ import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
+import java.io.IOException;
+import java.lang.Boolean;
+import java.lang.Integer;
+import java.lang.Long;
+import java.lang.String;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import org.apache.http.client.fluent.*;
 
 public class BergamotClient extends BaseBergamotClient
 {
@@ -218,6 +222,112 @@ public class BergamotClient extends BaseBergamotClient
 
 
 
+    public static class GetCurrentAlertForCheckCall extends BergamotAPICall<AlertMO>
+    {
+
+        private UUID id;
+
+        public GetCurrentAlertForCheckCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public GetCurrentAlertForCheckCall id(UUID id)
+        {
+            this.id = id;
+            return this;
+        }
+
+        public AlertMO execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/alert/current/for-check/id/" + this.id + ""))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), AlertMO.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public GetCurrentAlertForCheckCall callGetCurrentAlertForCheck()
+    {
+        return new GetCurrentAlertForCheckCall(this);
+    }
+
+
+
+    public static class AcknowledgeAlertCall extends BergamotAPICall<AlertMO>
+    {
+
+        private UUID id;
+
+        private String summary;
+
+        private String comment;
+
+        public AcknowledgeAlertCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public AcknowledgeAlertCall id(UUID id)
+        {
+            this.id = id;
+            return this;
+        }
+
+        public AcknowledgeAlertCall summary(String summary)
+        {
+            this.summary = summary;
+            return this;
+        }
+
+        public AcknowledgeAlertCall comment(String comment)
+        {
+            this.comment = comment;
+            return this;
+        }
+
+        public AlertMO execute()
+        {
+            try
+            {
+                Response response = execute(
+                    post(url("/api/alert/id/" + this.id + "/acknowledge"))
+                    .addHeader(authHeader())
+                    .bodyForm(
+                        param("summary", this.summary),
+                        param("comment", this.comment)
+                    )
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), AlertMO.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public AcknowledgeAlertCall callAcknowledgeAlert()
+    {
+        return new AcknowledgeAlertCall(this);
+    }
+
+
+
     public static class GetAlertsCall extends BergamotAPICall<List<AlertMO>>
     {
 
@@ -335,112 +445,6 @@ public class BergamotClient extends BaseBergamotClient
     public GetAlertsForCheckCall callGetAlertsForCheck()
     {
         return new GetAlertsForCheckCall(this);
-    }
-
-
-
-    public static class GetCurrentAlertForCheckCall extends BergamotAPICall<AlertMO>
-    {
-
-        private UUID id;
-
-        public GetCurrentAlertForCheckCall(BaseBergamotClient client)
-        {
-            super(client);
-        }
-
-
-        public GetCurrentAlertForCheckCall id(UUID id)
-        {
-            this.id = id;
-            return this;
-        }
-
-        public AlertMO execute()
-        {
-            try
-            {
-                Response response = execute(
-                    get(url("/api/alert/current/for-check/id/" + this.id + ""))
-                    .addHeader(authHeader())
-                );
-                return transcoder().decodeFromString(response.returnContent().asString(), AlertMO.class);
-            }
-            catch (IOException e)
-            {
-                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
-            }
-        }
-
-    }
-
-
-    public GetCurrentAlertForCheckCall callGetCurrentAlertForCheck()
-    {
-        return new GetCurrentAlertForCheckCall(this);
-    }
-
-
-
-    public static class AcknowledgeAlertCall extends BergamotAPICall<AlertMO>
-    {
-
-        private UUID id;
-
-        private String summary;
-
-        private String comment;
-
-        public AcknowledgeAlertCall(BaseBergamotClient client)
-        {
-            super(client);
-        }
-
-
-        public AcknowledgeAlertCall id(UUID id)
-        {
-            this.id = id;
-            return this;
-        }
-
-        public AcknowledgeAlertCall summary(String summary)
-        {
-            this.summary = summary;
-            return this;
-        }
-
-        public AcknowledgeAlertCall comment(String comment)
-        {
-            this.comment = comment;
-            return this;
-        }
-
-        public AlertMO execute()
-        {
-            try
-            {
-                Response response = execute(
-                    post(url("/api/alert/id/" + this.id + "/acknowledge"))
-                    .addHeader(authHeader())
-                    .bodyForm(
-                        param("summary", this.summary),
-                        param("comment", this.comment)
-                    )
-                );
-                return transcoder().decodeFromString(response.returnContent().asString(), AlertMO.class);
-            }
-            catch (IOException e)
-            {
-                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
-            }
-        }
-
-    }
-
-
-    public AcknowledgeAlertCall callAcknowledgeAlert()
-    {
-        return new AcknowledgeAlertCall(this);
     }
 
 
@@ -1625,6 +1629,49 @@ public class BergamotClient extends BaseBergamotClient
 
 
 
+    public static class GetGroupCall extends BergamotAPICall<GroupMO>
+    {
+
+        private UUID id;
+
+        public GetGroupCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public GetGroupCall id(UUID id)
+        {
+            this.id = id;
+            return this;
+        }
+
+        public GroupMO execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/group/id/" + this.id + ""))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), GroupMO.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public GetGroupCall callGetGroup()
+    {
+        return new GetGroupCall(this);
+    }
+
+
+
     public static class ExecuteChecksInGroupCall extends BergamotAPICall<String>
     {
 
@@ -1781,32 +1828,32 @@ public class BergamotClient extends BaseBergamotClient
 
 
 
-    public static class GetGroupCall extends BergamotAPICall<GroupMO>
+    public static class GetGroupChildrenCall extends BergamotAPICall<List<GroupMO>>
     {
 
         private UUID id;
 
-        public GetGroupCall(BaseBergamotClient client)
+        public GetGroupChildrenCall(BaseBergamotClient client)
         {
             super(client);
         }
 
 
-        public GetGroupCall id(UUID id)
+        public GetGroupChildrenCall id(UUID id)
         {
             this.id = id;
             return this;
         }
 
-        public GroupMO execute()
+        public List<GroupMO> execute()
         {
             try
             {
                 Response response = execute(
-                    get(url("/api/group/id/" + this.id + ""))
+                    get(url("/api/group/id/" + this.id + "/children"))
                     .addHeader(authHeader())
                 );
-                return transcoder().decodeFromString(response.returnContent().asString(), GroupMO.class);
+                return transcoder().decodeListFromString(response.returnContent().asString(), GroupMO.class);
             }
             catch (IOException e)
             {
@@ -1817,9 +1864,52 @@ public class BergamotClient extends BaseBergamotClient
     }
 
 
-    public GetGroupCall callGetGroup()
+    public GetGroupChildrenCall callGetGroupChildren()
     {
-        return new GetGroupCall(this);
+        return new GetGroupChildrenCall(this);
+    }
+
+
+
+    public static class GetGroupChecksCall extends BergamotAPICall<List<CheckMO>>
+    {
+
+        private UUID id;
+
+        public GetGroupChecksCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public GetGroupChecksCall id(UUID id)
+        {
+            this.id = id;
+            return this;
+        }
+
+        public List<CheckMO> execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/group/id/" + this.id + "/checks"))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeListFromString(response.returnContent().asString(), CheckMO.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public GetGroupChecksCall callGetGroupChecks()
+    {
+        return new GetGroupChecksCall(this);
     }
 
 
@@ -1906,92 +1996,6 @@ public class BergamotClient extends BaseBergamotClient
     public GetGroupChecksByNameCall callGetGroupChecksByName()
     {
         return new GetGroupChecksByNameCall(this);
-    }
-
-
-
-    public static class GetGroupChildrenCall extends BergamotAPICall<List<GroupMO>>
-    {
-
-        private UUID id;
-
-        public GetGroupChildrenCall(BaseBergamotClient client)
-        {
-            super(client);
-        }
-
-
-        public GetGroupChildrenCall id(UUID id)
-        {
-            this.id = id;
-            return this;
-        }
-
-        public List<GroupMO> execute()
-        {
-            try
-            {
-                Response response = execute(
-                    get(url("/api/group/id/" + this.id + "/children"))
-                    .addHeader(authHeader())
-                );
-                return transcoder().decodeListFromString(response.returnContent().asString(), GroupMO.class);
-            }
-            catch (IOException e)
-            {
-                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
-            }
-        }
-
-    }
-
-
-    public GetGroupChildrenCall callGetGroupChildren()
-    {
-        return new GetGroupChildrenCall(this);
-    }
-
-
-
-    public static class GetGroupChecksCall extends BergamotAPICall<List<CheckMO>>
-    {
-
-        private UUID id;
-
-        public GetGroupChecksCall(BaseBergamotClient client)
-        {
-            super(client);
-        }
-
-
-        public GetGroupChecksCall id(UUID id)
-        {
-            this.id = id;
-            return this;
-        }
-
-        public List<CheckMO> execute()
-        {
-            try
-            {
-                Response response = execute(
-                    get(url("/api/group/id/" + this.id + "/checks"))
-                    .addHeader(authHeader())
-                );
-                return transcoder().decodeListFromString(response.returnContent().asString(), CheckMO.class);
-            }
-            catch (IOException e)
-            {
-                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
-            }
-        }
-
-    }
-
-
-    public GetGroupChecksCall callGetGroupChecks()
-    {
-        return new GetGroupChecksCall(this);
     }
 
 
@@ -3639,6 +3643,41 @@ public class BergamotClient extends BaseBergamotClient
 
 
 
+    public static class GetCommandsCall extends BergamotAPICall<List<CommandMO>>
+    {
+
+        public GetCommandsCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public List<CommandMO> execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/command/"))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeListFromString(response.returnContent().asString(), CommandMO.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public GetCommandsCall callGetCommands()
+    {
+        return new GetCommandsCall(this);
+    }
+
+
+
     public static class GetCommandByNameCall extends BergamotAPICall<CommandMO>
     {
 
@@ -3678,41 +3717,6 @@ public class BergamotClient extends BaseBergamotClient
     public GetCommandByNameCall callGetCommandByName()
     {
         return new GetCommandByNameCall(this);
-    }
-
-
-
-    public static class GetCommandsCall extends BergamotAPICall<List<CommandMO>>
-    {
-
-        public GetCommandsCall(BaseBergamotClient client)
-        {
-            super(client);
-        }
-
-
-        public List<CommandMO> execute()
-        {
-            try
-            {
-                Response response = execute(
-                    get(url("/api/command/"))
-                    .addHeader(authHeader())
-                );
-                return transcoder().decodeListFromString(response.returnContent().asString(), CommandMO.class);
-            }
-            catch (IOException e)
-            {
-                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
-            }
-        }
-
-    }
-
-
-    public GetCommandsCall callGetCommands()
-    {
-        return new GetCommandsCall(this);
     }
 
 
@@ -4619,6 +4623,49 @@ public class BergamotClient extends BaseBergamotClient
 
 
 
+    public static class GetDowntimeCall extends BergamotAPICall<DowntimeMO>
+    {
+
+        private UUID id;
+
+        public GetDowntimeCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public GetDowntimeCall id(UUID id)
+        {
+            this.id = id;
+            return this;
+        }
+
+        public DowntimeMO execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/downtime/id/" + this.id + ""))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), DowntimeMO.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public GetDowntimeCall callGetDowntime()
+    {
+        return new GetDowntimeCall(this);
+    }
+
+
+
     public static class RemoveDowntimeCall extends BergamotAPICall<Boolean>
     {
 
@@ -4722,49 +4769,6 @@ public class BergamotClient extends BaseBergamotClient
     public GetDowntimeForObjectCall callGetDowntimeForObject()
     {
         return new GetDowntimeForObjectCall(this);
-    }
-
-
-
-    public static class GetDowntimeCall extends BergamotAPICall<DowntimeMO>
-    {
-
-        private UUID id;
-
-        public GetDowntimeCall(BaseBergamotClient client)
-        {
-            super(client);
-        }
-
-
-        public GetDowntimeCall id(UUID id)
-        {
-            this.id = id;
-            return this;
-        }
-
-        public DowntimeMO execute()
-        {
-            try
-            {
-                Response response = execute(
-                    get(url("/api/downtime/id/" + this.id + ""))
-                    .addHeader(authHeader())
-                );
-                return transcoder().decodeFromString(response.returnContent().asString(), DowntimeMO.class);
-            }
-            catch (IOException e)
-            {
-                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
-            }
-        }
-
-    }
-
-
-    public GetDowntimeCall callGetDowntime()
-    {
-        return new GetDowntimeCall(this);
     }
 
 
@@ -5005,6 +5009,76 @@ public class BergamotClient extends BaseBergamotClient
 
 
 
+    public static class VersionNumberCall extends BergamotAPICall<String>
+    {
+
+        public VersionNumberCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public String execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/util/version/number"))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), String.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public VersionNumberCall callVersionNumber()
+    {
+        return new VersionNumberCall(this);
+    }
+
+
+
+    public static class VersionCodeNameCall extends BergamotAPICall<String>
+    {
+
+        public VersionCodeNameCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public String execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/util/version/codename"))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), String.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public VersionCodeNameCall callVersionCodeName()
+    {
+        return new VersionCodeNameCall(this);
+    }
+
+
+
     public static class NewIdCall extends BergamotAPICall<UUID>
     {
 
@@ -5079,6 +5153,41 @@ public class BergamotClient extends BaseBergamotClient
     public NewIdsCall callNewIds()
     {
         return new NewIdsCall(this);
+    }
+
+
+
+    public static class VersionCall extends BergamotAPICall<String>
+    {
+
+        public VersionCall(BaseBergamotClient client)
+        {
+            super(client);
+        }
+
+
+        public String execute()
+        {
+            try
+            {
+                Response response = execute(
+                    get(url("/api/util/version"))
+                    .addHeader(authHeader())
+                );
+                return transcoder().decodeFromString(response.returnContent().asString(), String.class);
+            }
+            catch (IOException e)
+            {
+                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
+            }
+        }
+
+    }
+
+
+    public VersionCall callVersion()
+    {
+        return new VersionCall(this);
     }
 
 
