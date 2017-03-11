@@ -79,7 +79,7 @@
 			    if (#{Balsa().param('debug_js') != null}) bergamot_console_log.attachTo(document);
 			
 			    bergamot_ui_web_notify.attachTo(document, {
-			    	site_id: #{'"' + site.id + '"'}
+			    	site_id: #{'"' + balsa().currentPrincipal().site.id + '"'}
 			    });
 			    
 			    bergamot_api_driver.attachTo(document, {

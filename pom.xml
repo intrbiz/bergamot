@@ -4,7 +4,7 @@
 
 	<groupId>com.intrbiz.bergamot</groupId>
 	<artifactId>bergamot</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>bergamot</name>
