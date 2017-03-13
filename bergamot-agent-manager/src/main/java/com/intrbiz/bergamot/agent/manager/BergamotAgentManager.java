@@ -176,7 +176,7 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.INFO);
         // load the config
-        File configFile = new File(System.getProperty("bergamot.config", "/etc/bergamot/agent-manager.xml"));
+        File configFile = new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("bergamot_config"), System.getenv("BERGAMOT_CONFIG"), "/etc/bergamot/agent-manager.xml"));
         Logger.getLogger(BergamotAgentManager.class).info("Reading configuration file " + configFile.getAbsolutePath());
         BergamotAgentManagerCfg config = Configuration.read(BergamotAgentManagerCfg.class, new FileInputStream(configFile));
         config.applyDefaults();
