@@ -125,6 +125,14 @@ public class UICfg extends Configuration
     {
         return Configuration.read(UICfg.class, new FileInputStream(file));
     }
+    
+    /**
+     * Search for the configuration file
+     */
+    public static File getConfigurationFile()
+    {
+        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("bergamot_config"), System.getenv("BERGAMOT_CONFIG"), "/etc/bergamot/ui/default.xml"));
+    }
 
     /**
      * Load the UI configuration, either from the default config file, the specified config file or the default config.
@@ -133,7 +141,7 @@ public class UICfg extends Configuration
     {
         UICfg config = null;
         // try the config file?
-        File configFile = new File(System.getProperty("bergamot.config", "/etc/bergamot/ui/default.xml"));
+        File configFile = getConfigurationFile();
         if (configFile.exists())
         {
             config = Configuration.read(UICfg.class, new FileInputStream(configFile));
@@ -151,7 +159,7 @@ public class UICfg extends Configuration
      */
     public void saveConfiguration() throws Exception
     {
-        File configFile = new File(System.getProperty("bergamot.config", "/etc/bergamot/ui/default.xml"));
+        File configFile = getConfigurationFile();
         Configuration.write(UICfg.class, this, new FileOutputStream(configFile));
     }
 }

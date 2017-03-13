@@ -8,6 +8,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.DefaultWatcherCfg;
 import com.intrbiz.bergamot.config.WatcherCfg;
 import com.intrbiz.configuration.Configuration;
@@ -49,11 +50,19 @@ public class DefaultWatcher extends AbstractWatcher
         }
     }
     
+    /**
+     * Search for the configuration file
+     */
+    protected File getConfigurationFile()
+    {
+        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("bergamot_config"), System.getenv("BERGAMOT_CONFIG"), this.defaultConfigFile));
+    }
+    
     protected WatcherCfg loadConfiguration() throws Exception
     {
         WatcherCfg config = null;
         // try the config file?
-        File configFile = new File(System.getProperty("bergamot.config", this.defaultConfigFile));
+        File configFile = this.getConfigurationFile();
         if (configFile.exists())
         {
             Logger.getLogger(Watcher.class).info("Reading configuration file " + configFile.getAbsolutePath());

@@ -8,6 +8,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import com.intrbiz.Util;
 import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
@@ -56,11 +57,19 @@ public class DefaultWorker extends AbstractWorker
         }
     }
     
+    /**
+     * Search for the configuration file
+     */
+    protected File getConfigurationFile()
+    {
+        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("bergamot_config"), System.getenv("BERGAMOT_CONFIG"), this.defaultConfigFile));
+    }
+    
     protected WorkerCfg loadConfiguration() throws Exception
     {
         WorkerCfg config = null;
         // try the config file?
-        File configFile = new File(System.getProperty("bergamot.config", this.defaultConfigFile));
+        File configFile = this.getConfigurationFile();
         if (configFile.exists())
         {
             Logger.getLogger(Worker.class).info("Reading configuration file " + configFile.getAbsolutePath());
