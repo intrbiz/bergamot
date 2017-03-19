@@ -24,6 +24,7 @@ import com.intrbiz.bergamot.accounting.model.LoginAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.bergamot.ui.security.password.check.BadPassword;
@@ -68,6 +69,17 @@ public class LoginRouter extends Router<BergamotApp>
             // complete the login
             this.completeLogin(authResp, redirect);
             return;
+        }
+        // should we redirect to the first install
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            GlobalSetting firstInstall = db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL);
+            if (firstInstall == null)
+            {
+                // redirect to the first install helper
+                redirect("/global/install/");
+                return;
+            }
         }
         // show the login page
         var("redirect", redirect);

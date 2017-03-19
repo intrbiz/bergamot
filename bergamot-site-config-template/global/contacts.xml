@@ -21,6 +21,7 @@
         <summary>Linux Checks</summary>
     </security-domain>
     
+    <!--
     <contact name="admin" extends="generic_contact" teams="bergamot-admins">
         <summary>Administrator</summary>
         <email>admin@localhost</email>
@@ -30,6 +31,7 @@
         <summary>Operator</summary>
         <email>op@localhost</email>
     </contact>
+    -->
     
     <team name="admins"  grants="ui.*, api.*">
         <access-control security-domain="global" grants="*"/>

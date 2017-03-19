@@ -1,0 +1,23 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa" title="Hello there, lets get up and running!">
+	<div id="login-box">
+        <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Hello there, lets get up and running!</h4>
+		<p class="centre">
+		  Ok we're ready to create the site #{install.siteSummary} (https://#{install.siteName}/).
+		</p>
+		<p class="centre">
+		  Once the site is created to can login with the username: #{install.username} and the password you chose.
+		</p>
+		<hr/>
+		<p class="centre">
+		  It might take a few minutes to create #{intall.siteSummary}, please be paitent.
+		</p>
+		<form method="post" action="#{path('/global/install/go')}">
+			<p>
+				<input type="submit" id="go" name="go" value="Setup Bergamot Monitoring"/>
+			</p>
+		</form>
+	</div>
+</fragment>

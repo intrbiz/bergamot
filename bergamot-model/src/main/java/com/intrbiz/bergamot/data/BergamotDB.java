@@ -25,7 +25,6 @@ import com.intrbiz.bergamot.model.AgentTemplate;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
-import com.intrbiz.bergamot.model.ContactBackupCode;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Cluster;
@@ -36,10 +35,13 @@ import com.intrbiz.bergamot.model.ComputedPermissionForDomain;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.ContactBackupCode;
+import com.intrbiz.bergamot.model.ContactHOTPRegistration;
+import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.Escalation;
+import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Group;
-import com.intrbiz.bergamot.model.ContactHOTPRegistration;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationEngine;
@@ -52,7 +54,6 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
-import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
@@ -86,7 +87,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 43, 0}),
+        version = @SQLVersion({3, 44, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -126,7 +127,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ContactU2FDeviceRegistration.class,
             ContactHOTPRegistration.class,
             ContactBackupCode.class,
-            AgentTemplate.class
+            AgentTemplate.class,
+            GlobalSetting.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -204,6 +206,23 @@ public abstract class BergamotDB extends DatabaseAdapter
         this.getAdapterCache().removePrefix("get_site_by_name");
         this.getAdapterCache().removePrefix("get_site");
     }
+    
+    // global settings
+    
+    @Cacheable
+    @SQLSetter(table = GlobalSetting.class, name = "set_global_setting", since = @SQLVersion({3, 44, 0}))
+    public abstract void setGlobalSetting(GlobalSetting setting);
+    
+    @Cacheable
+    @SQLGetter(table = GlobalSetting.class, name = "get_global_setting", since = @SQLVersion({3, 44, 0}))
+    public abstract GlobalSetting getGlobalSetting(@SQLParam("name") String name);
+    
+    @Cacheable
+    @SQLRemove(table = GlobalSetting.class, name = "remove_global_setting", since = @SQLVersion({3, 44, 0}))
+    public abstract void removeGlobalSetting(@SQLParam("name") String name);
+    
+    @SQLGetter(table = GlobalSetting.class, name = "list_global_settings", since = @SQLVersion({3, 44, 0}))
+    public abstract List<GlobalSetting> listGlobalSettings();
 
     // site
     

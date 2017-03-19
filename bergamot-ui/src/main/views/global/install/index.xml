@@ -1,0 +1,22 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa" title="Hello there, lets get up and running!">
+	<div id="login-box">
+        <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Hello there, lets get up and running!</h4>
+		<p class="centre">Thank you for installing Bergamot Monitoring, just answer a few simple questions and we'll be up and running in no time at all.</p>
+		<hr/>
+		<p class="centre">Bergamot Monitoring can run multiple sites at the same, but first off what is your primary site?</p>
+		<form method="post" action="#{path('/global/install/user')}">
+			<p>
+				<input type="text" id="name" name="name" placeholder="Site full DNS name" title="Enter the fully qualify domain name for this site" value="#{install.siteName}"/>
+			</p>
+			<p>
+				<input type="text" id="summary" name="summary" placeholder="Site summary" title="Enter the pretty name for this site" value="#{install.siteSummary}"/>
+			</p>
+			<p>
+				<input type="submit" id="next" name="next" value="Next"/>
+			</p>
+		</form>
+	</div>
+</fragment>

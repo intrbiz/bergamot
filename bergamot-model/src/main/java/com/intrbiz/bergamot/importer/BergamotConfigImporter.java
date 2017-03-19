@@ -123,10 +123,26 @@ public class BergamotConfigImporter
     
     private Timer importTimer = Witchcraft.get().source("com.intrbiz.config.bergamot").getRegistry().timer(Witchcraft.name(BergamotConfigImporter.class, "import_time"));
     
+    private String defaultPassword = "bergamot";
+    
+    private boolean requirePasswordChange = true;
+    
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
         if (! validated.getReport().isValid()) throw new RuntimeException("Cannot import invalid configuration");
         this.config = validated.getConfig();
+    }
+    
+    public BergamotConfigImporter defaultPassword(String password)
+    {
+        this.defaultPassword = password;
+        return this;
+    }
+    
+    public BergamotConfigImporter requirePasswordChange(boolean change)
+    {
+        this.requirePasswordChange = change;
+        return this;
     }
     
     public BergamotConfigImporter resetState(boolean resetState)
@@ -144,6 +160,18 @@ public class BergamotConfigImporter
     public BergamotConfigImporter online(boolean online)
     {
         this.online = online;
+        return this;
+    }
+    
+    public BergamotConfigImporter online()
+    {
+        this.online = true;
+        return this;
+    }
+    
+    public BergamotConfigImporter offline()
+    {
+        this.online = false;
         return this;
     }
     
@@ -1000,12 +1028,12 @@ public class BergamotConfigImporter
             else
             {
                 /*
-                 * We are in offline mode, ie: running an import from the CLI, 
+                 * We are in offline mode, ie: running an import from the CLI / first install, 
                  * so simply set a default password of 'bergamot' for any users,
                  * created.
                  */
-                contact.hashPassword("bergamot");
-                contact.setForcePasswordChange(true);
+                contact.hashPassword(this.defaultPassword);
+                contact.setForcePasswordChange(this.requirePasswordChange);
                 this.report.info("Setting default password for user " + resolvedConfiguration.getName() + " (" + resolvedConfiguration.getEmail() + ") to 'bergamot', please login and change it!");
             }
             this.report.info("Configuring new contact: " + resolvedConfiguration.getName() + " (" + resolvedConfiguration.getEmail() + ")");

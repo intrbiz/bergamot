@@ -1,0 +1,43 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa" title="Hello there, lets get up and running!">
+	<div id="login-box">
+        <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Hello there, lets get up and running!</h4>
+		<p class="centre">
+		  Great, we're almost ready to create #{install.getSiteSummary()} (https://#{install.siteName}/), but first we need to 
+		  create your global administrator.
+		</p>
+		<hr/>
+		<p class="centre">
+		  By default the first user of the first site you create will be enabled as a golbal administrator, this allows 
+		  your user to create sites, configure workers and notifiers, delete sites and lots of other super important things.
+		</p>
+		<form method="post" action="#{path('/global/install/confirm')}">
+		 	<p>
+				<input type="text" id="first_name" name="first_name" placeholder="Your first name" title="Enter your first name" value="#{install.userFirstName}"/>
+			</p>
+			<p>
+				<input type="text" id="last_name" name="last_name" placeholder="Your last name" title="Enter your last name" value="#{install.userLastName}"/>
+			</p>
+			<p>
+				<input type="text" id="email" name="email" placeholder="Your email address" title="Enter your email address" value="#{install.userEmail}"/>
+			</p>
+			<p>
+				<input type="text" id="mobile" name="mobile" placeholder="Your mobile numer" title="Enter your mobile phone number" value="#{install.userMobile}"/>
+			</p>
+			<p>
+				<input type="text" id="username" name="username" placeholder="Choose your username" title="Enter your username" value="#{install.username}"/>
+			</p>
+			<p>
+				<input type="password" id="password" name="password" placeholder="Choose your password" value="#{install.password}"/>
+			</p>
+			<p>
+				<input type="password" id="password_confirm" name="password_confirm" placeholder="Confirm your password" value="#{install.confirmPassword}"/>
+			</p>
+			<p>
+				<input type="submit" id="next" name="next" value="Next"/>
+			</p>
+		</form>
+	</div>
+</fragment>

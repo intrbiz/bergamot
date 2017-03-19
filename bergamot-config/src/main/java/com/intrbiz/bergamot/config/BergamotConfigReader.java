@@ -22,6 +22,8 @@ public class BergamotConfigReader
     
     private Stack<File> toParse = new Stack<File>();
     
+    private String overrideSiteName;
+    
     public BergamotConfigReader()
     {
         super();
@@ -46,6 +48,21 @@ public class BergamotConfigReader
                 }
             }
         }
+        return this;
+    }
+    
+    public BergamotConfigReader inject(BergamotCfg configuration)
+    {
+        if (this.overrideSiteName != null)
+            configuration.setSite(this.overrideSiteName);
+        // merge the config
+        this.merge(configuration);
+        return this;
+    }
+    
+    public BergamotConfigReader overrideSiteName(String siteName)
+    {
+        this.overrideSiteName = siteName;
         return this;
     }
     
@@ -77,6 +94,9 @@ public class BergamotConfigReader
                         object.setLoadedFrom(file);
                     }
                 }
+                // forcefully override site name
+                if (this.overrideSiteName != null)
+                    cfg.setSite(this.overrideSiteName);
                 // merge together
                 this.merge(cfg);
             }

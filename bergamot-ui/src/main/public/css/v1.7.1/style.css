@@ -499,6 +499,10 @@ span.indent {
     border: 4px solid #00BF00;
 }
 
+#login-box.wide {
+	width: 960px;
+}
+
 #login-box form {
 	margin: 10px 0;
 }

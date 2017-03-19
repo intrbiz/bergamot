@@ -1,16 +1,16 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Global Configuration">
+<fragment xmlns="com.intrbiz.balsa" title="Site Configuration">
     
     <div class="row">
-    	<h3>Global Parameters</h3>
+    	<h3>Site Parameters</h3>
     	<p class="text-body">
-    		Global site configuration parameters, which can be 
+    		Site configuration parameters, which can be 
     		used in command definitions.
     	</p>
     	<p>
-    		<a href="/admin/configchange/add/site-parameters" class="pull-right">Change global parameters</a>
+    		<a href="/admin/configchange/add/site-parameters" class="pull-right">Change site parameters</a>
     	</p>
        	<div class="col12">
 	    	<table style="width: 100%;">
