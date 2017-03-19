@@ -104,7 +104,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
         String siteName    = install.getSiteName();
         String siteSummary = install.getSiteSummary();
         // TODO
-        File templateConfigDir = new File(System.getProperty("bergamot.site.config.template", "/etc/bergamot/config/template"));
+        File templateConfigDir = new File(System.getProperty("bergamot.site.config.template", "cfg/template"));
         // now check that we can create the site and it's aliases
         try (BergamotDB db = BergamotDB.connect())
         {
