@@ -1,17 +1,17 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Admin - Utilities">
+<fragment xmlns="com.intrbiz.balsa" title="Global Admin - Utilities">
 	<div clas="row">
     	<p rendered="#{cacheCleared}" class="text-body">
     		All cached data objects have been successfully cleared.
     	</p>
     	<div class="col12">
     		<ul>
-    			<li><a href="/admin/utils/cache/clear">Clear Caches - clear all cached data objects</a></li>
+    			<li><a href="/global/admin/utils/cache/clear">Clear Caches - clear all cached data objects</a></li>
     		</ul>
     		<ul>
-    			<li><a href="/admin/utils/cache/view">View Cache</a></li>
+    			<li><a href="/global/admin/utils/cache/view">View Cache</a></li>
     		</ul>
     	</div>
     </div>

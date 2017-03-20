@@ -1,53 +1,55 @@
-package com.intrbiz.bergamot.ui.router.admin;
+package com.intrbiz.bergamot.ui.router.global;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.metadata.GetBergamotSite;
-import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.Cache;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
 
-@Prefix("/admin/utils")
+@Prefix("/global/admin/utils")
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-public class UtilsAdminRouter extends Router<BergamotApp>
+public class GlobalUtilsAdminRouter extends Router<BergamotApp>
 {   
-    private Logger logger = Logger.getLogger(UtilsAdminRouter.class);
+    private static final Logger logger = Logger.getLogger(GlobalUtilsAdminRouter.class);
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @GetBergamotSite() Site site)
+    public void index(BergamotDB db, @CurrentPrincipal Contact principal)
     {
-        encode("admin/utils/index");
+        require(principal.isGlobalAdmin());
+        encode("global/admin/utils/index");
     }
     
     @Any("/cache/clear")
     @WithDataAdapter(BergamotDB.class)
-    public void clearCaches(BergamotDB db, @GetBergamotSite() Site site)
+    public void clearCaches(BergamotDB db, @CurrentPrincipal Contact principal)
     {
+        require(principal.isGlobalAdmin());
         logger.warn("Flushing all data caches due to administrative request");
         db.cacheClear();
         var("cacheCleared", true);
-        encode("admin/utils/index");
+        encode("global/admin/utils/index");
     }
     
     @Any("/cache/view")
     @WithDataAdapter(BergamotDB.class)
-    public void viewCache(BergamotDB db, @GetBergamotSite() Site site)
+    public void viewCache(BergamotDB db, @CurrentPrincipal Contact principal)
     {
-        require(app().isDevEnv());
+        require(principal.isGlobalAdmin());
         Cache cache = DataManager.get().cache("cache.bergamot");
         var("cachekeys", cache.keySet(""));
-        encode("admin/utils/cache/view");
+        encode("global/admin/utils/cache/view");
     }
 }

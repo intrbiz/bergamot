@@ -497,6 +497,19 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
         return filtered;
     }
+    
+    public boolean isGlobalAdmin()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            GlobalSetting globalAdmins = db.getGlobalSetting(GlobalSetting.NAME.GLOBAL_ADMINS);
+            if (globalAdmins != null)
+            {
+                return "true".equals(globalAdmins.getParameter(this.id.toString()));
+            }
+        }
+        return false;
+    }
 
     public String toString()
     {

@@ -117,9 +117,6 @@
 	                    <a href="/admin/configchange/">Configuration Changes</a>
 	                </li>
 	                <li>
-	                    <a href="/admin/utils/">Utilities</a>
-	                </li>
-	                <li>
 	                    <a href="/command/editor/">Command Editor</a>
 	                </li>         
 	            </ul>

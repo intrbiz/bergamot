@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.ui.router.global;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -45,9 +46,29 @@ public class FirstInstallRouter extends Router<BergamotApp>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void showInstallSite(BergamotDB db)
+    public void showInstallSite(BergamotDB db) throws Exception
     {
         require(db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL) == null);
+        // do we have any existing sites?
+        List<Site> sites = db.listSites();
+        if (! sites.isEmpty())
+        {
+            // add all admins as global admins
+            GlobalSetting globalAdmins = new GlobalSetting(GlobalSetting.NAME.GLOBAL_ADMINS);
+            for (Site site : sites)
+            {
+                for (Contact contact : db.listContacts(site.getId()))
+                {
+                    if (contact.hasPermission("ui.admin"))
+                        globalAdmins.addParameter(contact.getId().toString(), "true");
+                }
+            }
+            db.setGlobalSetting(globalAdmins);
+            // mark first install as complete
+            db.setGlobalSetting(new GlobalSetting(GlobalSetting.NAME.FIRST_INSTALL, "complete"));
+            // redirect to dashboard
+            redirect(path("/"));
+        }
         // create our installation form model
         InstallBean install = createSessionModel("install", InstallBean.class);
         install.setSiteName(balsa().request().getServerName());

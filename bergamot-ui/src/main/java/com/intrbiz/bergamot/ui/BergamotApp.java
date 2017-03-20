@@ -83,14 +83,14 @@ import com.intrbiz.bergamot.ui.router.admin.LocationAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ResourceAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.SecurityDomainAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ServiceAdminRouter;
-import com.intrbiz.bergamot.ui.router.admin.SiteAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TeamAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TimePeriodAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.TrapAdminRouter;
-import com.intrbiz.bergamot.ui.router.admin.UtilsAdminRouter;
 import com.intrbiz.bergamot.ui.router.agent.AgentRouter;
 import com.intrbiz.bergamot.ui.router.command.CommandEditorRouter;
 import com.intrbiz.bergamot.ui.router.global.FirstInstallRouter;
+import com.intrbiz.bergamot.ui.router.global.GlobalAdminRouter;
+import com.intrbiz.bergamot.ui.router.global.GlobalUtilsAdminRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
 import com.intrbiz.configuration.Configurable;
@@ -282,13 +282,13 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new ResourceAdminRouter());
         router(new ConfigChangeAdminRouter());
         router(new ConfigAdminRouter());
-        router(new SiteAdminRouter());
-        router(new UtilsAdminRouter());
         router(new SecurityDomainAdminRouter());
         // Command Editor
         router(new CommandEditorRouter());
         // Global Stuff
         router(new FirstInstallRouter());
+        router(new GlobalAdminRouter());
+        router(new GlobalUtilsAdminRouter());
         // API
         router(new APIRouter());
         router(new MetricsAPIRouter());

@@ -3,9 +3,12 @@ package com.intrbiz.bergamot.ui.router.admin;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.health.HealthTracker;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
+import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -19,10 +22,9 @@ public class AdminRouter extends Router<BergamotApp>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db)
+    public void index(BergamotDB db, @CurrentPrincipal Contact principal, @GetBergamotSite() Site site)
     {
-        boolean showDaemons = var("showDaemons", ! "no".equalsIgnoreCase(System.getProperty("admin.show.daemons", "yes")));
-        if (showDaemons) var("daemons", HealthTracker.getInstance().getDaemons());
+        model("site", site);
         encode("admin/index");
     }
 }
