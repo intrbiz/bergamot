@@ -51,6 +51,9 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
      */
     @SQLColumn(index = 7, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 2, 0, 0 }))
     private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
+    
+    @SQLColumn(index = 8, name = "disabled", since = @SQLVersion({ 3, 45, 0 }))
+    private boolean disabled = false;
 
     public Site()
     {
@@ -140,6 +143,16 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     {
         if (parameters == null) parameters = new LinkedHashMap<String, Parameter>();
         this.parameters = parameters;
+    }
+
+    public boolean isDisabled()
+    {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled)
+    {
+        this.disabled = disabled;
     }
 
     @Override

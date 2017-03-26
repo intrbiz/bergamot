@@ -5,12 +5,10 @@ import org.apache.log4j.Logger;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.Cache;
 import com.intrbiz.metadata.Any;
-import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -25,18 +23,15 @@ public class GlobalUtilsAdminRouter extends Router<BergamotApp>
     private static final Logger logger = Logger.getLogger(GlobalUtilsAdminRouter.class);
     
     @Any("/")
-    @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @CurrentPrincipal Contact principal)
+    public void index()
     {
-        require(principal.isGlobalAdmin());
         encode("global/admin/utils/index");
     }
     
     @Any("/cache/clear")
     @WithDataAdapter(BergamotDB.class)
-    public void clearCaches(BergamotDB db, @CurrentPrincipal Contact principal)
+    public void clearCaches(BergamotDB db)
     {
-        require(principal.isGlobalAdmin());
         logger.warn("Flushing all data caches due to administrative request");
         db.cacheClear();
         var("cacheCleared", true);
@@ -45,9 +40,8 @@ public class GlobalUtilsAdminRouter extends Router<BergamotApp>
     
     @Any("/cache/view")
     @WithDataAdapter(BergamotDB.class)
-    public void viewCache(BergamotDB db, @CurrentPrincipal Contact principal)
+    public void viewCache(BergamotDB db)
     {
-        require(principal.isGlobalAdmin());
         Cache cache = DataManager.get().cache("cache.bergamot");
         var("cachekeys", cache.keySet(""));
         encode("global/admin/utils/cache/view");

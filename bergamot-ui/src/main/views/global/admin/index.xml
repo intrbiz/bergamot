@@ -5,7 +5,7 @@
 	<div class="row submenu pull-right">
 		<a href="/global/admin/utils/">Global System Utilities</a>
 	</div>
-    <div class="row" rendered="#{showDaemons and globalAdmin}">
+    <div class="row">
 		<h3>Global System Status</h3>
 		<data-set var="daemon" value="#{daemons}">
 			<div class="col3 dash_icon check">
@@ -43,7 +43,7 @@
 			</div>
 		</data-set>
     </div>
-    <div class="row" rendered="#{globalAdmin}">
+    <div class="row">
 		<h3>Sites</h3>
 		<table>
 			<tr>
@@ -56,25 +56,87 @@
 			</tr>
 			<data-set var="site" value="#{sites}">
 				<tr>
-					<td><a href="https://#{site.name}/">#{site.name}</a></td>
+					<td><a href="https://#{site.name}/">https://#{site.name}/</a></td>
 					<td>#{site.summary}</td>
 					<td>#{site.poolCount}</td>
-					<td>#{site.aliases}</td>
-					<td></td>
+					<td>
+						<data-set var="alias" value="#{site.aliases}">
+							<a href="https://alias/">https://alias/</a>
+						</data-set>
+					</td>
+					<td>#{if(site.disabled, 'Yes', 'No')}</td>
 					<td>
 						<!-- Disable -->
-    					<form action="#{path('/global/admin/site/disable')}" method="post">
-							<input type="hidden" name="id" value="#{site.id}"/>
+    					<form action="#{path('/global/admin/site/id/' + site.id + '/disable')}" method="post" rendered="#{! site.disabled}">
+    						<access-token-for-url id="access-token" path="#{path('/global/admin/site/id/' + site.id + '/disable')}"/>
 							<input type="submit" name="disable" value="Disable" class="danger"/>
 						</form>
-						<!-- Delete -->
-    					<form action="#{path('/global/admin/site/delete')}" method="post">
+						<!-- Enable -->
+    					<form action="#{path('/global/admin/site/id/' + site.id + '/enable')}" method="post" rendered="#{site.disabled}">
+    						<access-token-for-url id="access-token" path="#{path('/global/admin/site/id/' + site.id + '/enable')}"/>
 							<input type="hidden" name="id" value="#{site.id}"/>
-							<input type="submit" name="delete" value="Delete" class="danger"/>
+							<input type="submit" name="enable" value="Enable" class="danger"/>
 						</form>
 					</td>
 				</tr>
 			</data-set>
+		</table>
+	</div>
+	    <div class="row">
+		<h3>Global Admins</h3>
+		<table>
+			<tr>
+				<th>Site</th>
+				<th>Username</th>
+				<th>Name</th>
+				<th>Email</th>
+				<th>Disabled</th>
+				<th>Password Change Required</th>
+	    		<th>Locked</th>
+				<th></th>
+			</tr>
+			<data-set var="admin" value="#{globalAdmins}">
+				<tr>
+					<td>#{admin.site.name}</td>
+					<td>#{admin.name}</td>
+					<td>#{admin.summary}</td>
+					<td>#{admin.email}</td>
+					<td>#{if(admin.isGlobalAdmin(), 'no', 'Yes')}</td>
+					<td>#{if(admin.forcePasswordChange, 'Yes', 'No')}</td>
+	    			<td>#{if(admin.locked, coalesce(contact.lockedReason.description, 'Yes'), 'No')}</td>
+					<td>
+						<!-- Disable -->
+    					<form action="#{path('/global/admin/contact/id/' + admin.id + '/disable')}" method="post" rendered="#{admin.isGlobalAdmin()}">
+    						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/id/' + admin.id + '/disable')}"/>
+							<input type="submit" name="disable" value="Disable" class="danger"/>
+						</form>
+						<!-- Enable -->
+    					<form action="#{path('/global/admin/contact/id/' + admin.id + '/enable')}" method="post" rendered="#{! admin.isGlobalAdmin()}">
+    						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/id/' + admin.id + '/enable')}"/>
+							<input type="submit" name="enable" value="Enable" class="danger"/>
+						</form>
+						<!-- Remove -->
+    					<form action="#{path('/global/admin/contact/id/' + admin.id + '/remove')}" method="post" rendered="#{! admin.isGlobalAdmin()}">
+    						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/id/' + admin.id + '/remove')}"/>
+							<input type="submit" name="remove" value="Remove" class="danger"/>
+						</form>
+					</td>
+				</tr>
+			</data-set>
+			<tr>
+				<td colspan="8">
+					<form action="#{path('/global/admin/contact/add')}" method="post">
+						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/add')}"/>
+						<select name="id">
+							<option value="">Select contact</option>
+							<data-set var="admin" value="#{allAdmins}">
+								<option value="#{admin.id}">#{admin.summary} (#{admin.site.name}/#{admin.name}) - #{admin.email}</option>
+							</data-set>
+						</select>
+						<input type="submit" name="add" value="Make a Global Administrator" class="danger"/>
+					</form>
+				</td>
+			</tr>
 		</table>
 	</div>
 </fragment>

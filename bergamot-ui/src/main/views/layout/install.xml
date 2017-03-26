@@ -1,0 +1,29 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- A template applied to the main interfaces, ie: after login -->
+<html xmlns="com.intrbiz.balsa">
+	<head>
+		<title>Bergamot Monitoring [Install] - #{title()}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="#{public('/css/' + bergamot_css_version() +'/style.css')}" />
+		<!-- Scripts -->
+    	<script src="#{public('/js/' + bergamot_js_version() + '/bower_components/jquery/dist/jquery.js')}"></script>
+	</head>
+	<body>
+		<div id="header">
+			<div class="container">
+				<div id="logo">
+					<a href="/">
+                        <img src="#{public('/images/logo/bergamot_7_h50.png')}" alt="Bergamot Monitoring"/>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div id="content">
+			<div class="container">
+				<h2>#{title()}</h2>
+				<content/>
+			</div>
+		</div>
+	</body>
+</html>

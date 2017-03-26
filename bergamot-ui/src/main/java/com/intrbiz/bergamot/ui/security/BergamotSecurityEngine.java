@@ -83,9 +83,9 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
         if (validationLevel == ValidationLevel.STRONG)
         {
             // validate that the principal is in a good state
-            return principal instanceof Contact && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
+            return principal instanceof Contact && (! ((Contact) principal).getSite().isDisabled()) && (! (((Contact) principal).isForcePasswordChange() || ((Contact) principal).isLocked()));
         }
-        return principal instanceof Contact;
+        return principal instanceof Contact && (! ((Contact) principal).getSite().isDisabled());
     }
 
     @Override
@@ -144,6 +144,8 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
                 logger.error("Failed to determine the site for the server name: " + Balsa().request().getServerName() + ", authentication cannot continue.");
                 throw new BalsaSecurityException("No such principal");
             }
+            // is the site disable
+            if (site.isDisabled()) throw new BalsaSecurityException("Site is disabled");
             // lookup the principal
             Contact contact = db.getContactByNameOrEmail(site.getId(), username);
             // does the username exist?
@@ -217,6 +219,8 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
             logger.error("Rejecting valid token login for principal " + contact.getName() + " => " + contact.getSiteId() + " :: " + contact.getId() + " as the account has been locked.");
             throw new BalsaSecurityException("Account locked");
         }
+        // is the site disable
+        if (contact.getSite().isDisabled()) throw new BalsaSecurityException("Site is disabled");
     }
 
     /**
@@ -227,7 +231,8 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
     {
         if (principal instanceof Contact)
         {
-            return ((Contact) principal).hasPermission(Permission.of(permission));
+            Contact contact = (Contact) principal;
+            return (! contact.getSite().isDisabled()) && contact.hasPermission(Permission.of(permission));
         }
         return false;
     }
@@ -240,13 +245,15 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
     {
         if (principal instanceof Contact)
         {
+            Contact contact = (Contact) principal;
+            if (contact.getSite().isDisabled()) return false;
             if (object instanceof SecuredObject)
             {
-                return ((Contact) principal).hasPermission(Permission.of(permission), (SecuredObject<?,?>) object);
+                return contact.hasPermission(Permission.of(permission), (SecuredObject<?,?>) object);
             }
             else if (object instanceof UUID)
             {
-                return ((Contact) principal).hasPermission(Permission.of(permission), (UUID) object);
+                return contact.hasPermission(Permission.of(permission), (UUID) object);
             }
         }
         return false;

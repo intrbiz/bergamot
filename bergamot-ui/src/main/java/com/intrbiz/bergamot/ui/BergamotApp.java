@@ -342,7 +342,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             {
                 for (Site site : db.listSites())
                 {
-                    this.clusterManager.registerSite(site);
+                    if (! site.isDisabled())
+                        this.clusterManager.registerSite(site);
                 }
             }
         }

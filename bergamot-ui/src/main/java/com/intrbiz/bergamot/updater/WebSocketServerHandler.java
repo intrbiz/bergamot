@@ -118,6 +118,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         {
             BalsaContext.withContext(application, session, () -> {
                 Contact contact = session.authenticationState().currentPrincipal();
+                if (contact == null) return null;
                 WebSocketServerHandler.this.context.setSite(contact.getSite());
                 WebSocketServerHandler.this.context.setPrincipal(contact);
                 return null;
@@ -150,7 +151,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
         }
         catch (BalsaSecurityException e)
         {
-            logger.warn("Denying access for websocket", e);
+            logger.debug("Denying access for websocket", e);
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
             return;
         }

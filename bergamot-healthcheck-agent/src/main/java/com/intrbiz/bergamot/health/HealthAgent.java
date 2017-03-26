@@ -213,6 +213,7 @@ public final class HealthAgent
     
     public static final UUID computeInstanceId()
     {
+        // Attempt to find a configured specific instance id
         String instanceIdStr = System.getProperty("bergamot.instanceid", System.getenv("BERGAMOT_INSTANCEID"));
         if (instanceIdStr != null && instanceIdStr.length() > 0)
         {
@@ -224,6 +225,7 @@ public final class HealthAgent
             {
             }
         }
+        Logger.getLogger(HealthAgent.class).warn("Failed to get service instance id, defaulting to a randomly allocated id, please set the environment variable \"BERGAMOT_INSTANCEID\" or the system property \"bergamot.instanceid\"");
         return UUID.randomUUID();
     }
 }

@@ -77,9 +77,11 @@ import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.DeinitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.request.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.ClusterManagerError;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.DeinitedSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.FlushedGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.model.message.command.GeneralCommandError;
@@ -251,6 +253,8 @@ public class BergamotTranscoder
         InitedSite.class,
         FlushGlobalCaches.class,
         FlushedGlobalCaches.class,
+        DeinitSite.class,
+        DeinitedSite.class,
         // util models
         BergamotImportReportMO.class,
         AppliedConfigChange.class,

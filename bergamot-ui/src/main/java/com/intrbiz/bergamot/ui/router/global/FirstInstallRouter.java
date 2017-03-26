@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import com.intrbiz.Util;
 import com.intrbiz.balsa.BalsaException;
 import com.intrbiz.balsa.engine.route.Router;
@@ -33,6 +35,7 @@ import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
@@ -41,14 +44,23 @@ import com.intrbiz.queue.RPCClient;
 import com.intrbiz.queue.name.RoutingKey;
 
 @Prefix("/global/install")
-@Template("layout/global")
+@Template("layout/install")
 public class FirstInstallRouter extends Router<BergamotApp>
-{    
+{   
+    private static final Logger logger = Logger.getLogger(FirstInstallRouter.class);
+    
+    @Before()
+    @Any("**")
+    @WithDataAdapter(BergamotDB.class)
+    public void firstInstallFilter(BergamotDB db)
+    {
+        require(db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL) == null);
+    }
+    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
     public void showInstallSite(BergamotDB db) throws Exception
     {
-        require(db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL) == null);
         // do we have any existing sites?
         List<Site> sites = db.listSites();
         if (! sites.isEmpty())
@@ -81,7 +93,6 @@ public class FirstInstallRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void setInstallSite(BergamotDB db)
     {
-        require(db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL) == null);
         // decode the form
         decodeOnly("global/install/index");
         // next step
@@ -92,7 +103,6 @@ public class FirstInstallRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void showInstallUser(BergamotDB db)
     {
-        require(db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL) == null);
         // next step
         encode("global/install/user");
     }
@@ -101,7 +111,6 @@ public class FirstInstallRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void setInstallUser(BergamotDB db)
     {
-        require(db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL) == null);
         decodeOnly("global/install/user");
         // next step
         encode("global/install/confirm");
@@ -111,7 +120,6 @@ public class FirstInstallRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void goCreateSite(BergamotDB db) throws Exception
     {
-        require(db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL) == null);
         // create the site
         this.createSite(sessionModel("install"));
         // done!
@@ -159,7 +167,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
             }
             else
             {
-                System.out.println(vbcfg.getReport().toString());
+                logger.info(vbcfg.getReport().toString());
             }
         }
         // now create the site
@@ -171,7 +179,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)
         {
             BergamotImportReport report = new BergamotConfigImporter(vbcfg).offline().defaultPassword(install.getPassword()).requirePasswordChange(false).resetState(true).importConfiguration();
-            System.out.println(report.toString());
+            logger.info(report.toString());
         }
         // create the Site CA
         try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
@@ -183,7 +191,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
                     AgentManagerResponse response = client.publish(new CreateSiteCA(siteId, siteName)).get(5, TimeUnit.SECONDS);
                     if (response instanceof CreatedSiteCA)
                     {
-                        System.out.println("Created Bergamot Agent site Certificate Authority");
+                        logger.info("Created Bergamot Agent site Certificate Authority");
                     }
                 }
                 catch (Exception e)
@@ -198,19 +206,20 @@ public class FirstInstallRouter extends Router<BergamotApp>
             {
                 try
                 {
-                    ClusterManagerResponse response = client.publish(new InitSite(siteId, siteName)).get(5, TimeUnit.SECONDS);
+                    ClusterManagerResponse response = client.publish(new InitSite(siteId, siteName)).get(30, TimeUnit.SECONDS);
                     if (response instanceof InitedSite)
                     {
-                        System.out.println("Initialised site with UI cluster");
+                        logger.info("Initialised site with UI cluster");
                     }
                 }
                 catch (Exception e)
                 {
+                    logger.error("Failed to initialise site with UI cluster");
                 }
             }
         }
         // all done
-        System.out.println("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
+        logger.info("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
         // mark first install as complete
         try (BergamotDB db = BergamotDB.connect())
         {

@@ -31,15 +31,18 @@ import com.intrbiz.bergamot.cluster.migration.DeregisterPoolTask;
 import com.intrbiz.bergamot.cluster.migration.RegisterPoolTask;
 import com.intrbiz.bergamot.cluster.model.ProcessingPool;
 import com.intrbiz.bergamot.cluster.util.OwnerPredicate;
+import com.intrbiz.bergamot.cluster.util.SitePredicate;
 import com.intrbiz.bergamot.command.CommandProcessor;
 import com.intrbiz.bergamot.command.DefaultCommandProcessor;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
 import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
+import com.intrbiz.bergamot.model.message.cluster.manager.request.DeinitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.request.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.ClusterManagerError;
+import com.intrbiz.bergamot.model.message.cluster.manager.response.DeinitedSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
@@ -325,6 +328,38 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
         this.logger.info("Registering site " + site.getId() + " " + site.getName());
         this.initPoolsForSite(this.cluster.getMembers(), site);
     }
+    
+    public void deregisterSite(Site site)
+    {
+        this.logger.info("Deregistering site " + site.getId() + " " + site.getName());
+        this.deinitPoolsForSite(this.cluster.getMembers(), site);
+    }
+    
+    /**
+     * Remove all pools for a site
+     */
+    private void deinitPoolsForSite(Set<Member> memberSet, Site site)
+    {
+        this.clusterManagerLock.lock();
+        try
+        {
+            // add the pools for the given site
+            this.logger.info("Uninitialising cluster state, members: " + memberSet);
+            // get all the processing pools for this site
+            for (ProcessingPool pool : this.pools.values(new SitePredicate(site.getId())))
+            {
+                // ensure the processing pool is removed
+                for (Member member : memberSet)
+                {
+                    this.sendMigration(member, new DeregisterPoolTask(pool.getSite(), pool.getPool()));
+                }
+            }
+        }
+        finally
+        {
+            this.clusterManagerLock.unlock();
+        }
+    }
 
     /**
      * Initially register the pools for the given site with this cluster.
@@ -337,9 +372,7 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
             // add the pools for the given site
             this.logger.info("Initialising cluster state, members: " + memberSet);
             Set<ProcessingPool> altered = new HashSet<ProcessingPool>();
-            Member[] members = memberSet.stream().toArray((l) -> {
-                return new Member[l];
-            });
+            Member[] members = memberSet.stream().toArray((l) -> new Member[l]);
             for (int i = 0; i < site.getPoolCount(); i++)
             {
                 ProcessingPool pool = new ProcessingPool(site.getId(), i);
@@ -500,6 +533,19 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
                     this.registerSite(site);
                 }
                 return new InitedSite();
+            }
+            else if (event instanceof DeinitSite)
+            {
+                UUID siteId = ((DeinitSite) event).getSiteId();
+                String siteName = ((DeinitSite) event).getSiteName();
+                logger.info("Got request to deinit site: " + siteId + " - " + siteName);
+                try (BergamotDB db = BergamotDB.connect())
+                {
+                    Site site = db.getSite(siteId);
+                    if (site == null) return new ClusterManagerError("Unknown site");
+                    this.deregisterSite(site);
+                }
+                return new DeinitedSite();
             }
             else if (event instanceof FlushGlobalCaches)
             {

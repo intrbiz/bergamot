@@ -2,7 +2,7 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
 <fragment xmlns="com.intrbiz.balsa" title="Admin">
-	<div class="row submenu pull-right" rendered="#{globalAdmin}">
+	<div class="row submenu pull-right" rendered="#{currentPrincipal.isGlobalAdmin()}">
 		<a href="/global/admin/">Global System Administration</a>
 	</div>
 	<div class="row">
