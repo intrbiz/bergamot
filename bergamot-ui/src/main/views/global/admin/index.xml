@@ -67,13 +67,11 @@
 					<td>#{if(site.disabled, 'Yes', 'No')}</td>
 					<td>
 						<!-- Disable -->
-    					<form action="#{path('/global/admin/site/id/' + site.id + '/disable')}" method="post" rendered="#{! site.disabled}">
-    						<access-token-for-url id="access-token" path="#{path('/global/admin/site/id/' + site.id + '/disable')}"/>
+    					<form path="/global/admin/site/id/#{site.id}/disable" rendered="#{! site.disabled}">
 							<input type="submit" name="disable" value="Disable" class="danger"/>
 						</form>
 						<!-- Enable -->
-    					<form action="#{path('/global/admin/site/id/' + site.id + '/enable')}" method="post" rendered="#{site.disabled}">
-    						<access-token-for-url id="access-token" path="#{path('/global/admin/site/id/' + site.id + '/enable')}"/>
+    					<form path="/global/admin/site/id/#{site.id}/enable" rendered="#{site.disabled}">
 							<input type="hidden" name="id" value="#{site.id}"/>
 							<input type="submit" name="enable" value="Enable" class="danger"/>
 						</form>
@@ -106,18 +104,15 @@
 	    			<td>#{if(admin.locked, coalesce(contact.lockedReason.description, 'Yes'), 'No')}</td>
 					<td>
 						<!-- Disable -->
-    					<form action="#{path('/global/admin/contact/id/' + admin.id + '/disable')}" method="post" rendered="#{admin.isGlobalAdmin()}">
-    						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/id/' + admin.id + '/disable')}"/>
+    					<form path="/global/admin/contact/id/#{admin.id}/disable" rendered="#{admin.isGlobalAdmin()}">
 							<input type="submit" name="disable" value="Disable" class="danger"/>
 						</form>
 						<!-- Enable -->
-    					<form action="#{path('/global/admin/contact/id/' + admin.id + '/enable')}" method="post" rendered="#{! admin.isGlobalAdmin()}">
-    						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/id/' + admin.id + '/enable')}"/>
+    					<form path="/global/admin/contact/id/#{admin.id}/enable" rendered="#{! admin.isGlobalAdmin()}">
 							<input type="submit" name="enable" value="Enable" class="danger"/>
 						</form>
 						<!-- Remove -->
-    					<form action="#{path('/global/admin/contact/id/' + admin.id + '/remove')}" method="post" rendered="#{! admin.isGlobalAdmin()}">
-    						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/id/' + admin.id + '/remove')}"/>
+    					<form path="/global/admin/contact/id/#{admin.id}/remove" rendered="#{! admin.isGlobalAdmin()}">
 							<input type="submit" name="remove" value="Remove" class="danger"/>
 						</form>
 					</td>
@@ -125,8 +120,7 @@
 			</data-set>
 			<tr>
 				<td colspan="8">
-					<form action="#{path('/global/admin/contact/add')}" method="post">
-						<access-token-for-url id="access-token" path="#{path('/global/admin/contact/add')}"/>
+					<form path="/global/admin/contact/add">
 						<select name="id">
 							<option value="">Select contact</option>
 							<data-set var="admin" value="#{allAdmins}">
