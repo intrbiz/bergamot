@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="ssh_nagios_check" engine="ssh" executor="nagios" security-domains="global">
+        <summary>Nagios over SSH Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="username">#{coalesce(host.getParameter('ssh_username'), host.location.getParameter('ssh_username'), global.ssh_username)}</parameter>
+        <parameter name="private_key">#{coalesce(host.getParameter('ssh_private_key'), host.location.getParameter('ssh_private_key'), global.ssh_private_key)}</parameter>
+        <parameter name="public_key">#{coalesce(host.getParameter('ssh_public_key'), host.location.getParameter('ssh_public_key'), global.ssh_public_key)}</parameter>
+        <parameter name="command_line"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/service.png</parameter>
+        <description>Execute a Nagios check over SSH</description>
+    </command>
+    
+    <command name="ssh_script_check" engine="ssh" executor="script" security-domains="global">
+        <summary>SSH Script Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="username">#{coalesce(host.getParameter('ssh_username'), host.location.getParameter('ssh_username'), global.ssh_username)}</parameter>
+        <parameter name="private_key">#{coalesce(host.getParameter('ssh_private_key'), host.location.getParameter('ssh_private_key'), global.ssh_private_key)}</parameter>
+        <parameter name="public_key">#{coalesce(host.getParameter('ssh_public_key'), host.location.getParameter('ssh_public_key'), global.ssh_public_key)}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/service.png</parameter>
+        <description>Use SSH to execute checks</description>
+    </command>
+    
+</bergamot>

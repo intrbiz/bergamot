@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <!-- Generic host templates -->
+    
+    <host name="generic-host" template="yes">
+        <summary>Generic Host</summary>
+        <notifications enabled="yes" time-period="24x7" all-engines="yes">
+            <!-- escalation policies -->
+            <escalate after="1h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+            <escalate after="6h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+        </notifications>
+        <notify teams="admins"/>
+        <state failed-after="4" recovers-after="10"/>
+        <check-command command="check-host-alive"/>
+        <schedule every="5" retry-every="1" time-period="24x7"/>
+        <description>A generic host template</description>
+    </host>
+    
+    <host name="web-server" extends="generic-host" template="yes" groups="web-servers" security-domains="web">
+        <summary>Web Server</summary>
+        <notify teams="web-admins"/>
+        <description>A web server template</description>
+    </host>
+    
+    <host name="db-server" extends="generic-host" template="yes" groups="db-servers" security-domains="db">
+        <summary>DB Server</summary>
+        <notify teams="db-admins"/>
+        <description>A database server template</description>
+    </host>
+    
+    <host name="vm-host-server" extends="generic-host" template="yes" groups="vm-servers" security-domains="linux">
+        <summary>VM Host Server</summary>
+        <description>A VM host server template</description>
+    </host>
+    
+    <host name="network-device" extends="generic-host" template="yes" groups="network-devices" security-domains="network">
+        <summary>Network Device</summary>
+        <notify teams="network-admins"/>
+        <description>A generic network device template</description>
+    </host>
+    
+    <host name="router" extends="network-device" template="yes" groups="routers">
+        <summary>Router</summary>
+        <description>A generic network router template</description>
+    </host>
+    
+    <host name="switch" extends="network-device" template="yes" groups="switches">
+        <summary>Switch</summary>
+        <description>A generic network switch template</description>
+    </host>
+    
+    <!-- Default Linux host timeplates -->
+    
+    <host name="linux-server-nrpe" extends="generic-host" template="yes" groups="linux-servers" security-domains="linux">
+        <summary>Linux Server (NRPE)</summary>
+        <notify teams="linux-admins"/>
+        <description>Default Linux server checked via NRPE template</description>
+        
+        <service extends="linux-service" name="memory" groups="linux-services">
+            <summary>Memory</summary>
+            <check-command command="check_nrpe_mem"/>
+        </service>
+        
+        <service extends="linux-service" name="load" groups="linux-services">
+            <summary>Load</summary>
+            <check-command command="check_nrpe_load"/>
+        </service>
+        
+        <service extends="linux-service" name="ping" groups="linux-services" >
+            <summary>Ping</summary>
+            <check-command command="check_ping">
+                <parameter name="arg1">100.0,20%</parameter>
+                <parameter name="arg2">500.0,60%</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="linux-service" name="users" groups="linux-services">
+            <summary>Active Users</summary>
+            <check-command command="check_nrpe_users"/>
+        </service>
+        
+        <service extends="linux-service" name="zombie_procs" groups="linux-services">
+            <summary>Zombie Processes</summary>
+            <check-command command="check_zombie_procs"/>
+        </service>
+        
+        <service extends="linux-service" name="total_procs" groups="linux-services">
+            <summary>Total Processes</summary>
+            <check-command command="check_total_procs"/>
+        </service>
+        
+        <service extends="linux-service" name="disk_space_root" groups="linux-services">
+            <summary>Disk Space: /</summary>
+            <check-command command="check_disk_space_root"/>
+        </service>
+        
+        <service extends="linux-service" name="service_ssh" groups="linux-services">
+            <summary>Load</summary>
+            <check-command command="check_ssh"/>
+        </service>
+        
+        <service extends="linux-service" name="local_ntp_offset" groups="linux-services">
+            <summary>Local NTP Offset</summary>
+            <check-command command="check_local_ntp_offset"/>
+        </service>
+        
+    </host>
+    
+    <host name="linux-server-agent" extends="generic-host" template="yes" groups="linux-servers" security-domains="linux">
+        <summary>Linux Server (Bergamot Agent)</summary>
+        <check-command command="check_agent_presence"/>
+        <notify teams="linux-admins"/>
+        <description>Default Linux server checked via Bergamot Agent template</description>
+        
+        <!-- Agent self checks -->
+        <service extends="linux-service" name="agent-info">
+            <summary>Bergamot Agent</summary>
+            <check-command command="check_agent_info"/>
+        </service>
+
+        <service extends="linux-service" name="agent-memory">
+            <summary>Bergamot Agent Free Memory</summary>
+            <check-command command="check_agent_own_memory">
+                <parameter name="warning">10MiB</parameter>
+                <parameter name="critical">5MiB</parameter>
+            </check-command>
+        </service>
+        
+        <!-- Core OS checks -->
+        <service extends="linux-service" name="os-info">
+            <summary>OS Info</summary>
+            <check-command command="check_agent_os"/>
+        </service>
+    
+        <service extends="linux-service" name="cpu-usage">
+            <summary>CPU</summary>
+            <check-command command="check_agent_cpu"/>
+        </service>
+        
+        <service extends="linux-service" name="load">
+            <summary>Load</summary>
+            <check-command command="check_agent_load"/>
+        </service>
+
+        <service extends="linux-service" name="memory">
+            <summary>Memory</summary>
+            <check-command command="check_agent_memory"/>
+        </service>
+        
+        <service extends="linux-service" name="all-disks">
+            <summary>Disk Space</summary>
+            <check-command command="check_agent_disks"/>
+        </service>
+        
+        <service extends="linux-service" name="disk_space_root">
+            <summary>Disk Space: /</summary>
+            <check-command command="check_agent_disk">
+                <parameter name="mount">/</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="linux-service" name="active_users">
+            <summary>Active Users</summary>
+            <check-command command="check_agent_users">
+                <parameter name="warning">5</parameter>
+                <parameter name="critical">10</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="linux-service" name="total_processes">
+            <summary>Total Processes</summary>
+            <check-command command="check_agent_total_processes">
+                <parameter name="warning">320</parameter>
+                <parameter name="critical">400</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="linux-service" name="zombie_processes">
+            <summary>Zombie Processes</summary>
+            <check-command command="check_agent_zombie_processes"/>
+        </service>
+        
+        <service extends="linux-service" name="uptime">
+            <summary>Uptime</summary>
+            <check-command command="check_agent_uptime"/>
+        </service>
+        
+        <service extends="linux-service" name="process-sshd">
+            <summary>Process: SSHD</summary>
+            <check-command command="check_agent_process_sshd"/>
+        </service>
+        
+        <service extends="linux-service" name="listener-sshd">
+            <summary>Port Listener: SSHD</summary>
+            <check-command command="check_agent_listener_ssh"/>
+        </service>
+        
+    </host>
+    
+    <!-- Default application host templates -->
+    
+    <host name="nginx-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers" security-domains="web">
+        <summary>Nginx Web Server (NRPE)</summary>
+        <description>Default Nginx web server checked via NRPE template</description>
+        
+        <service name="service_nginx" extends="web-service">
+            <summary>Service: Nginx</summary>
+            <check-command command="check_nrpe_nginx"/>
+        </service>
+    </host>
+    
+    <host name="nginx-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
+        <summary>Nginx Web Server (Bergamot Agent)</summary>
+        <description>Default Nginx web server checked via Bergamot Agent template</description>
+        
+        <service extends="web-service" name="process-nginx">
+            <summary>Process: Nginx</summary>
+            <check-command command="check_agent_process_nginx"/>
+        </service>
+        
+        <service extends="web-service" name="listener-http">
+            <summary>Port Listener: HTTP</summary>
+            <check-command command="check_agent_listener_http"/>
+        </service>
+    </host>
+    
+    <host name="apache-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers" security-domains="web">
+        <summary>Apache Web Server (NRPE)</summary>
+        <description>Default Apache web server checked via NRPE template</description>
+        
+        <service name="service_apache" extends="web-service">
+            <summary>Service: Apache HTTPD</summary>
+            <check-command command="check_nrpe_apache"/>
+        </service>
+    </host>
+    
+    <host name="apache-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
+        <summary>Apache Web Server (Bergamot Agent)</summary>
+        <description>Default Apache web server checked via Bergamot Agent template</description>
+        
+        <service extends="web-service" name="process-apache">
+            <summary>Process: Apache</summary>
+            <check-command command="check_agent_process_apache"/>
+        </service>
+        
+        <service extends="web-service" name="listener-http">
+            <summary>Port Listener: HTTP</summary>
+            <check-command command="check_agent_listener_http"/>
+        </service>
+    </host>
+    
+    <host name="mysql-server-nrpe" extends="db-server, linux-server-nrpe" template="yes" groups="db-servers" security-domains="db">
+        <summary>MySQL DB Server (NRPE)</summary>
+        <description>Default MySQL DB server checked via NRPE template</description>
+        
+        <service name="service_mysql" extends="db-service">
+            <summary>Service: MySQL</summary>
+            <check-command command="check_nrpe_mysql"/>
+        </service>
+    </host>
+    
+    <host name="mysql-server-nrpe" extends="db-server, linux-server-agent" template="yes" groups="db-servers" security-domains="db">
+        <summary>MySQL DB Server (Bergamot Agent)</summary>
+        <description>Default MySQL DB server checked via Bergamot Agent template</description>
+        
+        <service extends="db-service" name="process-mysql">
+            <summary>Process: MySQL</summary>
+            <check-command command="check_agent_process_mysql"/>
+        </service>
+        
+        <service extends="web-service" name="listener-mysql">
+            <summary>Port Listener: MySQL</summary>
+            <check-command command="check_agent_listener_mysql"/>
+        </service>
+    </host>
+    
+    <host name="postgresql-server-nrpe" extends="db-server, linux-server-nrpe" template="yes" groups="db-servers" security-domains="db">
+        <summary>PostgreSQL DB Server (NRPE)</summary>
+        
+        <service name="service_postgresql" extends="db-service">
+            <summary>Service: PostgreSQL</summary>
+            <check-command command="check_nrpe_postgresql"/>
+        </service>
+    </host>
+    
+    <host name="postgresql-server-agent" extends="db-server, linux-server-agent" template="yes" groups="db-servers" security-domains="db">
+        <summary>PostgreSQL DB Server (Bergamot Agent)</summary>
+        
+        <service extends="db-service" name="process-postgresql">
+            <summary>Process: PostgreSQL</summary>
+            <check-command command="check_agent_process_postgresql"/>
+        </service>
+        
+        <service extends="web-service" name="listener-postgresql">
+            <summary>Port Listener: PostgreSQL</summary>
+            <check-command command="check_agent_listener_postgresql"/>
+        </service>
+    </host>
+
+    <!-- Network device templates -->
+    
+    <host name="snmp-network-device" extends="network-device" template="yes" groups="network-devices" security-domains="network">
+        <summary>Network Device (SNMP)</summary>
+        <notify teams="network-admins"/>
+        <description>A generic SNMP capable network device template</description>
+        
+        <!-- Services -->
+        <service name="snmp_description" extends="network-service" template="yes">
+            <summary>Device Description</summary>
+            <check-command command="check_snmp_description"/>
+        </service>
+        
+        <service name="snmp_name" extends="network-service" template="yes">
+            <summary>Device Name</summary>
+            <check-command command="check_snmp_name"/>
+        </service>
+        
+        <service name="snmp_location" extends="network-service" template="yes">
+            <summary>Device Location</summary>
+            <check-command command="check_snmp_location"/>
+        </service>
+        
+        <service name="snmp_contact" extends="network-service" template="yes">
+            <summary>Device Contact</summary>
+            <check-command command="check_snmp_contact"/>
+        </service>
+        
+        <service name="snmp_uptime" extends="network-service" template="yes">
+            <summary>Device Uptime</summary>
+            <check-command command="check_snmp_uptime"/>
+        </service>
+
+    </host>
+
+    <host name="snmp-router" extends="snmp-network-device" template="yes" groups="routers" security-domains="network">
+        <summary>Router (SNMP)</summary>
+        <description>A generic SNMP capable network router template</description>
+    </host>
+    
+    <host name="snmp-switch" extends="snmp-network-device" template="yes" groups="switches" security-domains="network">
+        <summary>Switch (SNMP)</summary>
+        <description>A generic SNMP capable network switch template</description>
+    </host>
+    
+</bergamot>

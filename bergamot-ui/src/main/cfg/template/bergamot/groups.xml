@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <group name="bergamot-services" groups="services">
+        <summary>Bergamot Monitoring Services</summary>
+    </group>
+    
+    <group name="bergamot-servers" groups="hosts">
+        <summary>Bergamot Monitoring Servers</summary>
+    </group>
+    
+</bergamot>

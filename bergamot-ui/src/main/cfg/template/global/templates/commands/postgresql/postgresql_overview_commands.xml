@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+
+    <command name="postgresql_version" extends="postgresql_jdbc_check">
+        <summary>PostgreSQL Version</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                con.query('SELECT setting FROM pg_settings WHERE name = \'server_version\'', function(rs) {
+                    rs.next();
+                    bergamot.info("PostgreSQL " + rs.getString(1));
+                });
+            });
+        ]]>
+        </script>
+        <description>PostgreSQL version information</description>
+    </command>
+    
+    <command name="postgresql_active_connections" extends="postgresql_jdbc_check">
+        <summary>PostgreSQL Active Connections</summary>
+        <parameter description="Warning threshold" name="warning">50</parameter>
+        <parameter description="Critical threshold" name="critical">100</parameter>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                var total = con.query('SELECT count(pid) FROM pg_stat_activity', function(rs) {
+                    return rs.next() ? rs.getLong(1) : 0;
+                });
+                bergamot.publish(
+                    bergamot.createResult().applyGreaterThanThreshold(
+                        total,
+                        check.getLongParameter('warning'),
+                        check.getLongParameter('critical'),
+                        'Connections: ' + total
+                    )
+                );
+                bergamot.publishReadings(
+                    bergamot.createLongGaugeReading('connections', null, total, check.getLongParameter('warning'), check.getLongParameter('critical'), null, null)
+                );
+            });
+        ]]>
+        </script>
+        <description>PostgreSQL active connections</description>
+    </command>
+    
+    <command name="postgresql_connections_per_database" extends="postgresql_jdbc_check">
+        <summary>PostgreSQL Active Connections Per Database</summary>
+        <parameter description="Warning threshold" name="warning">50</parameter>
+        <parameter description="Critical threshold" name="critical">100</parameter>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                con.query('SELECT datname, count(pid), sum(count(pid)) OVER () FROM pg_stat_activity GROUP BY 1', function(rs) {
+                    /* Process the per database readings */
+                    var total = 0;
+                    while (rs.next())
+                    {
+                        var database = rs.getString(1);
+                        var conns    = rs.getLong(2);
+                        total        = rs.getLong(3);
+                        bergamot.publishReadings(
+                            bergamot.createLongGaugeReading('connections[' + database + ']', null, conns, check.getLongParameter('warning'),                check.getLongParameter('critical'), null, null)
+                        );
+                    }
+                    /* Decide state based upon the total */
+                    bergamot.publish(
+                        bergamot.createResult().applyGreaterThanThreshold(
+                            total,
+                            check.getLongParameter('warning'),
+                            check.getLongParameter('critical'),
+                            'Connections: ' + total
+                        )
+                    );
+                    bergamot.publishReadings(
+                        bergamot.createLongGaugeReading('connections', null, total, check.getLongParameter('warning'), check.getLongParameter('critical'), null, null)
+                    );
+                });
+            });
+        ]]>
+        </script>
+        <description>PostgreSQL active connections per database</description>
+    </command>
+    
+</bergamot>

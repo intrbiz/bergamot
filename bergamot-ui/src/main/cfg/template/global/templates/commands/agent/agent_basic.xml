@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command category="System" engine="agent" executor="presence" extends="check_agent" name="check_agent_presence">
+        <summary>Bergamot Agent: Presence</summary>
+    </command>
+
+    <command category="System" application="bergamot agent" engine="agent" executor="agent" extends="check_agent" name="check_agent_info">
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
+        <summary>Bergamot Agent: Info</summary>
+    </command>
+    
+    <command category="System" application="bergamot agent" engine="agent" executor="agent-memory" extends="check_agent" name="check_agent_own_memory">
+        <parameter description="Warning threshold" name="warning">10MiB</parameter>
+        <parameter description="Critical threshold" name="critical">5MiB</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/memory.png</parameter>
+        <summary>Bergamot Agent: Free Memory</summary>
+    </command>
+    
+</bergamot>

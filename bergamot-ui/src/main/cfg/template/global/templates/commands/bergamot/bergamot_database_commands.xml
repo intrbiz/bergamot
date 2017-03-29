@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command application="PostgreSQL" name="bergamot_postgresql_jdbc_check" extends="postgresql_jdbc_check" security-domains="global">
+        <summary>Check Bergamot Monitoring PostgreSQL Database</summary>
+        <parameter name="database">bergamot</parameter>
+        <description>Check a Bergamot Monitoring PostgreSQL database</description>
+    </command>
+    
+    <command name="bergamot_readings_total_size" extends="bergamot_postgresql_jdbc_check" category="Bergamot Monitoring">
+        <summary>Total Readings Size</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                var total = con.query('SELECT round(sum(pg_relation_size((quote_ident("schema") || \'.\' || quote_ident("table"))::regclass)) / 1024.0 / 1024.0, 3) FROM lamplighter.check_reading', function(rs) {
+                    return rs.next() ? rs.getDouble(1) : 0.0;
+                });
+                bergamot.info('Total Readings Size: ' + total + ' MiB');
+                bergamot.publishReadings(bergamot.createDoubleGaugeReading('readings_total_size', 'MiB', total, null, null, null, null));
+            });
+        ]]>
+        </script>
+        <description>Total size of all readings stored by Bergamot Monitoring</description>
+    </command>
+    
+    <command name="bergamot_transitions_size" extends="bergamot_postgresql_jdbc_check" category="Bergamot Monitoring">
+        <summary>Check Transitions Size</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                var total = con.query('SELECT round(pg_relation_size(\'bergamot.check_transition\'::regclass) / 1024.0 / 1024.0, 3)', function(rs) {
+                    return rs.next() ? rs.getDouble(1) : 0.0;
+                });
+                bergamot.info('Check Transitions Size: ' + total + ' MiB');
+                bergamot.publishReadings(bergamot.createDoubleGaugeReading('check_transitions_size', 'MiB', total, null, null, null, null));
+            });
+        ]]>
+        </script>
+        <description>Size of the check transition log stored by Bergamot Monitoring</description>
+    </command>
+    
+</bergamot>

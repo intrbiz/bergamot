@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command engine="agent" executor="processes" extends="check_agent" name="check_agent_processes">
+        <parameter description="Warning range" name="warning">1:1</parameter>
+        <parameter description="Critical range" name="critical">1:1</parameter>
+        <parameter description="Flatten the command line" name="flatten">no</parameter>
+        <parameter description="Regex match" name="regex">no</parameter>
+        <parameter description="Process title" name="command"></parameter>
+        <parameter description="Process command" name="command"></parameter>
+        <parameter description="Process user name" name="user"></parameter>
+        <parameter description="Process group name" name="group"></parameter>
+        <parameter description="Process state" name="state"></parameter>
+        <parameter description="Process agument" name="argument"></parameter>
+        <summary>Bergamot Agent: Processes</summary>
+    </command>
+    
+    <command category="System" engine="agent" executor="process-stats" extends="check_agent" name="check_agent_zombie_processes">
+        <parameter description="Warning threshold" name="warning">0</parameter>
+        <parameter description="Critical threshold" name="critical">0</parameter>
+        <parameter description="Process state" name="state">zombie</parameter>
+        <summary>Bergamot Agent: Zombie Processes</summary>
+    </command>
+    
+    <command category="System" engine="agent" executor="process-stats" extends="check_agent" name="check_agent_total_processes">
+        <parameter description="Warning threshold" name="warning">150</parameter>
+        <parameter description="Critical threshold" name="critical">200</parameter>
+        <parameter description="Process state" name="state">total</parameter>
+        <summary>Bergamot Agent: Total Processes</summary>
+    </command>
+    
+    <command category="System" application="SSH" extends="check_agent_processes" name="check_agent_process_sshd">
+        <summary>Process: SSHD</summary>
+        <parameter name="warning">1:20</parameter>
+        <parameter name="critical">1:20</parameter>
+        <parameter name="command">sshd</parameter>
+    </command>
+    
+    <command application="PostgreSQL" extends="check_agent_processes" name="check_agent_process_postgresql">
+        <summary>Process: PostgreSQL</summary>
+        <parameter name="warning">1:25</parameter>
+        <parameter name="critical">1:25</parameter>
+        <parameter name="title">postgres</parameter>
+        <parameter name="user">postgres</parameter>
+    </command>
+    
+    <command application="MySQL" extends="check_agent_processes" name="check_agent_process_mysql">
+        <summary>Process: MySQL</summary>
+        <parameter name="warning">1:25</parameter>
+        <parameter name="critical">1:25</parameter>
+        <parameter name="command">mysql</parameter>
+        <parameter name="user">mysql</parameter>
+    </command>
+    
+    <command application="Nginx" extends="check_agent_processes" name="check_agent_process_nginx">
+        <summary>Process: Nginx</summary>
+        <parameter name="warning">1:4</parameter>
+        <parameter name="critical">1:4</parameter>
+        <parameter name="command">nginx</parameter>
+    </command>
+    
+    <command application="Apache" extends="check_agent_processes" name="check_agent_process_apache">
+        <summary>Process: Apache HTTPD</summary>
+        <parameter name="warning">1:100</parameter>
+        <parameter name="critical">1:100</parameter>
+        <parameter name="regex">yes</parameter>
+        <parameter name="flatten">yes</parameter>
+        <parameter name="command">(httpd|apache2)</parameter>
+    </command>
+    
+    <command application="RabbitMQ" extends="check_agent_processes" name="check_agent_process_rabbitmq">
+        <summary>Process: RabbitMQ</summary>
+        <parameter name="warning">1:1</parameter>
+        <parameter name="critical">1:1</parameter>
+        <parameter name="command">erlang</parameter>
+        <parameter name="argument">rabbitmq_server</parameter>
+    </command>
+    
+</bergamot>

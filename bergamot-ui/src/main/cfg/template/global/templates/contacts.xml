@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <contact name="generic_contact" template="yes">
+        <access-control security-domain="global" grants="read"/>
+        <notifications enabled="yes" time-period="24x7" alerts="yes" recovery="yes" acknowledge="yes">
+            <notification-engine engine="email" enabled="yes" time-period="24x7"/>
+            <notification-engine engine="sms" enabled="yes" time-period="24x7" alert="yes" recovery="no" ignore="pending, ok, warning"/>
+            <!-- escalation policies -->
+            <escalate after="30m" time-period="24x7" renotify="yes" />
+            <escalate after="1h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+            <escalate after="6h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+        </notifications>
+    </contact>
+    
+</bergamot>

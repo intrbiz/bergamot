@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="jmx_script_check" engine="jmx" executor="script" security-domains="global">
+        <summary>JMX Script Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/service.png</parameter>
+        <description>Check Java application via the JMX protocolC</description>
+    </command>
+    
+</bergamot>

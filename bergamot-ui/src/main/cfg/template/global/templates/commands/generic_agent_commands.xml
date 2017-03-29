@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command engine="agent" name="check_agent" template="yes" security-domains="global">
+        <parameter description="The Agent ID" name="agent_id">#{host.id}</parameter>
+        <summary>Bergamot Agent: Generic Check</summary>
+        <description>A generic check which executes via the Bergamot Agent</description>
+    </command>
+    
+</bergamot>

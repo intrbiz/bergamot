@@ -5,7 +5,7 @@
 target/
 *~
 *.kate-swp
-cfg/
+*/cfg
 bergamot-core/bergamot.xml
 bergamot-ui/bergamot.xml
 bergamot-agent-manager/agent-manager.xml

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="java_process_cpu_usage" extends="jmx_script_check">
+        <summary>Java CPU Usage</summary>
+        <parameter name="warning">80</parameter>
+        <parameter name="critical">90</parameter>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* Params */
+            var warning = check.getDoubleParameter('warning');
+            var critical = check.getDoubleParameter('critical');
+            /* Execute */
+            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), function(con) {
+                /* Fetch the CPU mbean */
+                var sysBean = con.getMBean('java.lang:type=OperatingSystem');
+                var processCPU = Math.round(sysBean.getAttribute('ProcessCpuLoad').getValue() * 10000) / 100.0;
+                /* Result */
+                if (processCPU > critical) {
+                    bergamot.critical('Java CPU Usage: ' + processCPU + '%');
+                } else if (processCPU > warning) {
+                    bergamot.warning('Java CPU Usage: ' + processCPU + '%');
+                } else {
+                    bergamot.ok('Java CPU Usage: ' + processCPU + '%');
+                }
+                /* Readings */
+                bergamot.publishReadings(
+                    bergamot.createDoubleGaugeReading('CPU Usage', '%', processCPU, warning, critical, 0, 100)
+                );
+            }); 
+        ]]>
+        </script>
+        <description>Check the CPU usage of a Java process</description>
+    </command>
+    
+    <command name="java_heap_usage" extends="jmx_script_check">
+        <summary>Java Heap Usage</summary>
+        <parameter name="warning">80</parameter>
+        <parameter name="critical">90</parameter>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* Params */
+            var warning = check.getDoubleParameter('warning');
+            var critical = check.getDoubleParameter('critical');
+            /* Execute */
+            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), function(con) {
+                /* Fetch the Memory mbean */
+                var sysBean = con.getMBean('java.lang:type=Memory');
+                var heapMemUsage = sysBean.getAttribute('HeapMemoryUsage').getValue();
+                var committedMem = Math.round((heapMemUsage.committed / 1048576.0) * 1000.0) / 1000.0;
+                var maxMem = Math.round((heapMemUsage.max / 1048576.0) * 1000.0) / 1000.0;
+                var usedMem = Math.round((heapMemUsage.used / 1048576.0) * 1000.0) / 1000.0;
+                var usedPC = Math.round((heapMemUsage.used / heapMemUsage.max) * 10000.0) / 100.0;
+                /* Result */
+                if (usedPC > critical) {
+                    bergamot.critical('Java Heap Usage: ' + usedPC + '%, ' + usedMem + 'MiB of ' + maxMem + 'MiB');
+                } else if (usedPC > warning) {
+                    bergamot.warning('Java Heap Usage: ' + usedPC + '%, ' + usedMem + 'MiB of ' + maxMem + 'MiB');
+                } else {
+                    bergamot.ok('Java Heap Usage: ' + usedPC + '%, ' + usedMem + 'MiB of ' + maxMem + 'MiB');
+                }
+                /* Readings */
+                bergamot.publishReadings(
+                    bergamot.createDoubleGaugeReading('Heap committed memory', 'MiB', committedMem, null, null, 0, maxMem),
+                    bergamot.createDoubleGaugeReading('Heap used memory', 'MiB', usedMem, null, null, null, null),
+                    bergamot.createDoubleGaugeReading('Heap used', '%', usedPC, warning, critical, 0, 100)
+                );
+            });
+        ]]>
+        </script>
+        <description>Check the CPU usage of a Java process</description>
+    </command>
+    
+    <command name="java_version_info" extends="jmx_script_check">
+        <summary>Java Version Info</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            /* Execute */
+            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), function(con) {
+                /* Fetch the Runtime mbean */
+                var runBean = con.getMBean('java.lang:type=Runtime');
+                var specVersion = runBean.getAttribute('SpecVersion').getValue();
+                var vmVersion   = runBean.getAttribute('VmVersion').getValue();
+                var vmVendor    = runBean.getAttribute('VmVendor').getValue();
+                var vmName    = runBean.getAttribute('VmName').getValue();
+                /* Result */
+                bergamot.info(specVersion + '.' + vmVersion + ' ' + vmVendor + ' ' + vmName);
+            });
+        ]]>
+        </script>
+        <description>Check the CPU usage of a Java process</description>
+    </command>
+    
+</bergamot>
