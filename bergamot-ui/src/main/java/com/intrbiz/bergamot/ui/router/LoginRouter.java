@@ -43,6 +43,7 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireAuthenticating;
+import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
@@ -251,7 +252,7 @@ public class LoginRouter extends Router<BergamotApp>
     }
     
     @Get("/change-password")
-    @RequireValidPrincipal()
+    @RequirePrincipal()
     public void changePassword(@Param("redirect") String redirect)
     {
         var("redirect", redirect);
@@ -260,7 +261,7 @@ public class LoginRouter extends Router<BergamotApp>
     }
     
     @Post("/force-change-password")
-    @RequireValidPrincipal()
+    @RequirePrincipal()
     @RequireValidAccessTokenForURL()
     public void changePassword(@Param("password") @CheckStringLength(mandatory = true, min = 8) String password, @Param("confirm_password") @CheckStringLength(mandatory = true, min = 8) String confirmPassword, @Param("redirect") String redirect) throws IOException
     {
@@ -296,7 +297,7 @@ public class LoginRouter extends Router<BergamotApp>
     @Catch(BalsaSecurityException.class)
     @Order()
     @Post("/force-change-password")
-    @RequireValidPrincipal()
+    @RequirePrincipal()
     @RequireValidAccessTokenForURL()
     public void changePasswordError(@Param("redirect") String redirect) throws IOException
     {
@@ -313,11 +314,6 @@ public class LoginRouter extends Router<BergamotApp>
     {
         // deauth the current session
         deauthenticate();
-        // clean up the session
-        sessionVar("u2fDevice", null);
-        sessionVar("hotpDevice", null);
-        sessionVar("backupCode", null);
-        sessionVar("done2FA", false);
         // clean up any auto auth
         String autoAuthToken = sessionVar("bergamot.auto.login");
         if (! Util.isEmpty(autoAuthToken))
@@ -344,8 +340,7 @@ public class LoginRouter extends Router<BergamotApp>
     public void reset(@Param("token") String token) throws IOException
     {
         // authenticate the token
-        AuthenticationResponse authResp = authenticate(new GenericAuthenticationToken(token, CryptoCookie.Flags.Reset));
-        Contact contact = authResp.getPrincipal();
+        Contact contact = authenticateSingleFactor(new GenericAuthenticationToken(token, CryptoCookie.Flags.Reset), true);
         // assert that the contact requires a reset
         if (! contact.isForcePasswordChange())
         {
