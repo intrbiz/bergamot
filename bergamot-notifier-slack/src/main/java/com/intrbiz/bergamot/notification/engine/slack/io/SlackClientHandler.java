@@ -1,5 +1,6 @@
-package com.intrbiz.bergamot.notification.engine.webhook;
+package com.intrbiz.bergamot.notification.engine.slack.io;
 
+import java.nio.charset.Charset;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,9 +14,9 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.ssl.SslHandshakeCompletionEvent;
 
-public class WebHookClientHandler extends ChannelInboundHandlerAdapter
+public class SlackClientHandler extends ChannelInboundHandlerAdapter
 {
-    private final Logger logger = Logger.getLogger(WebHookClientHandler.class);
+    private final Logger logger = Logger.getLogger(SlackClientHandler.class);
     
     private volatile long start;
     
@@ -29,7 +30,7 @@ public class WebHookClientHandler extends ChannelInboundHandlerAdapter
     
     private volatile boolean timedOut = false;
     
-    public WebHookClientHandler(Timer timer, SSLEngine sslEngine, FullHttpRequest request)
+    public SlackClientHandler(Timer timer, SSLEngine sslEngine, FullHttpRequest request)
     {
         super();
         this.request = request;
@@ -44,8 +45,12 @@ public class WebHookClientHandler extends ChannelInboundHandlerAdapter
         {
             FullHttpResponse response = (FullHttpResponse) msg;
             long runtime = System.currentTimeMillis() - this.start;
-            logger.info("WebHook: Got HTTP response: " + response.getStatus() + " in: " + runtime + "ms");
-            if (logger.isTraceEnabled()) logger.trace("Response:\n" + response);
+            logger.info("Slack WebHook: Got HTTP response: " + response.getStatus() + " in: " + runtime + "ms");
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Response:\n" + response);
+                logger.trace("Content:\n" + response.content().toString(Charset.defaultCharset()));
+            }
             // cancel the timeout
             if (this.timeoutTask != null) this.timeoutTask.cancel();
             // Note: we don't currently care what the response it, simply fire and move on
@@ -114,9 +119,9 @@ public class WebHookClientHandler extends ChannelInboundHandlerAdapter
      */
     protected static class TimeoutTask extends TimerTask
     {
-        private volatile WebHookClientHandler handler;
+        private volatile SlackClientHandler handler;
         
-        public TimeoutTask(WebHookClientHandler handler)
+        public TimeoutTask(SlackClientHandler handler)
         {
             this.handler = handler;
         }

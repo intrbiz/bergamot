@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.notification.engine.webhook;
+package com.intrbiz.bergamot.notification.engine.slack;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,11 +17,15 @@ import org.apache.log4j.Logger;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
 import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
-import com.intrbiz.bergamot.notification.engine.webhook.io.WebHookClientHandler;
+import com.intrbiz.bergamot.notification.NotificationException;
+import com.intrbiz.bergamot.notification.engine.slack.express.SlackEncode;
+import com.intrbiz.bergamot.notification.engine.slack.io.SlackClientHandler;
+import com.intrbiz.bergamot.notification.engine.slack.model.SlackMessage;
+import com.intrbiz.express.ExpressContext;
+import com.intrbiz.express.template.ExpressTemplate;
 import com.intrbiz.util.IBThreadFactory;
 
 import io.netty.bootstrap.Bootstrap;
@@ -42,11 +46,11 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.ssl.SslHandler;
 
-public class WebHookEngine extends AbstractNotificationEngine
+public class SlackEngine extends AbstractNotificationEngine
 {
-    public static final String NAME = "webhook";
+    public static final String NAME = "slack";
 
-    private Logger logger = Logger.getLogger(WebHookEngine.class);
+    private Logger logger = Logger.getLogger(SlackEngine.class);
     
     private SSLContext sslContext;
     
@@ -54,11 +58,9 @@ public class WebHookEngine extends AbstractNotificationEngine
     
     private final Timer timer;
     
-    private final BergamotTranscoder transcoder = new BergamotTranscoder();
-    
-    private Accounting accounting = Accounting.create(WebHookEngine.class);
+    private Accounting accounting = Accounting.create(SlackEngine.class);
 
-    public WebHookEngine()
+    public SlackEngine()
     {
         super(NAME);
         // timer used for timeouts
@@ -79,14 +81,16 @@ public class WebHookEngine extends AbstractNotificationEngine
     protected void configure() throws Exception
     {
         super.configure();
+        // setup our custom functions for templating
+        this.expressExtensions.addFunction("slack_encode", SlackEncode.class);
         // setup our HTTP engine
         // Setup a custom SSLContext which will not validate certs
         this.sslContext = SSLContext.getInstance("TLS");
         this.sslContext.init(null, new TrustManager[] { new BergamotTrustManager(false) }, new SecureRandom());
         // setup the Netty event loop
-        this.eventLoop = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 2, new IBThreadFactory("bergamot-webhook-notifier", false));
+        this.eventLoop = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 2, new IBThreadFactory("bergamot-slack-notifier", false));
         // log
-        logger.info("WebHook notifier configured");
+        logger.info("Slack notifier configured");
     }
     
     public void shutdown()
@@ -99,6 +103,21 @@ public class WebHookEngine extends AbstractNotificationEngine
         {
         }
     }
+    
+    protected void buildMessage(CheckNotification notification, SlackMessage message) throws Exception
+    {
+        String templateName = notification.getCheck().getCheckType() + "." + notification.getNotificationType();
+        ExpressContext context = this.createContext(notification);
+        // add the slack message to the context
+        context.setEntity("slack_message", message, null);
+        // load the template
+        ExpressTemplate template = this.templateLoader.load(context, templateName);
+        if (template == null) throw new NotificationException("Failed to find template: " + templateName);
+        // process the template
+        message.rawText(template.encodeToString(context, notification));
+        if (logger.isTraceEnabled()) 
+            logger.trace(message.toString());
+    }
 
     @Override
     public void sendNotification(Notification notification)
@@ -106,17 +125,30 @@ public class WebHookEngine extends AbstractNotificationEngine
         // we only handle check notifications
         if (notification instanceof CheckNotification)
         {
-            // the webhook URL is stored as a check parameter
-            for (String webhookUrl : this.findNotificationParameters((CheckNotification) notification, "webhook.url"))
+            // the slack URL is stored as a parameter on either: contacts, teams, hosts or services
+            for (String slackUrl : this.findNotificationParameters((CheckNotification) notification, "slack.url"))
             {
                 try
                 {
-                    URL url = new URL(webhookUrl);
+                    // parse the URL
+                    URL url = new URL(slackUrl);
+                    // build the message to send
+                    SlackMessage slackMessage = new SlackMessage()
+                            .username("Bergamot Monitoring")
+                            .iconUrl("https://github.com/intrbiz/bergamot-site/raw/master/src/main/public/logo/disk/64/bergamot_disk_64.png");
+                    // optionally set the channel
+                    if (url.getRef() != null)
+                    {
+                        if (logger.isDebugEnabled()) logger.debug("Sending slack message to channel: " + url.getRef());
+                        slackMessage.channel(url.getRef());
+                    }
+                    // template the message
+                    this.buildMessage((CheckNotification) notification, slackMessage);
                     // build the request to send
-                    FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, url.getPath(), Unpooled.wrappedBuffer(this.transcoder.encodeAsBytes(notification)));
-                    request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+                    FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, url.getPath(), Unpooled.wrappedBuffer(slackMessage.toBytes()));
                     request.headers().add(HttpHeaders.Names.HOST, url.getPort() == -1 ? url.getHost() : url.getHost() + ":" + url.getPort());
-                    request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring WebHook 1.1.0");
+                    request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+                    request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring Slack Notifier 1.0.0");
                     request.headers().add(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8");
                     request.headers().add(HttpHeaders.Names.CONTENT_LENGTH, request.content().readableBytes());
                     // make a HTTP request
@@ -129,23 +161,20 @@ public class WebHookEngine extends AbstractNotificationEngine
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception
                         {
-                            // SSL handling
+                            // Force SSL handling
                             SSLEngine sslEngine = null;
-                            if ("https".equalsIgnoreCase(url.getProtocol()))
-                            {
-                                sslEngine = sslContext.createSSLEngine(url.getHost(), url.getPort() == -1 ? 443 : url.getPort());
-                                sslEngine.setUseClientMode(true);
-                                SSLParameters params = new SSLParameters();
-                                params.setEndpointIdentificationAlgorithm("HTTPS");
-                                sslEngine.setSSLParameters(params);
-                                ch.pipeline().addLast(new SslHandler(sslEngine));
-                            }
+                            sslEngine = sslContext.createSSLEngine(url.getHost(), url.getPort() == -1 ? 443 : url.getPort());
+                            sslEngine.setUseClientMode(true);
+                            SSLParameters params = new SSLParameters();
+                            params.setEndpointIdentificationAlgorithm("HTTPS");
+                            sslEngine.setSSLParameters(params);
+                            ch.pipeline().addLast(new SslHandler(sslEngine));
                             // HTTP handling
                             ch.pipeline().addLast(
                                     new HttpClientCodec(),
                                     new HttpContentDecompressor(),
                                     new HttpObjectAggregator(1 * 1024 * 1024 /* 1 MiB */),
-                                    new WebHookClientHandler(timer, sslEngine, request)
+                                    new SlackClientHandler(timer, sslEngine, request)
                             );
                         }
                     });
@@ -159,14 +188,18 @@ public class WebHookEngine extends AbstractNotificationEngine
                         getNotificationType(notification),
                         null,
                         this.getName(),
-                        "webhook",
+                        "slack",
                         url.toString(),
                         null
                     ));
                 }
                 catch (MalformedURLException e)
                 {
-                    logger.error("Cannot send WebHook to malformed url", e);
+                    logger.error("Cannot send Slack notification to malformed url", e);
+                }
+                catch (Exception e)
+                {
+                    logger.error("Failed to send Slack notification", e);
                 }
             }
         }

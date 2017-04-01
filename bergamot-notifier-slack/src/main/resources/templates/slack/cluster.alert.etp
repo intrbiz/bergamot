@@ -1,0 +1,4 @@
+Alert for cluster #{slack_encode(cluster.summary)} is #{cluster.state.status}
+<# slack_message.attachment().color('#086bff').authorName('Last checked').text().text(dateformat('HH:mm:ss', cluster.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime));
+   slack_message.attachment().color('#2c2c2c').text().link('https://' + site.name + '/cluster/id/' + cluster.id, 'View cluster ' + cluster.summary);
+#>

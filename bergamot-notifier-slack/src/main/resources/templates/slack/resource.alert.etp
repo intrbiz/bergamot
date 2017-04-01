@@ -1,0 +1,4 @@
+Alert for resource #{slack_encode(resource.summary)} on the cluster #{slack_encode(cluster.summary)} is #{resource.state.status}
+<# slack_message.attachment().color('#086bff').authorName('Last checked').text().text(dateformat('HH:mm:ss', resource.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime));
+   slack_message.attachment().color('#2c2c2c').text().link('https://' + site.name + '/resource/id/' + resource.id, 'View resource ' + resource.summary + ' on cluster ' + cluster.summary);
+#>

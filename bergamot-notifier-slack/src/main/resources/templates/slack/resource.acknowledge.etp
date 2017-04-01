@@ -1,0 +1,4 @@
+The alert for trap #{slack_encode(trap.summary)} on the cluster #{slack_encode(cluster.summary)} has been acknowledged by #{slack_encode(notification.acknowledgedBy.summary)} #{dateformat('HH:mm:ss', notification.raised)} on #{dateformat('EEEE dd/MM/yyyy', notification.raised)}
+<# slack_message.attachment().color('#55aaff').authorName(notification.acknowledgeSummary).text(notification.acknowledgeComment);
+   slack_message.attachment().color('#2c2c2c').text().link('https://' + site.name + '/trap/id/' + trap.id, 'View trap ' + trap.summary + ' on cluster ' + cluster.summary);
+#>

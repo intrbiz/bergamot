@@ -122,6 +122,7 @@
     <module>bergamot-worker-ssh</module>
     <module>bergamot-check-ssh</module>
     <module>bergamot-command-processor</module>
+    <module>bergamot-notifier-slack</module>
   </modules>
   
   <dependencyManagement>
