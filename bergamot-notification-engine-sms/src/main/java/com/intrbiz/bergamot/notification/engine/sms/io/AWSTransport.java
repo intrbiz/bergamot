@@ -5,13 +5,16 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.EC2ContainerCredentialsProviderWrapper;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.MessageAttributeValue;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.notification.engine.sms.model.SMSMessage;
 import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
@@ -22,7 +25,7 @@ public class AWSTransport implements SMSTransport
     
     private NotificationEngineCfg config;
     
-    private BasicAWSCredentials awsCredentials;
+    private AWSCredentialsProvider awsCredentials;
     
     private AmazonSNS snsClient;
     
@@ -36,11 +39,21 @@ public class AWSTransport implements SMSTransport
     {
         this.config = cfg;
         // auth details
-        this.awsCredentials = new BasicAWSCredentials(cfg.getStringParameterValue("aws.accessKeyId", null), cfg.getStringParameterValue("aws.secretKey", null));
-        logger.info("Using the Amazon Web Services account: " + this.awsCredentials.getAWSAccessKeyId());
+        String awsAccessKeyId = cfg.getStringParameterValue("aws.accessKeyId", null);
+        String awsSecretKey   = cfg.getStringParameterValue("aws.secretKey", null);
+        if (Util.isEmpty(awsAccessKeyId) || Util.isEmpty(awsSecretKey))
+        {
+            this.awsCredentials = new EC2ContainerCredentialsProviderWrapper();
+            logger.info("Using Amazon Web Services instance or container provided credentials");
+        }
+        else
+        {
+            this.awsCredentials = new AWSStaticCredentialsProvider(new BasicAWSCredentials(awsAccessKeyId, awsSecretKey));
+            logger.info("Using the Amazon Web Services account: " + awsAccessKeyId);
+        }
         // setup the client
         this.snsClient = AmazonSNSClientBuilder.standard()
-                .withCredentials(new AWSStaticCredentialsProvider(this.awsCredentials))
+                .withCredentials(this.awsCredentials)
                 .withRegion(cfg.getStringParameterValue("aws.region", "eu-west-1"))
                 .build();
     }

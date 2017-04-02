@@ -96,6 +96,10 @@
 			<groupId>com.intrbiz.balsa</groupId>
 			<artifactId>balsa-2fa</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-aws</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>
