@@ -14,6 +14,7 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
 import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
@@ -137,7 +138,7 @@ public class SlackEngine extends AbstractNotificationEngine
                             .username("Bergamot Monitoring")
                             .iconUrl("https://github.com/intrbiz/bergamot-site/raw/master/src/main/public/logo/disk/64/bergamot_disk_64.png");
                     // optionally set the channel
-                    if (url.getRef() != null)
+                    if (! Util.isEmpty(url.getRef()))
                     {
                         if (logger.isDebugEnabled()) logger.debug("Sending slack message to channel: " + url.getRef());
                         slackMessage.channel(url.getRef());
