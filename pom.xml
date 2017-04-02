@@ -494,6 +494,16 @@
          	<artifactId>u2flib-server-attestation</artifactId>
          	<version>${u2f.version}</version>
          </dependency>
+         <dependency>
+         	<groupId>com.twilio.sdk</groupId>
+         	<artifactId>twilio</artifactId>
+         	<version>(7.0,7.9)</version>
+         </dependency>
+         <dependency>
+         	<groupId>com.amazonaws</groupId>
+         	<artifactId>aws-java-sdk-sns</artifactId>
+         	<version>1.11.112</version>
+         </dependency>
   	</dependencies>
   </dependencyManagement>
   

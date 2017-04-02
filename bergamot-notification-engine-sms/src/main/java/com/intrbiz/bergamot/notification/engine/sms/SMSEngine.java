@@ -2,6 +2,9 @@ package com.intrbiz.bergamot.notification.engine.sms;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -134,39 +137,37 @@ public class SMSEngine extends AbstractNotificationEngine
         {
             try
             {
-                if (!this.checkAtLeastOneRecipient(notification)) return;
+                Map<String, ContactMO> tos = this.getTo(notification);
+                if (tos.isEmpty()) return;
                 // build the message
                 String message = this.buildMessage(notification);
                 if (Util.isEmpty(message)) throw new RuntimeException("Failed to build message, not sending notifications");
                 // send the SMSes
-                for (ContactMO contact : notification.getTo())
+                for (Entry<String, ContactMO> to : tos.entrySet())
                 {
-                    if ((!Util.isEmpty(contact.getPager())) && contact.hasEngine(this.getName()))
+                    try
                     {
-                        try
-                        {
-                            SMSMessage sms = new SMSMessage(Util.coalesceEmpty(contact.getPager(), contact.getMobile()), this.from, message);
-                            if (logger.isDebugEnabled()) logger.debug("Sending SMS: " + sms);
-                            SentSMS sent = this.transport.sendSMS(sms);
-                            if (logger.isDebugEnabled()) logger.debug("Sent SMS: " + sent);
-                            // accounting
-                            this.accounting.account(new SendNotificationToContactAccountingEvent(
-                                notification.getSite().getId(),
-                                notification.getId(),
-                                getObjectId(notification),
-                                getNotificationType(notification),
-                                contact.getId(),
-                                this.getName(),
-                                "sms",
-                                sms.getTo(),
-                                sent.getMessageId()
-                            ));
-                        }
-                        catch (Exception e)
-                        {
-                            this.smsSendErrors.inc();
-                            logger.error("Failed to send SMS notification to " + Util.coalesceEmpty(contact.getPager(), contact.getMobile()) + " - " + contact.getName(), e);
-                        }
+                        SMSMessage sms = new SMSMessage(to.getKey(), this.from, message);
+                        if (logger.isDebugEnabled()) logger.debug("Sending SMS: " + sms);
+                        SentSMS sent = this.transport.sendSMS(sms);
+                        if (logger.isDebugEnabled()) logger.debug("Sent SMS: " + sent);
+                        // accounting
+                        this.accounting.account(new SendNotificationToContactAccountingEvent(
+                            notification.getSite().getId(),
+                            notification.getId(),
+                            getObjectId(notification),
+                            getNotificationType(notification),
+                            to.getValue().getId(),
+                            this.getName(),
+                            "sms",
+                            sms.getTo(),
+                            sent.getMessageId()
+                        ));
+                    }
+                    catch (Exception e)
+                    {
+                        this.smsSendErrors.inc();
+                        logger.error("Failed to send SMS notification to " + to.getKey() + " - " + to.getValue().getName(), e);
                     }
                 }
             }
@@ -182,14 +183,18 @@ public class SMSEngine extends AbstractNotificationEngine
             tctx.stop();
         }
     }
-
-    protected boolean checkAtLeastOneRecipient(Notification notification)
+    
+    protected Map<String, ContactMO> getTo(Notification notification)
     {
+        Map<String, ContactMO> to = new TreeMap<String, ContactMO>();
         for (ContactMO contact : notification.getTo())
         {
-            if ((!Util.isEmpty(Util.coalesceEmpty(contact.getPager(), contact.getMobile()))) && contact.hasEngine(this.getName())) { return true; }
+            if ((!Util.isEmpty(Util.coalesceEmpty(contact.getPager(), contact.getMobile()))) && contact.hasEngine(this.getName()))
+            {
+                to.put(Util.coalesceEmpty(contact.getPager(), contact.getMobile()), contact);
+            }
         }
-        return false;
+        return to;
     }
 
     protected String buildMessage(Notification notification) throws Exception
