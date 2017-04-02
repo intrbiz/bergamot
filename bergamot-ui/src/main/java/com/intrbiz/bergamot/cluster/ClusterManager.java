@@ -25,6 +25,7 @@ import com.hazelcast.core.Member;
 import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.query.Predicates;
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.controller.BergamotController;
 import com.intrbiz.bergamot.cluster.migration.ClusterMigration;
 import com.intrbiz.bergamot.cluster.migration.DeregisterPoolTask;
@@ -200,7 +201,7 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
                 if (config == null)
                 {
                     // setup config
-                    String hazelcastConfigFile = System.getProperty("hazelcast.config");
+                    String hazelcastConfigFile = Util.coalesceEmpty(System.getProperty("hazelcast.config"), System.getenv("hazelcast.config"));
                     if (hazelcastConfigFile != null)
                     {
                         // when using a config file, you must configure the balsa.sessions map
