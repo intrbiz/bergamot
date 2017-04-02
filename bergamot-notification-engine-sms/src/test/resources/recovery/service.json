@@ -98,7 +98,7 @@
           "security_domains" : [ null ]
         },
         "alerts_enabled" : true,
-        "recovery_enabled" : false,
+        "recovery_enabled" : true,
         "acknowledge_enabled" : true
       } ],
       "ignore" : [ ],
@@ -191,7 +191,7 @@
           "security_domains" : [ null ]
         },
         "alerts_enabled" : true,
-        "recovery_enabled" : false,
+        "recovery_enabled" : true,
         "acknowledge_enabled" : true
       } ],
       "ignore" : [ ],
@@ -312,7 +312,7 @@
           "security_domains" : [ null ]
         },
         "alerts_enabled" : true,
-        "recovery_enabled" : false,
+        "recovery_enabled" : true,
         "acknowledge_enabled" : true
       } ],
       "ignore" : [ ],
