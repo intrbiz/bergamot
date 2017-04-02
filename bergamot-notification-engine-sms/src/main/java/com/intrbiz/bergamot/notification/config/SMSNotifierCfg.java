@@ -24,9 +24,13 @@ public class SMSNotifierCfg extends NotifierCfg
             // email engine with default templates
             this.getEngines().add(
                     new NotificationEngineCfg(
-                            SMSEngine.class, 
-                            new CfgParameter("twillo.account", "The Twillo account SID", ""), 
-                            new CfgParameter("twillo.token", "The Twillo auth token", ""), 
+                            SMSEngine.class,
+                            new CfgParameter("transport", "The transport used to send SMS messages, choice of: [twilio, aws]", "twilio"),
+                            new CfgParameter("twilio.account", "The Twilio account SID", ""), 
+                            new CfgParameter("twilio.token", "The Twilio auth token", ""),
+                            new CfgParameter("aws.accessKeyId", "The AWS access key id", ""), 
+                            new CfgParameter("aws.secretKey", "The AWS secret key", ""),
+                            new CfgParameter("aws.region", "The AWS Region to use", "eu-west-1"),
                             new CfgParameter("from", "The from phone number", "+440000000000") 
                     )
             );

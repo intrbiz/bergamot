@@ -1,12 +1,9 @@
 package com.intrbiz.bergamot.notification.engine.sms;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Counter;
@@ -20,29 +17,24 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
+import com.intrbiz.bergamot.notification.engine.sms.io.AWSTransport;
+import com.intrbiz.bergamot.notification.engine.sms.io.SMSTransport;
+import com.intrbiz.bergamot.notification.engine.sms.io.SMSTransportException;
+import com.intrbiz.bergamot.notification.engine.sms.io.TwilioTransport;
+import com.intrbiz.bergamot.notification.engine.sms.model.SMSMessage;
+import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.QueueException;
-import com.twilio.sdk.TwilioRestClient;
-import com.twilio.sdk.resource.factory.MessageFactory;
-import com.twilio.sdk.resource.instance.Message;
 
 public class SMSEngine extends AbstractNotificationEngine
 {
     public static final String NAME = "sms";
 
-    private Logger logger = Logger.getLogger(SMSEngine.class);
-
-    private String accountSid;
-
-    private String authToken;
+    private static final Logger logger = Logger.getLogger(SMSEngine.class);
 
     private String from;
-
-    private TwilioRestClient client;
-
-    private MessageFactory messageFactory;
     
     private final Timer smsSendTimer;
     
@@ -51,6 +43,8 @@ public class SMSEngine extends AbstractNotificationEngine
     private Accounting accounting = Accounting.create(SMSEngine.class);
     
     private List<String> healthcheckAdmins = new LinkedList<String>();
+    
+    private SMSTransport transport;
 
     public SMSEngine()
     {
@@ -60,20 +54,30 @@ public class SMSEngine extends AbstractNotificationEngine
         this.smsSendTimer = source.getRegistry().timer("sms-sent");
         this.smsSendErrors = source.getRegistry().counter("sms-errors");
     }
+    
+    protected SMSTransport loadTransport(String transportName) throws SMSTransportException
+    {
+        switch (transportName)
+        {
+            case "twilio":
+                return new TwilioTransport();
+            case "aws":
+                return new AWSTransport();
+        }
+        throw new SMSTransportException("The transport: " + transportName + " is not known, cannot load transport");
+    }
 
     @Override
     protected void configure() throws Exception
     {
         super.configure();
-        // auth details
-        this.accountSid = this.config.getStringParameterValue("twilio.account", "");
-        this.authToken = this.config.getStringParameterValue("twilio.token", "");
         // from number
         this.from = this.config.getStringParameterValue("from", "");
-        // setup the client
-        logger.info("Using the Twilio account: " + this.accountSid + ", from: " + this.from);
-        this.client = new TwilioRestClient(this.accountSid, this.authToken);
-        this.messageFactory = client.getAccount().getMessageFactory();
+        logger.info("Sending SMS messages from: " + this.from);
+        // load our SMS transport
+        this.transport = this.loadTransport(this.config.getStringParameterValue("transport", "twilio"));
+        this.transport.configure(this.config);
+        logger.info("Using " + this.transport + " to send SMS messages");
         // who to contact in the event we get a warning from the healthcheck subsystem
         for (CfgParameter param : this.config.getParameters())
         {
@@ -84,6 +88,8 @@ public class SMSEngine extends AbstractNotificationEngine
         // setup healthchecking
         HealthTracker.getInstance().addAlertHandler(this::raiseHealthcheckAlert);
     }
+    
+    
     
     public void raiseHealthcheckAlert(KnownDaemon failed)
     {
@@ -101,17 +107,11 @@ public class SMSEngine extends AbstractNotificationEngine
                     {
                         try
                         {
-                            // send the SMS
-                            List<NameValuePair> params = new ArrayList<NameValuePair>();
-                            params.add(new BasicNameValuePair("To", admin));
-                            params.add(new BasicNameValuePair("From", this.from));
-                            params.add(new BasicNameValuePair("Body", message));
-                            Message sms = this.messageFactory.create(params);
-                            logger.info("Sent SMS, Id: " + sms.getSid());
+                            this.transport.sendSMS(new SMSMessage(admin, this.from, message));
                         }
-                        catch (Exception e)
+                        catch (SMSTransportException e)
                         {
-                            logger.error("Failed to send SMS notification to " + admin);
+                            logger.error("Failed to send healthcheck SMS to " + admin, e);
                         }
                     }
                     // successfully sent
@@ -145,13 +145,10 @@ public class SMSEngine extends AbstractNotificationEngine
                     {
                         try
                         {
-                            // send the SMS
-                            List<NameValuePair> params = new ArrayList<NameValuePair>();
-                            params.add(new BasicNameValuePair("To", contact.getPager()));
-                            params.add(new BasicNameValuePair("From", this.from));
-                            params.add(new BasicNameValuePair("Body", message));
-                            Message sms = this.messageFactory.create(params);
-                            logger.info("Sent SMS, Id: " + sms.getSid());
+                            SMSMessage sms = new SMSMessage(Util.coalesceEmpty(contact.getPager(), contact.getMobile()), this.from, message);
+                            if (logger.isDebugEnabled()) logger.debug("Sending SMS: " + sms);
+                            SentSMS sent = this.transport.sendSMS(sms);
+                            if (logger.isDebugEnabled()) logger.debug("Sent SMS: " + sent);
                             // accounting
                             this.accounting.account(new SendNotificationToContactAccountingEvent(
                                 notification.getSite().getId(),
@@ -161,14 +158,14 @@ public class SMSEngine extends AbstractNotificationEngine
                                 contact.getId(),
                                 this.getName(),
                                 "sms",
-                                contact.getPager(),
-                                sms.getSid()
+                                sms.getTo(),
+                                sent.getMessageId()
                             ));
                         }
                         catch (Exception e)
                         {
                             this.smsSendErrors.inc();
-                            logger.error("Failed to send SMS notification to " + contact.getPager() + " - " + contact.getName());
+                            logger.error("Failed to send SMS notification to " + Util.coalesceEmpty(contact.getPager(), contact.getMobile()) + " - " + contact.getName(), e);
                         }
                     }
                 }
@@ -190,7 +187,7 @@ public class SMSEngine extends AbstractNotificationEngine
     {
         for (ContactMO contact : notification.getTo())
         {
-            if ((!Util.isEmpty(contact.getPager())) && contact.hasEngine(this.getName())) { return true; }
+            if ((!Util.isEmpty(Util.coalesceEmpty(contact.getPager(), contact.getMobile()))) && contact.hasEngine(this.getName())) { return true; }
         }
         return false;
     }

@@ -375,11 +375,6 @@
   			<version>4.0.40.Final</version>
   		</dependency>
   		<dependency>
-  			<groupId>com.twilio.sdk</groupId>
-  			<artifactId>twilio-java-sdk</artifactId>
-  			<version>3.4.4</version>
-  		</dependency>
-  		<dependency>
   			<groupId>com.fasterxml.jackson.core</groupId>
   			<artifactId>jackson-core</artifactId>
   			<version>${jackson.version}</version>
