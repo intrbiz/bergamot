@@ -175,7 +175,7 @@ public class TestNagiosRunner
         );
     }
     
-    @Test
+    /*@Test
     public void testFailingNRPE()
     {
         // deliberately wrong port number
@@ -197,7 +197,7 @@ public class TestNagiosRunner
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
-    }
+    }*/
     
     /*@Test
     public void testNRPE()
