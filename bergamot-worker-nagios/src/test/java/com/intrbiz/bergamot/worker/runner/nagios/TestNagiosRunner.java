@@ -199,7 +199,7 @@ public class TestNagiosRunner
         );
     }
     
-    @Test
+    /*@Test
     public void testNRPE()
     {
         ExecuteCheck executeCheck = nagiosCheck("check_nrpe", "/usr/lib/nagios/plugins/check_nrpe -H 127.0.0.1 -t 15 -c check_load");
@@ -220,7 +220,7 @@ public class TestNagiosRunner
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
-    }
+    }*/
     
     private static class NagiosExecutorTester extends NagiosExecutor
     {
