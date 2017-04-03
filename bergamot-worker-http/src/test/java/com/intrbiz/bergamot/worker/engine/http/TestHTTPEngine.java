@@ -93,7 +93,7 @@ public class TestHTTPEngine
         System.out.println("Got result: " + resultMO);
     }
     
-    @Test
+    /*@Test
     public void testScriptedHTTPCheck() throws Exception
     {
         // the check to execute
@@ -126,7 +126,7 @@ public class TestHTTPEngine
         assertThat(resultMO, is(notNullValue()));
         assertThat(resultMO.getStatus(), is(equalTo("INFO")));
         System.out.println("Got result: " + resultMO);
-    }
+    }*/
     
     @Test
     public void testJsoupHTTPCheck() throws Exception
