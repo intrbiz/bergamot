@@ -31,6 +31,7 @@ import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.data.DataManager;
+import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RPCClient;
 import com.intrbiz.queue.name.RoutingKey;
@@ -144,6 +145,11 @@ public class CreateSiteCommand extends BergamotCLICommand
             }
             // create
             db.setSite(site);
+        }
+        // setup the readings
+        try (LamplighterDB db = LamplighterDB.connect())
+        {
+            db.setupSiteReadings(siteId);
         }
         // now import the site config
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)

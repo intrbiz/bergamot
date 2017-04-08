@@ -7,6 +7,7 @@ import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.data.DataManager;
+import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.util.pool.database.DatabasePool;
 
 public class DBVersionCommand extends BergamotCLICommand
@@ -51,6 +52,10 @@ public class DBVersionCommand extends BergamotCLICommand
         BergamotDB.install();
         // now actually create the site
         try (BergamotDB db = BergamotDB.connect())
+        {
+            System.out.println(db.getName() + " " + db.getVersion());
+        }
+        try (LamplighterDB db = LamplighterDB.connect())
         {
             System.out.println(db.getName() + " " + db.getVersion());
         }

@@ -34,6 +34,7 @@ import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Get;
@@ -174,6 +175,11 @@ public class FirstInstallRouter extends Router<BergamotApp>
         try (BergamotDB db = BergamotDB.connect())
         {
             db.setSite(new Site(siteId, siteName, siteSummary));
+        }
+        // setup the readings
+        try (LamplighterDB db = LamplighterDB.connect())
+        {
+            db.setupSiteReadings(siteId);
         }
         // now import the site config
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)
