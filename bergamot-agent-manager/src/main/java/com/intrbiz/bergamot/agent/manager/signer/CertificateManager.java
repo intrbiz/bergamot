@@ -200,7 +200,7 @@ public class CertificateManager
         }
     }
     
-    public Certificate signServer(String commonName, PublicKey key)
+    public CertificatePair signServer(String commonName, PublicKey key)
     {
         if (this.keyStore.hasServer(commonName))
         {
@@ -218,7 +218,7 @@ public class CertificateManager
                 // store
                 this.keyStore.storeServer(commonName, server);
                 // return the cert
-                return server.getCertificate();
+                return server;
             }
             catch (Exception e)
             {
@@ -238,7 +238,7 @@ public class CertificateManager
                 // store
                 this.keyStore.storeServer(commonName, server);
                 // return the cert
-                return server.getCertificate();
+                return server;
             }
             catch (Exception e)
             {

@@ -1,12 +1,18 @@
 package com.intrbiz.bergamot.worker.engine.agent;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer.RegisterAgentCallback.SendAgentRegistrationMessage;
 import com.intrbiz.bergamot.agent.server.config.BergamotAgentServerCfg;
+import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
+import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
+import com.intrbiz.bergamot.model.message.agent.manager.request.GetServer;
+import com.intrbiz.bergamot.model.message.agent.manager.response.AgentManagerError;
+import com.intrbiz.bergamot.model.message.agent.manager.response.GotServer;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationComplete;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed.ErrorCode;
@@ -14,15 +20,18 @@ import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRe
 import com.intrbiz.bergamot.model.message.command.GeneralCommandError;
 import com.intrbiz.bergamot.model.message.command.RegisterBergamotAgent;
 import com.intrbiz.bergamot.model.message.command.RegisteredBergamotAgent;
+import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.worker.config.AgentWorkerCfg;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.queue.RPCClient;
+import com.intrbiz.queue.name.RoutingKey;
 
 /**
  * Execute Bergamot Agent checks via the Bergamot Agent Server
  */
 public class AgentEngine extends AbstractEngine
 {
-    private Logger logger = Logger.getLogger(AgentEngine.class);
+    private static final Logger logger = Logger.getLogger(AgentEngine.class);
     
     public static final String NAME = "agent";
     
@@ -70,10 +79,18 @@ public class AgentEngine extends AbstractEngine
     @Override
     public void start() throws Exception
     {
-        // configure the agent server
-        BergamotAgentServerCfg serverCfg = ((AgentWorkerCfg) this.getWorker().getConfiguration()).getAgentServer();
-        Logger.getLogger(AgentEngine.class).info("Listening for Bergamot Agent connections on port: " + serverCfg.getPort());
+        // create our agent server
         this.agentServer = new BergamotAgentServer();
+        AgentWorkerCfg workerCfg = (AgentWorkerCfg) this.getWorker().getConfiguration();
+        BergamotAgentServerCfg serverCfg = workerCfg.getAgentServer();
+        // use a static configuration or dynamically request certificates from the agent manager
+        if (serverCfg == null)
+        {
+            logger.info("Requesting agent server certificate from agent manager, for: " + workerCfg.getName());
+            serverCfg = requestAgentServerCertificates(workerCfg.getName(), workerCfg.getPort()); 
+        }
+        // configure the agent server with a static configuration            
+        logger.info("Listening for Bergamot Agent connections on port: " + serverCfg.getPort());
         this.agentServer.configure(serverCfg);
         // handle binding / unbinding agent routes when an agent connects and disconnects
         this.agentServer.setOnAgentRegisterHandler((handler) -> {
@@ -90,6 +107,42 @@ public class AgentEngine extends AbstractEngine
         // start the agent server
         this.agentServer.start();
     }
+    
+    protected BergamotAgentServerCfg requestAgentServerCertificates(String name, int port) throws Exception
+    {
+        try (BergamotAgentManagerQueue agentManager = BergamotAgentManagerQueue.open())
+        {
+            try (RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client = agentManager.createBergamotAgentManagerRPCClient())
+            {
+                BergamotAgentServerCfg cfg = new BergamotAgentServerCfg();
+                cfg.setPort(port);
+                cfg.setName(name);
+                // get the root CA
+                GotServer server = this.callAgentManager(client, new GetServer(name).withRoot().withKey().withGenerate(), 60);
+                // complete the config
+                cfg.setCaCertificate(server.getRootCertificatePEM());
+                cfg.setCertificate(server.getCertificatePEM());
+                cfg.setKey(server.getKeyPEM());
+                return cfg;
+            }
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to request agent server certificates from the agent manager", e);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected <T extends AgentManagerResponse> T callAgentManager(RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client, AgentManagerRequest request, int timeoutSeconds) throws Exception
+    {
+        AgentManagerResponse response = client.publish(request).get(timeoutSeconds, TimeUnit.SECONDS);
+        if (response instanceof AgentManagerError)
+        {
+            AgentManagerError error = (AgentManagerError) response;
+            throw new RuntimeException("Failed to call agent manager: " + error.getMessage());
+        }
+        return (T) response;
+    }
 
     public BergamotAgentServer getAgentServer()
     {
@@ -105,7 +158,7 @@ public class AgentEngine extends AbstractEngine
         command.setTemplateId(templateId);
         command.setPublicKey(request.getPublicKey());
         // log
-        this.logger.info("Got request to register agent using template: " + templateId + ", agent id: " + request.getAgentId() + " common name: " + request.getCommonName());
+        logger.info("Got request to register agent using template: " + templateId + ", agent id: " + request.getAgentId() + " common name: " + request.getCommonName());
         // send the command
         this.getCommandRPCClient().publish(60_000L, command, (response) -> {
             if (response instanceof RegisteredBergamotAgent)

@@ -10,6 +10,12 @@ public class GotServer extends AgentManagerResponse
     @JsonProperty("certificate_pem")
     private String certificatePEM;
     
+    @JsonProperty("root_certificate_pem")
+    private String rootCertificatePEM;
+    
+    @JsonProperty("key_pem")
+    private String keyPEM;
+    
     public GotServer()
     {
         super();
@@ -28,5 +34,25 @@ public class GotServer extends AgentManagerResponse
     public void setCertificatePEM(String certificatePEM)
     {
         this.certificatePEM = certificatePEM;
+    }
+
+    public String getRootCertificatePEM()
+    {
+        return rootCertificatePEM;
+    }
+
+    public void setRootCertificatePEM(String rootCertificatePEM)
+    {
+        this.rootCertificatePEM = rootCertificatePEM;
+    }
+
+    public String getKeyPEM()
+    {
+        return keyPEM;
+    }
+
+    public void setKeyPEM(String keyPEM)
+    {
+        this.keyPEM = keyPEM;
     }
 }

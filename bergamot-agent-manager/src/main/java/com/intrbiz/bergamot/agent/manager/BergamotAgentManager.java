@@ -14,6 +14,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.manager.config.BergamotAgentManagerCfg;
 import com.intrbiz.bergamot.agent.manager.signer.CertificateManager;
 import com.intrbiz.bergamot.agent.manager.store.BergamotKeyStore;
+import com.intrbiz.bergamot.crypto.util.CertificatePair;
 import com.intrbiz.bergamot.crypto.util.PEMUtil;
 import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
@@ -30,6 +31,7 @@ import com.intrbiz.bergamot.model.message.agent.manager.response.AgentManagerErr
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.GotServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
@@ -105,21 +107,52 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
         {
             if (event instanceof GetRootCA)
             {
-                return new GotRootCA(PEMUtil.saveCertificate(this.keyStore.loadRootCA().getCertificate()));
+                return new GotRootCA(this.keyStore.loadRootCA().getCertificateAsPEM());
             }
             else if (event instanceof GetSiteCA)
             {
-                return new GotSiteCA(PEMUtil.saveCertificate(this.keyStore.loadSiteCA(((GetSiteCA) event).getSiteId()).getCertificate()));
+                return new GotSiteCA(this.keyStore.loadSiteCA(((GetSiteCA) event).getSiteId()).getCertificateAsPEM());
             }
             else if (event instanceof GetAgent)
             {
                 GetAgent agent = (GetAgent) event;
-                return new GotAgent(PEMUtil.saveCertificate(this.keyStore.loadAgent(agent.getSiteId(), agent.getId()).getCertificate()));
+                return new GotAgent(this.keyStore.loadAgent(agent.getSiteId(), agent.getId()).getCertificateAsPEM());
             }
             else if (event instanceof GetServer)
             {
                 GetServer server = (GetServer) event;
-                return new GotAgent(PEMUtil.saveCertificate(this.keyStore.loadServer(server.getCommonName()).getCertificate()));
+                // do we have the server
+                if (this.keyStore.hasServer(server.getCommonName()))
+                {
+                    // load the server key
+                    CertificatePair serverPair = this.keyStore.loadServer(server.getCommonName());
+                    GotServer resp = new GotServer(serverPair.getCertificateAsPEM());
+                    // do we want the key?
+                    if (server.isIncludeKey() && serverPair.getKey() != null)
+                        resp.setKeyPEM(serverPair.getKeyAsPEM());
+                    // do we want the CA cert
+                    if (server.isIncludeRoot())
+                        resp.setRootCertificatePEM(this.keyStore.loadRootCA().getCertificateAsPEM());
+                    return resp;
+                }
+                else if (server.isGenerate())
+                {
+                    // generate the certificate
+                    CertificatePair serverPair = this.certificateManager.signServer(server.getCommonName(), null);
+                    GotServer resp = new GotServer();
+                    resp.setCertificatePEM(serverPair.getCertificateAsPEM());
+                    // do we want the key?
+                    if (server.isIncludeKey() && serverPair.getKey() != null)
+                        resp.setKeyPEM(serverPair.getKeyAsPEM());
+                    // do we want the CA cert
+                    if (server.isIncludeRoot())
+                        resp.setRootCertificatePEM(this.keyStore.loadRootCA().getCertificateAsPEM());
+                    return resp;
+                }
+                else
+                {
+                    throw new RuntimeException("Failed to load certificate for server: " + server.getCommonName());
+                }
             }
             else if (event instanceof CreateSiteCA)
             {
@@ -141,10 +174,10 @@ public class BergamotAgentManager implements Configurable<BergamotAgentManagerCf
             else if (event instanceof SignServer)
             {
                 SignServer sign = (SignServer) event;
-                // sign the agent 
-                Certificate cert = this.certificateManager.signServer(sign.getCommonName(), PEMUtil.loadPublicKey(sign.getPublicKeyPEM()));
+                // sign the server 
+                CertificatePair cert = this.certificateManager.signServer(sign.getCommonName(), PEMUtil.loadPublicKey(sign.getPublicKeyPEM()));
                 // respond
-                return new SignedServer(PEMUtil.saveCertificate(cert));
+                return new SignedServer(cert.getCertificateAsPEM());
             }
             else if (event instanceof SignTemplate)
             {

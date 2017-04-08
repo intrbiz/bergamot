@@ -68,7 +68,7 @@ public class FileKeyStore implements BergamotKeyStore
     
     public FileKeyStore(File base)
     {
-        this.base   = base;
+        this.base   = base.getAbsoluteFile();
         this.root   = new File(this.base, "root");
         this.site   = new File(this.base, "site");
         this.server = new File(this.base, "server");

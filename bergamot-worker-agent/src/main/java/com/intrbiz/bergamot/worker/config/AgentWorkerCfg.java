@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.worker.config;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -35,6 +36,8 @@ public class AgentWorkerCfg extends WorkerCfg
     private static final long serialVersionUID = 1L;
 
     private BergamotAgentServerCfg agentServer;
+    
+    private int port = 15443;
 
     public AgentWorkerCfg()
     {
@@ -50,6 +53,17 @@ public class AgentWorkerCfg extends WorkerCfg
     public void setAgentServer(BergamotAgentServerCfg agentServer)
     {
         this.agentServer = agentServer;
+    }
+    
+    @XmlAttribute(name = "port")
+    public int getPort()
+    {
+        return port;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
     }
 
     @Override
