@@ -23,6 +23,7 @@ import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.config.model.ContactCfg;
+import com.intrbiz.bergamot.config.model.CredentialCfg;
 import com.intrbiz.bergamot.config.model.EscalateCfg;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
@@ -52,6 +53,7 @@ import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Credential;
 import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
@@ -202,6 +204,8 @@ public class BergamotConfigImporter
                             this.loadSecurityDomains(db);
                             // templates
                             this.loadTemplates(db);
+                            // load the credentials
+                            this.loadCredentials(db);
                             // load the commands
                             this.loadCommands(db);
                             // time periods
@@ -601,9 +605,9 @@ public class BergamotConfigImporter
     
     private void loadLocation(LocationCfg configuration, BergamotDB db)
     {
-        if (this.loadedObjects.contains("timeperiod:" + configuration.getName()))
+        if (this.loadedObjects.contains("location:" + configuration.getName()))
         {
-            this.report.info("Skipping reconfiguring timeperiod " + configuration.getName());
+            this.report.info("Skipping reconfiguring location " + configuration.getName());
             return;
         }
         // load
@@ -1784,6 +1788,83 @@ public class BergamotConfigImporter
                 }
             }
         }
+    }
+    
+    private void loadCredentials(BergamotDB db)
+    {
+        for (CredentialCfg configuration : this.config.getCredentials())
+        {
+            if (! configuration.getTemplateBooleanValue())
+            {
+                if (ObjectState.isRemove(configuration.getObjectState()))
+                {
+                    // remove the credential
+                    this.removeCredential(configuration, db);
+                }
+                else
+                {
+                    // add or change the credential
+                    this.loadCredential(configuration, db);
+                }
+            }
+        }
+        // load any credential where a template change cascades
+        for (CascadedChange change : this.cascadedChanges.values())
+        {
+            if (change.dependent.getConfiguration() instanceof CredentialCfg)
+            {
+                CredentialCfg configuration = (CredentialCfg) change.dependent.getConfiguration();
+                if (! (configuration.getTemplateBooleanValue() || this.loadedObjects.contains("credential:" + configuration.getName())))
+                {
+                    this.report.info("Reconfiguring credential " + configuration.getName() + " due to a change to the " + change.template.getName() + " inherited template.");
+                    // first we need to resolve the inheritance for the cascaded object
+                    db.getConfigResolver(this.site.getId()).computeInheritenance(configuration);
+                    // load
+                    this.loadCredential(configuration, db);
+                }
+            }
+        }
+    }
+    
+    private void removeCredential(CredentialCfg configuration, BergamotDB db)
+    {
+        this.report.info("Removing credential: " + configuration.resolve().getName());
+        // remove the location
+        Credential credential = db.getCredentialByName(this.site.getId(), configuration.getName());
+        if (credential != null)
+        {
+            db.removeCredential(credential.getId());
+            db.removeConfig(credential.getId());
+            db.removeSecurityDomainMembershipForCheck(credential.getId());
+        }
+    }
+    
+    private void loadCredential(CredentialCfg configuration, BergamotDB db)
+    {
+        if (this.loadedObjects.contains("credential:" + configuration.getName()))
+        {
+            this.report.info("Skipping reconfiguring credential " + configuration.getName());
+            return;
+        }
+        // load
+        CredentialCfg resolvedConfiguration = configuration.resolve();
+        Credential credential = db.getCredentialByName(this.site.getId(), configuration.getName());
+        if (credential == null)
+        {
+            configuration.setId(this.site.randomObjectId());
+            credential = new Credential();
+            this.report.info("Configuring new credential: " + resolvedConfiguration.getName());
+        }
+        else
+        {
+            configuration.setId(credential.getId());
+            this.report.info("Reconfiguring existing credential: " + resolvedConfiguration.getName() + " (" + configuration.getId() + ")");
+        }
+        credential.configure(configuration);
+        db.setCredential(credential);
+        this.loadedObjects.add("credential:" + configuration.getName());
+        // security domains
+        this.linkSecurityDomains(resolvedConfiguration, credential, db);
     }
     
     /**
