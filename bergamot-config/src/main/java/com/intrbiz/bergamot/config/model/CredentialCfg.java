@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.config.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -29,7 +29,7 @@ public class CredentialCfg extends SecuredObjectCfg<CredentialCfg>
         super();
     }
 
-    @XmlAttribute(name = "username")
+    @XmlElement(name = "username")
     @ResolveWith(CoalesceEmptyString.class)
     public String getUsername()
     {
@@ -41,7 +41,7 @@ public class CredentialCfg extends SecuredObjectCfg<CredentialCfg>
         this.username = username;
     }
 
-    @XmlAttribute(name = "password")
+    @XmlElement(name = "password")
     @ResolveWith(CoalesceEmptyString.class)
     public String getPassword()
     {
@@ -53,7 +53,7 @@ public class CredentialCfg extends SecuredObjectCfg<CredentialCfg>
         this.password = password;
     }
 
-    @XmlAttribute(name = "key-id")
+    @XmlElement(name = "key-id")
     @ResolveWith(CoalesceEmptyString.class)
     public String getKeyId()
     {
@@ -65,7 +65,7 @@ public class CredentialCfg extends SecuredObjectCfg<CredentialCfg>
         this.keyId = keyId;
     }
 
-    @XmlAttribute(name = "key-secret")
+    @XmlElement(name = "key-secret")
     @ResolveWith(CoalesceEmptyString.class)
     public String getKeySecret()
     {
