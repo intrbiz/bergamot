@@ -65,11 +65,14 @@ public class LoginRouter extends Router<BergamotApp>
         {
             // try the given auth token and assert the contact has ui.access permission
             AuthenticationResponse authResp = tryAuthenticate(new GenericAuthenticationToken(autoAuthToken));
-            // record the token in the session for removal on logout
-            sessionVar("bergamot.auto.login", autoAuthToken);
-            // complete the login
-            this.completeLogin(authResp, redirect);
-            return;
+            if (authResp != null)
+            {
+                // record the token in the session for removal on logout
+                sessionVar("bergamot.auto.login", autoAuthToken);
+                // complete the login
+                this.completeLogin(authResp, redirect);
+                return;
+            }
         }
         // should we redirect to the first install
         try (BergamotDB db = BergamotDB.connect())
