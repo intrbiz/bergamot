@@ -24,7 +24,7 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
 {
     private static final long serialVersionUID = 1L;
 
-    public static final Class<?>[] OBJECT_TYPES = { TeamCfg.class, ContactCfg.class, TimePeriodCfg.class, LocationCfg.class, GroupCfg.class, CommandCfg.class, ServiceCfg.class, TrapCfg.class, HostCfg.class, ResourceCfg.class, ClusterCfg.class };
+    public static final Class<?>[] OBJECT_TYPES = { TeamCfg.class, ContactCfg.class, TimePeriodCfg.class, LocationCfg.class, GroupCfg.class, CommandCfg.class, ServiceCfg.class, TrapCfg.class, HostCfg.class, ResourceCfg.class, ClusterCfg.class, CredentialCfg.class };
 
     private String site = "default";
 
@@ -55,6 +55,8 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
     private List<ClusterCfg> clusters = new LinkedList<ClusterCfg>();
     
     private List<SecurityDomainCfg> securityDomains = new LinkedList<SecurityDomainCfg>();
+    
+    private List<CredentialCfg> credentials = new LinkedList<CredentialCfg>();
 
     private Map<String, TemplatedObjectCfg<?>> index = new HashMap<String, TemplatedObjectCfg<?>>();
 
@@ -246,6 +248,17 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
         this.securityDomains = securityDomains;
     }
 
+    @XmlElementRef(type = CredentialCfg.class)
+    public List<CredentialCfg> getCredentials()
+    {
+        return credentials;
+    }
+
+    public void setCredentials(List<CredentialCfg> credentials)
+    {
+        this.credentials = credentials;
+    }
+
     public void mergeIn(BergamotCfg other)
     {
         this.teams.addAll(other.getTeams());
@@ -260,6 +273,7 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
         this.resources.addAll(other.getResources());
         this.clusters.addAll(other.getClusters());
         this.securityDomains.addAll(other.getSecurityDomains());
+        this.credentials.addAll(other.getCredentials());
         // merge in parameters
         this.getParameters().addAll(other.getParameters());
         // update the index
@@ -326,6 +340,10 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
         {
             this.securityDomains.add((SecurityDomainCfg) object);
         }
+        else if (object instanceof CredentialCfg)
+        {
+            this.credentials.add((CredentialCfg) object);
+        }
         // update the index
         this.index(true);
     }
@@ -333,7 +351,7 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
     @SuppressWarnings("unchecked")
     public List<? extends TemplatedObjectCfg<?>>[] getAllObjects()
     {
-        return new List[] { this.clusters, this.commands, this.contacts, this.groups, this.hosts, this.locations, this.resources, this.services, this.teams, this.timePeriods, this.traps, this.securityDomains };
+        return new List[] { this.clusters, this.commands, this.contacts, this.groups, this.hosts, this.locations, this.resources, this.services, this.teams, this.timePeriods, this.traps, this.securityDomains, this.credentials };
     }
 
     public void index(boolean force)

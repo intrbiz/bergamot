@@ -29,6 +29,7 @@ import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.CredentialMO;
 import com.intrbiz.bergamot.model.message.DowntimeMO;
 import com.intrbiz.bergamot.model.message.EscalationMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
@@ -165,6 +166,7 @@ public class BergamotTranscoder
         CommentMO.class,
         DowntimeMO.class,
         SecurityDomainMO.class,
+        CredentialMO.class,
         // model
         ParameterMO.class,
         // messages

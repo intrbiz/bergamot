@@ -38,6 +38,7 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.ContactBackupCode;
 import com.intrbiz.bergamot.model.ContactHOTPRegistration;
 import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
+import com.intrbiz.bergamot.model.Credential;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.GlobalSetting;
@@ -87,7 +88,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 45, 0}),
+        version = @SQLVersion({3, 46, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -128,7 +129,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ContactHOTPRegistration.class,
             ContactBackupCode.class,
             AgentTemplate.class,
-            GlobalSetting.class
+            GlobalSetting.class,
+            Credential.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -395,6 +397,29 @@ public abstract class BergamotDB extends DatabaseAdapter
         timePeriod.getExcludesId().remove(excluded.getId());
         this.setTimePeriod(timePeriod);
     }
+    
+    // credential
+    
+    @Cacheable
+    @CacheInvalidate({"get_credential_by_name.#{site_id}.*"})
+    @SQLSetter(table = Credential.class, name = "set_credential", since = @SQLVersion({3, 46, 0}))
+    public abstract void setCredential(Credential Credential);
+    
+    @Cacheable
+    @SQLGetter(table = Credential.class, name = "get_credential", since = @SQLVersion({3, 46, 0}))
+    public abstract Credential getCredential(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLGetter(table = Credential.class, name = "get_credential_by_name", since = @SQLVersion({3, 46, 0}))
+    public abstract Credential getCredentialByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
+    
+    @SQLGetter(table = Credential.class, name = "list_credentials", since = @SQLVersion({3, 46, 0}))
+    public abstract List<Credential> listCredentials(@SQLParam("site_id") UUID siteId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_credential_by_name.#{this.getSiteId(id)}.*"})
+    @SQLRemove(table = Credential.class, name = "remove_credential", since = @SQLVersion({3, 46, 0}))
+    public abstract void removeCredential(@SQLParam("id") UUID id);
     
     // command
     
