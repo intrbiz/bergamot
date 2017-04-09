@@ -4,9 +4,11 @@ import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.config.model.CredentialCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
+import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Get;
@@ -24,7 +26,10 @@ public class ConfigAdminRouter extends Router<BergamotApp>
     public void showConfigure(BergamotDB db, @IsaObjectId UUID id, @GetBergamotSite() Site site)
     {
         require(permission("read.config", id));
-        var("config", db.getConfig(id));
+        Config cfg = var("config", db.getConfig(id));
+        // special check for credentials
+        if (cfg.getConfiguration() instanceof CredentialCfg)
+            require(permission("config.change.apply", id));
         encode("admin/config/view");
     }
 }

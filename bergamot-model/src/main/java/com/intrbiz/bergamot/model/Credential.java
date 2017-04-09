@@ -80,6 +80,10 @@ public class Credential extends SecuredObject<CredentialMO, CredentialCfg>
     public void configure(CredentialCfg configuration, CredentialCfg resolvedConfiguration)
     {
         super.configure(configuration, resolvedConfiguration);
+        this.username = resolvedConfiguration.getUsername();
+        this.password = resolvedConfiguration.getPassword();
+        this.keyId = resolvedConfiguration.getKeyId();
+        this.keySecret = resolvedConfiguration.getKeySecret();
     }
 
     @Override

@@ -90,6 +90,9 @@
 	                    <a href="/admin/command/">Commands</a>
 	                </li>
 	                <li>
+	                    <a href="/admin/credential/">Credentials</a>
+	                </li>
+	                <li>
 	                    <a href="/admin/location/">Locations</a>
 	                </li>
 	                <li>

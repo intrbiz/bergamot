@@ -77,6 +77,7 @@ import com.intrbiz.bergamot.ui.router.admin.CommandAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ConfigAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ConfigChangeAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ContactAdminRouter;
+import com.intrbiz.bergamot.ui.router.admin.CredentialAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.GroupAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.HostAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.LocationAdminRouter;
@@ -283,6 +284,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new ConfigChangeAdminRouter());
         router(new ConfigAdminRouter());
         router(new SecurityDomainAdminRouter());
+        router(new CredentialAdminRouter());
         // Command Editor
         router(new CommandEditorRouter());
         // Global Stuff
