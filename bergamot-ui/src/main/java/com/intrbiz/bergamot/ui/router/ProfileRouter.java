@@ -187,7 +187,7 @@ public class ProfileRouter extends Router<BergamotApp>
     {
         // get the HOTP registration
         ContactHOTPRegistration registration = notNull(db.getHOTPRegistration(hotpRegistrationId));
-        // assert that this registration is owned by the current principal
+        // require that this registration is owned by the current principal
         require(registration.getContactId().equals(contact.getId()));
         // generate the QR Code
         String account = Util.urlEncode(contact.getName(), Util.UTF8);
