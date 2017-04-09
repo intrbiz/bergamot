@@ -114,9 +114,6 @@
 	                    <a href="/admin/resource/">Resources</a>
 	                </li>
 	                <li>
-	                    <a href="/admin/site/">Site Configuration</a>
-	                </li>
-	                <li>
 	                    <a href="/admin/configchange/">Configuration Changes</a>
 	                </li>
 	                <li>
