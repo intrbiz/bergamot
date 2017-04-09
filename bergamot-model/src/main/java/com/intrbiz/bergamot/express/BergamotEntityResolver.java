@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.express;
 
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.CheckCommand;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.NamedObject;
@@ -91,6 +92,38 @@ public class BergamotEntityResolver extends ExpressEntityResolver
                     Site site = ((NamedObject<?,?>) source).getSite();
                     if (site == null) return null;
                     return site.getParameter(name);
+                }
+
+                @Override
+                public void set(String name, Object value, ExpressContext context, Object source) throws ExpressException
+                {
+                }
+
+                @Override
+                public Converter<?> getConverter(String name, ExpressContext context, Object source) throws ExpressException
+                {
+                    return null;
+                }
+
+                @Override
+                public Validator<?> getValidator(String name, ExpressContext context, Object source) throws ExpressException
+                {
+                    return null;
+                }
+            };
+        }
+        else if ("credential".equals(name) || "credentials".equals(name))
+        {
+            return new DynamicEntity()
+            {
+                @Override
+                public Object get(String name, ExpressContext context, Object source) throws ExpressException
+                {
+                    // lookup the credential by name
+                    try (BergamotDB db = BergamotDB.connect())
+                    {
+                        return db.getCredentialByName(((NamedObject<?,?>) source).getSiteId(), name);
+                    }
                 }
 
                 @Override
