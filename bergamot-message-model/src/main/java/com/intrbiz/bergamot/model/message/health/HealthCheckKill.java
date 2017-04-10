@@ -17,16 +17,20 @@ public class HealthCheckKill extends HealthCheckMessage
     @JsonProperty("runtime-id")
     private UUID runtimeId;
     
+    @JsonProperty("password")
+    private String password;
+    
     public HealthCheckKill()
     {
         super();
     }
     
-    public HealthCheckKill(UUID instanceId, UUID runtimeId)
+    public HealthCheckKill(UUID instanceId, UUID runtimeId, String password)
     {
         super();
         this.instanceId = instanceId;
         this.runtimeId = runtimeId;
+        this.password = password;
     }
 
     public UUID getInstanceId()
@@ -48,5 +52,14 @@ public class HealthCheckKill extends HealthCheckMessage
     {
         this.runtimeId = runtimeId;
     }
-    
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
 }

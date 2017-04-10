@@ -33,7 +33,7 @@ public class KillDaemonCommand extends BergamotCLICommand
     @Override
     public String usage()
     {
-        return "<instance-uuid> <runtime-uuid>";
+        return "<instance-uuid> <runtime-uuid> <password>";
     }
 
     @Override
@@ -45,9 +45,10 @@ public class KillDaemonCommand extends BergamotCLICommand
     @Override
     public int execute(BergamotCLI cli, List<String> args) throws Exception
     {
-        if (args.size() != 2) throw new BergamotCLIException("The instance UUID and runtime UUID of the daemon are required");
+        if (args.size() != 3) throw new BergamotCLIException("The instance UUID and runtime UUID of the daemon are required");
         UUID instanceId = UUID.fromString(args.remove(0));
         UUID runtimeId = UUID.fromString(args.remove(0));
+        String password = args.remove(0);
         // read the UI config and connect to the database
         UICfg config = UICfg.loadConfiguration();
         // setup the queue manager
@@ -55,7 +56,7 @@ public class KillDaemonCommand extends BergamotCLICommand
         // setup the health checker
         HealthTracker tracker = HealthTracker.getInstance();
         tracker.init();
-        tracker.killDaemon(instanceId, runtimeId);
+        tracker.killDaemon(instanceId, runtimeId, password);
         return 0;
     }
 }

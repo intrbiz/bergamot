@@ -124,9 +124,9 @@ public class HealthTracker
      * @param instanceId the daemon instance id
      * @param runtimeId the daemon runtime id
      */
-    public void killDaemon(UUID instanceId, UUID runtimeId)
+    public void killDaemon(UUID instanceId, UUID runtimeId, String password)
     {
-        this.healthcheckControlProducer.publish(new HealthCheckKill(instanceId, runtimeId));
+        this.healthcheckControlProducer.publish(new HealthCheckKill(instanceId, runtimeId, password));
     }
     
     private void setupTimer()

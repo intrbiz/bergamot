@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckKill;
@@ -205,9 +206,13 @@ public final class HealthAgent
     {
         if (this.instanceId.equals(message.getInstanceId()) && this.runtimeId.equals(message.getRuntimeId()))
         {
-            Logger.getLogger(HealthAgent.class).fatal("Received request to terminate via health check, exiting immediately");
-            System.err.println("Received request to terminate via health check, exiting immediately");
-            System.exit(-1);
+            String password = Util.coalesceEmpty(System.getProperty("bergamot.health.password"), System.getenv("bergamot.health.password"));
+            if ((! Util.isEmpty(password)) && message.getPassword() != null && message.getPassword().equals(password))
+            {
+                Logger.getLogger(HealthAgent.class).fatal("Received request to terminate via health check, exiting immediately");
+                System.err.println("Received request to terminate via health check, exiting immediately");
+                System.exit(-1);
+            }
         }
     }
     
