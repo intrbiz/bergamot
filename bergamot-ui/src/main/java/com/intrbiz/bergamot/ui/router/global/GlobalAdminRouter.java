@@ -15,12 +15,17 @@ import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
+import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
+import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
+import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
 import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
 import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
 import com.intrbiz.bergamot.model.message.cluster.manager.request.DeinitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.DeinitedSite;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
+import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -140,6 +145,35 @@ public class GlobalAdminRouter extends Router<BergamotApp>
                 catch (Exception e)
                 {
                     logger.error("Failed to initialise site with UI cluster");
+                }
+            }
+        }
+        redirect(path("/global/admin/"));
+    }
+    
+    @Any("/site/id/:id/generate-certificates")
+    @RequireValidAccessTokenForURL(@Param("access-token"))
+    @WithDataAdapter(BergamotDB.class)
+    public void generateSiteCertificates(BergamotDB db, @IsaUUID UUID id) throws Exception
+    {
+        // get the site 
+        Site site = notNull(db.getSite(id));
+        logger.warn("Generating certificates for site: " + site.getName() + " (" + site.getId() + ")");
+        // message the agent manager
+        try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
+        {
+            try (RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client = queue.createBergamotAgentManagerRPCClient())
+            {
+                try
+                {
+                    AgentManagerResponse response = client.publish(new CreateSiteCA(site.getId(), site.getName())).get(5, TimeUnit.SECONDS);
+                    if (response instanceof CreatedSiteCA)
+                    {
+                        logger.info("Created Bergamot Agent site Certificate Authority");
+                    }
+                }
+                catch (Exception e)
+                {
                 }
             }
         }

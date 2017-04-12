@@ -75,6 +75,11 @@
 							<input type="hidden" name="id" value="#{site.id}"/>
 							<input type="submit" name="enable" value="Enable" class="danger"/>
 						</form>
+						<!-- Generate Site Certificates -->
+						<form path="/global/admin/site/id/#{site.id}/generate-certificates" rendered="#{! site.disabled}">
+							<input type="hidden" name="id" value="#{site.id}"/>
+							<input type="submit" name="enable" value="Generate Certificates" class="danger"/>
+						</form>
 					</td>
 				</tr>
 			</data-set>
