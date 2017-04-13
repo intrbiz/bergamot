@@ -12,7 +12,6 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
-import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
 import com.intrbiz.bergamot.util.AgentUtil;
 
 import io.netty.channel.Channel;
@@ -46,7 +45,7 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
         super();
         this.timer = timer;
         HttpHeaders headers = new DefaultHttpHeaders();
-        headers.set(HttpHeaders.Names.USER_AGENT, "BergamotAgent/1.0.0 (Java)");
+        headers.set(HttpHeaders.Names.USER_AGENT, BergamotAgent.AGENT_PRODUCT + "/" + BergamotAgent.AGENT_VERSION);
         this.handshaker = WebSocketClientHandshakerFactory.newHandshaker(server, WebSocketVersion.V13, null, false, headers);
     }
     
@@ -55,19 +54,14 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
         if (this.hello == null)
         {
             this.hello = new AgentHello(UUID.randomUUID().toString());
-            hello.setAgentName("BergamotAgent");
-            hello.setAgentVariant("Java");
-            hello.setAgentVersion("1.0.0");
+            hello.setAgentName(BergamotAgent.AGENT_PRODUCT);
+            hello.setAgentVariant(BergamotAgent.AGENT_VENDOR);
+            hello.setAgentVersion(BergamotAgent.AGENT_VERSION);
             hello.setNonce(AgentUtil.newNonce());
             hello.setTimestamp(System.currentTimeMillis());
             hello.setProtocolVersion(1);
         }
         return this.hello;
-    }
-    
-    protected AgentMessage processRegistrationMessage(final ChannelHandlerContext ctx, final AgentMessage request)
-    {
-        return null;
     }
     
     protected abstract AgentMessage processAgentMessage(final ChannelHandlerContext ctx, final AgentMessage request);
@@ -122,7 +116,7 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
             WebSocketFrame frame = (WebSocketFrame) msg;
             if (frame instanceof TextWebSocketFrame)
             {
-                logger.debug("Message: " + ((TextWebSocketFrame) frame).text());
+                logger.debug("Got message from agent server: " + ((TextWebSocketFrame) frame).text());
                 try
                 {
                     AgentMessage request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), AgentMessage.class);
@@ -130,15 +124,7 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
                     if (request instanceof AgentMessage)
                     {
                         // process the message
-                        AgentMessage response = null;
-                        if (request instanceof AgentRegistrationMessage)
-                        {
-                            this.processRegistrationMessage(ctx, request);
-                        }
-                        else
-                        {
-                            response = this.processAgentMessage(ctx, request);
-                        }
+                        AgentMessage response = this.processAgentMessage(ctx, request);
                         // respond
                         if (response != null)
                         {

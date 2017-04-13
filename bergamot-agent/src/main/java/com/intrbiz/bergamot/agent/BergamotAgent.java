@@ -76,7 +76,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     public static final String AGENT_PRODUCT = "Bergamot Agent";
     
-    public static final String AGENT_VERSION = "2.0.0";
+    public static final String AGENT_VERSION = "3.0.0";
     
     private Logger logger = Logger.getLogger(BergamotAgent.class);
     
@@ -419,15 +419,25 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     public static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
     {
-        FileInputStream input = new FileInputStream(new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml")));
-        try
+        // our possible configuration files
+        for (File config : new File[] { new File(System.getProperty("bergamot.agent.config.template", "/etc/bergamot/agent-template.xml")), new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml"))})
         {
-            return BergamotAgentCfg.read(BergamotAgentCfg.class, input);
+            config = config.getAbsoluteFile();
+            System.out.println("Trying configuration file: " + config.getAbsolutePath());
+            if (config.exists())
+            {
+                FileInputStream input = new FileInputStream(config);
+                try
+                {
+                    return BergamotAgentCfg.read(BergamotAgentCfg.class, input);
+                }
+                finally
+                {
+                    input.close();
+                }
+            }
         }
-        finally
-        {
-            input.close();
-        }
+        throw new FileNotFoundException("Failed to find bergamot agent configuration file");
     }
     
     public static void saveConfig(BergamotAgentCfg newConfig) throws JAXBException, FileNotFoundException, IOException
@@ -477,6 +487,18 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         finally
         {
             input.close();
+        }
+    }
+    
+    public static String getHostName()
+    {
+        try
+        {
+            return Humidor.getInstance().getSigar().getFQDN();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException("Failed to get system host name");
         }
     }
 

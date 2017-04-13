@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer.RegisterAgentCallback.SendAgentRegistrationMessage;
 import com.intrbiz.bergamot.agent.server.config.BergamotAgentServerCfg;
+import com.intrbiz.bergamot.model.message.SiteMO;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.GetServer;
@@ -151,9 +152,11 @@ public class AgentEngine extends AbstractEngine
     
     public void registerAgent(UUID templateId, final AgentRegistrationRequest request, final SendAgentRegistrationMessage callback)
     {
+        // mask the agentId with the siteId from the template
+        UUID agentId = SiteMO.setSiteId(SiteMO.getSiteId(templateId), request.getAgentId());
         // build the command
         RegisterBergamotAgent command = new RegisterBergamotAgent();
-        command.setAgentId(request.getAgentId());
+        command.setAgentId(agentId);
         command.setCommonName(request.getCommonName());
         command.setTemplateId(templateId);
         command.setPublicKey(request.getPublicKey());
