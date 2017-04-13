@@ -78,7 +78,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     public static final String AGENT_VERSION = "3.0.0";
     
-    private Logger logger = Logger.getLogger(BergamotAgent.class);
+    private static final Logger logger = Logger.getLogger(BergamotAgent.class);
     
     private URI server;
 
@@ -135,7 +135,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             @Override
             public void run()
             {
-                BergamotAgent.this.logger.info("Bergamot Agent shutting down");
+                BergamotAgent.logger.info("Bergamot Agent shutting down");
                 if (BergamotAgent.this.channel != null && BergamotAgent.this.channel.isActive())
                 {
                     BergamotAgent.this.channel.close();
@@ -339,7 +339,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     protected void scheduleReconnect()
     {
         long wait = Math.min(Math.max(connectionAttempt.get(), 1) * 1000L, 15000L);
-        this.logger.info("Scheduling reconnection in " + wait + "ms");
+        logger.info("Scheduling reconnection in " + wait + "ms");
         this.timer.schedule(new TimerTask() {
             @Override
             public void run()
@@ -350,7 +350,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 }
                 catch (Exception e)
                 {
-                    BergamotAgent.this.logger.error("Error connecting to server", e);
+                    BergamotAgent.logger.error("Error connecting to server", e);
                     BergamotAgent.this.scheduleReconnect();
                 }
             }
@@ -395,7 +395,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 }
                 catch (Exception e)
                 {
-                    BergamotAgent.this.logger.error("Failed to restart BergamotAgent", e);
+                    BergamotAgent.logger.error("Failed to restart BergamotAgent", e);
                 }
             }
         }, 500L);
@@ -423,7 +423,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         for (File config : new File[] { new File(System.getProperty("bergamot.agent.config.template", "/etc/bergamot/agent-template.xml")), new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml"))})
         {
             config = config.getAbsoluteFile();
-            System.out.println("Trying configuration file: " + config.getAbsolutePath());
+            logger.info("Trying configuration file: " + config.getAbsolutePath());
             if (config.exists())
             {
                 FileInputStream input = new FileInputStream(config);
@@ -442,16 +442,8 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     public static void saveConfig(BergamotAgentCfg newConfig) throws JAXBException, FileNotFoundException, IOException
     {
-        File configFile = new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml"));
-        // backup the configuration file
-        try
-        {
-            copyFile(configFile, new File(configFile.getAbsolutePath() + "." + System.currentTimeMillis()));
-        }
-        catch (Exception e)
-        {
-            Logger.getLogger(BergamotAgent.class).warn("Failed to write backup configuration file.");
-        }
+        File configFile = new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml")).getAbsoluteFile();
+        logger.info("Writing configuration to: " + configFile);
         // write the file
         FileOutputStream output = new FileOutputStream(configFile);
         try
@@ -461,44 +453,6 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         finally
         {
             output.close();
-        }
-    }
-    
-    private static void copyFile(File from, File to) throws FileNotFoundException, IOException
-    {
-        FileInputStream input = new FileInputStream(from);
-        try
-        {
-            FileOutputStream output = new FileOutputStream(to);
-            try
-            {
-                byte[] buffer = new byte[8192];
-                int r;
-                while ((r = input.read(buffer)) != -1)
-                {
-                    output.write(buffer, 0, r);
-                }
-            }
-            finally
-            {
-                output.close();
-            }
-        }
-        finally
-        {
-            input.close();
-        }
-    }
-    
-    public static String getHostName()
-    {
-        try
-        {
-            return Humidor.getInstance().getSigar().getFQDN();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Failed to get system host name");
         }
     }
 

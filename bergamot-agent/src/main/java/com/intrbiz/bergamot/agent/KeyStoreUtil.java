@@ -235,15 +235,16 @@ public class KeyStoreUtil
             try
             {
                 pw.writeObject(key);
-                return sw.toString();
             }
             finally
             {
                 pw.close();
             }
+            return sw.toString();
         }
         catch (IOException e)
         {
+            e.printStackTrace();
         }
         return null;
     }
@@ -257,12 +258,12 @@ public class KeyStoreUtil
             try
             {
                 pw.writeObject(key);
-                return sw.toString();
             }
             finally
             {
                 pw.close();
             }
+            return sw.toString();
         }
         catch (IOException e)
         {
@@ -279,12 +280,12 @@ public class KeyStoreUtil
             try
             {
                 pw.writeObject(cert);
-                return sw.toString();
             }
             finally
             {
                 pw.close();
             }
+            return sw.toString();
         }
         catch (IOException e)
         {

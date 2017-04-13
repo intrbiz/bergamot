@@ -99,7 +99,6 @@ public class AgentRegistrationHandler extends AbstractAgentHandler
             // update the certificates
             currentConfig.setCertificate(complete.getCertificate());
             currentConfig.setKey(KeyStoreUtil.saveKey(this.currentKeyPair.getPrivate()));
-            currentConfig.addParameter(new CfgParameter("public-key", null, null, KeyStoreUtil.savePublicKey(this.currentKeyPair.getPublic())));
             // save the config
             try
             {
