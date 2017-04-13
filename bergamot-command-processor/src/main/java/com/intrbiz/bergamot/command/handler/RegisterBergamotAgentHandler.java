@@ -102,6 +102,7 @@ public class RegisterBergamotAgentHandler implements BergamotCommandHandler<Regi
     {
         // create the configuration change
         BergamotCfg changeCfg = new BergamotCfg();
+        changeCfg.setSite(site.getName());
         changeCfg.setSummary("Auto register host: " + request.getCommonName());
         // the host we are adding
         HostCfg host = new HostCfg();
