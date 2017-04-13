@@ -62,7 +62,7 @@ public class RegisterBergamotAgentHandler implements BergamotCommandHandler<Regi
                 // lookup the template
                 Site site = db.getSite(Site.getSiteId(request.getAgentId()));
                 if (site == null) throw new RuntimeException("No such site");
-                Config template = db.getConfig(request.getAgentId());
+                Config template = db.getConfig(request.getTemplateId());
                 if (template == null) throw new RuntimeException("No such template");
                 HostCfg hostTemplate = (HostCfg) template.getConfiguration();
                 // assert that the template is a Host template
