@@ -420,7 +420,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     public static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
     {
         // our possible configuration files
-        for (File config : new File[] { new File(System.getProperty("bergamot.agent.config.template", "/etc/bergamot/agent-template.xml")), new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml"))})
+        for (File config : new File[] { new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml")), new File(System.getProperty("bergamot.agent.config.template", "/etc/bergamot/agent-template.xml"))})
         {
             config = config.getAbsoluteFile();
             logger.info("Trying configuration file: " + config.getAbsolutePath());
