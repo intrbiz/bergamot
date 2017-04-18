@@ -444,6 +444,14 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         return this.getContactsToNotify(type, this.getState().getStatus(), Calendar.getInstance());
     }
     
+    public List<SLA> getSLAs()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getSLAsForCheck(this.id);
+        }
+    }
+    
     //
 
     protected void toMO(CheckMO mo, Contact contact, EnumSet<MOFlag> options)
@@ -461,6 +469,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         if (options.contains(MOFlag.NOTIFICATIONS)) mo.setNotifications(this.getNotifications().toMO(contact));
         if (options.contains(MOFlag.DOWNTIME)) mo.setDowntime(this.getDowntime().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         if (options.contains(MOFlag.COMMENTS)) mo.setComments(this.getComments().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.SLA)) mo.setSlas(this.getSLAs().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
     }
     
     @Override

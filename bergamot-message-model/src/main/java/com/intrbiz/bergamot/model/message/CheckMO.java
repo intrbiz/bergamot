@@ -44,6 +44,9 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     
     @JsonProperty("comments")
     protected List<CommentMO> comments = new LinkedList<CommentMO>();
+    
+    @JsonProperty("slas")
+    protected List<SLAMO> slas = new LinkedList<SLAMO>();
 
     public CheckMO()
     {
@@ -173,5 +176,15 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     public void setComments(List<CommentMO> comments)
     {
         this.comments = comments;
+    }
+
+    public List<SLAMO> getSlas()
+    {
+        return slas;
+    }
+
+    public void setSlas(List<SLAMO> slas)
+    {
+        this.slas = slas;
     }
 }

@@ -13,14 +13,14 @@ public class SLARollingPeriodCfg extends SLAPeriodCfg
 {
     private static final long serialVersionUID = 1L;
     
-    public enum RollingPeriodGranularity {
+    public enum RollingPeriodGranularityCfg {
         daily,
         weekly,
         monthly,
         yearly
     }
     
-    private RollingPeriodGranularity granularity;
+    private RollingPeriodGranularityCfg granularity;
 
     public SLARollingPeriodCfg()
     {
@@ -29,12 +29,12 @@ public class SLARollingPeriodCfg extends SLAPeriodCfg
 
     @XmlAttribute(name = "granularity")
     @ResolveWith(Coalesce.class)
-    public RollingPeriodGranularity getGranularity()
+    public RollingPeriodGranularityCfg getGranularity()
     {
         return granularity;
     }
 
-    public void setGranularity(RollingPeriodGranularity granularity)
+    public void setGranularity(RollingPeriodGranularityCfg granularity)
     {
         this.granularity = granularity;
     }
