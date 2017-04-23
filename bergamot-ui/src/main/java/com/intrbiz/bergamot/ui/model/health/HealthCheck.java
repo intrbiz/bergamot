@@ -9,6 +9,9 @@ public class HealthCheck
     
     @JsonProperty("database")
     private DatabaseHealth database;
+    
+    @JsonProperty("cluster")
+    private ClusterHealth cluster;
 
     public HealthCheck()
     {
@@ -33,5 +36,15 @@ public class HealthCheck
     public void setDatabase(DatabaseHealth database)
     {
         this.database = database;
+    }
+
+    public ClusterHealth getCluster()
+    {
+        return cluster;
+    }
+
+    public void setCluster(ClusterHealth cluster)
+    {
+        this.cluster = cluster;
     }
 }

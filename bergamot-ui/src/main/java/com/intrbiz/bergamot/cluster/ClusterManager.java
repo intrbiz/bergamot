@@ -563,4 +563,14 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
             return new ClusterManagerError(e.getMessage());
         }
     }
+    
+    public int getMemberCount()
+    {
+        return this.hazelcastInstance.getCluster().getMembers().size();
+    }
+    
+    public int getProcessPoolCount()
+    {
+        return this.pools == null ? 0 : this.pools.size();
+    }
 }
