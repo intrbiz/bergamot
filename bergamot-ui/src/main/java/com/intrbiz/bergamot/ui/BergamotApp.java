@@ -61,6 +61,7 @@ import com.intrbiz.bergamot.ui.router.ContactRouter;
 import com.intrbiz.bergamot.ui.router.DashboardRouter;
 import com.intrbiz.bergamot.ui.router.ErrorRouter;
 import com.intrbiz.bergamot.ui.router.GroupsRouter;
+import com.intrbiz.bergamot.ui.router.HealthRouter;
 import com.intrbiz.bergamot.ui.router.HostRouter;
 import com.intrbiz.bergamot.ui.router.LocationRouter;
 import com.intrbiz.bergamot.ui.router.LoginRouter;
@@ -110,6 +111,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
 {   
     public static final class VERSION
     {
+        public static final String NAME = "Bergamot Monitoring";
+        
         public static final String NUMBER = "3.0.0";
         
         public static final String CODE_NAME = "Red Snow";
@@ -246,6 +249,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void setupRouters() throws Exception
     {
+        // health check router
+        router(new HealthRouter());
         // Setup the application routers
         router(new ErrorRouter());
         router(new LoginRouter());
