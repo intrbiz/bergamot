@@ -40,8 +40,10 @@ import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.configuration.Configurable;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -245,6 +247,7 @@ public class BergamotAgentServer implements Runnable, Configurable<BergamotAgent
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup);
             b.channel(NioServerSocketChannel.class);
+            b.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator());
             b.childHandler(new ChannelInitializer<SocketChannel>()
             {
                 @Override

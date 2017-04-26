@@ -16,7 +16,7 @@ import com.intrbiz.bergamot.util.AgentUtil;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -28,8 +28,10 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 
-public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
+public abstract class AgentClientHandler extends SimpleChannelInboundHandler<Object>
 {
+    private static final long AGENT_PING_INTERVAL_MS = 30L * 1000L;
+    
     private Logger logger = Logger.getLogger(AgentClientHandler.class);
 
     private final WebSocketClientHandshaker handshaker;
@@ -96,40 +98,56 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
                     this.cancel();
                 }
             }
-        }, 30000L, 30000L);
+        }, AGENT_PING_INTERVAL_MS, AGENT_PING_INTERVAL_MS);
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg)
+    public void channelRead0(final ChannelHandlerContext ctx, Object msg)
     {
-        // complete the handshake
-        if (!handshaker.isHandshakeComplete())
+        if (msg instanceof FullHttpResponse)
         {
-            handshaker.finishHandshake(ctx.channel(), (FullHttpResponse) msg);
-            this.channelHandshaked(ctx);
-            return;
+            FullHttpResponse http = (FullHttpResponse) msg;
+            // complete the handshake
+            if (!handshaker.isHandshakeComplete())
+            {
+                handshaker.finishHandshake(ctx.channel(), http);
+                this.channelHandshaked(ctx);
+                return;
+            }
         }
-        // check we only expect a websocket frame
-        if (msg instanceof WebSocketFrame)
+        else if (msg instanceof WebSocketFrame)
         {
             // process the frame
             WebSocketFrame frame = (WebSocketFrame) msg;
             if (frame instanceof TextWebSocketFrame)
             {
-                logger.debug("Got message from agent server: " + ((TextWebSocketFrame) frame).text());
+                String message = ((TextWebSocketFrame) frame).text();
+                if (logger.isDebugEnabled()) logger.debug("Got message from agent server: " + message);
                 try
                 {
-                    AgentMessage request = this.transcoder.decodeFromString(((TextWebSocketFrame) frame).text(), AgentMessage.class);
+                    final AgentMessage request = this.transcoder.decodeFromString(message, AgentMessage.class);
                     // process the request
                     if (request instanceof AgentMessage)
                     {
                         // process the message
-                        AgentMessage response = this.processAgentMessage(ctx, request);
-                        // respond
-                        if (response != null)
-                        {
-                            ctx.channel().writeAndFlush(new TextWebSocketFrame(this.transcoder.encodeAsString(response)));
-                        }
+                        ctx.executor().execute(new Runnable() {
+                            public void run()
+                            {
+                                try
+                                {
+                                    AgentMessage response = processAgentMessage(ctx, request);
+                                    // respond
+                                    if (response != null)
+                                    {
+                                        ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(response)));
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new GeneralError("Failed to process message"))));
+                                }
+                            }
+                        });
                     }
                     else
                     {
@@ -154,7 +172,7 @@ public abstract class AgentClientHandler extends ChannelInboundHandlerAdapter
         }
         else
         {
-            throw new IllegalStateException("Expected WebSocketFrame, got: " + msg);
+            throw new IllegalStateException("Unexpected message, got: " + msg);
         }
     }
 

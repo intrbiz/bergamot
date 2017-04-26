@@ -186,11 +186,17 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     {
         if (msg instanceof FullHttpRequest)
         {
-            handleHttpRequest(ctx, (FullHttpRequest) msg);
+            FullHttpRequest http = (FullHttpRequest) msg;
+            handleHttpRequest(ctx, http);
         }
         else if (msg instanceof WebSocketFrame)
         {
-            handleWebSocketFrame(ctx, (WebSocketFrame) msg);
+            WebSocketFrame frame = (WebSocketFrame) msg;
+            handleWebSocketFrame(ctx, frame);
+        }
+        else
+        {
+            throw new IllegalStateException("Unexpected message, got: " + msg);
         }
     }
 
@@ -214,7 +220,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             this.handshaker = wsFactory.newHandshaker(req);
             if (this.handshaker == null)
             {
-                WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+                WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
             }
             else
             {

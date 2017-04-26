@@ -85,7 +85,7 @@ public class AgentRouter extends Router<BergamotApp>
         cfg.setCaCertificate(padCert(PEMUtil.saveCertificate(rootCert)));
         cfg.setSiteCaCertificate(padCert(PEMUtil.saveCertificate(siteCert)));
         cfg.setCertificate(padCert(template.getCertificate()));
-        cfg.setKey(padCert(template.getCertificate()));
+        cfg.setKey(padCert(template.getPrivateKey()));
         cfg.setName(template.getName());
         cfg.addParameter(new CfgParameter("template-id", null, null, id.toString()));
         // display
@@ -195,7 +195,7 @@ public class AgentRouter extends Router<BergamotApp>
         {
             sb.append("        ").append(s).append("\n");
         }
-        sb.append("\n");
+        //sb.append("\n");
         return sb.toString();
     }
 }
