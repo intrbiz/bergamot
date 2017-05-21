@@ -42,11 +42,11 @@ public abstract class WorkerQueue extends QueueAdapter
         return this.publishChecks(null);
     }
     
-    public abstract Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine, boolean agentRouting, UUID workerId);
+    public abstract Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine, boolean agentRouting);
     
     public Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine)
     {
-        return this.consumeChecks(handler, site, workerPool, engine, false, null);
+        return this.consumeChecks(handler, site, workerPool, engine, false);
     }
     
     public abstract Consumer<ExecuteCheck, NullKey> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler);

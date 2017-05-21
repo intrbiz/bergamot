@@ -19,7 +19,7 @@ public abstract class AbstractWorker implements Worker
 
     private UUID site;
     
-    private UUID id = UUID.randomUUID();
+    private final UUID id = UUID.randomUUID();
 
     private String workerPool;
 

@@ -183,7 +183,7 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
         for (int i = 0; i < this.getWorker().getConfiguration().getThreads(); i ++)
         {
             logger.trace("Creating consumer " + i);
-            this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName(), this.isAgentRouted(), this.getWorker().getId()));
+            this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName(), this.isAgentRouted()));
         }
     }
     

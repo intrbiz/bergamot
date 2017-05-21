@@ -63,12 +63,11 @@ public class RabbitWorkerQueue extends WorkerQueue
     }
 
     @Override
-    public Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String theWorkerPool, String engine, boolean agentRouting, UUID workerId)
+    public Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String theWorkerPool, String engine, boolean agentRouting)
     {
         // validate arguments
         final String workerPool = Util.isEmpty(theWorkerPool) ? null : theWorkerPool;
         if (Util.isEmpty(engine)) throw new IllegalArgumentException("Engine name must be given!");
-        if (agentRouting && workerId == null) throw new IllegalArgumentException("For agent routing an worker id must be given");
         // the engine exchange
         final String engineExchangeName = "bergamot.check.engine." + Util.coalesce(site, "default") + "." + Util.coalesce(workerPool, "any") + "." + engine;
         // create the consumer
@@ -89,8 +88,8 @@ public class RabbitWorkerQueue extends WorkerQueue
                 if (agentRouting)
                 {
                     // for agent routed check, we use a transient queue
-                    queueName = "bergamot.check." + Util.coalesce(site, "default") + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine + "." + workerId;
-                    on.queueDeclare(queueName, false, true, true, args("x-dead-letter-exchange", "bergamot.dead_check"));
+                    queueName = "bergamot.check." + Util.coalesce(site, "default") + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine + "." + UUID.randomUUID();
+                    on.queueDeclare(queueName, false, true, true, args("x-dead-letter-exchange", "bergamot.dead_agent_check"));
                 }
                 else
                 {
