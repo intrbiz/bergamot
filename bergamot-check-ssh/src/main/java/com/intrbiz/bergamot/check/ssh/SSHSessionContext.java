@@ -4,20 +4,21 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Consumer;
 
 import com.intrbiz.util.Hash;
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-public class SSHSession
+public class SSHSessionContext
 {
     private final JSch jsch;
     
     private final Session session;
     
-    public SSHSession(JSch jsch, Session session)
+    public SSHSessionContext(JSch jsch, Session session)
     {
         this.jsch = jsch;
         this.session = session;
@@ -28,7 +29,33 @@ public class SSHSession
         return session.getHostKey().getFingerPrint(this.jsch);
     }
     
+    public SSHSessionContext sftp(Consumer<SFTPContext> onOpen)
+    {
+        try
+        {
+            ChannelSftp sftp = (ChannelSftp) this.session.openChannel("sftp");
+            try
+            {
+                onOpen.accept(new SFTPContext(sftp));
+            }
+            finally
+            {
+                sftp.disconnect();
+            }
+        }
+        catch (Exception e)
+        {
+            throw new SSHException(e);
+        }
+        return this;
+    }
+    
     public ExecStat exec(String command)
+    {
+        return exec(command, null);
+    }
+    
+    public ExecStat exec(String command, String stdIn)
     {
         try
         {
@@ -36,8 +63,8 @@ public class SSHSession
             // execute
             exec.setCommand(command);
             // input
-            if (command != null && command.length() > 0)
-                exec.setInputStream(new ByteArrayInputStream(Hash.asUTF8(command)));
+            if (stdIn != null && stdIn.length() > 0)
+                exec.setInputStream(new ByteArrayInputStream(Hash.asUTF8(stdIn)));
             // outputs
             ByteArrayOutputStream stdOut = new ByteArrayOutputStream();
             ByteArrayOutputStream stdErr = new ByteArrayOutputStream();
@@ -62,10 +89,6 @@ public class SSHSession
             {
                 exec.disconnect();
             }
-        }
-        catch (JSchException e)
-        {
-            throw new SSHException(e);
         }
         catch (Exception e)
         {
