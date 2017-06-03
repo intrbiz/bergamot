@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.worker.engine.ssh;
+package com.intrbiz.bergamot.worker.engine.ssh.util;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.check.ssh.SSHCheckContext;

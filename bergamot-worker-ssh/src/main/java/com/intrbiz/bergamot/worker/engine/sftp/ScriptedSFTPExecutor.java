@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.worker.engine.ssh;
+package com.intrbiz.bergamot.worker.engine.sftp;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -12,12 +12,13 @@ import com.intrbiz.bergamot.check.ssh.SSHCheckContext;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.ssh.util.SSHCheckUtil;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
 /**
  * 
  */
-public class ScriptedSFTPExecutor extends AbstractExecutor<SSHEngine>
+public class ScriptedSFTPExecutor extends AbstractExecutor<SFTPEngine>
 {
     public static final String NAME = "script";
     
@@ -36,7 +37,7 @@ public class ScriptedSFTPExecutor extends AbstractExecutor<SSHEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return SSHEngine.SFTP_NAME.equalsIgnoreCase(task.getEngine()) &&
+        return SFTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
                ScriptedSFTPExecutor.NAME.equalsIgnoreCase(task.getExecutor());
     }
     

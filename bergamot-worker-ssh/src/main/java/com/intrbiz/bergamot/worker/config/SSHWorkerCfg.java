@@ -6,9 +6,10 @@ import javax.xml.bind.annotation.XmlType;
 import com.intrbiz.bergamot.config.EngineCfg;
 import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
+import com.intrbiz.bergamot.worker.engine.sftp.SFTPEngine;
+import com.intrbiz.bergamot.worker.engine.sftp.ScriptedSFTPExecutor;
 import com.intrbiz.bergamot.worker.engine.ssh.NagiosSSHExecutor;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
-import com.intrbiz.bergamot.worker.engine.ssh.ScriptedSFTPExecutor;
 import com.intrbiz.bergamot.worker.engine.ssh.ScriptedSSHExecutor;
 
 @XmlType(name = "worker")
@@ -28,7 +29,9 @@ public class SSHWorkerCfg extends WorkerCfg
         // add our default engines to avoid needing to configure them
         this.getEngines().add(new EngineCfg(SSHEngine.class, 
                 new ExecutorCfg(NagiosSSHExecutor.class), 
-                new ExecutorCfg(ScriptedSSHExecutor.class),
+                new ExecutorCfg(ScriptedSSHExecutor.class)
+        ));
+        this.getEngines().add(new EngineCfg(SFTPEngine.class, 
                 new ExecutorCfg(ScriptedSFTPExecutor.class)
         ));
         // apply defaults from super class

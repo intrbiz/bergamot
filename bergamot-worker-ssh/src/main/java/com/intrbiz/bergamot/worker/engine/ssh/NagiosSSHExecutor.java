@@ -11,12 +11,14 @@ import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
+import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.ssh.util.SSHCheckUtil;
 import com.intrbiz.gerald.polyakov.Reading;
 
 /**
  * Execute checks over SSH
  */
-public class NagiosSSHExecutor extends BaseSSHExecutor
+public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
 {
     public static final String NAME = "nagios";
     
@@ -33,7 +35,7 @@ public class NagiosSSHExecutor extends BaseSSHExecutor
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return SSHEngine.SSH_NAME.equalsIgnoreCase(task.getEngine()) && 
+        return SSHEngine.NAME.equalsIgnoreCase(task.getEngine()) && 
                NagiosSSHExecutor.NAME.equalsIgnoreCase(task.getExecutor());
     }
 
