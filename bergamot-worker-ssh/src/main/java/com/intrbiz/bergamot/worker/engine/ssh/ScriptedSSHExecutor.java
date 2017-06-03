@@ -35,7 +35,7 @@ public class ScriptedSSHExecutor extends AbstractExecutor<SSHEngine>
     @Override
     public boolean accept(ExecuteCheck task)
     {
-        return SSHEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
+        return SSHEngine.SSH_NAME.equalsIgnoreCase(task.getEngine()) &&
                ScriptedSSHExecutor.NAME.equalsIgnoreCase(task.getExecutor());
     }
     

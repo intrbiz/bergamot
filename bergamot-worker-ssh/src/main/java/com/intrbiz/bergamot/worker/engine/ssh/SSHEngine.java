@@ -4,17 +4,19 @@ import com.intrbiz.bergamot.check.ssh.SSHChecker;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 
 /**
- * Execute checks via SSH
+ * Execute checks via SSH (including SFTP)
  */
 public class SSHEngine extends AbstractEngine
 {
-    public static final String NAME = "ssh";
+    public static final String SSH_NAME = "ssh";
+    
+    public static final String SFTP_NAME = "sftp";
     
     private SSHChecker checker;
 
     public SSHEngine()
     {
-        super(NAME);
+        super(SSH_NAME);
     }
     
     public SSHChecker getChecker()
@@ -30,6 +32,7 @@ public class SSHEngine extends AbstractEngine
         {
             this.addExecutor(new NagiosSSHExecutor());
             this.addExecutor(new ScriptedSSHExecutor());
+            this.addExecutor(new ScriptedSFTPExecutor());
         }
     }
     
