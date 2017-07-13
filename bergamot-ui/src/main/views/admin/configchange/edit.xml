@@ -564,7 +564,7 @@
 					for (filter in this.attr_filters)
 					{
 						console.log("Trying filter: " + filter);
-						if (line.contains('<' + filter))
+						if (line.indexOf('<' + filter) !== -1)
 						{
 							attrs = this.attr_filters[filter];
 							break;
