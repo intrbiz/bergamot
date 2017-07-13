@@ -4,7 +4,8 @@ package com.intrbiz.bergamot.queue;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
-import com.intrbiz.bergamot.queue.impl.RabbitWatcherQueue;
+import com.intrbiz.bergamot.queue.impl.hcq.HCQWatcherQueue;
+import com.intrbiz.bergamot.queue.impl.rabbit.RabbitWatcherQueue;
 import com.intrbiz.bergamot.queue.key.WatcherKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
@@ -20,6 +21,7 @@ public abstract class WatcherQueue extends QueueAdapter
     static
     {
         RabbitWatcherQueue.register();
+        HCQWatcherQueue.register();
     }
     
     public static WatcherQueue open()

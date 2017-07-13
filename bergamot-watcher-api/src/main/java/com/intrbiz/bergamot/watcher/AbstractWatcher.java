@@ -87,5 +87,7 @@ public abstract class AbstractWatcher implements Watcher
         {
             engine.start();
         }
-    }    
+    } 
+    
+    public abstract String getDaemonName();
 }

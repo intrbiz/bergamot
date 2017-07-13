@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.bergamot.ui.action.BergamotAgentActions;
 import com.intrbiz.bergamot.ui.action.CheckActions;
 import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
@@ -100,8 +101,6 @@ import com.intrbiz.crypto.SecretKey;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
 import com.intrbiz.lamplighter.data.LamplighterDB;
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
 
 /**
@@ -394,7 +393,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             DataManager.get().registerDefaultCacheProvider(DataManager.get().cacheProvider("hazelcast"));
             // setup the queue manager
             System.out.println("Setting up RabbitMQ");
-            QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+            QueueUtil.setupQueueBroker(config.getBroker(), "bergamot-ui");
             // setup data manager
             System.out.println("Setting up PostgreSQL");
             DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());

@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.queue.impl;
+package com.intrbiz.bergamot.queue.impl.rabbit;
 
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.command.CommandRequest;
@@ -12,6 +12,7 @@ import com.intrbiz.queue.RPCServer;
 import com.intrbiz.queue.name.Exchange;
 import com.intrbiz.queue.name.Queue;
 import com.intrbiz.queue.name.RoutingKey;
+import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.queue.rabbit.RabbitRPCClient;
 import com.intrbiz.queue.rabbit.RabbitRPCServer;
 import com.rabbitmq.client.Channel;
@@ -20,7 +21,7 @@ public class RabbitBergamotCommandQueue extends BergamotCommandQueue
 {
     public static final void register()
     {
-        QueueManager.getInstance().registerQueueAdapter(BergamotCommandQueue.class, RabbitBergamotCommandQueue::new);
+        QueueManager.getInstance().registerQueueAdapter(BergamotCommandQueue.class, RabbitPool.TYPE, RabbitBergamotCommandQueue::new);
     }
 
     private final BergamotTranscoder transcoder = new BergamotTranscoder();

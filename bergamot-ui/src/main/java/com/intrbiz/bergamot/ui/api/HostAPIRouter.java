@@ -27,12 +27,22 @@ import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.XML;
+import com.intrbiz.metadata.doc.Desc;
+import com.intrbiz.metadata.doc.Title;
 
 
+@Title("Host API Methods")
+@Desc({
+    "Hosts represent pysical and virtual servers upon which Services run.  These API calls provide information opn configured Host checks and their current state."
+})
 @Prefix("/api/host")
 @RequireValidPrincipal()
 public class HostAPIRouter extends Router<BergamotApp>
 {
+    @Title("List hosts")
+    @Desc({
+        "Retreive the list of all hosts for this site, with minimal information for each host."
+    })
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
@@ -42,6 +52,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return db.listHosts(site.getId()).stream().map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
     }
     
+    @Title("Get host by name")
+    @Desc({
+        "Get the host check for the given name, returning minimal information about the host check."
+    })
     @Get("/name/:name")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -52,6 +66,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.toMO(currentPrincipal());
     }
     
+    @Title("Get host state by name")
+    @Desc({
+        "Get the state of the host check for the given name, returning just the check state."
+    })
     @Get("/name/:name/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -62,6 +80,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getState().toMO(currentPrincipal());
     }
     
+    @Title("Get host by id")
+    @Desc({
+        "Get the host check for the given id (UUID), returning minimal information about the host check."
+    })
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -72,6 +94,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.toMO(currentPrincipal());
     }
     
+    @Title("Get host state by name")
+    @Desc({
+        "Get the state of the host check for the given id (UUID), returning just the check state."
+    })
     @Get("/id/:id/state")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)

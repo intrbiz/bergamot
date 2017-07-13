@@ -14,11 +14,10 @@ import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse
 import com.intrbiz.bergamot.model.message.cluster.manager.request.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.cluster.manager.response.FlushedGlobalCaches;
 import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.data.DataManager;
-import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RPCClient;
 import com.intrbiz.queue.name.RoutingKey;
-import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
 
 public class AddSiteAliasCommand extends BergamotCLICommand
@@ -70,7 +69,7 @@ public class AddSiteAliasCommand extends BergamotCLICommand
         // setup the data manager
         DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());
         // setup the queue manager
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        QueueUtil.setupQueueBroker(config.getBroker(), "bergamot-cli");
         // ensure the DB schema is installed
         BergamotDB.install();
         // now actually create the site

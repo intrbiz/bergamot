@@ -23,6 +23,8 @@ import com.intrbiz.queue.name.NullKey;
 
 public final class HealthAgent
 {
+    private static final Logger logger = Logger.getLogger(HealthAgent.class);
+    
     private static final HealthAgent US = new HealthAgent();
     
     public static HealthAgent getInstance()
@@ -175,8 +177,15 @@ public final class HealthAgent
     
     private void joinHealthCheckCluster()
     {
-        // send a join message
-        this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.runtimeId, this.daemonKind, this.daemonName, this.startedAt, this.hostId, this.hostName));
+        try
+        {
+            // send a join message
+            this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.runtimeId, this.daemonKind, this.daemonName, this.startedAt, this.hostId, this.hostName));
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to join health check");
+        }
     }
     
     private void unjoinHealthCheckCluster()

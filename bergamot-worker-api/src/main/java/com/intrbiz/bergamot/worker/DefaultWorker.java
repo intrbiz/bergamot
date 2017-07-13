@@ -14,9 +14,8 @@ import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.health.HealthAgent;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.configuration.Configuration;
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
 
 
 public class DefaultWorker extends AbstractWorker
@@ -85,7 +84,7 @@ public class DefaultWorker extends AbstractWorker
         Logger logger = Logger.getLogger(Worker.class);
         logger.debug("Bergamot worker, using configuration:\r\n" + config.toString());
         // setup the queue broker
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        QueueUtil.setupQueueBroker(config.getBroker(), this.getDaemonName());
         // setup accounting
         AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
         AccountingManager.getInstance().registerConsumer("queue", new BergamotAccountingQueueConsumer());

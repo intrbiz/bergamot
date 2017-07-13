@@ -35,5 +35,9 @@
 		<groupId>com.intrbiz.bergamot</groupId>
 		<artifactId>bergamot-accounting-model</artifactId>
 	</dependency>
+    <dependency>
+    	<groupId>com.intrbiz.bergamot</groupId>
+    	<artifactId>bergamot-daemon-config</artifactId>
+    </dependency>
   </dependencies>
 </project>

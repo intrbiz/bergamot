@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.queue.impl;
+package com.intrbiz.bergamot.queue.impl.rabbit;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -22,6 +22,7 @@ import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RoutedProducer;
 import com.intrbiz.queue.name.NullKey;
 import com.intrbiz.queue.rabbit.RabbitConsumer;
+import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.queue.rabbit.RabbitProducer;
 import com.rabbitmq.client.Channel;
 
@@ -29,7 +30,7 @@ public class RabbitWorkerQueue extends WorkerQueue
 {
     public static final void register()
     {
-        QueueManager.getInstance().registerQueueAdapter(WorkerQueue.class, RabbitWorkerQueue::new);
+        QueueManager.getInstance().registerQueueAdapter(WorkerQueue.class, RabbitPool.TYPE, RabbitWorkerQueue::new);
     }
 
     private final BergamotTranscoder transcoder = new BergamotTranscoder();

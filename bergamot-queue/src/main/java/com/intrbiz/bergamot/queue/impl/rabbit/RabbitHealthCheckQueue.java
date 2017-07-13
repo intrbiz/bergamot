@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.queue.impl;
+package com.intrbiz.bergamot.queue.impl.rabbit;
 
 import java.io.IOException;
 
@@ -14,6 +14,7 @@ import com.intrbiz.queue.QueueBrokerPool;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.name.NullKey;
 import com.intrbiz.queue.rabbit.RabbitConsumer;
+import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.queue.rabbit.RabbitProducer;
 import com.rabbitmq.client.Channel;
 
@@ -21,7 +22,7 @@ public class RabbitHealthCheckQueue extends HealthCheckQueue
 {
     public static final void register()
     {
-        QueueManager.getInstance().registerQueueAdapter(HealthCheckQueue.class, RabbitHealthCheckQueue::new);
+        QueueManager.getInstance().registerQueueAdapter(HealthCheckQueue.class, RabbitPool.TYPE, RabbitHealthCheckQueue::new);
     }
 
     private final BergamotTranscoder transcoder = new BergamotTranscoder();

@@ -158,7 +158,7 @@ public class APIRouter extends Router<BergamotApp>
         // we may already have the auth from the session, if shared with a UI session
         if (! this.validPrincipal())
         {
-            authenticateRequest(new GenericAuthenticationToken(Util.coalesceEmpty(header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key"))));
+            authenticateRequestSingleFactor(new GenericAuthenticationToken(Util.coalesceEmpty(header("Authorization"), header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key"))));
         }
         // assert that the contact is permitted API access
         require(permission("api.access"));
@@ -174,6 +174,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("/app/auth-token")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public AuthTokenMO getAppAuthToken(BergamotDB db, @Param("app") @CheckStringLength(mandatory = true, min = 3, max = 80) String appName, @Param("username") String username, @Param("password") String password)
     {
         authenticateRequest(username, password);
@@ -201,6 +202,7 @@ public class APIRouter extends Router<BergamotApp>
      */
     @Any("/extend-auth-token")
     @JSON()
+    @IgnoreBinding
     public AuthTokenMO extendAuthToken(@Param("auth-token") String token)
     {
         authenticateRequest(new GenericAuthenticationToken(token));
@@ -216,6 +218,7 @@ public class APIRouter extends Router<BergamotApp>
     @JSON()
     @RequireValidPrincipal()
     @WithDataAdapter(BergamotDB.class)
+    @IgnoreBinding
     public Boolean changePassword(
             BergamotDB db, 
             @Param("current-password") @CheckStringLength(min = 1, max = 80, mandatory = true) String currentPassword,

@@ -9,11 +9,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.config.DefaultWatcherCfg;
 import com.intrbiz.bergamot.config.WatcherCfg;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.configuration.Configuration;
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
 
 
 public class DefaultWatcher extends AbstractWatcher
@@ -22,16 +20,20 @@ public class DefaultWatcher extends AbstractWatcher
     
     protected final String defaultConfigFile;
     
-    public DefaultWatcher(Class<? extends WatcherCfg> configurationClass, String defaultConfigFile)
+    protected final String daemonName;
+    
+    public DefaultWatcher(Class<? extends WatcherCfg> configurationClass, String defaultConfigFile, String daemonName)
     {
         super();
         this.configurationClass = configurationClass;
         this.defaultConfigFile = defaultConfigFile;
+        this.daemonName = daemonName;
     }
     
-    public DefaultWatcher()
+    @Override
+    public String getDaemonName()
     {
-        this(DefaultWatcherCfg.class, "/etc/bergamot/watcher/default.xml");
+        return this.daemonName;
     }
     
     protected void configureLogging() throws Exception
@@ -86,17 +88,11 @@ public class DefaultWatcher extends AbstractWatcher
         WatcherCfg config = this.loadConfiguration();
         logger.debug("Bergamot watcher, using configuration:\r\n" + config.toString());
         // setup the queue broker
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        QueueUtil.setupQueueBroker(config.getBroker(), this.getDaemonName());
         // configure the worker
         this.configure(config);
         // go go go
         logger.info("Bergamot watcher starting.");
         super.start();
-    }
-    
-    public static void main(String[] args) throws Exception
-    {
-        Watcher watcher = new DefaultWatcher();
-        watcher.start();
     }
 }

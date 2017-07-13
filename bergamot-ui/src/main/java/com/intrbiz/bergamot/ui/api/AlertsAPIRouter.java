@@ -41,10 +41,15 @@ import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.doc.Desc;
+import com.intrbiz.metadata.doc.Title;
 import com.intrbiz.queue.RoutedProducer;
 
 
-
+@Title("Alert API Methods")
+@Desc({
+    "Alerts are raised when a check has reached a steady not OK state and someone or something needs to be notified."
+})
 @Prefix("/api/alert")
 @RequireValidPrincipal()
 public class AlertsAPIRouter extends Router<BergamotApp>
@@ -76,6 +81,10 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         this.updateProducer = this.updateQueue.publishUpdates();   
     }
     
+    @Title("List alerts")
+    @Desc({
+        "Get the list of all currently active alerts, returning minimal information about each alert."
+    })
     @Get("/")
     @JSON
     @WithDataAdapter(BergamotDB.class)
