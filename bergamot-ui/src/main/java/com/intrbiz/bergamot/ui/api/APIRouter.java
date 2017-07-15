@@ -171,8 +171,7 @@ public class APIRouter extends Router<BergamotApp>
      */
     @Get("/auth-token")
     @JSON()
-    @WithDataAdapter(BergamotDB.class)
-    public AuthTokenMO getAuthToken(BergamotDB db)
+    public AuthTokenMO getAuthToken()
     {
         // perform a token based request authentication
         // we may already have the auth from the session, if shared with a UI session
