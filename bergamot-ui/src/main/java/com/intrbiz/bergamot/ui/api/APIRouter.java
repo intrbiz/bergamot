@@ -25,8 +25,10 @@ import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.IgnoreMethods;
 import com.intrbiz.metadata.IgnorePaths;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.Options;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.XML;
@@ -137,6 +139,35 @@ public class APIRouter extends Router<BergamotApp>
             logger.error("Caught internal server error: " + error.getMessage(), error);
         }
         return new APIError(error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage());
+    }
+    
+    /**
+     * CORS Preflight Handling
+     */
+    @Options("**")
+    @Order(-10)
+    public void handleCORSPreflight()
+    {
+        response()
+         .header("Access-Control-Allow-Origin", "*")
+         .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+         .header("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Bergamot-Auth")
+         .header("Access-Control-Max-Age", " 86400")
+         .plain()
+         .ok();
+    }
+    
+    /**
+     * Inject CORS response headers
+     */
+    @Before
+    @Any("**")
+    @IgnoreMethods({"OPTIONS"})
+    @Order(5)
+    public void addCORSHeaders()
+    {
+        response()
+        .header("Access-Control-Allow-Origin", "*");
     }
     
     /**
