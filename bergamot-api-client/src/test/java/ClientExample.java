@@ -7,24 +7,18 @@ public class ClientExample
 {
     public static void main(String[] args) throws Exception
     {
-        System.out.println("Enter your password: ");
+        System.out.println("Enter your key: ");
         Scanner inp = new Scanner(System.in);
-        String password = inp.nextLine();
+        String key = inp.nextLine();
         //
         System.setProperty("ssl.SocketFactory.provider", "");
         //
-        BergamotClient client = new BergamotClient("https://bergamot.local/api/", "chris.ellis", password);
-        // auth api calls
-        System.out.println(client.callGetAuthToken().username("chris.ellis").password(password).execute());
-        System.out.println(client.callExtendAuthToken().token(client.getAuthToken().getToken()).execute());
-        System.out.println(client.callGetAppAuthToken().appName("Test Client").username("chris.ellis").password(password).execute());
+        BergamotClient client = new BergamotClient("https://bergamot.local", key);
         // test api calls
         System.out.println(client.callHelloWorld().execute());
         System.out.println(client.callHelloYou().execute());
-        /*
-        System.out.println(client.goodbyeCruelWorld().execute());
-        System.out.println(client.lookingForSomething().execute());
-        */
+        // auth api calls
+        System.out.println(client.callGetAuthToken().execute());
         // contacts
         System.out.println(client.callGetContacts().execute());
         System.out.println(client.callGetContactByName().name("chris.ellis").execute());

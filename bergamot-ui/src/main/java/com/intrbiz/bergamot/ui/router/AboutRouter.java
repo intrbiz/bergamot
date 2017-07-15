@@ -82,11 +82,6 @@ public class AboutRouter extends Router<BergamotApp>
         writer.write("        super(baseURL, credentials);\n");
         writer.write("    }\n");
         writer.write("\n");
-        writer.write("    public BergamotClient(String baseURL, String username, String password)\n");
-        writer.write("    {\n");
-        writer.write("        super(baseURL, username, password);\n");
-        writer.write("    }\n");
-        writer.write("\n");
         writer.write("    public BergamotClient(String baseURL, String token)\n");
         writer.write("    {\n");
         writer.write("        super(baseURL, token);\n");
