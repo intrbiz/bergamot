@@ -146,7 +146,7 @@ public class APIRouter extends Router<BergamotApp>
     @Before
     @Any("**")
     /* We don't want to filter the certain routes */
-    @IgnorePaths({ "/test/hello/world" })
+    @IgnorePaths({ "/test/hello/world", "/auth-token" })
     @Order(10)
     @WithDataAdapter(BergamotDB.class)
     public void authenticateRequest(BergamotDB db)
@@ -155,7 +155,7 @@ public class APIRouter extends Router<BergamotApp>
         // we may already have the auth from the session, if shared with a UI session
         if (! this.validPrincipal())
         {
-            authenticateRequestSingleFactor(new GenericAuthenticationToken(Util.coalesceEmpty(header("Authorization"), header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key"))));
+            authenticateRequestSingleFactor(new GenericAuthenticationToken(Util.coalesceEmpty(header("Authorization"), header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key")), CryptoCookie.Flags.Principal));
         }
         // assert that the contact is permitted API access
         require(permission("api.access"));
@@ -165,13 +165,24 @@ public class APIRouter extends Router<BergamotApp>
     }
     
     /**
-     * Generate a short-lived authentication token which represents the currently authenticated principal for 1 hour
+     * Generate a short-lived authentication token which represents the currently authenticated principal for 1 hour.
+     * 
+     * Note: this can only be called with a perpetual access token, or via a valid UI session
      */
     @Get("/auth-token")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
     public AuthTokenMO getAuthToken(BergamotDB db)
     {
+        // perform a token based request authentication
+        // we may already have the auth from the session, if shared with a UI session
+        if (! this.validPrincipal())
+        {
+            authenticateRequestSingleFactor(new GenericAuthenticationToken(Util.coalesceEmpty(header("Authorization"), header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key")), CryptoCookie.Flags.Perpetual, CryptoCookie.Flags.Principal));
+        }
+        // assert that the contact is permitted API access
+        require(permission("api.access"));
+        // generate temporary access token
         long expiry = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
         String token = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiry, CryptoCookie.Flags.Principal);
         return new AuthTokenMO(token, expiry);
