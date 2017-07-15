@@ -1,6 +1,5 @@
 package com.intrbiz.bergamot;
 
-import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -11,7 +10,6 @@ import javax.net.ssl.TrustManager;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.fluent.Executor;
-import org.apache.http.client.fluent.Response;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -28,7 +26,6 @@ import com.intrbiz.bergamot.call.HelloWorldCall;
 import com.intrbiz.bergamot.call.HelloYouCall;
 import com.intrbiz.bergamot.call.LookingForSomethingCall;
 import com.intrbiz.bergamot.call.SignAgentKey;
-import com.intrbiz.bergamot.credentials.BasicCredentials;
 import com.intrbiz.bergamot.credentials.ClientCredentials;
 import com.intrbiz.bergamot.credentials.TokenCredentials;
 import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
@@ -103,12 +100,6 @@ public abstract class BaseBergamotClient
     {
         this(baseURL);
         this.credentials = new TokenCredentials(token);
-    }
-    
-    public BaseBergamotClient(String baseURL, String username, String password)
-    {
-        this(baseURL);
-        this.credentials = new BasicCredentials(username, password);
     }
     
     public BergamotTranscoder transcoder()
@@ -194,57 +185,6 @@ public abstract class BaseBergamotClient
             ns = true;
         }
         return sb.toString();
-    }
-    
-    // auth calls
-    
-    public static class GetAuthTokenCall extends BergamotAPICall<AuthTokenMO>
-    {
-        private String username;
-
-        private String password;
-
-        public GetAuthTokenCall(BaseBergamotClient client)
-        {
-            super(client);
-        }
-
-        public GetAuthTokenCall username(String username)
-        {
-            this.username = username;
-            return this;
-        }
-
-        public GetAuthTokenCall password(String password)
-        {
-            this.password = password;
-            return this;
-        }
-
-        public AuthTokenMO execute()
-        {
-            try
-            {
-                Response response = execute(
-                    post(url("/api/auth-token"))
-                    .addHeader(authHeader())
-                    .bodyForm(
-                        param("username", this.username),
-                        param("password", this.password)
-                    )
-                );
-                return transcoder().decodeFromString(response.returnContent().asString(), AuthTokenMO.class);
-            }
-            catch (IOException e)
-            {
-                throw new BergamotAPIException("Error calling Bergamot Monitoring API", e);
-            }
-        }
-    }
-
-    public GetAuthTokenCall callGetAuthToken()
-    {
-        return new GetAuthTokenCall(this);
     }
     
     // test calls
