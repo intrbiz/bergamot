@@ -22,6 +22,8 @@ import com.intrbiz.queue.hcq.HCQProducer;
 
 public class HCQSchedulerQueue extends SchedulerQueue
 {
+    public static final int QUEUE_SIZE = 100;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(SchedulerQueue.class, HCQPool.TYPE, HCQSchedulerQueue::new);
@@ -66,7 +68,7 @@ public class HCQSchedulerQueue extends SchedulerQueue
             {
                 on.getOrCreateExchange("bergamot.scheduler", "topic");
                 String queueName = "bergamot.scheduler." + UUID.randomUUID(); 
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 return queueName;
             }
 

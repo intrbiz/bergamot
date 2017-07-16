@@ -22,6 +22,8 @@ import com.intrbiz.queue.name.NullKey;
 
 public class HCQHealthCheckQueue extends HealthCheckQueue
 {
+    public static final int QUEUE_SIZE = 100;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(HealthCheckQueue.class, HCQPool.TYPE, HCQHealthCheckQueue::new);
@@ -78,7 +80,7 @@ public class HCQHealthCheckQueue extends HealthCheckQueue
             public String setupQueue(HCQBatch on) throws IOException
             {
                 String queueName = "health-" + UUID.randomUUID();
-                on.getOrCreateTempQueue(queueName)
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE)
                  .getOrCreateExchange("bergamot.health.event", "fanout")
                  .bindQueueToExchange("bergamot.health.event", "", queueName);
                 return queueName;
@@ -94,7 +96,7 @@ public class HCQHealthCheckQueue extends HealthCheckQueue
             public String setupQueue(HCQBatch on) throws IOException
             {
                 String queueName = "health-" + UUID.randomUUID(); 
-                on.getOrCreateTempQueue(queueName)
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE)
                  .getOrCreateExchange("bergamot.health.control", "fanout")
                  .bindQueueToExchange("bergamot.health.control", "", queueName);
                 return queueName;

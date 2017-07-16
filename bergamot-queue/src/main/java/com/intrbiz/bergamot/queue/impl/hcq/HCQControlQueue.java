@@ -19,6 +19,8 @@ import com.intrbiz.queue.name.NullKey;
 
 public class HCQControlQueue extends ControlQueue
 {
+    public static final int QUEUE_SIZE = 100;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(ControlQueue.class, HCQPool.TYPE, HCQControlQueue::new);
@@ -62,7 +64,7 @@ public class HCQControlQueue extends ControlQueue
             public String setupQueue(HCQBatch on) throws Exception
             {
                 on
-                 .getOrCreateQueue("bergamot.control.queue", false)
+                 .getOrCreateQueue("bergamot.control.queue", QUEUE_SIZE, false)
                  .getOrCreateExchange("bergamot.control", "topic")
                  .bindQueueToExchange("bergamot.control", "#", "bergamot.control.queue");
                 return "bergamot.control.queue";

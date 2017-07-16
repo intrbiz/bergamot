@@ -29,6 +29,8 @@ import com.intrbiz.queue.name.NullKey;
 
 public class HCQWorkerQueue extends WorkerQueue
 {
+    public static final int QUEUE_SIZE = 100;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(WorkerQueue.class, HCQPool.TYPE, HCQWorkerQueue::new);
@@ -59,11 +61,11 @@ public class HCQWorkerQueue extends WorkerQueue
             protected String setupExchange(HCQBatch on) throws Exception
             {
                 // the dead check queue
-                on.getOrCreateQueue("bergamot.dead_check_queue", false);
+                on.getOrCreateQueue("bergamot.dead_check_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.dead_check", "fanout");
                 on.bindQueueToExchange("bergamot.dead_check", "", "bergamot.dead_check_queue");
                 // the dead agent check queue
-                on.getOrCreateQueue("bergamot.dead_agent_check_queue", false);
+                on.getOrCreateQueue("bergamot.dead_agent_check_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.dead_agent_check", "fanout");
                 on.bindQueueToExchange("bergamot.dead_agent_check", "", "bergamot.dead_agent_check_queue");
                 // common exchanges
@@ -95,11 +97,11 @@ public class HCQWorkerQueue extends WorkerQueue
             public String setupQueue(HCQBatch on) throws IOException
             {
                 // the dead check queue
-                on.getOrCreateQueue("bergamot.dead_check_queue", false);
+                on.getOrCreateQueue("bergamot.dead_check_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.dead_check", "fanout");
                 on.bindQueueToExchange("bergamot.dead_check", "", "bergamot.dead_check_queue");
                 // the dead agent check queue
-                on.getOrCreateQueue("bergamot.dead_agent_check_queue", false);
+                on.getOrCreateQueue("bergamot.dead_agent_check_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.dead_agent_check", "fanout");
                 on.bindQueueToExchange("bergamot.dead_agent_check", "", "bergamot.dead_agent_check_queue");
                 // setup our worker queue
@@ -108,14 +110,14 @@ public class HCQWorkerQueue extends WorkerQueue
                 {
                     // for agent routed check, we use a transient queue
                     queueName = "bergamot.check." + Util.coalesce(site, "default") + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine + "." + UUID.randomUUID();
-                    on.getOrCreateTempQueue(queueName);
+                    on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                     // TODO: on.getOrCreateQueue(queueName, false, true, true, args("x-dead-letter-exchange", "bergamot.dead_agent_check"));
                 }
                 else
                 {
                     // for non agent routed checks we use a shared queue
                     queueName = "bergamot.check." + Util.coalesce(site, "default") + "." + Util.coalesceEmpty(workerPool, "any") + "." + engine;
-                    on.getOrCreateQueue(queueName, false);
+                    on.getOrCreateQueue(queueName, QUEUE_SIZE, false);
                     // TODO: on.getOrCreateQueue(queueName, true, false, false, args("x-dead-letter-exchange", "bergamot.dead_check"));
                 }
                 // common exchanges
@@ -193,7 +195,7 @@ public class HCQWorkerQueue extends WorkerQueue
         {
             public String setupQueue(HCQBatch on) throws IOException
             {
-                on.getOrCreateQueue("bergamot.dead_check_queue", false);
+                on.getOrCreateQueue("bergamot.dead_check_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.dead_check", "fanout");
                 on.bindQueueToExchange("bergamot.dead_check", "", "bergamot.dead_check_queue");
                 return "bergamot.dead_check_queue";
@@ -208,7 +210,7 @@ public class HCQWorkerQueue extends WorkerQueue
         {
             public String setupQueue(HCQBatch on) throws IOException
             {
-                on.getOrCreateQueue("bergamot.dead_agent_check_queue", false);
+                on.getOrCreateQueue("bergamot.dead_agent_check_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.dead_agent_check", "fanout");
                 on.bindQueueToExchange("bergamot.dead_agent_check", "", "bergamot.dead_agent_check_queue");
                 return "bergamot.dead_agent_check_queue";
@@ -226,7 +228,7 @@ public class HCQWorkerQueue extends WorkerQueue
             protected String setupExchange(HCQBatch on) throws IOException
             {
                 // the fallback queue
-                on.getOrCreateQueue("bergamot.result.fallback_queue", false);
+                on.getOrCreateQueue("bergamot.result.fallback_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.result.fallback", "fanout");
                 on.bindQueueToExchange("bergamot.result.fallback", "", "bergamot.result.fallback_queue");
                 // the result exchange
@@ -245,13 +247,13 @@ public class HCQWorkerQueue extends WorkerQueue
             public String setupQueue(HCQBatch on) throws IOException
             {
                 // the fallback queue
-                on.getOrCreateQueue("bergamot.result.fallback_queue", false);
+                on.getOrCreateQueue("bergamot.result.fallback_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.result.fallback", "fanout");
                 on.bindQueueToExchange("bergamot.result.fallback", "", "bergamot.result.fallback_queue");
                 // Use a transient queue since
                 // processing duties could be moved at any time
                 String queueName = "bergamot.result.processor." + instance;
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 // the result exchange
                 on.getOrCreateExchange("bergamot.result", "topic");
                 on.bindAlternateExchange("bergamot.result", "bergamot.result.fallback");
@@ -279,7 +281,7 @@ public class HCQWorkerQueue extends WorkerQueue
         {
             public String setupQueue(HCQBatch on) throws IOException
             {
-                on.getOrCreateQueue("bergamot.result.fallback_queue", false);
+                on.getOrCreateQueue("bergamot.result.fallback_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.result.fallback", "fanout");
                 on.bindQueueToExchange("bergamot.result.fallback", "", "bergamot.result.fallback_queue");
                 return "bergamot.result.fallback_queue";
@@ -297,7 +299,7 @@ public class HCQWorkerQueue extends WorkerQueue
             protected String setupExchange(HCQBatch on) throws IOException
             {
                 // the fallback queue
-                on.getOrCreateQueue("bergamot.reading.fallback_queue", false);
+                on.getOrCreateQueue("bergamot.reading.fallback_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.reading.fallback", "fanout");
                 on.bindQueueToExchange("bergamot.reading.fallback", "", "bergamot.reading.fallback_queue");
                 // the result exchange
@@ -316,13 +318,13 @@ public class HCQWorkerQueue extends WorkerQueue
             public String setupQueue(HCQBatch on) throws IOException
             {
                 // the fallback queue
-                on.getOrCreateQueue("bergamot.reading.fallback_queue", false);
+                on.getOrCreateQueue("bergamot.reading.fallback_queue", QUEUE_SIZE, false);
                 on.getOrCreateExchange("bergamot.reading.fallback", "fanout");
                 on.bindQueueToExchange("bergamot.reading.fallback", "", "bergamot.reading.fallback_queue");
                 // Use a transient queue since
                 // processing duties could be moved at any time
                 String queueName = "bergamot.reading.processor." + instance;
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 // the result exchange
                 on.getOrCreateExchange("bergamot.reading", "topic");
                 on.bindAlternateExchange("bergamot.reading", "bergamot.reading.fallback");
@@ -351,7 +353,7 @@ public class HCQWorkerQueue extends WorkerQueue
             public String setupQueue(HCQBatch on) throws IOException
             {
                 on.getOrCreateExchange("bergamot.reading.fallback", "fanout");
-                on.getOrCreateQueue("bergamot.reading.fallback_queue", false);
+                on.getOrCreateQueue("bergamot.reading.fallback_queue", QUEUE_SIZE, false);
                 on.bindQueueToExchange("bergamot.reading.fallback", "", "bergamot.reading.fallback_queue");
                 return "bergamot.reading.fallback_queue";
             }
@@ -382,7 +384,7 @@ public class HCQWorkerQueue extends WorkerQueue
             {
                 on.getOrCreateExchange("bergamot.adhocresult", "topic");
                 String queueName = "adhoc-result-" + UUID.randomUUID();
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 on.bindQueueToExchange("bergamot.adhocresult", new AdhocResultKey(adhocId).toString(), queueName);
                 return queueName;
             }

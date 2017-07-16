@@ -19,6 +19,8 @@ import com.intrbiz.queue.name.RoutingKey;
 
 public class HCQBergamotClusterManagerQueue extends BergamotClusterManagerQueue
 {
+    public static final int QUEUE_SIZE = 100;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(BergamotClusterManagerQueue.class, HCQPool.TYPE, HCQBergamotClusterManagerQueue::new);
@@ -48,6 +50,7 @@ public class HCQBergamotClusterManagerQueue extends BergamotClusterManagerQueue
                 this.transcoder.asQueueEventTranscoder(ClusterManagerResponse.class), 
                 handler, 
                 new Queue("bergamot.cluster.manager.requests", true), 
+                QUEUE_SIZE, 
                 new Exchange("bergamot.cluster.manager", "fanout", true)
         );
     }
@@ -60,7 +63,8 @@ public class HCQBergamotClusterManagerQueue extends BergamotClusterManagerQueue
                 this.transcoder.asQueueEventTranscoder(ClusterManagerRequest.class), 
                 this.transcoder.asQueueEventTranscoder(ClusterManagerResponse.class), 
                 new Exchange("bergamot.cluster.manager", "fanout", true),
-                new Queue("bergamot.cluster.manager.requests", true).toKey()
+                new Queue("bergamot.cluster.manager.requests", true).toKey(), 
+                QUEUE_SIZE
         );
     }
 

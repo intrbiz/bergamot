@@ -22,6 +22,8 @@ import com.intrbiz.queue.hcq.HCQProducer;
 
 public class HCQNotificationQueue extends NotificationQueue
 {
+    public static final int QUEUE_SIZE = 1000;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(NotificationQueue.class, HCQPool.TYPE, HCQNotificationQueue::new);
@@ -66,7 +68,7 @@ public class HCQNotificationQueue extends NotificationQueue
             {
                 on.getOrCreateExchange("bergamot.notification", "topic");
                 String queueName = "bergamot.notification." + (site == null ? "default" : site.toString()) + "." + engineName;
-                on.getOrCreateQueue(queueName, false);
+                on.getOrCreateQueue(queueName, QUEUE_SIZE, false);
                 on.bindQueueToExchange("bergamot.notification", site == null ? "#" : site.toString(), queueName);
                 return queueName;
             }
@@ -82,7 +84,7 @@ public class HCQNotificationQueue extends NotificationQueue
             {
                 on.getOrCreateExchange("bergamot.notification", "topic");
                 String queueName = "notifications-" + UUID.randomUUID();
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 on.bindQueueToExchange("bergamot.notification", site == null ? "#" : site.toString(), queueName);
                 return queueName;
             }

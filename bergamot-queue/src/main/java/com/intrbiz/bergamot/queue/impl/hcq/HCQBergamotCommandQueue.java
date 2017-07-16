@@ -19,6 +19,8 @@ import com.intrbiz.queue.name.RoutingKey;
 
 public class HCQBergamotCommandQueue extends BergamotCommandQueue
 {
+    public static final int QUEUE_SIZE = 100;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(BergamotCommandQueue.class, HCQPool.TYPE, HCQBergamotCommandQueue::new);
@@ -48,6 +50,7 @@ public class HCQBergamotCommandQueue extends BergamotCommandQueue
                 this.transcoder.asQueueEventTranscoder(CommandResponse.class), 
                 handler, 
                 new Queue("bergamot.command.requests", true), 
+                QUEUE_SIZE, 
                 new Exchange("bergamot.command", "fanout", true)
         );
     }
@@ -59,8 +62,9 @@ public class HCQBergamotCommandQueue extends BergamotCommandQueue
                 this.broker, 
                 this.transcoder.asQueueEventTranscoder(CommandRequest.class), 
                 this.transcoder.asQueueEventTranscoder(CommandResponse.class), 
-                new Exchange("bergamot.command", "fanout", true),
-                new Queue("bergamot.command.requests", true).toKey()
+                new Exchange("bergamot.command", "fanout", true), 
+                new Queue("bergamot.command.requests", true).toKey(), 
+                QUEUE_SIZE
         );
     }
 

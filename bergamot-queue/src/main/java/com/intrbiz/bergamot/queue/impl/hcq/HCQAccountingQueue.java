@@ -23,6 +23,8 @@ import com.intrbiz.queue.name.NullKey;
 
 public class HCQAccountingQueue extends AccountingQueue
 {
+    public static final int QUEUE_SIZE = 1000;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(AccountingQueue.class, HCQPool.TYPE, HCQAccountingQueue::new);
@@ -90,7 +92,7 @@ public class HCQAccountingQueue extends AccountingQueue
             protected String setupQueue(HCQBatch on) throws Exception
             {
                 on
-                 .getOrCreateQueue(ACCOUNTING_QUEUE_NAME, false)
+                 .getOrCreateQueue(ACCOUNTING_QUEUE_NAME, QUEUE_SIZE, false)
                  .getOrCreateExchange(ACCOUNTING_EXCHANGE_NAME, "topic")
                  .bindQueueToExchange(ACCOUNTING_EXCHANGE_NAME, "#", ACCOUNTING_QUEUE_NAME);
                 return ACCOUNTING_QUEUE_NAME;

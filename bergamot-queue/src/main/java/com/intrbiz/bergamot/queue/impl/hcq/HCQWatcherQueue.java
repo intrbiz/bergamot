@@ -22,6 +22,8 @@ import com.intrbiz.queue.hcq.HCQProducer;
 
 public class HCQWatcherQueue extends WatcherQueue
 {
+    public static final int QUEUE_SIZE = 100;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(WatcherQueue.class, HCQPool.TYPE, HCQWatcherQueue::new);
@@ -67,7 +69,7 @@ public class HCQWatcherQueue extends WatcherQueue
                 on.getOrCreateExchange("bergamot.watcher", "topic");
                 // the transient watcher queue
                 String queueName = "watcher-" + UUID.randomUUID();
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 on.bindQueueToExchange("bergamot.watcher", new WatcherKey(watcher, engine).toString(), queueName);
                 return queueName;
             }

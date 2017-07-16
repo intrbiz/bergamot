@@ -23,6 +23,8 @@ import com.intrbiz.queue.hcq.HCQProducer;
 
 public class HCQUpdateQueue extends UpdateQueue
 {
+    public static final int QUEUE_SIZE = 10;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(UpdateQueue.class, HCQPool.TYPE, HCQUpdateQueue::new);
@@ -68,7 +70,7 @@ public class HCQUpdateQueue extends UpdateQueue
             {
                 on.getOrCreateExchange("bergamot.update", "topic");
                 String queueName = "update-" + UUID.randomUUID();
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 on.bindQueueToExchange("bergamot.update", (site == null ? "*" : site.toString()) + "." + (check == null ? "*" : check.toString()), queueName);
                 return queueName;
             }
@@ -94,7 +96,7 @@ public class HCQUpdateQueue extends UpdateQueue
             {
                 on.getOrCreateExchange("bergamot.update", "topic");
                 String queueName = "update-" + UUID.randomUUID();
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 // no bindings for the moment
                 return queueName;
             }
@@ -121,7 +123,7 @@ public class HCQUpdateQueue extends UpdateQueue
                 on.getOrCreateExchange("bergamot.update", "topic");
                 // setup the queue
                 String queueName = "update-" + UUID.randomUUID();
-                on.getOrCreateTempQueue(queueName);
+                on.getOrCreateTempQueue(queueName, QUEUE_SIZE);
                 // bind
                 for (UpdateKey binding : initialBindings)
                 {

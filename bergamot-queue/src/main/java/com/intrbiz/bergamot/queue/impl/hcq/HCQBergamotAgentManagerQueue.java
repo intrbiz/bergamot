@@ -19,6 +19,8 @@ import com.intrbiz.queue.name.RoutingKey;
 
 public class HCQBergamotAgentManagerQueue extends BergamotAgentManagerQueue
 {
+    public static final int QUEUE_SIZE = 10;
+    
     public static final void register()
     {
         QueueManager.getInstance().registerQueueAdapter(BergamotAgentManagerQueue.class, HCQPool.TYPE, HCQBergamotAgentManagerQueue::new);
@@ -47,7 +49,8 @@ public class HCQBergamotAgentManagerQueue extends BergamotAgentManagerQueue
                 this.transcoder.asQueueEventTranscoder(AgentManagerRequest.class), 
                 this.transcoder.asQueueEventTranscoder(AgentManagerResponse.class), 
                 handler, 
-                new Queue("bergamot.agent.manager.requests", true), 
+                new Queue("bergamot.agent.manager.requests", true),
+                QUEUE_SIZE,
                 new Exchange("bergamot.agent.manager", "fanout", true)
         );
     }
@@ -60,7 +63,8 @@ public class HCQBergamotAgentManagerQueue extends BergamotAgentManagerQueue
                 this.transcoder.asQueueEventTranscoder(AgentManagerRequest.class), 
                 this.transcoder.asQueueEventTranscoder(AgentManagerResponse.class), 
                 new Exchange("bergamot.agent.manager", "fanout", true),
-                new Queue("bergamot.agent.manager.requests", true).toKey()
+                new Queue("bergamot.agent.manager.requests", true).toKey(),
+                QUEUE_SIZE
         );
     }
 
