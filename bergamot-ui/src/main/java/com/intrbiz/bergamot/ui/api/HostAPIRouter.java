@@ -33,7 +33,7 @@ import com.intrbiz.metadata.doc.Title;
 
 @Title("Host API Methods")
 @Desc({
-    "Hosts represent pysical and virtual servers upon which Services run.  These API calls provide information opn configured Host checks and their current state."
+    "Hosts represent pysical and virtual servers upon which Services run.  These API calls provide information on configured Host checks and their current state."
 })
 @Prefix("/api/host")
 @RequireValidPrincipal()
@@ -52,7 +52,7 @@ public class HostAPIRouter extends Router<BergamotApp>
         return db.listHosts(site.getId()).stream().map((x) -> x.toStubMO(currentPrincipal())).collect(Collectors.toList());
     }
     
-    @Title("Get host by name")
+    @Title("Get host")
     @Desc({
         "Get the host check for the given name, returning minimal information about the host check."
     })
@@ -66,7 +66,7 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.toMO(currentPrincipal());
     }
     
-    @Title("Get host state by name")
+    @Title("Get host state")
     @Desc({
         "Get the state of the host check for the given name, returning just the check state."
     })
@@ -80,7 +80,7 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getState().toMO(currentPrincipal());
     }
     
-    @Title("Get host by id")
+    @Title("Get host")
     @Desc({
         "Get the host check for the given id (UUID), returning minimal information about the host check."
     })
@@ -94,7 +94,7 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.toMO(currentPrincipal());
     }
     
-    @Title("Get host state by name")
+    @Title("Get host state")
     @Desc({
         "Get the state of the host check for the given id (UUID), returning just the check state."
     })
@@ -108,6 +108,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getState().toMO(currentPrincipal());
     }
     
+    @Title("Get services on host")
+    @Desc({
+        "Get all the services on the host identified by the given host name."
+    })
     @Get("/name/:name/services")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -119,6 +123,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getServices().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
+    @Title("Get services on host")
+    @Desc({
+        "Get all the services on the host identified by the given UUID."
+    })
     @Get("/id/:id/services")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -130,6 +138,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getServices().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
+    @Title("Get traps on host")
+    @Desc({
+        "Get all the traps on the host identified by the given host name."
+    })
     @Get("/name/:name/traps")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -141,6 +153,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getTraps().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
+    @Title("Get traps on host")
+    @Desc({
+        "Get all the traps on the host identified by the given UUID."
+    })
     @Get("/id/:id/traps")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -152,6 +168,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getTraps().stream().filter((x) -> permission("read", x)).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
+    @Title("Execute a host check")
+    @Desc({
+        "Execute a check immediately for the host identified by the given UUID."
+    })
     @Get("/id/:id/execute")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -163,6 +183,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok";
     }
     
+    @Title("Suppress a host")
+    @Desc({
+        "Suppress the host identified by the given UUID, this will prevent any alerts being raised for this host."
+    })
     @Get("/id/:id/suppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -174,6 +198,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok";
     }
     
+    @Title("Unsuppress a host")
+    @Desc({
+        "Unsuppress the host identified by the given UUID, this will stop preventing any alerts being raised for this host."
+    })
     @Get("/id/:id/unsuppress")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -185,6 +213,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok";
     }
     
+    @Title("Execute all service checks on a host")
+    @Desc({
+        "Execute a check immediately for every service on the host identified by the given UUID."
+    })
     @Get("/id/:id/execute-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -203,6 +235,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, executed " + executed + " services";
     }
     
+    @Title("Suppress all services on a host")
+    @Desc({
+        "Suppress all services on the host identified by the given UUID."
+    })
     @Get("/id/:id/suppress-services")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -221,6 +257,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, suppressed " + suppressed + " services";
     }
     
+    @Title("Unsuppress all services on a host")
+    @Desc({
+        "Unsuppress all services on the host identified by the given UUID."
+    })
     @Get("/id/:id/unsuppress-services")
     @JSON()
     @RequirePermission("api.write.host.unsuppress")
@@ -241,6 +281,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, unsuppressed " + unsuppressed + " services";
     }
     
+    @Title("Suppress all traps on a host")
+    @Desc({
+        "Suppress all traps on the host identified by the given UUID."
+    })
     @Get("/id/:id/suppress-traps")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -259,6 +303,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, suppressed " + suppressed + " traps";
     }
     
+    @Title("Unsuppress all traps on a host")
+    @Desc({
+        "Unsuppress all traps on the host identified by the given UUID."
+    })
     @Get("/id/:id/unsuppress-traps")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -277,6 +325,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, unsuppressed " + unsuppressed + " traps";
     }
     
+    @Title("Suppress all services and traps on a host")
+    @Desc({
+        "Suppress all services and traps on the host identified by the given UUID."
+    })
     @Get("/id/:id/suppress-all")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -303,6 +355,10 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, suppressed " + suppressed;
     }
     
+    @Title("Unsuppress all services and traps on a host")
+    @Desc({
+        "Unsuppress all services and traps on the host identified by the given UUID."
+    })
     @Get("/id/:id/unsuppress-all")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -329,10 +385,14 @@ public class HostAPIRouter extends Router<BergamotApp>
         return "Ok, unsuppressed " + unsuppressed;
     }
     
+    @Title("Get host configuration")
+    @Desc({
+        "Get the configuration for the host identified by the given name, returning the XML configuration snippet."
+    })
     @Get("/name/:name/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    @IgnoreBinding
+    @IgnoreBinding(ignoreDocs = false)
     public HostCfg getHostConfigByName(BergamotDB db, @Var("site") Site site, String name)
     {
         Host host = notNull(db.getHostByName(site.getId(), name));
@@ -340,10 +400,14 @@ public class HostAPIRouter extends Router<BergamotApp>
         return host.getConfiguration();
     }
     
+    @Title("Get host configuration")
+    @Desc({
+        "Get the configuration for the host identified by the given UUID, returning the XML configuration snippet."
+    })
     @Get("/id/:id/config.xml")
     @XML(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
-    @IgnoreBinding
+    @IgnoreBinding(ignoreDocs = false)
     public HostCfg getHostConfig(BergamotDB db, @IsaObjectId() UUID id)
     {
         Host host = notNull(db.getHost(id));

@@ -137,7 +137,7 @@ public class AboutRouter extends Router<BergamotApp>
                 List<RouteInfo> routes = Route.fromRouter(prefix, router).stream()
                                           .filter((r) -> ! (r.isFilter() || r.isExceptionHandler()))
                                           .map((r) -> new RouteInfo(r))
-                                          .filter((r) -> ! r.isIgnoreBinding())
+                                          .filter((r) -> ! r.isIgnoreDocs())
                                           .collect(Collectors.toList());
                 if (! routes.isEmpty())
                 {
@@ -180,7 +180,7 @@ public class AboutRouter extends Router<BergamotApp>
                         if ("ANY".equals(route.getMethod()) || "GET".equals(route.getMethod()))
                         {
                             writer.append("#### Example\n\n");
-                            writer.append("    curl -X GET -H 'X-Bergamot-Auth: WVArodeKagxYAK0f4w61BB4XCOWcpTINgu2DQVpx4FwIFKNgCF6bEwtXhAxdeH9uT5029bXWsiA8bHv7wgR7ZGe0S-rddU3tMMUQJTFf' https://demo.bergamot-monitoring.org").append(route.getPath());
+                            writer.append("    curl -X GET -H 'Authorization: WVArodeKagxYAK0f4w61BB4XCOWcpTINgu2DQVpx4FwIFKNgCF6bEwtXhAxdeH9uT5029bXWsiA8bHv7wgR7ZGe0S-rddU3tMMUQJTFf' https://demo.bergamot-monitoring.org").append(route.getPath());
                             if (route.getParameters().stream().anyMatch((r) -> ! r.isAs()))
                             {
                                 writer.append("?");
@@ -246,6 +246,8 @@ public class AboutRouter extends Router<BergamotApp>
         
         private boolean ignoreBinding;
         
+        private boolean ignoreDocs;
+        
         private Title title;
         
         private Desc desc;
@@ -270,7 +272,9 @@ public class AboutRouter extends Router<BergamotApp>
                 SetOf soa = route.getHandler().getAnnotation(SetOf.class);
                 if (soa != null) this.returnOfType = soa.value();
                 // manual binding
-                this.ignoreBinding = route.getHandler().getAnnotation(IgnoreBinding.class) != null;
+                IgnoreBinding ignore = route.getHandler().getAnnotation(IgnoreBinding.class);
+                this.ignoreBinding = ignore != null;
+                this.ignoreDocs = ignore == null ? false : ignore.ignoreDocs();
                 // use the exec build to introspect the route
                 ExecBuilder exec = ExecBuilder.build(route);
                 // look at the annotations
@@ -373,6 +377,11 @@ public class AboutRouter extends Router<BergamotApp>
         public boolean isIgnoreBinding()
         {
             return this.ignoreBinding;
+        }
+        
+        public boolean isIgnoreDocs()
+        {
+            return this.ignoreDocs;
         }
 
         public void buildRouteAPICall(StringBuilder sb, Set<String> imports)

@@ -94,6 +94,10 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         return db.listAlerts(site.getId()).stream().filter((a) -> permission("read", a.getCheckId())).map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
+    @Title("Get alert")
+    @Desc({
+        "Get alert identified by the given UUID"
+    })
     @Get("/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -104,6 +108,10 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         return alert.toMO(currentPrincipal());
     }
     
+    @Title("Get alerts for check")
+    @Desc({
+        "Get the alerts for the given check identified by the given UUID."
+    })
     @Get("/for-check/id/:id")
     @JSON()
     @WithDataAdapter(BergamotDB.class)
@@ -114,6 +122,10 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         return db.getAlertsForCheck(id).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
     
+    @Title("Get current alert for check")
+    @Desc({
+        "Get the current alert for the given check identified by the given UUID."
+    })
     @Get("/current/for-check/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)
@@ -124,6 +136,10 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         return alert.toMO(currentPrincipal());
     }
     
+    @Title("Acknowledge alert")
+    @Desc({
+        "Acknowledge the alert identified by the given UUID with the given summary and comment"
+    })
     @Any("/id/:id/acknowledge")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)

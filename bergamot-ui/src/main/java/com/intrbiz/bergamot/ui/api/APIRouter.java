@@ -15,6 +15,7 @@ import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
@@ -32,8 +33,11 @@ import com.intrbiz.metadata.Options;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.XML;
+import com.intrbiz.metadata.doc.Desc;
+import com.intrbiz.metadata.doc.Title;
 import com.intrbiz.validator.ValidationException;
 
+@Title("Authentication API Methods")
 @Prefix("/api/")
 public class APIRouter extends Router<BergamotApp>
 {   
@@ -146,6 +150,7 @@ public class APIRouter extends Router<BergamotApp>
      */
     @Options("**")
     @Order(-10)
+    @IgnoreBinding
     public void handleCORSPreflight()
     {
         response()
@@ -200,6 +205,10 @@ public class APIRouter extends Router<BergamotApp>
      * 
      * Note: this can only be called with a perpetual access token, or via a valid UI session
      */
+    @Title("Generate temporary authentication token")
+    @Desc({
+        "Temporary authentication tokens last for 1 hour from creation and can be used to authorize subsequent requests to the Bergamot Monitoring API wit the same level of access as requestor."
+    })
     @Get("/auth-token")
     @JSON()
     public AuthTokenMO getAuthToken()
