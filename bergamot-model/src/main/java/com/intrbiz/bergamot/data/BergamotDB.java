@@ -262,10 +262,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLRemove(table = Config.class, name = "remove_config", since = @SQLVersion({1, 0, 0}))
     public abstract void removeConfig(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = Config.class, name = "list_config", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Config.class, name = "list_config", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}))
     public abstract List<Config> listConfig(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type", optional = true) String type);
     
-    @SQLGetter(table = Config.class, name = "list_config_templates", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Config.class, name = "list_config_templates", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND type = p_type AND template = TRUE")
     )
     public abstract List<Config> listConfigTemplates(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type") String type);
@@ -273,7 +273,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLGetter(table = Config.class, name = "get_config_by_name", since = @SQLVersion({1, 0, 0}))
     public abstract Config getConfigByName(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
     
-    @SQLGetter(table = Config.class, name = "list_dependent_config", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Config.class, name = "list_dependent_config", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND required_templates @> ARRAY[p_qualified_template_name] AND (NOT (type = 'service' OR type = 'trap' OR type = 'resource'))")
     )
     public abstract List<Config> listDependentConfig(@SQLParam("site_id") UUID siteId, @SQLParam(value = "qualified_template_name", virtual = true) String qualifiedTemplateName);
@@ -281,7 +281,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     /**
      * Recursively find all objects which utilise the given template
      */
-    @SQLGetter(table = Config.class, name = "list_all_dependent_config_objects", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Config.class, name = "list_all_dependent_config_objects", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("WITH RECURSIVE config_graph AS ( " + 
                               "    SELECT c.* " +
                               "    FROM bergamot.config c " + 
@@ -745,7 +745,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract Contact getContactByNameOrEmail(@SQLParam("site_id") UUID siteId, @SQLParam(value = "name_or_email", virtual = true) String nameOrEmail);
     
-    @SQLGetter(table = Contact.class, name = "list_contacts", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Contact.class, name = "list_contacts", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}))
     public abstract List<Contact> listContacts(@SQLParam("site_id") UUID siteId);
     
     @Cacheable

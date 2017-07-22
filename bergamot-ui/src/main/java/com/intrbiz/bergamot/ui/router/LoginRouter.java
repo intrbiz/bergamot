@@ -116,6 +116,8 @@ public class LoginRouter extends Router<BergamotApp>
         // validate captcha
         if (! Util.isEmpty(recaptchaSiteKey))
         {
+            if (Util.isEmpty(recaptchaResponse))
+                throw new BalsaValidationError("reCAPTCHA response required");
             require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
         }
         // process login
@@ -312,6 +314,8 @@ public class LoginRouter extends Router<BergamotApp>
         // validate captcha
         if (! Util.isEmpty(recaptchaSiteKey))
         {
+            if (Util.isEmpty(recaptchaResponse))
+                throw new BalsaValidationError("reCAPTCHA response required");
             require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
         }
         // change the password
@@ -483,6 +487,8 @@ public class LoginRouter extends Router<BergamotApp>
             // validate captcha
             if (! Util.isEmpty(recaptchaSiteKey))
             {
+                if (Util.isEmpty(recaptchaResponse))
+                    throw new BalsaValidationError("reCAPTCHA response required");
                 require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
             }
             // lookup the contact
