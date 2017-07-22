@@ -8,10 +8,8 @@
 		<p class="error centre">
 	    	The request you've made was bad, either malformed or contained unexpected data.
 	    </p>
-	    <data-set var="error" value="#{balsa().getValidationErrors()}">
-		    <p class="error centre">
-		    	Error: #{'"' + error.getMessage() + '"'}
-		    </p>
-	    </data-set>
+	    <p class="error centre">
+	    	Error reference: #{errorId}
+	    </p>
 	</div>
 </fragment>

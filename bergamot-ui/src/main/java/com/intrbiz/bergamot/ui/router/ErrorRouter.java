@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.ui.router;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -45,7 +46,8 @@ public class ErrorRouter extends Router<BergamotApp>
     @Status(HTTPStatus.BadRequest)
     public void badRequest()
     {
-        logger.error("Bad request: " + balsa().getValidationErrors());
+        UUID errorId = var("errorId", UUID.randomUUID());
+        logger.error("ERROR[" + errorId + "] Bad request: " + balsa().getValidationErrors());
         encode("error/400");
     }
     
@@ -55,7 +57,8 @@ public class ErrorRouter extends Router<BergamotApp>
     @Status(HTTPStatus.InternalServerError)
     public void unhandledError()
     {
-        logger.error("Unhandle error handling request", balsa().getException());
+        UUID errorId = var("errorId", UUID.randomUUID());
+        logger.error("ERROR[" + errorId + "] Unhandle error handling request", balsa().getException());
         encode("error/500");
     }
 }
