@@ -1,0 +1,15 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- A template view, applied to all views -->
+<fragment xmlns="com.intrbiz.balsa" title="Internal Error">
+	<div id="login-box">
+        <img src="#{public('/images/logo/bergamot_7_h100.png')}" alt="Welcome to Bergamot Monitoring" class="centre"/>
+		<h4 class="centre">Your Account Is Locked</h4>
+		<p class="error centre">
+	    	For security reasons your account has been locked.
+	    </p>
+	    <p class="error centre">
+	    	Please wait 15 minutes before attempting to login again or contact your support team for assistance.
+	    </p>
+	</div>
+</fragment>

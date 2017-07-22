@@ -101,6 +101,18 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
     @SQLColumn(index = 12, name = "locked_at", since = @SQLVersion({ 1, 0, 0 }))
     private Timestamp lockedAt = null;
 
+    /**
+     * How many failed authentication attempts there have been
+     */
+    @SQLColumn(index = 13, name = "auth_fails", since = @SQLVersion({ 3, 47, 0 }))
+    private int authFails = 0;
+    
+    /**
+     * Last time this contact logged in
+     */
+    @SQLColumn(index = 14, name = "last_login_at", since = @SQLVersion({ 3, 48, 0 }))
+    private Timestamp lastLoginAt = null;
+
     public Contact()
     {
         super();
@@ -286,6 +298,26 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         this.lockedAt = lockedAt;
     }
     
+    public int getAuthFails()
+    {
+        return authFails;
+    }
+
+    public void setAuthFails(int authFails)
+    {
+        this.authFails = authFails;
+    }
+    
+    public Timestamp getLastLoginAt()
+    {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(Timestamp lastLoginAt)
+    {
+        this.lastLoginAt = lastLoginAt;
+    }
+
     public Contact forcePasswordChange()
     {
         this.forcePasswordChange = true;
@@ -294,7 +326,6 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
     
     public Contact resetPassword()
     {
-        this.passwordHash = null;
         this.forcePasswordChange = true;
         return this;
     }
@@ -312,9 +343,10 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         this.locked = false;
         this.lockedReason = null;
         this.lockedAt = null;
+        this.authFails = 0;
         return this;
     }
-    
+
     public List<APIToken> getAPITokens()
     {
         try (BergamotDB db = BergamotDB.connect())

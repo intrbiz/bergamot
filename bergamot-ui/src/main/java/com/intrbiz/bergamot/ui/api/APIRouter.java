@@ -24,12 +24,14 @@ import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.IgnoreCatch;
 import com.intrbiz.metadata.IgnoreMethods;
 import com.intrbiz.metadata.IgnorePaths;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Options;
 import com.intrbiz.metadata.Order;
 import com.intrbiz.metadata.Prefix;
+import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.XML;
 import com.intrbiz.metadata.doc.Desc;
 import com.intrbiz.metadata.doc.Title;
@@ -48,6 +50,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**\\.xml")
     @Order(10)
     @XML(status = HTTPStatus.NotFound)
+    @RequirePrincipal()
     public APIError notFoundXML()
     {
         return new APIError("Not found");
@@ -72,6 +75,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(20)
     @JSON(status = HTTPStatus.NotFound)
+    @RequirePrincipal()
     public APIError notFound()
     {
         return new APIError("Not found");
@@ -96,7 +100,8 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(30)
     @JSON(status = HTTPStatus.BadRequest)
-    public APIError invalideRequest()
+    @RequirePrincipal()
+    public APIError invalidRequest()
     {
         for (ConversionException cex : balsa().getConversionErrors())
         {
@@ -116,6 +121,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(40)
     @JSON(status = HTTPStatus.BadRequest)
+    @RequirePrincipal()
     public APIError badRequest()
     {
         Throwable error = balsa().getException();
@@ -133,6 +139,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(Order.LAST)
     @JSON(status = HTTPStatus.InternalServerError)
+    @RequirePrincipal()
     public APIError internalServerError()
     {
         Throwable error = balsa().getException();
@@ -182,6 +189,7 @@ public class APIRouter extends Router<BergamotApp>
     /* We don't want to filter the certain routes */
     @IgnorePaths({ "/test/hello/world", "/auth-token" })
     @Order(10)
+    @IgnoreCatch({ BalsaSecurityException.class })
     public void authenticateRequest()
     {
         // perform a token based request authentication

@@ -14,10 +14,11 @@
 			<p>
 				<input type="password" id="password" name="password" placeholder="Enter your password"/>
 			</p>
-	            <p>
-	                <input type="checkbox" id="remember_me" name="remember_me" value="yes"/>
-	                <label for="remember_me">Remember me on this computer</label>
-	            </p>
+	        <p>
+	            <input type="checkbox" id="remember_me" name="remember_me" value="yes"/>
+	            <label for="remember_me">Remember me on this computer</label>
+	        </p>
+			<div rendered="#{!isempty(recaptchaSiteKey)}" class="g-recaptcha" data-sitekey="#{recaptchaSiteKey}"></div>
 			<p>
 				<access-token-for-url path="#{path('/login')}"/>
 				<input type="hidden" id="redirect" name="redirect" value="#{coalesce(redirect,'')}" />
@@ -28,4 +29,5 @@
         	<a href="/reset-password?username=#{urlencode(coalesce(username, ''))}" class="error">Forgotten your password?</a>
         </p>
 	</div>
+	<script rendered="#{!isempty(recaptchaSiteKey)}" src='https://www.google.com/recaptcha/api.js'></script>
 </fragment>
