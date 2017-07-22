@@ -13,8 +13,6 @@ import com.intrbiz.balsa.error.BalsaValidationError;
 import com.intrbiz.balsa.error.http.BalsaBadRequest;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
-import com.intrbiz.balsa.metadata.WithDataAdapter;
-import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
@@ -149,7 +147,7 @@ public class APIRouter extends Router<BergamotApp>
      * CORS Preflight Handling
      */
     @Options("**")
-    @Order(-10)
+    @Order(Order.FIRST)
     @IgnoreBinding
     public void handleCORSPreflight()
     {
@@ -168,7 +166,7 @@ public class APIRouter extends Router<BergamotApp>
     @Before
     @Any("**")
     @IgnoreMethods({"OPTIONS"})
-    @Order(5)
+    @Order(Order.FIRST)
     public void addCORSHeaders()
     {
         response()
@@ -184,8 +182,7 @@ public class APIRouter extends Router<BergamotApp>
     /* We don't want to filter the certain routes */
     @IgnorePaths({ "/test/hello/world", "/auth-token" })
     @Order(10)
-    @WithDataAdapter(BergamotDB.class)
-    public void authenticateRequest(BergamotDB db)
+    public void authenticateRequest()
     {
         // perform a token based request authentication
         // we may already have the auth from the session, if shared with a UI session

@@ -73,6 +73,7 @@ import com.intrbiz.bergamot.ui.router.StatsRouter;
 import com.intrbiz.bergamot.ui.router.TeamRouter;
 import com.intrbiz.bergamot.ui.router.TimePeriodRouter;
 import com.intrbiz.bergamot.ui.router.TrapRouter;
+import com.intrbiz.bergamot.ui.router.UIRouter;
 import com.intrbiz.bergamot.ui.router.admin.AdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ClusterAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.CommandAdminRouter;
@@ -248,6 +249,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void setupRouters() throws Exception
     {
+        // UI filters and defaults
+        router(new UIRouter());
         // health check router
         router(new HealthRouter());
         // Setup the application routers
