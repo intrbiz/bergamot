@@ -41,9 +41,13 @@ import com.yubico.u2f.data.DeviceRegistration;
 
 public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
 {
-    private static final int MAX_AUTH_FAILS = 10;
+    private static final int DEFAUlT_MAX_AUTH_FAILS = 10;
     
-    private static final long AUTOMATIC_AUTH_LOCKOUT_PERIOD = TimeUnit.MINUTES.toMillis(15);
+    private static final int DEFAULT_AUTOMATIC_AUTH_LOCKOUT_PERIOD = 15;
+    
+    private static final String AUTOMATIC_LOCKOUT_MINUTES = "automatic-lockout-minutes";
+    
+    private static final String AUTOMATIC_LOCKOUT_AFTER = "automatic-lockout-after";
     
     private Logger logger = Logger.getLogger(BergamotSecurityEngine.class);
     
@@ -154,6 +158,9 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
             }
             // is the site disable
             if (site.isDisabled()) throw new BalsaSecurityException("Site is disabled");
+            // get some site wide configuration
+            int automaticLockoutMinutes = site.getIntParameter(AUTOMATIC_LOCKOUT_MINUTES, DEFAULT_AUTOMATIC_AUTH_LOCKOUT_PERIOD);
+            int automaticLockoutAttempts = site.getIntParameter(AUTOMATIC_LOCKOUT_AFTER, DEFAUlT_MAX_AUTH_FAILS);
             // lookup the principal
             Contact contact = db.getContactByNameOrEmail(site.getId(), username);
             // does the username exist?
@@ -165,7 +172,7 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
                 if (contact.getLockedReason() == LockOutReason.AUTOMATIC)
                 {
                     long timeDiff = System.currentTimeMillis() - contact.getLockedAt().getTime();
-                    if (timeDiff > AUTOMATIC_AUTH_LOCKOUT_PERIOD)
+                    if (timeDiff > TimeUnit.MINUTES.toMillis(automaticLockoutMinutes))
                     {
                         logger.error("Unlocking principal " + username + " => " + site.getId() + " :: " + contact.getId());
                         contact.unlock();
@@ -190,7 +197,7 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
                 // apply account lockout
                 int authFails = Math.max(contact.getAuthFails(), 0) + 1;
                 contact.setAuthFails(authFails);
-                if (authFails >= MAX_AUTH_FAILS)
+                if (authFails >= automaticLockoutAttempts)
                 {
                     // automatically lock this account out
                     logger.error("Automatically locking principal " + username + " => " + site.getId() + " :: " + contact.getId());

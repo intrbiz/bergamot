@@ -39,4 +39,28 @@ public interface Parameterised
         Parameter parameter = this.getParameters().get(name);
         return parameter == null ? defaultValue : parameter.getValue();
     }
+    
+    default int getIntParameter(String name, int defaultValue)
+    {
+        Parameter parameter = this.getParameters().get(name);
+        return parameter == null ? defaultValue : Integer.parseInt(parameter.getValue());
+    }
+    
+    default long getLongParameter(String name, long defaultValue)
+    {
+        Parameter parameter = this.getParameters().get(name);
+        return parameter == null ? defaultValue : Long.parseLong(parameter.getValue());
+    }
+    
+    default float getFloatParameter(String name, float defaultValue)
+    {
+        Parameter parameter = this.getParameters().get(name);
+        return parameter == null ? defaultValue : Float.parseFloat(parameter.getValue());
+    }
+    
+    default double getDoubleParameter(String name, double defaultValue)
+    {
+        Parameter parameter = this.getParameters().get(name);
+        return parameter == null ? defaultValue : Double.parseDouble(parameter.getValue());
+    }
 }
