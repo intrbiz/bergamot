@@ -125,7 +125,7 @@ public class APIRouter extends Router<BergamotApp>
         {
             logger.error("Caught internal bad request error: " + error.getMessage(), error);
         }
-        return new APIError("Bad Request: " + (error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage()));
+        return new APIError("Bad Request");
     }
     
     /**
@@ -142,7 +142,7 @@ public class APIRouter extends Router<BergamotApp>
         {
             logger.error("Caught internal server error: " + error.getMessage(), error);
         }
-        return new APIError(error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage());
+        return new APIError("Not sure what happened here!");
     }
     
     /**
