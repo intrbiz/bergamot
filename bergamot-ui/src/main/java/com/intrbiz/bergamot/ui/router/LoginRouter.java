@@ -87,10 +87,6 @@ public class LoginRouter extends Router<BergamotApp>
             redirect("/global/install/");
             return;
         }
-        // setup recaptcha
-        Site site = var("site", db.getSiteByName(request().getServerName()));
-        require(site != null, new BalsaBadRequest("Bad Site"));
-        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
         // show the login page
         var("redirect", redirect);
         var("username", cookie("bergamot.username"));
@@ -116,9 +112,17 @@ public class LoginRouter extends Router<BergamotApp>
         // validate captcha
         if (! Util.isEmpty(recaptchaSiteKey))
         {
-            if (Util.isEmpty(recaptchaResponse))
-                throw new BalsaValidationError("reCAPTCHA response required");
-            require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
+            // lookup the contact and assert if we require a captcha
+            Contact theContact = db.getContactByNameOrEmail(site.getId(), username);
+            require(theContact != null);
+            // does this contact have any failed logins which forces a CAPTCHA
+            if (theContact.getAuthFails() > 0)
+            {
+                // verify the captcha
+                if (Util.isEmpty(recaptchaResponse))
+                    throw new BalsaValidationError("reCAPTCHA response required");
+                require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
+            }
         }
         // process login
         logger.info("Login: " + username);
@@ -228,6 +232,10 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireAuthenticating()
     public void startBackupCodeAuthentication() throws Exception
     {
+        Contact contact = authenticationState().authenticatingPrincipal();
+        // setup recaptcha
+        Site site = var("site", contact.getSite());
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
         encode("login/backup_code_authenticate");
     }
     
@@ -235,8 +243,25 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireAuthenticating()
     @RequireValidAccessTokenForURL()
     @WithDataAdapter(BergamotDB.class)
-    public void finishBackupCodeAuthentication(BergamotDB db, @Param("code") String code) throws Exception
+    public void finishBackupCodeAuthentication(
+            BergamotDB db, 
+            @Param("code") String code,
+            @Param("g-recaptcha-response") String recaptchaResponse
+    ) throws Exception
     {
+        Contact contact = authenticationState().authenticatingPrincipal();
+        // get recaptcha settings
+        Site site = contact.getSite();
+        String recaptchaSiteKey = var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+        String recaptchaSecretKey = site.getParameter("recaptcha-secret-key");
+        // validate captcha
+        if (! Util.isEmpty(recaptchaSiteKey))
+        {
+            if (Util.isEmpty(recaptchaResponse))
+                throw new BalsaValidationError("reCAPTCHA response required");
+            require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
+        }
+        // process the 2nd factor authentication
         AuthenticationResponse authResp = authenticate(new BackupCodeCredentials.Simple(code));
         this.completeLogin(authResp, path("/profile/"));
     }
@@ -249,6 +274,10 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireValidAccessTokenForURL()
     public void finishBackupCodeAuthenticationError(@Param("redirect") String redirect) throws Exception
     {
+        Contact contact = authenticationState().authenticatingPrincipal();
+        // setup recaptcha
+        Site site = var("site", contact.getSite());
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
         // error during backup code
         var("failed", true);
         encode("login/backup_code_authenticate");

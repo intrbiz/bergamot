@@ -266,7 +266,7 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
         if (contact.isLocked())
         {
             logger.error("Rejecting valid token login for principal " + contact.getName() + " => " + contact.getSiteId() + " :: " + contact.getId() + " as the account has been locked.");
-            throw new BalsaSecurityException("Account locked");
+            throw new BalsaPrincipalLockout();
         }
         // is the site disable
         if (contact.getSite().isDisabled()) throw new BalsaSecurityException("Site is disabled");
@@ -311,10 +311,21 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
     @Override
     public void verifyBackupCode(Principal principal, String backupCode) throws BalsaSecurityException
     {
-        ContactBackupCode contactBackupCode = ((Contact) principal).getBackupCodes().stream()
-                                                    .filter((bc) -> bc.getCode().equals(backupCode)).findFirst().orElse(null);
+        Contact contact = (Contact) principal;
+        // Verify the backup code
+        ContactBackupCode contactBackupCode = contact.getBackupCodes().stream().filter((bc) -> bc.getCode().equals(backupCode)).findFirst().orElse(null);
         if (contactBackupCode == null || contactBackupCode.isUsed())
-            throw new BalsaSecurityException("The given backup code is invalid");
+        {
+            // lock the account
+            logger.error("Automatically locking principal " + contact.getName() + " => " + contact.getSiteId() + " :: " + contact.getId() + " due to invalid backup code");
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                contact.lock(LockOutReason.AUTOMATIC);
+                db.setContact(contact);
+            }
+            // account is locked
+            throw new BalsaPrincipalLockout("The given backup code is invalid");
+        }
     }
 
     @Override
