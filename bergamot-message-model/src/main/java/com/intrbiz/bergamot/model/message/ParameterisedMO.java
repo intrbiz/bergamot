@@ -138,7 +138,7 @@ public interface ParameterisedMO
     
     default double getPercentParameter(String name)
     {
-        return this.getFloatParameter(name, -1);
+        return this.getPercentParameter(name, -1);
     }
     
     /**
@@ -273,6 +273,14 @@ public interface ParameterisedMO
         return new Integer[] { Integer.parseInt(values[0]), Integer.parseInt(values[1]), };
     }
     
+    default Integer[] getIntRangeParameter(String name, String defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) value = defaultValue;
+        String[] values = value.split(":");
+        return values.length != 2 ? null : new Integer[] { Integer.parseInt(values[0]), Integer.parseInt(values[1]), };
+    }
+    
     /**
      * Get a range parameter, eg: '0:10' for 0 to 10
      */
@@ -283,6 +291,14 @@ public interface ParameterisedMO
         String[] values = value.split(":");
         if (values.length != 2) return defaultValue;
         return new Long[] { Long.parseLong(values[0]), Long.parseLong(values[1]), };
+    }
+    
+    default Long[] getLongRangeParameter(String name, String defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) value =  defaultValue;
+        String[] values = value.split(":");
+        return values.length != 2 ? null : new Long[] { Long.parseLong(values[0]), Long.parseLong(values[1]), };
     }
     
     /**
@@ -297,6 +313,14 @@ public interface ParameterisedMO
         return new Float[] { Float.parseFloat(values[0]), Float.parseFloat(values[1]), };
     }
     
+    default Float[] getFloatRangeParameter(String name, String defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) value = defaultValue;
+        String[] values = value.split(":");
+        return values.length != 2 ? null : new Float[] { Float.parseFloat(values[0]), Float.parseFloat(values[1]), };
+    }
+    
     /**
      * Get a range parameter, eg: '0:10' for 0 to 10
      */
@@ -307,5 +331,13 @@ public interface ParameterisedMO
         String[] values = value.split(":");
         if (values.length != 2) return defaultValue;
         return new Double[] { Double.parseDouble(values[0]), Double.parseDouble(values[1]), };
+    }
+    
+    default Double[] getDoubleRangeParameter(String name, String defaultValue)
+    {
+        String value = this.getParameter(name);
+        if (value == null || value.length() == 0 || ! value.contains(":")) value =  defaultValue;
+        String[] values = value.split(":");
+        return values.length != 2 ? null : new Double[] { Double.parseDouble(values[0]), Double.parseDouble(values[1]), };
     }
 }

@@ -103,6 +103,21 @@ public interface Executor<T extends Engine> extends Configurable<ExecutorCfg>
     }
     
     /**
+     * Publish the given readings for the given check execution
+     * @param check the check which was executed
+     * @param readings the readings
+     */
+    default void publishReading(ExecuteCheck check, Iterable<Reading> readings)
+    {
+        ReadingParcelMO readingParcel = new ReadingParcelMO().fromCheck(check.getCheckId()).captured(System.currentTimeMillis());
+        for (Reading reading : readings)
+        {
+            readingParcel.reading(reading);
+        }
+        this.publishReading(check, readingParcel);
+    }
+    
+    /**
      * Publish a readings for a check of the given site
      * @param siteId the site which these readings are fore
      * @param readingParcelMO the readings all parcelled up and addressed
