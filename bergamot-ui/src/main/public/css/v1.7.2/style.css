@@ -385,12 +385,8 @@ table tr:hover {
 	background-color: #F3C300 !important;
 }
 
-.dash_img.status_critical, .dash_img.status_down, .dash_img.status_action {
+.dash_img.status_critical, .dash_img.status_down, .dash_img.status_action, .dash_img.status_unknown, .dash_img.status_error, .dash_img.status_timeout, .dash_img.status_disconnected {
 	background-color: #E85752 !important;	
-}
-
-.dash_img.status_unknown, .dash_img.status_error, .dash_img.status_timeout, .dash_img.status_disconnected {
-	background-color: #A3007B !important;
 }
 
 /* icons */

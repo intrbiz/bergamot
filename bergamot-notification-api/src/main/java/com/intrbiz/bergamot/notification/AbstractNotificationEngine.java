@@ -26,6 +26,7 @@ import com.intrbiz.bergamot.model.message.notification.RegisterContactNotificati
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.notification.express.StatusColour;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.ExpressExtensionRegistry;
@@ -58,6 +59,8 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
     public void configure(NotificationEngineCfg cfg) throws Exception
     {
         this.config = cfg;
+        // register our default express functions
+        this.expressExtensions.addFunction("status_colour", StatusColour.class);
         // setup our template loader
         this.templateLoader = new TemplateLoader();
         String templatePath = cfg.getStringParameterValue("template.path", "/etc/bergamot/notifier/" + this.getName() + "/templates");
