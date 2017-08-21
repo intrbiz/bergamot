@@ -273,8 +273,8 @@ public class ActiveCheckScriptContext
     public void applyRange(Long value, String message)
     {
         this.require(WARNING, CRITICAL);
-        Long[] warning = this.executeCheck.getLongRangeParameter(WARNING, null);
-        Long[] critical = this.executeCheck.getLongRangeParameter(CRITICAL, null);
+        Long[] warning = this.executeCheck.getLongRangeParameter(WARNING, (Long[]) null);
+        Long[] critical = this.executeCheck.getLongRangeParameter(CRITICAL, (Long[]) null);
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
     }
     
@@ -286,8 +286,8 @@ public class ActiveCheckScriptContext
     public void applyRange(Integer value, String message)
     {
         this.require(WARNING, CRITICAL);
-        Integer[] warning = this.executeCheck.getIntRangeParameter(WARNING, null);
-        Integer[] critical = this.executeCheck.getIntRangeParameter(CRITICAL, null);
+        Integer[] warning = this.executeCheck.getIntRangeParameter(WARNING, (Integer[]) null);
+        Integer[] critical = this.executeCheck.getIntRangeParameter(CRITICAL, (Integer[]) null);
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
     }
     
@@ -299,8 +299,8 @@ public class ActiveCheckScriptContext
     public void applyRange(Double value, String message)
     {
         this.require(WARNING, CRITICAL);
-        Double[] warning = this.executeCheck.getDoubleRangeParameter(WARNING, null);
-        Double[] critical = this.executeCheck.getDoubleRangeParameter(CRITICAL, null);
+        Double[] warning = this.executeCheck.getDoubleRangeParameter(WARNING, (Double[]) null);
+        Double[] critical = this.executeCheck.getDoubleRangeParameter(CRITICAL, (Double[]) null);
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
     }
     
@@ -312,8 +312,8 @@ public class ActiveCheckScriptContext
     public void applyRange(Float value, String message)
     {
         this.require(WARNING, CRITICAL);
-        Float[] warning = this.executeCheck.getFloatRangeParameter(WARNING, null);
-        Float[] critical = this.executeCheck.getFloatRangeParameter(CRITICAL, null);
+        Float[] warning = this.executeCheck.getFloatRangeParameter(WARNING, (Float[]) null);
+        Float[] critical = this.executeCheck.getFloatRangeParameter(CRITICAL, (Float[]) null);
         this.publish(new ActiveResultMO().fromCheck(this.executeCheck).applyRange(value, warning, critical, message));
     }
     
