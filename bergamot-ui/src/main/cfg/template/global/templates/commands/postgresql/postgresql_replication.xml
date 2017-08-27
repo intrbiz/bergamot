@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command extends="postgresql_jdbc_check" name="postgresql_replication_lag">
+        <parameter description="Warning threshold (default: 16MiB)" name="warning">16777216</parameter>
+        <parameter description="Critical threshold (default: 64MiB)" name="critical">67108864</parameter>
+        <description>Check PostgreSQL replication lag from master to slaves.  Note you need to install the PostgreSQL Bergamot Monitoring schema.</description>
+        <summary>PostgreSQL Replication Lag</summary>
+        <script>
+          <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            var warning = check.getDoubleParameter('warning');
+            var critical = check.getDoubleParameter('critical');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                // query our replication lag monitoring function
+                con.query('SELECT * FROM bergamot_monitoring.get_replication_lag()', function(rs) {
+                    var LinkedList = Java.type('java.util.LinkedList');
+                    var lags = new LinkedList();
+                    var output = [];
+                    while (rs.next()) {
+                        // get the data
+                        var slave       = rs.getString(1);
+                        var state       = rs.getString(2);
+                        var sync_state  = rs.getString(3);
+                        var sent_lag    = rs.getDouble(4);
+                        var write_lag   = rs.getDouble(5);
+                        var flush_lag   = rs.getDouble(6);
+                        var replay_lag  = rs.getDouble(7);
+                        // state
+                        lags.add(replay_lag);
+                        output.push('Slave ' + slave + ' ' + state + ' (' + sync_state + ') lag ' + Math.round(replay_lag) + ' B');
+                        // readings
+                        bergamot.publishReadings(
+                            bergamot.createLongGaugeReading('sent_lag[' + slave + ']', 'B', sent_lag, warning, critical, null, null),
+                            bergamot.createLongGaugeReading('write_lag[' + slave + ']', 'B', write_lag, warning, critical, null, null),
+                            bergamot.createLongGaugeReading('flush_lag[' + slave + ']', 'B', flush_lag, warning, critical, null, null),
+                            bergamot.createLongGaugeReading('replay_lag[' + slave + ']', 'B', replay_lag, warning, critical, null, null)
+                        );
+                    }
+                    bergamot.publish(
+                        bergamot.createResult().applyGreaterThanThresholds(
+                            lags,
+                            warning,
+                            critical,
+                            output.length == 0 ? 'No Slaves' : output.join('.  ')
+                        )
+                    );
+                });
+            });
+          ]]>
+        </script>
+    </command>
+
+    <command extends="postgresql_jdbc_check" name="postgresql_replication_streaming_slaves">
+        <parameter description="Warning threshold" name="warning">1</parameter>
+        <parameter description="Critical threshold" name="critical">0</parameter>
+        <description>Check PostgreSQL number of streaming slaves.  Note you need to install the PostgreSQL Bergamot Monitoring schema.</description>
+        <summary>PostgreSQL Streaming Slaves</summary>
+        <script>
+          <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            var warning = check.getIntParameter('warning');
+            var critical = check.getIntParameter('critical');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                // query our replication lag monitoring function
+                con.query('SELECT bergamot_monitoring.get_replication_streaming_slaves', function(rs) {
+                    rs.next();
+                    var slaves = rs.getInt(1);
+                    // result
+                    bergamot.publish(bergamot.createResult().applyLessThanThreshold(slaves, warning, critical, slaves + ' currently streaming'));
+                    // reading
+                    bergamot.publishReadings(bergamot.createIntegerGaugeReading('streaming_slaves', null, slaves, warning, critical, null, null));
+                });
+            });
+          ]]>
+        </script>
+    </command>
+
+    <command extends="postgresql_jdbc_check" name="postgresql_replication_slaves">
+        <parameter description="Warning threshold" name="warning">1</parameter>
+        <parameter description="Critical threshold" name="critical">0</parameter>
+        <description>Check PostgreSQL replication slaves.  Note you need to install the PostgreSQL Bergamot Monitoring schema.</description>
+        <summary>PostgreSQL Replication Slaves</summary>
+        <script>
+          <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            var warning = check.getDoubleParameter('warning');
+            var critical = check.getDoubleParameter('critical');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                // query slaves
+                con.query('SELECT * FROM bergamot_monitoring.get_replication_slaves()', function(rs) {
+                    var output = [];
+                    while (rs.next()) {
+                        // get the data
+                        var slave       = rs.getString(1);
+                        var state       = rs.getString(2);
+                        var sync_state  = rs.getString(3);
+                        // state
+                        output.push('Slave ' + slave + ' ' + state + ' (' + sync_state + ')');
+                    }
+                    // result
+                    bergamot.publish(bergamot.createResult().applyLessThanThreshold(output.length, warning, critical, output.length == 0 ? 'No slaves' : output.join('.  ')));
+                    // readings
+                    bergamot.publishReadings(bergamot.createIntegerGaugeReading('slaves', null, output.length, warning, critical, null, null));
+                });
+            });
+          ]]>
+        </script>
+    </command>
+    
+</bergamot>
