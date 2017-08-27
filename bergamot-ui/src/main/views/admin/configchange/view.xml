@@ -5,7 +5,7 @@
 		<div class="col12">
 			<p class="field area">
 				<label style="display: none;" for="change_configuration">Configuration</label>
-				<pre name="change_configuration" id="change_configuration" style="width: 95%; min-height: 400px;">#{change.configuration.toString()}</pre>
+				<pre name="change_configuration" id="change_configuration" style="width: 95%; min-height: 750px;">#{change.configuration.toString()}</pre>
 			</p>
 		</div>
     </div>

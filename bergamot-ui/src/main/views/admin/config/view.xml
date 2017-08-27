@@ -4,7 +4,7 @@
 <fragment xmlns="com.intrbiz.balsa" title="Configuration for #{config.type} #{coalesce(config.summary, config.name)}">    
     <div class="row">
    		<h4>XML Configuration</h4>
-   		<pre id="view_config" style="width: 95%; min-height: 800px;">#{config.getConfiguration().toString()}</pre>
+   		<pre id="view_config" style="width: 95%; min-height: 400px;">#{config.getConfiguration().toString()}</pre>
     </div>
     <div class="row">
    		<h4>Resolved Configuration</h4>
