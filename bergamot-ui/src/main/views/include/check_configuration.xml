@@ -165,7 +165,7 @@
 						<th>Parameter Name</th>
 						<th>Parameter Value</th>
 					</tr>
-					<data-set var="parameter" value="#{check.checkCommand.resolveCheckParameters()}">
+					<data-set var="parameter" value="#{check.checkCommand.resolveCheckParameters().values()}">
 						<tr>
 							<td>#{parameter.name}</td>
 							<td>#{parameter.value}</td>

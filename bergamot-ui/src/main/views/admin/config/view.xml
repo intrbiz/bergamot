@@ -4,12 +4,12 @@
 <fragment xmlns="com.intrbiz.balsa" title="Configuration for #{config.type} #{coalesce(config.summary, config.name)}">    
     <div class="row">
    		<h4>XML Configuration</h4>
-   		<pre id="view_config" style="width: 95%; min-height: 400px;">#{config.getConfiguration().toString()}</pre>
+   		<pre id="view_config" style="width: 95%; min-height: 800px;">#{config.getConfiguration().toString()}</pre>
     </div>
     <div class="row">
    		<h4>Resolved Configuration</h4>
    		<p class="text-body">The following is the resultant configuration once templates have been applied:</p>
-   		<pre id="view_resolved_config" style="width: 95%; min-height: 400px;">#{config.getResolvedConfiguration().resolveDeep().toString()}</pre>
+   		<pre id="view_resolved_config" style="width: 95%; min-height: 800px;">#{config.getResolvedConfiguration().resolveDeep().toString()}</pre>
     </div>
     <div class="row" rendered="#{Balsa().permission('config.change.apply', config.id)}">
     	<a href="/admin/configchange/add/#{config.type}/id/#{config.id}" class="add">Edit this #{config.type}</a>

@@ -59,6 +59,7 @@ public class TestEmailEngine extends EmailEngine
         assertThat(subject, is(notNullValue()));
         // build the content
         String content = this.engine.applyTemplate("service.alert.content", message);
+        System.out.println("Content: " + content);
         assertThat(content, is(notNullValue()));
     }
     

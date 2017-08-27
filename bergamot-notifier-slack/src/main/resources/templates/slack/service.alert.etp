@@ -1,5 +1,14 @@
 Alert for service #{slack_encode(service.summary)} on the host #{slack_encode(host.summary)} is #{service.state.status}
 <# slack_message.attachment().color(status_colour(service.state.status)).authorName('Check Output').text(service.state.output);
    slack_message.attachment().color(status_colour(service.state.status)).authorName('Last checked').text().text(dateformat('HH:mm:ss', service.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime));
-   slack_message.attachment().color(status_colour(service.state.status)).text().link('https://' + site.name + '/service/id/' + service.id, 'View service ' + service.summary + ' on host ' + host.summary);
+   slack_message.attachment().color(status_colour(service.state.status)).authorName('View Check').text().link('https://' + site.name + '/service/id/' + service.id, 'View service ' + service.summary + ' on host ' + host.summary);
+   if (service.note != null) {
+     noteText = slack_message.attachment().color(status_colour(service.state.status)).authorName('Note').text();
+     if (! isempty(service.note.content)) {
+       noteText.text(service.note.content).text('\n');
+     }
+     if (! isempty(service.note.url)) {
+   	   noteText.link(service.note.url, coalesce(service.note.title, 'More information'));
+   	 }
+   }
 #>

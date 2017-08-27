@@ -1,7 +1,15 @@
 Alert for cluster #{cluster.summary} is #{if(cluster.state.ok, 'UP', 'DOWN')}
-
+<# if (! isempty(cluster.description)) { #>
+#{cluster.description}
+<# } #>
 Last checked at #{dateformat('HH:mm:ss', cluster.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime)}
 
-For more information: https://#{site.name}/cluster/id/#{cluster.id}
-
+View cluster: https://#{site.name}/cluster/id/#{cluster.id}
+<# if (cluster.note != null) {
+     if (! isempty(cluster.note.content)) { #>
+#{cluster.note.content}
+<#    } if (! isempty(cluster.note.url)) { #>
+#{coalesce(cluster.note.title, "Additional information")}: #{cluster.note.url}
+<#    }
+   } #>
 Thank you, Bergamot

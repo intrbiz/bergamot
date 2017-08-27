@@ -61,6 +61,11 @@
 			    <span class="value">#{coalesce(resource.state.output, '')}</span>
 		    </p>
 		</div>
+		<div class="col4 description" style="padding-top: 100px;">
+			<p rendered="#{! isempty(resource.description)}">#{resource.description}</p>
+			<p rendered="#{! isempty(resource.note)}">#{resource.note}</p>
+			<p rendered="#{! isempty(resource.noteUrl)}"><a href="#{resource.noteUrl}">#{coalesce(resource.noteTitle, 'Additional information')}</a></p>
+		</div>
 	</div>
 	
 	<!-- References -->

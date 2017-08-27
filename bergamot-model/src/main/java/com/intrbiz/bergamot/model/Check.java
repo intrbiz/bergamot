@@ -9,10 +9,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.CheckCfg;
+import com.intrbiz.bergamot.config.model.NoteCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.NoteMO;
 import com.intrbiz.bergamot.model.message.VirtualCheckMO;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -61,8 +64,29 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     @SQLColumn(index = 8, name = "pool", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected int pool = 0;
     
+    /**
+     * External systems reference for this check
+     */
     @SQLColumn(index = 9, name = "external_ref", since = @SQLVersion({ 2, 1, 0 }))
     protected String externalRef;
+    
+    /**
+     * Optional note for this check
+     */
+    @SQLColumn(index = 10, name = "note", since = @SQLVersion({ 3, 49, 0 }))
+    protected String note;
+    
+    /**
+     * Optional URL to external notes for this check
+     */
+    @SQLColumn(index = 11, name = "note_url", since = @SQLVersion({ 3, 49, 0 }))
+    protected String noteUrl;
+   
+    /**
+     * Optional title for url to external notes for this check
+     */
+    @SQLColumn(index = 12, name = "note_title", since = @SQLVersion({ 3, 49, 0 }))
+    protected String noteTitle;
 
     public Check()
     {
@@ -362,6 +386,36 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     {
         this.externalRef = externalRef;
     }
+
+    public String getNoteTitle()
+    {
+        return noteTitle;
+    }
+
+    public void setNoteTitle(String noteTitle)
+    {
+        this.noteTitle = noteTitle;
+    }
+
+    public String getNote()
+    {
+        return note;
+    }
+
+    public void setNote(String note)
+    {
+        this.note = note;
+    }
+
+    public String getNoteUrl()
+    {
+        return noteUrl;
+    }
+
+    public void setNoteUrl(String noteUrl)
+    {
+        this.noteUrl = noteUrl;
+    }
     
     // some basic actions
 
@@ -454,13 +508,23 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         mo.setSuppressed(this.isSuppressed());
         mo.setInDowntime(this.isInDowntime());
         mo.setPool(this.getPool());
-        if (options.contains(MOFlag.GROUPS)) mo.setGroups(this.getGroups().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
-        if (options.contains(MOFlag.CONTACTS)) mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
-        if (options.contains(MOFlag.TEAMS)) mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
-        if (options.contains(MOFlag.REFERENCED_BY)) mo.setReferencedBy(this.getReferencedBy().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((v) -> {return (VirtualCheckMO) v.toStubMO(contact);}).collect(Collectors.toList()));
-        if (options.contains(MOFlag.NOTIFICATIONS)) mo.setNotifications(this.getNotifications().toMO(contact));
-        if (options.contains(MOFlag.DOWNTIME)) mo.setDowntime(this.getDowntime().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
-        if (options.contains(MOFlag.COMMENTS)) mo.setComments(this.getComments().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setExternalRef(this.getExternalRef());
+        if (options.contains(MOFlag.NOTE) && (! Util.isEmpty(this.getNote()))) 
+            mo.setNote(new NoteMO(this.getNoteTitle(), this.getNoteUrl(), this.getNote()));
+        if (options.contains(MOFlag.GROUPS)) 
+            mo.setGroups(this.getGroups().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.CONTACTS)) 
+            mo.setContacts(this.getContacts().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.TEAMS)) 
+            mo.setTeams(this.getTeams().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.REFERENCED_BY)) 
+            mo.setReferencedBy(this.getReferencedBy().stream().filter((x) -> contact == null || contact.hasPermission("read", x)).map((v) -> {return (VirtualCheckMO) v.toStubMO(contact);}).collect(Collectors.toList()));
+        if (options.contains(MOFlag.NOTIFICATIONS)) 
+            mo.setNotifications(this.getNotifications().toMO(contact));
+        if (options.contains(MOFlag.DOWNTIME)) 
+            mo.setDowntime(this.getDowntime().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        if (options.contains(MOFlag.COMMENTS)) 
+            mo.setComments(this.getComments().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
     }
     
     @Override
@@ -471,5 +535,13 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         this.enabled    = resolvedConfiguration.getEnabledBooleanValue(this.enabled);
         this.suppressed = resolvedConfiguration.getSuppressedBooleanValue(this.suppressed);
         this.externalRef = resolvedConfiguration.getExternalRef();
+        // note
+        NoteCfg noteCfg = resolvedConfiguration.getNote();
+        if (noteCfg != null)
+        {
+            this.note = noteCfg.getNote().trim();
+            this.noteUrl = noteCfg.getUrl();
+            this.noteTitle = noteCfg.getTitle();
+        }
     }
 }

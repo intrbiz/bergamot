@@ -36,6 +36,8 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     private InitiallyCfg initialState;
     
     private String externalRef;
+    
+    private NoteCfg note;
 
     public CheckCfg()
     {
@@ -170,5 +172,17 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     public void setExternalRef(String externalRef)
     {
         this.externalRef = externalRef;
+    }
+
+    @XmlElementRef(type = NoteCfg.class)
+    @ResolveWith(Coalesce.class)
+    public NoteCfg getNote()
+    {
+        return note;
+    }
+
+    public void setNote(NoteCfg note)
+    {
+        this.note = note;
     }
 }

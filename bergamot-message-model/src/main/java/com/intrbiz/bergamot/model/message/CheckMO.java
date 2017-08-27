@@ -39,6 +39,12 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     @JsonProperty("pool")
     protected int pool;
     
+    @JsonProperty("external-ref")
+    protected String externalRef;
+    
+    @JsonProperty("note")
+    protected NoteMO note;
+    
     @JsonProperty("downtime")
     protected List<DowntimeMO> downtime = new LinkedList<DowntimeMO>();
     
@@ -173,5 +179,25 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     public void setComments(List<CommentMO> comments)
     {
         this.comments = comments;
+    }
+
+    public String getExternalRef()
+    {
+        return externalRef;
+    }
+
+    public void setExternalRef(String externalRef)
+    {
+        this.externalRef = externalRef;
+    }
+
+    public NoteMO getNote()
+    {
+        return note;
+    }
+
+    public void setNote(NoteMO note)
+    {
+        this.note = note;
     }
 }

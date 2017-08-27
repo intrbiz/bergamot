@@ -65,6 +65,11 @@
 			    <span class="value">#{coalesce(host.state.output, '')}</span>
 		    </p>
 		</div>
+		<div class="col4 description" style="padding-top: 100px;">
+			<p rendered="#{! isempty(host.description)}">#{host.description}</p>
+			<p rendered="#{! isempty(host.note)}">#{host.note}</p>
+			<p rendered="#{! isempty(host.noteUrl)}"><a href="#{host.noteUrl}">#{coalesce(host.noteTitle, 'Additional information')}</a></p>
+		</div>
 	</div>
 	
 	<!-- Services -->

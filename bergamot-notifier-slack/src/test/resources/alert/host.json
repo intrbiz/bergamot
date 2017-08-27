@@ -354,6 +354,12 @@
     "summary" : "Test Dummy Host 2",
     "description" : null,
     "parameters" : [ ],
+    "note": {
+        "type": "bergamot.note",
+    	"title": "Wiki",
+    	"url": "http://localhost/wiki/dummy",
+    	"content": "This is a dummy host"
+    },
     "state" : {
       "type" : "bergamot.state.check",
       "ok" : false,

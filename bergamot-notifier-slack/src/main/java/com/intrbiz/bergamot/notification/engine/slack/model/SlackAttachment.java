@@ -42,6 +42,12 @@ public class SlackAttachment
         return this;
     }
     
+    public SlackAttachment link(String href, String display)
+    {
+        this.text().link(href, display).build();
+        return this;
+    }
+    
     public SlackAttachment rawText(String text)
     {
         this.json.addMember("text", new JSString(text));

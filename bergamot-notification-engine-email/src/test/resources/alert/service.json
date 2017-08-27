@@ -352,7 +352,13 @@
     "id" : "0ea77812-4d95-4ba9-8b1c-6019a0d88b10",
     "name" : "linux-agent-cpu",
     "summary" : "CPU",
-    "description" : null,
+    "description" : "CPU usage on host",
+    "note": {
+    	"type": "bergamot.note",
+    	"title": "More information in our Wiki",
+    	"url": "http://localhost/wiki/service/test",
+    	"content": "This is a service note"
+    },
     "parameters" : [ ],
     "state" : {
       "type" : "bergamot.state.check",
