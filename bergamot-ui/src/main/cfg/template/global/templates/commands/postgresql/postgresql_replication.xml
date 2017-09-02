@@ -87,7 +87,7 @@
             /* Execute */
             jdbc.connect(url, user, pass, function(con) {
                 // query our replication lag monitoring function
-                con.query('SELECT bergamot_monitoring.get_replication_streaming_slaves', function(rs) {
+                con.query('SELECT bergamot_monitoring.get_replication_streaming_slaves()', function(rs) {
                     rs.next();
                     var slaves = rs.getInt(1);
                     // result
@@ -119,8 +119,8 @@
             var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
             var user = check.getParameter('username');
             var pass = check.getParameter('password');
-            var warning = check.getDoubleParameter('warning');
-            var critical = check.getDoubleParameter('critical');
+            var warning = check.getIntParameter('warning');
+            var critical = check.getIntParameter('critical');
             /* Execute */
             jdbc.connect(url, user, pass, function(con) {
                 // query slaves

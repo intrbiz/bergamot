@@ -29,7 +29,8 @@ SECURITY DEFINER;
 
 ALTER FUNCTION bergamot_monitoring.get_replication_lag() OWNER TO postgres;
 
-GRANT EXECUTE ON FUNCTION bergamot_monitoring.get_replication_lag() TO bergamot_monitoring;
+GRANT  EXECUTE ON FUNCTION bergamot_monitoring.get_replication_lag() TO bergamot_monitoring;
+REVOKE EXECUTE ON FUNCTION bergamot_monitoring.get_replication_lag() FROM public;
 
 -- Replication Slaves
 
@@ -43,7 +44,8 @@ SECURITY DEFINER;
 
 ALTER FUNCTION bergamot_monitoring.get_replication_slaves() OWNER TO postgres;
 
-GRANT EXECUTE ON FUNCTION bergamot_monitoring.get_replication_slaves() TO bergamot_monitoring;
+GRANT  EXECUTE ON FUNCTION bergamot_monitoring.get_replication_slaves() TO bergamot_monitoring;
+REVOKE EXECUTE ON FUNCTION bergamot_monitoring.get_replication_slaves() FROM public;
 
 -- Replication Streaming Slaves
 
@@ -58,7 +60,12 @@ SECURITY DEFINER;
 
 ALTER FUNCTION bergamot_monitoring.get_replication_streaming_slaves() OWNER TO postgres;
 
-GRANT EXECUTE ON FUNCTION bergamot_monitoring.get_replication_streaming_slaves() TO bergamot_monitoring;
+GRANT  EXECUTE ON FUNCTION bergamot_monitoring.get_replication_streaming_slaves() TO bergamot_monitoring;
+REVOKE EXECUTE ON FUNCTION bergamot_monitoring.get_replication_streaming_slaves() FROM public;
+
+-- Database Size
+
+SELECT datname, pg_database_size(oid) / 1024.0 / 1024.0 FROM pg_database;
 
 -- Grant monitoring role to your monitoring user
 -- GRANT bergamot_monitoring TO app_monitoring;
