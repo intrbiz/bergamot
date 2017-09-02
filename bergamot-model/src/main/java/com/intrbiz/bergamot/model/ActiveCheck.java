@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.model;
 
 import java.util.EnumSet;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -221,23 +220,25 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         // eval parameters
         ExpressContext context = new DefaultContext(new BergamotEntityResolver());
         // configured parameters
-        for (Entry<String, Parameter> parameter : checkCommand.resolveCheckParameters().entrySet())
+        for (Parameter parameter : checkCommand.resolveCheckParameters().values())
         {
-            try
+            if (parameter != null)
             {
-                ValueExpression vexp = new ValueExpression(context, parameter.getValue().getValue());
-                String value = Util.nullable(vexp.get(context, this), Object::toString);
-                if (logger.isTraceEnabled()) logger.trace("Adding parameter: " + parameter.getKey() + " => " + value + " (" + parameter.getValue().getValue() + ")");
-                if (! Util.isEmpty(value)) executeCheck.setParameter(parameter.getKey(), value);
-            }
-            catch (Exception e)
-            {
-                logger.error("Error computing parameter value, for check: " + this.getType() + "::" + this.getId() + " " + this.getName() , e);
+                try
+                {
+                    ValueExpression vexp = new ValueExpression(context, parameter.getValue());
+                    Object value = vexp.get(context, this);
+                    if (value != null) executeCheck.setParameter(parameter.getName(), String.valueOf(value));
+                }
+                catch (Exception e)
+                {
+                    logger.error("Error computing parameter value, for check: " + this.getType() + "::" + this.getId() + " " + this.getName() + " " + parameter.getName() + " => " + parameter.getValue(), e);
+                }
             }
         }
         executeCheck.setTimeout(30_000L);
         executeCheck.setScheduled(System.currentTimeMillis());
-        if (logger.isTraceEnabled())logger.trace("Executing check: " + new BergamotTranscoder().encodeAsString(executeCheck));
+        if (logger.isTraceEnabled()) logger.trace("Executing check: " + new BergamotTranscoder().encodeAsString(executeCheck));
         return executeCheck;
     }
 
