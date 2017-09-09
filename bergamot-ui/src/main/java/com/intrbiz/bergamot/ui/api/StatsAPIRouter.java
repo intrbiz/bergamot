@@ -18,11 +18,21 @@ import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.doc.Desc;
+import com.intrbiz.metadata.doc.Title;
 
+@Title("Stats API Methods")
+@Desc({
+    "Bergamot Monitoring tracks basic statistics about the execution of all checks, providing information on the performance of checks."
+})
 @Prefix("/api/stats")
 @RequireValidPrincipal()
 public class StatsAPIRouter extends Router<BergamotApp>
-{    
+{
+    @Title("Check Transitions")
+    @Desc({
+        "Get details of recent transitions for the check identified by the given UUID.  This will provide detail data on every execution of a check."
+    })
     @Any("/transitions/check/id/:id")
     @JSON(notFoundIfNull = true)
     @WithDataAdapter(BergamotDB.class)

@@ -63,6 +63,11 @@
 			    <span class="value">#{coalesce(service.state.output, '')}</span>
 		    </p>
 		</div>
+		<div class="col4 description" style="padding-top: 100px;">
+			<p rendered="#{! isempty(service.description)}">#{service.description}</p>
+			<p rendered="#{! isempty(service.note)}">#{service.note}</p>
+			<p rendered="#{! isempty(service.noteUrl)}"><a href="#{service.noteUrl}">#{coalesce(service.noteTitle, 'Additional information')}</a></p>
+		</div>
 	</div>
 	
 	<!-- Alerts -->

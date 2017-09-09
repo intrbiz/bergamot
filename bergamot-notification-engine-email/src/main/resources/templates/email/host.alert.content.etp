@@ -1,9 +1,17 @@
 Alert for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}
 
 Check output: #{host.state.output}
-
+<# if (! isempty(host.description)) { #>
+#{host.description}
+<# } #>
 Last checked at #{dateformat('HH:mm:ss', host.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime)}
 
-For more information: https://#{site.name}/host/id/#{host.id}
-
+View host: https://#{site.name}/host/id/#{host.id}
+<# if (host.note != null) {
+     if (! isempty(host.note.content)) { #>
+#{host.note.content}
+<#    } if (! isempty(host.note.url)) { #>
+#{coalesce(host.note.title, "Additional information")}: #{host.note.url}
+<#    }
+   } #>
 Thank you, Bergamot

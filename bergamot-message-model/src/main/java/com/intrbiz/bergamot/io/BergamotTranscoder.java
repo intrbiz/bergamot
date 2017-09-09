@@ -35,6 +35,7 @@ import com.intrbiz.bergamot.model.message.EscalationMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.LocationMO;
+import com.intrbiz.bergamot.model.message.NoteMO;
 import com.intrbiz.bergamot.model.message.NotificationEngineMO;
 import com.intrbiz.bergamot.model.message.NotificationsMO;
 import com.intrbiz.bergamot.model.message.ParameterMO;
@@ -149,6 +150,7 @@ public class BergamotTranscoder
         NotificationEngineMO.class,
         EscalationMO.class,
         NotificationsMO.class,
+        NoteMO.class,
         CheckStateMO.class,
         GroupStateMO.class,
         CommandMO.class,

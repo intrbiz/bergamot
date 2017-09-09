@@ -6,7 +6,8 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.impl.RabbitWorkerQueue;
+import com.intrbiz.bergamot.queue.impl.hcq.HCQWorkerQueue;
+import com.intrbiz.bergamot.queue.impl.rabbit.RabbitWorkerQueue;
 import com.intrbiz.bergamot.queue.key.AdhocResultKey;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.queue.key.ResultKey;
@@ -26,6 +27,7 @@ public abstract class WorkerQueue extends QueueAdapter
     static
     {
         RabbitWorkerQueue.register();
+        HCQWorkerQueue.register();
     }
     
     public static WorkerQueue open()
@@ -42,11 +44,11 @@ public abstract class WorkerQueue extends QueueAdapter
         return this.publishChecks(null);
     }
     
-    public abstract Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine, boolean agentRouting, UUID workerId);
+    public abstract Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine, boolean agentRouting);
     
     public Consumer<ExecuteCheck, WorkerKey> consumeChecks(DeliveryHandler<ExecuteCheck> handler, UUID site, String workerPool, String engine)
     {
-        return this.consumeChecks(handler, site, workerPool, engine, false, null);
+        return this.consumeChecks(handler, site, workerPool, engine, false);
     }
     
     public abstract Consumer<ExecuteCheck, NullKey> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler);

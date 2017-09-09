@@ -23,10 +23,9 @@ import com.intrbiz.bergamot.model.message.agent.manager.request.SignServer;
 import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
-import com.intrbiz.queue.QueueManager;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.queue.RPCClient;
 import com.intrbiz.queue.name.RoutingKey;
-import com.intrbiz.queue.rabbit.RabbitPool;
 
 public class ServerCommand extends BergamotCLICommand
 {
@@ -75,7 +74,7 @@ public class ServerCommand extends BergamotCLICommand
             // read the UI config and connect to the database
             UICfg config = UICfg.loadConfiguration();
             // setup the queue manager
-            QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+            QueueUtil.setupQueueBroker(config.getBroker(), "bergamot-cli");
             // sign the server
             try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
             {

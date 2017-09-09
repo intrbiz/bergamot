@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command name="haproxy_frontend_sessions" extends="haproxy_stats_check">
+      <summary>HAProxy Frontend Sessions</summary>
+      <parameter name="proxy_name"></parameter>
+      <parameter name="warning">100</parameter>
+      <parameter name="critical">150</parameter>
+      <script>
+        <![CDATA[
+            function parseStats(data)
+            {
+                var stats = {};
+                var lines = data.split('\n');
+                var columns = lines[0].substr(1).split(',');
+                for (var i = 1; i < lines.length; i++)
+                {
+                    var stat = {};
+                    var fields = lines[i].split(',');
+                    for (var j = 0; j < fields.length; j++)
+                    {
+                        stat[columns[j].trim()] = fields[j];
+                    }
+                    if (! stats[stat.pxname]) 
+                        stats[stat.pxname] = { frontend: null, backend: null, servers: [] };
+                    if (stat.svname == 'FRONTEND' || stat.svname == 'BACKEND')
+                        stats[stat.pxname][stat.svname.toLowerCase()] = stat;
+                    else
+                        stats[stat.pxname].servers.push(stat);
+                }
+                return stats;
+            }
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('proxy_name');
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* Execute */
+            http.check()
+            .connect(check.getParameter('host'))
+            .port(check.getIntParameter('port'))
+            .get(check.getParameter('path'))
+            .basicAuth(check.getParameter('username'), check.getParameter('password'))
+            .execute(
+                function(r) {
+                    /* API Error? */
+                    if (r.status() != 200)
+                    { 
+                        bergamot.error('HAProxy API returned: ' + r.status());
+                        return;
+                    }
+                    /* Parse the CSV into something useful */
+                    var stats = parseStats(r.content());
+                    /* Get the stats */
+                    var proxy = stats[check.getParameter('proxy_name')];
+                    if (! proxy)
+                    {
+                        bergamot.error('HAProxy has no such proxy: ' + check.getParameter('proxy_name'));
+                        return;
+                    }
+                    bergamot.publish(
+                        bergamot.createResult().applyGreaterThanThreshold(
+                            new java.lang.Integer(proxy.frontend.scur),
+                            check.getIntParameter('warning'),
+                            check.getIntParameter('critical'),
+                            'Current ' + proxy.frontend.scur + " of " + proxy.frontend.slim + ' sessions.  ' + proxy.frontend.smax + ' max, ' + proxy.frontend.stot + ' total.'
+                        )
+                    );
+                    bergamot.publishReadings(
+                        bergamot.createLongGaugeReading('current_sessions',  null, parseInt(proxy.frontend.scur)),
+                        bergamot.createLongGaugeReading('max_sessions', null, parseInt(proxy.frontend.smax)),
+                        bergamot.createLongGaugeReading('total_sessions', null, parseInt(proxy.frontend.stot)),
+                        bergamot.createLongGaugeReading('sessions_limit', null, parseInt(proxy.frontend.slim))
+                    );
+                }, 
+                function(e) { 
+                    bergamot.error(e); 
+                }
+            );
+        ]]>
+        </script>
+        <description>Check the number of session currently to a HAProxy frontend</description>
+    </command>
+    
+    <command name="haproxy_backend_sessions" extends="haproxy_stats_check">
+      <summary>HAProxy Backend Session</summary>
+      <parameter name="proxy_name"></parameter>
+      <parameter name="warning">100</parameter>
+      <parameter name="critical">150</parameter>
+      <script>
+        <![CDATA[
+            function parseStats(data)
+            {
+                var stats = {};
+                var lines = data.split('\n');
+                var columns = lines[0].substr(1).split(',');
+                for (var i = 1; i < lines.length; i++)
+                {
+                    var stat = {};
+                    var fields = lines[i].split(',');
+                    for (var j = 0; j < fields.length; j++)
+                    {
+                        stat[columns[j].trim()] = fields[j];
+                    }
+                    if (! stats[stat.pxname]) 
+                        stats[stat.pxname] = { frontend: null, backend: null, servers: [] };
+                    if (stat.svname == 'FRONTEND' || stat.svname == 'BACKEND')
+                        stats[stat.pxname][stat.svname.toLowerCase()] = stat;
+                    else
+                        stats[stat.pxname].servers.push(stat);
+                }
+                return stats;
+            }
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('proxy_name');
+            /* Execute */
+            http.check()
+            .connect(check.getParameter('host'))
+            .port(check.getIntParameter('port'))
+            .get(check.getParameter('path'))
+            .basicAuth(check.getParameter('username'), check.getParameter('password'))
+            .execute(
+                function(r) {
+                    /* API Error? */
+                    if (r.status() != 200)
+                    { 
+                        bergamot.error('HAProxy API returned: ' + r.status());
+                        return;
+                    }
+                    /* Parse the CSV into something useful */
+                    var stats = parseStats(r.content());
+                    /* Get the stats */
+                    var proxy = stats[check.getParameter('proxy_name')];
+                    if (! proxy)
+                    {
+                        bergamot.error('HAProxy has no such proxy: ' + check.getParameter('proxy_name'));
+                        return;
+                    }
+                    bergamot.publish(
+                        bergamot.createResult().applyGreaterThanThreshold(
+                            new java.lang.Integer(proxy.backend.scur),
+                            check.getIntParameter('warning'),
+                            check.getIntParameter('critical'),
+                            'Current ' + proxy.backend.scur + " of " + proxy.backend.slim + ' sessions.  ' + proxy.backend.smax + ' max, ' + proxy.backend.stot + ' total.'
+                        )
+                    );
+                    bergamot.publishReadings(
+                        bergamot.createLongGaugeReading('current_sessions',  null, parseInt(proxy.backend.scur)),
+                        bergamot.createLongGaugeReading('max_sessions', null, parseInt(proxy.backend.smax)),
+                        bergamot.createLongGaugeReading('total_sessions', null, parseInt(proxy.backend.stot)),
+                        bergamot.createLongGaugeReading('sessions_limit', null, parseInt(proxy.backend.slim))
+                    );
+                }, 
+                function(e) { 
+                    bergamot.error(e); 
+                }
+            );
+        ]]>
+        </script>
+        <description>Check the number of session currently to a HAProxy backend</description>
+    </command>
+    
+</bergamot>

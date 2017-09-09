@@ -8,7 +8,6 @@ import com.intrbiz.bergamot.BergamotCLIException;
 import com.intrbiz.bergamot.BergamotClient;
 import com.intrbiz.bergamot.config.CLICfg;
 import com.intrbiz.bergamot.config.CLISiteCfg;
-import com.intrbiz.bergamot.model.message.AuthTokenMO;
 
 public class ConfigCommand extends BergamotCLICommand
 {
@@ -57,21 +56,20 @@ public class ConfigCommand extends BergamotCLICommand
             }
             else if ("add-site".equals(subCommand))
             {
-                if (args.size() != 4) throw new BergamotCLIException("Add site expects 4 arguments: <name> <url> <username> <password>");
+                if (args.size() != 3) throw new BergamotCLIException("Add site expects 3 arguments: <name> <url> <key>");
                 String name = args.remove(0);
                 String url = args.remove(0);
-                String username = args.remove(0);
-                String password = args.remove(0);
+                String key = args.remove(0);
                 // talk to the API
                 BergamotClient client = new BergamotClient(url);
                 String hello = client.callHelloWorld().execute();
                 System.out.println("Successfully connected to " + name + " (" + url + ") => " + hello);
                 // auth
-                AuthTokenMO token = client.callGetAppAuthToken().appName("Bergamot CLI").username(username).password(password).execute();
-                System.out.println("Sucessfully authenticated with " + name);
+                String you = client.callHelloYou().execute();
+                System.out.println("Sucessfully authenticated to " + name + "(" + url +  ")" + " ,hello " + you);
                 // add the config
                 CLICfg cfg = CLICfg.loadConfiguration();
-                cfg.setSite(new CLISiteCfg(name, url, token.getToken()));
+                cfg.setSite(new CLISiteCfg(name, url, key));
                 cfg.saveConfiguration();
                 System.out.println(cfg);
             }

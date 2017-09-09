@@ -4,7 +4,7 @@ import com.intrbiz.bergamot.check.ssh.SSHChecker;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 
 /**
- * Execute checks via SSH
+ * Execute checks via SSH (including SFTP)
  */
 public class SSHEngine extends AbstractEngine
 {

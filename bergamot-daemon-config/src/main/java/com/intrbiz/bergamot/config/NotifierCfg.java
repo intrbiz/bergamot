@@ -113,7 +113,7 @@ public abstract class NotifierCfg extends Configuration
         // the broker
         if (this.broker == null)
         {
-            this.broker = new BrokerCfg("amqp://127.0.0.1", "bergamot", "bergamot");
+            this.broker = new BrokerCfg("hcq", new String[] { "ws://127.0.0.1:1543/hcq", "ws://127.0.0.1:1544/hcq", "ws://127.0.0.1:1545/hcq" });
         }
         // default number of threads
         if (this.getThreads() <= 0)

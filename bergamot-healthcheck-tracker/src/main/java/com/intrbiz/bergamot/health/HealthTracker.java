@@ -46,7 +46,7 @@ public class HealthTracker
     
     private Producer<HealthCheckMessage> healthcheckEventProducer;
     
-    private Logger logger = Logger.getLogger(HealthTracker.class);
+    private static final Logger logger = Logger.getLogger(HealthTracker.class);
     
     private Timer timer;
     
@@ -239,6 +239,13 @@ public class HealthTracker
     
     private void requestJoin()
     {
-        this.healthcheckControlProducer.publish(new HealthCheckRequestJoin());
+        try
+        {
+            this.healthcheckControlProducer.publish(new HealthCheckRequestJoin());
+        }
+        catch (Exception e)
+        {
+            logger.warn("Could not send health check join request");
+        }
     }
 }

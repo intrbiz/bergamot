@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.local">
+    
+    <command name="postgresql_up" extends="postgresql_jdbc_check">
+        <summary>PostgreSQL Up</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('database');
+            bergamot.require('username');
+            bergamot.require('password');
+            /* URL */
+            var url = 'jdbc:postgresql://' + check.getParameter('host') + ':' + check.getIntParameter('port') + '/' + check.getParameter('database');
+            var user = check.getParameter('username');
+            var pass = check.getParameter('password');
+            /* Execute */
+            jdbc.connect(url, user, pass, function(con) {
+                con.query('SELECT 1', function(rs) {
+                    rs.next();
+                    bergamot.ok("PostgreSQL Up");
+                });
+            });
+        ]]>
+        </script>
+        <description>PostgreSQL can execute simple queries</description>
+    </command>
 
     <command name="postgresql_version" extends="postgresql_jdbc_check">
         <summary>PostgreSQL Version</summary>

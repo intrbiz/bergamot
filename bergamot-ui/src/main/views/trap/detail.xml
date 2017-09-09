@@ -62,6 +62,11 @@
 			    <span class="value">#{coalesce(trap.state.output, '')}</span>
 		    </p>
 		</div>
+		<div class="col4 description" style="padding-top: 100px;">
+			<p rendered="#{! isempty(trap.description)}">#{trap.description}</p>
+			<p rendered="#{! isempty(trap.note)}">#{trap.note}</p>
+			<p rendered="#{! isempty(trap.noteUrl)}"><a href="#{trap.noteUrl}">#{coalesce(trap.noteTitle, 'Additional information')}</a></p>
+		</div>
 	</div>
 	
 	<!-- Alerts -->

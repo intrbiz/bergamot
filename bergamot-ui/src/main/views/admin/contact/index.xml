@@ -9,7 +9,7 @@
     		they can (optionally) use API and most importantly they will be notified 
     		about checks.  Contacts are usually your systems administrators.
     	</p>
-    	<div class="col12">
+    	<div class="col12" style="overflow: auto;">
 	    	<table>
 	    		<tr>
 	    			<th>Full Name</th>
@@ -22,9 +22,9 @@
 	    			<th>Notifications</th>
 	    			<th>Notification Period</th>
 	    			<th>Notification Engines</th>
+	    			<th>Last Login</th>
 	    			<th>Password Change Required</th>
 	    			<th>Locked</th>
-	    			<th></th>
 	    			<th></th>
 	    		</tr>
 	    		<data-set var="contact" value="#{contacts}">
@@ -54,16 +54,15 @@
 	    						<span>#{engine.engine}</span>
 	    					</data-set>
 	    				</td>
+	    				<td>#{if(contact.lastLoginAt != null, dateformat('HH:mm:ss', contact.lastLoginAt) + ' on ' + dateformat('EEEE dd/MM/yyyy', contact.lastLoginAt), 'Never')}</td>
 	    				<td>#{if(contact.forcePasswordChange, 'Yes', 'No')}</td>
-	    				<td>#{if(contact.locked, coalesce(contact.lockedReason.description, 'Yes'), 'No')}</td>
+	    				<td>#{if(contact.locked, coalesce(contact.lockedReason.description, 'Yes') + ' at ' + dateformat('HH:mm:ss', contact.lockedAt) + ' on ' + dateformat('EEEE dd/MM/yyyy', contact.lockedAt), 'No')}</td>
 	    				<td>
 	    					<!-- Password Reset -->
 	    					<form action="#{path('/admin/contact/reset')}" method="post">
 								<input type="hidden" name="id" value="#{contact.id}"/>
 								<input type="submit" name="reset" value="Reset Password" class="danger"/>
 							</form>
-	    				</td>
-	    				<td>
 	    					<!-- Locked -->
 	    					<form action="#{path('/admin/contact/lock')}" method="post" rendered="#{! contact.locked}">
 								<input type="hidden" name="id" value="#{contact.id}"/>

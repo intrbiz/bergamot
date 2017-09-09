@@ -6,17 +6,16 @@ import java.io.FileInputStream;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import com.intrbiz.Util;
 import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
+import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.health.HealthAgent;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.configuration.Configuration;
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
 
 
 public class DefaultWorker extends AbstractWorker
@@ -41,20 +40,12 @@ public class DefaultWorker extends AbstractWorker
         return this.daemonName;
     }
     
-    protected void configureLogging() throws Exception
+    protected void configureLogging(LoggingCfg config) throws Exception
     {
-        String logging = System.getProperty("bergamot.logging", "console");
-        if ("console".equals(logging))
-        {
-            // configure logging to terminal
-            BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(Level.toLevel(System.getProperty("bergamot.logging.level", "trace").toUpperCase()));
-        }
-        else
-        {
-            // configure from file
-            PropertyConfigurator.configure(new File(logging).getAbsolutePath());
-        }
+        if (config == null) config = new LoggingCfg();
+        // configure logging to terminal
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.toLevel(Util.coalesceEmpty(config.getLevel(), "info").toUpperCase()));
     }
     
     /**
@@ -72,7 +63,7 @@ public class DefaultWorker extends AbstractWorker
         File configFile = this.getConfigurationFile();
         if (configFile.exists())
         {
-            Logger.getLogger(Worker.class).info("Reading configuration file " + configFile.getAbsolutePath());
+            System.out.println("Using configuration file " + configFile.getAbsolutePath());
             config = Configuration.read(this.configurationClass, new FileInputStream(configFile));
         }
         else
@@ -86,15 +77,14 @@ public class DefaultWorker extends AbstractWorker
     @Override
     public void start() throws Exception
     {
-        // setup logging
-        this.configureLogging();
-        Logger logger = Logger.getLogger(Worker.class);
-        // configure accounting
         // load the config
         WorkerCfg config = this.loadConfiguration();
+        // setup logging
+        this.configureLogging(config.getLogging());
+        Logger logger = Logger.getLogger(Worker.class);
         logger.debug("Bergamot worker, using configuration:\r\n" + config.toString());
         // setup the queue broker
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        QueueUtil.setupQueueBroker(config.getBroker(), this.getDaemonName());
         // setup accounting
         AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
         AccountingManager.getInstance().registerConsumer("queue", new BergamotAccountingQueueConsumer());

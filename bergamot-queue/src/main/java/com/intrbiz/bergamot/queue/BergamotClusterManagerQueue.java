@@ -3,7 +3,8 @@ package com.intrbiz.bergamot.queue;
 
 import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
 import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
-import com.intrbiz.bergamot.queue.impl.RabbitBergamotClusterManagerQueue;
+import com.intrbiz.bergamot.queue.impl.hcq.HCQBergamotClusterManagerQueue;
+import com.intrbiz.bergamot.queue.impl.rabbit.RabbitBergamotClusterManagerQueue;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RPCClient;
@@ -19,6 +20,7 @@ public abstract class BergamotClusterManagerQueue extends QueueAdapter
     static
     {
         RabbitBergamotClusterManagerQueue.register();
+        HCQBergamotClusterManagerQueue.register();
     }
     
     public static BergamotClusterManagerQueue open()

@@ -203,6 +203,7 @@ public class ProfileRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void moreBackupCodes(BergamotDB db) throws IOException
     {
+        require(! authenticationState().info().isBackupCodeUsed());
         Contact contact = currentPrincipal();
         contact.generateMoreBackupCodes();
         redirect(path("/profile/"));

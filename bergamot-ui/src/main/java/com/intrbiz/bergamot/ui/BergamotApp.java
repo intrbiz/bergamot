@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.bergamot.ui.action.BergamotAgentActions;
 import com.intrbiz.bergamot.ui.action.CheckActions;
 import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
@@ -61,6 +62,7 @@ import com.intrbiz.bergamot.ui.router.ContactRouter;
 import com.intrbiz.bergamot.ui.router.DashboardRouter;
 import com.intrbiz.bergamot.ui.router.ErrorRouter;
 import com.intrbiz.bergamot.ui.router.GroupsRouter;
+import com.intrbiz.bergamot.ui.router.HealthRouter;
 import com.intrbiz.bergamot.ui.router.HostRouter;
 import com.intrbiz.bergamot.ui.router.LocationRouter;
 import com.intrbiz.bergamot.ui.router.LoginRouter;
@@ -71,6 +73,7 @@ import com.intrbiz.bergamot.ui.router.StatsRouter;
 import com.intrbiz.bergamot.ui.router.TeamRouter;
 import com.intrbiz.bergamot.ui.router.TimePeriodRouter;
 import com.intrbiz.bergamot.ui.router.TrapRouter;
+import com.intrbiz.bergamot.ui.router.UIRouter;
 import com.intrbiz.bergamot.ui.router.admin.AdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.ClusterAdminRouter;
 import com.intrbiz.bergamot.ui.router.admin.CommandAdminRouter;
@@ -99,8 +102,6 @@ import com.intrbiz.crypto.SecretKey;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
 import com.intrbiz.lamplighter.data.LamplighterDB;
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
 import com.intrbiz.util.pool.database.DatabasePool;
 
 /**
@@ -110,6 +111,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
 {   
     public static final class VERSION
     {
+        public static final String NAME = "Bergamot Monitoring";
+        
         public static final String NUMBER = "3.0.0";
         
         public static final String CODE_NAME = "Red Snow";
@@ -119,7 +122,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         
             public static final String JS = "v1.5.1";
             
-            public static final String CSS = "v1.7.1";
+            public static final String CSS = "v1.7.2";
         
         }
     }
@@ -246,6 +249,10 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void setupRouters() throws Exception
     {
+        // UI filters and defaults
+        router(new UIRouter());
+        // health check router
+        router(new HealthRouter());
         // Setup the application routers
         router(new ErrorRouter());
         router(new LoginRouter());
@@ -389,7 +396,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             DataManager.get().registerDefaultCacheProvider(DataManager.get().cacheProvider("hazelcast"));
             // setup the queue manager
             System.out.println("Setting up RabbitMQ");
-            QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+            QueueUtil.setupQueueBroker(config.getBroker(), "bergamot-ui");
             // setup data manager
             System.out.println("Setting up PostgreSQL");
             DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());

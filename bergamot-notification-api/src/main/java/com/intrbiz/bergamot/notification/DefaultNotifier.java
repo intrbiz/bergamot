@@ -15,9 +15,8 @@ import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.health.HealthAgent;
 import com.intrbiz.bergamot.health.HealthTracker;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.configuration.Configuration;
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
 
 public class DefaultNotifier extends AbstractNotifier
 {
@@ -100,7 +99,7 @@ public class DefaultNotifier extends AbstractNotifier
         NotifierCfg config = this.loadConfiguration();
         logger.debug("Bergamot notifier, using configuration:\r\n" + config.toString());
         // setup the queue broker
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        QueueUtil.setupQueueBroker(config.getBroker(), this.getDaemonName());
         // setup accounting
         AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
         AccountingManager.getInstance().registerConsumer("queue", new BergamotAccountingQueueConsumer());

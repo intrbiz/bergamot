@@ -13,6 +13,34 @@
         <summary>Linux Services</summary>
     </group>
     
+    <group name="linux-system-services" groups="linux-services" extends="generic_group">
+        <summary>System</summary>
+    </group>
+    
+    <group name="linux-storage-services" groups="linux-services" extends="generic_group">
+        <summary>Storage</summary>
+    </group>
+    
+    <group name="linux-monitoring-services" groups="linux-services" extends="generic_group">
+        <summary>Monitoring</summary>
+    </group>
+    
+    <group name="linux-daemon-services" groups="linux-services" extends="generic_group">
+        <summary>Daemons</summary>
+    </group>
+    
+    <group name="linux-processes-services" groups="linux-services" extends="generic_group">
+        <summary>Processes</summary>
+    </group>
+    
+    <group name="linux-users-services" groups="linux-services" extends="generic_group">
+        <summary>Users</summary>
+    </group>
+    
+    <group name="linux-network-services" groups="linux-services" extends="generic_group">
+        <summary>Network</summary>
+    </group>
+    
     <group name="network-services" groups="services" extends="generic_group">
         <summary>Network Services</summary>
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>

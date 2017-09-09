@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.impl.route.Route;
@@ -24,6 +25,8 @@ import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.SetOf;
 import com.intrbiz.metadata.Template;
+import com.intrbiz.metadata.doc.Desc;
+import com.intrbiz.metadata.doc.Title;
 
 @Prefix("/about")
 @Template("layout/main")
@@ -56,7 +59,6 @@ public class AboutRouter extends Router<BergamotApp>
                         RouteInfo info = new RouteInfo(route);
                         if (! info.isIgnoreBinding())
                         {
-                            info.buildRouteAPICall(bindings, imports);
                         }
                     }
                 }
@@ -82,11 +84,6 @@ public class AboutRouter extends Router<BergamotApp>
         writer.write("        super(baseURL, credentials);\n");
         writer.write("    }\n");
         writer.write("\n");
-        writer.write("    public BergamotClient(String baseURL, String username, String password)\n");
-        writer.write("    {\n");
-        writer.write("        super(baseURL, username, password);\n");
-        writer.write("    }\n");
-        writer.write("\n");
         writer.write("    public BergamotClient(String baseURL, String token)\n");
         writer.write("    {\n");
         writer.write("        super(baseURL, token);\n");
@@ -102,6 +99,112 @@ public class AboutRouter extends Router<BergamotApp>
         // done
         writer.write("}\n");
         writer.write("\n");
+    }
+    
+    @Any("/generate/api/docs")
+    public void generateAPIDocs() throws Exception
+    {
+        // write the response
+        BalsaWriter writer = response().ok().contentType("text/markdown").header("Content-Disposition", "attachment; filename=BergamotAPIDocs.md").getViewWriter();
+        // write the client
+        writer.write("# Bergamot Monitoring API Reference\n");
+        writer.write("\n");
+        for (Router<?> router : app().getRouters())
+        {
+            String prefix = router.getPrefix();
+            if (prefix.startsWith("/api"))
+            {
+                List<RouteInfo> routes = Route.fromRouter(prefix, router).stream()
+                                          .filter((r) -> ! (r.isFilter() || r.isExceptionHandler()))
+                                          .map((r) -> new RouteInfo(r))
+                                          .filter((r) -> ! r.isIgnoreBinding())
+                                          .collect(Collectors.toList());
+                if (! routes.isEmpty())
+                {
+                    Title title = router.getClass().getAnnotation(Title.class);
+                    writer.append("* [").append(title == null ? router.getClass().getSimpleName() : title.value()).append("](#")
+                    .append(router.getClass().getSimpleName().toLowerCase()).append(")\n");
+                }
+            }
+        }
+        writer.write("\n");
+        // introspect each call
+        for (Router<?> router : app().getRouters())
+        {
+            String prefix = router.getPrefix();
+            if (prefix.startsWith("/api"))
+            {
+                List<RouteInfo> routes = Route.fromRouter(prefix, router).stream()
+                                          .filter((r) -> ! (r.isFilter() || r.isExceptionHandler()))
+                                          .map((r) -> new RouteInfo(r))
+                                          .filter((r) -> ! r.isIgnoreDocs())
+                                          .collect(Collectors.toList());
+                if (! routes.isEmpty())
+                {
+                    // get info about the router
+                    Title title = router.getClass().getAnnotation(Title.class);
+                    Desc  desc  = router.getClass().getAnnotation(Desc.class);
+                    // the router
+                    writer.append("<p><a id=\"").append(router.getClass().getSimpleName().toLowerCase()).append("\"></a></p>\n");
+                    writer.append("## ").append(title == null ? router.getClass().getSimpleName() : title.value()).append("\n\n");
+                    if (desc != null)
+                    {
+                        for (String para : desc.value())
+                        {
+                            writer.append(para).append("\n\n");   
+                        }
+                    }
+                    // routes for this router
+                    for (RouteInfo route : routes)
+                    {
+                        writer.append("### ").append(route.getTitle()).append("\n\n");
+                        writer.append("`").append(route.getMethod()).append("` `").append(route.getPath()).append("`\n\n");
+                        for (String para : route.getDescription())
+                        {
+                            writer.append(para).append("\n\n");
+                        }
+                        // parameters
+                        if (! route.getParameters().isEmpty())
+                        {
+                            writer.append("#### Parameters\n\n");
+                            for (RouteParameter param : route.getParameters())
+                            {
+                                writer.append("* `").append(param.getName()).append("`").append(" (type: ").append(param.getType().getSimpleName()).append(")");
+                                if (param.isAs()) writer.append(" (provided in the URL path)");
+                                else writer.append(" (provided as a query parameter)");
+                                writer.append("\n");
+                            }
+                            writer.append("\n");
+                        }
+                        // example
+                        if ("ANY".equals(route.getMethod()) || "GET".equals(route.getMethod()))
+                        {
+                            writer.append("#### Example\n\n");
+                            writer.append("    curl -X GET -H 'Authorization: WVArodeKagxYAK0f4w61BB4XCOWcpTINgu2DQVpx4FwIFKNgCF6bEwtXhAxdeH9uT5029bXWsiA8bHv7wgR7ZGe0S-rddU3tMMUQJTFf' https://demo.bergamot-monitoring.org").append(route.getPath());
+                            if (route.getParameters().stream().anyMatch((r) -> ! r.isAs()))
+                            {
+                                writer.append("?");
+                                boolean na = false;
+                                for (RouteParameter param : route.getParameters())
+                                {
+                                    if (! param.isAs())
+                                    {
+                                        if (na) writer.append("&");
+                                        writer.append(param.getName()).append("=");
+                                        na = true;
+                                    }
+                                }
+                            }
+                            writer.append("\n\n");
+                        }
+                        else if ("POST".equals(route.getMethod()))
+                        {
+                            // TODO
+                        }
+                    }
+                }
+            }
+        }
     }
     
     @Any("/routes")
@@ -123,6 +226,8 @@ public class AboutRouter extends Router<BergamotApp>
     
     public static class RouteInfo
     {
+        private Route route;
+        
         private String method;
         
         private String prefix;
@@ -141,41 +246,74 @@ public class AboutRouter extends Router<BergamotApp>
         
         private boolean ignoreBinding;
         
-        public RouteInfo(Route route) throws Exception
+        private boolean ignoreDocs;
+        
+        private Title title;
+        
+        private Desc desc;
+        
+        public RouteInfo(Route route)
         {
-            this.method = route.getMethod();
-            this.prefix = route.getPrefix();
-            this.pattern = route.getPattern();
-            this.as = new LinkedHashSet<String>(Arrays.asList(route.getCompiledPattern().getAs()));
-            this.parameters = new LinkedList<RouteParameter>();
-            this.callName = route.getHandler().getName();
-            this.returnType = route.getHandler().getReturnType();
-            // of type
-            ListOf loa = route.getHandler().getAnnotation(ListOf.class);
-            if (loa != null) this.returnOfType = loa.value();
-            SetOf soa = route.getHandler().getAnnotation(SetOf.class);
-            if (soa != null) this.returnOfType = soa.value();
-            // manual binding
-            this.ignoreBinding = route.getHandler().getAnnotation(IgnoreBinding.class) != null;
-            // use the exec build to introspect the route
-            ExecBuilder exec = ExecBuilder.build(route);
-            // look at the annotations
-            Parameter[] parameters = route.getHandler().getParameters();
-            for (int i = 0; i < exec.getArguments().length; i++)
+            try
             {
-                ArgumentBuilder<?> builder = exec.getArguments()[i];
-                Parameter parameter = parameters[i];
-                if (builder instanceof ParameterArgument)
+                this.route = route;
+                this.method = route.getMethod();
+                this.prefix = route.getPrefix();
+                this.pattern = route.getPattern();
+                this.as = new LinkedHashSet<String>(Arrays.asList(route.getCompiledPattern().getAs()));
+                this.parameters = new LinkedList<RouteParameter>();
+                this.callName = route.getHandler().getName();
+                this.returnType = route.getHandler().getReturnType();
+                title = route.getHandler().getAnnotation(Title.class);
+                desc  = route.getHandler().getAnnotation(Desc.class);
+                // of type
+                ListOf loa = route.getHandler().getAnnotation(ListOf.class);
+                if (loa != null) this.returnOfType = loa.value();
+                SetOf soa = route.getHandler().getAnnotation(SetOf.class);
+                if (soa != null) this.returnOfType = soa.value();
+                // manual binding
+                IgnoreBinding ignore = route.getHandler().getAnnotation(IgnoreBinding.class);
+                this.ignoreBinding = ignore != null;
+                this.ignoreDocs = ignore == null ? false : ignore.ignoreDocs();
+                // use the exec build to introspect the route
+                ExecBuilder exec = ExecBuilder.build(route);
+                // look at the annotations
+                Parameter[] parameters = route.getHandler().getParameters();
+                for (int i = 0; i < exec.getArguments().length; i++)
                 {
-                    ParameterArgument paramArg = (ParameterArgument) builder;
-                    this.parameters.add(new RouteParameter(paramArg.getParameterName(), parameter.getName(), parameter.getType(), this.as.contains(paramArg.getParameterName())));
-                }
-                else if (builder instanceof ListParameterArgument)
-                {
-                    ListParameterArgument paramArg = (ListParameterArgument) builder;
-                    this.parameters.add(new RouteParameter(paramArg.getParameterName(), parameter.getName(), parameter.getType(), false));
+                    ArgumentBuilder<?> builder = exec.getArguments()[i];
+                    Parameter parameter = parameters[i];
+                    if (builder instanceof ParameterArgument)
+                    {
+                        ParameterArgument paramArg = (ParameterArgument) builder;
+                        this.parameters.add(new RouteParameter(paramArg.getParameterName(), parameter.getName(), parameter.getType(), this.as.contains(paramArg.getParameterName())));
+                    }
+                    else if (builder instanceof ListParameterArgument)
+                    {
+                        ListParameterArgument paramArg = (ListParameterArgument) builder;
+                        this.parameters.add(new RouteParameter(paramArg.getParameterName(), parameter.getName(), parameter.getType(), false));
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        public String getTitle()
+        {
+            return title == null ? callName : title.value();
+        }
+        
+        public String[] getDescription()
+        {
+            return desc == null ? new String[0] : desc.value();
+        }
+        
+        public Route getRoute()
+        {
+            return this.route;
         }
         
         public String getMethod()
@@ -239,6 +377,11 @@ public class AboutRouter extends Router<BergamotApp>
         public boolean isIgnoreBinding()
         {
             return this.ignoreBinding;
+        }
+        
+        public boolean isIgnoreDocs()
+        {
+            return this.ignoreDocs;
         }
 
         public void buildRouteAPICall(StringBuilder sb, Set<String> imports)

@@ -2,7 +2,8 @@ package com.intrbiz.bergamot.queue;
 
 
 import com.intrbiz.bergamot.model.message.event.control.ControlEvent;
-import com.intrbiz.bergamot.queue.impl.RabbitControlQueue;
+import com.intrbiz.bergamot.queue.impl.hcq.HCQControlQueue;
+import com.intrbiz.bergamot.queue.impl.rabbit.RabbitControlQueue;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
 import com.intrbiz.queue.Producer;
@@ -22,6 +23,7 @@ public abstract class ControlQueue extends QueueAdapter
     static
     {
         RabbitControlQueue.register();
+        HCQControlQueue.register();
     }
     
     public static ControlQueue open()

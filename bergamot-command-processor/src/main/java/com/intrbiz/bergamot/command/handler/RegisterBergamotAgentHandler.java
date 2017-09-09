@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.SignAgentAccountingEvent;
 import com.intrbiz.bergamot.command.CommandProcessor;
@@ -108,6 +109,14 @@ public class RegisterBergamotAgentHandler implements BergamotCommandHandler<Regi
         HostCfg host = new HostCfg();
         host.setAgentId(request.getAgentId());
         host.setName(request.getCommonName());
+        if (! Util.isEmpty(template.getSummary()))
+        {
+            host.setSummary(request.getCommonName() + " (" + template.getSummary() + ")");
+        }
+        else
+        {
+            host.setSummary(request.getCommonName());
+        }
         host.getInheritedTemplates().add(template.getName());
         changeCfg.addObject(host);
         // log the config change

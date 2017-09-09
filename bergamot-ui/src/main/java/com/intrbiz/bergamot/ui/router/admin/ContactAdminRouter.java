@@ -38,7 +38,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void lock(BergamotDB db, @Param("id") @IsaObjectId UUID contactId) throws IOException
     {
-        action("lock-password", db.getContact(contactId));
+        action("lock-contact", db.getContact(contactId));
         redirect(path("/admin/contact/"));
     }
     
@@ -46,7 +46,7 @@ public class ContactAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void unlock(BergamotDB db, @Param("id") @IsaObjectId UUID contactId) throws IOException
     {
-        action("unlock-password", db.getContact(contactId));
+        action("unlock-contact", db.getContact(contactId));
         redirect(path("/admin/contact/"));
     }
     

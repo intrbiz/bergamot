@@ -13,28 +13,31 @@ import com.intrbiz.balsa.error.BalsaValidationError;
 import com.intrbiz.balsa.error.http.BalsaBadRequest;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
-import com.intrbiz.balsa.metadata.WithDataAdapter;
-import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
-import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.converter.ConversionException;
+import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Catch;
-import com.intrbiz.metadata.CheckStringLength;
+import com.intrbiz.metadata.Get;
+import com.intrbiz.metadata.IgnoreCatch;
+import com.intrbiz.metadata.IgnoreMethods;
 import com.intrbiz.metadata.IgnorePaths;
 import com.intrbiz.metadata.JSON;
+import com.intrbiz.metadata.Options;
 import com.intrbiz.metadata.Order;
-import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
-import com.intrbiz.metadata.RequireValidPrincipal;
+import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.XML;
+import com.intrbiz.metadata.doc.Desc;
+import com.intrbiz.metadata.doc.Title;
 import com.intrbiz.validator.ValidationException;
 
+@Title("Authentication API Methods")
 @Prefix("/api/")
 public class APIRouter extends Router<BergamotApp>
 {   
@@ -47,6 +50,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**\\.xml")
     @Order(10)
     @XML(status = HTTPStatus.NotFound)
+    @RequirePrincipal()
     public APIError notFoundXML()
     {
         return new APIError("Not found");
@@ -71,6 +75,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(20)
     @JSON(status = HTTPStatus.NotFound)
+    @RequirePrincipal()
     public APIError notFound()
     {
         return new APIError("Not found");
@@ -95,7 +100,8 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(30)
     @JSON(status = HTTPStatus.BadRequest)
-    public APIError invalideRequest()
+    @RequirePrincipal()
+    public APIError invalidRequest()
     {
         for (ConversionException cex : balsa().getConversionErrors())
         {
@@ -115,6 +121,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(40)
     @JSON(status = HTTPStatus.BadRequest)
+    @RequirePrincipal()
     public APIError badRequest()
     {
         Throwable error = balsa().getException();
@@ -122,7 +129,7 @@ public class APIRouter extends Router<BergamotApp>
         {
             logger.error("Caught internal bad request error: " + error.getMessage(), error);
         }
-        return new APIError("Bad Request: " + (error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage()));
+        return new APIError("Bad Request");
     }
     
     /**
@@ -132,6 +139,7 @@ public class APIRouter extends Router<BergamotApp>
     @Any("**")
     @Order(Order.LAST)
     @JSON(status = HTTPStatus.InternalServerError)
+    @RequirePrincipal()
     public APIError internalServerError()
     {
         Throwable error = balsa().getException();
@@ -139,7 +147,37 @@ public class APIRouter extends Router<BergamotApp>
         {
             logger.error("Caught internal server error: " + error.getMessage(), error);
         }
-        return new APIError(error == null || Util.isEmpty(error.getMessage()) ? "Not sure what happened here!" : error.getMessage());
+        return new APIError("Not sure what happened here!");
+    }
+    
+    /**
+     * CORS Preflight Handling
+     */
+    @Options("**")
+    @Order(Order.FIRST)
+    @IgnoreBinding
+    public void handleCORSPreflight()
+    {
+        response()
+         .header("Access-Control-Allow-Origin", "*")
+         .header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+         .header("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Bergamot-Auth")
+         .header("Access-Control-Max-Age", " 86400")
+         .plain()
+         .ok();
+    }
+    
+    /**
+     * Inject CORS response headers
+     */
+    @Before
+    @Any("**")
+    @IgnoreMethods({"OPTIONS"})
+    @Order(Order.FIRST)
+    public void addCORSHeaders()
+    {
+        response()
+        .header("Access-Control-Allow-Origin", "*");
     }
     
     /**
@@ -148,17 +186,17 @@ public class APIRouter extends Router<BergamotApp>
      */
     @Before
     @Any("**")
-    /* We don't want to filter the authentication routes */
-    @IgnorePaths({"/auth-token", "/extend-auth-token", "/test/hello/world", "/app/auth-token"})
+    /* We don't want to filter the certain routes */
+    @IgnorePaths({ "/test/hello/world", "/auth-token" })
     @Order(10)
-    @WithDataAdapter(BergamotDB.class)
-    public void authenticateRequest(BergamotDB db)
+    @IgnoreCatch({ BalsaSecurityException.class })
+    public void authenticateRequest()
     {
         // perform a token based request authentication
         // we may already have the auth from the session, if shared with a UI session
         if (! this.validPrincipal())
         {
-            authenticateRequest(new GenericAuthenticationToken(Util.coalesceEmpty(header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key"))));
+            authenticateRequestSingleFactor(new GenericAuthenticationToken(Util.coalesceEmpty(header("Authorization"), header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key")), CryptoCookie.Flags.Principal));
         }
         // assert that the contact is permitted API access
         require(permission("api.access"));
@@ -168,67 +206,29 @@ public class APIRouter extends Router<BergamotApp>
     }
     
     /**
-     * Authenticate a user for API access on behalf of an application, 
-     * this will generate a perpetual auth token
+     * Generate a short-lived authentication token which represents the currently authenticated principal for 1 hour.
+     * 
+     * Note: this can only be called with a perpetual access token, or via a valid UI session
      */
-    @Any("/app/auth-token")
+    @Title("Generate temporary authentication token")
+    @Desc({
+        "Temporary authentication tokens last for 1 hour from creation and can be used to authorize subsequent requests to the Bergamot Monitoring API wit the same level of access as requestor."
+    })
+    @Get("/auth-token")
     @JSON()
-    @WithDataAdapter(BergamotDB.class)
-    public AuthTokenMO getAppAuthToken(BergamotDB db, @Param("app") @CheckStringLength(mandatory = true, min = 3, max = 80) String appName, @Param("username") String username, @Param("password") String password)
+    public AuthTokenMO getAuthToken()
     {
-        authenticateRequest(username, password);
-        String token = app().getSecurityEngine().generatePerpetualAuthenticationTokenForPrincipal(currentPrincipal());
-        db.setAPIToken(new APIToken(token, currentPrincipal(), Util.coalesceEmpty("Application: " + appName)));
-        return new AuthTokenMO(token, 0L);
-    }
-    
-    /**
-     * Authenticate a user for API access, 
-     */
-    @Any("/auth-token")
-    @JSON()
-    @IgnoreBinding
-    public AuthTokenMO getAuthToken(@Param("username") String username, @Param("password") String password)
-    {
-        authenticateRequest(username, password);
-        long expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
-        String token = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiresAt);
-        return new AuthTokenMO(token, expiresAt);
-    }
-    
-    /**
-     * Extend an authentication token 
-     */
-    @Any("/extend-auth-token")
-    @JSON()
-    public AuthTokenMO extendAuthToken(@Param("auth-token") String token)
-    {
-        authenticateRequest(new GenericAuthenticationToken(token));
-        long expiresAt = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
-        String newToken = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiresAt);
-        return new AuthTokenMO(newToken, expiresAt);
-    }
-    
-    /**
-     * Change the current users password
-     */
-    @Any("/change-password")
-    @JSON()
-    @RequireValidPrincipal()
-    @WithDataAdapter(BergamotDB.class)
-    public Boolean changePassword(
-            BergamotDB db, 
-            @Param("current-password") @CheckStringLength(min = 1, max = 80, mandatory = true) String currentPassword,
-            @Param("new-password")     @CheckStringLength(min = 1, max = 80, mandatory = true) String newPassword
-    )
-    {
-        Contact contact = currentPrincipal();
-        // verify the given current password before changing the password
-        if (! contact.verifyPassword(currentPassword)) throw new BalsaSecurityException("Failed to verify current password");
-        // change the password
-        contact.hashPassword(newPassword);
-        // update the contact
-        db.setContact(contact);
-        return true;
+        // perform a token based request authentication
+        // we may already have the auth from the session, if shared with a UI session
+        if (! this.validPrincipal())
+        {
+            authenticateRequestSingleFactor(new GenericAuthenticationToken(Util.coalesceEmpty(header("Authorization"), header("X-Bergamot-Auth"), cookie("bergamot.api.key"), param("key")), CryptoCookie.Flags.Perpetual, CryptoCookie.Flags.Principal));
+        }
+        // assert that the contact is permitted API access
+        require(permission("api.access"));
+        // generate temporary access token
+        long expiry = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1);
+        String token = app().getSecurityEngine().generateAuthenticationTokenForPrincipal(currentPrincipal(), expiry, CryptoCookie.Flags.Principal);
+        return new AuthTokenMO(token, expiry);
     }
 }

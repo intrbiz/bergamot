@@ -14,19 +14,19 @@ public abstract class SLAPeriod<T extends SLAPeriodMO> extends BergamotObject<T>
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "sla_id", since = @SQLVersion({ 3, 47, 0 }))
-    @SQLForeignKey(references = SLA.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "sla_id", since = @SQLVersion({ 3, 50, 0 }))
+    @SQLForeignKey(references = SLA.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 50, 0 }))
     @SQLPrimaryKey
     private UUID slaId;
 
-    @SQLColumn(index = 2, name = "name", since = @SQLVersion({ 3, 47, 0 }))
+    @SQLColumn(index = 2, name = "name", since = @SQLVersion({ 3, 50, 0 }))
     @SQLPrimaryKey
     private String name;
 
-    @SQLColumn(index = 3, name = "summary", since = @SQLVersion({ 3, 47, 0 }))
+    @SQLColumn(index = 3, name = "summary", since = @SQLVersion({ 3, 50, 0 }))
     private String summary;
 
-    @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 3, 47, 0 }))
+    @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 3, 50, 0 }))
     private String description;
 
     public SLAPeriod()

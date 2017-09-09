@@ -12,7 +12,7 @@
 	    	Please attempt the request again, should you see this message again, you might wish to contact our support team.
 	    </p>
 	    <p class="error centre">
-	    	Error: #{'"' + Balsa().getException().getMessage() + '"'}
+	    	Error reference: #{errorId}
 	    </p>
 	</div>
 </fragment>

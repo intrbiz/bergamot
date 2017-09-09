@@ -4,7 +4,8 @@ package com.intrbiz.bergamot.queue;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.bergamot.queue.impl.RabbitNotificationQueue;
+import com.intrbiz.bergamot.queue.impl.hcq.HCQNotificationQueue;
+import com.intrbiz.bergamot.queue.impl.rabbit.RabbitNotificationQueue;
 import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
@@ -20,6 +21,7 @@ public abstract class NotificationQueue extends QueueAdapter
     static
     {
         RabbitNotificationQueue.register();
+        HCQNotificationQueue.register();
     }
     
     public static NotificationQueue open()

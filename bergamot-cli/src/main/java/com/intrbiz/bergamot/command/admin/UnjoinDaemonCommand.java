@@ -8,8 +8,7 @@ import com.intrbiz.bergamot.BergamotCLICommand;
 import com.intrbiz.bergamot.BergamotCLIException;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.health.HealthTracker;
-import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.rabbit.RabbitPool;
+import com.intrbiz.bergamot.queue.util.QueueUtil;
 
 public class UnjoinDaemonCommand extends BergamotCLICommand
 {
@@ -50,7 +49,7 @@ public class UnjoinDaemonCommand extends BergamotCLICommand
         // read the UI config and connect to the database
         UICfg config = UICfg.loadConfiguration();
         // setup the queue manager
-        QueueManager.getInstance().registerDefaultBroker(new RabbitPool(config.getBroker().getUrl(), config.getBroker().getUsername(), config.getBroker().getPassword()));
+        QueueUtil.setupQueueBroker(config.getBroker(), "bergamot-cli");
         // setup the health checker
         HealthTracker tracker = HealthTracker.getInstance();
         tracker.init();

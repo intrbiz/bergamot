@@ -5,8 +5,10 @@ import static com.intrbiz.balsa.BalsaContext.*;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -17,9 +19,11 @@ import com.intrbiz.balsa.engine.impl.security.method.HOTPAuthenticationMethod;
 import com.intrbiz.balsa.engine.impl.security.method.PasswordAuthenticationMethod;
 import com.intrbiz.balsa.engine.impl.security.method.TokenAuthenticationMethod;
 import com.intrbiz.balsa.error.BalsaSecurityException;
+import com.intrbiz.balsa.error.security.BalsaPrincipalLockout;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.Contact.LockOutReason;
 import com.intrbiz.bergamot.model.ContactBackupCode;
 import com.intrbiz.bergamot.model.ContactHOTPRegistration;
 import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
@@ -37,6 +41,14 @@ import com.yubico.u2f.data.DeviceRegistration;
 
 public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
 {
+    private static final int DEFAUlT_MAX_AUTH_FAILS = 10;
+    
+    private static final int DEFAULT_AUTOMATIC_AUTH_LOCKOUT_PERIOD = 15;
+    
+    private static final String AUTOMATIC_LOCKOUT_MINUTES = "automatic-lockout-minutes";
+    
+    private static final String AUTOMATIC_LOCKOUT_AFTER = "automatic-lockout-after";
+    
     private Logger logger = Logger.getLogger(BergamotSecurityEngine.class);
     
     private SecureRandom random = new SecureRandom();
@@ -146,22 +158,59 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
             }
             // is the site disable
             if (site.isDisabled()) throw new BalsaSecurityException("Site is disabled");
+            // get some site wide configuration
+            int automaticLockoutMinutes = site.getIntParameter(AUTOMATIC_LOCKOUT_MINUTES, DEFAULT_AUTOMATIC_AUTH_LOCKOUT_PERIOD);
+            int automaticLockoutAttempts = site.getIntParameter(AUTOMATIC_LOCKOUT_AFTER, DEFAUlT_MAX_AUTH_FAILS);
             // lookup the principal
             Contact contact = db.getContactByNameOrEmail(site.getId(), username);
             // does the username exist?
             if (contact == null) return null;
+            // is the account locked
+            if (contact.isLocked())
+            {
+                // is this a temporary lockout
+                if (contact.getLockedReason() == LockOutReason.AUTOMATIC)
+                {
+                    long timeDiff = System.currentTimeMillis() - contact.getLockedAt().getTime();
+                    if (timeDiff > TimeUnit.MINUTES.toMillis(automaticLockoutMinutes))
+                    {
+                        logger.error("Unlocking principal " + username + " => " + site.getId() + " :: " + contact.getId());
+                        contact.unlock();
+                        db.setContact(contact);
+                    }
+                    else
+                    {
+                        logger.error("Rejecting login for principal " + username + " => " + site.getId() + " :: " + contact.getId() + " as the account has been locked.");
+                        throw new BalsaPrincipalLockout();
+                    }
+                }
+                else
+                {
+                    logger.error("Rejecting login for principal " + username + " => " + site.getId() + " :: " + contact.getId() + " as the account has been locked.");
+                    throw new BalsaPrincipalLockout();
+                }
+            }
             // check the password
             if (! contact.verifyPassword(new String(password)))
             {
                 logger.error("Password mismatch for principal " + username + " => " + site.getId() + "::" + contact.getId());
-                throw new BalsaSecurityException("Invalid password");
+                // apply account lockout
+                int authFails = Math.max(contact.getAuthFails(), 0) + 1;
+                contact.setAuthFails(authFails);
+                if (authFails >= automaticLockoutAttempts)
+                {
+                    // automatically lock this account out
+                    logger.error("Automatically locking principal " + username + " => " + site.getId() + " :: " + contact.getId());
+                    contact.lock(LockOutReason.AUTOMATIC);
+                }
+                db.setContact(contact);
+                throw contact.isLocked() ? new BalsaPrincipalLockout() : new BalsaSecurityException("Invalid password");
             }
-            // check if the account is locked
-            if (contact.isLocked())
-            {
-                logger.error("Rejecting valid login for principal " + username + " => " + site.getId() + " :: " + contact.getId() + " as the account has been locked.");
-                throw new BalsaSecurityException("Account locked");
-            }
+            // update authentication count
+            contact.setAuthFails(0);
+            contact.setLastLoginAt(new Timestamp(System.currentTimeMillis()));
+            db.setContact(contact);
+            // all good
             return contact;
         }
         catch (DataException e)
@@ -217,7 +266,7 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
         if (contact.isLocked())
         {
             logger.error("Rejecting valid token login for principal " + contact.getName() + " => " + contact.getSiteId() + " :: " + contact.getId() + " as the account has been locked.");
-            throw new BalsaSecurityException("Account locked");
+            throw new BalsaPrincipalLockout();
         }
         // is the site disable
         if (contact.getSite().isDisabled()) throw new BalsaSecurityException("Site is disabled");
@@ -262,10 +311,21 @@ public class BergamotSecurityEngine extends BaseTwoFactorSecurityEngine
     @Override
     public void verifyBackupCode(Principal principal, String backupCode) throws BalsaSecurityException
     {
-        ContactBackupCode contactBackupCode = ((Contact) principal).getBackupCodes().stream()
-                                                    .filter((bc) -> bc.getCode().equals(backupCode)).findFirst().orElse(null);
+        Contact contact = (Contact) principal;
+        // Verify the backup code
+        ContactBackupCode contactBackupCode = contact.getBackupCodes().stream().filter((bc) -> bc.getCode().equals(backupCode)).findFirst().orElse(null);
         if (contactBackupCode == null || contactBackupCode.isUsed())
-            throw new BalsaSecurityException("The given backup code is invalid");
+        {
+            // lock the account
+            logger.error("Automatically locking principal " + contact.getName() + " => " + contact.getSiteId() + " :: " + contact.getId() + " due to invalid backup code");
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                contact.lock(LockOutReason.AUTOMATIC);
+                db.setContact(contact);
+            }
+            // account is locked
+            throw new BalsaPrincipalLockout("The given backup code is invalid");
+        }
     }
 
     @Override

@@ -3,7 +3,8 @@ package com.intrbiz.bergamot.queue;
 
 import com.intrbiz.bergamot.model.message.command.CommandRequest;
 import com.intrbiz.bergamot.model.message.command.CommandResponse;
-import com.intrbiz.bergamot.queue.impl.RabbitBergamotCommandQueue;
+import com.intrbiz.bergamot.queue.impl.hcq.HCQBergamotCommandQueue;
+import com.intrbiz.bergamot.queue.impl.rabbit.RabbitBergamotCommandQueue;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;
 import com.intrbiz.queue.RPCClient;
@@ -20,6 +21,7 @@ public abstract class BergamotCommandQueue extends QueueAdapter
     static
     {
         RabbitBergamotCommandQueue.register();
+        HCQBergamotCommandQueue.register();
     }
     
     public static BergamotCommandQueue open()

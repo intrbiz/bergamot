@@ -40,6 +40,8 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     
     private List<SLACfg> slas = new LinkedList<SLACfg>();
 
+    private NoteCfg note;
+
     public CheckCfg()
     {
         super();
@@ -185,5 +187,17 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     {
         List<TemplatedObjectCfg<?>> r = new LinkedList<TemplatedObjectCfg<?>>();
         return r;
+    }
+
+    @XmlElementRef(type = NoteCfg.class)
+    @ResolveWith(Coalesce.class)
+    public NoteCfg getNote()
+    {
+        return note;
+    }
+
+    public void setNote(NoteCfg note)
+    {
+        this.note = note;
     }
 }

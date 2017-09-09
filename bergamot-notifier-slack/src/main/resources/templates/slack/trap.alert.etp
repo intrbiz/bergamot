@@ -1,5 +1,14 @@
 Alert for trap #{slack_encode(trap.summary)} on the host #{slack_encode(host.summary)} is #{trap.state.status}
-<# slack_message.attachment().color('#55aaff').authorName('Check Output').text(trap.state.output);
-   slack_message.attachment().color('#086bff').authorName('Last checked').text().text(dateformat('HH:mm:ss', trap.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime));
-   slack_message.attachment().color('#2c2c2c').text().link('https://' + site.name + '/trap/id/' + trap.id, 'View trap ' + trap.summary + ' on host ' + host.summary);
+<# slack_message.attachment().color(status_colour(trap.state.status)).authorName('Check Output').text(trap.state.output);
+   slack_message.attachment().color(status_colour(trap.state.status)).authorName('Last checked').text().text(dateformat('HH:mm:ss', trap.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime));
+   slack_message.attachment().color(status_colour(trap.state.status)).authorName('View Check').text().link('https://' + site.name + '/trap/id/' + trap.id, 'View trap ' + trap.summary + ' on host ' + host.summary);
+   if (trap.note != null) {
+     noteText = slack_message.attachment().color(status_colour(trap.state.status)).authorName('Note').text();
+     if (! isempty(trap.note.content)) {
+       noteText.text(trap.note.content).text('\n');
+     }
+     if (! isempty(trap.note.url)) {
+   	   noteText.link(trap.note.url, coalesce(trap.note.title, 'More information'));
+   	 }
+   }
 #>

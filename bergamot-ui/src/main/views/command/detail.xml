@@ -17,6 +17,14 @@
 			    <span class="label">Executor: </span>
 			    <span class="value">#{coalesce(command.executor, '')}</span>
 		    </p>
+			<p>
+			    <span class="label">Category: </span>
+			    <span class="value">#{coalesce(command.category, '')}</span>
+		    </p>
+		    <p>
+			    <span class="label">Application: </span>
+			    <span class="value">#{coalesce(command.application, '')}</span>
+		    </p>
 		</div>
 		<div class="col4 dash_icon">
 			<h4>Description</h4>
@@ -35,7 +43,7 @@
 					<th>Default Value</th>
 					<th>Description</th>
 				</tr>
-				<data-set var="parameter" value="#{command.getParameters()}">
+				<data-set var="parameter" value="#{command.parameters.values()}">
 					<tr>
 						<td>#{parameter.name}</td>
 						<td>#{coalesce(parameter.value, '')}</td>
@@ -44,6 +52,24 @@
 				</data-set>
 			</table>
 		</div>
+	</div>
+	
+	<div class="row" rendered="#{! isempty(command.script)}">
+		<div class="col12 dash_icon">
+			<h4>Script</h4>
+			<pre id="view_script" style="width: 95%; min-height: 800px;">#{command.script}</pre>
+		</div>
+		<!-- ACE text editor -->
+	    <script src="#{public('/js/' + bergamot_js_version() + '/bower_components/ace-builds/src-noconflict/ace.js')}" />
+	    <script type="text/javascript">
+		  <![CDATA[
+			var editor1 = ace.edit("view_script");
+	    	editor1.setTheme("ace/theme/github");
+	    	editor1.getSession().setMode("ace/mode/javascript");
+	    	editor1.setReadOnly(true);
+	    	editor1.getSession().setUseWrapMode(true);
+	      ]]>
+	    </script>
 	</div>
 	
 </fragment>

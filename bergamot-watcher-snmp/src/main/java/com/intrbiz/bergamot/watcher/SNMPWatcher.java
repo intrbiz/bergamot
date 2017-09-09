@@ -11,7 +11,7 @@ public class SNMPWatcher extends DefaultWatcher
 {
     public SNMPWatcher()
     {
-        super(SNMPWatcherCfg.class, "/etc/bergamot/watcher/snmp.xml");
+        super(SNMPWatcherCfg.class, "/etc/bergamot/watcher/snmp.xml", "bergamot-watcher-snmp");
     }
     
     public static void main(String[] args) throws Exception

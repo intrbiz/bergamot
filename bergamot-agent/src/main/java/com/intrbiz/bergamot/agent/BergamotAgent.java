@@ -52,10 +52,12 @@ import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -111,7 +113,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             {
                 System.gc();
                 Runtime rt = Runtime.getRuntime();
-                logger.debug("Memory: " + rt.freeMemory() + " " + rt.totalMemory() + " " + rt.maxMemory());
+                logger.debug("Memory, free: " + rt.freeMemory() + " total: " + rt.totalMemory() + " max: " + rt.maxMemory());
             }
         }, 30000L, 30000L);
         // handlers
@@ -256,6 +258,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
         b.channel(NioSocketChannel.class);
+        b.option(ChannelOption.ALLOCATOR, new UnpooledByteBufAllocator(false));
         b.handler(new ChannelInitializer<SocketChannel>()
         {
             @Override

@@ -21,12 +21,13 @@ public class SSHCheckContext
         this.jsch = new JSch();
     }
     
-    protected void applyDefaultConfiguration(Session session)
+    protected SSHCheckContext applyDefaultConfiguration(Session session)
     {
         session.setConfig("StrictHostKeyChecking", "no");
+        return this;
     }
     
-    public void addIdentity(String privateKeyContents, String publicKeyContents)
+    public SSHCheckContext addIdentity(String privateKeyContents, String publicKeyContents)
     {
         try
         {
@@ -37,19 +38,22 @@ public class SSHCheckContext
         {
             this.onError.accept(new SSHException(e));
         }
+        return this;
     }
     
-    public void setPassword(String password)
+    public SSHCheckContext setPassword(String password)
     {
         this.password = password;
+        return this;
     }
     
-    public void connect(String username, String host, Consumer<SSHSession> onConnected)
+    public SSHCheckContext connect(String username, String host, Consumer<SSHSessionContext> onConnected)
     {
         this.connect(username, host, 22, onConnected);
+        return this;
     }
     
-    public void connect(String username, String host, int port, Consumer<SSHSession> onConnected)
+    public SSHCheckContext connect(String username, String host, int port, Consumer<SSHSessionContext> onConnected)
     {
         try
         {
@@ -63,7 +67,7 @@ public class SSHCheckContext
                     session.setPassword(this.password);
                 }
                 session.connect();
-                onConnected.accept(new SSHSession(this.jsch, session));
+                onConnected.accept(new SSHSessionContext(this.jsch, session));
             }
             finally
             {
@@ -74,5 +78,6 @@ public class SSHCheckContext
         {
             this.onError.accept(t);
         }
+        return this;
     }
 }

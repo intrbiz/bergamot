@@ -19,11 +19,13 @@ public class SlackEngineTest
         SlackEngine slack = new SlackEngine();
         slack.configure(new NotificationEngineCfg());
         // our dummy alert
-        SendAlert alert = loadMessage(SendAlert.class, "alert/service.json");
+        SendAlert alert;
+        SendRecovery recovery;
+        alert = loadMessage(SendAlert.class, "alert/service.json");
         alert.getTo().get(0).getTeams().get(0).addParameter("slack.url", System.getProperty("slack.url"));
         slack.sendNotification(alert);
         // our dummy recovery
-        SendRecovery recovery = loadMessage(SendRecovery.class, "recovery/service.json");
+        recovery = loadMessage(SendRecovery.class, "recovery/service.json");
         recovery.getTo().get(0).getTeams().get(0).addParameter("slack.url", System.getProperty("slack.url"));
         slack.sendNotification(recovery);
         // our dummy alert

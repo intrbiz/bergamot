@@ -1,9 +1,17 @@
 Alert for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}
 
 Check output: #{trap.state.output}
-
+<# if (! isempty(trap.description)) { #>
+#{trap.description}
+<# } #>
 Last checked at #{dateformat('HH:mm:ss', trap.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', trap.state.lastCheckTime)}
 
-For more information: https://#{site.name}/trap/id/#{trap.id}
-
+View trap: https://#{site.name}/trap/id/#{trap.id}
+<# if (trap.note != null) {
+     if (! isempty(trap.note.content)) { #>
+#{trap.note.content}
+<#    } if (! isempty(trap.note.url)) { #>
+#{coalesce(trap.note.title, "Additional information")}: #{trap.note.url}
+<#    }
+   } #>
 Thank you, Bergamot

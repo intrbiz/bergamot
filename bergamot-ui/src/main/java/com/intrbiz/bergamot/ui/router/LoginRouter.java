@@ -19,6 +19,8 @@ import com.intrbiz.balsa.engine.security.method.AuthenticationMethod;
 import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaSecurityException;
 import com.intrbiz.balsa.error.BalsaValidationError;
+import com.intrbiz.balsa.error.http.BalsaBadRequest;
+import com.intrbiz.balsa.error.security.BalsaPrincipalLockout;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.accounting.model.LoginAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -29,6 +31,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.bergamot.ui.security.password.check.BadPassword;
 import com.intrbiz.bergamot.ui.security.password.check.PasswordCheckEngine;
+import com.intrbiz.bergamot.ui.util.RecaptchaUtil;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsBoolean;
@@ -36,6 +39,7 @@ import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.Cookie;
+import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.Order;
@@ -59,7 +63,8 @@ public class LoginRouter extends Router<BergamotApp>
     private Accounting accounting = Accounting.create(LoginRouter.class);
     
     @Get("/login")
-    public void login(@Param("redirect") String redirect, @Cookie("bergamot.auto.login") String autoAuthToken) throws Exception
+    @WithDataAdapter(BergamotDB.class)
+    public void login(BergamotDB db, @Param("redirect") String redirect, @Cookie("bergamot.auto.login") String autoAuthToken) throws Exception
     {
         if (! Util.isEmpty(autoAuthToken))
         {
@@ -74,16 +79,13 @@ public class LoginRouter extends Router<BergamotApp>
                 return;
             }
         }
-        // should we redirect to the first install
-        try (BergamotDB db = BergamotDB.connect())
+        // is this first install?
+        GlobalSetting firstInstall = db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL);
+        if (firstInstall == null)
         {
-            GlobalSetting firstInstall = db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL);
-            if (firstInstall == null)
-            {
-                // redirect to the first install helper
-                redirect("/global/install/");
-                return;
-            }
+            // redirect to the first install helper
+            redirect("/global/install/");
+            return;
         }
         // show the login page
         var("redirect", redirect);
@@ -94,8 +96,35 @@ public class LoginRouter extends Router<BergamotApp>
     @Post("/login")
     @RequireValidAccessTokenForURL()
     @WithDataAdapter(BergamotDB.class)
-    public void doLogin(BergamotDB db, @Param("username") String username, @Param("password") String password, @Param("redirect") String redirect, @Param("remember_me") @AsBoolean(defaultValue = false, coalesce = CoalesceMode.ALWAYS) Boolean rememberMe) throws Exception
+    public void doLogin(BergamotDB db, 
+            @Param("username") String username, 
+            @Param("password") String password, 
+            @Param("redirect") String redirect, 
+            @Param("remember_me") @AsBoolean(defaultValue = false, coalesce = CoalesceMode.ALWAYS) Boolean rememberMe, 
+            @Param("g-recaptcha-response") String recaptchaResponse
+    ) throws Exception
     {
+        // get recaptcha settings
+        Site site = var("site", db.getSiteByName(request().getServerName()));
+        require(site != null, new BalsaBadRequest("Bad Site"));
+        String recaptchaSiteKey = var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+        String recaptchaSecretKey = site.getParameter("recaptcha-secret-key");
+        // validate captcha
+        if (! Util.isEmpty(recaptchaSiteKey))
+        {
+            // lookup the contact and assert if we require a captcha
+            Contact theContact = db.getContactByNameOrEmail(site.getId(), username);
+            require(theContact != null);
+            // does this contact have any failed logins which forces a CAPTCHA
+            if (theContact.getAuthFails() > 0)
+            {
+                // verify the captcha
+                if (Util.isEmpty(recaptchaResponse))
+                    throw new BalsaValidationError("reCAPTCHA response required");
+                require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
+            }
+        }
+        // process login
         logger.info("Login: " + username);
         AuthenticationResponse authResp = authenticate(new PasswordCredentials.Simple(username, password));
         // set a cookie of the username, to remember the user
@@ -135,6 +164,9 @@ public class LoginRouter extends Router<BergamotApp>
             // do we need to force a password change
             if (contact.isForcePasswordChange())
             {
+                // setup recaptcha
+                Site site = var("site", contact.getSite());
+                var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
                 var("redirect", redirect);
                 var("forced", true);
                 encode("login/force_change_password");
@@ -200,6 +232,10 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireAuthenticating()
     public void startBackupCodeAuthentication() throws Exception
     {
+        Contact contact = authenticationState().authenticatingPrincipal();
+        // setup recaptcha
+        Site site = var("site", contact.getSite());
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
         encode("login/backup_code_authenticate");
     }
     
@@ -207,8 +243,25 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireAuthenticating()
     @RequireValidAccessTokenForURL()
     @WithDataAdapter(BergamotDB.class)
-    public void finishBackupCodeAuthentication(BergamotDB db, @Param("code") String code) throws Exception
+    public void finishBackupCodeAuthentication(
+            BergamotDB db, 
+            @Param("code") String code,
+            @Param("g-recaptcha-response") String recaptchaResponse
+    ) throws Exception
     {
+        Contact contact = authenticationState().authenticatingPrincipal();
+        // get recaptcha settings
+        Site site = contact.getSite();
+        String recaptchaSiteKey = var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+        String recaptchaSecretKey = site.getParameter("recaptcha-secret-key");
+        // validate captcha
+        if (! Util.isEmpty(recaptchaSiteKey))
+        {
+            if (Util.isEmpty(recaptchaResponse))
+                throw new BalsaValidationError("reCAPTCHA response required");
+            require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
+        }
+        // process the 2nd factor authentication
         AuthenticationResponse authResp = authenticate(new BackupCodeCredentials.Simple(code));
         this.completeLogin(authResp, path("/profile/"));
     }
@@ -221,6 +274,10 @@ public class LoginRouter extends Router<BergamotApp>
     @RequireValidAccessTokenForURL()
     public void finishBackupCodeAuthenticationError(@Param("redirect") String redirect) throws Exception
     {
+        Contact contact = authenticationState().authenticatingPrincipal();
+        // setup recaptcha
+        Site site = var("site", contact.getSite());
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
         // error during backup code
         var("failed", true);
         encode("login/backup_code_authenticate");
@@ -256,8 +313,12 @@ public class LoginRouter extends Router<BergamotApp>
     
     @Get("/change-password")
     @RequirePrincipal()
-    public void changePassword(@Param("redirect") String redirect)
+    public void changePassword(@Param("redirect") String redirect, @CurrentPrincipal Contact contact)
     {
+        // setup recaptcha
+        Site site = var("site", contact.getSite());
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+        //
         var("redirect", redirect);
         var("forced", false);
         encode("login/force_change_password");
@@ -266,8 +327,27 @@ public class LoginRouter extends Router<BergamotApp>
     @Post("/force-change-password")
     @RequirePrincipal()
     @RequireValidAccessTokenForURL()
-    public void changePassword(@Param("password") @CheckStringLength(mandatory = true, min = 8) String password, @Param("confirm_password") @CheckStringLength(mandatory = true, min = 8) String confirmPassword, @Param("redirect") String redirect) throws IOException
+    public void changePassword(
+            @Param("password") @CheckStringLength(mandatory = true, min = 8) String password, 
+            @Param("confirm_password") @CheckStringLength(mandatory = true, min = 8) String confirmPassword, 
+            @Param("redirect") String redirect,
+            @Param("g-recaptcha-response") String recaptchaResponse
+    ) throws IOException
     {
+        // get recaptcha settings
+        Contact contact = currentPrincipal();
+        Site site = var("site", contact.getSite());
+        require(site != null, new BalsaBadRequest("Bad Site"));
+        String recaptchaSiteKey = var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+        String recaptchaSecretKey = site.getParameter("recaptcha-secret-key");
+        // validate captcha
+        if (! Util.isEmpty(recaptchaSiteKey))
+        {
+            if (Util.isEmpty(recaptchaResponse))
+                throw new BalsaValidationError("reCAPTCHA response required");
+            require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
+        }
+        // change the password
         try
         {
             // verify the password == confirm_password
@@ -275,7 +355,6 @@ public class LoginRouter extends Router<BergamotApp>
             // enforce the default password policy
             PasswordCheckEngine.getDefaultInstance().check(password);
             // update the password
-            Contact contact = currentPrincipal();
             logger.info("Processing password change for " + contact.getEmail() + " => " + contact.getSiteId() + "::" + contact.getId());
             try (BergamotDB db = BergamotDB.connect())
             {
@@ -307,6 +386,11 @@ public class LoginRouter extends Router<BergamotApp>
         var("redirect", redirect);
         var("forced", true);
         var("error", "validation");
+        // setup the recaptcha
+        Contact contact = var("contact", currentPrincipal());
+        Site site = var("site", contact.getSite());
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+        //
         encode("login/force_change_password");
     }
 
@@ -353,23 +437,37 @@ public class LoginRouter extends Router<BergamotApp>
         }
         // setup the session
         logger.info("Successfully authenticated password reset for user: " + contact.getName() + " => " + contact.getSiteId() + "::" + contact.getId());
-        // setup the session
-        sessionVar("contact", currentPrincipal());
-        sessionVar("site", contact.getSite());
+        // setup the recaptcha
+        var("contact", currentPrincipal());
+        Site site = var("site", contact.getSite());
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
         // force password change
         var("forced", true);
         encode("login/force_change_password");
     }
     
+    @Catch(BalsaPrincipalLockout.class)
+    @Order(-10)
+    @Any("/**")
+    public void lockoutError()
+    {
+        encode("login/locked");
+    }
+    
     @Catch(BalsaSecurityException.class)
-    @Order()
+    @Order(10)
     @Post("/login")
-    public void loginError(@Param("username") String username, @Param("redirect") String redirect)
+    @WithDataAdapter(BergamotDB.class)
+    public void loginError(BergamotDB db, @Param("username") String username, @Param("redirect") String redirect)
     {
         // error during login
         var("error", "invalid");
         var("redirect", redirect);
         var("username", cookie("bergamot.username"));
+        // setup recaptcha
+        Site site = var("site", db.getSiteByName(request().getServerName()));
+        require(site != null, new BalsaBadRequest("Bad Site"));
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
         // account this invalid login
         this.accounting.account(new LoginAccountingEvent(null, null, request().getServerName(), username, balsa().session().id(), false, false, request().getRemoteAddress()));
         // encode login page
@@ -386,8 +484,14 @@ public class LoginRouter extends Router<BergamotApp>
     }
     
     @Get("/reset-password")
-    public void resetPassword(@Param("username") String username) throws IOException
+    @WithDataAdapter(BergamotDB.class)
+    public void resetPassword(BergamotDB db, @Param("username") String username) throws IOException
     {
+        // setup recaptcha
+        Site site = var("site", db.getSiteByName(request().getServerName()));
+        require(site != null, new BalsaBadRequest("Bad Site"));
+        var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+        // be nice about username
         var("username", Util.coalesceEmpty(username, cookie("bergamot.username"), null));
         encode("login/reset_password");
     }
@@ -395,12 +499,27 @@ public class LoginRouter extends Router<BergamotApp>
     @Post("/reset-password")
     @RequireValidAccessTokenForURL()
     @WithDataAdapter(BergamotDB.class)
-    public void doResetPassword(BergamotDB db, @Param("username") String username) throws IOException
+    public void doResetPassword(
+            BergamotDB db, 
+            @Param("username") String username,
+            @Param("g-recaptcha-response") String recaptchaResponse
+    ) throws IOException
     {
         // lookup the site
         Site site = db.getSiteByName(request().getServerName());
         if (site != null)
-        {
+        {   
+            // get recaptcha settings
+            require(site != null, new BalsaBadRequest("Bad Site"));
+            String recaptchaSiteKey = var("recaptchaSiteKey", site.getParameter("recaptcha-site-key"));
+            String recaptchaSecretKey = site.getParameter("recaptcha-secret-key");
+            // validate captcha
+            if (! Util.isEmpty(recaptchaSiteKey))
+            {
+                if (Util.isEmpty(recaptchaResponse))
+                    throw new BalsaValidationError("reCAPTCHA response required");
+                require(RecaptchaUtil.verify(request().getServerName(), recaptchaSecretKey, recaptchaResponse, null));
+            }
             // lookup the contact
             Contact contact = db.getContactByNameOrEmail(site.getId(), username);
             if (contact != null)

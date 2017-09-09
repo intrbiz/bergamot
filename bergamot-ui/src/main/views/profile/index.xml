@@ -114,14 +114,14 @@
 	        <p class="text-body" rendered="#{currentPrincipal.isTwoFactorConfigured()}">
 	        	You currently have two factor authentication enabled :)
 	        </p>
-	        <p class="text-body" rendered="#{balsa.authenticationInfo().secondaryAuthenticationMethodName() == 'u2f'}">
-	        	You logged in using your #{balsa.authenticationInfo().secondaryAuthenticationMethodDetail().u2fDevice.summary}, a #{coalesce(balsa.authenticationInfo().secondaryAuthenticationMethodDetail().u2fDevice.device, 'Unknown')} Security Key.
+	        <p class="text-body" rendered="#{authenticationInfo.secondaryAuthenticationMethodName() == 'u2f'}">
+	        	You logged in using your #{authenticationInfo.secondaryAuthenticationMethodDetail().u2fDevice.summary}, a #{coalesce(authenticationInfo.secondaryAuthenticationMethodDetail().u2fDevice.device, 'Unknown')} Security Key.
 	        </p>
-	        <p class="text-body" rendered="#{balsa.authenticationInfo().secondaryAuthenticationMethodName() == 'hotp'}">
-	        	You logged in using Google Authenticator running on #{balsa.authenticationInfo().secondaryAuthenticationMethodDetail().hotp.summary}.
+	        <p class="text-body" rendered="#{authenticationInfo.secondaryAuthenticationMethodName() == 'hotp'}">
+	        	You logged in using Google Authenticator running on #{authenticationInfo.secondaryAuthenticationMethodDetail().hotp.summary}.
 	        </p>
-	        <p class="text-body" rendered="#{balsa.authenticationInfo().secondaryAuthenticationMethodName() == 'backup_code'}">
-	        	You logged in using the backup code <code>#{balsa.authenticationInfo().secondaryAuthenticationMethodDetail().backupCode}</code>.  Please register a new second factor authentication method. 
+	        <p class="text-body" rendered="#{authenticationInfo.secondaryAuthenticationMethodName() == 'backup_code'}">
+	        	You logged in using the backup code <code>#{authenticationInfo.secondaryAuthenticationMethodDetail().backupCode}</code>.  Please register a new second factor authentication method. 
 	        </p>
         </div>
     </div>
@@ -278,7 +278,7 @@
     	</div>
     </div>
     
-    <div class="row" rendered="#{backupCode == null}">
+    <div class="row" rendered="#{! authenticationInfo.isBackupCodeUsed()}">
     	<h3>Backup Codes</h3>
     	<div class="col12">
 	    	<p class="text-body">

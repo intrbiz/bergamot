@@ -6,7 +6,7 @@
 			<div class="col12">
 				<p class="field area">
 					<label style="display: none;" for="change_configuration">Configuration</label>
-					<pre id="change_configuration" style="width: 95%; min-height: 400px;">#{if(error == null, change.configuration.toString(), bad_configuration)}</pre>
+					<pre id="change_configuration" style="width: 95%; min-height: 750px;">#{if(error == null, change.configuration.toString(), bad_configuration)}</pre>
 					<input type="hidden" name="change_configuration" id="change_configuration_hidden"/>
 					<div class="error" rendered="#{error != null}">
 						<p>An error was detected in the above configuration:</p>
@@ -564,7 +564,7 @@
 					for (filter in this.attr_filters)
 					{
 						console.log("Trying filter: " + filter);
-						if (line.contains('<' + filter))
+						if (line.indexOf('<' + filter) !== -1)
 						{
 							attrs = this.attr_filters[filter];
 							break;

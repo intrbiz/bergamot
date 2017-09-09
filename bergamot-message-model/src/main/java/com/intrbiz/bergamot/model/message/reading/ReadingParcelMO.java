@@ -146,7 +146,8 @@ public class ReadingParcelMO extends Message implements MatchableMO, Parameteris
     @JsonIgnore
     public ReadingParcelMO reading(Reading reading)
     {
-        this.getReadings().add(reading);
+        if (reading != null)
+            this.getReadings().add(reading);
         return this;
     }
     

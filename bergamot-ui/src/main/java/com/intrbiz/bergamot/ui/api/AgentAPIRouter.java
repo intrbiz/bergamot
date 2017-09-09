@@ -29,9 +29,14 @@ import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
+import com.intrbiz.metadata.doc.Desc;
+import com.intrbiz.metadata.doc.Title;
 
 
-
+@Title("Agent API Methods")
+@Desc({
+    "The Bergamot Agent runs on servers and allows checks to be run locally on a host."
+})
 @Prefix("/api/agent")
 @RequireValidPrincipal()
 @RequirePermission("api.sign.agent")
@@ -41,6 +46,10 @@ public class AgentAPIRouter extends Router<BergamotApp>
     /**
      * Sign an agent certificate request
      */
+    @Title("Sign agent")
+    @Desc({
+        "Sign a Bergamot Agent certificate request by the site certificate authority.  This will return a certificate which can then be installed on the corresponding host."
+    })
     @Any("/sign-agent")
     @JSON
     @WithDataAdapter(BergamotDB.class)
@@ -76,6 +85,10 @@ public class AgentAPIRouter extends Router<BergamotApp>
     /**
      * Sign an agent key
      */
+    @Title("Sign agent key")
+    @Desc({
+        "Sign a Bergamot Agent public key generating a certificate with the given common name.  The resulting certificate can be installed on the corresponding host."
+    })
     @Any("/sign-agent-key")
     @JSON
     @WithDataAdapter(BergamotDB.class)
@@ -112,6 +125,10 @@ public class AgentAPIRouter extends Router<BergamotApp>
     /**
      * Revoke an agent certificate
      */
+    @Title("Revoke agent")
+    @Desc({
+        "Revoke the agent identified by the given UUID."
+    })
     @Any("/revoke-agent")   
     @JSON
     @WithDataAdapter(BergamotDB.class)
