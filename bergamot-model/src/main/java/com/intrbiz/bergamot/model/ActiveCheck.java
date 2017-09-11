@@ -222,7 +222,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         // configured parameters
         for (Parameter parameter : checkCommand.resolveCheckParameters().values())
         {
-            if (parameter != null)
+            if (parameter != null && parameter.getValue() != null)
             {
                 try
                 {
