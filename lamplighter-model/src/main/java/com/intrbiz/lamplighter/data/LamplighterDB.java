@@ -158,11 +158,9 @@ public abstract class LamplighterDB extends DatabaseAdapter
     @SQLGetter(table = CheckReading.class, name = "get_check_reading", since = @SQLVersion({1, 0, 0}))
     public abstract CheckReading getCheckReading(@SQLParam("id") UUID id);
     
-    @Cacheable
     @SQLGetter(table = CheckReading.class, name ="get_check_reading_by_name", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder("name"))
     public abstract CheckReading getCheckReadingByName(@SQLParam("check_id") UUID checkId, @SQLParam("name") String name);
     
-    @Cacheable
     @SQLGetter(table = CheckReading.class, name ="get_check_readings_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder("name"))
     public abstract List<CheckReading> getCheckReadingsForCheck(@SQLParam("check_id") UUID checkId);
     
@@ -199,6 +197,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID readingId = Site.randomId(siteId);
             // setup
             this.setupDoubleGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit, pollInterval);
+            this.commit();
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
@@ -244,6 +243,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID readingId = Site.randomId(siteId);
             // setup
             this.setupLongGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit, pollInterval);
+            this.commit();
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
@@ -289,6 +289,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID readingId = Site.randomId(siteId);
             // setup
             this.setupIntGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit, pollInterval);
+            this.commit();
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
@@ -334,6 +335,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             UUID readingId = Site.randomId(siteId);
             // setup
             this.setupFloatGaugeReading(siteId, readingId, checkId, name, nameToSummary(name), null, unit, pollInterval);
+            this.commit();
             // get the metadata
             reading = this.getCheckReading(readingId);
         }
