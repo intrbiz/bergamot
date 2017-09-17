@@ -93,10 +93,7 @@ import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
 import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
-import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
-import com.intrbiz.bergamot.model.message.health.HealthCheckKill;
-import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.model.message.importer.BergamotImportReportMO;
 import com.intrbiz.bergamot.model.message.notification.BackupCodeUsed;
@@ -266,10 +263,7 @@ public class BergamotTranscoder
         VerifiedCommand.class,
         // heathchecks
         HealthCheckJoin.class,
-        HealthCheckHeartbeat.class,
         HealthCheckUnjoin.class,
-        HealthCheckRequestJoin.class,
-        HealthCheckKill.class,
         // commands
         RegisterBergamotAgent.class,
         RegisteredBergamotAgent.class,

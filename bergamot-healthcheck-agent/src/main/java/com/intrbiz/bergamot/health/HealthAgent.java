@@ -1,30 +1,20 @@
 package com.intrbiz.bergamot.health;
 
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
-import com.intrbiz.bergamot.model.message.health.HealthCheckKill;
 import com.intrbiz.bergamot.model.message.health.HealthCheckMessage;
-import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.queue.HealthCheckQueue;
 import com.intrbiz.gerald.polyakov.Node;
-import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.Producer;
-import com.intrbiz.queue.name.NullKey;
 
 public final class HealthAgent
-{
-    private static final Logger logger = Logger.getLogger(HealthAgent.class);
-    
+{    
     private static final HealthAgent US = new HealthAgent();
     
     public static HealthAgent getInstance()
@@ -37,8 +27,6 @@ public final class HealthAgent
     private final UUID runtimeId = UUID.randomUUID();
     
     private String daemonName;
-    
-    private final AtomicLong heartbeatSequence = new AtomicLong();
     
     private volatile boolean inited = false;
     
@@ -53,9 +41,6 @@ public final class HealthAgent
     private HealthCheckQueue queue;
     
     private Producer<HealthCheckMessage> healthcheckProducer;
-    
-    @SuppressWarnings("unused")
-    private Consumer<HealthCheckMessage, NullKey> healthcheckConsumer;
     
     private Timer timer;
     
@@ -81,8 +66,6 @@ public final class HealthAgent
                 this.setupQueues();
                 // setup shutdown hook
                 this.setupShutdownHook();
-                // send join
-                this.joinHealthCheckCluster();
                 // setup timer
                 this.setupTimer();
             }
@@ -131,16 +114,10 @@ public final class HealthAgent
         return this.startedAt;
     }
     
-    long nextHeartbeatSequence()
-    {
-        return this.heartbeatSequence.getAndIncrement();
-    }
-    
     private void setupQueues()
     {
         this.queue = HealthCheckQueue.open();
         this.healthcheckProducer = this.queue.publishHealthCheckEvents();
-        this.healthcheckConsumer = this.queue.consumeHealthCheckControlEvents(this::handleHealthCheckMessage);
     }
     
     private void setupTimer()
@@ -161,7 +138,7 @@ public final class HealthAgent
                 }
             }
         }, 
-        5_000L, 5_000L);
+        30_000L, 30_000L);
     }
     
     private void setupShutdownHook()
@@ -175,19 +152,6 @@ public final class HealthAgent
         });
     }
     
-    private void joinHealthCheckCluster()
-    {
-        try
-        {
-            // send a join message
-            this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.runtimeId, this.daemonKind, this.daemonName, this.startedAt, this.hostId, this.hostName));
-        }
-        catch (Exception e)
-        {
-            logger.warn("Failed to join health check");
-        }
-    }
-    
     private void unjoinHealthCheckCluster()
     {
         // send a join message
@@ -196,33 +160,7 @@ public final class HealthAgent
     
     private void sendHeartbeat()
     {
-        this.healthcheckProducer.publish(new HealthCheckHeartbeat(this.instanceId, System.currentTimeMillis(), this.nextHeartbeatSequence()));
-    }
-    
-    private void handleHealthCheckMessage(Map<String, Object> headers, HealthCheckMessage message)
-    {
-        if (message instanceof HealthCheckRequestJoin)
-        {
-            this.joinHealthCheckCluster();
-        }
-        else if (message instanceof HealthCheckKill)
-        {
-            this.commitSeppuku((HealthCheckKill) message);
-        }
-    }
-    
-    private void commitSeppuku(HealthCheckKill message)
-    {
-        if (this.instanceId.equals(message.getInstanceId()) && this.runtimeId.equals(message.getRuntimeId()))
-        {
-            String password = Util.coalesceEmpty(System.getProperty("bergamot.health.password"), System.getenv("bergamot.health.password"));
-            if ((! Util.isEmpty(password)) && message.getPassword() != null && message.getPassword().equals(password))
-            {
-                Logger.getLogger(HealthAgent.class).fatal("Received request to terminate via health check, exiting immediately");
-                System.err.println("Received request to terminate via health check, exiting immediately");
-                System.exit(-1);
-            }
-        }
+        this.healthcheckProducer.publish(new HealthCheckJoin(this.instanceId, this.runtimeId, this.daemonKind, this.daemonName, this.startedAt, this.hostId, this.hostName));
     }
     
     public static final UUID computeInstanceId()
