@@ -58,7 +58,7 @@ public class RabbitHealthCheckQueue extends HealthCheckQueue
     @Override
     public Consumer<HealthCheckMessage, NullKey> consumeHealthCheckEvents(DeliveryHandler<HealthCheckMessage> handler)
     {
-        return new RabbitConsumer<HealthCheckMessage, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(HealthCheckMessage.class), handler, this.source.getRegistry().timer("consume-health-checks"))
+        return new RabbitConsumer<HealthCheckMessage, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(HealthCheckMessage.class), handler, this.source.getRegistry().timer("consume-health-checks"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {

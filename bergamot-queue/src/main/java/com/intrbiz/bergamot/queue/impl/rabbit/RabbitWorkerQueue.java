@@ -277,7 +277,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ReadingParcelMO, ReadingKey> consumeReadings(DeliveryHandler<ReadingParcelMO> handler, String instance)
     {
-        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-reading"))
+        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-reading"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -313,7 +313,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ReadingParcelMO, ReadingKey> consumeFallbackReadings(DeliveryHandler<ReadingParcelMO> handler)
     {
-        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-fallback-reading"))
+        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-fallback-reading"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -344,7 +344,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ResultMO, AdhocResultKey> consumeAdhocResults(UUID adhocId, DeliveryHandler<ResultMO> handler)
     {
-        return new RabbitConsumer<ResultMO, AdhocResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"))
+        return new RabbitConsumer<ResultMO, AdhocResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
