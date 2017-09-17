@@ -54,19 +54,6 @@ public class RabbitHealthCheckQueue extends HealthCheckQueue
             }
         };
     }
-    
-    @Override
-    public Producer<HealthCheckMessage> publishHealthCheckControlEvents()
-    {
-        return new RabbitProducer<HealthCheckMessage, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(HealthCheckMessage.class), new NullKey(), this.source.getRegistry().timer("publish-health-checks"))
-        {
-            protected String setupExchange(Channel on) throws IOException
-            {
-                on.exchangeDeclare("bergamot.health.control", "fanout", true);
-                return "bergamot.health.control";
-            }
-        };
-    }
 
     @Override
     public Consumer<HealthCheckMessage, NullKey> consumeHealthCheckEvents(DeliveryHandler<HealthCheckMessage> handler)
@@ -78,21 +65,6 @@ public class RabbitHealthCheckQueue extends HealthCheckQueue
                 String queueName = on.queueDeclare().getQueue();
                 on.exchangeDeclare("bergamot.health.event", "fanout", true);
                 on.queueBind(queueName, "bergamot.health.event", "");
-                return queueName;
-            }
-        };
-    }
-    
-    @Override
-    public Consumer<HealthCheckMessage, NullKey> consumeHealthCheckControlEvents(DeliveryHandler<HealthCheckMessage> handler)
-    {
-        return new RabbitConsumer<HealthCheckMessage, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(HealthCheckMessage.class), handler, this.source.getRegistry().timer("consume-health-checks"))
-        {
-            public String setupQueue(Channel on) throws IOException
-            {
-                String queueName = on.queueDeclare().getQueue();
-                on.exchangeDeclare("bergamot.health.control", "fanout", true);
-                on.queueBind(queueName, "bergamot.health.control", "");
                 return queueName;
             }
         };
