@@ -265,5 +265,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
             this.retryInterval    = resolvedConfiguration.getSchedule().getRetryEveryTimeInterval(TimeInterval.minutes(1)).toMillis();
             this.changingInterval = resolvedConfiguration.getSchedule().getChangingEveryTimeInterval(resolvedConfiguration.getSchedule().getRetryEveryTimeInterval(TimeInterval.minutes(1))).toMillis();
         }
+        // worker pool
+        this.workerPool = resolvedConfiguration.getWorkerPool();
     }
 }
