@@ -116,7 +116,7 @@ public class RabbitWorkerQueue extends WorkerQueue
                 {
                     on.exchangeDeclare("bergamot.check.worker_pool.default." + workerPool, "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
                     // bind the worker pool to default site exchange
-                    on.exchangeBind("bergamot.check.site.default", "bergamot.check.worker_pool.default." + workerPool, "*." + workerPool + ".*.*");
+                    on.exchangeBind("bergamot.check.worker_pool.default." + workerPool, "bergamot.check.site.default", "*." + workerPool + ".*.*");
                 }
                 // specific exchanges
                 if (site != null && workerPool != null)
