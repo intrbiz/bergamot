@@ -16,7 +16,7 @@ CREATE ROLE bergamot_monitoring NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NORE
 CREATE SCHEMA bergamot_monitoring AUTHORIZATION postgres;
 
 GRANT  USAGE ON SCHEMA bergamot_monitoring TO bergamot_monitoring;
-REVOKE USAGE ON SCHEMA bergamot_monitoring TO public;
+REVOKE USAGE ON SCHEMA bergamot_monitoring FROM public;
 
 -- Replication Lag
 
