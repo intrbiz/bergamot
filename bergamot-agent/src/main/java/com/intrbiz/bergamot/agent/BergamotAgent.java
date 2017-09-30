@@ -39,6 +39,7 @@ import com.intrbiz.bergamot.agent.handler.DiskIOHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ExecHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
+import com.intrbiz.bergamot.agent.handler.MetricsHandler;
 import com.intrbiz.bergamot.agent.handler.NetConInfoHandler;
 import com.intrbiz.bergamot.agent.handler.NetIOHandler;
 import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
@@ -146,6 +147,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new AgentInfoHandler());
         this.registerHandler(new NetIOHandler());
         this.registerHandler(new DiskIOHandler());
+        this.registerHandler(new MetricsHandler());
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

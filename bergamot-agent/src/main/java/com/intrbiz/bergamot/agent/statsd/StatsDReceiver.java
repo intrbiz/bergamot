@@ -147,13 +147,18 @@ public class StatsDReceiver implements Runnable
                     }
                 }
                 // consume the metric
-                this.consumer.processMetric(new StatsDMetric(((InetSocketAddress) from).getAddress().getHostAddress(), metricName, metricValue, metricType, sampleRate));
+                this.consumer.processMetric(new StatsDMetric(getSourceName(from), metricName, metricValue, metricType, sampleRate));
             }
         }
         catch (Exception e)
         {
             logger.warn("Error parsing StatsD metric", e);
         }
+    }
+    
+    private String getSourceName(SocketAddress from)
+    {
+        return ((InetSocketAddress) from).getAddress().getHostAddress().replace('.', '-');
     }
     
     public void shutdown()
