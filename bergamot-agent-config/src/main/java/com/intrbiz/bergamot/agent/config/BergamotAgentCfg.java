@@ -24,6 +24,8 @@ public class BergamotAgentCfg extends Configuration
     private String key;
 
     private String certificate;
+    
+    private int statsDPort = 8125;
 
     public BergamotAgentCfg()
     {
@@ -103,6 +105,17 @@ public class BergamotAgentCfg extends Configuration
     public void setServer(String server)
     {
         this.server = server;
+    }
+
+    @XmlAttribute(name = "statsd-port")
+    public int getStatsDPort()
+    {
+        return statsDPort;
+    }
+
+    public void setStatsDPort(int statsDPort)
+    {
+        this.statsDPort = statsDPort;
     }
 
     private static String trim(String in)
