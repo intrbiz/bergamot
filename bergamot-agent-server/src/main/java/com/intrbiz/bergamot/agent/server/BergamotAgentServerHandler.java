@@ -9,6 +9,7 @@ import java.net.SocketAddress;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -22,6 +23,19 @@ import com.intrbiz.bergamot.crypto.util.CertInfo;
 import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.agent.check.CheckAgent;
+import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
+import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
+import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
+import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
+import com.intrbiz.bergamot.model.message.agent.check.CheckMetrics;
+import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
+import com.intrbiz.bergamot.model.message.agent.check.CheckNetIO;
+import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
+import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
+import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
+import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
+import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
@@ -31,6 +45,7 @@ import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFa
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationMessage;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequest;
 import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequired;
+import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -159,6 +174,84 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     {
         this.sendMessageToAgent(new AgentPing(UUID.randomUUID().toString(), System.currentTimeMillis()), (message) -> onPong.accept(System.currentTimeMillis() - ((AgentPong) message).getTimestamp()) );
     }
+    
+    //
+    
+    public void checkAgent(Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckAgent(), onResponse);
+    }
+    
+    public void checkCPU(Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckCPU(), onResponse);
+    }
+    
+    public void checkDisk(Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckDisk(), onResponse);
+    }
+    
+    public void checkDiskIO(List<String> devices, Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckDiskIO(devices), onResponse);
+    }
+    
+    public void checkMem(Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckMem(), onResponse);
+    }
+    
+    public void checkMetrics(String metricNameFilter, boolean stripSourceFromMericName, Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckMetrics(metricNameFilter, stripSourceFromMericName), onResponse);
+    }
+    
+    public void execNagiosCheck(String name, String commandLine, Consumer<AgentMessage> onResponse)
+    {
+        ExecCheck check = new ExecCheck();
+        check.setName(name);
+        check.setEngine("nagios");
+        check.getParameters().add(new Parameter("command_line", commandLine));
+        this.sendMessageToAgent(check, onResponse);
+    }
+    
+    public void execCheck(String engine, String executor, String name, List<Parameter> parameters, Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new ExecCheck(engine, executor, name, parameters), onResponse);
+    }
+    
+    public void checkNetCon(boolean client, boolean server, boolean tcp, boolean udp, boolean unix, boolean raw, int localPort, int remotePort, String localAddress, String remoteAddress, Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckNetCon(client, server, tcp, udp, unix, raw, localPort, remotePort, localAddress, remoteAddress), onResponse);
+    }
+    
+    public void checkNetIO(List<String> interfaces, Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckNetIO(interfaces), onResponse);
+    }
+    
+    public void checkOS(Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckOS(), onResponse);
+    }
+    
+    public void checkProcess(boolean listProcesses, String command, boolean flattenCommand, List<String> arguments, boolean regex, List<String> state, String user, String group, String title, Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckProcess(listProcesses, command, flattenCommand, arguments, regex, state, user, group, title), onResponse);
+    }
+    
+    public void checkUptime(Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckUptime(), onResponse);
+    }
+    
+    public void checkWho(Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new CheckWho(), onResponse);
+    }
+    
+    //
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception

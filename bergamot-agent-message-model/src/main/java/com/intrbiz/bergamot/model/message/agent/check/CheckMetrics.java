@@ -20,6 +20,13 @@ public class CheckMetrics extends AgentMessage
     {
         super();
     }
+    
+    public CheckMetrics(String metricNameFilter, boolean stripSourceFromMetricName)
+    {
+        super();
+        this.metricsNameFilter = metricNameFilter;
+        this.stripSourceFromMetricName = stripSourceFromMetricName;
+    }
 
     public CheckMetrics(AgentMessage message)
     {

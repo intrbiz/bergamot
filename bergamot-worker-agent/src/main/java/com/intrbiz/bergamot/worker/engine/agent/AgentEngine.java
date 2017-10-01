@@ -75,6 +75,7 @@ public class AgentEngine extends AbstractEngine
             this.addExecutor(new DiskIOExecutor());
             this.addExecutor(new LoadExecutor());
             this.addExecutor(new MetricsExecutor());
+            this.addExecutor(new ScriptExecutor());
         }
     }
     
