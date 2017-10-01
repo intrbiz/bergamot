@@ -13,8 +13,8 @@ public class CheckMetrics extends AgentMessage
     @JsonProperty("metric_name_filter")
     private String metricsNameFilter = "#";
     
-    @JsonProperty("strip_source_from_key")
-    private boolean stripSourceFromKey = true;
+    @JsonProperty("strip_source_from_metric_name")
+    private boolean stripSourceFromMetricName = true;
     
     public CheckMetrics()
     {
@@ -41,13 +41,13 @@ public class CheckMetrics extends AgentMessage
         this.metricsNameFilter = metricsNameFilter;
     }
 
-    public boolean isStripSourceFromKey()
+    public boolean isStripSourceFromMetricName()
     {
-        return stripSourceFromKey;
+        return stripSourceFromMetricName;
     }
 
-    public void setStripSourceFromKey(boolean stripSourceFromKey)
+    public void setStripSourceFromMetricName(boolean stripSourceFromMetricName)
     {
-        this.stripSourceFromKey = stripSourceFromKey;
+        this.stripSourceFromMetricName = stripSourceFromMetricName;
     }
 }

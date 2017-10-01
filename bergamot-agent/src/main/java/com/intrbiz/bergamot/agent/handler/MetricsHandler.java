@@ -40,7 +40,7 @@ public class MetricsHandler extends AbstractAgentHandler
             {
                 // strip the host from the key
                 String key = metric.getKey(); 
-                key = metrics.isStripSourceFromKey() ? key.substring(key.indexOf(".") + 1) : key;
+                key = metrics.isStripSourceFromMetricName() ? key.substring(key.indexOf(".") + 1) : key;
                 // does the filter match this key
                 if (filter.matcher(key).matches())
                 {
