@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMetrics;
+import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.MetricsStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
@@ -62,6 +63,13 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
                 long sent = System.nanoTime();
                 agent.sendMessageToAgent(checkMetrics, (response) -> {
                     double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
+                    // error from agent?
+                    if (response instanceof GeneralError)
+                    {
+                        this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(((GeneralError) response).getMessage()));
+                        return;
+                    }
+                    // process the stat
                     MetricsStat stat = (MetricsStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got metrics from agent in " + runtime + "ms: " + stat);
                     // if we have a script execute it otherwise just publish an informational result

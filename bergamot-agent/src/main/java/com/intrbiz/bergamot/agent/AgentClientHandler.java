@@ -144,7 +144,7 @@ public abstract class AgentClientHandler extends SimpleChannelInboundHandler<Obj
                                 }
                                 catch (Exception e)
                                 {
-                                    ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new GeneralError("Failed to process message"))));
+                                    ctx.channel().writeAndFlush(new TextWebSocketFrame(transcoder.encodeAsString(new GeneralError("Failed to process message: " + e.getMessage()))));
                                 }
                             }
                         });

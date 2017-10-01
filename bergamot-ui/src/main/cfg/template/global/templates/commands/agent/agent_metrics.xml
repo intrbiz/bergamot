@@ -3,7 +3,7 @@
     
     <command category="Application" engine="agent" executor="metrics" extends="check_agent" name="check_agent_metrics">
         <parameter description="Remove metrics source from metric name" name="strip_source_from_metric_name">true</parameter>
-        <parameter description="Metric name filter" name="metric_name_filter">#</parameter>
+        <parameter description="Metric name filter" name="metric_name_filter">.*</parameter>
         <summary>Bergamot Agent: Metrics</summary>
         <description>Fetch all metric readings which have been sent to Bergamot Agent</description>
     </command>

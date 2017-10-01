@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 public class CheckMetrics extends AgentMessage
 {
     @JsonProperty("metric_name_filter")
-    private String metricsNameFilter = "#";
+    private String metricsNameFilter = ".*";
     
     @JsonProperty("strip_source_from_metric_name")
     private boolean stripSourceFromMetricName = true;
