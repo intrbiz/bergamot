@@ -109,7 +109,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredDoubleGaugeReading> readings = db.getLatestDoubleGaugeReadings(site.getId(), id, limit);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredDoubleGaugeReading::getValue, StoredDoubleGaugeReading::getWarning, StoredDoubleGaugeReading::getCritical, StoredDoubleGaugeReading::getMin, StoredDoubleGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, DOUBLE_GAUGE_SERIES);
     }
     
     @Title("Get double gauge readings")
@@ -137,7 +137,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredDoubleGaugeReading> readings = db.getDoubleGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredDoubleGaugeReading::getValue, StoredDoubleGaugeReading::getWarning, StoredDoubleGaugeReading::getCritical, StoredDoubleGaugeReading::getMin, StoredDoubleGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, DOUBLE_GAUGE_SERIES);
     }
     
     // float gauge
@@ -163,7 +163,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredFloatGaugeReading> readings = db.getLatestFloatGaugeReadings(site.getId(), id, limit);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredFloatGaugeReading::getValue, StoredFloatGaugeReading::getWarning, StoredFloatGaugeReading::getCritical, StoredFloatGaugeReading::getMin, StoredFloatGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, FLOAT_GAUGE_SERIES);
     }
     
     @Title("Get float gauge readings")
@@ -191,7 +191,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredFloatGaugeReading> readings = db.getFloatGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredFloatGaugeReading::getValue, StoredFloatGaugeReading::getWarning, StoredFloatGaugeReading::getCritical, StoredFloatGaugeReading::getMin, StoredFloatGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, FLOAT_GAUGE_SERIES);
     }
     
     // long gauge
@@ -217,7 +217,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredLongGaugeReading> readings = db.getLatestLongGaugeReadings(site.getId(), id, limit);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredLongGaugeReading::getValue, StoredLongGaugeReading::getWarning, StoredLongGaugeReading::getCritical, StoredLongGaugeReading::getMin, StoredLongGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, LONG_GAUGE_SERIES);
     }
     
     @Title("Get long gauge readings")
@@ -245,7 +245,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredLongGaugeReading> readings = db.getLongGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredLongGaugeReading::getValue, StoredLongGaugeReading::getWarning, StoredLongGaugeReading::getCritical, StoredLongGaugeReading::getMin, StoredLongGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, LONG_GAUGE_SERIES);
     }
     
     // int gauge
@@ -271,7 +271,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredIntGaugeReading> readings = db.getLatestIntGaugeReadings(site.getId(), id, limit);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredIntGaugeReading::getValue, StoredIntGaugeReading::getWarning, StoredIntGaugeReading::getCritical, StoredIntGaugeReading::getMin, StoredIntGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, INT_GAUGE_SERIES);
     }
     
     @Title("Get int gauge readings")
@@ -299,7 +299,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredIntGaugeReading> readings = db.getIntGaugeReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeLineChartData(jenny, checkReading, readings, series, StoredIntGaugeReading::getValue, StoredIntGaugeReading::getWarning, StoredIntGaugeReading::getCritical, StoredIntGaugeReading::getMin, StoredIntGaugeReading::getMax);
+        this.writeLineChartData(jenny, checkReading, readings, series, INT_GAUGE_SERIES);
     }
     
     // meter
@@ -325,7 +325,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredMeterReading> readings = db.getLatestMeterReadings(site.getId(), id, limit);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+        this.writeLineChartData(jenny, checkReading, readings, series, METER_SERIES);
     }
     
     @Title("Get meter readings")
@@ -353,7 +353,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredMeterReading> readings = db.getMeterReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+        this.writeLineChartData(jenny, checkReading, readings, series, METER_SERIES);
     }
     
     // timer
@@ -379,7 +379,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredTimerReading> readings = db.getLatestTimerReadings(site.getId(), id, limit);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+        this.writeLineChartData(jenny, checkReading, readings, series, TIMER_SERIES);
     }
     
     @Title("Get timer readings")
@@ -407,25 +407,12 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         List<StoredTimerReading> readings = db.getTimerReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
         // write
         JsonGenerator jenny = response().ok().json().getJsonWriter();
-        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+        this.writeLineChartData(jenny, checkReading, readings, series, TIMER_SERIES);
     }
     
-    // generic
+    // data output methods
     
-    /**
-     * Generically output a line chart JSON data structure
-     * @param jenny the json output stream
-     * @param checkReading the check reading
-     * @param readings the data points
-     * @param series which series to output
-     * @param getValue the value accessor
-     * @param getWarning the warning accessor
-     * @param getCritical the critical accessor
-     * @param getMin the min accessor
-     * @param getMax the max accessor
-     * @throws IOException
-     */
-    private <T extends StoredReading> void writeLineChartData(JsonGenerator jenny, CheckReading checkReading, List<T> readings, String series, Function<T,Object> getValue, Function<T,Object> getWarning, Function<T,Object> getCritical, Function<T,Object> getMin, Function<T,Object> getMax) throws IOException
+    private <T extends StoredReading> void writeLineChartData(JsonGenerator jenny, CheckReading checkReading, List<T> readings, String requestedSeries, Series<T>[] series) throws IOException
     {
         jenny.writeStartObject();
         // title
@@ -442,7 +429,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         jenny.writeStartArray();
         for (T reading : readings)
         {
-            jenny.writeNumber(reading.getCollectedAt().getTime());
+            jenny.writeObject(series[0].accessor.apply(reading));
         }
         jenny.writeEndArray();
         // y sets
@@ -451,87 +438,39 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         // value
         jenny.writeStartObject();
         jenny.writeFieldName("title");
-        jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
+        jenny.writeString(series[0].title);
         jenny.writeFieldName("colour");
-        jenny.writeString("#00BF00");
+        jenny.writeString(series[0].colour);
         jenny.writeFieldName("y");
         jenny.writeStartArray();
         for (T reading : readings)
         {
-            jenny.writeObject(getValue.apply(reading));
+            jenny.writeObject(series[0].accessor.apply(reading));
         }
         jenny.writeEndArray();
         jenny.writeEndObject();
         // optional series
-        if (! (Util.isEmpty(series) || "none".equals(series)))
+        if (! (Util.isEmpty(requestedSeries) || "none".equals(requestedSeries)))
         {
-            // warning
-            if (series.contains("warning"))
+            for (int i = 1; i < series.length; i++)
             {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Warning");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#FFBF00");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (T reading : readings)
+                Series<T> optional = series[i];
+                if (requestedSeries.contains(optional.name))
                 {
-                    jenny.writeObject(getWarning.apply(reading));
+                    jenny.writeStartObject();
+                    jenny.writeFieldName("title");
+                    jenny.writeString(optional.title);
+                    jenny.writeFieldName("colour");
+                    jenny.writeString(optional.colour);
+                    jenny.writeFieldName("y");
+                    jenny.writeStartArray();
+                    for (T reading : readings)
+                    {
+                        jenny.writeObject(optional.accessor.apply(reading));
+                    }
+                    jenny.writeEndArray();
+                    jenny.writeEndObject();
                 }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
-            }
-            // critical
-            if (series.contains("critical"))
-            {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Critical");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#E20800");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (T reading : readings)
-                {
-                    jenny.writeObject(getCritical.apply(reading));
-                }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
-            }
-            // min
-            if (series.contains("min"))
-            {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Min");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#A4C0E4");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (T reading : readings)
-                {
-                    jenny.writeObject(getMin.apply(reading));
-                }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
-            }
-            // max
-            if (series.contains("max"))
-            {
-                jenny.writeStartObject();
-                jenny.writeFieldName("title");
-                jenny.writeString("Max");
-                jenny.writeFieldName("colour");
-                jenny.writeString("#A4C0E4");
-                jenny.writeFieldName("y");
-                jenny.writeStartArray();
-                for (T reading : readings)
-                {
-                    jenny.writeObject(getMax.apply(reading));
-                }
-                jenny.writeEndArray();
-                jenny.writeEndObject();
             }
         }
         // end y sets
@@ -539,45 +478,88 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         jenny.writeEndObject();
     }
     
-    private <T extends StoredReading> void writeMeterLineChartData(JsonGenerator jenny, CheckReading checkReading, List<T> readings, String series, Function<T,Long> getCount) throws IOException
+    private static class Series<T extends StoredReading>
     {
-        jenny.writeStartObject();
-        // title
-        jenny.writeFieldName("title");
-        jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
-        // x-title
-        jenny.writeFieldName("x-title");
-        jenny.writeString("");
-        // y-title
-        jenny.writeFieldName("y-title");
-        jenny.writeString(Util.isEmpty(checkReading.getUnit()) ? "" : checkReading.getUnit());
-        // x
-        jenny.writeFieldName("x");
-        jenny.writeStartArray();
-        for (T reading : readings)
+        public final String name;
+        
+        public final String title;
+        
+        public final String colour;
+        
+        public final Function<T, Number> accessor;
+        
+        public Series(String name, String title, String colour, Function<T, Number> accessor)
         {
-            jenny.writeNumber(reading.getCollectedAt().getTime());
+            this.name = name;
+            this.title = title;
+            this.colour = colour;
+            this.accessor = accessor;
         }
-        jenny.writeEndArray();
-        // y sets
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        // value
-        jenny.writeStartObject();
-        jenny.writeFieldName("title");
-        jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
-        jenny.writeFieldName("colour");
-        jenny.writeString("#00BF00");
-        jenny.writeFieldName("y");
-        jenny.writeStartArray();
-        for (T reading : readings)
+        
+        @SafeVarargs
+        public static <X extends StoredReading> Series<X>[] of(Series<X>... xs)
         {
-            jenny.writeObject(getCount.apply(reading));
+            return xs;
         }
-        jenny.writeEndArray();
-        jenny.writeEndObject();
-        // end y sets
-        jenny.writeEndArray();
-        jenny.writeEndObject();
     }
+    
+    private static final Series<StoredDoubleGaugeReading>[] DOUBLE_GAUGE_SERIES = Series.of(
+            new Series<StoredDoubleGaugeReading>("value", "Value", "#00BF00", (r) -> r.getValue()),
+            new Series<StoredDoubleGaugeReading>("warning", "Warning", "#FFBF00", (r) -> r.getWarning()),
+            new Series<StoredDoubleGaugeReading>("critical", "Critical", "#E20800", (r) -> r.getCritical()),
+            new Series<StoredDoubleGaugeReading>("min", "Min", "#bbb0c4", (r) -> r.getMin()),
+            new Series<StoredDoubleGaugeReading>("max", "Max", "#684a96", (r) -> r.getMax())
+    );
+    
+    private static final Series<StoredFloatGaugeReading>[] FLOAT_GAUGE_SERIES = Series.of(
+            new Series<StoredFloatGaugeReading>("value", "Value", "#00BF00", (r) -> r.getValue()),
+            new Series<StoredFloatGaugeReading>("warning", "Warning", "#FFBF00", (r) -> r.getWarning()),
+            new Series<StoredFloatGaugeReading>("critical", "Critical", "#E20800", (r) -> r.getCritical()),
+            new Series<StoredFloatGaugeReading>("min", "Min", "#bbb0c4", (r) -> r.getMin()),
+            new Series<StoredFloatGaugeReading>("max", "Max", "#684a96", (r) -> r.getMax())
+    );
+    
+    private static final Series<StoredLongGaugeReading>[] LONG_GAUGE_SERIES = Series.of(
+            new Series<StoredLongGaugeReading>("value", "Value", "#00BF00", (r) -> r.getValue()),
+            new Series<StoredLongGaugeReading>("warning", "Warning", "#FFBF00", (r) -> r.getWarning()),
+            new Series<StoredLongGaugeReading>("critical", "Critical", "#E20800", (r) -> r.getCritical()),
+            new Series<StoredLongGaugeReading>("min", "Min", "#bbb0c4", (r) -> r.getMin()),
+            new Series<StoredLongGaugeReading>("max", "Max", "#684a96", (r) -> r.getMax())
+    );
+    
+    private static final Series<StoredIntGaugeReading>[] INT_GAUGE_SERIES = Series.of(
+            new Series<StoredIntGaugeReading>("value", "Value", "#00BF00", (r) -> r.getValue()),
+            new Series<StoredIntGaugeReading>("warning", "Warning", "#FFBF00", (r) -> r.getWarning()),
+            new Series<StoredIntGaugeReading>("critical", "Critical", "#E20800", (r) -> r.getCritical()),
+            new Series<StoredIntGaugeReading>("min", "Min", "#bbb0c4", (r) -> r.getMin()),
+            new Series<StoredIntGaugeReading>("max", "Max", "#684a96", (r) -> r.getMax())
+    );
+    
+    private static final Series<StoredMeterReading>[] METER_SERIES = Series.of(
+            new Series<StoredMeterReading>("mean_rate", "Mean Rate", "#f3c362", (r) -> r.getMeanRate()),
+            new Series<StoredMeterReading>("1_minute_rate", "1 Minute Rate", "#ffee97", (r) -> r.getOneMinuteRate()),
+            new Series<StoredMeterReading>("5_minute_rate", "5 Minute Rate", "#9cea00", (r) -> r.getFiveMinuteRate()),
+            new Series<StoredMeterReading>("15_minute_rate", "15 Minute Rate", "#ff557f", (r) -> r.getFifteenMinuteRate()),
+            new Series<StoredMeterReading>("count", "Count", "#00BF00", (r) -> r.getCount())
+    );
+        
+    private static final Series<StoredTimerReading>[] TIMER_SERIES = Series.of(
+            new Series<StoredTimerReading>("mean", "Mean", "#fe8901", (r) -> r.getMean()),
+            new Series<StoredTimerReading>("count", "Count", "#00BF00", (r) -> r.getCount()),
+            new Series<StoredTimerReading>("mean_rate", "Mean Rate", "#f3c362", (r) -> r.getMeanRate()),
+            new Series<StoredTimerReading>("1_minute_rate", "1 Minute Rate", "#ffee97", (r) -> r.getOneMinuteRate()),
+            new Series<StoredTimerReading>("5_minute_rate", "5 Minute Rate", "#9cea00", (r) -> r.getFiveMinuteRate()),
+            new Series<StoredTimerReading>("15_minute_rate", "15 Minute Rate", "#ff557f", (r) -> r.getFifteenMinuteRate()),
+            new Series<StoredTimerReading>("median", "Median", "#b88855", (r) -> r.getMedian()),
+            new Series<StoredTimerReading>("min", "Min", "#bbb0c4", (r) -> r.getMin()),
+            new Series<StoredTimerReading>("max", "Max", "#684a96", (r) -> r.getMax()),
+            new Series<StoredTimerReading>("std_dev", "Std. Dev.", "#d13477", (r) -> r.getStdDev()),
+            new Series<StoredTimerReading>("75th", "75%", "#009a49", (r) -> r.getThe75thPercentile()),
+            new Series<StoredTimerReading>("95th", "95%", "#a6c67d", (r) -> r.getThe95thPercentile()),
+            new Series<StoredTimerReading>("98th", "98%", "#79c0b5", (r) -> r.getThe98thPercentile()),
+            new Series<StoredTimerReading>("99th", "99%", "#59aec3", (r) -> r.getThe99thPercentile()),
+            new Series<StoredTimerReading>("999th", "99.9%", "#4d68dc", (r) -> r.getThe999thPercentile())
+            
+            
+    );
 }

@@ -57,7 +57,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			$.getJSON(this.getDataURL(reading.reading_id, true), function(data) {
 				line_chart.attachTo("#reading-" + reading.reading_id + "-chart", {
 					/* "width": 1140, */
-					"height": 300,
+					"height": 350,
 					"data": data,
 					"axis-x-sample": function(l) { return Math.floor(l / 4); },
 					"axis-x-formater": function(x) { var d = new Date(x); return d.toLocaleTimeString() + "\n" + d.toLocaleDateString() }
@@ -73,8 +73,31 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
             var series = [];
             if (this.readings[readingId].thresholds)
             {
-                series.push('warning');
-                series.push('critical');
+            	if (this.readings[readingId].reading.reading_type == 'meter_reading')
+        		{
+                    series.push('1_minute_rate');
+                    series.push('5_minute_rate');
+                    series.push('15_minute_rate');
+        		}
+            	else if (this.readings[readingId].reading.reading_type == 'timer_reading')
+        		{
+                    series.push('median');
+                    series.push('min');
+                    series.push('max');
+                    series.push('std_dev');
+                    series.push('75th');
+                    series.push('95th');
+                    series.push('98th');
+                    series.push('99th');
+                    series.push('999th');
+        		}
+            	else
+            	{
+            		series.push('warning');
+            		series.push('critical');
+            		series.push('min');
+                    series.push('max');
+            	}
             }
 			// get the graph url
 			var graphUrl = this.reading_types[this.readings[readingId].reading.reading_type].graph_url;
@@ -203,7 +226,7 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 				this.changeChart(readingId, { "y-starts-at-zero": $(startAtZeroCheck).prop("checked") });
 			}).bind(this));
             // chart thresholds
-			var thresholdsLabel = $.parseHTML('<h6 style="margin-bottom: 5px; padding-left: 4px;">Show thresholds</h6>');
+			var thresholdsLabel = $.parseHTML('<h6 style="margin-bottom: 5px; padding-left: 4px;">Additional data</h6>');
 			$(opts).append(thresholdsLabel);
 			var thresholdsCheck = $.parseHTML([
 				'<input type="checkbox" />'
