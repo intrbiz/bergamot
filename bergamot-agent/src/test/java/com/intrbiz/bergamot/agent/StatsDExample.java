@@ -306,6 +306,11 @@ public class StatsDExample extends TimerTask
             client.gauge("test3", rnd.nextInt(100), 0.99);
             client.decrement("test1");
             client.decrement("test4");
+            client.gauge("test5", rnd.nextInt(100));
+            client.gauge("test6", rnd.nextInt(100));
+            client.gauge("test7", rnd.nextInt(100));
+            client.gauge("test8", rnd.nextInt(100));
+            client.gauge("test9", rnd.nextInt(100));
             client.flush();
             Thread.sleep(500);
         }

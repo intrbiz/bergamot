@@ -15,7 +15,11 @@ BEGIN
     ELSIF (p_reading_type = 'int_gauge_reading') THEN
       PERFORM lamplighter.create_int_gauge_reading(p_site_id, p_reading_id);
     ELSIF (p_reading_type = 'float_gauge_reading') THEN
-      PERFORM lamplighter.create_float_gauge_reading(p_site_id, p_reading_id);      
+      PERFORM lamplighter.create_float_gauge_reading(p_site_id, p_reading_id);
+    ELSIF (p_reading_type = 'meter_reading') THEN
+      PERFORM lamplighter.create_meter_reading(p_site_id, p_reading_id);
+    ELSIF (p_reading_type = 'timer_reading') THEN
+      PERFORM lamplighter.create_timer_reading(p_site_id, p_reading_id);
     ELSE
       RAISE EXCEPTION 'No such reading type: %', p_reading_type;
     END IF;

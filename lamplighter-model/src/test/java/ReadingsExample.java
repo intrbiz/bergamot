@@ -31,10 +31,10 @@ public class ReadingsExample
        UUID readingIdF = Site.randomId(siteId);
        //
        db.setupSiteReadings(siteId);
-       db.setupDoubleGaugeReading(siteId, readingIdD, checkId, "testd", "Test", "", "", 300_000L);
-       db.setupLongGaugeReading(siteId, readingIdL, checkId, "testl", "Test", "", "", 300_000L);
-       db.setupIntGaugeReading(siteId, readingIdI, checkId, "testi", "Test", "", "", 300_000L);
-       db.setupFloatGaugeReading(siteId, readingIdF, checkId, "testf", "Test", "", "", 300_000L);
+       db.getOrSetupDoubleGaugeReading(checkId, "testd", "", 300_000L);
+       db.getOrSetupFloatGaugeReading(checkId, "testf", "", 300_000L);
+       db.getOrSetupLongGaugeReading(checkId, "testl", "", 300_000L);
+       db.getOrSetupIntGaugeReading(checkId, "testi", "", 300_000L);
        System.out.println("Setup reading: " + siteId + "::" + readingIdD + "/" + readingIdL + "/" + readingIdI + "/" + readingIdF);  
        //
        db.execute(() -> {

@@ -15,5 +15,5 @@ public interface ReadingScaler
     /**
      * Scale the given reading
      */
-    Reading scaleReading(Reading reading, String toUnit);
+    <T extends Reading> T scaleReading(T reading, String toUnit);
 }
