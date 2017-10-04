@@ -7,6 +7,8 @@ define(['flight/lib/component', 'lamplighter/lib/chart/line', 'bergamot/lib/api'
 			"float_gauge_reading": { graph_url: 'graph/reading/gauge/float' },
 			"long_gauge_reading": { graph_url: 'graph/reading/gauge/long' },
 			"int_gauge_reading": { graph_url: 'graph/reading/gauge/int' },
+			"meter_reading": { graph_url: 'graph/reading/meter' },
+			"timer_reading": { graph_url: 'graph/reading/timer' }
 		};
 	
 		this.after('initialize', function() {

@@ -22,7 +22,9 @@ import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
 import com.intrbiz.lamplighter.model.StoredFloatGaugeReading;
 import com.intrbiz.lamplighter.model.StoredIntGaugeReading;
 import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
+import com.intrbiz.lamplighter.model.StoredMeterReading;
 import com.intrbiz.lamplighter.model.StoredReading;
+import com.intrbiz.lamplighter.model.StoredTimerReading;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckRegEx;
 import com.intrbiz.metadata.CoalesceMode;
@@ -300,6 +302,114 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         this.writeLineChartData(jenny, checkReading, readings, series, StoredIntGaugeReading::getValue, StoredIntGaugeReading::getWarning, StoredIntGaugeReading::getCritical, StoredIntGaugeReading::getMin, StoredIntGaugeReading::getMax);
     }
     
+    // meter
+    
+    @Title("Latest meter readings")
+    @Desc({
+        "Get the latest readings for a meter."
+    })
+    @Any("/graph/reading/meter/:id/latest/:limit")
+    @RequirePermission("api.read.lamplighter.readings")
+    @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding(ignoreDocs = false)
+    public void getMeterReadings(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId() UUID id, 
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) Integer limit,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredMeterReading> readings = db.getLatestMeterReadings(site.getId(), id, limit);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+    }
+    
+    @Title("Get meter readings")
+    @Desc({
+        "Get meter readings for the given period (from start to end) applying the given aggregation method over the given rollup period.",
+        "For example we can get the 5 minute average using the `avg` aggregation method with rollup period of `300000`."
+    })
+    @Any("/graph/reading/meter/:id/date/:rollup/:agg/:start/:end")
+    @RequirePermission("api.read.lamplighter.readings")
+    @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding(ignoreDocs = false)
+    public void getMeterReadingsByDate(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId() UUID id, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) Long rollup, 
+            @CheckRegEx(value="(avg|sum|min|max)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
+            @IsaLong() Long start,
+            @IsaLong() Long end,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredMeterReading> readings = db.getMeterReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+    }
+    
+    // timer
+    
+    @Title("Latest timer readings")
+    @Desc({
+        "Get the latest readings for a timer."
+    })
+    @Any("/graph/reading/timer/:id/latest/:limit")
+    @RequirePermission("api.read.lamplighter.readings")
+    @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding(ignoreDocs = false)
+    public void getTimerReadings(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId() UUID id, 
+            @IsaInt(min = 1, max = 1000, defaultValue = 100, coalesce = CoalesceMode.ALWAYS) Integer limit,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredTimerReading> readings = db.getLatestTimerReadings(site.getId(), id, limit);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+    }
+    
+    @Title("Get timer readings")
+    @Desc({
+        "Get timer readings for the given period (from start to end) applying the given aggregation method over the given rollup period.",
+        "For example we can get the 5 minute average using the `avg` aggregation method with rollup period of `300000`."
+    })
+    @Any("/graph/reading/timer/:id/date/:rollup/:agg/:start/:end")
+    @RequirePermission("api.read.lamplighter.readings")
+    @WithDataAdapter(LamplighterDB.class)
+    @IgnoreBinding(ignoreDocs = false)
+    public void getTimerReadingsByDate(
+            LamplighterDB db, 
+            @Var("site") Site site, 
+            @IsaObjectId() UUID id, 
+            @IsaLong(mandatory = true, defaultValue = 300_000L, coalesce = CoalesceMode.ALWAYS) Long rollup, 
+            @CheckRegEx(value="(avg|sum|min|max)", mandatory = true, defaultValue = "avg", coalesce = CoalesceMode.ALWAYS) String agg,
+            @IsaLong() Long start,
+            @IsaLong() Long end,
+            @Param("series") String series
+    ) throws IOException
+    {
+        // get the data
+        CheckReading checkReading = db.getCheckReading(id);
+        List<StoredTimerReading> readings = db.getTimerReadingsByDate(checkReading.getSiteId(), checkReading.getId(), new Timestamp(start), new Timestamp(end), rollup, agg);
+        // write
+        JsonGenerator jenny = response().ok().json().getJsonWriter();
+        this.writeMeterLineChartData(jenny, checkReading, readings, series, (r) -> r.getCount());
+    }
+    
     // generic
     
     /**
@@ -424,6 +534,48 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
                 jenny.writeEndObject();
             }
         }
+        // end y sets
+        jenny.writeEndArray();
+        jenny.writeEndObject();
+    }
+    
+    private <T extends StoredReading> void writeMeterLineChartData(JsonGenerator jenny, CheckReading checkReading, List<T> readings, String series, Function<T,Long> getCount) throws IOException
+    {
+        jenny.writeStartObject();
+        // title
+        jenny.writeFieldName("title");
+        jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
+        // x-title
+        jenny.writeFieldName("x-title");
+        jenny.writeString("");
+        // y-title
+        jenny.writeFieldName("y-title");
+        jenny.writeString(Util.isEmpty(checkReading.getUnit()) ? "" : checkReading.getUnit());
+        // x
+        jenny.writeFieldName("x");
+        jenny.writeStartArray();
+        for (T reading : readings)
+        {
+            jenny.writeNumber(reading.getCollectedAt().getTime());
+        }
+        jenny.writeEndArray();
+        // y sets
+        jenny.writeFieldName("y");
+        jenny.writeStartArray();
+        // value
+        jenny.writeStartObject();
+        jenny.writeFieldName("title");
+        jenny.writeString(checkReading.getSummary() + (Util.isEmpty(checkReading.getUnit()) ? "" : " (" + checkReading.getUnit() + ")"));
+        jenny.writeFieldName("colour");
+        jenny.writeString("#00BF00");
+        jenny.writeFieldName("y");
+        jenny.writeStartArray();
+        for (T reading : readings)
+        {
+            jenny.writeObject(getCount.apply(reading));
+        }
+        jenny.writeEndArray();
+        jenny.writeEndObject();
         // end y sets
         jenny.writeEndArray();
         jenny.writeEndObject();
