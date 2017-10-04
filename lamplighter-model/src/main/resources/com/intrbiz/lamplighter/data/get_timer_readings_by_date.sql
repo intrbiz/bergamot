@@ -51,7 +51,6 @@ BEGIN
      $$ || quote_ident(p_agg) || $$("the_98th_percentile")::DOUBLE PRECISION AS "the_98th_percentile",
      $$ || quote_ident(p_agg) || $$("the_99th_percentile")::DOUBLE PRECISION AS "the_99th_percentile",
      $$ || quote_ident(p_agg) || $$("the_999th_percentile")::DOUBLE PRECISION AS "the_999th_percentile"
-     //
     FROM $$ || v_table || $$ 
     WHERE collected_at BETWEEN ($3 - (($5 / 1000) ||' seconds')::interval) AND ($4 + (($5 / 1000) ||' seconds')::interval) 
     GROUP BY 1 
