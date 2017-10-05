@@ -32,5 +32,8 @@
 				setTimeout(poll, 2000);
 			})
 		</script>
+		<p style="padding-top: 20px">
+			<a href="/admin/configchange/">Configuration Changes</a>
+		</p>
     </div>
 </fragment>

@@ -294,7 +294,7 @@ public class StatsDExample extends TimerTask
     
     public static void main(String[] args) throws Exception
     {
-        StatsDExample client = new StatsDExample("10.227.128.85", 8125);
+        StatsDExample client = new StatsDExample("127.0.0.1", 8125);
         client.enableMultiMetrics(true);
         //
         SecureRandom rnd = new SecureRandom();
