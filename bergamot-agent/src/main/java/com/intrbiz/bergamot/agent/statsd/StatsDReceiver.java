@@ -31,6 +31,7 @@ public class StatsDReceiver implements Runnable
         this.channel = DatagramChannel.open();
         this.channel.configureBlocking(true);
         this.channel.socket().setReuseAddress(true);
+        this.channel.socket().setReceiveBufferSize(8192);
     }
     
     public StatsDReceiver(StatsDMetricConsumer consumer) throws IOException
@@ -51,7 +52,7 @@ public class StatsDReceiver implements Runnable
             {
                 try
                 {
-                    buffer.rewind();
+                    buffer.clear();
                     SocketAddress from = this.channel.receive(buffer);
                     buffer.flip();
                     this.decodeMetrics(from, buffer);
@@ -76,6 +77,7 @@ public class StatsDReceiver implements Runnable
      */
     protected void decodeMetrics(SocketAddress from, ByteBuffer buffer)
     {
+        if (logger.isTraceEnabled()) logger.trace(new String(buffer.array(), buffer.arrayOffset(), buffer.remaining()));
         try
         {
             byte[] array = buffer.array();
