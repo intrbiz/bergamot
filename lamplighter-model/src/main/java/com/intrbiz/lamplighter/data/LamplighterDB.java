@@ -38,7 +38,7 @@ import com.intrbiz.lamplighter.model.StoredTimerReading;
 
 @SQLSchema(
         name = "lamplighter", 
-        version = @SQLVersion({1, 9, 0}),
+        version = @SQLVersion({1, 10, 0}),
         tables = {
             CheckReading.class,
             StoredDoubleGaugeReading.class,
@@ -201,7 +201,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
     }
     
     @SQLCustom(
-            since = @SQLVersion({1, 0, 0}),
+            since = @SQLVersion({1, 10, 0}),
             userDefined = @SQLUserDefined(resources = {
                     "create_double_gauge_reading.sql",
                     "create_long_gauge_reading.sql",
@@ -442,21 +442,21 @@ public abstract class LamplighterDB extends DatabaseAdapter
 
     @SQLSetter(
             table = StoredMeterReading.class, name = "store_meter_reading", upsert = false, 
-            since = @SQLVersion({1, 9, 0}),
+            since = @SQLVersion({1, 10, 0}),
             userDefined = @SQLUserDefined(resources = "store_meter_reading.sql")
     )
     public abstract void storeMeterReading(StoredMeterReading reading);
     
     @SQLGetter(
             table = StoredMeterReading.class, name ="get_latest_meter_readings", 
-            since = @SQLVersion({1, 9, 0}),
+            since = @SQLVersion({1, 10, 0}),
             userDefined = @SQLUserDefined(resources = "get_latest_meter_readings.sql")
     )
     public abstract List<StoredMeterReading> getLatestMeterReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
     
     @SQLGetter(
             table = StoredMeterReading.class, name ="get_meter_readings_by_date", 
-            since = @SQLVersion({1, 9, 0}),
+            since = @SQLVersion({1, 10, 0}),
             userDefined = @SQLUserDefined(resources = "get_meter_readings_by_date.sql")
     )
     public abstract List<StoredMeterReading> getMeterReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) long rollup, @SQLParam(value = "agg", virtual = true) String agg);
@@ -465,21 +465,21 @@ public abstract class LamplighterDB extends DatabaseAdapter
    
     @SQLSetter(
             table = StoredTimerReading.class, name = "store_timer_reading", upsert = false, 
-            since = @SQLVersion({1, 9, 0}),
+            since = @SQLVersion({1, 10, 0}),
             userDefined = @SQLUserDefined(resources = "store_timer_reading.sql")
     )
     public abstract void storeTimerReading(StoredTimerReading reading);
     
     @SQLGetter(
             table = StoredTimerReading.class, name ="get_latest_timer_readings", 
-            since = @SQLVersion({1, 9, 0}),
+            since = @SQLVersion({1, 10, 0}),
             userDefined = @SQLUserDefined(resources = "get_latest_timer_readings.sql")
     )
     public abstract List<StoredTimerReading> getLatestTimerReadings(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "limit", virtual = true) int limit);
     
     @SQLGetter(
             table = StoredTimerReading.class, name ="get_timer_readings_by_date", 
-            since = @SQLVersion({1, 9, 0}),
+            since = @SQLVersion({1, 10, 0}),
             userDefined = @SQLUserDefined(resources = "get_timer_readings_by_date.sql")
     )
     public abstract List<StoredTimerReading> getTimerReadingsByDate(@SQLParam("site_id") UUID siteId, @SQLParam("reading_id") UUID readingId, @SQLParam(value = "start", virtual = true) Timestamp start, @SQLParam(value = "end", virtual = true) Timestamp end, @SQLParam(value = "rollup", virtual = true) long rollup, @SQLParam(value = "agg", virtual = true) String agg);
@@ -564,7 +564,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
         });
     }
     
-    @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}))
+    @SQLPatch(name = "set_function_owner", index = 1000, type = ScriptType.BOTH_LAST, version = @SQLVersion({1, 10, 0}))
     protected static SQLScript setFunctionOWner()
     {
         return new SQLScript(
@@ -609,7 +609,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "setup_existing_sites", index = 2000, type = ScriptType.INSTALL, version = @SQLVersion({1, 0, 0}))
+    @SQLPatch(name = "setup_existing_sites", index = 2000, type = ScriptType.INSTALL_LAST, version = @SQLVersion({1, 0, 0}))
     protected static SQLScript setupExistingSites()
     {
         return new SQLScript(
@@ -617,7 +617,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_meter_and_timer_base_tables_to_sites", index = 2000, type = ScriptType.UPGRADE, version = @SQLVersion({1, 8, 0}))
+    @SQLPatch(name = "add_meter_and_timer_base_tables_to_sites", index = 2000, type = ScriptType.UPGRADE_LAST, version = @SQLVersion({1, 10, 0}))
     protected static SQLScript addMeterAndTimerBaseTablesToSites()
     {
         return new SQLScript(
