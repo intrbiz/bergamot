@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.nrpe;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -98,6 +99,7 @@ public class NRPEPoller
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
         b.channel(NioSocketChannel.class);
+        b.option(ChannelOption.ALLOCATOR, new UnpooledByteBufAllocator(false));
         b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) TimeUnit.SECONDS.toMillis(connectTimeout));
         b.handler(new ChannelInitializer<SocketChannel>()
         {
