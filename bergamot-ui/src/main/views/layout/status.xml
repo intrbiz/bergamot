@@ -1,0 +1,17 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- A template for status pages -->
+<html xmlns="com.intrbiz.balsa">
+	<head>
+		<title>#{title()}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="#{public('/css/' + bergamot_css_version() +'/style.css')}" />
+	</head>
+	<body class="status">
+		<div id="content">
+			<div class="container">
+				<content/>
+			</div>
+		</div>
+	</body>
+</html>

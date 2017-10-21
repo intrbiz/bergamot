@@ -70,6 +70,7 @@ import com.intrbiz.bergamot.ui.router.ProfileRouter;
 import com.intrbiz.bergamot.ui.router.ResourceRouter;
 import com.intrbiz.bergamot.ui.router.ServiceRouter;
 import com.intrbiz.bergamot.ui.router.StatsRouter;
+import com.intrbiz.bergamot.ui.router.StatusRouter;
 import com.intrbiz.bergamot.ui.router.TeamRouter;
 import com.intrbiz.bergamot.ui.router.TimePeriodRouter;
 import com.intrbiz.bergamot.ui.router.TrapRouter;
@@ -122,7 +123,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         
             public static final String JS = "v1.6.0";
             
-            public static final String CSS = "v1.7.2";
+            public static final String CSS = "v1.7.3";
         
         }
     }
@@ -271,6 +272,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new StatsRouter());
         router(new CommandRouter());
         router(new AlertsRouter());
+        router(new StatusRouter());
         // Agent
         router(new AgentRouter());
         // About

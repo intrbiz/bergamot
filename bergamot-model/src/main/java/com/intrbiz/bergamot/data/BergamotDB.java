@@ -88,7 +88,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 49, 0}),
+        version = @SQLVersion({3, 50, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -974,7 +974,8 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_all_alerts_for_check_paged.*",
         "get_recovered_alerts_for_check.*", 
         "get_alerts_for_check.*", 
-        "get_current_alert_for_check.*"
+        "get_current_alert_for_check.*",
+        "get_last_alert_for_check.*"
     })
     @SQLRemove(table = Alert.class, name = "remove_alert", since = @SQLVersion({1, 0, 0}))
     public abstract void removeAlert(@SQLParam("id") UUID id);
@@ -1010,6 +1011,12 @@ public abstract class BergamotDB extends DatabaseAdapter
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE ORDER BY raised DESC LIMIT 1")
     )
     public abstract Alert getCurrentAlertForCheck(@SQLParam("check_id") UUID checkId);
+    
+    @Cacheable
+    @SQLGetter(table = Alert.class, name = "get_last_alert_for_check", since = @SQLVersion({3, 50, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id ORDER BY raised DESC LIMIT 1")
+    )
+    public abstract Alert getLastAlertForCheck(@SQLParam("check_id") UUID checkId);
     
     @SQLGetter(table = Alert.class, name = "list_alerts", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE site_id = p_site_id AND recovered = FALSE AND acknowledged = FALSE ORDER BY raised DESC")

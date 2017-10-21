@@ -373,19 +373,19 @@ table tr:hover {
 
 /* State colours */
 
-.dash_img.status_info {
+.status_info {
 	background-color: #D9E1D9 !important;
 }
 
-.dash_img.status_ok, .dash_img.status_up {
+.status_ok, .status_up {
 	background-color: #00BF00 !important;
 }
 
-.dash_img.status_warning {
+.status_warning {
 	background-color: #F3C300 !important;
 }
 
-.dash_img.status_critical, .dash_img.status_down, .dash_img.status_action, .dash_img.status_unknown, .dash_img.status_error, .dash_img.status_timeout, .dash_img.status_disconnected {
+.status_critical, .status_down, .status_action, .status_unknown, .status_error, .status_timeout, .status_disconnected {
 	background-color: #E85752 !important;	
 }
 
@@ -884,6 +884,73 @@ form > div input[type=submit] {
 form > div ul {
     display: block;
     float: left;
+}
+
+/* Status Page */
+body.status {
+	background: #ebebeb;
+}
+body.status #content .container {
+	width: 570px;
+	margin: 0 auto;
+}
+h1.status_title {
+	font-size: 36px;
+	margin-bottom: 5px;
+}
+p.status_at {
+	font-size: 20px;
+	margin-bottom: 20px;
+}
+div.status_group {
+	border-radius: 5px;
+	background: linear-gradient(rgba(198, 217, 229, 0.7), rgba(0,0,0,0));
+	padding: 5px;
+}
+div.status_group > a, div.status_group > a:visited, div.status_group > a:active {
+	color: #2c2c2c;
+	text-decoration: none;
+	outline: none;
+}
+div.status_group > a:hover {
+    color: #004D00;
+    text-decoration: underline;
+    outline: none;
+}
+.status_group h2 {
+	padding: 5px;
+	font-size: 30px;
+	margin-bottom: 10px;
+}
+.status_group ul {
+	margin-left: 10px;
+}
+.status_group ul li {
+	margin-bottom: 20px;
+}
+.status_group ul li h4 {
+	font-size: 24px;
+	padding: 3px 5px;
+	margin-bottom: 10px;
+}
+.status_group ul li h4 .status_icon {
+	display: block;
+	float: left;
+	width: 30px;
+	height: 30px;
+	border-radius: 15px;
+	overflow: hidden;
+	margin-right: 15px;
+	box-shadow: 2px 2px 4px #888888;
+}
+.status_group ul li p.status_output {
+	margin-left: 50px;
+	font-size: 18px;
+}
+.status_group ul li p.status_meta {
+	margin-left: 50px;
+	font-size: 14px;
+	color: #666;
 }
 
 /* Resizing */

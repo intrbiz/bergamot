@@ -511,6 +511,15 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     {
         this.notifiedIds = notifiedIds;
     }
+    
+    /**
+     * Is this alert active, IE: not recovered and not acknowledged
+     * @return
+     */
+    public boolean isActive()
+    {
+        return ! (this.recovered || this.acknowledged);
+    }
 
     /**
      * Get comments against this alert
