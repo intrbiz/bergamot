@@ -88,7 +88,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 50, 0}),
+        version = @SQLVersion({3, 51, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -566,7 +566,6 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
                         "UPDATE bergamot.group SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
-                        "UPDATE bergamot.contact  SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
                         "UPDATE bergamot.host     SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
                         "UPDATE bergamot.service  SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
                         "UPDATE bergamot.trap     SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
