@@ -429,7 +429,7 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
         jenny.writeStartArray();
         for (T reading : readings)
         {
-            jenny.writeObject(series[0].accessor.apply(reading));
+            jenny.writeNumber(reading.getCollectedAt().getTime());
         }
         jenny.writeEndArray();
         // y sets
