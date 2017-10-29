@@ -11,7 +11,10 @@ import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 import com.intrbiz.data.DataException;
+import com.intrbiz.gerald.polyakov.MeterReading;
 import com.intrbiz.gerald.polyakov.Reading;
+import com.intrbiz.gerald.polyakov.ReadingSnapshot;
+import com.intrbiz.gerald.polyakov.TimerReading;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.FloatGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
@@ -22,6 +25,8 @@ import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
 import com.intrbiz.lamplighter.model.StoredFloatGaugeReading;
 import com.intrbiz.lamplighter.model.StoredIntGaugeReading;
 import com.intrbiz.lamplighter.model.StoredLongGaugeReading;
+import com.intrbiz.lamplighter.model.StoredMeterReading;
+import com.intrbiz.lamplighter.model.StoredTimerReading;
 import com.intrbiz.lamplighter.reading.scaling.ReadingScalers;
 
 public class DefaultReadingProcessor extends AbstractReadingProcessor
@@ -118,6 +123,47 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
                                     ((IntegerGaugeReading) reading).getMax() == null ? 0 : ((IntegerGaugeReading) reading).getMax()
                             ));
                         }
+                        else if (reading instanceof MeterReading)
+                        {
+                            CheckReading metadata = db.getOrSetupMeterReading(check.getId(), reading.getName(), reading.getUnit(), pollInterval);
+                            MeterReading meterReading = this.preProcessReading(metadata, (MeterReading) reading);
+                            db.storeMeterReading(new StoredMeterReading(
+                                    metadata.getSiteId(),
+                                    metadata.getId(),
+                                    new Timestamp(readings.getCaptured()),
+                                    meterReading.getCount(),
+                                    meterReading.getMeanRate(),
+                                    meterReading.getOneMinuteRate(),
+                                    meterReading.getFiveMinuteRate(),
+                                    meterReading.getFifteenMinuteRate()
+                            ));
+                        }
+                        else if (reading instanceof TimerReading)
+                        {
+                            CheckReading metadata = db.getOrSetupTimerReading(check.getId(), reading.getName(), reading.getUnit(), pollInterval);
+                            TimerReading timerReading = this.preProcessReading(metadata, (TimerReading) reading);
+                            ReadingSnapshot snapshot = timerReading.getSnapshot();
+                            db.storeTimerReading(new StoredTimerReading(
+                                    metadata.getSiteId(),
+                                    metadata.getId(),
+                                    new Timestamp(readings.getCaptured()),
+                                    timerReading.getCount(),
+                                    timerReading.getMeanRate(),
+                                    timerReading.getOneMinuteRate(),
+                                    timerReading.getFiveMinuteRate(),
+                                    timerReading.getFifteenMinuteRate(),
+                                    snapshot.getMedian(),
+                                    snapshot.getMean(),
+                                    snapshot.getMin(),
+                                    snapshot.getMax(),
+                                    snapshot.getStdDev(),
+                                    snapshot.getThe75thPercentile(),
+                                    snapshot.getThe95thPercentile(),
+                                    snapshot.getThe98thPercentile(),
+                                    snapshot.getThe99thPercentile(),
+                                    snapshot.getThe999thPercentile()
+                            ));
+                        }
                     }
                 }
                 else
@@ -144,7 +190,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
         }
     }
     
-    protected Reading preProcessReading(CheckReading checkReading, Reading reading)
+    protected <T extends Reading> T preProcessReading(CheckReading checkReading, T reading)
     {
         // apply the scaling rules
         reading = this.scalers.scale(reading, checkReading.getUnit());

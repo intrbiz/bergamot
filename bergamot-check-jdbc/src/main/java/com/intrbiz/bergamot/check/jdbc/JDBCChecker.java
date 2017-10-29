@@ -8,15 +8,11 @@ import java.util.function.Consumer;
  * A JDBC based check framework
  */
 public class JDBCChecker
-{   
-    private int defaultTimeoutSeconds;
-    
+{    
     private final Timer timer;
 
-    public JDBCChecker(int defaultTimeoutSeconds)
+    public JDBCChecker()
     {
-        this.defaultTimeoutSeconds = defaultTimeoutSeconds;
-        //
         this.timer = new Timer();
         // some util timer tasks
         // every 5 minutes forcefully purge the timer queue
@@ -30,30 +26,20 @@ public class JDBCChecker
             }
         }, 300_000L, 300_000L);
     }
-
-    public JDBCChecker()
-    {
-        this(60);
-    }
-
-    public int getTimeoutSeconds()
-    {
-        return defaultTimeoutSeconds;
-    }
     
     Timer getTimer()
     {
         return this.timer;
     }
 
-    public JDBCCheckContext createContext()
+    public JDBCCheckContext createContext(long timeout)
     {
-        return new JDBCCheckContext((t) -> { throw new JDBCException(t); });
+        return new JDBCCheckContext(this, (t) -> { throw new JDBCException(t); }, timeout);
     }
     
-    public JDBCCheckContext createContext(Consumer<Throwable> errorHandler)
+    public JDBCCheckContext createContext(Consumer<Throwable> errorHandler, long timeout)
     {
-        return new JDBCCheckContext(errorHandler);
+        return new JDBCCheckContext(this, errorHandler, timeout);
     }
 
     public void shutdown()

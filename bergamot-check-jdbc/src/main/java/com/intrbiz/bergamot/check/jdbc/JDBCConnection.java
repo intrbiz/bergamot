@@ -4,12 +4,20 @@ import java.sql.Connection;
 import java.util.function.Function;
 
 public class JDBCConnection 
-{    
-    private Connection connection;
+{   
+    private final JDBCCheckContext context;
     
-    public JDBCConnection(Connection connection)
+    private final Connection connection;
+    
+    public JDBCConnection(JDBCCheckContext context, Connection connection)
     {
+        this.context = context;
         this.connection = connection;
+    }
+    
+    public JDBCCheckContext getContext()
+    {
+        return this.context;
     }
     
     public JDBCStatement prepare(String query)

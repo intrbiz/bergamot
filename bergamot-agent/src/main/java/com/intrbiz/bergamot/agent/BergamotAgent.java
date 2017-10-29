@@ -39,6 +39,7 @@ import com.intrbiz.bergamot.agent.handler.DiskIOHandler;
 import com.intrbiz.bergamot.agent.handler.DiskInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ExecHandler;
 import com.intrbiz.bergamot.agent.handler.MemInfoHandler;
+import com.intrbiz.bergamot.agent.handler.MetricsHandler;
 import com.intrbiz.bergamot.agent.handler.NetConInfoHandler;
 import com.intrbiz.bergamot.agent.handler.NetIOHandler;
 import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
@@ -46,6 +47,8 @@ import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ProcessInfoHandler;
 import com.intrbiz.bergamot.agent.handler.UptimeInfoHandler;
 import com.intrbiz.bergamot.agent.handler.WhoInfoHandler;
+import com.intrbiz.bergamot.agent.statsd.StatsDProcessor;
+import com.intrbiz.bergamot.agent.statsd.StatsDReceiver;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
@@ -100,6 +103,12 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     private AtomicInteger connectionAttempt = new AtomicInteger(0);
     
+    private StatsDProcessor statsDProcessor;
+    
+    private StatsDReceiver statsDReceiver;
+    
+    private Thread statsDRunner;
+    
     public BergamotAgent()
     {
         super();
@@ -111,6 +120,12 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             @Override
             public void run()
             {
+                // clean up metrics
+                if (BergamotAgent.this.statsDProcessor != null)
+                {
+                    BergamotAgent.this.statsDProcessor.clearUpStaleMetrics();
+                }
+                // GC
                 System.gc();
                 Runtime rt = Runtime.getRuntime();
                 logger.debug("Memory, free: " + rt.freeMemory() + " total: " + rt.totalMemory() + " max: " + rt.maxMemory());
@@ -132,6 +147,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new AgentInfoHandler());
         this.registerHandler(new NetIOHandler());
         this.registerHandler(new DiskIOHandler());
+        this.registerHandler(new MetricsHandler());
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -144,6 +160,11 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 }
             }
         });
+    }
+    
+    public StatsDProcessor getStatsDProcessor()
+    {
+        return this.statsDProcessor;
     }
     
     public BergamotAgentCfg getConfiguration()
@@ -246,6 +267,21 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         {
             logger.error("Failed to setup Sigar!", e);
             throw new RuntimeException("Failed to setup Sigar, aborting!", e);
+        }
+        // setup StatsD
+        if (this.configuration.getStatsDPort() > 0)
+        {
+            try
+            {
+                this.statsDProcessor = new StatsDProcessor();
+                this.statsDReceiver = new StatsDReceiver(this.configuration.getStatsDPort(), this.statsDProcessor);
+                this.statsDRunner = new Thread(this.statsDReceiver);
+                this.statsDRunner.start();
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to start StatsD receiver");
+            }
         }
         // start the connection process
         this.connect();
@@ -365,6 +401,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         try
         {
             this.eventLoop.shutdownGracefully().await();
+            this.statsDReceiver.shutdown();
         }
         catch (InterruptedException e)
         {
@@ -376,6 +413,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         try
         {
             this.eventLoop.shutdownGracefully(1, 2, TimeUnit.SECONDS).await();
+            this.statsDReceiver.shutdown();
         }
         catch (InterruptedException e)
         {

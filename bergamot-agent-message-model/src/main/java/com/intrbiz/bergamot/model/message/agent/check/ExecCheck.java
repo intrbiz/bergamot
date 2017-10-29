@@ -31,6 +31,17 @@ public class ExecCheck extends AgentMessage
         super();
     }
 
+    public ExecCheck(String engine, String executor, String name, List<Parameter> parameters)
+    {
+        super();
+        this.engine = engine;
+        this.executor = executor;
+        this.name = name;
+        this.parameters = parameters;
+    }
+
+
+
     public ExecCheck(AgentMessage message)
     {
         super(message);

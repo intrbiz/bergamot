@@ -23,8 +23,6 @@ public class KnownDaemon implements Comparable<KnownDaemon>
 
     private volatile long lastHeartbeatTime = System.currentTimeMillis();
 
-    private volatile long lastHeartbeatSequence = 0;
-
     private volatile int alertCount = 0;
 
     private volatile int recoveryCount = 0;
@@ -57,16 +55,6 @@ public class KnownDaemon implements Comparable<KnownDaemon>
     public void setLastHeartbeatAt(long lastHeartbeatAt)
     {
         this.lastHeartbeatAt = lastHeartbeatAt;
-    }
-
-    public long getLastHeartbeatSequence()
-    {
-        return lastHeartbeatSequence;
-    }
-
-    public void setLastHeartbeatSequence(long lastHeartbeatSequence)
-    {
-        this.lastHeartbeatSequence = lastHeartbeatSequence;
     }
 
     public UUID getInstanceId()
@@ -152,14 +140,14 @@ public class KnownDaemon implements Comparable<KnownDaemon>
 
     public boolean isLastHeartbeatTooOld()
     {
-        // was the heartbeat over 30 seconds ago
-        return this.getLastHeartbeatAge() > 30_000L;
+        // was the heartbeat over two minutes ago (4 join events)
+        return this.getLastHeartbeatAge() > 120_000L;
     }
 
     public boolean isDaemonLongGone()
     {
-        // did we last see this daemon over a day ago
-        return this.getLastHeartbeatAge() > 86400_000L;
+        // did we last see this daemon over an hour ago
+        return this.getLastHeartbeatAge() > 3600_000L;
     }
 
     public boolean isAlive()

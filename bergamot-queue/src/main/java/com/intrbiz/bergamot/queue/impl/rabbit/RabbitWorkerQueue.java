@@ -72,7 +72,7 @@ public class RabbitWorkerQueue extends WorkerQueue
         // the engine exchange
         final String engineExchangeName = "bergamot.check.engine." + Util.coalesce(site, "default") + "." + Util.coalesce(workerPool, "any") + "." + engine;
         // create the consumer
-        return new RabbitConsumer<ExecuteCheck, WorkerKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-check"))
+        return new RabbitConsumer<ExecuteCheck, WorkerKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-check"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -116,7 +116,7 @@ public class RabbitWorkerQueue extends WorkerQueue
                 {
                     on.exchangeDeclare("bergamot.check.worker_pool.default." + workerPool, "topic", true, false, args("alternate-exchange", "bergamot.dead_check"));
                     // bind the worker pool to default site exchange
-                    on.exchangeBind("bergamot.check.site.default", "bergamot.check.worker_pool.default." + workerPool, "*." + workerPool + ".*.*");
+                    on.exchangeBind("bergamot.check.worker_pool.default." + workerPool, "bergamot.check.site.default", "*." + workerPool + ".*.*");
                 }
                 // specific exchanges
                 if (site != null && workerPool != null)
@@ -156,7 +156,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ExecuteCheck, NullKey> consumeDeadChecks(DeliveryHandler<ExecuteCheck> handler)
     {
-        return new RabbitConsumer<ExecuteCheck, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-dead-check"))
+        return new RabbitConsumer<ExecuteCheck, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-dead-check"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -171,7 +171,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ExecuteCheck, NullKey> consumeDeadAgentChecks(DeliveryHandler<ExecuteCheck> handler)
     {
-        return new RabbitConsumer<ExecuteCheck, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-dead-check"))
+        return new RabbitConsumer<ExecuteCheck, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(ExecuteCheck.class), handler, this.source.getRegistry().timer("consume-dead-check"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -206,7 +206,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ResultMO, ResultKey> consumeResults(DeliveryHandler<ResultMO> handler, String instance)
     {
-        return new RabbitConsumer<ResultMO, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"))
+        return new RabbitConsumer<ResultMO, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -242,7 +242,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ResultMO, ResultKey> consumeFallbackResults(DeliveryHandler<ResultMO> handler)
     {
-        return new RabbitConsumer<ResultMO, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-fallback-result"))
+        return new RabbitConsumer<ResultMO, ResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-fallback-result"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -277,7 +277,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ReadingParcelMO, ReadingKey> consumeReadings(DeliveryHandler<ReadingParcelMO> handler, String instance)
     {
-        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-reading"))
+        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-reading"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -313,7 +313,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ReadingParcelMO, ReadingKey> consumeFallbackReadings(DeliveryHandler<ReadingParcelMO> handler)
     {
-        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-fallback-reading"))
+        return new RabbitConsumer<ReadingParcelMO, ReadingKey>(this.broker, this.transcoder.asQueueEventTranscoder(ReadingParcelMO.class), handler, this.source.getRegistry().timer("consume-fallback-reading"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {
@@ -344,7 +344,7 @@ public class RabbitWorkerQueue extends WorkerQueue
     @Override
     public Consumer<ResultMO, AdhocResultKey> consumeAdhocResults(UUID adhocId, DeliveryHandler<ResultMO> handler)
     {
-        return new RabbitConsumer<ResultMO, AdhocResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"))
+        return new RabbitConsumer<ResultMO, AdhocResultKey>(this.broker, this.transcoder.asQueueEventTranscoder(ResultMO.class), handler, this.source.getRegistry().timer("consume-result"), 1, false)
         {
             public String setupQueue(Channel on) throws IOException
             {

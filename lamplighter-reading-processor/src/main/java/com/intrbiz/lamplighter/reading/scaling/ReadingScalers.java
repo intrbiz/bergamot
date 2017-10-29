@@ -32,7 +32,7 @@ public class ReadingScalers
         return this.scalers.get(unit);
     }
     
-    public Reading scale(Reading reading, String toUnit)
+    public <T extends Reading> T scale(T reading, String toUnit)
     {
         if (reading.getUnit() != null)
         {

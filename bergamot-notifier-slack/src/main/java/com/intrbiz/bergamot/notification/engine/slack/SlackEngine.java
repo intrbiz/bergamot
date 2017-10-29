@@ -31,6 +31,7 @@ import com.intrbiz.util.IBThreadFactory;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -156,6 +157,7 @@ public class SlackEngine extends AbstractNotificationEngine
                     Bootstrap b = new Bootstrap();
                     b.group(this.eventLoop);
                     b.channel(NioSocketChannel.class);
+                    b.option(ChannelOption.ALLOCATOR, new UnpooledByteBufAllocator(false));
                     b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) TimeUnit.SECONDS.toMillis(60));
                     b.handler(new ChannelInitializer<SocketChannel>()
                     {

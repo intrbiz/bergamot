@@ -52,7 +52,7 @@ public class ScriptedJDBCExecutor extends AbstractExecutor<JDBCEngine>
             bindings.put("check", executeCheck);
             bindings.put("jdbc", this.getEngine().getChecker().createContext((t) -> {
                 this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(t));
-            }));
+            }, executeCheck.getTimeout()));
             bindings.put("bergamot", this.createScriptContext(executeCheck));
             script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
             // execute

@@ -1,0 +1,45 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- Status page for the whole site -->
+<fragment xmlns="com.intrbiz.balsa" title="#{coalesce(site.getParameter('status-title'), site.summary)} Health Dashboard - #{dateformat('EEEE yyyy-MM-dd', now)}">
+	<h1 class="status_title">Status for #{coalesce(site.getParameter('status-title'), site.summary)}</h1>
+	<p class="status_at">At #{dateformat('HH:mm:ss', now)} on #{dateformat('EEEE yyyy-MM-dd', now)}</p>
+	<data-set var="group" value="#{groups}">
+		<div class="status_group">
+			<container data-groupstate="#{group.state}">
+				<a href="/status/#{group.name}">
+					<h2>
+						<span class="status_header">#{coalesce(group.getParameter('status-title'), group.summary)}</span>
+					</h2>
+				</a>
+				<ul>
+					<data-set var="check" value="#{group.getChecks()}">
+						<container data-checkstate="#{check.state}">
+							<li>
+								<h4>
+									<span class="status_icon status_#{checkstate.status.toString().toLowerCase()}" title="#{checkstate.status.toString().substring(0,1) + checkstate.status.toString().substring(1).toLowerCase()}"></span>
+									<span class="status_header">#{coalesce(check.getParameter('status-title'), check.summary)}</span>
+								</h4>
+								<p class="status_output">#{coalesce(checkstate.output, '')}</p>
+								<p class="status_meta">
+									Last checked at #{dateformat('HH:mm:ss', checkstate.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', checkstate.lastCheckTime)}
+								</p>
+								<container data-alert="#{check.getLastAlert()}">
+									<p class="status_meta" rendered="#{alert != null and alert.recovered}">
+										Alert raised at #{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)}and recovered at #{dateformat('HH:mm:ss', alert.recoveredAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.recoveredAt)}.
+									</p>
+									<p class="status_meta" rendered="#{alert != null and alert.acknowledged}">
+										Alert raised at #{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)} and acknowledged at #{dateformat('HH:mm:ss', alert.acknowledgedAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.acknowledgedAt)} by our engineers.
+									</p>
+									<p class="status_meta" rendered="#{alert != null and ! (alert.acknowledged or alert.recovered)}">
+										Alert raised at #{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)}. Our engineers will be looking at this soon.
+									</p>
+								</container>
+							</li>
+						</container>
+					</data-set>
+				</ul>
+			</container>
+		</div>
+	</data-set>
+</fragment>

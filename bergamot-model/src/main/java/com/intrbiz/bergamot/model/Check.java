@@ -470,6 +470,87 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     }
     
     /**
+     * Get the current alert for this check
+     */
+    public Alert getCurrentAlert()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getCurrentAlertForCheck(this.id);
+        }
+    }
+    
+    /**
+     * Get the last alert for this check
+     */
+    public Alert getLastAlert()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getLastAlertForCheck(this.id);
+        }
+    }
+    
+    /**
+     * Get the alerts for this check
+     */
+    public List<Alert> getAlerts()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAlertsForCheck(this.id);
+        }
+    }
+    
+    /**
+     * Get the recovered alerts for this check
+     * @return
+     */
+    public List<Alert> getRecoveredAlerts()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getRecoveredAlertsForCheck(this.id);
+        }
+    }
+    
+    /**
+     * Get the recent alerts for this check
+     * @param interval
+     * @param limit
+     * @return
+     */
+    public List<Alert> getAllRecentAlerts(String interval, long limit)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAllRecentAlertsForCheck(this.id, interval, limit);
+        }
+    }
+    
+    /**
+     * Get all alerts for this check
+     */
+    public List<Alert> getAllAlerts()
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAllAlertsForCheck(this.id);
+        }
+    }
+    
+    /**
+     * Get all alerts for this check
+     */
+    public List<Alert> getAllAlerts(long limit, long offset)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getAllAlertsForCheck(this.id, limit, offset);
+        }
+    }
+    
+    /**
      * Compute the list of contacts who should be notified
      * @return a list of contact message objects
      */

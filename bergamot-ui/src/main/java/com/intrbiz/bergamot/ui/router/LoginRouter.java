@@ -206,7 +206,7 @@ public class LoginRouter extends Router<BergamotApp>
     
     @Post("/finish-hotp-authentication")
     @RequireAuthenticating()
-    @RequireValidAccessTokenForURL()
+    /*@RequireValidAccessTokenForURL()*/
     @WithDataAdapter(BergamotDB.class)
     public void finishHOTPAuthentication(BergamotDB db, @Param("code") @IsaInt(min = 0, max = 999999, mandatory = true) int code, @Param("redirect") String redirect) throws Exception
     {

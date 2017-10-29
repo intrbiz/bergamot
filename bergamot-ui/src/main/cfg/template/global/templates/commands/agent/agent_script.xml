@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.local">
+    
+    <command category="Application" engine="agent" executor="script" extends="check_agent" name="check_agent_script">
+        <summary>Bergamot Agent: Scripted</summary>
+        <description>Execute a scripted check against a Bergamot agent</description>
+    </command>
+    
+</bergamot>

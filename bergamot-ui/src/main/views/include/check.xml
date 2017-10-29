@@ -14,7 +14,7 @@
 			    </h3>
 			    <p class="field-status">
 				    <span class="label">Status: </span>
-				    <span class="value">#{checkstate.status.toString().substring(0,1) + check.state.status.toString().substring(1).toLowerCase()}</span>
+				    <span class="value">#{checkstate.status.toString().substring(0,1) + checkstate.status.toString().substring(1).toLowerCase()}</span>
 			    </p>
 			    <p rendered="#{(check.type == 'service' or check.type == 'trap') and host == null}">
 				    <span class="label">Host: </span>

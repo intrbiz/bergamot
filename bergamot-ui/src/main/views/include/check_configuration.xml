@@ -157,6 +157,10 @@
 					<span class="label wide">Command Engine: </span>
 					<span class="value">#{check.checkCommand.command.engine}</span>
 				</p>
+				<p rendered="#{check.type == 'host' or check.type == 'service'}">
+					<span class="label wide">Worker Pool: </span>
+					<span class="value">#{coalesce(check.resolveWorkerPool(), 'any')}</span>
+				</p>
 			</div>
 			<div class="col8 dash_icon">
 				<h3>Command Parameters</h3>

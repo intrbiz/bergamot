@@ -13,29 +13,29 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLUnique;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "sla", since = @SQLVersion({ 3, 50, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "sla", since = @SQLVersion({ 3, 52, 0 }))
 public class SLA extends BergamotObject<SLAMO>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3, 50, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3, 52, 0 }))
     @SQLPrimaryKey
     private UUID id;
     
-    @SQLColumn(index = 2, name = "check_id", since = @SQLVersion({ 3, 59, 0 }))
+    @SQLColumn(index = 2, name = "check_id", since = @SQLVersion({ 3, 52, 0 }))
     @SQLUnique(name = "check_sla_name_unq", columns = { "check_id", "name" })
     private UUID checkId;
 
-    @SQLColumn(index = 3, name = "name", since = @SQLVersion({ 3, 50, 0 }))
+    @SQLColumn(index = 3, name = "name", since = @SQLVersion({ 3, 52, 0 }))
     private String name;
     
-    @SQLColumn(index = 4, name = "summary", since = @SQLVersion({ 3, 50, 0 }))
+    @SQLColumn(index = 4, name = "summary", since = @SQLVersion({ 3, 52, 0 }))
     private String summary;
     
-    @SQLColumn(index = 5, name = "description", since = @SQLVersion({ 3, 50, 0 }))
+    @SQLColumn(index = 5, name = "description", since = @SQLVersion({ 3, 52, 0 }))
     private String description;
     
-    @SQLColumn(index = 6, name = "target", since = @SQLVersion({ 3, 50, 0 }))
+    @SQLColumn(index = 6, name = "target", since = @SQLVersion({ 3, 52, 0 }))
     private float target;
 
     public SLA()

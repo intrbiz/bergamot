@@ -58,19 +58,6 @@ public class HCQHealthCheckQueue extends HealthCheckQueue
             }
         };
     }
-    
-    @Override
-    public Producer<HealthCheckMessage> publishHealthCheckControlEvents()
-    {
-        return new HCQProducer<HealthCheckMessage, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(HealthCheckMessage.class), new NullKey(), this.source.getRegistry().timer("publish-health-checks"))
-        {
-            protected String setupExchange(HCQBatch on) throws IOException
-            {
-                on.getOrCreateExchange("bergamot.health.control", "fanout");
-                return "bergamot.health.control";
-            }
-        };
-    }
 
     @Override
     public Consumer<HealthCheckMessage, NullKey> consumeHealthCheckEvents(DeliveryHandler<HealthCheckMessage> handler)
@@ -83,22 +70,6 @@ public class HCQHealthCheckQueue extends HealthCheckQueue
                 on.getOrCreateTempQueue(queueName, QUEUE_SIZE)
                  .getOrCreateExchange("bergamot.health.event", "fanout")
                  .bindQueueToExchange("bergamot.health.event", "", queueName);
-                return queueName;
-            }
-        };
-    }
-    
-    @Override
-    public Consumer<HealthCheckMessage, NullKey> consumeHealthCheckControlEvents(DeliveryHandler<HealthCheckMessage> handler)
-    {
-        return new HCQConsumer<HealthCheckMessage, NullKey>(this.broker, this.transcoder.asQueueEventTranscoder(HealthCheckMessage.class), handler, this.source.getRegistry().timer("consume-health-checks"))
-        {
-            public String setupQueue(HCQBatch on) throws IOException
-            {
-                String queueName = "health-" + UUID.randomUUID(); 
-                on.getOrCreateTempQueue(queueName, QUEUE_SIZE)
-                 .getOrCreateExchange("bergamot.health.control", "fanout")
-                 .bindQueueToExchange("bergamot.health.control", "", queueName);
                 return queueName;
             }
         };

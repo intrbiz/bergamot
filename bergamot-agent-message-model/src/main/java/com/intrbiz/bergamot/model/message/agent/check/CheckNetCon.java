@@ -43,6 +43,23 @@ public class CheckNetCon extends AgentMessage
         super();
     }
 
+    public CheckNetCon(boolean client, boolean server, boolean tcp, boolean udp, boolean unix, boolean raw, int localPort, int remotePort, String localAddress, String remoteAddress)
+    {
+        super();
+        this.client = client;
+        this.server = server;
+        this.tcp = tcp;
+        this.udp = udp;
+        this.unix = unix;
+        this.raw = raw;
+        this.localPort = localPort;
+        this.remotePort = remotePort;
+        this.localAddress = localAddress;
+        this.remoteAddress = remoteAddress;
+    }
+
+
+
     public CheckNetCon(AgentMessage message)
     {
         super(message);

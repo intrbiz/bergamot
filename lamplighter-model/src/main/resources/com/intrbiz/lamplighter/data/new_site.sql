@@ -11,6 +11,8 @@ BEGIN
     PERFORM lamplighter.create_long_gauge_reading(p_site_id, NULL);
     PERFORM lamplighter.create_int_gauge_reading(p_site_id, NULL);
     PERFORM lamplighter.create_float_gauge_reading(p_site_id, NULL);
+    PERFORM lamplighter.create_meter_reading(p_site_id, NULL);
+    PERFORM lamplighter.create_timer_reading(p_site_id, NULL);
     -- all done
     RETURN 1;
 END;

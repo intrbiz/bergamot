@@ -14,11 +14,8 @@ import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.health.model.KnownDaemon;
-import com.intrbiz.bergamot.model.message.health.HealthCheckHeartbeat;
 import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
-import com.intrbiz.bergamot.model.message.health.HealthCheckKill;
 import com.intrbiz.bergamot.model.message.health.HealthCheckMessage;
-import com.intrbiz.bergamot.model.message.health.HealthCheckRequestJoin;
 import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.queue.HealthCheckQueue;
 import com.intrbiz.queue.Producer;
@@ -42,8 +39,6 @@ public class HealthTracker
     @SuppressWarnings("unused")
     private com.intrbiz.queue.Consumer<HealthCheckMessage, NullKey> healthcheckConsumer;
     
-    private Producer<HealthCheckMessage> healthcheckControlProducer;
-    
     private Producer<HealthCheckMessage> healthcheckEventProducer;
     
     private static final Logger logger = Logger.getLogger(HealthTracker.class);
@@ -66,8 +61,6 @@ public class HealthTracker
                 this.inited = true;
                 // setup queues
                 this.setupQueue();
-                // request daemons to join
-                this.requestJoin();
                 // setup the check timer
                 this.setupTimer();
             }
@@ -119,16 +112,6 @@ public class HealthTracker
         this.unjoinDaemon(instanceId, null, "unknown");
     }
     
-    /**
-     * Request that the given running daemon with the given instance and runtime id immediately terminates
-     * @param instanceId the daemon instance id
-     * @param runtimeId the daemon runtime id
-     */
-    public void killDaemon(UUID instanceId, UUID runtimeId, String password)
-    {
-        this.healthcheckControlProducer.publish(new HealthCheckKill(instanceId, runtimeId, password));
-    }
-    
     private void setupTimer()
     {
         this.timer = new Timer();
@@ -170,19 +153,13 @@ public class HealthTracker
     private void setupQueue()
     {
         this.queue = HealthCheckQueue.open();
-        this.healthcheckControlProducer = this.queue.publishHealthCheckControlEvents();
         this.healthcheckEventProducer = this.queue.publishHealthCheckEvents();
         this.healthcheckConsumer = this.queue.consumeHealthCheckEvents(this::handleMessage);
     }
     
     private void handleMessage(Map<String, Object> headers, HealthCheckMessage message)
     {
-        if (message instanceof HealthCheckHeartbeat)
-        {
-            // heartbeat
-            this.processHeartbeat((HealthCheckHeartbeat) message);
-        }
-        else if (message instanceof HealthCheckJoin)
+        if (message instanceof HealthCheckJoin)
         {
             // join
             this.processJoin((HealthCheckJoin) message);
@@ -194,14 +171,12 @@ public class HealthTracker
         }
     }
     
-    private void processHeartbeat(HealthCheckHeartbeat heartbeat)
+    private void processJoin(HealthCheckJoin join)
     {
         // lookup the daemon
-        KnownDaemon daemon = this.knownDaemons.get(heartbeat.getInstanceId());
+        KnownDaemon daemon = this.knownDaemons.get(join.getInstanceId());
         if (daemon != null)
         {
-            // update the state
-            daemon.setLastHeartbeatSequence(heartbeat.getSequence());
             // use nanoTime as that is monotonic
             daemon.setLastHeartbeatAt(System.nanoTime());
             daemon.setLastHeartbeatTime(System.currentTimeMillis());
@@ -220,8 +195,8 @@ public class HealthTracker
         }
         else
         {
-            logger.warn("Got heartbeat for unkown daemon " + heartbeat.getInstanceId() + ", requesting join");
-            this.requestJoin();
+            this.knownDaemons.put(join.getInstanceId(), new KnownDaemon(join.getInstanceId(), join.getRuntimeId(), join.getDaemonKind(), join.getDaemonName(), join.getStarted(), join.getHostId(), join.getHostName()));
+            logger.info("Received join from " + join.getInstanceId() + " daemon " + join.getDaemonKind() + "::" + join.getDaemonName());
         }
     }
     
@@ -229,23 +204,5 @@ public class HealthTracker
     {
         this.knownDaemons.remove(unjoin.getInstanceId());
         logger.info("Received unjoin event from " + unjoin.getInstanceId() + " daemon " + unjoin.getDaemonName());
-    }
-    
-    private void processJoin(HealthCheckJoin join)
-    {
-        this.knownDaemons.put(join.getInstanceId(), new KnownDaemon(join.getInstanceId(), join.getRuntimeId(), join.getDaemonKind(), join.getDaemonName(), join.getStarted(), join.getHostId(), join.getHostName()));
-        logger.info("Received join event from " + join.getInstanceId() + " daemon " + join.getDaemonKind() + "::" + join.getDaemonName());
-    }
-    
-    private void requestJoin()
-    {
-        try
-        {
-            this.healthcheckControlProducer.publish(new HealthCheckRequestJoin());
-        }
-        catch (Exception e)
-        {
-            logger.warn("Could not send health check join request");
-        }
     }
 }

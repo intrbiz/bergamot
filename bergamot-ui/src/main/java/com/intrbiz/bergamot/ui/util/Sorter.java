@@ -27,6 +27,13 @@ public class Sorter
         return ret;
     }
     
+    public static <T extends Group> List<T> orderGroupsByName(Collection<T> toSort)
+    {
+        List<T> ret = new LinkedList<T>(toSort);
+        Collections.sort(ret, (a,b) -> a.getName().compareTo(b.getName()));
+        return ret;
+    }
+    
     public static <T extends Host> List<T> orderHostsByStatus(Collection<T> toSort)
     {
         List<T> ret = new LinkedList<T>(toSort);
@@ -45,6 +52,13 @@ public class Sorter
     {
         List<T> ret = new LinkedList<T>(toSort);
         Collections.sort(ret, (a, b) -> { return a.getState().getStatus() == b.getState().getStatus() ? a.getSummary().compareTo(b.getSummary()) : b.getState().getStatus().compareTo(a.getState().getStatus()); });
+        return ret;
+    }
+    
+    public static <T extends Check<?,?>> List<T> orderCheckByName(Collection<T> toSort)
+    {
+        List<T> ret = new LinkedList<T>(toSort);
+        Collections.sort(ret, (a, b) -> a.getName().compareTo(b.getName()));
         return ret;
     }
 }

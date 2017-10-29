@@ -67,6 +67,24 @@ public class CheckProcess extends AgentMessage
     {
         super();
     }
+    
+    
+
+    public CheckProcess(boolean listProcesses, String command, boolean flattenCommand, List<String> arguments, boolean regex, List<String> state, String user, String group, String title)
+    {
+        super();
+        this.listProcesses = listProcesses;
+        this.command = command;
+        this.flattenCommand = flattenCommand;
+        this.arguments = arguments;
+        this.regex = regex;
+        this.state = state;
+        this.user = user;
+        this.group = group;
+        this.title = title;
+    }
+
+
 
     public CheckProcess(AgentMessage message)
     {

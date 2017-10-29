@@ -61,7 +61,7 @@ public class RabbitUpdateQueue extends UpdateQueue
     @Override
     public Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler, UUID site, UUID check)
     {
-        return new RabbitConsumer<Update, UpdateKey>(this.broker, this.transcoder.asQueueEventTranscoder(Update.class), handler, this.source.getRegistry().timer("consume-update"))
+        return new RabbitConsumer<Update, UpdateKey>(this.broker, this.transcoder.asQueueEventTranscoder(Update.class), handler, this.source.getRegistry().timer("consume-update"), 1, false)
         {
             protected String setupQueue(Channel on) throws IOException
             {
@@ -81,7 +81,7 @@ public class RabbitUpdateQueue extends UpdateQueue
     @Override
     public Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler)
     {
-        return new RabbitConsumer<Update, UpdateKey>(this.broker, this.transcoder.asQueueEventTranscoder(Update.class), handler, this.source.getRegistry().timer("consume-update"))
+        return new RabbitConsumer<Update, UpdateKey>(this.broker, this.transcoder.asQueueEventTranscoder(Update.class), handler, this.source.getRegistry().timer("consume-update"), 1, false)
         {
             protected String setupQueue(Channel on) throws IOException
             {
@@ -101,7 +101,7 @@ public class RabbitUpdateQueue extends UpdateQueue
     @Override
     public Consumer<Update, UpdateKey> consumeUpdates(DeliveryHandler<Update> handler, Set<UpdateKey> initialBindings)
     {
-        return new RabbitConsumer<Update, UpdateKey>(this.broker, this.transcoder.asQueueEventTranscoder(Update.class), handler, this.source.getRegistry().timer("consume-update"))
+        return new RabbitConsumer<Update, UpdateKey>(this.broker, this.transcoder.asQueueEventTranscoder(Update.class), handler, this.source.getRegistry().timer("consume-update"), 1, false)
         {
             protected String setupQueue(Channel on) throws IOException
             {

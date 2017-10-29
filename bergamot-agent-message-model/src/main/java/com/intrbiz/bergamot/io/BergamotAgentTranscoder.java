@@ -26,6 +26,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
+import com.intrbiz.bergamot.model.message.agent.check.CheckMetrics;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIO;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIf;
@@ -48,6 +49,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskStat;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
 import com.intrbiz.bergamot.model.message.agent.stat.MemStat;
+import com.intrbiz.bergamot.model.message.agent.stat.MetricsStat;
 import com.intrbiz.bergamot.model.message.agent.stat.NetConStat;
 import com.intrbiz.bergamot.model.message.agent.stat.NetIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.NetIfStat;
@@ -142,7 +144,10 @@ public class BergamotAgentTranscoder
         AgentRegistrationRequired.class,
         AgentRegistrationRequest.class,
         AgentRegistrationComplete.class,
-        AgentRegistrationFailed.class
+        AgentRegistrationFailed.class,
+        // metrics
+        CheckMetrics.class,
+        MetricsStat.class
     };
     
     private static final BergamotAgentTranscoder US = new BergamotAgentTranscoder();

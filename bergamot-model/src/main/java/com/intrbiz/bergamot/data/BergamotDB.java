@@ -90,7 +90,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 50, 0}),
+        version = @SQLVersion({3, 52, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -429,47 +429,47 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_sla_by_name.#{check_id}.*", "get_slas_for_check.#{check_id}.*"})
-    @SQLSetter(table = SLA.class, name = "set_sla", since = @SQLVersion({3, 47, 0}))
+    @SQLSetter(table = SLA.class, name = "set_sla", since = @SQLVersion({3, 52, 0}))
     public abstract void setSLA(SLA SLA);
     
     @Cacheable
-    @SQLGetter(table = SLA.class, name = "get_sla", since = @SQLVersion({3, 47, 0}))
+    @SQLGetter(table = SLA.class, name = "get_sla", since = @SQLVersion({3, 52, 0}))
     public abstract SLA getSLA(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = SLA.class, name = "get_sla_by_name", since = @SQLVersion({3, 47, 0}))
+    @SQLGetter(table = SLA.class, name = "get_sla_by_name", since = @SQLVersion({3, 52, 0}))
     public abstract SLA getSLAByName(@SQLParam("check_id") UUID checkId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = SLA.class, name = "get_slas_for_check", since = @SQLVersion({3, 47, 0}))
+    @SQLGetter(table = SLA.class, name = "get_slas_for_check", since = @SQLVersion({3, 52, 0}))
     public abstract List<SLA> getSLAsForCheck(@SQLParam("check_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_sla_by_name.*", "get_slas_for_check.*"})
-    @SQLRemove(table = SLA.class, name = "remove_sla", since = @SQLVersion({3, 47, 0}))
+    @SQLRemove(table = SLA.class, name = "remove_sla", since = @SQLVersion({3, 52, 0}))
     public abstract void removeSLA(@SQLParam("id") UUID id);
     
     // SLA Rolling Period
     
     @Cacheable
     @CacheInvalidate({"get_sla_rolling_period_by_name.#{sla_id}.*", "get_sla_rolling_periods_for_sla.#{sla_id}.*"})
-    @SQLSetter(table = SLARollingPeriod.class, name = "set_sla_rolling_period", since = @SQLVersion({3, 47, 0}))
+    @SQLSetter(table = SLARollingPeriod.class, name = "set_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
     public abstract void setSLARollingPeriod(SLARollingPeriod SLARollingPeriod);
     
     @Cacheable
-    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period", since = @SQLVersion({3, 47, 0}))
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
     public abstract SLARollingPeriod getSLARollingPeriod(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period_by_name", since = @SQLVersion({3, 47, 0}))
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period_by_name", since = @SQLVersion({3, 52, 0}))
     public abstract SLARollingPeriod getSLARollingPeriodByName(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
     
-    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_periods_for_sla", since = @SQLVersion({3, 47, 0}))
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_periods_for_sla", since = @SQLVersion({3, 52, 0}))
     public abstract List<SLARollingPeriod> getSLARollingPeriodsForSLA(@SQLParam("sla_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_sla_rolling_period_by_name.#{sla_id}.*", "get_sla_rolling_periods_for_sla.#{sla_id}.*"})
-    @SQLRemove(table = SLARollingPeriod.class, name = "remove_sla_rolling_period", since = @SQLVersion({3, 47, 0}))
+    @SQLRemove(table = SLARollingPeriod.class, name = "remove_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
     public abstract void removeSLARollingPeriod(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
     
     // command
@@ -1024,7 +1024,8 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_all_alerts_for_check_paged.*",
         "get_recovered_alerts_for_check.*", 
         "get_alerts_for_check.*", 
-        "get_current_alert_for_check.*"
+        "get_current_alert_for_check.*",
+        "get_last_alert_for_check.*"
     })
     @SQLRemove(table = Alert.class, name = "remove_alert", since = @SQLVersion({1, 0, 0}))
     public abstract void removeAlert(@SQLParam("id") UUID id);
@@ -1060,6 +1061,12 @@ public abstract class BergamotDB extends DatabaseAdapter
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE ORDER BY raised DESC LIMIT 1")
     )
     public abstract Alert getCurrentAlertForCheck(@SQLParam("check_id") UUID checkId);
+    
+    @Cacheable
+    @SQLGetter(table = Alert.class, name = "get_last_alert_for_check", since = @SQLVersion({3, 50, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id ORDER BY raised DESC LIMIT 1")
+    )
+    public abstract Alert getLastAlertForCheck(@SQLParam("check_id") UUID checkId);
     
     @SQLGetter(table = Alert.class, name = "list_alerts", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE site_id = p_site_id AND recovered = FALSE AND acknowledged = FALSE ORDER BY raised DESC")
