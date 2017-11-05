@@ -1,23 +1,29 @@
 package com.intrbiz.bergamot.check.http;
 
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.DefaultHttpHeaders;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
-
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.crypto.util.TLSConstants;
 import com.intrbiz.bergamot.crypto.util.TLSConstants.CipherInfo;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.CharsetUtil;
 
 /**
  * Fluent interface to construct a HTTP check
@@ -57,6 +63,10 @@ public abstract class HTTPCheckBuilder
     private String username;
     
     private String password;
+    
+    private String contentType;
+    
+    private String content;
     
     public HTTPCheckBuilder()
     {
@@ -326,6 +336,48 @@ public abstract class HTTPCheckBuilder
         return this;
     }
     
+    public HTTPCheckBuilder content(String contentType, String content)
+    {
+        this.contentType = contentType;
+        this.content = content;
+        return this;
+    }
+    
+    public HTTPCheckBuilder contentJSON(String content)
+    {
+        this.contentType = HttpHeaders.Values.APPLICATION_JSON;
+        this.content = content;
+        return this;
+    }
+    
+    public HTTPCheckBuilder contentFormData(String content)
+    {
+        this.contentType = HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+        this.content = content;
+        return this;
+    }
+    
+    public HTTPCheckBuilder contentFormData(Map<String, String> content)
+    {
+        this.contentType = HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+        StringBuilder contentStr = new StringBuilder();
+        boolean ns = false;
+        for (Entry<String, String> entry : content.entrySet())
+        {
+            if (ns) contentStr.append('&');
+            try
+            {
+                contentStr.append(URLEncoder.encode(entry.getKey(), "UTF8")).append('=').append(URLEncoder.encode(entry.getValue(), "UTF8"));
+            }
+            catch (UnsupportedEncodingException e)
+            {
+            }
+            ns = true;
+        }
+        this.content = contentStr.toString();
+        return this;
+    }
+    
     public HTTPCheckBuilder onResponse(Consumer<HTTPCheckResponse> responseHandler)
     {
         this.responseHandler = responseHandler;
@@ -353,8 +405,10 @@ public abstract class HTTPCheckBuilder
         if (this.port == -1) this.port = this.ssl ? 443 : 80;
         // default virtual host
         if (this.virtualHost == null) this.virtualHost = this.address;
+        // content
+        ByteBuf content = this.content == null ? Unpooled.buffer(0) : Unpooled.copiedBuffer(this.content, CharsetUtil.UTF_8);
         // build the request
-        FullHttpRequest request = new DefaultFullHttpRequest(this.version, this.method, this.path);
+        FullHttpRequest request = new DefaultFullHttpRequest(this.version, this.method, this.path, content);
         // default to connection close
         request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         // virtual host
@@ -362,6 +416,11 @@ public abstract class HTTPCheckBuilder
         else request.headers().add(HttpHeaders.Names.HOST, this.virtualHost + ":" + this.port);
         // user agent
         request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring Check HTTP 1.0.0");
+        // Content Type
+        if (this.contentType != null)
+        {
+            request.headers().add(HttpHeaders.Names.CONTENT_TYPE, this.contentType);
+        }
         // HTTP auth
         if (! Util.isEmpty(this.username))
         {
