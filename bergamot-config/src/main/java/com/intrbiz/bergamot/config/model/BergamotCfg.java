@@ -353,6 +353,12 @@ public class BergamotCfg extends Configuration implements BergamotObjectLocator
     {
         return new List[] { this.clusters, this.commands, this.contacts, this.groups, this.hosts, this.locations, this.resources, this.services, this.teams, this.timePeriods, this.traps, this.securityDomains, this.credentials };
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<CheckCfg<?>>[] getAllChecks()
+    {
+        return new List[] { this.clusters, this.hosts, this.resources, this.services, this.traps };
+    }
 
     public void index(boolean force)
     {

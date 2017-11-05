@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import com.intrbiz.bergamot.config.model.SLACfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.SLAMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -113,6 +114,22 @@ public class SLA extends BergamotObject<SLAMO>
             periods.addAll(db.getSLARollingPeriodsForSLA(this.id));
         }
         return periods;
+    }
+    
+    public SLA forCheck(Check<?,?> check)
+    {
+        this.checkId = check.getId();
+        this.id = Site.randomId(Site.getSiteId(this.checkId));
+        return this;
+    }
+    
+    public SLA configure(SLACfg config)
+    {
+        this.name = config.getName();
+        this.summary = config.getSummary();
+        this.description = config.getDescription();
+        this.target = config.getTargetValue();
+        return this;
     }
 
     @Override

@@ -15,6 +15,8 @@ public abstract class SLAPeriodCfg implements Serializable
     private String name;
     
     private String summary;
+    
+    private String description;
 
     public SLAPeriodCfg()
     {
@@ -43,6 +45,18 @@ public abstract class SLAPeriodCfg implements Serializable
     public void setSummary(String summary)
     {
         this.summary = summary;
+    }
+    
+    @XmlElement(name = "description")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     @Override

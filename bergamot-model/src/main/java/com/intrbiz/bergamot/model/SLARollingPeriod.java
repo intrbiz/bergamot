@@ -2,6 +2,9 @@ package com.intrbiz.bergamot.model;
 
 import java.util.EnumSet;
 
+import com.intrbiz.Util;
+import com.intrbiz.bergamot.config.model.SLARollingPeriodCfg;
+import com.intrbiz.bergamot.config.model.SLARollingPeriodCfg.RollingPeriodGranularityCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.SLARollingPeriodMO;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -12,7 +15,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 public class SLARollingPeriod extends SLAPeriod<SLARollingPeriodMO>
 {
     public enum RollingPeriodGranularity {
-        DAILY, WEEKLY, MONTLY, YEARLY
+        DAILY, WEEKLY, MONTHLY, YEARLY
     }
 
     private static final long serialVersionUID = 1L;
@@ -33,6 +36,19 @@ public class SLARollingPeriod extends SLAPeriod<SLARollingPeriodMO>
     public void setGranularity(RollingPeriodGranularity granularity)
     {
         this.granularity = granularity;
+    }
+    
+    public SLARollingPeriod forSLA(SLA sla)
+    {
+        super.forSLA(sla);
+        return this;
+    }
+    
+    public SLARollingPeriod configure(SLARollingPeriodCfg config)
+    {
+        super.configure(config);
+        this.granularity = RollingPeriodGranularity.valueOf(Util.coalesce(config.getGranularity(), RollingPeriodGranularityCfg.monthly).toString().toUpperCase());
+        return this;
     }
 
     @Override

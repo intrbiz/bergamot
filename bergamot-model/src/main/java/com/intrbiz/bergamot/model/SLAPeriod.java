@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model;
 import java.util.EnumSet;
 import java.util.UUID;
 
+import com.intrbiz.bergamot.config.model.SLAPeriodCfg;
 import com.intrbiz.bergamot.model.message.SLAPeriodMO;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -17,17 +18,17 @@ public abstract class SLAPeriod<T extends SLAPeriodMO> extends BergamotObject<T>
     @SQLColumn(index = 1, name = "sla_id", since = @SQLVersion({ 3, 52, 0 }))
     @SQLForeignKey(references = SLA.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 52, 0 }))
     @SQLPrimaryKey
-    private UUID slaId;
+    protected UUID slaId;
 
     @SQLColumn(index = 2, name = "name", since = @SQLVersion({ 3, 52, 0 }))
     @SQLPrimaryKey
-    private String name;
+    protected String name;
 
     @SQLColumn(index = 3, name = "summary", since = @SQLVersion({ 3, 52, 0 }))
-    private String summary;
+    protected String summary;
 
     @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 3, 52, 0 }))
-    private String description;
+    protected String description;
 
     public SLAPeriod()
     {
@@ -72,6 +73,20 @@ public abstract class SLAPeriod<T extends SLAPeriodMO> extends BergamotObject<T>
     public void setDescription(String description)
     {
         this.description = description;
+    }
+    
+    public SLAPeriod<?> forSLA(SLA sla)
+    {
+        this.slaId = sla.getId();
+        return this;
+    }
+    
+    public SLAPeriod<?> configure(SLAPeriodCfg config)
+    {
+        this.name = config.getName();
+        this.summary = config.getSummary();
+        this.description = config.getDescription();
+        return this;
     }
 
     protected void toMO(Contact contact, EnumSet<MOFlag> options, SLAPeriodMO mo)
