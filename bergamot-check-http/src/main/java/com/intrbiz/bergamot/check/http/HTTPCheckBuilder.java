@@ -421,6 +421,11 @@ public abstract class HTTPCheckBuilder
         {
             request.headers().add(HttpHeaders.Names.CONTENT_TYPE, this.contentType);
         }
+        // Content Length
+        if (this.content != null)
+        {
+            request.headers().add(HttpHeaders.Names.CONTENT_TYPE, request.content().readableBytes());
+        }
         // HTTP auth
         if (! Util.isEmpty(this.username))
         {
