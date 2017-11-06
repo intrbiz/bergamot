@@ -424,7 +424,7 @@ public abstract class HTTPCheckBuilder
         // Content Length
         if (this.content != null)
         {
-            request.headers().add(HttpHeaders.Names.CONTENT_TYPE, request.content().readableBytes());
+            request.headers().add(HttpHeaders.Names.CONTENT_LENGTH, request.content().readableBytes());
         }
         // HTTP auth
         if (! Util.isEmpty(this.username))
