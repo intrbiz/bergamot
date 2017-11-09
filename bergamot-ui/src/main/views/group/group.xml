@@ -9,6 +9,7 @@
 		
 		<div class="row submenu pull-right">
 			<a href="/group/execute-all-checks/#{group.id}" id="check-all-now" data-group-id="#{group.id}">Check all now</a>
+			<a href="/sla/group/id/#{group.id}">SLA Reports</a>
 		</div>
 		
 		<div class="row">

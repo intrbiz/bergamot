@@ -2,8 +2,9 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
 	<div class="row" id="alert-#{alert.id}">
-		<div class="submenu pull-right" rendered="#{(!(alert.acknowledged or alert.recovered)) and Balsa().permission('acknowledge', alert.checkId)}">
-			<a href="#acknowledge-alert" id="acknowledge-#{alert.id}" data-acknowledge-alert="#{alert.id}">Acknowledge this alert</a>
+		<div class="submenu pull-right">
+			<a href="#acknowledge-alert" id="acknowledge-#{alert.id}" data-acknowledge-alert="#{alert.id}" rendered="#{(!(alert.acknowledged or alert.recovered)) and Balsa().permission('acknowledge', alert.checkId)}">Acknowledge this alert</a>
+			<a href="#falsepositive-alert" id="falsepositive-#{alert.id}" data-falsepositive-alert="#{alert.id}" rendered="#{(! alert.falsePositive) and (alert.acknowledged or alert.recovered) and Balsa().permission('acknowledge', alert.checkId)}">This alert is a false positive</a>
 		</div>
 	    <div class="col4 dash_icon alert">
 			<h3>
@@ -45,6 +46,18 @@
 		    <p rendered="#{alert.acknowledged}">
 		    	<span class="label">By: </span>
 			    <span class="value">#{alert.acknowledgedBy.summary}</span>
+		    </p>
+		    <p class="alert-falsepositive">
+			    <span class="label">False Positive: </span>
+			    <span class="value">#{if(alert.falsePositive, 'Yes', 'No')}</span>
+		    </p>
+		    <p rendered="#{alert.falsePositive}">
+		    	<span class="label">At: </span>
+			    <span class="value">#{dateformat('HH:mm:ss', alert.falsePositiveAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.falsePositiveAt)}</span>
+		    </p>
+		    <p rendered="#{alert.falsePositive}">
+		    	<span class="label">By: </span>
+			    <span class="value">#{alert.falsePositiveBy.summary}</span>
 		    </p>
 	    </div>
 	    <div class="col4 dash_icon alert">

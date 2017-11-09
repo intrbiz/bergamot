@@ -29,15 +29,39 @@
 	     	</form>
 	    	<a class="close-reveal-modal">&#215;</a>
 		</div>
+		
 		<div id="comment_modal" class="reveal-modal">
 			<div id="comment_container">
 	     	</div>
 	    	<a class="close-reveal-modal">&#215;</a>
 		</div>
+		
+		<div id="falsepositive_modal" class="reveal-modal">
+	     	<h1>False Positive Alert</h1>
+	     	<form id="falsepositive_form" method="post" action="#falsepositive">
+	     		<p>To mark this alert as a false positive, please provide a justification.</p>
+	     		<p>
+	     			<span style="display: block; float: left; padding-top: 7px; width: 85px;">Summary: </span>
+	     			<input type="text" id="falsepositive_summary" name="summary" placeholder="Internet went down" style="width: 402px;"/>
+	     		</p>
+	     		<p>
+	     			<textarea id="falsepositive_comment" name="comment" style="width: 500px; height: 150px;"></textarea>
+	     		</p>
+	     		<p id="falsepositive_error" style="display: none;" class="error">
+	     			Failed to mark this alert as a false positive, please make sure you provide a summary and comment and try again.
+	     		</p>
+	     		<p>
+	     			<input type="submit" id="do_falsepositive" name="falsepositive" value="Mark As False Positive"/>
+	     		</p>
+	     	</form>
+	    	<a class="close-reveal-modal">&#215;</a>
+		</div>
+		
 		<script type="text/javascript">
 			<![CDATA[
 			// acknowledge alerts
 			$(document).ready(function() {
+			    // acknowledge
 				$('a[data-acknowledge-alert]').click(function(ev) {
 					ev.preventDefault();
 					var alert_id = $(this).attr('data-acknowledge-alert');
@@ -80,6 +104,40 @@
 					 	$('#comment_container').html(data);
 						$('#comment_modal').reveal();
 					});
+				});
+				// false positive
+				$('a[data-falsepositive-alert]').click(function(ev) {
+					ev.preventDefault();
+					var alert_id = $(this).attr('data-falsepositive-alert');
+					$('#acknowledge_form').attr('action', #{'"' + path('/api/alert/id') + '/"'} + alert_id + '/falsepositive');
+					$('#acknowledge_form').attr('data-falsepositive-alert', alert_id);
+					$('#acknowledge_error').hide();
+					$('#acknowledge_modal').reveal();
+				});
+				$('#falsepositive_form').submit(function(ev) {
+					ev.preventDefault();
+					var alert_id = $(this).attr('data-falsepositive-alert');
+					$.post($(this).attr('action'), $("#falsepositive_form").serialize())
+					 .done(function(data) {
+					 	$('#falsepositive_modal').trigger('reveal:close');
+					 	// fetch the rerendered content
+					 	$.get(#{'"' + path('/api/alert/id') + '/"'} + alert_id + '/render', function(data) {
+					 		$('#alert-' + alert_id).replaceWith(data);
+					 		// comment handlers
+							$('#alert-' + alert_id).find('a[data-comment-id]').click(function(ev) {
+								ev.preventDefault();
+								var comment_id = $(this).attr('data-comment-id');
+								// get the comment content
+								$.get(#{'"' + path('/api/comment/id') + '/"'} + comment_id + '/render', function(data) {
+								 	$('#comment_container').html(data);
+									$('#comment_modal').reveal();
+								});
+							});
+					 	});
+					 })
+					 .fail(function() {
+					 	$('#falsepositive_error').show();
+					 });
 				});
 			});
 			]]>

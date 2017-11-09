@@ -1,0 +1,48 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="SLA Report For #{group.summary}">
+
+	<div class="row">
+		<div class="col4">
+			<p rendered="#{! isempty(slas)}">
+				Below is all the Service Level Agreement reports for the group #{group.summary}.
+			</p>
+			<p rendered="#{isempty(slas)}">
+				There are no Service Level Agreement reports for the group #{group.summary}.
+			</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col12">
+			<table style="width: 100%;">
+				<tr>
+					<th>SLA</th>
+					<th>Period</th>
+					<th>Period Start</th>
+					<th>Period End</th>
+					<th>Alerts</th>
+					<th>False Positives</th>
+					<th>Target</th>
+					<th>Actual</th>
+					<th>Breached</th>
+				</tr>
+				<data-set var="report" value="#{slas}">
+					<tr>
+						<td>#{report.slaSummary}</td>
+						<td>#{report.periodSummary}</td>
+						<td>#{dateformat('EEEE dd/MM/yyyy', report.periodStart)}</td>
+						<td>#{dateformat('EEEE dd/MM/yyyy', report.periodEnd)}</td>
+						<td>#{report.periodAlerts}</td>
+						<td>#{report.periodFalsePositives}</td>
+						<td>#{decimalformat('0.00', report.slaTarget * 100)}%</td>
+						<td>#{decimalformat('0.00', report.periodValue * 100)}%</td>
+						<td>#{if(report.periodBreached, 'Yes', 'No')}</td>
+					</tr>
+				</data-set>
+			</table>			
+		</div>
+	</div>
+	
+</fragment>

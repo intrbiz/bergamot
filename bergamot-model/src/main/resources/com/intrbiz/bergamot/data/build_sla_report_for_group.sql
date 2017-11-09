@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION bergamot.build_sla_report_for_group(p_group_id UUID)
-RETURNS SETOF bergamot.sla_report
+RETURNS SETOF bergamot.t_sla_report
 LANGUAGE plpgsql AS $$
 BEGIN
   RETURN QUERY SELECT
@@ -11,14 +11,14 @@ BEGIN
     sla_period.sla_name,
     sla_period.sla_summary,
     sla_period.sla_description,
-    sla_period.sla_target,
+    sla_period.sla_target :: double precision,
     sla_period.period_name,
     sla_period.period_summary,
     sla_period.period_description,
     (now() - sla_period.period_interval) AS period_start,
     now() AS period_end,
-    downtime.alerts AS period_alerts,
-    downtime.false_positives AS period_false_positives,
+    downtime.alerts :: integer AS period_alerts,
+    downtime.false_positives :: integer AS period_false_positives,
     ((extract(epoch FROM sla_period.period_interval) - coalesce(extract(epoch FROM downtime.downtime), 0))::DOUBLE PRECISION / extract(epoch FROM sla_period.period_interval)::DOUBLE PRECISION) AS period_value,
     (((extract(epoch FROM sla_period.period_interval) - coalesce(extract(epoch FROM downtime.downtime), 0))::DOUBLE PRECISION / extract(epoch FROM sla_period.period_interval)::DOUBLE PRECISION) < sla_period.sla_target) AS period_breached
     FROM (
@@ -43,7 +43,10 @@ BEGIN
         JOIN bergamot.sla_rolling_period r ON (s.id = r.sla_id)
     ) sla_period
     JOIN LATERAL (
-        SELECT count(*) AS alerts, (count(*) FILTER (WHERE a.false_positive)) AS false_positives, sum(coalesce(a.recovered_at, now()) - a.raised) AS downtime
+        SELECT 
+          count(*) AS alerts, 
+          (count(*) FILTER (WHERE a.false_positive)) AS false_positives, 
+          sum(coalesce(a.recovered_at, now()) - a.raised) FILTER (WHERE a.false_positive IS NULL OR NOT a.false_positive) AS downtime
         FROM bergamot.alert a
         WHERE a.check_id = sla_period.sla_check_id
         AND   a.raised BETWEEN now() - sla_period.period_interval AND now()

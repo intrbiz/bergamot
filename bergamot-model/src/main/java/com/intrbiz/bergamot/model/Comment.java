@@ -25,6 +25,7 @@ public class Comment extends BergamotObject<CommentMO> implements Serializable
     public static final class CommentType {
         public static final String GENERAL = "general";
         public static final String ACKNOWLEDGEMENT = "acknowledgement";
+        public static final String FALSE_POSITIVE = "falsepositive";
     }
     
     public static final class Format {
@@ -271,6 +272,13 @@ public class Comment extends BergamotObject<CommentMO> implements Serializable
     {
         this.on(alert);
         this.setCommentType(CommentType.ACKNOWLEDGEMENT);
+        return this;
+    }
+    
+    public Comment falsePositive(Alert alert)
+    {
+        this.on(alert);
+        this.setCommentType(CommentType.FALSE_POSITIVE);
         return this;
     }
     
