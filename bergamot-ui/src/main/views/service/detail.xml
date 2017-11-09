@@ -9,6 +9,7 @@
 		<a rendered="#{service.enabled and Balsa().permission('disable', service)}"         href="/service/disable/#{service.id}">Disable</a>
 		<a rendered="#{(!service.enabled) and Balsa().permission('enable', service)}"       href="/service/enable/#{service.id}">Enable</a>
 		<a rendered="#{Balsa().permission('execute', service)}"                             href="/service/execute/#{service.id}" id="check-now" data-check-id="#{service.id}">Check now</a>
+		<a href="/sla/check/id/#{service.id}">SLA Reports</a>
 	</div>
 
 	<div class="row">

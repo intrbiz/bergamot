@@ -8,6 +8,7 @@
 		<a rendered="#{(!trap.suppressed) and Balsa().permission('suppress', trap)}"  href="/trap/suppress/#{trap.id}">Supress</a>
 		<a rendered="#{trap.enabled and Balsa().permission('disable', trap)}"         href="/trap/disable/#{trap.id}">Disable</a>
 		<a rendered="#{(!trap.enabled) and Balsa().permission('enable', trap)}"       href="/trap/enable/#{trap.id}">Enable</a>
+		<a href="/sla/check/id/#{trap.id}">SLA Reports</a>
 	</div>
 
 	<div class="row">

@@ -9,6 +9,7 @@
 		<a rendered="#{host.enabled and Balsa().permission('disable', host)}"         href="/host/disable/#{host.id}">Disable</a>
 		<a rendered="#{(!host.enabled) and Balsa().permission('enable', host)}"       href="/host/enable/#{host.id}">Enable</a>
 		<a rendered="#{Balsa().permission('execute', host)}"                          href="/host/execute/#{host.id}" id="check-now" data-check-id="#{host.id}">Check now</a>
+		<a href="/sla/check/id/#{host.id}">SLA Reports</a>
 	</div>
 
 	<div class="row">

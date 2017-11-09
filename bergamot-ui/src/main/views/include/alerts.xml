@@ -109,10 +109,10 @@
 				$('a[data-falsepositive-alert]').click(function(ev) {
 					ev.preventDefault();
 					var alert_id = $(this).attr('data-falsepositive-alert');
-					$('#acknowledge_form').attr('action', #{'"' + path('/api/alert/id') + '/"'} + alert_id + '/falsepositive');
-					$('#acknowledge_form').attr('data-falsepositive-alert', alert_id);
-					$('#acknowledge_error').hide();
-					$('#acknowledge_modal').reveal();
+					$('#falsepositive_form').attr('action', #{'"' + path('/api/alert/id') + '/"'} + alert_id + '/falsepositive');
+					$('#falsepositive_form').attr('data-falsepositive-alert', alert_id);
+					$('#falsepositive_error').hide();
+					$('#falsepositive_modal').reveal();
 				});
 				$('#falsepositive_form').submit(function(ev) {
 					ev.preventDefault();
