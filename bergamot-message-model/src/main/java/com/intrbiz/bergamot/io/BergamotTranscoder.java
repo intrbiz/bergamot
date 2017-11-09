@@ -40,6 +40,8 @@ import com.intrbiz.bergamot.model.message.NotificationEngineMO;
 import com.intrbiz.bergamot.model.message.NotificationsMO;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
+import com.intrbiz.bergamot.model.message.SLAMO;
+import com.intrbiz.bergamot.model.message.SLARollingPeriodMO;
 import com.intrbiz.bergamot.model.message.SecurityDomainMO;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
@@ -105,6 +107,7 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.U2FADeviceRegistered;
 import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.report.SLAReportMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
 import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
@@ -166,6 +169,8 @@ public class BergamotTranscoder
         DowntimeMO.class,
         SecurityDomainMO.class,
         CredentialMO.class,
+        SLAMO.class,
+        SLARollingPeriodMO.class,
         // model
         ParameterMO.class,
         // messages
@@ -267,7 +272,9 @@ public class BergamotTranscoder
         // commands
         RegisterBergamotAgent.class,
         RegisteredBergamotAgent.class,
-        GeneralCommandError.class
+        GeneralCommandError.class,
+        // reports
+        SLAReportMO.class
     };
     
     private final ObjectMapper factory = new ObjectMapper();

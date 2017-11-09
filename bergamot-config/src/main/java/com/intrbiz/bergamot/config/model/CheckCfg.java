@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.config.resolver.BeanResolver;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
 import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
+import com.intrbiz.bergamot.config.resolver.stratergy.MergeListUnique;
 import com.intrbiz.bergamot.config.resolver.stratergy.SmartMergeSet;
 
 public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P>
@@ -37,6 +38,8 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     
     private String externalRef;
     
+    private List<SLACfg> slas = new LinkedList<SLACfg>();
+
     private NoteCfg note;
 
     public CheckCfg()
@@ -144,12 +147,6 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
         this.enabled = enabled;
     }
 
-    public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
-    {
-        List<TemplatedObjectCfg<?>> r = new LinkedList<TemplatedObjectCfg<?>>();
-        return r;
-    }
-
     @XmlElementRef(type = InitiallyCfg.class)
     @ResolveWith(Coalesce.class)
     public InitiallyCfg getInitialState()
@@ -172,6 +169,24 @@ public abstract class CheckCfg<P extends CheckCfg<P>> extends SecuredObjectCfg<P
     public void setExternalRef(String externalRef)
     {
         this.externalRef = externalRef;
+    }
+    
+    @XmlElementRef(type = SLACfg.class)
+    @ResolveWith(MergeListUnique.class)
+    public List<SLACfg> getSlas()
+    {
+        return slas;
+    }
+
+    public void setSlas(List<SLACfg> slas)
+    {
+        this.slas = slas;
+    }
+
+    public List<TemplatedObjectCfg<?>> getTemplatedChildObjects()
+    {
+        List<TemplatedObjectCfg<?>> r = new LinkedList<TemplatedObjectCfg<?>>();
+        return r;
     }
 
     @XmlElementRef(type = NoteCfg.class)

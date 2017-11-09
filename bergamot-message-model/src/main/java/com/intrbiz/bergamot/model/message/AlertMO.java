@@ -143,6 +143,27 @@ public class AlertMO extends MessageObject implements CommentedMO
      */
     @JsonProperty("recovered_at")
     private long recoveredAt;
+    
+    @JsonProperty("false_positive")
+    private boolean falsePositive;
+    
+    /**
+     * When was this alert marked as a false positive
+     */
+    @JsonProperty("false_positive_at")
+    private long falsePositiveAt;
+
+    /**
+     * Whom marked this alert as a false positive
+     */
+    @JsonProperty("false_positive_by")
+    private ContactMO falsePositiveBy;
+    
+    /**
+     * Why this alert was marked as a false positive
+     */
+    @JsonProperty("false_positive_reason")
+    private CommentMO falsePositiveReason;
 
     @JsonProperty("comments")
     private List<CommentMO> comments = new LinkedList<CommentMO>();
@@ -447,5 +468,45 @@ public class AlertMO extends MessageObject implements CommentedMO
     public void setEncompassed(List<AlertEncompassesMO> encompassed)
     {
         this.encompassed = encompassed;
+    }
+
+    public boolean isFalsePositive()
+    {
+        return falsePositive;
+    }
+
+    public void setFalsePositive(boolean falsePositive)
+    {
+        this.falsePositive = falsePositive;
+    }
+
+    public long getFalsePositiveAt()
+    {
+        return falsePositiveAt;
+    }
+
+    public void setFalsePositiveAt(long falsePositiveAt)
+    {
+        this.falsePositiveAt = falsePositiveAt;
+    }
+
+    public ContactMO getFalsePositiveBy()
+    {
+        return falsePositiveBy;
+    }
+
+    public void setFalsePositiveBy(ContactMO falsePositiveBy)
+    {
+        this.falsePositiveBy = falsePositiveBy;
+    }
+
+    public CommentMO getFalsePositiveReason()
+    {
+        return falsePositiveReason;
+    }
+
+    public void setFalsePositiveReason(CommentMO falsePositiveReason)
+    {
+        this.falsePositiveReason = falsePositiveReason;
     }
 }

@@ -37,7 +37,7 @@ public class TCPChecker
         this.defaultRequestTimeoutSeconds = defaultRequestTimeoutSeconds;
         this.defaultConnectTimeoutSeconds = defaultConnectTimeoutSeconds;
         // setup the Netty event loop
-        this.eventLoop = new NioEventLoopGroup(threads, new IBThreadFactory("bergamot-http-checker", false));
+        this.eventLoop = new NioEventLoopGroup(threads, new IBThreadFactory("bergamot-tcp-checker", false));
     }
 
     public TCPChecker()

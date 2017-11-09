@@ -34,6 +34,9 @@ import com.intrbiz.bergamot.config.model.NotificationsCfg;
 import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
+import com.intrbiz.bergamot.config.model.SLACfg;
+import com.intrbiz.bergamot.config.model.SLAPeriodCfg;
+import com.intrbiz.bergamot.config.model.SLARollingPeriodCfg;
 import com.intrbiz.bergamot.config.model.SecuredObjectCfg;
 import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
@@ -63,6 +66,8 @@ import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.PassiveCheck;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Resource;
+import com.intrbiz.bergamot.model.SLA;
+import com.intrbiz.bergamot.model.SLARollingPeriod;
 import com.intrbiz.bergamot.model.SecuredObject;
 import com.intrbiz.bergamot.model.SecurityDomain;
 import com.intrbiz.bergamot.model.Service;
@@ -1404,6 +1409,30 @@ public class BergamotConfigImporter
             }
         }
     }
+    
+    private void loadSLAs(Check<?,?> check, CheckCfg<?> resolvedConfiguration, BergamotDB db)
+    {
+        for (SLACfg slaCfg : resolvedConfiguration.getSlas())
+        {
+            SLA sla = db.getSLAByName(check.getId(), slaCfg.getName());
+            if (sla == null) sla = new SLA().forCheck(check);
+            // configure the SLA
+            sla.configure(slaCfg);
+            // upsert the SLA
+            db.setSLA(sla);
+            // configure the periods
+            for (SLAPeriodCfg spCfg : slaCfg.getPeriods())
+            {
+                if (spCfg instanceof SLARollingPeriodCfg)
+                {
+                    SLARollingPeriod srp = db.getSLARollingPeriodByName(sla.getId(), spCfg.getName());
+                    if (srp == null) srp = new SLARollingPeriod().forSLA(sla);
+                    srp.configure((SLARollingPeriodCfg) spCfg);
+                    db.setSLARollingPeriod(srp);
+                }
+            }
+        }
+    }
 
     private void loadCheck(Check<?,?> check, CheckCfg<?> resolvedConfiguration, BergamotDB db)
     {
@@ -1413,6 +1442,8 @@ public class BergamotConfigImporter
         this.loadCheckState(check, resolvedConfiguration, db);
         // the stats
         this.loadCheckStats(check, resolvedConfiguration, db);
+        // the SLAs
+        this.loadSLAs(check, resolvedConfiguration, db);
         // notifications
         this.loadNotifications(check.getId(), resolvedConfiguration.getNotifications(), db);
         // notify

@@ -171,17 +171,92 @@ public class AlertsAPIRouter extends Router<BergamotApp>
             // send acknowledge notifications
             if (! alert.getCheck().getState().isSuppressedOrInDowntime())
             {
-                SendAcknowledge sendAck = alert.createAcknowledgeNotification(Calendar.getInstance(), contact, ackCom);
-                if (sendAck != null && (! sendAck.getTo().isEmpty()))
+                try
                 {
-                    logger.warn("Sending acknowledge for " + alert.getId());
-                    this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
-                    // accounting
-                    this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
+                    SendAcknowledge sendAck = alert.createAcknowledgeNotification(Calendar.getInstance(), contact, ackCom);
+                    if (sendAck != null && (! sendAck.getTo().isEmpty()))
+                    {
+                        logger.warn("Sending acknowledge for " + alert.getId());
+                        this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
+                        // accounting
+                        this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
+                    }
+                    else
+                    {
+                        logger.warn("Not sending acknowledge for " + alert.getId());
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    logger.warn("Not sending acknowledge for " + alert.getId());
+                    logger.warn("Failed to send acknoweldge notification, for alert " + alert);
+                }
+            }
+            // send alert update
+            this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), new AlertUpdate(alert.toMO(currentPrincipal())));
+        }
+        return alert.toMO(currentPrincipal());
+    }
+    
+    @Title("False positive alert")
+    @Desc({
+        "Mark the alert identified by the given UUID as a false positive with the given summary and comment"
+    })
+    @Any("/id/:id/falsepositive")
+    @JSON(notFoundIfNull = true)
+    @WithDataAdapter(BergamotDB.class)
+    public AlertMO falsePositiveAlert(
+            BergamotDB db, 
+            @IsaObjectId() UUID id,
+            @Param("summary") @CheckStringLength(min = 1, max = 80, mandatory = true) String summary, 
+            @Param("comment") @CheckStringLength(min = 0, max = 4096, mandatory = false) String comment
+    )
+    {
+        Alert alert = notNull(db.getAlert(id));
+        require(permission("acknowledge", alert.getCheckId()));
+        // can only acknowledge an non-recovered and non-acknowledged alert
+        if (! alert.isFalsePositive())
+        {
+            // the contact
+            Contact contact = currentPrincipal();
+            // the comment to add
+            Comment ackCom = new Comment().author(contact).falsePositive(alert).summary(summary).message(comment);
+            // acknowledge
+            db.execute(() -> {
+                db.setComment(ackCom);
+                alert.setFalsePositive(true);
+                alert.setFalsePositiveAt(new Timestamp(System.currentTimeMillis()));
+                alert.setFalsePositiveById(contact.getId());
+                alert.setFalsePositiveReasonId(ackCom.getId());
+                if (! alert.isAcknowledged())
+                {
+                    alert.setAcknowledged(true);
+                    alert.setAcknowledgedAt(new Timestamp(System.currentTimeMillis()));
+                    alert.setAcknowledgedById(contact.getId());
+                }
+                db.setAlert(alert);
+                db.acknowledgeCheck(alert.getCheckId(), true);
+            });
+            // send acknowledge notifications
+            if (! alert.getCheck().getState().isSuppressedOrInDowntime())
+            {
+                try
+                {
+                    SendAcknowledge sendAck = alert.createAcknowledgeNotification(Calendar.getInstance(), contact, ackCom);
+                    if (sendAck != null && (! sendAck.getTo().isEmpty()))
+                    {
+                        logger.warn("Sending acknowledge for " + alert.getId());
+                        this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
+                        // accounting
+                        this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
+                    }
+                    else
+                    {
+                        logger.warn("Not sending acknowledge for " + alert.getId());
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.warn("Failed to send false positive acknoweldge notification, for alert " + alert);
                 }
             }
             // send alert update

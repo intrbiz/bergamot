@@ -68,6 +68,7 @@ import com.intrbiz.bergamot.ui.router.LocationRouter;
 import com.intrbiz.bergamot.ui.router.LoginRouter;
 import com.intrbiz.bergamot.ui.router.ProfileRouter;
 import com.intrbiz.bergamot.ui.router.ResourceRouter;
+import com.intrbiz.bergamot.ui.router.SLARouter;
 import com.intrbiz.bergamot.ui.router.ServiceRouter;
 import com.intrbiz.bergamot.ui.router.StatsRouter;
 import com.intrbiz.bergamot.ui.router.StatusRouter;
@@ -273,6 +274,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new CommandRouter());
         router(new AlertsRouter());
         router(new StatusRouter());
+        router(new SLARouter());
         // Agent
         router(new AgentRouter());
         // About

@@ -48,6 +48,8 @@ import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationEngine;
 import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.Resource;
+import com.intrbiz.bergamot.model.SLA;
+import com.intrbiz.bergamot.model.SLARollingPeriod;
 import com.intrbiz.bergamot.model.SecurityDomain;
 import com.intrbiz.bergamot.model.SecurityDomainMembership;
 import com.intrbiz.bergamot.model.Service;
@@ -56,6 +58,7 @@ import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
+import com.intrbiz.bergamot.model.report.SLAReport;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
@@ -81,6 +84,7 @@ import com.intrbiz.data.db.compiler.meta.SQLQuery;
 import com.intrbiz.data.db.compiler.meta.SQLRemove;
 import com.intrbiz.data.db.compiler.meta.SQLSchema;
 import com.intrbiz.data.db.compiler.meta.SQLSetter;
+import com.intrbiz.data.db.compiler.meta.SQLUserDefined;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.data.db.compiler.meta.ScriptType;
 import com.intrbiz.data.db.compiler.util.SQLScript;
@@ -88,7 +92,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 51, 0}),
+        version = @SQLVersion({3, 53, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -130,7 +134,10 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ContactBackupCode.class,
             AgentTemplate.class,
             GlobalSetting.class,
-            Credential.class
+            Credential.class,
+            SLA.class,
+            SLARollingPeriod.class,
+            SLAReport.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -421,6 +428,75 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLRemove(table = Credential.class, name = "remove_credential", since = @SQLVersion({3, 46, 0}))
     public abstract void removeCredential(@SQLParam("id") UUID id);
     
+    // SLA
+    
+    @Cacheable
+    @CacheInvalidate({"get_sla_by_name.#{check_id}.*", "get_slas_for_check.#{check_id}.*"})
+    @SQLSetter(table = SLA.class, name = "set_sla", since = @SQLVersion({3, 52, 0}))
+    public abstract void setSLA(SLA SLA);
+    
+    @Cacheable
+    @SQLGetter(table = SLA.class, name = "get_sla", since = @SQLVersion({3, 52, 0}))
+    public abstract SLA getSLA(@SQLParam("id") UUID id);
+    
+    @Cacheable
+    @SQLGetter(table = SLA.class, name = "get_sla_by_name", since = @SQLVersion({3, 52, 0}))
+    public abstract SLA getSLAByName(@SQLParam("check_id") UUID checkId, @SQLParam("name") String name);
+    
+    @Cacheable
+    @SQLGetter(table = SLA.class, name = "get_slas_for_check", since = @SQLVersion({3, 52, 0}))
+    public abstract List<SLA> getSLAsForCheck(@SQLParam("check_id") UUID siteId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_sla_by_name.*", "get_slas_for_check.*"})
+    @SQLRemove(table = SLA.class, name = "remove_sla", since = @SQLVersion({3, 52, 0}))
+    public abstract void removeSLA(@SQLParam("id") UUID id);
+    
+    // SLA Rolling Period
+    
+    @Cacheable
+    @CacheInvalidate({"get_sla_rolling_period_by_name.#{sla_id}.*", "get_sla_rolling_periods_for_sla.#{sla_id}.*"})
+    @SQLSetter(table = SLARollingPeriod.class, name = "set_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
+    public abstract void setSLARollingPeriod(SLARollingPeriod SLARollingPeriod);
+    
+    @Cacheable
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
+    public abstract SLARollingPeriod getSLARollingPeriod(@SQLParam("sla_id") UUID id, @SQLParam("name") String name);
+    
+    @Cacheable
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period_by_name", since = @SQLVersion({3, 52, 0}))
+    public abstract SLARollingPeriod getSLARollingPeriodByName(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
+    
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_periods_for_sla", since = @SQLVersion({3, 52, 0}))
+    public abstract List<SLARollingPeriod> getSLARollingPeriodsForSLA(@SQLParam("sla_id") UUID siteId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_sla_rolling_period_by_name.#{sla_id}.*", "get_sla_rolling_periods_for_sla.#{sla_id}.*"})
+    @SQLRemove(table = SLARollingPeriod.class, name = "remove_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
+    public abstract void removeSLARollingPeriod(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
+    
+    // SLA Reports
+    
+    @SQLGetter(
+            table = SLAReport.class, name ="build_sla_report_for_group", 
+            since = @SQLVersion({3, 53, 0}),
+            userDefined = @SQLUserDefined(
+                    resources = "build_sla_report_for_group.sql",
+                    value = "ALTER FUNCTION bergamot.build_sla_report_for_group(UUID) OWNER TO bergamot"
+            )
+    )
+    public abstract List<SLAReport> buildSLAReportForGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
+    
+    @SQLGetter(
+            table = SLAReport.class, name ="build_sla_report_for_check", 
+            since = @SQLVersion({3, 53, 0}),
+            userDefined = @SQLUserDefined(
+                    resources = "build_sla_report_for_check.sql",
+                    value = "ALTER FUNCTION bergamot.build_sla_report_for_check(UUID) OWNER TO bergamot"
+            )
+    )
+    public abstract List<SLAReport> buildSLAReportForCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId);
+    
     // command
     
     @Cacheable
@@ -565,7 +641,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     })
     @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery(
-                        "UPDATE bergamot.group SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
+                        "UPDATE bergamot.group    SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
                         "UPDATE bergamot.host     SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
                         "UPDATE bergamot.service  SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
                         "UPDATE bergamot.trap     SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +

@@ -36,6 +36,7 @@ public abstract class BergamotObject<T extends MessageObject> implements Seriali
         HOST,
         CLUSTER,
         DEPENDS,
+        SLA,
         NOTE;
         
         public static final EnumSet<MOFlag> ALL = EnumSet.allOf(MOFlag.class);

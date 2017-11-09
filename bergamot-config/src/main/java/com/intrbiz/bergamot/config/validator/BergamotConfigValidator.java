@@ -6,6 +6,7 @@ import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
+import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.config.model.ClusterCfg;
 import com.intrbiz.bergamot.config.model.CommandCfg;
 import com.intrbiz.bergamot.config.model.ContactCfg;
@@ -15,6 +16,8 @@ import com.intrbiz.bergamot.config.model.LocationCfg;
 import com.intrbiz.bergamot.config.model.NamedObjectCfg;
 import com.intrbiz.bergamot.config.model.NotifyCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
+import com.intrbiz.bergamot.config.model.SLACfg;
+import com.intrbiz.bergamot.config.model.SLAPeriodCfg;
 import com.intrbiz.bergamot.config.model.SecurityDomainCfg;
 import com.intrbiz.bergamot.config.model.ServiceCfg;
 import com.intrbiz.bergamot.config.model.TeamCfg;
@@ -120,6 +123,8 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 checkCommandExists(host.getCheckCommand().getCommand(), host, report);
             }
+            // SLA
+            this.validateSLAs(report, host);
             // services of the host
             for (ServiceCfg service : host.getServices())
             {
@@ -132,6 +137,7 @@ public class BergamotConfigValidator extends BergamotConfigResolver
                     this.checkSecurityDomainExists(securityDomainName, service, report);
                 }
                 this.validateNotify(service.getNotify(), service, report);
+                this.validateSLAs(report, service);
             }
             // traps of the host
             for (TrapCfg trap : host.getTraps())
@@ -145,6 +151,7 @@ public class BergamotConfigValidator extends BergamotConfigResolver
                     this.checkSecurityDomainExists(securityDomainName, trap, report);
                 }
                 this.validateNotify(trap.getNotify(), trap, report);
+                this.validateSLAs(report, trap);
             }
         }
     }
@@ -166,6 +173,8 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             {
                 report.logError("You must provide a condition for the cluster " + cluster.getName());
             }
+            // sla
+            this.validateSLAs(report, cluster);
             // resources of the cluster
             for (ResourceCfg resource : cluster.getResources())
             {
@@ -178,6 +187,7 @@ public class BergamotConfigValidator extends BergamotConfigResolver
                     this.checkSecurityDomainExists(securityDomainName, resource, report);
                 }
                 this.validateNotify(resource.getNotify(), resource, report);
+                this.validateSLAs(report, resource);
             }
         }
     }
@@ -329,6 +339,24 @@ public class BergamotConfigValidator extends BergamotConfigResolver
             if (Util.isEmpty(command.resolve().getEngine()))
             {
                 report.logError("The command engine should be specified for " + command);
+            }
+        }
+    }
+    
+    private void validateSLAs(BergamotValidationReport report, CheckCfg<?> cfg)
+    {
+        for (SLACfg slaCfg : cfg.getSlas())
+        {
+            if (Util.isEmpty(slaCfg.getName()))
+            {
+                report.logError("Missing name for SLA on check " + cfg.getName());
+            }
+            for (SLAPeriodCfg spaCfg : slaCfg.getPeriods())
+            {
+                if (Util.isEmpty(spaCfg.getName()))
+                {
+                    report.logError("Missing name for SLA period on check " + cfg.getName());
+                }
             }
         }
     }
