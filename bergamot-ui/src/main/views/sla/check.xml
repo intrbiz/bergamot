@@ -32,8 +32,8 @@
 					<tr>
 						<td>#{report.slaSummary}</td>
 						<td>#{report.periodSummary}</td>
-						<td>#{dateformat('EEEE dd/MM/yyyy', report.periodStart)}</td>
-						<td>#{dateformat('EEEE dd/MM/yyyy', report.periodEnd)}</td>
+						<td>#{dateformat('dd/MM/yyyy', report.periodStart)}</td>
+						<td>#{dateformat('dd/MM/yyyy', report.periodEnd)}</td>
 						<td>#{report.periodAlerts}</td>
 						<td>#{report.periodFalsePositives}</td>
 						<td>#{decimalformat('0.00', report.slaTarget * 100)}%</td>

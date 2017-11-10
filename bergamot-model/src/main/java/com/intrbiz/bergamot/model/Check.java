@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.NoteMO;
 import com.intrbiz.bergamot.model.message.VirtualCheckMO;
+import com.intrbiz.bergamot.model.report.SLAReport;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -584,6 +585,14 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         try (BergamotDB db = BergamotDB.connect())
         {
             return db.getSLAsForCheck(this.id);
+        }
+    }
+    
+    public List<SLAReport> getSLAReports(boolean statusPage)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.buildSLAReportForCheck(this.id, statusPage);
         }
     }
     

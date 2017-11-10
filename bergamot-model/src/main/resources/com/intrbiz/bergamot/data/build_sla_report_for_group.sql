@@ -19,8 +19,8 @@ BEGIN
     sla_period.period_end,
     downtime.alerts :: integer AS period_alerts,
     downtime.false_positives :: integer AS period_false_positives,
-    ((extract(epoch FROM (sla_period.period_end - sla_period.period_start)) - coalesce(extract(epoch FROM downtime.downtime), 0))::DOUBLE PRECISION / extract(epoch FROM (sla_period.period_end - sla_period.period_start))::DOUBLE PRECISION) AS period_value,
-    (((extract(epoch FROM (sla_period.period_end - sla_period.period_start)) - coalesce(extract(epoch FROM downtime.downtime), 0))::DOUBLE PRECISION / extract(epoch FROM (sla_period.period_end - sla_period.period_start))::DOUBLE PRECISION) < sla_period.sla_target) AS period_breached
+    (greatest(extract(epoch FROM (sla_period.period_end - sla_period.period_start)) - coalesce(extract(epoch FROM downtime.downtime), 0), 0.0)::DOUBLE PRECISION / extract(epoch FROM (sla_period.period_end - sla_period.period_start))::DOUBLE PRECISION) AS period_value,
+    ((greatest(extract(epoch FROM (sla_period.period_end - sla_period.period_start)) - coalesce(extract(epoch FROM downtime.downtime), 0), 0.0)::DOUBLE PRECISION / extract(epoch FROM (sla_period.period_end - sla_period.period_start))::DOUBLE PRECISION) < sla_period.sla_target) AS period_breached
     FROM (
         SELECT 
          s.id AS sla_id,
@@ -55,7 +55,7 @@ BEGIN
          sum(coalesce(a.recovered_at, now()) - a.raised) FILTER (WHERE a.false_positive IS NULL OR NOT a.false_positive) AS downtime
         FROM bergamot.alert a
         WHERE a.check_id = sla_period.sla_check_id
-        AND   a.raised BETWEEN sla_period.period_start AND sla_period.period_end
+        AND tstzrange(a.raised, a.recovered_at, '[]') && tstzrange(sla_period.period_start, sla_period.period_end, '[]')
     ) downtime ON (true)
     JOIN (
         SELECT id, name, summary, description, group_ids FROM bergamot.host

@@ -35,6 +35,31 @@
 										Alert raised at #{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)}. Our engineers will be looking at this soon.
 									</p>
 								</container>
+								<container data-slas="#{check.getSLAReports(true)}">
+									<div class="status_slas" rendered="#{! isempty(slas)}">
+										<h5>SLAs for #{check.summary}</h5>
+										<ul>
+											<data-set var="report" value="#{slas}">
+												<li>
+													<p>
+														<span class="sla_period_name">#{report.periodSummary}</span> from <span class="sla_period_start">#{dateformat('dd/MM/yyyy', report.periodStart)}</span> to <span class="sla_period_end">#{dateformat('dd/MM/yyyy', report.periodStart)}</span>
+													</p>
+													<p class="status_sla_value #{if(report.periodBreached, 'sla_bad', 'sla_good')}">
+														<span class="sla_target">
+															Target: #{decimalformat('0.00', report.slaTarget * 100)}
+														</span>
+														<span class="sla_value">
+															Attained: #{decimalformat('0.00', report.periodValue * 100)}
+														</span>
+														<span rendered="#{report.periodBreached}">
+															SLA Breached
+														</span>
+													</p>
+												</li>
+											</data-set>
+										</ul>
+									</div>
+								</container>
 							</li>
 						</container>
 					</data-set>

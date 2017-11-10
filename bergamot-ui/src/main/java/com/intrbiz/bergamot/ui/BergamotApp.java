@@ -124,7 +124,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         
             public static final String JS = "v1.6.0";
             
-            public static final String CSS = "v1.7.3";
+            public static final String CSS = "v1.7.4";
         
         }
     }

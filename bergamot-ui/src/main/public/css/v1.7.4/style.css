@@ -953,6 +953,36 @@ div.status_group > a:hover {
 	color: #666;
 }
 
+.status_group ul li div.status_slas {
+    margin-top: 20px;
+	margin-left: 50px;
+	font-size: 14px;
+	color: #666;
+}
+
+.status_group ul li div.status_slas p.status_sla_value {
+	margin-left: 25px;
+}
+
+.status_group ul li div.status_slas p.sla_good {
+	color: #00BF00 !important;
+}
+
+.status_group ul li div.status_slas p.sla_bad {
+	color: #E85752 !important;
+}
+
+.status_group ul li div.status_slas p.status_sla_value span.sla_target,
+.status_group ul li div.status_slas p.status_sla_value span.sla_value {
+	padding-right: 25px;
+}
+
+.status_group ul li div.status_slas span.sla_period_name,
+.status_group ul li div.status_slas span.sla_period_start,
+.status_group ul li div.status_slas span.sla_period_end {
+	color: #2c2c2c;
+}
+
 /* Resizing */
 
 @media (min-width: 571px) and (max-width: 869px) {
