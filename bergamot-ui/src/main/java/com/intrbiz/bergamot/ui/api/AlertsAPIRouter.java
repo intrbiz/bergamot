@@ -214,7 +214,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
         Alert alert = notNull(db.getAlert(id));
         require(permission("acknowledge", alert.getCheckId()));
         // can only acknowledge an non-recovered and non-acknowledged alert
-        if (! alert.isFalsePositive())
+        if ((! alert.isFalsePositive()) && alert.isAcknowledged())
         {
             // the contact
             Contact contact = currentPrincipal();
@@ -227,38 +227,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 alert.setFalsePositiveAt(new Timestamp(System.currentTimeMillis()));
                 alert.setFalsePositiveById(contact.getId());
                 alert.setFalsePositiveReasonId(ackCom.getId());
-                if (! alert.isAcknowledged())
-                {
-                    alert.setAcknowledged(true);
-                    alert.setAcknowledgedAt(new Timestamp(System.currentTimeMillis()));
-                    alert.setAcknowledgedById(contact.getId());
-                }
                 db.setAlert(alert);
-                db.acknowledgeCheck(alert.getCheckId(), true);
             });
-            // send acknowledge notifications
-            if (! alert.getCheck().getState().isSuppressedOrInDowntime())
-            {
-                try
-                {
-                    SendAcknowledge sendAck = alert.createAcknowledgeNotification(Calendar.getInstance(), contact, ackCom);
-                    if (sendAck != null && (! sendAck.getTo().isEmpty()))
-                    {
-                        logger.warn("Sending acknowledge for " + alert.getId());
-                        this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
-                        // accounting
-                        this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
-                    }
-                    else
-                    {
-                        logger.warn("Not sending acknowledge for " + alert.getId());
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.warn("Failed to send false positive acknoweldge notification, for alert " + alert);
-                }
-            }
             // send alert update
             this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), new AlertUpdate(alert.toMO(currentPrincipal())));
         }
