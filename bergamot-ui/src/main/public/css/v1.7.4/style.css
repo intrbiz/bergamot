@@ -977,6 +977,10 @@ div.status_group > a:hover {
 	padding-right: 25px;
 }
 
+.status_group ul li div.status_slas p.status_sla_value span.sla_value {
+	font-weight: bold;
+}
+
 .status_group ul li div.status_slas span.sla_period_name,
 .status_group ul li div.status_slas span.sla_period_start,
 .status_group ul li div.status_slas span.sla_period_end {
