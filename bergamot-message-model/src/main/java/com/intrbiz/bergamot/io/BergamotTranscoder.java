@@ -40,6 +40,7 @@ import com.intrbiz.bergamot.model.message.NotificationEngineMO;
 import com.intrbiz.bergamot.model.message.NotificationsMO;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
+import com.intrbiz.bergamot.model.message.SLAFixedPeriodMO;
 import com.intrbiz.bergamot.model.message.SLAMO;
 import com.intrbiz.bergamot.model.message.SLARollingPeriodMO;
 import com.intrbiz.bergamot.model.message.SecurityDomainMO;
@@ -171,6 +172,7 @@ public class BergamotTranscoder
         CredentialMO.class,
         SLAMO.class,
         SLARollingPeriodMO.class,
+        SLAFixedPeriodMO.class,
         // model
         ParameterMO.class,
         // messages

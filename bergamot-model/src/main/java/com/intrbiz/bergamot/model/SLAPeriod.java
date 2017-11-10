@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.model;
 import java.util.EnumSet;
 import java.util.UUID;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.SLAPeriodCfg;
 import com.intrbiz.bergamot.model.message.SLAPeriodMO;
 import com.intrbiz.data.db.compiler.meta.Action;
@@ -29,6 +30,9 @@ public abstract class SLAPeriod<T extends SLAPeriodMO> extends BergamotObject<T>
 
     @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 3, 52, 0 }))
     protected String description;
+    
+    @SQLColumn(index = 5, name = "status", since = @SQLVersion({ 3, 54, 0 }))
+    protected boolean status;
 
     public SLAPeriod()
     {
@@ -75,6 +79,16 @@ public abstract class SLAPeriod<T extends SLAPeriodMO> extends BergamotObject<T>
         this.description = description;
     }
     
+    public boolean isStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(boolean status)
+    {
+        this.status = status;
+    }
+
     public SLAPeriod<?> forSLA(SLA sla)
     {
         this.slaId = sla.getId();
@@ -86,6 +100,7 @@ public abstract class SLAPeriod<T extends SLAPeriodMO> extends BergamotObject<T>
         this.name = config.getName();
         this.summary = config.getSummary();
         this.description = config.getDescription();
+        this.status = Util.coalesce(config.getStatus(), Boolean.FALSE);
         return this;
     }
 

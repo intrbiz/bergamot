@@ -49,6 +49,7 @@ import com.intrbiz.bergamot.model.NotificationEngine;
 import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.SLA;
+import com.intrbiz.bergamot.model.SLAFixedPeriod;
 import com.intrbiz.bergamot.model.SLARollingPeriod;
 import com.intrbiz.bergamot.model.SecurityDomain;
 import com.intrbiz.bergamot.model.SecurityDomainMembership;
@@ -92,7 +93,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 53, 0}),
+        version = @SQLVersion({3, 54, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -137,6 +138,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             Credential.class,
             SLA.class,
             SLARollingPeriod.class,
+            SLAFixedPeriod.class,
             SLAReport.class
         }
 )
@@ -475,6 +477,29 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLRemove(table = SLARollingPeriod.class, name = "remove_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
     public abstract void removeSLARollingPeriod(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
     
+    // SLA Fixed Period
+    
+    @Cacheable
+    @CacheInvalidate({"get_sla_fixed_period_by_name.#{sla_id}.*", "get_sla_fixed_periods_for_sla.#{sla_id}.*"})
+    @SQLSetter(table = SLAFixedPeriod.class, name = "set_sla_fixed_period", since = @SQLVersion({3, 54, 0}))
+    public abstract void setSLAFixedPeriod(SLAFixedPeriod SLAFixedPeriod);
+    
+    @Cacheable
+    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_period", since = @SQLVersion({3, 54, 0}))
+    public abstract SLAFixedPeriod getSLAFixedPeriod(@SQLParam("sla_id") UUID id, @SQLParam("name") String name);
+    
+    @Cacheable
+    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_period_by_name", since = @SQLVersion({3, 54, 0}))
+    public abstract SLAFixedPeriod getSLAFixedPeriodByName(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
+    
+    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_periods_for_sla", since = @SQLVersion({3, 54, 0}))
+    public abstract List<SLAFixedPeriod> getSLAFixedPeriodsForSLA(@SQLParam("sla_id") UUID siteId);
+    
+    @Cacheable
+    @CacheInvalidate({"get_sla_fixed_period_by_name.#{sla_id}.*", "get_sla_fixed_periods_for_sla.#{sla_id}.*"})
+    @SQLRemove(table = SLAFixedPeriod.class, name = "remove_sla_fixed_period", since = @SQLVersion({3, 54, 0}))
+    public abstract void removeSLAFixedPeriod(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
+    
     // SLA Reports
     
     @SQLGetter(
@@ -482,20 +507,20 @@ public abstract class BergamotDB extends DatabaseAdapter
             since = @SQLVersion({3, 53, 0}),
             userDefined = @SQLUserDefined(
                     resources = "build_sla_report_for_group.sql",
-                    value = "ALTER FUNCTION bergamot.build_sla_report_for_group(UUID) OWNER TO bergamot"
+                    value = "ALTER FUNCTION bergamot.build_sla_report_for_group(UUID, BOOLEAN) OWNER TO bergamot"
             )
     )
-    public abstract List<SLAReport> buildSLAReportForGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
+    public abstract List<SLAReport> buildSLAReportForGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId, @SQLParam(value = "status", virtual = true) boolean status);
     
     @SQLGetter(
             table = SLAReport.class, name ="build_sla_report_for_check", 
             since = @SQLVersion({3, 53, 0}),
             userDefined = @SQLUserDefined(
                     resources = "build_sla_report_for_check.sql",
-                    value = "ALTER FUNCTION bergamot.build_sla_report_for_check(UUID) OWNER TO bergamot"
+                    value = "ALTER FUNCTION bergamot.build_sla_report_for_check(UUID, BOOLEAN) OWNER TO bergamot"
             )
     )
-    public abstract List<SLAReport> buildSLAReportForCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId);
+    public abstract List<SLAReport> buildSLAReportForCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId, @SQLParam(value = "status", virtual = true) boolean status);
     
     // command
     

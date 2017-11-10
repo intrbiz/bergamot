@@ -35,6 +35,7 @@ import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
 import com.intrbiz.bergamot.config.model.RealCheckCfg;
 import com.intrbiz.bergamot.config.model.ResourceCfg;
 import com.intrbiz.bergamot.config.model.SLACfg;
+import com.intrbiz.bergamot.config.model.SLAFixedPeriodCfg;
 import com.intrbiz.bergamot.config.model.SLAPeriodCfg;
 import com.intrbiz.bergamot.config.model.SLARollingPeriodCfg;
 import com.intrbiz.bergamot.config.model.SecuredObjectCfg;
@@ -67,6 +68,7 @@ import com.intrbiz.bergamot.model.PassiveCheck;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.SLA;
+import com.intrbiz.bergamot.model.SLAFixedPeriod;
 import com.intrbiz.bergamot.model.SLARollingPeriod;
 import com.intrbiz.bergamot.model.SecuredObject;
 import com.intrbiz.bergamot.model.SecurityDomain;
@@ -1429,6 +1431,13 @@ public class BergamotConfigImporter
                     if (srp == null) srp = new SLARollingPeriod().forSLA(sla);
                     srp.configure((SLARollingPeriodCfg) spCfg);
                     db.setSLARollingPeriod(srp);
+                }
+                else if (spCfg instanceof SLAFixedPeriodCfg)
+                {
+                    SLAFixedPeriod srp = db.getSLAFixedPeriodByName(sla.getId(), spCfg.getName());
+                    if (srp == null) srp = new SLAFixedPeriod().forSLA(sla);
+                    srp.configure((SLAFixedPeriodCfg) spCfg);
+                    db.setSLAFixedPeriod(srp);
                 }
             }
         }

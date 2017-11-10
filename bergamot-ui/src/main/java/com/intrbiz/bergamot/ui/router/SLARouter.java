@@ -28,7 +28,7 @@ public class SLARouter extends Router<BergamotApp>
     {
         Group group = model("group", notNull(db.getGroup(id)));
         require(permission("read", group));
-        model("slas", db.buildSLAReportForGroup(group.getId()));
+        model("slas", db.buildSLAReportForGroup(group.getId(), false));
         encode("sla/group");
     }
     
@@ -41,7 +41,7 @@ public class SLARouter extends Router<BergamotApp>
     {
         Check<?,?> check = model("check", notNull(db.getCheck(id)));
         require(permission("read", check));
-        model("slas", db.buildSLAReportForCheck(check.getId()));
+        model("slas", db.buildSLAReportForCheck(check.getId(), false));
         encode("sla/check");
     }
 }

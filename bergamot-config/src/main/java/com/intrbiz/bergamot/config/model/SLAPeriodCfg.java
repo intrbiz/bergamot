@@ -4,8 +4,11 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.intrbiz.bergamot.config.adapter.YesNoAdapter;
 import com.intrbiz.bergamot.config.resolver.ResolveWith;
+import com.intrbiz.bergamot.config.resolver.stratergy.Coalesce;
 import com.intrbiz.bergamot.config.resolver.stratergy.CoalesceEmptyString;
 
 public abstract class SLAPeriodCfg implements Serializable
@@ -17,6 +20,8 @@ public abstract class SLAPeriodCfg implements Serializable
     private String summary;
     
     private String description;
+    
+    private Boolean status;
 
     public SLAPeriodCfg()
     {
@@ -57,6 +62,19 @@ public abstract class SLAPeriodCfg implements Serializable
     public void setDescription(String description)
     {
         this.description = description;
+    }
+    
+    @XmlJavaTypeAdapter(YesNoAdapter.class)
+    @XmlAttribute(name = "status")
+    @ResolveWith(Coalesce.class)
+    public Boolean getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(Boolean status)
+    {
+        this.status = status;
     }
 
     @Override
