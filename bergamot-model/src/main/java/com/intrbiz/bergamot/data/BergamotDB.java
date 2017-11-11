@@ -91,9 +91,12 @@ import com.intrbiz.data.db.compiler.meta.ScriptType;
 import com.intrbiz.data.db.compiler.util.SQLScript;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 
+/**
+ * Database abstraction layer for Bergamot Monitoring
+ */
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 54, 0}),
+        version = @SQLVersion({3, 58, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1053,6 +1056,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // alerts
     
+    /**
+     * Insert or update the given alert
+     * @param alert the alert to store
+     */
     @Cacheable
     @CacheInvalidate({
         "get_all_alerts_for_check.#{check_id}", 
@@ -1064,10 +1071,19 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLSetter(table = Alert.class, name = "set_alert", since = @SQLVersion({1, 0, 0}))
     public abstract void setAlert(Alert alert);
     
+    /**
+     * Get an alert by it's id
+     * @param id the alert id
+     * @return the alert
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_alert", since = @SQLVersion({1, 0, 0}))
     public abstract Alert getAlert(@SQLParam("id") UUID id);
     
+    /**
+     * Remove the given alert
+     * @param id the alert id
+     */
     @Cacheable
     @CacheInvalidate({
         "get_all_alerts_for_check.*",
@@ -1080,48 +1096,137 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLRemove(table = Alert.class, name = "remove_alert", since = @SQLVersion({1, 0, 0}))
     public abstract void removeAlert(@SQLParam("id") UUID id);
     
+    /**
+     * Get all alerts for the given check
+     * @param checkId the check if
+     * @return a list of alerts
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<Alert> getAllAlertsForCheck(@SQLParam("check_id") UUID checkId);
     
+    /**
+     * Get all alerts for a given check in a paged manner
+     * @param checkId the check id
+     * @param limit how many alerts to return
+     * @param offset how many alerts to skip before returning
+     * @return a list of alerts
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check_paged", since = @SQLVersion({3, 5, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<Alert> getAllAlertsForCheck(@SQLParam("check_id") UUID checkId, @SQLLimit() long limit, @SQLOffset() long offset);
     
+    /**
+     * Get all recent alerts for the given check
+     * @param checkId the check id 
+     * @param interval how recent the alerts can be (from now() - interval) 
+     * @param limit limit the number of alerts returned
+     * @return a list of alerts
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_all_recent_alerts_for_check", since = @SQLVersion({3, 5, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
         query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND raised > (now() - p_interval) ORDER BY raised DESC LIMIT p_limit")
     )
     public abstract List<Alert> getAllRecentAlertsForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "interval", virtual = true) String interval, @SQLLimit() long limit);
     
+    /**
+     * Get all alerts which have recovered for the given check
+     * @param checkId the check id
+     * @return a list of alerts
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_recovered_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = TRUE")
     )
     public abstract List<Alert> getRecoveredAlertsForCheck(@SQLParam("check_id") UUID checkId);
     
+    /**
+     * Get all alerts which have not recovered for the given check
+     * @param checkId the check id
+     * @return a list of alerts
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE")
     )
     public abstract List<Alert> getAlertsForCheck(@SQLParam("check_id") UUID checkId);
     
+    /**
+     * Get the currently active alert for the given check
+     * @param checkId the check id
+     * @return the alert
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_current_alert_for_check", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE ORDER BY raised DESC LIMIT 1")
     )
     public abstract Alert getCurrentAlertForCheck(@SQLParam("check_id") UUID checkId);
     
+    /**
+     * Get the last alert for the given check
+     * @param checkId the check id
+     * @return the alert
+     */
     @Cacheable
     @SQLGetter(table = Alert.class, name = "get_last_alert_for_check", since = @SQLVersion({3, 50, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id ORDER BY raised DESC LIMIT 1")
     )
     public abstract Alert getLastAlertForCheck(@SQLParam("check_id") UUID checkId);
     
+    /**
+     * List active alerts for the given site.  These are alerts which have not recovered or been acknowledged.
+     * @param siteId the site id to get the alerts for
+     * @return a list of all currently active alerts
+     */
     @SQLGetter(table = Alert.class, name = "list_alerts", since = @SQLVersion({1, 0, 0}),
-            query = @SQLQuery("SELECT * FROM bergamot.alert WHERE site_id = p_site_id AND recovered = FALSE AND acknowledged = FALSE ORDER BY raised DESC")
+            query = @SQLQuery("SELECT * FROM bergamot.alert "
+                    + "WHERE site_id = p_site_id "
+                    + "AND recovered = FALSE AND acknowledged = FALSE "
+                    + "ORDER BY raised DESC")
     )
     public abstract List<Alert> listAlerts(@SQLParam("site_id") UUID siteId);
+    
+    /**
+     * List active alerts for the given site filtered by the given contacts permissions.  These are alerts which have not recovered or been acknowledged.
+     * @param siteId the site id
+     * @param contactId the contact id
+     * @return a list of alerts
+     */
+    @SQLGetter(table = Alert.class, name = "list_alerts_for_contact", since = @SQLVersion({3, 58, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.alert "
+                    + "WHERE site_id = p_site_id "
+                    + "AND recovered = FALSE AND acknowledged = FALSE "
+                    + "AND bergamot.has_permission_for_object(p_contact_id, check_id, 'read') "
+                    + "ORDER BY raised DESC")
+    )
+    public abstract List<Alert> listAlertsForContact(@SQLParam("site_id") UUID siteId, @SQLParam(value = "contact_id", virtual = true) UUID contactId);
+    
+    /**
+     * Get all alerts for a site, paging through them from newest to oldest 
+     * @param siteId the site id
+     * @param offset the number of alerts to skip
+     * @param limit the number of alerts to return
+     * @return a list of alerts
+     */
+    @SQLGetter(table = Alert.class, name = "list_alert_history", since = @SQLVersion({3, 55, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
+    public abstract List<Alert> listAlertHistory(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);
+
+    /**
+     * Get all alerts for a site, paging through them from newest to oldest, filtered by the given contacts permissions
+     * @param siteId the site id
+     * @param contactId the contact id
+     * @param offset the number of alerts to skip
+     * @param limit the number of alerts to return
+     * @return a list of alerts
+     */
+    @SQLGetter(table = Alert.class, name = "list_alert_history_for_contact", since = @SQLVersion({3, 56, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.alert "
+                    + "WHERE site_id = p_site_id "
+                    + "AND bergamot.has_permission_for_object(p_contact_id, check_id, 'read') "
+                    + "ORDER BY raised DESC "
+                    + "OFFSET p_offset LIMIT p_limit")
+    )
+    public abstract List<Alert> listAlertHistoryForContact(@SQLParam("site_id") UUID siteId, @SQLParam(value = "contact_id", virtual = true) UUID contactId, @SQLOffset long offset, @SQLLimit long limit);
     
     // alert escalations
     

@@ -4,7 +4,9 @@
 <fragment xmlns="com.intrbiz.balsa" title="Overview">
 		<!-- Alerts -->
 		<div class="row" id="alerts">
-			<h2>Active Alerts</h2>
+			<a href="/alerts/" style="text-decoration: none;">
+				<h2>Active Alerts</h2>
+			</a>
 			<data-set var="alert" value="#{alerts}">
 				<include view="include/check" data-check="#{alert.check}"/>
 			</data-set>
@@ -13,7 +15,9 @@
 		<!-- Overview -->
 		<!-- An overview of groups -->
 		<div class="row" style="margin-top: 30px;">
-			<h2>Groups</h2>
+			<a href="/group/" style="text-decoration: none;">
+				<h2>Groups</h2>
+			</a>
 			<data-set var="group" value="#{groups}">
 				<include view="include/group"/>
 			</data-set>
@@ -21,7 +25,9 @@
 		
 		<!-- An overview of locations -->
 		<div class="row" style="margin-top: 30px;">
-			<h2>Locations</h2>
+			<a href="/location/" style="text-decoration: none;">
+				<h2>Locations</h2>
+			</a>
 			<data-set var="location" value="#{locations}">
 				<include view="include/location"/>
 			</data-set>

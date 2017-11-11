@@ -27,7 +27,7 @@
 	                <a href="/alerts/">Active Alerts</a>
 	            </li>
 	            <li>
-	                <a href="/alerts/history">Historic Alerts</a>
+	                <a href="/alerts/history">Alert History</a>
 	            </li>
 	            <li>
 	                <a href="/logout">Logout</a>

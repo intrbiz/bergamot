@@ -7,9 +7,14 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.model.Alert;
+import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
+import com.intrbiz.metadata.CoalesceMode;
+import com.intrbiz.metadata.CurrentPrincipal;
+import com.intrbiz.metadata.IsaLong;
+import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
@@ -21,9 +26,25 @@ public class AlertsRouter extends Router<BergamotApp>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @GetBergamotSite() Site site)
+    public void activeAlerts(BergamotDB db, @GetBergamotSite() Site site, @CurrentPrincipal() Contact contact)
     {
-        model("alerts", db.listAlerts(site.getId()).stream().map(Alert::getCheck).filter((c) -> permission("read", c)).collect(Collectors.toList()));
+        model("alerts", db.listAlertsForContact(site.getId(), contact.getId()).stream().map(Alert::getCheck).collect(Collectors.toList()));
         encode("alerts/index");
+    }
+    
+    @Any("/history")
+    @WithDataAdapter(BergamotDB.class)
+    public void historicAlerts(
+            BergamotDB db, 
+            @GetBergamotSite() Site site,
+            @CurrentPrincipal() Contact contact,
+            @Param("offset") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L)  long offset,
+            @Param("limit")  @IsaLong(min = 1, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 10L) long limit
+    )
+    {
+        model("alerts", db.listAlertHistoryForContact(site.getId(), contact.getId(), offset, limit));
+        var("offset", offset);
+        var("limit", limit);
+        encode("alerts/historic");
     }
 }
