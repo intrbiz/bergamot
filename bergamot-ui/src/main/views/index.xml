@@ -4,7 +4,7 @@
 <fragment xmlns="com.intrbiz.balsa" title="Overview">
 		<!-- Alerts -->
 		<div class="row" id="alerts">
-			<h2>Alerts</h2>
+			<h2>Active Alerts</h2>
 			<data-set var="alert" value="#{alerts}">
 				<include view="include/check" data-check="#{alert.check}"/>
 			</data-set>
@@ -44,5 +44,9 @@
 			require(["bergamot/lib/ui/check-state"], function(bergamot_ui_check_state) {
 		    	bergamot_ui_check_state.attachTo("div[data-check-id]");
 			})
+			/* Hard refresh the dashboard every 15 minutes */
+			setTimeout(function() {
+				window.location = window.location;
+			}, 900000);
 		</script>
 </fragment>
