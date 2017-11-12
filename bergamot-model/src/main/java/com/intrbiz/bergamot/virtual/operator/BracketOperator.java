@@ -35,9 +35,21 @@ public class BracketOperator extends VirtualCheckOperator
     }
 
     @Override
-    public void computeDependencies(Set<CheckReference> checks)
+    public void computeDependencies(VirtualCheckExpressionContext context, Set<CheckReference<?>> checks)
     {
-        this.operand.computeDependencies(checks);
+        this.operand.computeDependencies(context, checks);
+    }
+    
+    @Override
+    public boolean isAllDependenciesHard(VirtualCheckExpressionContext context)
+    {
+        return this.operand.isAllDependenciesHard(context);
+    }
+
+    @Override
+    public void computePoolDependencies(VirtualCheckExpressionContext context, Set<String> pools)
+    {
+        this.operand.computePoolDependencies(context, pools);
     }
     
     public String toString()

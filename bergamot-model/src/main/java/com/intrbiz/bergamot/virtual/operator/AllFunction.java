@@ -1,34 +1,22 @@
 package com.intrbiz.bergamot.virtual.operator;
 
-import java.util.List;
-import java.util.Set;
-
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
-import com.intrbiz.bergamot.virtual.reference.CheckReference;
 
-public class AllFunction extends VirtualCheckOperator
+public class AllFunction extends ValuesFunction
 {
     private static final long serialVersionUID = 1L;
 
-    private final List<ValueOperator> checks;
-
-    public AllFunction(List<ValueOperator> checks)
+    public AllFunction(ValuesOperator values)
     {
-        super();
-        this.checks = checks;
-    }
-
-    public List<ValueOperator> getChecks()
-    {
-        return checks;
+        super(values);
     }
 
     @Override
     public boolean computeOk(VirtualCheckExpressionContext context)
     {
         boolean ret = true;
-        for (ValueOperator check : this.checks)
+        for (ValueOperator check : this.values.getValues(context))
         {
             ret = ret & check.computeOk(context);
         }
@@ -38,24 +26,15 @@ public class AllFunction extends VirtualCheckOperator
     public Status computeStatus(VirtualCheckExpressionContext context)
     {
         Status ret = Status.OK;
-        for (ValueOperator check : this.checks)
+        for (ValueOperator check : this.values.getValues(context))
         {
             ret = Status.worst(ret, check.computeStatus(context));
         }
         return ret;
     }
 
-    @Override
-    public void computeDependencies(Set<CheckReference> checks)
-    {
-        for (ValueOperator check : this.checks)
-        {
-            check.computeDependencies(checks);
-        }
-    }
-
     public String toString()
     {
-        return "all of " + this.checks.toString();
+        return "all of " + this.values.toString();
     }
 }

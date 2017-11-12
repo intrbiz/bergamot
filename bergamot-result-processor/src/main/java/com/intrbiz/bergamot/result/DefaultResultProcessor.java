@@ -656,6 +656,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 continue;
             }
             processedVirtualChecks.add(referencedBy.getId());
+            logger.info("Updating virtual check " + referencedBy.getType() + "::" + referencedBy.getId());
             // update the status of the check
             VirtualCheckExpressionContext context = db.createVirtualCheckContext(check.getSiteId(), null);
             boolean ok = referencedBy.getCondition().computeOk(context);

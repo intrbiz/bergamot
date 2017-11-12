@@ -6,7 +6,7 @@ import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 /**
  * A reference to a service on a host, but the host is not known
  */
-public class AnonymousService implements CheckReference, ServiceReference
+public class AnonymousService implements ServiceReference
 {
     private static final long serialVersionUID = 1L;
 

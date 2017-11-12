@@ -11,25 +11,35 @@ public class ValueOperator extends VirtualCheckOperator
 {
     private static final long serialVersionUID = 1L;
     
-    private final CheckReference check;
+    private final CheckReference<?> check;
     
-    public ValueOperator(CheckReference check)
+    public ValueOperator(CheckReference<?> check)
     {
         super();
         this.check = check;
     }
     
-    public CheckReference getCheck()
+    public CheckReference<?> getCheck()
     {
         return this.check;
     }
     
-    public void computeDependencies(Set<CheckReference> checks)
+    public void computeDependencies(VirtualCheckExpressionContext context, Set<CheckReference<?>> checks)
     {
         checks.add(this.check);
     }
+    
+    @Override
+    public boolean isAllDependenciesHard(VirtualCheckExpressionContext context)
+    {
+        return this.check.resolve(context).getState().isHard();
+    }
 
     @Override
+    public void computePoolDependencies(VirtualCheckExpressionContext context, Set<String> pools)
+    {
+    }
+
     public boolean computeOk(VirtualCheckExpressionContext context)
     {
         CheckState state = check.resolve(context).getState();

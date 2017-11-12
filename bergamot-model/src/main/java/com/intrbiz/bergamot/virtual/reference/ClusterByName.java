@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.virtual.reference;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class ClusterByName implements CheckReference, ClusterReference
+public class ClusterByName implements ClusterReference
 {
     private static final long serialVersionUID = 1L;
 

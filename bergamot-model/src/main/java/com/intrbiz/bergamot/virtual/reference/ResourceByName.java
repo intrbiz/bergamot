@@ -4,7 +4,7 @@ import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class ResourceByName implements CheckReference, ResourceReference
+public class ResourceByName implements ResourceReference
 {
     private static final long serialVersionUID = 1L;
     

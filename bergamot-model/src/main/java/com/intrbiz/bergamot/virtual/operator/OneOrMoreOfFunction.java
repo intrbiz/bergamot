@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.virtual.operator;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class OneOfFunction extends ValuesFunction
+public class OneOrMoreOfFunction extends ValuesFunction
 {    
     private static final long serialVersionUID = 1L;
     
@@ -35,7 +35,7 @@ public class OneOfFunction extends ValuesFunction
     
     private final Status as;
 
-    public OneOfFunction(ValuesOperator values, String count, Status as)
+    public OneOrMoreOfFunction(ValuesOperator values, String count, Status as)
     {
         super(values);
         this.count = Count.valueOf(count);
@@ -56,7 +56,7 @@ public class OneOfFunction extends ValuesFunction
             if (check.computeOk(context))
                 okCount++;
         }
-        return okCount == this.count.getCount();
+        return okCount >= this.count.getCount();
     }
 
     public Status computeStatus(VirtualCheckExpressionContext context)
@@ -67,6 +67,6 @@ public class OneOfFunction extends ValuesFunction
 
     public String toString()
     {
-        return this.count + " of " + this.values.toString() + " as " + this.as.toString();
+        return this.count + " or more of " + this.values.toString() + " as " + this.as.toString();
     }
 }

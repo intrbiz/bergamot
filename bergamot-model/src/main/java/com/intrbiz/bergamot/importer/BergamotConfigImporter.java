@@ -136,6 +136,8 @@ public class BergamotConfigImporter
     
     private boolean requirePasswordChange = true;
     
+    private Set<String> updatedResourcePools = new HashSet<String>();
+    
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
         if (! validated.getReport().isValid()) throw new RuntimeException("Cannot import invalid configuration");
@@ -231,6 +233,8 @@ public class BergamotConfigImporter
                             this.loadClusters(db);
                             // link any check to check dependencies
                             this.linkDependencies(db);
+                            // update any virtual checks
+                            this.updateResourcePools(db);
                             // rebuild computed permissions
                             if (this.rebuildPermissions)
                             {
@@ -1410,6 +1414,11 @@ public class BergamotConfigImporter
                 throw new DataException("The command " + resolvedConfiguration.getCheckCommand().getCommand() + " could not be found, needed by " + check.getName());
             }
         }
+        // track any resource pools we need to update
+        if (! Util.isEmpty(resolvedConfiguration.getResourcePool()))
+        {
+            this.updatedResourcePools.add(resolvedConfiguration.getResourcePool());
+        }
     }
     
     private void loadSLAs(Check<?,?> check, CheckCfg<?> resolvedConfiguration, BergamotDB db)
@@ -1600,7 +1609,7 @@ public class BergamotConfigImporter
                 // context to use
                 VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId(), null);
                 // validate the condition
-                for (CheckReference chkRef : cond.computeDependencies())
+                for (CheckReference<?> chkRef : cond.computeDependencies(vcec))
                 {
                     if (chkRef.resolve(vcec) == null)
                     {
@@ -1610,10 +1619,18 @@ public class BergamotConfigImporter
                 // set the condition
                 check.setCondition(cond);
                 this.report.info("Using virtual check condition " + cond.toString() + " for " + check);
-                // cross reference the checks
-                check.setReferenceIds(new LinkedList<UUID>(cond.computeDependencies().stream().map((c) -> c.resolve(vcec).getId()).collect(Collectors.toSet())));
+                // extract and set the dependencies for this check
+                this.setVirtualCheckDependencies(check, vcec);
             }
         }
+    }
+    
+    private void setVirtualCheckDependencies(VirtualCheck<?,?> check, VirtualCheckExpressionContext vcec)
+    {
+        VirtualCheckOperator cond = check.getCondition();
+        // cross reference the checks
+        check.setReferenceIds(new LinkedList<UUID>(cond.computeDependencies(vcec).stream().map((c) -> c.resolve(vcec).getId()).collect(Collectors.toSet())));
+        check.setReferenceResourcePools(new LinkedList<String>(cond.computePoolDependencies(vcec)));        
     }
 
     private void loadClusters(BergamotDB db)
@@ -1809,10 +1826,10 @@ public class BergamotConfigImporter
                             if (host != null)
                             {
                                 // parse the dependencies
-                                List<CheckReference> dependsOn = VirtualCheckExpressionParser.parseParentsExpression(checkCfg.getDepends());
+                                List<CheckReference<?>> dependsOn = VirtualCheckExpressionParser.parseParentsExpression(checkCfg.getDepends());
                                 // validate the references and link
                                 VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId(), host);
-                                for (CheckReference chkRef : dependsOn)
+                                for (CheckReference<?> chkRef : dependsOn)
                                 {
                                     Check<?,?> dependsOnCheck = chkRef.resolve(vcec);
                                     if (dependsOnCheck == null) throw new RuntimeException("The check " + checkCfg.getName() + " depends upon the check " + chkRef + " which does not exist");
@@ -1826,6 +1843,30 @@ public class BergamotConfigImporter
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    private void updateResourcePools(BergamotDB db)
+    {
+        for (String resourcePool : this.updatedResourcePools)
+        {
+            this.report.info("Updating virtual checks dependent on the resource pool: " + resourcePool);
+            // virtual check context for resolving checks
+            VirtualCheckExpressionContext vcec = db.createVirtualCheckContext(this.site.getId(), null);
+            // update clusters
+            for (Cluster cluster : db.getClusterReferencingResourcePool(this.site.getId(), resourcePool))
+            {
+                this.report.info("Updating cluster " + cluster.getName() + " (" + cluster.getId() + ")");
+                this.setVirtualCheckDependencies(cluster, vcec);
+                db.setCluster(cluster);
+            }
+            // update resources
+            for (Resource resource : db.getResourcesReferencingResourcePool(this.site.getId(), resourcePool))
+            {
+                this.report.info("Updating resource " + resource.getName() + " (" + resource.getId() + ")");
+                this.setVirtualCheckDependencies(resource, vcec);
+                db.setResource(resource);
             }
         }
     }

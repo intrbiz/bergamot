@@ -23,9 +23,10 @@ PARSER_END(VirtualCheckExpressionParserInternal)
 SKIP : { " " | "\t" | "\n" | "\r" | "\r\n" }
 TOKEN : 
 {
-    <LUUID               :  (<HEXCHAR>){8} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){12} >
+    <UUID               :  (<HEXCHAR>){8} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){4} "-" (<HEXCHAR>){12} >
   | <XOR                 : "^" | "xor" >
-  | <OR                  : "||" | "|" | "or" >
+  | <OR                  : "||" | "|" >
+  | <LOR                 : "or" >
   | <AND                 : "&&" | "&" | "and" >
   | <NOT                 : "!" | "not" >
   | <EQ                  : "==" | "eq" >
@@ -44,14 +45,29 @@ TOKEN :
   | <HOST                : "host" >
   | <SERVICE             : "service" >
   | <TRAP                : "trap" >
+  | <HOSTS               : "hosts" >
+  | <SERVICES            : "services" >
+  | <TRAPS               : "traps" >
   | <RESOURCE            : "resource" >
   | <CLUSTER             : "cluster" >
-  | <LON                 : "on" >
+  | <POOL                : "pool" >
+  | <ON                  : "on" >
+  | <IN                  : "in" >
   | <COUNT               : "count" >
   | <IS                  : "is" >
   | <ALL                 : "all" >
   | <ANY                 : "any" >
   | <ONE                 : "one" >
+  | <TWO                 : "two" >
+  | <THREE               : "three" >
+  | <FOUR                : "four" >
+  | <FIVE                : "five" >
+  | <SIX                 : "six" >
+  | <SEVEN               : "seven" >
+  | <EIGHT               : "eight" >
+  | <NINE                : "nine" >
+  | <LMORE               : "more" >
+  | <LLESS               : "less" >
   | <OF                  : "of" >
   | <CASE                : "case" >
   | <WHEN                : "when" >
@@ -59,13 +75,13 @@ TOKEN :
   | <ELSE                : "else" >
   | <END                 : "end" >
   | <AS                  : "as" >
-  | <LSTATUS             : "PENDING" | "OK" | "WARNING" | "CRITICAL" | "UNKNOWN" | "TIMEOUT" | "DISCONNECTED" | "ACTION" >
-  | <LBOOLEAN            : "true" | "TRUE" | "false" | "FALSE" >
-  | <LINTEGER            : (["0"-"9"])+ >
+  | <STATUS             : "PENDING" | "OK" | "WARNING" | "CRITICAL" | "UNKNOWN" | "TIMEOUT" | "DISCONNECTED" | "ACTION" >
+  | <BOOLEAN            : "true" | "TRUE" | "false" | "FALSE" >
+  | <INTEGER            : (["0"-"9"])+ >
   | <#HEXCHAR            : ["a"-"f","A"-"F","0"-"9"]> 
   | <#ESCAPECHAR         : "\\" ["n","t","b","r","f","\\","'","\"", "/"] > 
   | <#UESCAPECHAR        : "\\u" <HEXCHAR><HEXCHAR><HEXCHAR><HEXCHAR> > 
-  | <LSTRING             : "\'" ( (~["\'","\\","\n","\r"]) | <ESCAPECHAR> | <UESCAPECHAR>)* "\'" >
+  | <STRING             : "\'" ( (~["\'","\\","\n","\r"]) | <ESCAPECHAR> | <UESCAPECHAR>)* "\'" >
   | <QUOTE               : "\"" > : STRINGSTATE 
 }
 
@@ -80,7 +96,7 @@ private Status readStatus() :
     Token t;
 }
 {
-    t = <LSTATUS>
+    t = <STATUS>
     { return Status.parse(t.image); }
 }
 
@@ -89,8 +105,8 @@ private UUID readUUID() :
     Token t;
 }
 {
-    t = <LUUID>
-    { return UUID.fromString(t.image); }
+    t = <UUID>
+    { return java.util.UUID.fromString(t.image); }
 }
 
 private String readString() : 
@@ -98,7 +114,7 @@ private String readString() :
     Token t;
 }
 {
-    t = <LSTRING>
+    t = <STRING>
     { return t.image.substring(1, t.image.length() -1); }
 }
 
@@ -143,7 +159,7 @@ private ValueOperator readService() :
 	    	) |
 	    	(
 				name = readString()
-	    		<LON>
+	    		<ON>
 	    		(<HOST>)?
 	    		(
 			    	(
@@ -180,7 +196,7 @@ private ValueOperator readParentService() :
 	    	) |
 	    	LOOKAHEAD(2) (
 	    		name = readString()
-	    		<LON>
+	    		<ON>
 	    		(<HOST>)?
 	    		(
 			    	(
@@ -221,7 +237,7 @@ private ValueOperator readTrap() :
 	    	) |
 	    	(
 				name = readString()
-	    		<LON>
+	    		<ON>
 	    		(<HOST>)?
 				(
 			    	(
@@ -258,7 +274,7 @@ private ValueOperator readParentTrap() :
 	    	) |
 	    	LOOKAHEAD(2) (
 				name = readString()
-	    		<LON>
+	    		<ON>
 	    		(<HOST>)?
 				(
 			    	(
@@ -323,7 +339,7 @@ private ValueOperator readResource() :
 	    	(
 				name = readString()
 				(
-		    		<LON>
+		    		<ON>
 		    		(<CLUSTER>)?
 		    		(
 				    	(
@@ -358,7 +374,7 @@ private ValueOperator readCheck() :
     { return check; }
 }
 
-private List<ValueOperator> readCheckList() :
+private ListValue readCheckList() :
 {
     List<ValueOperator> checks = new LinkedList<ValueOperator>();
     ValueOperator check;
@@ -377,12 +393,110 @@ private List<ValueOperator> readCheckList() :
     	)?
     	<EDARRAY>
     )
-    { return checks; }
+    { return new ListValue(checks); }
 }
 
-public List<CheckReference> readParents() :
+private ValuesOperator readHostPool() :
 {
-    List<CheckReference> checks = new LinkedList<CheckReference>();
+    String pool;
+}
+{
+    (
+    	<HOSTS>
+    	<IN>
+    	(<RESOURCE>)?
+    	<POOL>
+    	pool = readString()
+    )
+    { return new PoolOperator(new HostPool(pool)); }
+}
+
+private ValuesOperator readServicePool() :
+{
+    String service;
+    String pool;
+}
+{
+    (
+        <SERVICE>
+        service = readString()
+        <ON>
+    	<HOSTS>
+    	<IN>
+    	(<RESOURCE>)?
+    	<POOL>
+    	pool = readString()
+    )
+    { return new PoolOperator(new ServicePool(service, pool)); }
+}
+
+private ValuesOperator readTrapPool() :
+{
+    String trap;
+    String pool;
+}
+{
+    (
+        <TRAP>
+        trap = readString()
+        <ON>
+    	<HOSTS>
+    	<IN>
+    	<POOL>
+    	pool = readString()
+    )
+    { return new PoolOperator(new TrapPool(trap, pool)); }
+}
+
+private ValuesOperator readAnonymousServicePool() :
+{
+    String pool;
+}
+{
+    (
+        <SERVICES>
+        <IN>
+        (<RESOURCE>)?
+        <POOL>
+        pool = readString()
+    )
+    { return new PoolOperator(new AnonymousServicePool(pool)); }
+}
+
+private ValuesOperator readAnonymousTrapPool() :
+{
+    String pool;
+}
+{
+    (
+        <TRAPS>
+        <IN>
+        (<RESOURCE>)?
+        <POOL>
+        pool = readString()
+    )
+    { return new PoolOperator(new AnonymousTrapPool(pool)); }
+}
+
+private ValuesOperator readValues() :
+{
+    ValuesOperator values;
+}
+{
+    (
+    	values = readCheckList()             |
+    	values = readHostPool()              |
+    	values = readServicePool()           |
+    	values = readTrapPool()              |
+    	values = readAnonymousServicePool()  |
+    	values = readAnonymousTrapPool()
+    )
+    { return values; }
+}
+
+public List<CheckReference<?>> readParents() :
+{
+    List<CheckReference<?>> checks = new LinkedList<CheckReference<?>>();
     ValueOperator check;
 }
 {
@@ -441,52 +555,87 @@ private VirtualCheckOperator readUnary() :
 
 private VirtualCheckOperator readAllFunction() :
 {
-    List<ValueOperator> checks;
+    ValuesOperator values;
 }
 {
     (
         <ALL>
         (<OF>)?
-        checks = readCheckList()
+        values = readValues()
     )
-    { return new AllFunction(checks); }
+    { return new AllFunction(values); }
 }
 
 private VirtualCheckOperator readAnyFunction() :
 {
-    List<ValueOperator> checks;
+    ValuesOperator values;
 }
 {
     (
         <ANY>
         (<OF>)?
-        checks = readCheckList()
+        values = readValues()
     )
-    { return new AnyFunction(checks); }
+    { return new AnyFunction(values); }
 }
 
 private VirtualCheckOperator readOneOfFunction() :
 {
-    List<ValueOperator> checks;
+    Token x;
+    ValuesOperator values;
     Status as = null;
+    Token type = null;
 }
 {
     (
-        <ONE>
+        (
+            x = <ONE>   |
+            x = <TWO>   |
+            x = <THREE> |
+            x = <FOUR>  |
+            x = <FIVE>  |
+            x = <SIX>   |
+            x = <SEVEN> |
+            x = <EIGHT> |
+            x = <NINE>
+        )
+        (
+            <LOR>
+            (
+                type = <LMORE> |
+                type = <LLESS>
+            )
+        )?
         (<OF>)?
-        checks = readCheckList()
+        values = readValues()
         (
         	<AS>
         	as = readStatus()
         )?
     )
-    { return new OneOfFunction(checks, as); }
+    { 
+        if (type != null)
+        {
+            if (LMORE == type.kind)
+            {
+                return new OneOrMoreOfFunction(values, x.image, as); 
+            } 
+            else if (LLESS == type.kind) 
+            {
+                return new OneOrLessOfFunction(values, x.image, as); 
+            }
+        } 
+        else 
+        {
+            return new OneOfFunction(values, x.image, as); 
+        }
+    }
 }
 
 private VirtualCheckOperator readCountFunction() :
 {
     Status status = null;
-    List<ValueOperator> checks;
+    ValuesOperator values;
     Token test = null;
     Token value = null;
     Status as = null;
@@ -498,18 +647,23 @@ private VirtualCheckOperator readCountFunction() :
         	status = readStatus()
         )?
         (<OF>)?
-        checks = readCheckList()
+        values = readValues()
         (<IS>)?
         (
-        	test = <EQ> | <NE> | <LT> | <LTEQ> | <GT> | <GTEQ>
+        	test = <EQ>    | 
+        	test = <NE>    | 
+        	test = <LT>    | 
+        	test = <LTEQ>  | 
+        	test = <GT>    | 
+        	test = <GTEQ>
         )
-        value = <LINTEGER>
+        value = <INTEGER>
         (
         	<AS>
         	as = readStatus()
         )?
     )
-    { return new CountFunction(status, checks, test.image.toLowerCase(), Integer.parseInt(value.image), as); }
+    { return new CountFunction(status, values, test.image.toLowerCase(), Integer.parseInt(value.image), as); }
 }
 
 private VirtualCheckOperator readCaseFunction() :
@@ -615,7 +769,7 @@ private VirtualCheckOperator readOrExpression() :
     (
 		l = readAndExpression()
 		(
-	    	<OR>
+	    	(<OR> | <LOR>)
 	    	r = readAndExpression()
 	    	{ l = new OrOperator(l, r); }
 		)*

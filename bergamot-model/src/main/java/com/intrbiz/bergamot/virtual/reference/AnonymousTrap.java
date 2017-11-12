@@ -6,7 +6,7 @@ import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 /**
  * A reference to a trap on a host, but the host is not known
  */
-public class AnonymousTrap implements CheckReference, TrapReference
+public class AnonymousTrap implements TrapReference
 {
     private static final long serialVersionUID = 1L;
 

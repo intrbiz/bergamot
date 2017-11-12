@@ -59,26 +59,16 @@
 		</div>
 	</div>
 	
-	<!-- References -->
-	
-	<h2 rendered="#{! cluster.references.isEmpty()}">Depends Upon</h2>
-
-	<div class="row hostgroup services" rendered="#{! cluster.references.isEmpty()}">
-		<data-set var="check" value="#{cluster.references}">
-			<include view="include/check"/>
-		</data-set>
-	</div>
-	
 	<!-- Resources -->
 	
 	<h2 rendered="#{! cluster.resources.isEmpty()}">Resources</h2>
 	
-	<div class="row submenu pull-right" rendered="#{! host.services.isEmpty()}">
-		<a href="/cluster/unsuppress-resource/#{host.id}" id="unsuppress-resources" data-cluster-id="#{cluster.id}">Unsuppress all</a>
-		<a href="/cluster/suppress-resource/#{host.id}"   id="suppress-resources"   data-cluster-id="#{cluster.id}">Suppress all</a>
+	<div class="row submenu pull-right" rendered="#{! cluster.resources.isEmpty()}">
+		<a href="/cluster/unsuppress-resource/#cluster.id}" id="unsuppress-resources" data-cluster-id="#{cluster.id}">Unsuppress all</a>
+		<a href="/cluster/suppress-resource/#{cluster.id}"   id="suppress-resources"   data-cluster-id="#{cluster.id}">Suppress all</a>
 	</div>
 	
-	<data-set var="category" value="#{host.getCategorisedResourcesForContact(Balsa().currentPrincipal())}">
+	<data-set var="category" value="#{cluster.getCategorisedResourcesForContact(Balsa().currentPrincipal())}">
 		<div class="row hostgroup services">
 			<h3 rendered="#{category.name != 'default'}">Category: #{ucfirst(category.name)}</h3>
 			<div class="row hostgroup services">
@@ -96,6 +86,16 @@
 			</data-set>
 		</div>
 	</data-set>
+	
+	<!-- References -->
+	
+	<h2 rendered="#{! cluster.references.isEmpty()}">References</h2>
+
+	<div class="row hostgroup services" rendered="#{! cluster.references.isEmpty()}">
+		<data-set var="check" value="#{cluster.references}">
+			<include view="include/check"/>
+		</data-set>
+	</div>
 	
 	<!-- Alerts -->
 	<include view="include/alerts"/>

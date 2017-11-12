@@ -125,6 +125,9 @@
 		</div>
 	</data-set>
 	
+	<!-- Referenced By -->
+	<include view="include/referenced_by" data-referenced="#{host.getReferencedBy()}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
 	

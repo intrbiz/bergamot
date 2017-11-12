@@ -4,7 +4,7 @@ import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class ServiceByName implements CheckReference, ServiceReference
+public class ServiceByName implements ServiceReference
 {
     private static final long serialVersionUID = 1L;
     

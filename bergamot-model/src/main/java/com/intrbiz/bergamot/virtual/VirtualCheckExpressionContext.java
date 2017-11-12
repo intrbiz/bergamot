@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.virtual;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.Check;
@@ -20,6 +21,8 @@ public interface VirtualCheckExpressionContext
     
     Host lookupHost(UUID id);
     
+    List<Host> lookupHostsInPool(String pool);
+    
     Cluster lookupCluster(String name);
     
     Cluster lookupCluster(UUID id);
@@ -30,11 +33,19 @@ public interface VirtualCheckExpressionContext
     
     Service lookupService(UUID id);
     
+    List<Service> lookupAnonymousServicesInPool(String pool);
+    
+    List<Service> lookupServicesInPool(String service, String pool);
+    
     Trap lookupTrap(Host on, String name);
     
     Trap lookupAnonymousTrap(String name);
     
     Trap lookupTrap(UUID id);
+    
+    List<Trap> lookupAnonymousTrapsInPool(String pool);
+    
+    List<Trap> lookupTrapsInPool(String trap, String pool);
     
     Resource lookupResource(Cluster on, String name);
     

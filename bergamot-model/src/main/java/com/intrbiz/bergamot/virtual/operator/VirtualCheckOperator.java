@@ -16,26 +16,26 @@ public abstract class VirtualCheckOperator implements Serializable
     
     public abstract Status computeStatus(VirtualCheckExpressionContext context);
     
-    public final Set<CheckReference> computeDependencies()
+    public final Set<CheckReference<?>> computeDependencies(VirtualCheckExpressionContext context)
     {
-        Set<CheckReference> checks = new HashSet<CheckReference>();
-        this.computeDependencies(checks);
+        Set<CheckReference<?>> checks = new HashSet<CheckReference<?>>();
+        this.computeDependencies(context, checks);
         return checks;
     }
     
+    public final Set<String> computePoolDependencies(VirtualCheckExpressionContext context)
+    {
+        Set<String> pools = new HashSet<String>();
+        this.computePoolDependencies(context, pools);
+        return pools;
+    }
     
     /**
      * Are all dependent checks in a hard state?
      */
-    public boolean isAllDependenciesHard(VirtualCheckExpressionContext context)
-    {
-        for (CheckReference check : this.computeDependencies())
-        {
-            if (! check.resolve(context).getState().isHard())
-                return false;
-        }
-        return true;
-    }
+    public abstract boolean isAllDependenciesHard(VirtualCheckExpressionContext context);
     
-    public abstract void computeDependencies(Set<CheckReference> checks);
+    public abstract void computeDependencies(VirtualCheckExpressionContext context, Set<CheckReference<?>> checks);
+    
+    public abstract void computePoolDependencies(VirtualCheckExpressionContext context, Set<String> pools);
 }

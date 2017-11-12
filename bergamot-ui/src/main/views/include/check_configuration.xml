@@ -161,6 +161,10 @@
 					<span class="label wide">Worker Pool: </span>
 					<span class="value">#{coalesce(check.resolveWorkerPool(), 'any')}</span>
 				</p>
+				<p rendered="#{check.type == 'host' or check.type == 'service' or check.type == 'trap'}">
+					<span class="label wide">Resource Pool: </span>
+					<span class="value">#{coalesce(check.resourcePool, '')}</span>
+				</p>
 			</div>
 			<div class="col8 dash_icon">
 				<h3>Command Parameters</h3>
@@ -176,6 +180,14 @@
 						</tr>
 					</data-set>
 				</table>
+			</div>
+		</div>
+	</container>
+	<container rendered="#{Balsa().permission('read.config', check) and (check.type == 'cluster' or check.type == 'resource')}">
+		<div class="row">
+			<div class="col12 dash_icon">
+				<h3>Condition</h3>
+				<p>#{check.condition.toString()}</p>
 			</div>
 		</div>
 	</container>

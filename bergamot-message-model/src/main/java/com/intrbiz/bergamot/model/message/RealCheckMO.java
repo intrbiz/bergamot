@@ -25,6 +25,9 @@ public abstract class RealCheckMO extends CheckMO
     
     @JsonProperty("depends")
     protected List<? extends CheckMO> depends = new LinkedList<CheckMO>();
+    
+    @JsonProperty("resource_pool")
+    protected String resourcePool;
 
     public RealCheckMO()
     {
@@ -89,5 +92,15 @@ public abstract class RealCheckMO extends CheckMO
     public void setDepends(List<? extends CheckMO> depends)
     {
         this.depends = depends;
+    }
+
+    public String getResourcePool()
+    {
+        return resourcePool;
+    }
+
+    public void setResourcePool(String resourcePool)
+    {
+        this.resourcePool = resourcePool;
     }
 }

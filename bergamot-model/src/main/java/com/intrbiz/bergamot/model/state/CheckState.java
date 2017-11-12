@@ -365,7 +365,7 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     }
     
     /**
-     * Should this check currently be ignore.
+     * Should this check currently be ignored.
      * This means that the check is currently 
      * suppressed, in downtime, acknowledged 
      * or encompassed.

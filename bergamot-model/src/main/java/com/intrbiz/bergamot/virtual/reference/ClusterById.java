@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class ClusterById extends CheckById implements ClusterReference
+public class ClusterById extends CheckById<Cluster> implements ClusterReference
 {
     private static final long serialVersionUID = 1L;
     

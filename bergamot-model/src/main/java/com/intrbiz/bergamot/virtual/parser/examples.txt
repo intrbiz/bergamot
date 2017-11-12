@@ -1,27 +1,61 @@
 # Virtual Check Expression Examples
 
+# One host or the other (OR)
 host 1cf38409-e6f6-473f-9a27-bc88665640e8 || host 1cf38409-e6f6-473f-9a27-bc88665640e8
 
-host 'vm1' and host 'vm2
-
-service 'ping' on host 'vm1 && service 'ping' on host 'vm2'
-
+# One trap or the other (OR)
 trap 'port1' on host 'sw1' or trap 'port2' on host 'sw2'
 
+# Both hosts (AND)
+host 'vm1' and host 'vm2
+
+# Both services (AND)
+service 'ping' on host 'vm1 && service 'ping' on host 'vm2'
+
+# Exactly one service or trap (XOR)
 service 1cf38409-e6f6-473f-9a27-bc88665640e8 ^ service 1cf38409-e6f6-473f-9a27-bc88665640e8 ^ trap 1cf38409-e6f6-473f-9a27-bc88665640e8
 
+# All hosts in the given pool
+all of hosts in pool 'dev_cluster'
+all hosts in pool 'dev_cluster'
+
+# All hosts in the given list
 all of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
 all [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
 
-any of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
-any [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+# Any hosts in the given pool
+any of hosts in pool 'cluster'
+any hosts in pool 'cluster'
 
+# Any host in the given list
+any of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
+any [ host 'vm1', hostt 'vm2', host 'vm3', host 'vm4' ]
+
+# One of the hosts in the given pool
+one of hosts in pool 'cluster'
+one hosts in pool 'cluster'
+
+# Two of the hosts in the given pool
+two of hosts in pool 'cluster'
+two hosts in pool 'cluster'
+
+# One of the services/traps in the given pool
+one of services in pool 'cluster'
+one of traps in pool 'cluster'
+
+# One of the named service/trap on hosts in the given pool
+one of service 'test' on hosts in pool 'cluster'
+one of traps 'test' on hosts in pool 'cluster'
+
+# One of the hosts in the given list
 one of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
 one [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
 
+# One of the hosts in the given list, as a warning
 one of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as WARNING
-one [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as CRITICAL
+one [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as WARNING
 
+# Count hosts in the given list in various ways
 count OK of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is == 1
 count WARNING of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is > 1
 count CRITICAL of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is < 1
@@ -33,4 +67,8 @@ count [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] <= 1
 count [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] is <= 1 as WARNING
 count [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] != 1 as ACTION
 
+# Count the hosts in the given pool expecting at least one to be ok
+count hosts in pool 'test' > 1 as CRITICAL
+
+# If statement, allowing status mapping
 case when host 'vm1' is OK then OK when host 'vm1' is WARNING then OK else CRITICAL end

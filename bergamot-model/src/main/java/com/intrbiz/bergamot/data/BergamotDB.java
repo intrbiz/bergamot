@@ -96,7 +96,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 58, 0}),
+        version = @SQLVersion({3, 59, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -1574,6 +1574,9 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLGetter(table = Host.class, name = "get_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
     public abstract Host getHostByExternalRef(@SQLParam("site_id") UUID siteId, @SQLParam("external_ref") String externalRef);
     
+    @SQLGetter(table = Host.class, name = "get_hosts_in_resource_pool", since = @SQLVersion({3, 59, 0}))
+    public abstract List<Host> getHostsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("resource_pool") String resourcePool);
+    
     @Cacheable
     @SQLGetter(table = Host.class, name = "get_host_by_agent_id", since = @SQLVersion({2, 3, 0}))
     public abstract Host getHostByAgentId(@SQLParam("site_id") UUID siteId, @SQLParam("agent_id") UUID agentId);
@@ -1689,6 +1692,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     @SQLGetter(table = Service.class, name = "get_service_on_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
     public abstract Service getServiceOnHostByExternalRef(@SQLParam("host_id") UUID hostId, @SQLParam("external_ref") String externalRef);
     
+    @SQLGetter(table = Service.class, name = "get_services_on_hosts_in_resource_pool", since = @SQLVersion({3, 59, 0}),
+            query = @SQLQuery("SELECT s.* "
+                    + "FROM bergamot.service s "
+                    + "JOIN bergamot.host h ON (s.host_id = h.id) "
+                    + "WHERE h.site_id = p_site_id "
+                    + "AND s.site_id = p_site_id "
+                    + "AND h.resource_pool = p_resource_pool "
+                    + "AND s.name = p_name")
+    )
+    public abstract List<Service> getServicesOnHostsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name, @SQLParam("resource_pool") String resourcePool);
+    
+    @SQLGetter(table = Service.class, name = "get_services_in_resource_pool", since = @SQLVersion({3, 59, 0}))
+    public abstract List<Service> getServicesInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("resource_pool") String resourcePool);
+    
     @SQLGetter(table = Service.class, name = "get_service_on_host_by_name", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.service WHERE host_id = (SELECT h.id FROM bergamot.host h WHERE h.site_id = p_site_id AND h.name = p_host_name) AND name = p_name")
     )
@@ -1757,6 +1774,20 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
     public abstract Trap getTrapOnHostByExternalRef(@SQLParam("host_id") UUID hostId, @SQLParam("external_ref") String externalRef);
+    
+    @SQLGetter(table = Trap.class, name = "get_traps_on_hosts_in_resource_pool", since = @SQLVersion({3, 59, 0}),
+            query = @SQLQuery("SELECT t.* "
+                    + "FROM bergamot.trap t "
+                    + "JOIN bergamot.host h ON (t.host_id = h.id) "
+                    + "WHERE h.site_id = p_site_id "
+                    + "AND t.site_id = p_site_id "
+                    + "AND h.resource_pool = p_resource_pool "
+                    + "AND t.name = p_name")
+    )
+    public abstract List<Trap> getTrapsOnHostsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name, @SQLParam("resource_pool") String resourcePool);
+    
+    @SQLGetter(table = Trap.class, name = "get_traps_in_resource_pool", since = @SQLVersion({3, 59, 0}))
+    public abstract List<Trap> getTrapsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("resource_pool") String resourcePool);
     
     @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_name", since = @SQLVersion({1, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.trap WHERE host_id = (SELECT h.id FROM bergamot.host h WHERE h.site_id = p_site_id AND h.name = p_host_name) AND name = p_name")
@@ -1865,6 +1896,13 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Cluster> getClustersReferencingCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId);
     
+    @SQLGetter(table = Cluster.class, name = "get_clusters_referencing_resource_pool", since = @SQLVersion({3, 59, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.cluster "
+                    + "WHERE site_id = p_site_id "
+                    + "AND reference_resource_pools @> ARRAY[p_resource_pool]")
+    )
+    public abstract List<Cluster> getClusterReferencingResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "resource_pool", virtual = true) String resourcePool);
+    
     @SQLGetter(table = Cluster.class, name = "list_clusters", since = @SQLVersion({1, 0, 0}))
     public abstract List<Cluster> listClusters(@SQLParam("site_id") UUID siteId);
     
@@ -1955,6 +1993,13 @@ public abstract class BergamotDB extends DatabaseAdapter
         query = @SQLQuery("SELECT * FROM bergamot.resource WHERE reference_ids @> ARRAY[p_check_id]")
     )
     public abstract List<Resource> getResourcesReferencingCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId);
+    
+    @SQLGetter(table = Resource.class, name = "get_resources_referencing_resource_pool", since = @SQLVersion({3, 59, 0}),
+        query = @SQLQuery("SELECT * FROM bergamot.resource "
+                + "WHERE site_id = p_site_id "
+                + "AND reference_resource_pools @> ARRAY[p_resource_pool]")
+    )
+    public abstract List<Resource> getResourcesReferencingResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "resource_pool", virtual = true) String resourcePool);
     
     @SQLGetter(table = Resource.class, name = "list_resources", since = @SQLVersion({1, 0, 0}))
     public abstract List<Resource> listResources(@SQLParam("site_id") UUID siteId);
@@ -2285,7 +2330,37 @@ public abstract class BergamotDB extends DatabaseAdapter
             public Trap lookupAnonymousTrap(String name)
             {
                 return contextualHost == null ? null : contextualHost.getTrap(name);
-            }  
+            }
+
+            @Override
+            public List<Host> lookupHostsInPool(String pool)
+            {
+                return getHostsInResourcePool(siteId, pool);
+            }
+
+            @Override
+            public List<Service> lookupAnonymousServicesInPool(String pool)
+            {
+                return getServicesInResourcePool(siteId, pool);
+            }
+
+            @Override
+            public List<Service> lookupServicesInPool(String service, String pool)
+            {
+                return getServicesOnHostsInResourcePool(siteId, service, pool);
+            }
+
+            @Override
+            public List<Trap> lookupAnonymousTrapsInPool(String pool)
+            {
+                return getTrapsInResourcePool(siteId, pool);
+            }
+
+            @Override
+            public List<Trap> lookupTrapsInPool(String trap, String pool)
+            {
+                return getTrapsOnHostsInResourcePool(siteId, trap, pool);
+            }
         };
     }
     

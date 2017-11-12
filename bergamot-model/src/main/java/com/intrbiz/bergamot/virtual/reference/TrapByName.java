@@ -4,7 +4,7 @@ import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class TrapByName implements CheckReference, TrapReference
+public class TrapByName implements TrapReference
 {
     private static final long serialVersionUID = 1L;
     

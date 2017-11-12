@@ -44,12 +44,25 @@ public class XorOperator extends VirtualCheckOperator
     }
 
     @Override
-    public void computeDependencies(Set<CheckReference> checks)
+    public void computeDependencies(VirtualCheckExpressionContext context, Set<CheckReference<?>> checks)
     {
-        this.left.computeDependencies(checks);
-        this.right.computeDependencies(checks);
+        this.left.computeDependencies(context, checks);
+        this.right.computeDependencies(context, checks);
     }
     
+    @Override
+    public boolean isAllDependenciesHard(VirtualCheckExpressionContext context)
+    {
+        return this.left.isAllDependenciesHard(context) && this.right.isAllDependenciesHard(context);
+    }
+
+    @Override
+    public void computePoolDependencies(VirtualCheckExpressionContext context, Set<String> pools)
+    {
+        this.left.computePoolDependencies(context, pools);
+        this.right.computePoolDependencies(context, pools);
+    }
+
     public String toString()
     {
         return this.left.toString() + " ^ " + this.right.toString();

@@ -40,6 +40,12 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
      */
     @SQLColumn(index = 10, name = "depends", type = "UUID[]", since = @SQLVersion({ 3, 21, 0 }))
     protected List<UUID> dependsIds = new LinkedList<UUID>();
+    
+    /**
+     * The resource pool this check is part of
+     */
+    @SQLColumn(index = 13, name = "resource_pool", since = @SQLVersion({ 3, 59, 0 }))
+    protected String resourcePool;
 
     public RealCheck()
     {
@@ -92,6 +98,16 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         return ! (this.dependsIds == null || this.dependsIds.isEmpty());
     }
     
+    public String getResourcePool()
+    {
+        return resourcePool;
+    }
+
+    public void setResourcePool(String resourcePool)
+    {
+        this.resourcePool = resourcePool;
+    }
+
     public List<Check<?,?>> getDepends()
     {
         List<Check<?,?>> depends = new LinkedList<Check<?,?>>();
@@ -127,6 +143,7 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
         mo.setAlertAttemptThreshold(this.getAlertAttemptThreshold());
         mo.setRecoveryAttemptThreshold(this.getRecoveryAttemptThreshold());
         mo.setCurrentAttemptThreshold(this.getCurrentAttemptThreshold());
+        mo.setResourcePool(this.getResourcePool());
         if (options.contains(MOFlag.STATS)) mo.setStats(this.getStats().toMO(contact));
         if (options.contains(MOFlag.COMMAND)) mo.setCheckCommand(Util.nullable(this.getCheckCommand(), (x) -> x.toStubMO(contact)));
         if (options.contains(MOFlag.DEPENDS)) mo.setDepends(this.getDepends().stream().map((c) -> (CheckMO) c.toStubMO(contact)).collect(Collectors.toList()));
@@ -136,6 +153,8 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
     public void configure(C configuration, C resolvedConfiguration)
     {
         super.configure(configuration, resolvedConfiguration);
+        // resource pool
+        this.resourcePool = resolvedConfiguration.getResourcePool();
         // configure state thresholds
         if (resolvedConfiguration.getState() != null)
         {

@@ -26,8 +26,17 @@ public abstract class VirtualCheck<T extends VirtualCheckMO, C extends VirtualCh
     @SQLColumn(index = 1, name = "reference_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
     protected List<UUID> referenceIds = new LinkedList<UUID>();
     
+    /**
+     * The virtual check condition used to compute the state of this check
+     */
     @SQLColumn(index = 2, name = "condition", type = "TEXT", adapter = VirtualCheckOperatorAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
     private VirtualCheckOperator condition;
+    
+    /**
+     * Pools which this check references
+     */
+    @SQLColumn(index = 3, name = "reference_resource_pools", type = "text[]", since = @SQLVersion({ 3, 59, 0 }))
+    protected List<String> referenceResourcePools = new LinkedList<String>();
     
     public VirtualCheck()
     {
@@ -44,14 +53,24 @@ public abstract class VirtualCheck<T extends VirtualCheckMO, C extends VirtualCh
         this.referenceIds = referenceIds;
     }
     
+    public List<String> getReferenceResourcePools()
+    {
+        return referenceResourcePools;
+    }
+
+    public void setReferenceResourcePools(List<String> referenceResourcePools)
+    {
+        this.referenceResourcePools = referenceResourcePools;
+    }
+    
     public List<Check<?,?>> getReferences()
     {
         List<Check<?,?>> r = new LinkedList<Check<?,?>>();
         if (this.getReferenceIds() != null)
         {
-            for (UUID refId : this.getReferenceIds())
+            try (BergamotDB db = BergamotDB.connect())
             {
-                try (BergamotDB db = BergamotDB.connect())
+                for (UUID refId : this.getReferenceIds())
                 {
                     r.add(db.getCheck(refId));
                 }

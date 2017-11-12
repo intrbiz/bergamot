@@ -5,11 +5,11 @@ import java.io.Serializable;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public interface CheckReference extends Serializable
+public interface CheckReference<T extends Check<?,?>> extends Serializable
 {
     /**
      * Resolve the check referenced by this reference
      * @return the check
      */
-    Check<?,?> resolve(VirtualCheckExpressionContext context);
+    T resolve(VirtualCheckExpressionContext context);
 }

@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class TrapById extends CheckById implements TrapReference
+public class TrapById extends CheckById<Trap> implements TrapReference
 {
     private static final long serialVersionUID = 1L;
     

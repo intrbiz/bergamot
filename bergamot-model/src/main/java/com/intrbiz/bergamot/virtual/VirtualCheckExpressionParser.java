@@ -25,7 +25,7 @@ public class VirtualCheckExpressionParser
         }
     }
     
-    public static final List<CheckReference> parseParentsExpression(String expression)
+    public static final List<CheckReference<?>> parseParentsExpression(String expression)
     {
         try
         {

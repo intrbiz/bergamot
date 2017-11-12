@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class ResourceById extends CheckById implements ResourceReference
+public class ResourceById extends CheckById<Resource> implements ResourceReference
 {
     private static final long serialVersionUID = 1L;
     

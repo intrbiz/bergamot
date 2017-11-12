@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class CheckById implements CheckReference
+public class CheckById<T extends Check<?,?>> implements CheckReference<T>
 {
     private static final long serialVersionUID = 1L;
     
@@ -31,9 +31,10 @@ public class CheckById implements CheckReference
         this.id = id;
     }
 
-    public Check<?, ?> resolve(VirtualCheckExpressionContext context)
+    @SuppressWarnings("unchecked")
+    public T resolve(VirtualCheckExpressionContext context)
     {
-        return context.lookupCheck(this.getId());
+        return (T) context.lookupCheck(this.getId());
     }
 
     @Override
@@ -45,6 +46,7 @@ public class CheckById implements CheckReference
         return result;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean equals(Object obj)
     {

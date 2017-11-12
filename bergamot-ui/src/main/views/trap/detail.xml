@@ -70,6 +70,9 @@
 		</div>
 	</div>
 	
+	<!-- Referenced By -->
+	<include view="include/referenced_by" data-referenced="#{trap.getReferencedBy()}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
 	

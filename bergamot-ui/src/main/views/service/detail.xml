@@ -71,6 +71,9 @@
 		</div>
 	</div>
 	
+	<!-- Referenced By -->
+	<include view="include/referenced_by" data-referenced="#{service.getReferencedBy()}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
 	

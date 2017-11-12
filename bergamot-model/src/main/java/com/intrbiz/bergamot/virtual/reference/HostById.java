@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class HostById extends CheckById implements HostReference
+public class HostById extends CheckById<Host> implements HostReference
 {
     private static final long serialVersionUID = 1L;
     

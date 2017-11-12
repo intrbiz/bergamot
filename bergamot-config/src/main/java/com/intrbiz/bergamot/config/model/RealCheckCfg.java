@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.config.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 
@@ -16,6 +17,8 @@ public abstract class RealCheckCfg<P extends RealCheckCfg<P>> extends CheckCfg<P
     private CheckCommandCfg checkCommand;
     
     private String depends;
+    
+    private String resourcePool;
     
     @XmlElementRef(type = CheckCommandCfg.class)
     @ResolveWith(BeanResolver.class)
@@ -56,5 +59,17 @@ public abstract class RealCheckCfg<P extends RealCheckCfg<P>> extends CheckCfg<P
     public void setDepends(String depends)
     {
         this.depends = depends;
+    }
+
+    @XmlAttribute(name = "resource-pool")
+    @ResolveWith(CoalesceEmptyString.class)
+    public String getResourcePool()
+    {
+        return resourcePool;
+    }
+
+    public void setResourcePool(String resourcePool)
+    {
+        this.resourcePool = resourcePool;
     }
 }

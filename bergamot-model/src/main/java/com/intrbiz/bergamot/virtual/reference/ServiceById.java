@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class ServiceById extends CheckById implements ServiceReference
+public class ServiceById extends CheckById<Service> implements ServiceReference
 {
     private static final long serialVersionUID = 1L;
     

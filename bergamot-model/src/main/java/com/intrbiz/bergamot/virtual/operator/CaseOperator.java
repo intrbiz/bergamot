@@ -12,7 +12,7 @@ public class CaseOperator extends VirtualCheckOperator
     private static final long serialVersionUID = 1L;
 
     private final List<CaseWhen> when;
-    
+
     private final Status elseStatus;
 
     public CaseOperator(List<CaseWhen> when, Status elseStatus)
@@ -39,8 +39,32 @@ public class CaseOperator extends VirtualCheckOperator
     }
 
     @Override
-    public void computeDependencies(Set<CheckReference> checks)
+    public boolean isAllDependenciesHard(VirtualCheckExpressionContext context)
     {
+        for (CaseWhen cw : this.when)
+        {
+            if (! cw.value.isAllDependenciesHard(context))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void computeDependencies(VirtualCheckExpressionContext context, Set<CheckReference<?>> checks)
+    {
+        for (CaseWhen cw : this.when)
+        {
+            cw.value.computeDependencies(context, checks);
+        }
+    }
+
+    @Override
+    public void computePoolDependencies(VirtualCheckExpressionContext context, Set<String> pools)
+    {
+        for (CaseWhen cw : this.when)
+        {
+            cw.value.computePoolDependencies(context, pools);
+        }
     }
 
     public String toString()
@@ -53,15 +77,15 @@ public class CaseOperator extends VirtualCheckOperator
         sb.append(" else ").append(this.elseStatus.toString()).append(" end");
         return sb.toString();
     }
-    
+
     public static class CaseWhen
     {
         private final VirtualCheckOperator value;
-        
+
         private final Status status;
-        
+
         private final Status as;
-        
+
         public CaseWhen(VirtualCheckOperator value, Status status, Status as)
         {
             this.value = value;
@@ -83,12 +107,12 @@ public class CaseOperator extends VirtualCheckOperator
         {
             return as;
         }
-        
+
         public Status apply(VirtualCheckExpressionContext context)
         {
             return this.value.computeStatus(context) == this.status ? this.as : null;
         }
-        
+
         public String toString()
         {
             return "when " + this.value.toString() + " is " + this.status.toString() + " then " + this.as;
