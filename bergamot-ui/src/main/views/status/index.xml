@@ -28,7 +28,7 @@
 									<p class="status_meta" rendered="#{alert != null and alert.recovered}">
 										Alert raised at #{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)}and recovered at #{dateformat('HH:mm:ss', alert.recoveredAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.recoveredAt)}.
 									</p>
-									<p class="status_meta" rendered="#{alert != null and alert.acknowledged}">
+									<p class="status_meta" rendered="#{alert != null and alert.acknowledged and (! alert.recovered)}">
 										Alert raised at #{dateformat('HH:mm:ss', alert.raised)} on #{dateformat('EEEE dd/MM/yyyy', alert.raised)} and acknowledged at #{dateformat('HH:mm:ss', alert.acknowledgedAt)} on #{dateformat('EEEE dd/MM/yyyy', alert.acknowledgedAt)} by our engineers.
 									</p>
 									<p class="status_meta" rendered="#{alert != null and ! (alert.acknowledged or alert.recovered)}">
@@ -42,7 +42,7 @@
 											<data-set var="report" value="#{slas}">
 												<li>
 													<p>
-														<span class="sla_period_name">#{report.periodSummary}</span> from <span class="sla_period_start">#{dateformat('dd/MM/yyyy', report.periodStart)}</span> to <span class="sla_period_end">#{dateformat('dd/MM/yyyy', report.periodStart)}</span>
+														<span class="sla_period_name">#{report.periodSummary}</span> from <span class="sla_period_start">#{dateformat('dd/MM/yyyy', report.periodStart)}</span> to <span class="sla_period_end">#{dateformat('dd/MM/yyyy', report.periodEnd)}</span>
 													</p>
 													<p class="status_sla_value #{if(report.periodBreached, 'sla_bad', 'sla_good')}">
 														<span class="sla_target">
