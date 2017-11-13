@@ -45,6 +45,7 @@ import com.intrbiz.bergamot.agent.handler.NetIOHandler;
 import com.intrbiz.bergamot.agent.handler.NetIfInfoHandler;
 import com.intrbiz.bergamot.agent.handler.OSInfoHandler;
 import com.intrbiz.bergamot.agent.handler.ProcessInfoHandler;
+import com.intrbiz.bergamot.agent.handler.ShellHandler;
 import com.intrbiz.bergamot.agent.handler.UptimeInfoHandler;
 import com.intrbiz.bergamot.agent.handler.WhoInfoHandler;
 import com.intrbiz.bergamot.agent.statsd.StatsDProcessor;
@@ -148,6 +149,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         this.registerHandler(new NetIOHandler());
         this.registerHandler(new DiskIOHandler());
         this.registerHandler(new MetricsHandler());
+        this.registerHandler(new ShellHandler());
         // shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

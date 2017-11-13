@@ -18,13 +18,13 @@ public class BergamotAgentCfg extends Configuration
     private String server;
 
     private String caCertificate;
-    
+
     private String siteCaCertificate;
 
     private String key;
 
     private String certificate;
-    
+
     private int statsDPort = 8125;
 
     public BergamotAgentCfg()
@@ -47,7 +47,7 @@ public class BergamotAgentCfg extends Configuration
     {
         this.caCertificate = caCertificate;
     }
-    
+
     @XmlElement(name = "site-ca-certificate")
     public String getSiteCaCertificate()
     {
@@ -142,6 +142,6 @@ public class BergamotAgentCfg extends Configuration
         {
         }
         String trimmed = out.toString();
-        return(trimmed == null || trimmed.length() == 0) ? null : trimmed;
+        return (trimmed == null || trimmed.length() == 0) ? null : trimmed;
     }
 }

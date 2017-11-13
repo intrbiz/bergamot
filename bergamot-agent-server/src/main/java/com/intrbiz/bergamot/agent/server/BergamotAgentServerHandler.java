@@ -36,6 +36,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
+import com.intrbiz.bergamot.model.message.agent.check.ShellCheck;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
@@ -249,6 +250,16 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     public void checkWho(Consumer<AgentMessage> onResponse)
     {
         this.sendMessageToAgent(new CheckWho(), onResponse);
+    }
+    
+    public void shell(String commandLine, String runAs, Consumer<AgentMessage> onResponse)
+    {
+        this.sendMessageToAgent(new ShellCheck(commandLine, runAs), onResponse);
+    }
+    
+    public void shell(String commandLine, Consumer<AgentMessage> onResponse)
+    {
+        shell(commandLine, null, onResponse);
     }
     
     //

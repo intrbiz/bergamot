@@ -199,6 +199,16 @@ public class BergamotAgentScriptWrapper
         this.agent.checkWho(onResponse);
     }
     
+    public void shell(String commandLine, String runAs, Consumer<AgentMessage> onResponse)
+    {
+        this.agent.shell(commandLine, runAs, onResponse);
+    }
+    
+    public void shell(String commandLine, Consumer<AgentMessage> onResponse)
+    {
+        this.agent.shell(commandLine, onResponse);
+    }
+    
     public static List<Parameter> mapJSObjectToAgentParameters(ScriptObjectMirror object, String property, List<Parameter> defaultValue)
     {
         if (object != null)
