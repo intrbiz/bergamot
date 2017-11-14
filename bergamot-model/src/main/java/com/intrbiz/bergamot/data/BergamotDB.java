@@ -2207,6 +2207,18 @@ public abstract class BergamotDB extends DatabaseAdapter
         return c;
     }
     
+    public VirtualCheck<?,?> getVirtualCheck(UUID id)
+    {
+        VirtualCheck<?,?> c = null;
+        // resource
+        c = this.getResource(id);
+        if (c != null) return c;
+        // cluster
+        c = this.getCluster(id);
+        if (c != null) return c;
+        return c;
+    }
+    
     public List<Check<?,?>> getChecksInGroup(UUID groupId)
     {
         List<Check<?,?>> checks = new LinkedList<Check<?,?>>();

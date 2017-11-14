@@ -11,9 +11,11 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
@@ -62,26 +64,40 @@ public class LamplighterAPIRouter extends Router<BergamotApp>
     @Any("/check/id/:id/readings")
     @JSON(notFoundIfNull = true)
     @RequirePermission("api.read.lamplighter.readings")
+    @WithDataAdapter(BergamotDB.class)
     @WithDataAdapter(LamplighterDB.class)
     @ListOf(CheckReadingMO.class)
-    public List<CheckReadingMO> getReadingsByCheck(LamplighterDB db, @Var("site") Site site, @IsaObjectId() UUID id)
+    public List<CheckReadingMO> getReadingsByCheck(BergamotDB bergamotDB, LamplighterDB db, @Var("site") Site site, @IsaObjectId() UUID id)
     {
-        List<CheckReadingMO> readings = new LinkedList<CheckReadingMO>();
-        for (CheckReading reading : db.getCheckReadingsForCheck(id))
+        
+        List<UUID> checkIds = new LinkedList<UUID>();
+        checkIds.add(id);
+        // If the check is a virtual check fetch all the referenced readings too
+        VirtualCheck<?,?> virtual = bergamotDB.getVirtualCheck(id);
+        if (virtual != null)
         {
-            readings.add(new CheckReadingMO(
-                    reading.getId(),
-                    reading.getSiteId(),
-                    reading.getCheckId(),
-                    reading.getName(),
-                    reading.getSummary(),
-                    reading.getDescription(),
-                    reading.getUnit(),
-                    reading.getReadingType(),
-                    reading.getCreated() == null ? 0 : reading.getCreated().getTime(),
-                    reading.getUpdated() == null ? 0 : reading.getUpdated().getTime(),
-                    reading.getPollInterval()
-            ));
+            checkIds.addAll(virtual.getReferenceIds());
+        }
+        // Lookup all readings for all checks
+        List<CheckReadingMO> readings = new LinkedList<CheckReadingMO>();
+        for (UUID checkId : checkIds)
+        {
+            for (CheckReading reading : db.getCheckReadingsForCheck(checkId))
+            {
+                readings.add(new CheckReadingMO(
+                        reading.getId(),
+                        reading.getSiteId(),
+                        reading.getCheckId(),
+                        reading.getName(),
+                        reading.getSummary(),
+                        reading.getDescription(),
+                        reading.getUnit(),
+                        reading.getReadingType(),
+                        reading.getCreated() == null ? 0 : reading.getCreated().getTime(),
+                        reading.getUpdated() == null ? 0 : reading.getUpdated().getTime(),
+                        reading.getPollInterval()
+                ));
+            }
         }
         return readings;
     }
