@@ -106,6 +106,9 @@
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{cluster}"/>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{cluster}"/>
+	
 	<!-- Stats -->
 	<include view="include/check_stats" data-check="#{cluster}"/>
 	

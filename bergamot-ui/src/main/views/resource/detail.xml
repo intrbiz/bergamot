@@ -88,6 +88,9 @@
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{resource}"/>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{resource}"/>
+	
 	<!-- Stats -->
 	<include view="include/check_stats" data-check="#{resource}"/>
 	
