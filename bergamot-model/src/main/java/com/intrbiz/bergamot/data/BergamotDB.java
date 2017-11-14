@@ -1844,7 +1844,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     @CacheInvalidate({
         "check_command.#{id}", 
         "check_state.#{id}", 
-        "get_cluster_by_name.#{site_id}.*"
+        "get_cluster_by_name.#{site_id}.*",
+        "get_clusters_referencing_check.*"
     })
     @SQLSetter(table = Cluster.class, name = "set_cluster", since = @SQLVersion({1, 0, 0}))
     public abstract void setCluster(Cluster cluster);
