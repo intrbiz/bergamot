@@ -35,6 +35,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
+import com.intrbiz.bergamot.model.message.agent.check.ShellCheck;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
@@ -55,6 +56,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.NetIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.NetIfStat;
 import com.intrbiz.bergamot.model.message.agent.stat.OSStat;
 import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
+import com.intrbiz.bergamot.model.message.agent.stat.ShellStat;
 import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
 import com.intrbiz.bergamot.model.message.agent.stat.WhoStat;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUInfo;
@@ -147,7 +149,10 @@ public class BergamotAgentTranscoder
         AgentRegistrationFailed.class,
         // metrics
         CheckMetrics.class,
-        MetricsStat.class
+        MetricsStat.class,
+        // shell
+        ShellCheck.class,
+        ShellStat.class
     };
     
     private static final BergamotAgentTranscoder US = new BergamotAgentTranscoder();

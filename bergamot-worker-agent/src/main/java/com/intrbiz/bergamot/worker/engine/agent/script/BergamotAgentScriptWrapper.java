@@ -5,6 +5,7 @@ import static com.intrbiz.bergamot.worker.engine.script.NashornUtil.*;
 import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -197,6 +198,16 @@ public class BergamotAgentScriptWrapper
     public void checkWho(Consumer<AgentMessage> onResponse)
     {
         this.agent.checkWho(onResponse);
+    }
+    
+    public void shell(String commandLine, Map<String, String> environment, Consumer<AgentMessage> onResponse)
+    {
+        this.agent.shell(commandLine, environment, onResponse);
+    }
+    
+    public void shell(String commandLine, Consumer<AgentMessage> onResponse)
+    {
+        this.agent.shell(commandLine, onResponse);
     }
     
     public static List<Parameter> mapJSObjectToAgentParameters(ScriptObjectMirror object, String property, List<Parameter> defaultValue)
