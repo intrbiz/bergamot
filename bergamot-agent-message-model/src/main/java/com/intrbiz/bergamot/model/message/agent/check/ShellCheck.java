@@ -1,5 +1,8 @@
 package com.intrbiz.bergamot.model.message.agent.check;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
@@ -13,19 +16,19 @@ public class ShellCheck extends AgentMessage
     @JsonProperty("command-line")
     private String commandLine;
     
-    @JsonProperty("run-as")
-    private String runAs;
+    @JsonProperty("environment")
+    private Map<String, String> environment = new HashMap<String, String>();
     
     public ShellCheck()
     {
         super();
     }
 
-    public ShellCheck(String commandLine, String runAs)
+    public ShellCheck(String commandLine, Map<String, String> environment)
     {
         super();
         this.commandLine = commandLine;
-        this.runAs = runAs;
+        this.environment = environment;
     }
 
     public ShellCheck(AgentMessage message)
@@ -48,13 +51,13 @@ public class ShellCheck extends AgentMessage
         this.commandLine = commandLine;
     }
 
-    public String getRunAs()
+    public Map<String, String> getEnvironment()
     {
-        return runAs;
+        return environment;
     }
 
-    public void setRunAs(String runAs)
+    public void setEnvironment(Map<String, String> environment)
     {
-        this.runAs = runAs;
+        this.environment = environment;
     }
 }

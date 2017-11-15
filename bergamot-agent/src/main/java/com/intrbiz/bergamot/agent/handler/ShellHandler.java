@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -49,6 +50,13 @@ public class ShellHandler extends AbstractAgentHandler
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.directory(this.workingDirectory);
             builder.environment().clear();
+            if (check.getEnvironment() != null)
+            {
+                for (Entry<String, String> var : check.getEnvironment().entrySet())
+                {
+                    builder.environment().put(var.getKey(), var.getValue());
+                }
+            }
             builder.redirectErrorStream(true);
             // execute the process
             Process process = null;

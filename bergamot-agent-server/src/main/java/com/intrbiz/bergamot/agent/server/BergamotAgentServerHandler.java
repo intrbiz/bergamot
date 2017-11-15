@@ -10,6 +10,7 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -252,9 +253,9 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         this.sendMessageToAgent(new CheckWho(), onResponse);
     }
     
-    public void shell(String commandLine, String runAs, Consumer<AgentMessage> onResponse)
+    public void shell(String commandLine, Map<String, String> environment, Consumer<AgentMessage> onResponse)
     {
-        this.sendMessageToAgent(new ShellCheck(commandLine, runAs), onResponse);
+        this.sendMessageToAgent(new ShellCheck(commandLine, environment), onResponse);
     }
     
     public void shell(String commandLine, Consumer<AgentMessage> onResponse)
