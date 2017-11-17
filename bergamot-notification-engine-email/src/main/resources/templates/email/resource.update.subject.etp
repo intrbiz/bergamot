@@ -1,0 +1,1 @@
+Update for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}

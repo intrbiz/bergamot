@@ -1,0 +1,1 @@
+Update for trap #{trap.summary} on the host #{host.summary} is #{trap.state.status}

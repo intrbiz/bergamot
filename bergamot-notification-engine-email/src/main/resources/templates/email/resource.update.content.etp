@@ -1,0 +1,15 @@
+Update for resource #{resource.summary} on the cluster #{cluster.summary} is #{resource.state.status}
+<# if (! isempty(resource.description)) { #>
+#{resource.description}
+<# } #>
+Last checked at #{dateformat('HH:mm:ss', resource.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime)}
+
+View resource: https://#{site.name}/resource/id/#{resource.id}
+<# if (resource.note != null) {
+     if (! isempty(resource.note.content)) { #>
+#{host.note.content}
+<#    } if (! isempty(resource.note.url)) { #>
+#{coalesce(resource.note.title, "Additional information")}: #{resource.note.url}
+<#    }
+   } #>
+Thank you, Bergamot

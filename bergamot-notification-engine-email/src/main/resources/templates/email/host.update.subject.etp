@@ -1,0 +1,1 @@
+Update for host #{host.summary} is #{if(host.state.ok, 'UP', 'DOWN')}

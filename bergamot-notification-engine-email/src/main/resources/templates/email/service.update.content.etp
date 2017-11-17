@@ -1,0 +1,17 @@
+Update for service #{service.summary} on the host #{host.summary} is #{service.state.status}
+
+Check output: #{service.state.output}
+<# if (! isempty(service.description)) { #>
+#{service.description}
+<# } #>
+Last checked at #{dateformat('HH:mm:ss', service.state.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', service.state.lastCheckTime)}
+
+View service: https://#{site.name}/service/id/#{service.id}
+<# if (service.note != null) {
+     if (! isempty(service.note.content)) { #>
+#{service.note.content}
+<#    } if (! isempty(service.note.url)) { #>
+#{coalesce(service.note.title, "Additional information")}: #{service.note.url}
+<#    }
+   } #>
+Thank you, Bergamot
