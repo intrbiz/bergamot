@@ -34,6 +34,8 @@ public class NotificationEngineCfg implements Serializable
     private Boolean recovery;
 
     private Boolean acknowledge;
+    
+    private Boolean updates;
 
     private Set<String> ignore = new LinkedHashSet<String>();
 
@@ -155,5 +157,23 @@ public class NotificationEngineCfg implements Serializable
     public void setIgnore(Set<String> ignore)
     {
         this.ignore = ignore;
+    }
+    
+    @XmlJavaTypeAdapter(YesNoAdapter.class)
+    @XmlAttribute(name = "updates")
+    @ResolveWith(Coalesce.class)
+    public Boolean getUpdates()
+    {
+        return updates;
+    }
+        
+    public boolean getUpdatesBooleanValue()
+    {
+        return this.updates == null ? true : this.updates.booleanValue();
+    }
+        
+    public void setUpdates(Boolean updates)
+    {
+        this.updates = updates;
     }
 }

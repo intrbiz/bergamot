@@ -26,6 +26,7 @@ import com.intrbiz.bergamot.model.message.notification.RegisterContactNotificati
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.notification.express.StatusColour;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
@@ -179,6 +180,7 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
         if (notification instanceof SendAlert) return AccountingNotificationType.ALERT;
         else if (notification instanceof SendRecovery) return AccountingNotificationType.RECOVERY;
         else if (notification instanceof SendAcknowledge) return AccountingNotificationType.ACKNOWLEDGEMENT;
+        else if (notification instanceof SendUpdate) return AccountingNotificationType.UPDATE;
         else if (notification instanceof PasswordResetNotification) return AccountingNotificationType.RESET;
         else if (notification instanceof RegisterContactNotification) return AccountingNotificationType.REGISTER;
         return null;

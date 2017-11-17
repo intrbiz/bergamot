@@ -5,5 +5,6 @@ public enum NotificationType
 {    
     ALERT,
     RECOVERY,
-    ACKNOWLEDGE
+    ACKNOWLEDGE,
+    UPDATE
 }

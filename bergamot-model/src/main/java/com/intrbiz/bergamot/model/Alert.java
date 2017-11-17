@@ -760,7 +760,6 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         // alert id
         notification.setAlertId(this.getId());
         // send
-        notification.setRaised(System.currentTimeMillis());
         notification.setCheck(check.toMOUnsafe());
         // to
         notification.setTo(to);

@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.NoteMO;
 import com.intrbiz.bergamot.model.message.VirtualCheckMO;
+import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.model.report.SLAReport;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -643,5 +644,20 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
             this.noteUrl = noteCfg.getUrl();
             this.noteTitle = noteCfg.getTitle();
         }
+    }
+
+    public SendUpdate createUpdateNotification(Calendar now, List<ContactMO> to)
+    {
+        // state
+        CheckState state = this.getState();
+        // should we send and update
+        if (! this.getNotifications().isEnabledAt(NotificationType.UPDATE, state.getStatus(), now)) return null;
+        // build the notification
+        SendUpdate notification = new SendUpdate();
+        notification.setSite(this.getSite().toMOUnsafe());
+        notification.setRaised(now.getTimeInMillis());
+        notification.setCheck(this.toMOUnsafe());
+        notification.setTo(to);
+        return notification;
     }
 }

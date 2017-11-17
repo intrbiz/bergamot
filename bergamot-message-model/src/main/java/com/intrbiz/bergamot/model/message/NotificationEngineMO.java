@@ -29,6 +29,9 @@ public class NotificationEngineMO extends MessageObject
     
     @JsonProperty("acknowledge_enabled")
     private boolean acknowledgeEnabled = true;
+    
+    @JsonProperty("updates_enabled")
+    private boolean updatesEnabled = true;
 
     public NotificationEngineMO()
     {
@@ -103,5 +106,15 @@ public class NotificationEngineMO extends MessageObject
     public void setAcknowledgeEnabled(boolean acknowledgeEnabled)
     {
         this.acknowledgeEnabled = acknowledgeEnabled;
+    }
+
+    public boolean isUpdatesEnabled()
+    {
+        return updatesEnabled;
+    }
+
+    public void setUpdatesEnabled(boolean updatesEnabled)
+    {
+        this.updatesEnabled = updatesEnabled;
     }
 }

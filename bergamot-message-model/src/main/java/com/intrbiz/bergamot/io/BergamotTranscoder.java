@@ -105,6 +105,7 @@ import com.intrbiz.bergamot.model.message.notification.RegisterContactNotificati
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.model.message.notification.U2FADeviceRegistered;
 import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
@@ -199,6 +200,7 @@ public class BergamotTranscoder
         SendAcknowledge.class,
         U2FADeviceRegistered.class,
         BackupCodeUsed.class,
+        SendUpdate.class,
         // updates
         CheckUpdate.class,
         GroupUpdate.class,

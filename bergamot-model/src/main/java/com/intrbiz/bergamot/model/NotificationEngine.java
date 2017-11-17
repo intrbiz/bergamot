@@ -50,6 +50,9 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
     
     @SQLColumn(index = 8, name = "acknowledge_enabled", since = @SQLVersion({ 3, 2, 0 }))
     private boolean acknowledgeEnabled = true;
+    
+    @SQLColumn(index = 8, name = "updates_enabled", since = @SQLVersion({ 3, 60, 0 }))
+    private boolean updatesEnabled = true;
 
     public NotificationEngine()
     {
@@ -144,6 +147,18 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
     {
         this.ignore = ignore;
     }
+    
+    
+
+    public boolean isUpdatesEnabled()
+    {
+        return updatesEnabled;
+    }
+
+    public void setUpdatesEnabled(boolean updatesEnabled)
+    {
+        this.updatesEnabled = updatesEnabled;
+    }
 
     /**
      * Is this notification engine valid for the given time
@@ -165,7 +180,8 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
     {
         return (type == NotificationType.ALERT && this.alertsEnabled) || 
                 (type == NotificationType.RECOVERY && this.recoveryEnabled) ||
-                (type == NotificationType.ACKNOWLEDGE && this.acknowledgeEnabled);
+                (type == NotificationType.ACKNOWLEDGE && this.acknowledgeEnabled) ||
+                (type == NotificationType.UPDATE && this.updatesEnabled);
     }
 
     @Override
@@ -179,6 +195,7 @@ public class NotificationEngine extends BergamotObject<NotificationEngineMO>
         mo.setRecoveryEnabled(this.isRecoveryEnabled());
         mo.setAcknowledgeEnabled(this.isAcknowledgeEnabled());
         mo.setTimePeriod(Util.nullable(this.getTimePeriod(), (x) -> x.toStubMO(contact)));
+        mo.setUpdatesEnabled(this.isUpdatesEnabled());
         return mo;
     }
 }

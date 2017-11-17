@@ -38,6 +38,7 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
@@ -238,6 +239,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     {
         // send the update
         this.publishCheckUpdate(check, new CheckUpdate(check.toStubMOUnsafe()));
+        // send any update notifications
+        this.sendUpdate(check, db);
     }
     
     /**
@@ -286,8 +289,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
 
-
-
     protected void sendRecovery(Check<?, ?> check, BergamotDB db)
     {
         logger.warn("Recovery for " + check);
@@ -320,6 +321,33 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
             // publish alert update
             this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
+        }
+    }
+    
+    /**
+     * Send a check update notification if enabled
+     */
+    protected void sendUpdate(Check<?, ?> check, BergamotDB db)
+    {
+        CheckState state = check.getState();
+        if (! (state.isSuppressedOrInDowntime() || state.isEncompassed()))
+        {
+            Calendar now = Calendar.getInstance();
+            // should we send update notifications
+            if (check.getNotifications().isEnabledAt(NotificationType.UPDATE, state.getStatus(), now))
+            {
+                // compute the contacts who should be notified
+                List<ContactMO> to = check.getContactsToNotify(NotificationType.UPDATE, state.getStatus(), now);
+                // send the notifications
+                SendUpdate update = check.createUpdateNotification(now, to);
+                if (update != null && (! update.getTo().isEmpty()))
+                {
+                    logger.info("Sending update for " + check);
+                    this.publishNotification(check, update);
+                    // accounting
+                    this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), update.getId(), check.getId(), AccountingNotificationType.UPDATE, update.getTo().size(), 0, null));
+                }
+            }
         }
     }
 

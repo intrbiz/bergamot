@@ -44,6 +44,8 @@ public class NotificationsCfg implements Serializable
     
     private List<EscalateCfg> escalations = new LinkedList<EscalateCfg>();
     
+    private UpdateNotificationsCfg updates;
+    
     public NotificationsCfg()
     {
         super();
@@ -192,5 +194,17 @@ public class NotificationsCfg implements Serializable
     public void setEscalations(List<EscalateCfg> escalations)
     {
         this.escalations = escalations;
+    }
+
+    @XmlElementRef(type = UpdateNotificationsCfg.class)
+    @ResolveWith(Coalesce.class)
+    public UpdateNotificationsCfg getUpdates()
+    {
+        return updates;
+    }
+
+    public void setUpdates(UpdateNotificationsCfg updates)
+    {
+        this.updates = updates;
     }
 }

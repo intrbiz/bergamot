@@ -38,6 +38,15 @@ public class NotificationsMO extends MessageObject
     @JsonProperty("escalations")
     private List<EscalationMO> escalations = new LinkedList<EscalationMO>();
     
+    @JsonProperty("updates_enabled")
+    private boolean updatesEnabled = false;
+    
+    @JsonProperty("updates_time_period")
+    private TimePeriodMO updatesTimePeriod;
+    
+    @JsonProperty("updates_ignore")
+    private Set<String> updatesIgnore = new HashSet<String>();
+    
     public NotificationsMO()
     {
         super();
@@ -131,5 +140,35 @@ public class NotificationsMO extends MessageObject
     public void setEscalations(List<EscalationMO> escalations)
     {
         this.escalations = escalations;
+    }
+
+    public boolean isUpdatesEnabled()
+    {
+        return updatesEnabled;
+    }
+
+    public void setUpdatesEnabled(boolean updatesEnabled)
+    {
+        this.updatesEnabled = updatesEnabled;
+    }
+
+    public TimePeriodMO getUpdatesTimePeriod()
+    {
+        return updatesTimePeriod;
+    }
+
+    public void setUpdatesTimePeriod(TimePeriodMO updatesTimePeriod)
+    {
+        this.updatesTimePeriod = updatesTimePeriod;
+    }
+
+    public Set<String> getUpdatesIgnore()
+    {
+        return updatesIgnore;
+    }
+
+    public void setUpdatesIgnore(Set<String> updatesIgnore)
+    {
+        this.updatesIgnore = updatesIgnore;
     }
 }

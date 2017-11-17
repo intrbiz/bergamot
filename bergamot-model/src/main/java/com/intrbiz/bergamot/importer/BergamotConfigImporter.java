@@ -46,6 +46,7 @@ import com.intrbiz.bergamot.config.model.TemplatedObjectCfg;
 import com.intrbiz.bergamot.config.model.TemplatedObjectCfg.ObjectState;
 import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.config.model.TrapCfg;
+import com.intrbiz.bergamot.config.model.UpdateNotificationsCfg;
 import com.intrbiz.bergamot.config.model.VirtualCheckCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -1113,6 +1114,28 @@ public class BergamotConfigImporter
                 notifications.setTimePeriodId(timePeriod.getId());
             }
         }
+        // updates
+        UpdateNotificationsCfg updates = configuration.getUpdates();
+        if (updates != null)
+        {
+            notifications.setUpdatesEnabled(updates.getEnabledBooleanValue());
+            notifications.setUpdatesIgnore(updates.getIgnore().stream().map((e) -> {return Status.valueOf(e.toUpperCase());}).collect(Collectors.toList()));
+            if (! Util.isEmpty(updates.getUpdatesPeriod()))
+            {
+                TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), configuration.getNotificationPeriod());
+                if (timePeriod != null)
+                {
+                    notifications.setUpdatesTimePeriodId(timePeriod.getId());
+                }
+            }
+        }
+        else
+        {
+            notifications.setUpdatesEnabled(false);
+            notifications.setUpdatesTimePeriodId(null);
+            notifications.setUpdatesIgnore(new LinkedList<Status>());
+        }
+        // store the notifications configuration
         db.setNotifications(notifications);
         // engines
         for (NotificationEngineCfg econfiguration : configuration.getNotificationEngines())
@@ -1123,6 +1146,7 @@ public class BergamotConfigImporter
             notificationEngine.setEnabled(econfiguration.getEnabledBooleanValue());
             notificationEngine.setAlertsEnabled(econfiguration.getAlertsBooleanValue());
             notificationEngine.setRecoveryEnabled(econfiguration.getRecoveryBooleanValue());
+            notificationEngine.setUpdatesEnabled(econfiguration.getUpdatesBooleanValue());
             notificationEngine.setIgnore(econfiguration.getIgnore().stream().map(Status::parse).collect(Collectors.toList()));
             if (! Util.isEmpty(econfiguration.getNotificationPeriod()))
             {

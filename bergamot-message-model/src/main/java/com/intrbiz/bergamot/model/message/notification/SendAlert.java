@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * An alert
  */
 @JsonTypeName("bergamot.send_alert")
-public class SendAlert extends CheckNotification
+public class SendAlert extends AlertNotification
 {
     /**
      * Is this alert notification an escalation of a previous alert

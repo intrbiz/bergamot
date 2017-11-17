@@ -8,7 +8,7 @@ import com.intrbiz.bergamot.model.message.ContactMO;
  * An acknoweledge of an alert
  */
 @JsonTypeName("bergamot.send_acknowledge")
-public class SendAcknowledge extends CheckNotification
+public class SendAcknowledge extends AlertNotification
 {
     @JsonProperty("acknowledged_by")
     private ContactMO acknowledgedBy;

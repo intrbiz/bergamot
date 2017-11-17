@@ -3,18 +3,18 @@ package com.intrbiz.bergamot.model.message.notification;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * An alert
+ * A check update notifications
  */
-@JsonTypeName("bergamot.send_recovery")
-public class SendRecovery extends AlertNotification
-{
-    public SendRecovery()
+@JsonTypeName("bergamot.send_update")
+public class SendUpdate extends CheckNotification
+{    
+    public SendUpdate()
     {
         super();
     }
     
     public String getNotificationType()
     {
-        return "recovery";
+        return "update";
     }
 }

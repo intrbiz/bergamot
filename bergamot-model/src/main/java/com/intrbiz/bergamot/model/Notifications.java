@@ -49,6 +49,16 @@ public class Notifications extends BergamotObject<NotificationsMO>
     
     @SQLColumn(index = 8, name = "acknowledge_enabled", since = @SQLVersion({ 3, 2, 0 }))
     private boolean acknowledgeEnabled = true;
+    
+    @SQLColumn(index = 9, name = "updates_enabled", since = @SQLVersion({ 3, 60, 0 }))
+    private boolean updatesEnabled = false;
+    
+    @SQLColumn(index = 10, name = "updates_ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 3, 60, 0 }))
+    private List<Status> updatesIgnore = new LinkedList<Status>();
+    
+    @SQLColumn(index = 11, name = "updates_timeperiod_id", since = @SQLVersion({ 3, 60, 0 }))
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 60, 0 }))
+    private UUID updatesTimePeriodId;
 
     public Notifications()
     {
@@ -161,6 +171,45 @@ public class Notifications extends BergamotObject<NotificationsMO>
         this.allEnginesEnabled = allEnginesEnabled;
     }
 
+    public boolean isUpdatesEnabled()
+    {
+        return updatesEnabled;
+    }
+
+    public void setUpdatesEnabled(boolean updatesEnabled)
+    {
+        this.updatesEnabled = updatesEnabled;
+    }
+
+    public List<Status> getUpdatesIgnore()
+    {
+        return updatesIgnore;
+    }
+
+    public void setUpdatesIgnore(List<Status> updatesIgnore)
+    {
+        this.updatesIgnore = updatesIgnore;
+    }
+
+    public UUID getUpdatesTimePeriodId()
+    {
+        return updatesTimePeriodId;
+    }
+
+    public void setUpdatesTimePeriodId(UUID updatesTimePeriodId)
+    {
+        this.updatesTimePeriodId = updatesTimePeriodId;
+    }
+    
+    public TimePeriod getUpdatesTimePeriod()
+    {
+        if (this.getUpdatesTimePeriodId() == null) return null;
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            return db.getTimePeriod(this.getUpdatesTimePeriodId());
+        }
+    }
+
     /**
      * Are notifications enabled for the given notification type, the given check statue and a point in time
      * @param type the notification type
@@ -171,11 +220,13 @@ public class Notifications extends BergamotObject<NotificationsMO>
     public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
     {
         TimePeriod timePeriod = this.getTimePeriod();
+        TimePeriod updatesTimePeriod = this.getUpdatesTimePeriod();
         return this.enabled && 
                 this.isNotificationTypeEnabled(type) && 
                 (!this.isStatusIgnored(status)) && 
                 (timePeriod == null ? true : timePeriod.isInTimeRange(time)) && 
-                (this.allEnginesEnabled || this.getEngines().stream().anyMatch((e) -> e.isEnabledAt(type, status, time)));
+                (this.allEnginesEnabled || this.getEngines().stream().anyMatch((e) -> e.isEnabledAt(type, status, time))) &&
+                (NotificationType.UPDATE == type ? ( updatesTimePeriod == null ? true : updatesTimePeriod.isInTimeRange(time) ) : true);
     }
 
     public boolean isStatusIgnored(Status status)
@@ -187,7 +238,8 @@ public class Notifications extends BergamotObject<NotificationsMO>
     {
         return (type == NotificationType.ALERT && this.alertsEnabled) || 
                 (type == NotificationType.RECOVERY && this.recoveryEnabled) ||
-                (type == NotificationType.ACKNOWLEDGE && this.acknowledgeEnabled);
+                (type == NotificationType.ACKNOWLEDGE && this.acknowledgeEnabled) ||
+                (type == NotificationType.UPDATE && this.updatesEnabled);
     }
 
     public Set<String> getEnginesEnabledAt(NotificationType type, Status status, Calendar time)
@@ -243,12 +295,19 @@ public class Notifications extends BergamotObject<NotificationsMO>
         mo.setRecoveryEnabled(this.isRecoveryEnabled());
         mo.setAcknowledgeEnabled(this.isAcknowledgeEnabled());
         TimePeriod timePeriod = this.getTimePeriod();
-        if (timePeriod != null)
+        if (timePeriod != null &&(contact == null || contact.hasPermission("read", timePeriod)))
         {
-            if (contact == null || contact.hasPermission("read", timePeriod)) mo.setTimePeriod(timePeriod.toStubMO(contact));
+            mo.setTimePeriod(timePeriod.toStubMO(contact));
         }
         mo.setEngines(this.getEngines().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         mo.setEscalations(this.getEscalations().stream().map((e) -> e.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setUpdatesEnabled(this.isUpdatesEnabled());
+        mo.setUpdatesIgnore(this.getUpdatesIgnore().stream().map(Status::toString).collect(Collectors.toSet()));
+        TimePeriod updatesTimePeriod = this.getUpdatesTimePeriod();
+        if (updatesTimePeriod != null && (contact == null || contact.hasPermission("read", updatesTimePeriod)))
+        {
+            mo.setUpdatesTimePeriod(updatesTimePeriod.toStubMO(contact));
+        }
         return mo;
     }
 }
