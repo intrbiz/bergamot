@@ -47,7 +47,15 @@
 				</p>
 				<p>
 					<span class="label wide">Notification period</span>
-					<span class="value"><a href="/timeperiod/id/#{check.notifications.timePeriod.id}">#{check.notifications.timePeriod.summary}</a></span>
+					<span class="value"><a href="/timeperiod/id/#{check.notifications.timePeriodId}">#{check.notifications.timePeriod.summary}</a></span>
+				</p>
+				<p>
+					<span class="label wide">Update notifications enabled</span>
+					<span class="value">#{if(check.notifications.updatesEnabled, 'yes', 'no')}</span>
+				</p>
+				<p rendered="#{check.notifications.updatesTimePeriodId != null}">
+					<span class="label wide">Update notifications period</span>
+					<span class="value"><a href="/timeperiod/id/#{check.notifications.updatesTimePeriodId}">#{check.notifications.updatesTimePeriod.summary}</a></span>
 				</p>
 			</div>
 			<div class="col4 dash_icon">
@@ -78,6 +86,7 @@
 						<th>Alerts</th>
 						<th>Recoveries</th>
 						<th>Acknowledgements</th>
+						<th>Updates</th>
 					</tr>
 					<data-set var="engine" value="#{check.notifications.engines}">
 						<tr>
@@ -88,6 +97,7 @@
 							<td>#{if(engine.alertsEnabled, 'yes', 'no')}</td>
 							<td>#{if(engine.recoveryEnabled, 'yes', 'no')}</td>
 							<td>#{if(engine.acknowledgeEnabled, 'yes', 'no')}</td>
+							<td>#{if(engine.updatesEnabled, 'yes', 'no')}</td>
 						</tr>
 					</data-set>
 				</table>
