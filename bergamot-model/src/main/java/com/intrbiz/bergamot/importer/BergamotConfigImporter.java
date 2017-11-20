@@ -1122,7 +1122,7 @@ public class BergamotConfigImporter
             notifications.setUpdatesIgnore(updates.getIgnore().stream().map((e) -> {return Status.valueOf(e.toUpperCase());}).collect(Collectors.toList()));
             if (! Util.isEmpty(updates.getUpdatesPeriod()))
             {
-                TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), configuration.getNotificationPeriod());
+                TimePeriod timePeriod = db.getTimePeriodByName(this.site.getId(), updates.getUpdatesPeriod());
                 if (timePeriod != null)
                 {
                     notifications.setUpdatesTimePeriodId(timePeriod.getId());
