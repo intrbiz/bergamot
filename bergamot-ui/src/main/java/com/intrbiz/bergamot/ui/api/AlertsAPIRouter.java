@@ -213,8 +213,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
     {
         Alert alert = notNull(db.getAlert(id));
         require(permission("acknowledge", alert.getCheckId()));
-        // can only acknowledge an non-recovered and non-acknowledged alert
-        if ((! alert.isFalsePositive()) && alert.isAcknowledged())
+        // Can only mark an alert as a false positive if it has been acknowledged or recovered
+        if ((! alert.isFalsePositive()) && (alert.isAcknowledged() || alert.isRecovered()))
         {
             // the contact
             Contact contact = currentPrincipal();
