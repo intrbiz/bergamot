@@ -50,6 +50,14 @@
 				<span class="label wide">Notification period</span>
 				<span class="value"><a href="/timeperiod/id/#{the_contact.notifications.timePeriod.id}">#{the_contact.notifications.timePeriod.summary}</a></span>
 			</p>
+			<p>
+				<span class="label wide">Update notifications enabled</span>
+				<span class="value">#{if(the_contact.notifications.updatesEnabled, 'yes', 'no')}</span>
+			</p>
+			<p rendered="#{the_contact.notifications.updatesTimePeriodId != null}">
+				<span class="label wide">Update notifications period</span>
+				<span class="value"><a href="/timeperiod/id/#{the_contact.notifications.updatesTimePeriodId}">#{the_contact.notifications.updatesTimePeriod.summary}</a></span>
+			</p>
 		</div>
 	</div>
 	
@@ -65,6 +73,7 @@
 					<th>Alerts</th>
 					<th>Recoveries</th>
 					<th>Acknowledgements</th>
+					<th>Updates</th>
 				</tr>
 				<data-set var="engine" value="#{the_contact.notifications.engines}">
 					<tr>
@@ -75,6 +84,7 @@
 						<td>#{if(engine.alertsEnabled, 'yes', 'no')}</td>
 						<td>#{if(engine.recoveryEnabled, 'yes', 'no')}</td>
 						<td>#{if(engine.acknowledgeEnabled, 'yes', 'no')}</td>
+						<td>#{if(engine.updatesEnabled, 'yes', 'no')}</td>
 					</tr>
 				</data-set>
 			</table>
