@@ -25,6 +25,8 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 public final class Site extends BergamotObject<SiteMO> implements Serializable, Parameterised
 {
     private static final long serialVersionUID = 1L;
+    
+    public static final int DEFAULT_POOL_COUNT = 48;
 
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey()
@@ -44,7 +46,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     protected List<String> aliases = new LinkedList<String>();
 
     @SQLColumn(index = 6, name = "pool_count", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    protected int poolCount = 4;
+    protected int poolCount = DEFAULT_POOL_COUNT;
     
     /**
      * Arbitrary parameters of an object
@@ -64,8 +66,10 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     {
         super();
         this.id = id;
+        this.poolCount = DEFAULT_POOL_COUNT;
         this.name = name;
         this.summary = summary;
+        this.disabled = false;
     }
 
     public UUID getId()

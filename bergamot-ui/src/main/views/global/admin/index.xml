@@ -44,6 +44,27 @@
 		</data-set>
     </div>
     <div class="row">
+		<h3 title="The cluster members which are participating in scheduling and processing checks">UI Cluster Members</h3>
+		<data-set var="member" value="#{cluster_info.members}">
+			<div class="col3 dash_icon check">
+				<h3>
+					<span class="dash_img status_ok" title="Member #{member.address}">
+						<img src="#{public('/images/icons/64/bergamot.png')}" />
+					</span>
+					<span class="name" title="The IP address of this member">Member #{member.address}</span>
+			    </h3>
+			    <p>
+				    <span class="label" title="The UUID of this member">UUID: </span>
+				    <span class="value" style="font-size: 13px;">#{member.uuid}</span>
+			    </p>				    
+			    <p>
+				    <span class="label" title="The number of processing pools this member has">Pools: </span>
+				    <span class="value">#{member.pools.size()}</span>
+			    </p>
+			</div>
+		</data-set>
+	</div>
+    <div class="row">
 		<h3>Sites</h3>
 		<table>
 			<tr>

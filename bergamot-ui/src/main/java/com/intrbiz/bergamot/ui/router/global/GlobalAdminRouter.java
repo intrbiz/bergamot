@@ -63,6 +63,8 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     {
         // the list of global daemons
         var("daemons", HealthTracker.getInstance().getDaemons());
+        // cluster info
+        var("cluster_info", this.app().getClusterManager().info());
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins

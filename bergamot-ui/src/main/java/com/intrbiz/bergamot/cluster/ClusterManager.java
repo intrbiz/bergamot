@@ -31,6 +31,9 @@ import com.intrbiz.bergamot.cluster.migration.ClusterMigration;
 import com.intrbiz.bergamot.cluster.migration.DeregisterPoolTask;
 import com.intrbiz.bergamot.cluster.migration.RegisterPoolTask;
 import com.intrbiz.bergamot.cluster.model.ProcessingPool;
+import com.intrbiz.bergamot.cluster.model.info.ClusterInfo;
+import com.intrbiz.bergamot.cluster.model.info.MemberInfo;
+import com.intrbiz.bergamot.cluster.model.info.PoolInfo;
 import com.intrbiz.bergamot.cluster.util.OwnerPredicate;
 import com.intrbiz.bergamot.cluster.util.SitePredicate;
 import com.intrbiz.bergamot.command.CommandProcessor;
@@ -177,6 +180,31 @@ public class ClusterManager implements RPCHandler<ClusterManagerRequest, Cluster
     public String getLocalMemberUUID()
     {
         return this.cluster.getLocalMember().getUuid();
+    }
+    
+    public ClusterInfo info()
+    {
+        // describe the current state of this cluster
+        try
+        {
+            ClusterInfo ci = new ClusterInfo(this.cluster.getLocalMember().getUuid(), this.cluster.getLocalMember().getAddress().getInetAddress().getHostAddress());
+            for (Member member : this.cluster.getMembers())
+            {
+                MemberInfo mi = new MemberInfo(member.getUuid(), member.getAddress().getInetAddress().getHostAddress());
+                // pools for this member
+                for (ProcessingPool pool : this.pools.values(new OwnerPredicate(member.getUuid())))
+                {
+                    mi.getPools().add(new PoolInfo(pool.getSite(), pool.getPool()));
+                }
+                ci.getMembers().add(mi);
+            }
+            return ci;
+        }
+        catch (Exception e)
+        {
+            logger.error("Failed to describe cluster", e);
+        }
+        return null;
     }
 
     public void start(String instanceName)
