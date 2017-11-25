@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<bergamot site="bergamot.local">
+<bergamot site="bergamot.template">
     
     <command application="PostgreSQL" name="bergamot_postgresql_jdbc_check" extends="postgresql_jdbc_check" security-domains="global">
         <summary>Check Bergamot Monitoring PostgreSQL Database</summary>

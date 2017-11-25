@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<bergamot site="bergamot.local">
+<bergamot site="bergamot.template">
     
     <command category="Websites" name="http_check" engine="http" security-domains="global">
         <summary>HTTP Check</summary>

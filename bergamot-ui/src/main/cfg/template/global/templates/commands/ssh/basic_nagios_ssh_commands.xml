@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<bergamot site="bergamot.local">
+<bergamot site="bergamot.template">
     
     <command category="System" name="check_local_disk_over_ssh" extends="ssh_nagios_check">
         <parameter name="command_line">#{nagios.path}/check_disk -w #{arg1} -c #{arg2} -p #{arg3}</parameter>

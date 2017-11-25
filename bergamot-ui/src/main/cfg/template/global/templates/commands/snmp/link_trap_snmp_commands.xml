@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<bergamot site="bergamot.local">
+<bergamot site="bergamot.template">
     
     <command engine="snmp" executor="link-state" name="snmp-link-trap" extends="snmp-trap">
         <parameter description="The SNMP Interface Name"                  name="interface-name"></parameter>
