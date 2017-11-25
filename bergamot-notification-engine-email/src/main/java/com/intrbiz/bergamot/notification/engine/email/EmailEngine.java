@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.mail.Message;
@@ -27,6 +28,7 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.GenericNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
+import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
 import com.intrbiz.configuration.CfgParameter;
@@ -304,6 +306,7 @@ public class EmailEngine extends AbstractNotificationEngine
             }
         }
         // headers
+        message.setHeader("Message-ID", this.messageId(notification.getId(), notification.getNotificationType()));
         message.setHeader("X-Bergamot-Notification-Id", notification.getId().toString());
         // sent date
         message.setSentDate(new Date(notification.getRaised()));
@@ -332,18 +335,32 @@ public class EmailEngine extends AbstractNotificationEngine
             }
         }
         // headers
-        message.setHeader("X-Bergamot-Alert-Id", notification.getAlertId().toString());
-        message.setHeader("Message-ID", this.checkMessageId(notification));
+        // message ids
+        if (notification instanceof SendAlert)
+        {
+            UUID alertId = ((SendAlert) notification).getAlertId();
+            if (alertId != null) message.setHeader("X-Bergamot-Alert-Id", alertId.toString());
+            message.setHeader("Message-ID", this.messageId(alertId, "alert"));
+        }
+        else if (notification instanceof SendRecovery)
+        {
+            UUID alertId = ((SendAlert) notification).getAlertId();
+            if (alertId != null) message.setHeader("X-Bergamot-Alert-Id", alertId.toString());
+            message.setHeader("Message-ID", this.messageId(alertId, "recovery"));
+            // reply to
+            String alertMessageId = this.messageId(alertId, "alert");
+            message.setHeader("References", alertMessageId);
+            message.setHeader("In-Reply-To", alertMessageId);
+        }
+        else
+        {
+            message.setHeader("Message-ID", this.messageId(notification.getId(), notification.getNotificationType()));
+        }
+        // helper headers
         message.setHeader("X-Bergamot-Notification-Id", notification.getId().toString());
         message.setHeader("X-Bergamot-Check-Type", notification.getCheck().getType());
         message.setHeader("X-Bergamot-Check-Id", notification.getCheck().getId().toString());
         message.setHeader("X-Bergamot-Check-Status", notification.getCheck().getState().getStatus().toString());
-        // in reply to?
-        if (notification instanceof SendRecovery)
-        {
-            message.setHeader("References", this.checkMessageId(notification));
-            message.setHeader("In-Reply-To", this.checkMessageId(notification));
-        }
         // sent date
         message.setSentDate(new Date(notification.getRaised()));
         // content
@@ -351,9 +368,10 @@ public class EmailEngine extends AbstractNotificationEngine
         return message;
     }
     
-    protected String checkMessageId(CheckNotification notification)
+    protected String messageId(UUID id, String type)
     {
-        return "<" + notification.getAlertId().toString() + ".bergamot>";
+        if (id == null) id = UUID.randomUUID();
+        return "<" + id + "." + type + ".bergamot>";
     }
 
     protected void buildCheckMessageContent(Message message, CheckNotification notification) throws Exception

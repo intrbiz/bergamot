@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
-import com.intrbiz.bergamot.model.message.notification.CheckNotification;
+import com.intrbiz.bergamot.model.message.notification.AlertNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
@@ -746,7 +746,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
      *            the constructor for the notification type
      * @return the notification
      */
-    public <T extends CheckNotification> T createNotification(Calendar now, NotificationType type, Supplier<T> ctor, List<ContactMO> to)
+    public <T extends AlertNotification> T createNotification(Calendar now, NotificationType type, Supplier<T> ctor, List<ContactMO> to)
     {
         Check<?, ?> check = this.getCheck();
         CheckState state = check.getState();

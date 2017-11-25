@@ -1,8 +1,9 @@
 package com.intrbiz.bergamot.notification.engine.email;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
+import javax.mail.Message;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
+import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.configuration.CfgParameter;
 
 public class TestEmailEngine extends EmailEngine
@@ -73,5 +75,30 @@ public class TestEmailEngine extends EmailEngine
         // build the content
         String content = this.engine.applyTemplate("password_reset.content", message);
         assertThat(content, is(notNullValue()));
+    }
+    
+    @Test
+    public void testServiceUpdateTemplate()
+    {
+        SendUpdate message = this.loadMessage(SendUpdate.class, "update/service.json");
+        // build the subhect
+        String subject = this.engine.applyTemplate("service.update.subject", message);
+        assertThat(subject, is(notNullValue()));
+        // build the content
+        String content = this.engine.applyTemplate("service.update.content", message);
+        System.out.println("Content: " + content);
+        assertThat(content, is(notNullValue()));
+    }
+    
+    @Test
+    public void testServiceUpdateBuildMessage() throws Exception
+    {
+        SendUpdate message = this.loadMessage(SendUpdate.class, "update/service.json");
+        // build the message
+        Message m = this.engine.buildMessage(message);
+        assertThat(m, is(notNullValue()));
+        assertThat(m.getContent(), is(notNullValue()));
+        assertThat(m.getAllHeaders(), is(notNullValue()));
+        assertThat(m.getHeader("Message-ID")[0], is(equalTo("<a9f82618-9801-4b91-8bed-9c8c01f883ad.update.bergamot>")));
     }
 }
