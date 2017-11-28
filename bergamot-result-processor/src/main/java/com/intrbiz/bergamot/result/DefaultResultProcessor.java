@@ -226,6 +226,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                     // we are in a hard not ok state, we should check the escalation policies
                     this.processEscalation(check, db);
                 }
+                // update notifications, don't send if we've sent an alert
+                if (!(transition.alert || transition.recovery || transition.hasGotWorse()))
+                {
+                    this.sendUpdate(check, db);   
+                }
                 // update any virtual checks
                 this.updateVirtualChecks(check, transition, resultMO, db);
             });
@@ -239,8 +244,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     {
         // send the update
         this.publishCheckUpdate(check, new CheckUpdate(check.toStubMOUnsafe()));
-        // send any update notifications
-        this.sendUpdate(check, db);
     }
     
     /**
@@ -720,6 +723,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             if (virtualTransition.recovery)
             {
                 this.sendRecovery(referencedBy, db);
+            }
+            // update notifications, don't send if we've sent an alert
+            if (!(transition.alert || transition.recovery))
+            {
+                this.sendUpdate(check, db);   
             }
             // recurse
             this.updateVirtualChecks(referencedBy, virtualTransition, resultMO, db, processedVirtualChecks);
