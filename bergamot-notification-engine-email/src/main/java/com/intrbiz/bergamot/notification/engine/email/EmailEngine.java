@@ -344,7 +344,7 @@ public class EmailEngine extends AbstractNotificationEngine
         }
         else if (notification instanceof SendRecovery)
         {
-            UUID alertId = ((SendAlert) notification).getAlertId();
+            UUID alertId = ((SendRecovery) notification).getAlertId();
             if (alertId != null) message.setHeader("X-Bergamot-Alert-Id", alertId.toString());
             message.setHeader("Message-ID", this.messageId(alertId, "recovery"));
             // reply to
