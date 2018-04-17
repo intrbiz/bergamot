@@ -23,7 +23,7 @@
 		<u2f.version>0.16.0</u2f.version>
 		<jsoup.version>[1.8,)</jsoup.version>
 		<jsch.version>0.1.54</jsch.version>
-		<twilio.version>(7.0,7.9)</twilio.version>
+		<twilio.version>[7.17,)</twilio.version>
 		<aws.sns.version>[1.11,)</aws.sns.version>
 		<hazelcast.aws.version>[1.1,)</hazelcast.aws.version>
 		<mysql.version>[5.1,)</mysql.version>
