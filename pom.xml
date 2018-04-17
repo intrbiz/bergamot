@@ -21,6 +21,21 @@
 		<bouncycastle.version>1.54</bouncycastle.version>
 		<jackson.version>[2.9,)</jackson.version>
 		<u2f.version>0.16.0</u2f.version>
+		<jsoup.version>[1.8,)</jsoup.version>
+		<jsch.version>0.1.54</jsch.version>
+		<twilio.version>(7.0,7.9)</twilio.version>
+		<aws.sns.version>[1.11,)</aws.sns.version>
+		<hazelcast.aws.version>[1.1,)</hazelcast.aws.version>
+		<mysql.version>[5.1,)</mysql.version>
+		<postgresql.version>[42.2,)</postgresql.version>
+		<netty.version>4.0.40.Final</netty.version>
+		<log4j.version>1.2.14</log4j.version>
+		<java.mail.version>[1.5,)</java.mail.version>
+		<jna.version>4.0.0</jna.version>
+		<sigar.version>1.6.4</sigar.version>
+		<commons.codec.version>1.8</commons.codec.version>
+		<fluent.hc.version>[4.5,)</fluent.hc.version>
+		<jbcrypt.version>0.4</jbcrypt.version>
 	</properties>
 
 	<build>
@@ -346,17 +361,17 @@
   		<dependency>
   			<groupId>com.intrbiz.3p.sigar</groupId>
   			<artifactId>sigar</artifactId>
-  			<version>1.6.4</version>
+  			<version>${sigar.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>net.java.dev.jna</groupId>
   			<artifactId>jna</artifactId>
-  			<version>4.0.0</version>
+  			<version>${jna.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.sun.mail</groupId>
   			<artifactId>javax.mail</artifactId>
-  			<version>1.5.2</version>
+  			<version>${java.mail.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>junit</groupId>
@@ -373,12 +388,12 @@
   		<dependency>
   			<groupId>log4j</groupId>
   			<artifactId>log4j</artifactId>
-  			<version>1.2.14</version>
+  			<version>${log4j.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>io.netty</groupId>
   			<artifactId>netty-all</artifactId>
-  			<version>4.0.40.Final</version>
+  			<version>${netty.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.fasterxml.jackson.core</groupId>
@@ -398,22 +413,22 @@
   		<dependency>
   			<groupId>commons-codec</groupId>
   			<artifactId>commons-codec</artifactId>
-  			<version>1.8</version>
+  			<version>${commons.codec.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>org.apache.httpcomponents</groupId>
   			<artifactId>fluent-hc</artifactId>
-  			<version>4.5.2</version>
+  			<version>${fluent.hc.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>org.mindrot</groupId>
   			<artifactId>jbcrypt</artifactId>
-  			<version>0.4</version>
+  			<version>${jbcrypt.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>org.postgresql</groupId>
   			<artifactId>postgresql</artifactId>
-  			<version>9.3-1102-jdbc41</version>
+  			<version>${postgresql.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
@@ -423,12 +438,12 @@
   		<dependency>
   			<groupId>org.jsoup</groupId>
   			<artifactId>jsoup</artifactId>
-  			<version>1.7.3</version>
+  			<version>${jsoup.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>mysql</groupId>
   			<artifactId>mysql-connector-java</artifactId>
-  			<version>5.1.36</version>
+  			<version>${mysql.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.accounting</groupId>
@@ -463,7 +478,7 @@
   		<dependency>
   			<groupId>com.jcraft</groupId>
   			<artifactId>jsch</artifactId>
-  			<version>0.1.53</version>
+  			<version>${jsch.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
@@ -503,17 +518,17 @@
          <dependency>
          	<groupId>com.twilio.sdk</groupId>
          	<artifactId>twilio</artifactId>
-         	<version>(7.0,7.9)</version>
+         	<version>${twilio.version}</version>
          </dependency>
          <dependency>
          	<groupId>com.amazonaws</groupId>
          	<artifactId>aws-java-sdk-sns</artifactId>
-         	<version>1.11.112</version>
+         	<version>${aws.sns.version}</version>
          </dependency>
          <dependency>
          	<groupId>com.hazelcast</groupId>
          	<artifactId>hazelcast-aws</artifactId>
-         	<version>[1.1,)</version>
+         	<version>${hazelcast.aws.version}</version>
          </dependency>
   	</dependencies>
   </dependencyManagement>
