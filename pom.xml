@@ -18,7 +18,7 @@
 		<intrbiz.balsa.version>5.0.0-SNAPSHOT</intrbiz.balsa.version>
 		<intrbiz.express.version>4.1.0-SNAPSHOT</intrbiz.express.version>
 		<intrbiz.core.version>[1.0,)</intrbiz.core.version>
-		<bouncycastle.version>1.54</bouncycastle.version>
+		<bouncycastle.version>1.60</bouncycastle.version>
 		<jackson.version>[2.9,)</jackson.version>
 		<u2f.version>0.16.0</u2f.version>
 		<jsoup.version>[1.8,)</jsoup.version>
