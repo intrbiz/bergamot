@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="https://bergamot-monitoring.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.intrbiz.bergamot</groupId>
@@ -19,7 +19,7 @@
 		<intrbiz.express.version>4.1.0-SNAPSHOT</intrbiz.express.version>
 		<intrbiz.core.version>[1.0,)</intrbiz.core.version>
 		<bouncycastle.version>1.54</bouncycastle.version>
-		<jackson.version>[2.9,)</jackson.version>
+		<jackson.version>[2.10,)</jackson.version>
 		<u2f.version>0.16.0</u2f.version>
 		<jsoup.version>[1.8,)</jsoup.version>
 		<jsch.version>0.1.54</jsch.version>
@@ -77,15 +77,15 @@
 						</goals>
 						<configuration>
 						    <additionalparam>-Xdoclint:none</additionalparam>
+						    <additionalparam>-source 8</additionalparam>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
-			        <groupId>org.apache.maven.plugins</groupId>
-			        <artifactId>maven-dependency-plugin</artifactId>
-		        	<version>3.1.0</version>
-		      </plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-dependency-plugin</artifactId>
+		    </plugin>
 		</plugins>
 	</build>
 	
@@ -143,7 +143,7 @@
     <module>bergamot-check-ssh</module>
     <module>bergamot-command-processor</module>
     <module>bergamot-notifier-slack</module>
-    <module>bergamot-worker-combined</module>
+    <!-- <module>bergamot-worker-combined</module> -->
   </modules>
   
   <dependencyManagement>
