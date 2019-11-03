@@ -158,7 +158,6 @@ public class TestNagiosSSHExecutor
                 assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("ERROR")));
-                assertThat(result.getOutput(), is(equalTo("Auth cancel")));
                 assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }

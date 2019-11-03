@@ -104,10 +104,23 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>
 		<plugins>
+			<!--
             <plugin>
                 <groupId>com.intrbiz.balsa</groupId>
                 <artifactId>balsa-executor-compiler-plugin</artifactId>
@@ -124,6 +137,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>packaging</artifactId>
