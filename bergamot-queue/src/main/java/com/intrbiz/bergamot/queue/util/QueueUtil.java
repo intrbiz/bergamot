@@ -5,7 +5,6 @@ import java.util.List;
 import com.intrbiz.bergamot.config.BrokerCfg;
 import com.intrbiz.queue.QueueBrokerPool;
 import com.intrbiz.queue.QueueManager;
-import com.intrbiz.queue.hcq.HCQPool;
 import com.intrbiz.queue.rabbit.RabbitPool;
 
 public class QueueUtil
@@ -37,13 +36,6 @@ public class QueueUtil
     
     private static QueueBrokerPool<?> createBroker(BrokerCfg brokerCfg, String applicationName)
     {
-        if ("hcq".equals(brokerCfg.getType()))
-        {
-            return new HCQPool(brokerCfg.getAllUrls(), applicationName);
-        }
-        else
-        {
-            return new RabbitPool(brokerCfg.getUrl(), brokerCfg.getUsername(), brokerCfg.getPassword());
-        }
+        return new RabbitPool(brokerCfg.getUrl(), brokerCfg.getUsername(), brokerCfg.getPassword());
     }
 }

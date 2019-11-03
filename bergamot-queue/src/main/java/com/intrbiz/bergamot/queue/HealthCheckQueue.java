@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.queue;
 
 
 import com.intrbiz.bergamot.model.message.health.HealthCheckMessage;
-import com.intrbiz.bergamot.queue.impl.hcq.HCQHealthCheckQueue;
 import com.intrbiz.bergamot.queue.impl.rabbit.RabbitHealthCheckQueue;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
@@ -20,7 +19,6 @@ public abstract class HealthCheckQueue extends QueueAdapter
     static
     {
         RabbitHealthCheckQueue.register();
-        HCQHealthCheckQueue.register();
     }
     
     public static HealthCheckQueue open()

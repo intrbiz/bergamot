@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.queue;
 
 
 import com.intrbiz.bergamot.accounting.model.BergamotAccountingEvent;
-import com.intrbiz.bergamot.queue.impl.hcq.HCQAccountingQueue;
 import com.intrbiz.bergamot.queue.impl.rabbit.RabbitAccountingQueue;
 import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.DeliveryHandler;
@@ -20,7 +19,6 @@ public abstract class AccountingQueue extends QueueAdapter
     static
     {
         RabbitAccountingQueue.register();
-        HCQAccountingQueue.register();
     }
     
     public static AccountingQueue open()

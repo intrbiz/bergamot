@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.message.update.Update;
-import com.intrbiz.bergamot.queue.impl.hcq.HCQUpdateQueue;
 import com.intrbiz.bergamot.queue.impl.rabbit.RabbitUpdateQueue;
 import com.intrbiz.bergamot.queue.key.UpdateKey;
 import com.intrbiz.queue.Consumer;
@@ -22,7 +21,6 @@ public abstract class UpdateQueue extends QueueAdapter
     static
     {
         RabbitUpdateQueue.register();
-        HCQUpdateQueue.register();
     }
     
     public static UpdateQueue open()

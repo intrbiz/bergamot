@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.queue;
 
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
-import com.intrbiz.bergamot.queue.impl.hcq.HCQBergamotAgentManagerQueue;
 import com.intrbiz.bergamot.queue.impl.rabbit.RabbitBergamotAgentManagerQueue;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;
@@ -21,7 +20,6 @@ public abstract class BergamotAgentManagerQueue extends QueueAdapter
     static
     {
         RabbitBergamotAgentManagerQueue.register();
-        HCQBergamotAgentManagerQueue.register();
     }
     
     public static BergamotAgentManagerQueue open()

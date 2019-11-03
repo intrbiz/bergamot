@@ -6,7 +6,6 @@ import java.util.UUID;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.impl.hcq.HCQWorkerQueue;
 import com.intrbiz.bergamot.queue.impl.rabbit.RabbitWorkerQueue;
 import com.intrbiz.bergamot.queue.key.AdhocResultKey;
 import com.intrbiz.bergamot.queue.key.ReadingKey;
@@ -27,7 +26,6 @@ public abstract class WorkerQueue extends QueueAdapter
     static
     {
         RabbitWorkerQueue.register();
-        HCQWorkerQueue.register();
     }
     
     public static WorkerQueue open()

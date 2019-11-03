@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.queue;
 
 
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
-import com.intrbiz.bergamot.queue.impl.hcq.HCQSchedulerQueue;
 import com.intrbiz.bergamot.queue.impl.rabbit.RabbitSchedulerQueue;
 import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.queue.Consumer;
@@ -19,7 +18,6 @@ public abstract class SchedulerQueue extends QueueAdapter
     static
     {
         RabbitSchedulerQueue.register();
-        HCQSchedulerQueue.register();
     }
     
     public static SchedulerQueue open()
