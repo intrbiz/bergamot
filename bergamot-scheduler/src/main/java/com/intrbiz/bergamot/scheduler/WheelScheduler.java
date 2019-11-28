@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.scheduler;
 
 import java.security.SecureRandom;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -15,8 +16,10 @@ import org.apache.log4j.Logger;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.model.ActiveCheck;
+import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
+import com.intrbiz.bergamot.scheduler.CheckProducer.PublishStatus;
 import com.intrbiz.util.IBThreadFactory;
 
 /**
@@ -45,7 +48,7 @@ import com.intrbiz.util.IBThreadFactory;
  */
 public class WheelScheduler extends AbstractScheduler
 {
-    private Logger logger = Logger.getLogger(WheelScheduler.class);
+    private static final Logger logger = Logger.getLogger(WheelScheduler.class);
 
     // ticker
     protected volatile boolean run = true;
@@ -89,9 +92,9 @@ public class WheelScheduler extends AbstractScheduler
     
     protected Accounting accounting = Accounting.create(WheelScheduler.class);
 
-    public WheelScheduler()
+    public WheelScheduler(UUID poolId, CheckProducer checkProducer)
     {
-        super();
+        super(poolId, checkProducer);
         // setup the wheel structure
         this.setupWheel(1_000L, 60);
         // create our task executor
@@ -226,8 +229,20 @@ public class WheelScheduler extends AbstractScheduler
             if (logger.isTraceEnabled() && removed != null) logger.trace("Removed job " + id + " from segment " + segment.id);
         }
     }
+    
+    protected void removeJobsFromSegments(Collection<UUID> ids)
+    {
+        for (Segment segment : this.orange)
+        {
+            for (UUID id : ids)
+            {
+                Job removed = segment.jobs.remove(id);
+                if (logger.isTraceEnabled() && removed != null) logger.trace("Removed job " + id + " from segment " + segment.id);
+            }
+        }
+    }
 
-    protected void scheduleJob(UUID id, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
+    protected void scheduleJob(UUID id, int processingPool, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
     {
         if (!this.jobs.containsKey(id))
         {
@@ -235,7 +250,7 @@ public class WheelScheduler extends AbstractScheduler
             interval = this.validateInterval(interval);
             logger.info("Scheduling job " + id + " with interval " + interval + "ms and initial delay " + initialDelay + " ms");
             // the job
-            Job job = new Job(id, site, pool, interval, initialDelay, timeRange, command);
+            Job job = new Job(id, processingPool, interval, initialDelay, timeRange, command);
             this.jobs.put(job.id, job);
             // place the job into segments
             this.addJobToSegments(job, interval, initialDelay);
@@ -276,22 +291,16 @@ public class WheelScheduler extends AbstractScheduler
         this.removeJobFromSegments(id);
     }
     
-    @Override
-    protected void removeJobsInPool(UUID site, int pool)
+    protected void removeJobs(Collection<UUID> ids)
     {
-        // ensure the jobs are removed from the segments
-        for (Segment segment : this.orange)
+        logger.info("Removing jobs " + ids + " from scheduling");
+        // ensure the given job is removed
+        for (UUID id : ids)
         {
-            for (Job job : segment.jobs.values())
-            {
-                if (site.equals(job.site) && pool == job.pool)
-                {
-                    logger.info("Removing job " + job.id + " from scheduling as it is part of pool " + site + "." + pool);
-                    segment.jobs.remove(job.id);
-                    this.jobs.remove(job.id);
-                }
-            }    
+            this.jobs.remove(id);
         }
+        // remove the job from all segments
+        this.removeJobsFromSegments(ids);
     }
 
     protected void enableJob(UUID id)
@@ -358,7 +367,7 @@ public class WheelScheduler extends AbstractScheduler
         // randomly distribute the initial delay
         long initialDelay = (long) (this.initialDelay.nextDouble() * ((double) check.getCurrentInterval()));
         logger.info("Scheduling " + check + " with interval " + check.getCurrentInterval() + " and initial delay " + initialDelay);
-        this.scheduleJob(check.getId(), check.getSiteId(), check.getPool(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
+        this.scheduleJob(check.getId(), check.getPool(), check.getSiteId(), check.getPool(), check.getCurrentInterval(), initialDelay, check.getTimePeriod(), new CheckRunner(check));
     }
 
     @Override
@@ -367,6 +376,28 @@ public class WheelScheduler extends AbstractScheduler
         interval = interval > 0 ? interval : check.getCurrentInterval();
         logger.info("Rescheduling " + check + " with interval " + interval);
         this.rescheduleJob(check.getId(), interval, check.getTimePeriod(), new CheckRunner(check));
+    }
+    
+    @Override
+    public void unschedule(Collection<UUID> checks)
+    {
+        this.removeJobs(checks);
+    }
+    
+    public void unschedulePool(UUID siteId, int processingPool)
+    {
+        for (Segment segment : this.orange)
+        {
+            for (Job job : segment.jobs.values())
+            {
+                if ( siteId.equals(Site.getSiteId(job.id)) && processingPool == job.processingPool)
+                {
+                    segment.jobs.remove(job.id);
+                    this.jobs.remove(job.id);
+                    if (logger.isTraceEnabled() && job != null) logger.trace("Removed job " + job.id + " from segment " + segment.id);
+                }
+            }
+        }
     }
 
     @Override
@@ -453,15 +484,13 @@ public class WheelScheduler extends AbstractScheduler
     /**
      * A scheduled job
      */
-    private class Job
+    private static class Job
     {
         // details
 
         public final UUID id;
         
-        public final UUID site;
-        
-        public final int pool;
+        public final int processingPool;
 
         public volatile Runnable command;
 
@@ -477,12 +506,11 @@ public class WheelScheduler extends AbstractScheduler
         
         public long initialDelay;
 
-        public Job(UUID id, UUID site, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
+        public Job(UUID id, int processingPool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
         {
             super();
             this.id = id;
-            this.site = site;
-            this.pool = pool;            
+            this.processingPool = processingPool;
             this.interval = interval;
             this.timeRange = timeRange;
             this.command = command;
@@ -496,7 +524,6 @@ public class WheelScheduler extends AbstractScheduler
         {
             final int prime = 31;
             int result = 1;
-            result = prime * result + getOuterType().hashCode();
             result = prime * result + ((id == null) ? 0 : id.hashCode());
             return result;
         }
@@ -508,18 +535,12 @@ public class WheelScheduler extends AbstractScheduler
             if (obj == null) return false;
             if (getClass() != obj.getClass()) return false;
             Job other = (Job) obj;
-            if (!getOuterType().equals(other.getOuterType())) return false;
             if (id == null)
             {
                 if (other.id != null) return false;
             }
             else if (!id.equals(other.id)) return false;
             return true;
-        }
-
-        private WheelScheduler getOuterType()
-        {
-            return WheelScheduler.this;
         }
     }
 
@@ -535,13 +556,15 @@ public class WheelScheduler extends AbstractScheduler
         public void run()
         {
             // fire off the check
-            ExecuteCheck executeCheck = this.check.executeCheck();
+            ExecuteCheck executeCheck = this.check.executeCheck(getPoolId());
             if (executeCheck != null)
             {
-                // account
-                WheelScheduler.this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), check.getId(), executeCheck.getEngine(), executeCheck.getExecutor(), executeCheck.getName()));
-                // execute
-                WheelScheduler.this.publishExecuteCheck(executeCheck, this.check.getRoutingKey(), this.check.getMessageTTL());
+                // publish the check
+                PublishStatus result = WheelScheduler.this.publishExecuteCheck(executeCheck);
+                if (result == PublishStatus.Success)
+                {
+                    WheelScheduler.this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), check.getId(), executeCheck.getEngine(), executeCheck.getExecutor(), executeCheck.getName()));
+                }
             }
         }
     }

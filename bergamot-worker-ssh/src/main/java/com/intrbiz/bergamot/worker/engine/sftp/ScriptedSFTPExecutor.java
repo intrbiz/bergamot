@@ -12,6 +12,8 @@ import com.intrbiz.bergamot.check.ssh.SSHCheckContext;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
+import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
 import com.intrbiz.bergamot.worker.engine.ssh.util.SSHCheckUtil;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
@@ -42,7 +44,7 @@ public class ScriptedSFTPExecutor extends AbstractExecutor<SFTPEngine>
     }
     
     @Override
-    public void execute(final ExecuteCheck executeCheck)
+    public void execute(final ExecuteCheck executeCheck, final CheckExecutionContext checkContext)
     {
         try
         {
@@ -55,13 +57,13 @@ public class ScriptedSFTPExecutor extends AbstractExecutor<SFTPEngine>
             final SimpleBindings bindings = new SimpleBindings();
             bindings.put("check", executeCheck);
             bindings.put("ssh", this.getEngine().getChecker().createContext((t) -> {
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(t));
+                checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(t));
             }));
-            bindings.put("bergamot", this.createScriptContext(executeCheck));
+            bindings.put("bergamot", new ActiveCheckScriptContext(executeCheck, checkContext));
             script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
             // create our context
             SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { 
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e)); 
+                checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e)); 
             });
             // setup the context - this will add SSH keys etc
             SSHCheckUtil.setupSSHCheckContext(executeCheck, context);
@@ -76,7 +78,7 @@ public class ScriptedSFTPExecutor extends AbstractExecutor<SFTPEngine>
                     }
                     catch (Exception e)
                     {
-                        this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+                        checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
                     }
                 });                
             });
@@ -84,7 +86,7 @@ public class ScriptedSFTPExecutor extends AbstractExecutor<SFTPEngine>
         catch (Exception e)
         {
             logger.error("Error executing check", e);
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

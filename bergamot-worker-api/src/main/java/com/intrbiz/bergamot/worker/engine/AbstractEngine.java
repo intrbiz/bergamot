@@ -1,100 +1,33 @@
 package com.intrbiz.bergamot.worker.engine;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
 
-import org.apache.log4j.Logger;
-
-import com.intrbiz.bergamot.config.EngineCfg;
-import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.command.CommandRequest;
-import com.intrbiz.bergamot.model.message.command.CommandResponse;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.BergamotCommandQueue;
-import com.intrbiz.bergamot.queue.WorkerQueue;
-import com.intrbiz.bergamot.queue.key.ActiveResultKey;
-import com.intrbiz.bergamot.queue.key.AgentBinding;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
-import com.intrbiz.bergamot.queue.key.ResultKey;
-import com.intrbiz.bergamot.queue.key.WorkerKey;
-import com.intrbiz.bergamot.worker.Worker;
-import com.intrbiz.queue.Consumer;
-import com.intrbiz.queue.DeliveryHandler;
-import com.intrbiz.queue.QueueException;
-import com.intrbiz.queue.RPCClient;
-import com.intrbiz.queue.RoutedProducer;
-import com.intrbiz.queue.name.RoutingKey;
 
-public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
+public abstract class AbstractEngine implements Engine
 {
-    private Logger logger = Logger.getLogger(AbstractEngine.class);
-
-    protected Worker worker;
-
     protected final String name;
 
-    protected EngineCfg config;
-
-    protected List<Executor<?>> executors = new LinkedList<Executor<?>>();
-
-    private WorkerQueue queue;
-
-    private List<Consumer<ExecuteCheck, WorkerKey>> consumers = new LinkedList<Consumer<ExecuteCheck, WorkerKey>>();
+    protected final List<Executor<?>> executors;
     
-    protected RoutedProducer<ResultMO, ResultKey> resultProducer;
-    
-    protected RoutedProducer<ReadingParcelMO, ReadingKey> readingProducer;
-    
-    private BergamotCommandQueue commandQueue;
-    
-    private RPCClient<CommandRequest, CommandResponse, RoutingKey> commandRPCClient;
+    protected EngineContext engineContext;
 
-    public AbstractEngine(final String name)
+    protected AbstractEngine(final String name, Executor<?>... executors)
     {
         super();
-        this.name = name;
-    }
-
-    @Override
-    public void configure(EngineCfg cfg) throws Exception
-    {
-        this.config = cfg;
-        this.configure();
-    }
-
-    @Override
-    public EngineCfg getConfiguration()
-    {
-        return this.config;
+        this.name = Objects.requireNonNull(name);
+        this.executors = Collections.unmodifiableList(Arrays.asList(Objects.requireNonNull(executors)));
     }
     
     @Override
-    public boolean isAgentRouted()
+    public String getName()
     {
-        return false;
-    }
-
-    protected void configure() throws Exception
-    {
-        for (ExecutorCfg executorCfg : this.config.getExecutors())
-        {
-            Executor<?> executor = (Executor<?>) executorCfg.create();
-            this.addExecutor(executor);
-        }
-    }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void addExecutor(Executor<?> executor)
-    {
-        ((Executor) executor).setEngine(this);
-        this.executors.add(executor);
+        return this.name;
     }
 
     @Override
@@ -102,137 +35,88 @@ public class AbstractEngine implements Engine, DeliveryHandler<ExecuteCheck>
     {
         return this.executors;
     }
-
-    @Override
-    public Worker getWorker()
-    {
-        return this.worker;
-    }
-
-    @Override
-    public void setWorker(Worker worker)
-    {
-        this.worker = worker;
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.name;
-    }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public void publishResult(ResultKey key, ResultMO resultMO)
+    public final void prepare(EngineContext context) throws Exception
     {
-        if (logger.isTraceEnabled())
+        this.engineContext = context;
+        this.doPrepare(context);
+        for (Executor<?> ex : this.getExecutors())
         {
-            logger.trace("Publishing result: " + resultMO.getId() + " " + resultMO.isOk() + " " + resultMO.getStatus() + " " + resultMO.getOutput());
+            ((Executor) ex).prepare(this, context);
         }
-        this.resultProducer.publish(key, resultMO);
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public void publishReading(ReadingKey key, ReadingParcelMO readingParcelMO)
+    public final void start(EngineContext context) throws Exception
     {
-        if (logger.isTraceEnabled())
+        for (Executor<?> ex : this.getExecutors())
         {
-            logger.trace("Publishing reading: " + readingParcelMO.getReadings().size() + " " + readingParcelMO.getMatchOn());
+            ((Executor) ex).start(this, context);
         }
-        this.readingProducer.publish(key, readingParcelMO);
+        this.doStart(context);
     }
     
     @Override
-    public void execute(ExecuteCheck task)
+    public void execute(ExecuteCheck check, CheckExecutionContext context)
+    {
+        Executor<?> executor = this.selectExecutor(check);
+        if (executor != null)
+        {
+            executor.execute(check, context);
+        }
+        else
+        {
+            context.publishResult(new ActiveResultMO().fromCheck(check).error("No executor found to execute check"));
+        }
+    }
+    
+    @Override
+    public boolean accept(ExecuteCheck task)
     {
         for (Executor<?> executor : this.executors)
         {
             if (executor.accept(task))
-            {
-                executor.execute(task);
-                return;
-            }
+                return true;
         }
-        this.publishResult(new ActiveResultKey(task.getSiteId(), task.getProcessingPool()), new ActiveResultMO().fromCheck(task).error("No executor found to execute check"));
-    }
-    
-    protected void startEngineServices() throws Exception
-    {
+        return false;
     }
 
-    @Override
-    public void start() throws Exception
+    protected Executor<?> selectExecutor(ExecuteCheck task)
     {
-        // open the command queue
-        this.commandQueue = BergamotCommandQueue.open();
-        // create an RPC client
-        this.commandRPCClient = this.commandQueue.createBergamotCommandRPCClient();
-        // open the queue
-        this.queue = WorkerQueue.open();
-        // the result producer
-        this.resultProducer = this.queue.publishResults();
-        // the reading producer
-        this.readingProducer = this.queue.publishReadings();
-        // start the executors
-        for (Executor<?> ex : this.getExecutors())
+        for (Executor<?> executor : this.executors)
         {
-            ex.start();
+            if (executor.accept(task))
+                return executor;
         }
-        // start any services needed for this engine
-        this.startEngineServices();
-        // start all the consumers
-        for (int i = 0; i < this.getWorker().getConfiguration().getThreads(); i ++)
-        {
-            logger.trace("Creating consumer " + i);
-            this.consumers.add(this.queue.consumeChecks(this, this.getWorker().getSite(), this.worker.getWorkerPool(), this.getName(), this.isAgentRouted()));
-        }
+        return null;
     }
     
-    @Override
-    public void bindAgent(UUID agentId)
+    public final void shutdown(EngineContext engineContext)
     {
-        logger.trace("Binding agent " + agentId + " to worker " + this.getWorker().getId());
-        try
-        {
-            for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
-            {
-                consumer.addBinding(new AgentBinding(agentId));
-                break; // shared queue so only need to update bindings once
-            }
-        }
-        catch (QueueException e)
-        {
-            logger.debug("Error binding agent", e);
-        }
+        this.doShutdown(engineContext);
     }
     
-    @Override
-    public void unbindAgent(UUID agentId)
+    protected final EngineContext getEngineContext()
     {
-        logger.trace("Unbinding agent " + agentId + " to worker " + this.getWorker().getId());
-        try
-        {
-            for (Consumer<ExecuteCheck, WorkerKey> consumer : this.consumers)
-            {
-                consumer.removeBinding(new AgentBinding(agentId));
-                break; // shared queue so only need to update bindings once
-            }
-        }
-        catch (QueueException e)
-        {
-            logger.debug("Error binding agent", e);
-        }
-    }
-
-    @Override
-    public void handleDevliery(Map<String, Object> headers, ExecuteCheck event) throws IOException
-    {
-        if (logger.isTraceEnabled())
-            logger.trace("Got task: " + event);
-        this.execute(event);
+        return this.engineContext;
     }
     
-    public RPCClient<CommandRequest, CommandResponse, RoutingKey> getCommandRPCClient()
+    protected void doConfigure() throws Exception
     {
-        return this.commandRPCClient;
+    }
+    
+    protected void doPrepare(EngineContext engineContext) throws Exception
+    {        
+    }
+    
+    protected void doStart(EngineContext engineContext) throws Exception
+    {
+    }
+    
+    protected void doShutdown(EngineContext engineContext)
+    {
     }
 }

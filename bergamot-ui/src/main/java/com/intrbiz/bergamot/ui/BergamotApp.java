@@ -12,12 +12,9 @@ import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.balsa.util.Util;
 import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
-import com.intrbiz.bergamot.cluster.ClusterManager;
+import com.intrbiz.bergamot.cluster.ProcessingPoolManager;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.health.HealthAgent;
-import com.intrbiz.bergamot.health.HealthTracker;
-import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.queue.util.QueueUtil;
 import com.intrbiz.bergamot.ui.action.BergamotAgentActions;
 import com.intrbiz.bergamot.ui.action.CheckActions;
@@ -115,9 +112,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     {
         public static final String NAME = "Bergamot Monitoring";
         
-        public static final String NUMBER = "3.0.0";
+        public static final String NUMBER = "4.0.0";
         
-        public static final String CODE_NAME = "Red Snow";
+        public static final String CODE_NAME = "Red Beard";
         
         public static final class COMPONENTS
         {
@@ -131,7 +128,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     private UICfg config;
     
-    private ClusterManager clusterManager;
+    private ProcessingPoolManager clusterManager;
     
     private UpdateServer updateServer;
     
@@ -218,7 +215,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         AccountingManager.getInstance().bindRootConsumer("queue");
         // setup ClusterManager to manage our critical
         // resources across the cluster
-        this.clusterManager = new ClusterManager();
+        this.clusterManager = new ProcessingPoolManager();
         // websocket update server
         this.updateServer = new UpdateServer(this.config.getListen().getWebsocketPort());
     }
@@ -330,10 +327,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void startApplication() throws Exception
     {
-        // setup healthcheck tracker
-        HealthTracker.getInstance().init();
-        // setup healthcheck agent
-        HealthAgent.getInstance().init("ui", "bergamot-ui");
         // setup the database
         BergamotDB.install();
         try (BergamotDB db = BergamotDB.connect())
@@ -345,21 +338,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         {
             System.out.println("Database module: " + db.getName() + " " + db.getVersion());
         }
-        // don't bother starting scheduler etc on ui only nodes
-        if (!Boolean.getBoolean("bergamot.ui.only"))
-        {
-            // start the cluster manager
-            this.clusterManager.start(this.getInstanceName());
-            // register sites with the cluster manager
-            try (BergamotDB db = BergamotDB.connect())
-            {
-                for (Site site : db.listSites())
-                {
-                    if (! site.isDisabled())
-                        this.clusterManager.registerSite(site);
-                }
-            }
-        }
         // start the update websocket server
         this.updateServer.start();
         // Start Gerald
@@ -367,7 +345,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         System.out.println("Application startup finished");
     }
     
-    public ClusterManager getClusterManager()
+    public ProcessingPoolManager getClusterManager()
     {
         return this.clusterManager;
     }

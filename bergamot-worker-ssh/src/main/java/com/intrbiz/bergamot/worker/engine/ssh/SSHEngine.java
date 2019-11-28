@@ -14,28 +14,15 @@ public class SSHEngine extends AbstractEngine
 
     public SSHEngine()
     {
-        super(NAME);
+        super(NAME,
+                new NagiosSSHExecutor(),
+                new ScriptedSSHExecutor());
+        // setup checker
+        this.checker = new SSHChecker();
     }
     
     public SSHChecker getChecker()
     {
         return this.checker;
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new NagiosSSHExecutor());
-            this.addExecutor(new ScriptedSSHExecutor());
-        }
-    }
-    
-    @Override
-    protected void startEngineServices() throws Exception
-    {
-        this.checker = new SSHChecker();
     }
 }

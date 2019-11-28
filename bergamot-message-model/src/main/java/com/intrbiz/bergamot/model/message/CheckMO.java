@@ -36,9 +36,6 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     @JsonProperty("notifications")
     protected NotificationsMO notifications;
     
-    @JsonProperty("pool")
-    protected int pool;
-    
     @JsonProperty("external-ref")
     protected String externalRef;
     
@@ -150,16 +147,6 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     public void setNotifications(NotificationsMO notifications)
     {
         this.notifications = notifications;
-    }
-
-    public int getPool()
-    {
-        return pool;
-    }
-
-    public void setPool(int pool)
-    {
-        this.pool = pool;
     }
 
     public List<DowntimeMO> getDowntime()

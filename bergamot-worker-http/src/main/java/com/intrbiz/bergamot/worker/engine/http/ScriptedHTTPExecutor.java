@@ -11,6 +11,8 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
+import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
 /**
@@ -43,26 +45,27 @@ public class ScriptedHTTPExecutor extends AbstractExecutor<HTTPEngine>
     }
     
     @Override
-    public void execute(final ExecuteCheck executeCheck)
+    public void execute(final ExecuteCheck executeCheck, final CheckExecutionContext context)
     {
+        // TODO: use ScriptedCheckManager
         try
         {
-        // we need a script!
-        if (Util.isEmpty(executeCheck.getScript())) throw new RuntimeException("The script must be defined!");
-        // setup the script engine
-        ScriptEngine script = factory.getEngineByName("nashorn");
-        SimpleBindings bindings = new SimpleBindings();
-        bindings.put("check", executeCheck);
-        bindings.put("http", this.getEngine().getChecker());
-        bindings.put("bergamot", this.createScriptContext(executeCheck));
-        script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-        // execute
-        script.eval(executeCheck.getScript());
+            // we need a script!
+            if (Util.isEmpty(executeCheck.getScript())) throw new RuntimeException("The script must be defined!");
+            // setup the script engine
+            ScriptEngine script = factory.getEngineByName("nashorn");
+            SimpleBindings bindings = new SimpleBindings();
+            bindings.put("check", executeCheck);
+            bindings.put("http", this.getEngine().getChecker());
+            bindings.put("bergamot", new ActiveCheckScriptContext(executeCheck, context));
+            script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+            // execute
+            script.eval(executeCheck.getScript());
         }
         catch (Exception e)
         {
             logger.error("Error executing check", e);
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

@@ -259,7 +259,7 @@ public class BergamotConfigImporter
                                 {
                                     for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
                                     {
-                                        producer.publish(delayedAction.key, delayedAction.action);
+                                        producer.publish(new SchedulerKey(delayedAction.key, 0), delayedAction.action);
                                     }
                                 }
                             }
@@ -1478,8 +1478,6 @@ public class BergamotConfigImporter
 
     private void loadCheck(Check<?,?> check, CheckCfg<?> resolvedConfiguration, BergamotDB db)
     {
-        // set the processing pool
-        check.setPool(this.site.computeProcessingPool(check.getId()));
         // the state
         this.loadCheckState(check, resolvedConfiguration, db);
         // the stats
@@ -1982,22 +1980,22 @@ public class BergamotConfigImporter
     
     private void scheduleCheck(ActiveCheck<?,?> check)
     {
-        this.report.info("Sscheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new ScheduleCheck(check.getId())));
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new EnableCheck(check.getId())));
+        this.report.info("Scheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new ScheduleCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new EnableCheck(check.getId())));
     }
     
     private void rescheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Rescheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new RescheduleCheck(check.getId())));
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new EnableCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new RescheduleCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new EnableCheck(check.getId())));
     }
     
     private void unscheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Unscheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new SchedulerKey(check.getSiteId(), check.getPool()), new UnscheduleCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new UnscheduleCheck(check.getId())));
     }
     
     private static class CascadedChange
@@ -2019,11 +2017,11 @@ public class BergamotConfigImporter
     
     public static class DelayedSchedulerAction
     {
-        public SchedulerKey key;
+        public UUID key;
         
         public SchedulerAction action;
         
-        public DelayedSchedulerAction(SchedulerKey key, SchedulerAction action)
+        public DelayedSchedulerAction(UUID key, SchedulerAction action)
         {
             this.key = key;
             this.action = action;

@@ -6,67 +6,55 @@
 		<a href="/global/admin/utils/">Global System Utilities</a>
 	</div>
     <div class="row">
-		<h3>Global System Status</h3>
-		<data-set var="daemon" value="#{daemons}">
+		<h3>Workers</h3>
+		<data-set var="worker" value="#{workers}">
 			<div class="col3 dash_icon check">
 				<h3>
-					<span class="dash_img status_#{if(daemon.isAlive(),'ok', 'critical')}" title="Daemon #{if(daemon.isAlive(), 'is alive', 'has failed')}">
+					<span class="dash_img status_ok" title="Worker #{worker.id}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
-					<span class="name">#{ucFirst(daemon.daemonName.replace('-', ' '))}</span>
-					<span class="name">(#{ucFirst(coalesce(daemon.daemonKind, ''))})</span>
+					<span class="name">#{ucFirst(coalesce(worker.application, 'Worker'))}</span>
+					<span class="name">(#{worker.id})</span>
 			    </h3>
 			    <p>
-				    <span class="label">Host: </span>
-				    <span class="value">#{daemon.hostName}</span>
-			    </p>				    
-			    <p>
-				    <span class="label">Started At: </span>
-				    <span class="value">#{dateformat('HH:mm:ss', daemon.startedAt)} on #{dateformat('EEEE dd/MM/yyyy', daemon.startedAt)}</span>
+				    <span class="label">Worker Pool: </span>
+				    <span class="value">#{coalesce(worker.workerPool, 'any')}</span>
 			    </p>
 			    <p>
-				    <span class="label">Last Seen: </span>
-				    <span class="value">#{dateformat('HH:mm:ss', daemon.lastHeartbeatTime)} on #{dateformat('EEEE dd/MM/yyyy', daemon.lastHeartbeatTime)}</span>
+				    <span class="label">Host: </span>
+				    <span class="value">#{worker.hostName}</span>
 			    </p>
 			    <p>
 				    <span class="label">&nbsp;</span>
-				    <span class="value">(#{daemon.getLastHeartbeatAge() / 1000} seconds ago)</span>
-			    </p>
-			    <p>
-				    <span class="label">Instance Id:</span>
-				    <span class="value" style="font-size: 13px;">#{daemon.instanceId}</span>
-			    </p>
-			    <p>
-				    <span class="label">Runtime Id:</span>
-				    <span class="value" style="font-size: 13px;">#{daemon.runtimeId}</span>
+				    <span class="value">#{worker.info}</span>
 			    </p>
 			</div>
 		</data-set>
     </div>
     <div class="row">
-		<h3 title="The cluster members which are participating in scheduling and processing checks">UI Cluster Members</h3>
-		<data-set var="member" value="#{cluster_info.members}">
+		<h3 title="The processing pools in this Bergamot cluster which can schedule checks and process results">Processing Pools</h3>
+		<data-set var="pool" value="#{processing_pools}">
 			<div class="col3 dash_icon check">
 				<h3>
-					<span class="dash_img status_ok" title="Member #{member.address}">
+					<span class="dash_img status_ok" title="Pool #{pool.id}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
-					<span class="name" title="The IP address of this member">Member #{member.address}</span>
+					<span class="name" title="The member this processing pool resides on">Member #{pool.memberName}</span>
 			    </h3>
 			    <p>
-				    <span class="label" title="The UUID of this member">UUID: </span>
-				    <span class="value" style="font-size: 13px;">#{member.uuid}</span>
+				    <span class="label" title="The UUID of this pool">UUID: </span>
+				    <span class="value" style="font-size: 13px;">#{pool.id}</span>
 			    </p>				    
 			    <p>
-				    <span class="label" title="The number of processing pools this member has">Pools: </span>
-				    <span class="value">#{member.pools.size()}</span>
+				    <span class="label" title="The number of site pools being processed">Site Pools: </span>
+				    <span class="value">#{pool.poolCount}</span>
 			    </p>
 			</div>
 		</data-set>
 	</div>
     <div class="row">
 		<h3>Sites</h3>
-		<table>
+		<table style="width: 100%">
 			<tr>
 				<th>Name</th>
 				<th>Summary</th>
@@ -108,7 +96,7 @@
 	</div>
 	    <div class="row">
 		<h3>Global Admins</h3>
-		<table>
+		<table style="width: 100%">
 			<tr>
 				<th>Site</th>
 				<th>Username</th>

@@ -26,7 +26,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
 {
     private static final long serialVersionUID = 1L;
     
-    public static final int DEFAULT_POOL_COUNT = 48;
+    public static final int PROCESSING_POOL_COUNT = 48;
 
     @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
     @SQLPrimaryKey()
@@ -44,9 +44,6 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
 
     @SQLColumn(index = 5, name = "aliases", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
     protected List<String> aliases = new LinkedList<String>();
-
-    @SQLColumn(index = 6, name = "pool_count", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    protected int poolCount = DEFAULT_POOL_COUNT;
     
     /**
      * Arbitrary parameters of an object
@@ -66,7 +63,6 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     {
         super();
         this.id = id;
-        this.poolCount = DEFAULT_POOL_COUNT;
         this.name = name;
         this.summary = summary;
         this.disabled = false;
@@ -120,20 +116,6 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     public void setAliases(List<String> aliases)
     {
         this.aliases = aliases;
-    }
-
-    /**
-     * Get the number of processing pools for this site
-     * @return
-     */
-    public int getPoolCount()
-    {
-        return poolCount;
-    }
-
-    public void setPoolCount(int poolCount)
-    {
-        this.poolCount = poolCount;
     }
     
     @Override
@@ -204,14 +186,6 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
     {
         return randomId(this.getId());
     }
-
-    /**
-     * Get the processing pool for a given objectId
-     */
-    public int computeProcessingPool(UUID objectId)
-    {
-        return ((int) (objectId.getLeastSignificantBits() & 0xFFL)) % this.getPoolCount();
-    }
     
     /**
      * Check if the given object id correctly has this sites id mask
@@ -238,7 +212,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
      * 
      * @return the site id
      */
-    public static UUID randomSiteId()
+    public static final UUID randomSiteId()
     {
         return getSiteId(UUID.randomUUID());
     }
@@ -249,7 +223,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
      * @param siteId
      * @return
      */
-    public static UUID randomId(UUID siteId)
+    public static final UUID randomId(UUID siteId)
     {
         return setSiteId(siteId, UUID.randomUUID());
     }
@@ -260,7 +234,7 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
      * @param objectId
      * @return
      */
-    public static UUID getSiteId(UUID objectId)
+    public static final UUID getSiteId(UUID objectId)
     {
         return new UUID((objectId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L);
     }
@@ -272,8 +246,48 @@ public final class Site extends BergamotObject<SiteMO> implements Serializable, 
      * @param objectId
      * @return
      */
-    public static UUID setSiteId(UUID siteId, UUID objectId)
+    public static final UUID setSiteId(UUID siteId, UUID objectId)
     {
         return new UUID((siteId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | (objectId.getMostSignificantBits() & 0x00000000_0000FFFFL), objectId.getLeastSignificantBits());
     }
+    
+    /**
+     * Compute the processing pool number for the given check.
+     * @param objectId the check id
+     */
+    public static final int computeSiteProcessingPool(UUID objectId)
+    {
+        return (int) ((objectId.getLeastSignificantBits() & 0xFFL) % PROCESSING_POOL_COUNT);
+    }
+    
+    /**
+     * Get the site processing pool id for the given site and processing pool
+     * @param siteId the site id
+     * @param processingPool the processing pool number
+     */
+    public static final UUID getSiteProcessingPool(UUID siteId, int processingPool)
+    {
+        return new UUID(siteId.getMostSignificantBits(), 0x80000000_00000000L | (processingPool & 0xFF));
+    }
+    
+    /**
+     * Extract the processing pool number for the site processing pool
+     * @param siteProcessingPool the site processing pool
+     * @return the processing pool number
+     */
+    public static final int extractSiteProcessingPool(UUID siteProcessingPool)
+    {
+        return (int) (siteProcessingPool.getLeastSignificantBits() & 0xFFL);
+    }
+    
+    /**
+     * Get the site processing pool id for the given check
+     * @param objectId the check id
+     */
+    public static final UUID getSiteProcessingPool(UUID objectId)
+    {
+        int processingPool = computeSiteProcessingPool(objectId);
+        return new UUID((objectId.getMostSignificantBits() & 0xFFFFFFFF_FFFF0000L) | 0x0000000000004000L, 0x80000000_00000000L | (processingPool & 0xFF));
+    }
+    
 }

@@ -56,15 +56,15 @@ import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class DefaultResultProcessor extends AbstractResultProcessor
 {
-    private Logger logger = Logger.getLogger(DefaultResultProcessor.class);
+    private static final Logger logger = Logger.getLogger(DefaultResultProcessor.class);
     
     private Matchers matchers = new Matchers();
     
     private Accounting accounting = Accounting.create(DefaultResultProcessor.class);
 
-    public DefaultResultProcessor()
+    public DefaultResultProcessor(UUID poolId, ResultConsumer resultConsumer)
     {
-        super();
+        super(poolId, resultConsumer);
     }    
 
     @Override

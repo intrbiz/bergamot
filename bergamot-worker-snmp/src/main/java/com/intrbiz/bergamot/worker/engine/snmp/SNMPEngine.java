@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.worker.engine.snmp;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.snmp.SNMPTransport;
 
 /**
@@ -10,6 +11,8 @@ import com.intrbiz.snmp.SNMPTransport;
  */
 public class SNMPEngine extends AbstractEngine
 {
+    private static final Logger logger = Logger.getLogger(SNMPEngine.class);
+    
     public static final String NAME = "snmp";
     
     private SNMPTransport transport;
@@ -18,31 +21,26 @@ public class SNMPEngine extends AbstractEngine
 
     public SNMPEngine()
     {
-        super(NAME);
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new ScriptedSNMPExecutor());
-            this.addExecutor(new GetSNMPExecutor());
-        }
+        super(NAME,
+                new ScriptedSNMPExecutor(),
+                new GetSNMPExecutor());
     }
     
     @Override
-    public void start() throws Exception
+    public void doPrepare(EngineContext engineContext) throws Exception
     {
         // setup the transport
-        int port = this.getWorker().getConfiguration().getIntParameterValue("snmp-port", 8161);
-        Logger.getLogger(SNMPEngine.class).info("Querying SNMP agents from port " + port);
+        int port = engineContext.getConfiguration().getIntParameterValue("snmp-port", 8161);
+        logger.info("Querying SNMP agents from port " + port);
         this.transport = SNMPTransport.open(port);
         this.transportThread = new Thread(this.transport, "SNMP-Transport");
+    }
+    
+    @Override
+    public void doStart(EngineContext engineContext) throws Exception
+    {
+        // start the transport
         this.transportThread.start();
-        // setup queues etc
-        super.start();
     }
 
     public SNMPTransport getTransport()

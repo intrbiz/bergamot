@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.worker.engine.dummy;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 /**
  * Execute static dummy checks
@@ -22,7 +23,7 @@ public class StaticExecutor extends AbstractExecutor<DummyEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         long start = System.nanoTime();
         ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
@@ -39,6 +40,6 @@ public class StaticExecutor extends AbstractExecutor<DummyEngine>
             result.setOutput(executeCheck.getParameter("output", ""));
         }
         result.setRuntime(((double)(System.nanoTime() - start)) / 1_000_000D);
-        this.publishActiveResult(executeCheck, result);
+        context.publishActiveResult(result);
     }
 }

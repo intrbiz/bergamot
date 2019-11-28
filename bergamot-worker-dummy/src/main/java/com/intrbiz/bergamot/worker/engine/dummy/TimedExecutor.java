@@ -7,6 +7,7 @@ import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.bergamot.timerange.TimeRangeParser;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 /**
  * Execute a timed dummy check, which changes state based on time ranges
@@ -26,7 +27,7 @@ public class TimedExecutor extends AbstractExecutor<DummyEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         long start = System.nanoTime();
         ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
@@ -48,6 +49,6 @@ public class TimedExecutor extends AbstractExecutor<DummyEngine>
         {
             result.ok(output);
         }
-        this.publishActiveResult(executeCheck, result.runtime(((double)(System.nanoTime() - start)) / 1_000_000D));
+        context.publishActiveResult(result.runtime(((double)(System.nanoTime() - start)) / 1_000_000D));
     }
 }

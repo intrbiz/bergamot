@@ -8,19 +8,9 @@ public class DummyEngine extends AbstractEngine
     
     public DummyEngine()
     {
-        super(NAME);
-    }
-    
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        // setup executors
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new StaticExecutor());
-            this.addExecutor(new RandomExecutor());
-            this.addExecutor(new TimedExecutor());
-        }
+        super(NAME, 
+                new StaticExecutor(),
+                new RandomExecutor(),
+                new TimedExecutor());
     }
 }

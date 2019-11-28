@@ -10,8 +10,8 @@ import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.ssh.util.SSHCheckUtil;
 import com.intrbiz.gerald.polyakov.Reading;
 
@@ -40,7 +40,7 @@ public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(final ExecuteCheck executeCheck, final CheckExecutionContext checkContext)
     {
         try
         {
@@ -48,7 +48,9 @@ public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
             SSHCheckUtil.validateSSHParameters(executeCheck);
             if (Util.isEmpty(executeCheck.getParameter("command_line"))) throw new RuntimeException("The 'command_line' parameter must be given");
             // create our context
-            SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e)); });
+            SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { 
+                checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e)); 
+             });
             // setup the context - this will add SSH keys etc
             SSHCheckUtil.setupSSHCheckContext(executeCheck, context);
             // connect to the host
@@ -68,7 +70,7 @@ public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
                 resultMO.setStatus(response.toStatus());
                 resultMO.setOutput(response.getOutput());
                 resultMO.setRuntime(response.getRuntime());
-                this.publishActiveResult(executeCheck, resultMO);
+                checkContext.publishActiveResult(resultMO);
                 // readings
                 if (! response.getPerfData().isEmpty())
                 {
@@ -78,14 +80,15 @@ public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
                         Reading reading = perfData.toReading();
                         if (reading != null) readings.reading(reading);
                     }
-                    if (readings != null && readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId(), executeCheck.getProcessingPool()), readings);
+                    if (readings != null && readings.getReadings().size() > 0)
+                        checkContext.publishReading(readings);
                 }
             });
         }
         catch (Exception e)
         {
             logger.error("Failed to execute Nagios over SSH check", e);
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

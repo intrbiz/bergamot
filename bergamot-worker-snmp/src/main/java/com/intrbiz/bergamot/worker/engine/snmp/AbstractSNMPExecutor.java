@@ -8,6 +8,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.SNMPVersion;
 import com.intrbiz.snmp.security.SNMPAuthMode;
@@ -34,10 +35,10 @@ public abstract class AbstractSNMPExecutor extends AbstractExecutor<SNMPEngine>
         return "snmp".equals(task.getEngine());
     }
     
-    protected abstract void executeSNMP(ExecuteCheck executeCheck, SNMPContext<?> agent) throws Exception;
+    protected abstract void executeSNMP(ExecuteCheck executeCheck, CheckExecutionContext context, SNMPContext<?> agent) throws Exception;
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, final CheckExecutionContext context)
     {
         if (logger.isDebugEnabled()) logger.debug("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         try
@@ -47,12 +48,12 @@ public abstract class AbstractSNMPExecutor extends AbstractExecutor<SNMPEngine>
             // open the context
             SNMPContext<?> agent = this.openContext(executeCheck);
             // invoke the specifics of the SNMP check
-            this.executeSNMP(executeCheck, agent);
+            this.executeSNMP(executeCheck, context, agent);
         }
         catch (Exception e)
         {
             logger.error("Error executing check", e);
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
     

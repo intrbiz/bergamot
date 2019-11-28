@@ -25,6 +25,7 @@
 		<jsch.version>0.1.54</jsch.version>
 		<twilio.version>[7.17,)</twilio.version>
 		<aws.sns.version>[1.11,)</aws.sns.version>
+		<hazelcast.version>3.12.4</hazelcast.version>
 		<hazelcast.aws.version>[1.1,)</hazelcast.aws.version>
 		<mysql.version>[5.1,)</mysql.version>
 		<postgresql.version>[42.2,)</postgresql.version>
@@ -112,8 +113,6 @@
     <module>bergamot-worker-nagios</module>
     <module>bergamot-worker-snmp</module>
     <module>bergamot-cli</module>
-    <module>bergamot-watcher-api</module>
-    <module>bergamot-watcher-snmp</module>
     <module>bergamot-daemon-config</module>
     <module>bergamot-api-client</module>
     <module>bergamot-jnetraw</module>
@@ -137,8 +136,6 @@
     <module>bergamot-worker-jdbc</module>
     <module>bergamot-check-jdbc</module>
     <module>bergamot-accounting-model</module>
-    <module>bergamot-healthcheck-agent</module>
-    <module>bergamot-healthcheck-tracker</module>
     <module>bergamot-accounting-consumer</module>
     <module>bergamot-check-jmx</module>
     <module>bergamot-worker-jmx</module>
@@ -146,16 +143,12 @@
     <module>bergamot-check-ssh</module>
     <module>bergamot-command-processor</module>
     <module>bergamot-notifier-slack</module>
-    <!-- <module>bergamot-worker-combined</module> -->
+    <module>bergamot-worker</module>
+    <module>bergamot-cluster</module>
   </modules>
   
   <dependencyManagement>
   	<dependencies>
-  	  	<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-watcher-api</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-worker-api</artifactId>
@@ -460,16 +453,6 @@
   		</dependency>
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-healthcheck-agent</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-healthcheck-tracker</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-accounting-consumer</artifactId>
   			<version>${project.version}</version>
   		</dependency>
@@ -547,6 +530,16 @@
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
 			<version>${jaxb.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>${hazelcast.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.hazelcast</groupId>
+    		<artifactId>hazelcast-client</artifactId>
+    		<version>${hazelcast.version}</version>
 		</dependency>
   	</dependencies>
   </dependencyManagement>

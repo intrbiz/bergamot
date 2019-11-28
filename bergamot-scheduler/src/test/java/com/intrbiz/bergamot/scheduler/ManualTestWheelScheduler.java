@@ -10,6 +10,11 @@ import com.intrbiz.bergamot.model.TimePeriod;
 
 public class ManualTestWheelScheduler extends WheelScheduler
 {
+    public ManualTestWheelScheduler()
+    {
+        super(UUID.randomUUID(), null);
+    }
+    
     protected void startQueues() throws Exception
     {
     }
@@ -22,21 +27,21 @@ public class ManualTestWheelScheduler extends WheelScheduler
         ManualTestWheelScheduler sch = new ManualTestWheelScheduler();
         //
         UUID j1 = UUID.randomUUID();
-        sch.scheduleJob(j1, UUID.randomUUID(), 1, 10_000L, sch.initialDelay.nextInt(10_000), new TimePeriod(), new Runnable() {
+        sch.scheduleJob(j1, 0, UUID.randomUUID(), 1, 10_000L, sch.initialDelay.nextInt(10_000), new TimePeriod(), new Runnable() {
             public void run()
             {
                 System.out.println("Run: " + System.currentTimeMillis());
             }
         });
         UUID j2 = UUID.randomUUID();
-        sch.scheduleJob(j2, UUID.randomUUID(), 1, 60_000L, sch.initialDelay.nextInt(60_000), new TimePeriod(), new Runnable() {
+        sch.scheduleJob(j2, 1, UUID.randomUUID(), 1, 60_000L, sch.initialDelay.nextInt(60_000), new TimePeriod(), new Runnable() {
             public void run()
             {
                 System.out.println("Run: " + System.currentTimeMillis());
             }
         });
         UUID j3 = UUID.randomUUID();
-        sch.scheduleJob(j3, UUID.randomUUID(), 1, 300_000L, sch.initialDelay.nextInt(300_000), new TimePeriod(), new Runnable() {
+        sch.scheduleJob(j3, 2, UUID.randomUUID(), 1, 300_000L, sch.initialDelay.nextInt(300_000), new TimePeriod(), new Runnable() {
             public void run()
             {
                 System.out.println("Run: " + System.currentTimeMillis());

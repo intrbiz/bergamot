@@ -195,7 +195,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     /**
      * Construct the execute check message for this check
      */
-    public final ExecuteCheck executeCheck()
+    public final ExecuteCheck executeCheck(UUID processingPool)
     {
         Logger logger = Logger.getLogger(ActiveCheck.class);
         CheckCommand checkCommand = this.getCheckCommand();
@@ -209,7 +209,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         executeCheck.setAgentId(this.resolveAgentId());
         executeCheck.setCheckType(this.getType());
         executeCheck.setCheckId(this.getId());
-        executeCheck.setProcessingPool(this.getPool());
+        executeCheck.setProcessingPool(processingPool);
         executeCheck.setEngine(command.getEngine());
         executeCheck.setExecutor(command.getExecutor());
         executeCheck.setName(command.getName());

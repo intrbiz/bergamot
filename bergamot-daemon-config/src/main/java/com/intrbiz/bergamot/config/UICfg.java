@@ -103,7 +103,7 @@ public class UICfg extends Configuration
         }
         if (this.broker.isEmpty())
         {
-            this.broker.add(new BrokerCfg("hcq", new String[] { "ws://127.0.0.1:1543/hcq", "ws://127.0.0.1:1544/hcq", "ws://127.0.0.1:1545/hcq" }));
+            this.broker.add(new BrokerCfg("rabbitmq", new String[] { "amqp://127.0.0.1:5672" }, "bergamot", "bergamot"));
         }
         // the database
         if (this.database == null)

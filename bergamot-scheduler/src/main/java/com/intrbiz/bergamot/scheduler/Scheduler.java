@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.scheduler;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.ActiveCheck;
@@ -24,6 +25,10 @@ public interface Scheduler
      */
     void schedule(ActiveCheck<?,?> check);
     
+    void schedule(Collection<ActiveCheck<?,?>> check);
+    
+    void schedulePool(UUID siteId, int processingPool);
+    
     /**
      * Reschedule the given check due to some form of state change
      * @param interval - the new interval of the check, optional if <= 0
@@ -47,19 +52,9 @@ public interface Scheduler
      */
     void unschedule(UUID check);
     
-    /**
-     * Make this scheduler responsible for the given pool
-     * @param site the site id
-     * @param pool the per site pool id
-     */
-    void ownPool(UUID site, int pool);
+    void unschedule(Collection<UUID> check);
     
-    /**
-     * Make this scheduler not responsible for the given pool
-     * @param site the site id
-     * @param pool the per site pool id
-     */
-    void disownPool(UUID site, int pool);
+    void unschedulePool(UUID siteId, int processingPool);
     
     /**
      * Start the scheduler

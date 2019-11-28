@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.config.NotificationEngineCfg;
-import com.intrbiz.bergamot.health.model.KnownDaemon;
 import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.ParameterMO;
@@ -114,23 +113,9 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
         throw new NotificationException("Failed to find template: " + name);
     }
     
-    public String applyTemplate(String name, KnownDaemon daemon)
-    {
-        ExpressContext context = this.createContext(daemon);
-        ExpressTemplate template = this.templateLoader.load(context, name);
-        if (template != null) return template.encodeToString(context, daemon);
-        throw new NotificationException("Failed to find template: " + name);
-    }
-    
     protected ExpressContext createContext(Notification notification)
     {
         return new DefaultContext(this.expressExtensions, new NotificationEngineEntityResolver(notification), this.templateLoader);
-    }
-    
-    protected ExpressContext createContext(final KnownDaemon daemon)
-    {
-        ExpressContext ctx = new DefaultContext(this.expressExtensions, new KnownDaemonEntityResolver(daemon), this.templateLoader);
-        return ctx;
     }
     
     // util helpers

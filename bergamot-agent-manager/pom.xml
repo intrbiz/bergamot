@@ -38,10 +38,6 @@
 		<groupId>com.intrbiz.util</groupId>
 		<artifactId>bootstrap</artifactId>
 	</dependency>
-   	<dependency>
-   		<groupId>com.intrbiz.bergamot</groupId>
-   		<artifactId>bergamot-healthcheck-agent</artifactId>
-   	</dependency>
   </dependencies>
   	<build>
 		<finalName>bergamot-agent-manager</finalName>

@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
@@ -61,10 +60,9 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db)
     {
-        // the list of global daemons
-        var("daemons", HealthTracker.getInstance().getDaemons());
-        // cluster info
-        var("cluster_info", this.app().getClusterManager().info());
+        // TODO: worker, pool and other cluster information
+        var("workers", app().getClusterManager().getCoordinator().getWorkers());
+        var("processing_pools", app().getClusterManager().getCoordinator().getProcessingPools());
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins

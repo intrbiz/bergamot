@@ -8,7 +8,7 @@ import javax.script.SimpleBindings;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.worker.engine.Executor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
 /**
@@ -19,11 +19,11 @@ import com.intrbiz.scripting.RestrictedScriptEngineManager;
  * 
  * public class MyExecutor
  * {
- *     private final ScriptedCheckManager scriptManager = new ScriptedCheckManager(this);
+ *     private final ScriptedCheckManager scriptManager = new ScriptedCheckManager();
  *     
- *     public void execute(ExecuteCheck executeCheck)
+ *     public void execute(ExecuteCheck check, CheckExecutionContext context)
  *     {
- *          this.scriptManager.createExecutor(executeCheck)
+ *          this.scriptManager.createExecutor(check, context)
  *              .bind("some_variable", new Object())
  *              .execute();
  *     }
@@ -34,12 +34,9 @@ public class ScriptedCheckManager
 {
     private final ScriptEngineManager factory = new RestrictedScriptEngineManager();
     
-    private final Executor<?> executor;
-    
-    public ScriptedCheckManager(Executor<?> executor)
+    public ScriptedCheckManager()
     {
         super();
-        this.executor = executor;
     }
     
     protected ScriptEngineManager getScriptEngineManager()
@@ -47,12 +44,13 @@ public class ScriptedCheckManager
         return this.factory;
     }
     
-    public ScriptedCheckExecutor createExecutor(final ExecuteCheck executeCheck)
+    public ScriptedCheckExecutor createExecutor(final ExecuteCheck check, final CheckExecutionContext context)
     {
         // script bindings
         final SimpleBindings bindings = new SimpleBindings();
-        bindings.put("check", executeCheck);
-        bindings.put("bergamot", new ActiveCheckScriptContext(executeCheck, this.executor));
+        bindings.put("check", check);
+        bindings.put("bergamot", this.createScriptContext(check, context));
+        this.setupBindings(bindings, check, context);
         // setup the executor
         return new ScriptedCheckExecutor()
         {
@@ -68,7 +66,7 @@ public class ScriptedCheckManager
             {
                 try
                 {
-                    final String script = executeCheck.getScript();
+                    final String script = check.getScript();
                     // we need a script to execute
                     if (Util.isEmpty(script)) throw new BergamotScriptedCheckException("A script must be provided");
                     // create the script
@@ -79,9 +77,18 @@ public class ScriptedCheckManager
                 }
                 catch (Exception e)
                 {
-                    ScriptedCheckManager.this.executor.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(check).error(e));
                 }
             }
         };
+    }
+    
+    protected ActiveCheckScriptContext createScriptContext(final ExecuteCheck check, final CheckExecutionContext context)
+    {
+        return new ActiveCheckScriptContext(check, context);
+    }
+    
+    protected void setupBindings(final SimpleBindings bindings, final ExecuteCheck check, final CheckExecutionContext context)
+    {
     }
 }

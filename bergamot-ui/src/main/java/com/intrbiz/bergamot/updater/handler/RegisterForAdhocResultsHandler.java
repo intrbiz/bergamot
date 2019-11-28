@@ -5,18 +5,10 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.message.api.error.APIError;
-import com.intrbiz.bergamot.model.message.api.result.AdhocResultEvent;
 import com.intrbiz.bergamot.model.message.api.result.RegisterForAdhocResults;
 import com.intrbiz.bergamot.model.message.api.result.RegisteredForAdhocResults;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.WorkerQueue;
-import com.intrbiz.bergamot.queue.key.ResultKey;
-import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.bergamot.updater.context.ClientContext;
-import com.intrbiz.queue.Consumer;
 import com.intrbiz.queue.QueueException;
-import com.intrbiz.queue.RoutedProducer;
 
 public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAdhocResults>
 {
@@ -38,6 +30,7 @@ public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAd
             // setup the adhoc results queue
             try
             {
+                /*
                 // setup cleanup task
                 context.onClose((ctx) -> {
                     if (logger.isTraceEnabled()) logger.trace("Got disconnect, closing adhoc result queue");
@@ -58,6 +51,7 @@ public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAd
                 }));
                 // setup the producer while we are here
                 context.var("adhocCheckProducer", queue.publishChecks());
+                */
             }
             catch (QueueException e)
             {

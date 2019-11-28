@@ -29,8 +29,11 @@ public class CheckEvent extends Message implements ParameterisedMO
     @JsonProperty("site_id")
     private UUID siteId;
     
+    @JsonProperty("worker_pool")
+    private String workerPool;
+    
     @JsonProperty("processing_pool")
-    private int processingPool;
+    private UUID processingPool;
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>(); 
@@ -120,16 +123,25 @@ public class CheckEvent extends Message implements ParameterisedMO
         this.parameters = parameters;
     }
     
-    public int getProcessingPool()
+    public UUID getProcessingPool()
     {
         return processingPool;
     }
 
-    public void setProcessingPool(int processingPool)
+    public void setProcessingPool(UUID processingPool)
     {
         this.processingPool = processingPool;
     }
-    
+
+    public String getWorkerPool()
+    {
+        return workerPool;
+    }
+
+    public void setWorkerPool(String workerPool)
+    {
+        this.workerPool = workerPool;
+    }
 
     public UUID getAdhocId()
     {

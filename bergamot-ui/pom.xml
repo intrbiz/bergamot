@@ -78,14 +78,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-healthcheck-agent</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-healthcheck-tracker</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-accounting-consumer</artifactId>
 		</dependency>
 		<dependency>
@@ -115,6 +107,11 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-cluster</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

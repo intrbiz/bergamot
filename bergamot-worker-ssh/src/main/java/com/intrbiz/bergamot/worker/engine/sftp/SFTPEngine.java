@@ -15,27 +15,14 @@ public class SFTPEngine extends AbstractEngine
 
     public SFTPEngine()
     {
-        super(NAME);
+        super(NAME,
+                new ScriptedSFTPExecutor());
+        // setup checker
+        this.checker = new SSHChecker();
     }
     
     public SSHChecker getChecker()
     {
         return this.checker;
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new ScriptedSFTPExecutor());
-        }
-    }
-    
-    @Override
-    protected void startEngineServices() throws Exception
-    {
-        this.checker = new SSHChecker();
     }
 }

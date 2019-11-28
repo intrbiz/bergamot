@@ -4,7 +4,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.util.UUID;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -12,17 +12,16 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.config.EngineCfg;
-import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
-import com.intrbiz.bergamot.queue.key.ResultKey;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 public class TestHTTPEngine
 {
-    private HTTPEngineTester engine;
+    private HTTPEngine engine;
+    
+    private UUID poolId = UUID.randomUUID();
     
     @Before
     public void setupEngine() throws Exception
@@ -30,8 +29,7 @@ public class TestHTTPEngine
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         //
-        this.engine = new HTTPEngineTester();
-        this.engine.configure(new EngineCfg(HTTPEngine.class, new ExecutorCfg(HTTPExecutor.class), new ExecutorCfg(CertificateExecutor.class), new ExecutorCfg(ScriptedHTTPExecutor.class)));
+        this.engine = new HTTPEngine();
     }
     
     @Test
@@ -43,13 +41,13 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(1);
+        check.setProcessingPool(this.poolId);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
         check.setParameter("ssl", "false");
         // execute
-        ResultMO resultMO = this.engine.test(check);
+        ResultMO resultMO = this.run(check);
         // check
         System.out.println("Got result: " + resultMO);
     }
@@ -63,7 +61,7 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(1);
+        check.setProcessingPool(this.poolId);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -71,7 +69,7 @@ public class TestHTTPEngine
         check.setParameter("contains", "Intrbiz Blog");
         check.setParameter("length", "1024");
         // execute
-        ResultMO resultMO = this.engine.test(check);
+        ResultMO resultMO = this.run(check);
         System.out.println("Got result: " + resultMO);
     }
     
@@ -84,12 +82,12 @@ public class TestHTTPEngine
         check.setName("check_certificate");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(1);
+        check.setProcessingPool(this.poolId);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
         // execute
-        ResultMO resultMO = this.engine.test(check);
+        ResultMO resultMO = this.run(check);
         System.out.println("Got result: " + resultMO);
     }
     
@@ -138,7 +136,7 @@ public class TestHTTPEngine
         check.setName("check_http_script");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(1);
+        check.setProcessingPool(this.poolId);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setScript(
@@ -162,66 +160,62 @@ public class TestHTTPEngine
                 + ");"
         );
         // execute
-        ResultMO resultMO = this.engine.test(check);
+        ResultMO resultMO = this.run(check);
         assertThat(resultMO, is(notNullValue()));
         assertThat(resultMO.getStatus(), is(equalTo("OK")));
         System.out.println("Got result: " + resultMO);
     }
     
-    private class HTTPEngineTester extends HTTPEngine
+    private ResultMO run(ExecuteCheck check) throws InterruptedException
     {
-        private BiConsumer<ResultKey, ResultMO> onResult;
+        // multi-threaded so we need to wait
+        final Object lock = new Object();
+        final ResultMO[] results = new ResultMO[1];
+        TestContext context = new TestContext((result) -> {
+            // ok we got a result
+            results[0] = result;
+            // all done
+            synchronized (lock)
+            {
+                lock.notifyAll();
+            }
+        }, null);
+        this.engine.execute(check, context);
+        // await execution
+        if (results[0] == null)
+        {
+            synchronized (lock)
+            {
+                lock.wait();
+            }
+        }
+        return results[0];
+    }
+    
+    private static class TestContext implements CheckExecutionContext
+    {
+        private Consumer<ResultMO> onResult;
         
-        private BiConsumer<ReadingKey, ReadingParcelMO> onReading;
-
-        public void setOnResult(BiConsumer<ResultKey, ResultMO> onResult)
+        private Consumer<ReadingParcelMO> onReading;
+        
+        public TestContext(Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
         {
             this.onResult = onResult;
-        }
-
-        @SuppressWarnings("unused")
-        public void setOnReading(BiConsumer<ReadingKey, ReadingParcelMO> onReading)
-        {
             this.onReading = onReading;
         }
 
         @Override
-        public void publishReading(ReadingKey key, ReadingParcelMO readingParcelMO)
+        public void publishReading(ReadingParcelMO readingParcelMO)
         {
-            if (this.onReading != null) this.onReading.accept(key, readingParcelMO);
+            if (this.onReading != null)
+                this.onReading.accept(readingParcelMO);
         }
 
         @Override
-        public void publishResult(ResultKey key, ResultMO resultMO)
+        public void publishResult(ResultMO resultMO)
         {
-            if (this.onResult != null) this.onResult.accept(key, resultMO);
-        }
-        
-        public ResultMO test(ExecuteCheck check) throws Exception
-        {
-            // setup
-            // multi-threaded so we need to wait
-            final Object lock = new Object();
-            final ResultMO[] results = new ResultMO[1];
-            this.setOnResult((key, result) -> {
-                // ok we got a result
-                results[0] = result;
-                // all done
-                synchronized (lock)
-                {
-                    lock.notifyAll();
-                }
-            });
-            this.execute(check);
-            // await execution
-            if (results[0] == null)
-            {
-                synchronized (lock)
-                {
-                    lock.wait();
-                }
-            }
-            return results[0];
+            if (this.onResult != null)
+                this.onResult.accept(resultMO);
         }
     }
 }
