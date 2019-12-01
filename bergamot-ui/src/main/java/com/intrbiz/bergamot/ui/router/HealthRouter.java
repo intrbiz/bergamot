@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.ui.router;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
-import com.intrbiz.bergamot.cluster.ProcessingPoolManager;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.processor.BergamotProcessor;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.bergamot.ui.model.health.ClusterHealth;
 import com.intrbiz.bergamot.ui.model.health.DatabaseHealth;
@@ -72,9 +72,9 @@ public class HealthRouter extends Router<BergamotApp>
     public ClusterHealth checkCluster()
     {
         ClusterHealth health = new ClusterHealth();
-        ProcessingPoolManager manager = app().getClusterManager();
-        health.setMembers(manager.getMemberCount());
-        health.setProcessingPools(manager.getCoordinator().getProcessingPoolCount());
+        BergamotProcessor processor = app().getProcessor();
+        health.setMembers(processor.getMemberCount());
+        health.setProcessingPools(processor.getProcessPoolCount());
         return health;
     }
     

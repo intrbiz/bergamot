@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
@@ -22,7 +23,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     
     protected final UUID poolId;
     
-    protected ResultConsumer resultConsumer;
+    protected final ProcessingPoolConsumer consumer;
 
     protected int threadCount;
     
@@ -30,11 +31,11 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     
     protected volatile boolean run = false;
 
-    public AbstractResultProcessor(UUID poolId, ResultConsumer resultConsumer)
+    public AbstractResultProcessor(UUID poolId, ProcessingPoolConsumer consumer)
     {
         super();
         this.poolId = poolId;
-        this.resultConsumer = resultConsumer;
+        this.consumer = consumer;
         this.threadCount = Runtime.getRuntime().availableProcessors();
     }
     
@@ -47,6 +48,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     public void start()
     {
         logger.info("Starting result processor");
+        // Start the executor
         this.startExecutors();
     }
     
@@ -63,7 +65,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
                 {
                     try
                     {
-                        ResultMO result = this.resultConsumer.pollResult();
+                        ResultMO result = this.consumer.pollResult();
                         if (result != null)
                         {
                             if (logger.isTraceEnabled())

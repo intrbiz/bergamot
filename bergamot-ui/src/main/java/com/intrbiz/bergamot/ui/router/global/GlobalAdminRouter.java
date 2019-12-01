@@ -18,14 +18,7 @@ import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
-import com.intrbiz.bergamot.model.message.cluster.manager.request.DeinitSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.response.DeinitedSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
-import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
@@ -61,8 +54,8 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     public void index(BergamotDB db)
     {
         // TODO: worker, pool and other cluster information
-        var("workers", app().getClusterManager().getCoordinator().getWorkers());
-        var("processing_pools", app().getClusterManager().getCoordinator().getProcessingPools());
+        var("workers", app().getProcessor().getWorkerCoordinator().getWorkers());
+        var("cluster_info", app().getProcessor().getProcessingPoolCoordinator().info());
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins
@@ -97,6 +90,8 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         site.setDisabled(true);
         db.setSite(site);
         // message the UI cluster to tear down the site
+        // TODO:
+        /*
         try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
         {
             try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
@@ -114,7 +109,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
                     logger.error("Failed to deinitialise site with UI cluster");
                 }
             }
-        }
+        }*/
         redirect(path("/global/admin/"));
     }
     
@@ -130,6 +125,8 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         site.setDisabled(false);
         db.setSite(site);
         // message the UI cluster to setup the site
+        // TODO:
+        /*
         try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
         {
             try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
@@ -148,6 +145,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
                 }
             }
         }
+        */
         redirect(path("/global/admin/"));
     }
     

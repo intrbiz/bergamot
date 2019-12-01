@@ -7,49 +7,36 @@ import java.util.concurrent.ConcurrentMap;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
-import com.intrbiz.bergamot.cluster.coordinator.ClusterNames;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerSchedulerCoordinator;
+import com.intrbiz.bergamot.cluster.ObjectNames;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerCoordinator;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.scheduler.CheckProducer;
 
-public class WorkerProducer implements CheckProducer
-{    
+public class WorkerProducer
+{
     /**
      * The hazelcast instance to use
      */
     private final HazelcastInstance hazelcast;
     
-    private final WorkerSchedulerCoordinator coordinator;
-    
-    private final UUID poolId;
+    private final WorkerCoordinator coordinator;
     
     /**
      * Our cache of worker queues
      */
     private final ConcurrentMap<UUID, IQueue<ExecuteCheck>> workerQueues;
     
-    private final IQueue<ResultMO> resultQueue;
-    
-    public WorkerProducer(HazelcastInstance hazelcast, UUID poolId, WorkerSchedulerCoordinator coordinator)
+    public WorkerProducer(HazelcastInstance hazelcast, WorkerCoordinator coordinator)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);
         this.coordinator = Objects.requireNonNull(coordinator);
-        this.poolId = Objects.requireNonNull(poolId);
         this.workerQueues = new ConcurrentHashMap<>();
-        this.resultQueue = this.hazelcast.getQueue(ClusterNames.buildResultQueueName(this.poolId));
-    }
-    
-    public UUID getPoolId()
-    {
-        return this.poolId;
     }
     
     private IQueue<ExecuteCheck> getCheckQueue(UUID workerId)
     {
         return this.workerQueues.computeIfAbsent(workerId, (key) -> {
-            return this.hazelcast.getQueue(ClusterNames.buildCheckQueueName(key));
+            return this.hazelcast.getQueue(ObjectNames.buildCheckQueueName(key));
         });
     }
     
@@ -65,8 +52,10 @@ public class WorkerProducer implements CheckProducer
         return success ? PublishStatus.Success : PublishStatus.Failed;
     }
     
-    public boolean publishFailedCheck(ResultMO result)
+    public static enum PublishStatus
     {
-        return this.resultQueue.offer(result);
+        Success,
+        Failed,
+        Unroutable
     }
 }

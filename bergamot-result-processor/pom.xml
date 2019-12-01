@@ -26,16 +26,16 @@
 			<artifactId>bergamot-model</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-queue</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.intrbiz.accounting</groupId>
 			<artifactId>accounting</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-accounting-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-cluster</artifactId>
 		</dependency>
 	</dependencies>
 </project>

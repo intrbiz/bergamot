@@ -1,8 +1,8 @@
-package com.intrbiz.bergamot.cluster.coordinator;
+package com.intrbiz.bergamot.cluster;
 
 import java.util.UUID;
 
-public final class ClusterNames
+public final class ObjectNames
 {
     public static final class Attributes
     {
@@ -24,11 +24,6 @@ public final class ClusterNames
         return "bergamot.cluster.processing.pools";
     }
     
-    public static final String buildProcessingPoolSitesMapName()
-    {
-        return "bergamot.cluster.processing.pool.sites";
-    }
-    
     public static final String buildWorkerRegistrationsMapName()
     {
         return "bergamot.cluster.workers";
@@ -39,18 +34,23 @@ public final class ClusterNames
         return "bergamot.queue.worker.checks." + workerId;
     }
     
-    public static final String buildResultQueueName(UUID pool)
+    public static final String buildResultQueueName(UUID memberId)
     {
-        return "bergamot.queue.pool.results." + pool;
+        return "bergamot.queue.pool.results." + memberId;
     }
     
-    public static final String buildReadingQueueName(UUID pool)
+    public static final String buildReadingQueueName(UUID memberId)
     {
-        return "bergamot.queue.pool.readings." + pool;
+        return "bergamot.queue.pool.readings." + memberId;
     }
     
-    public static final String getAssignmentLockName()
+    public static final String buildClusterMigrationQueueName(UUID memberUUID)
     {
-        return "bergamot.lock.processing.pool.assignment";
+        return "bergamot.queue.cluster.migrations." + memberUUID;
+    }
+    
+    public static final String getClusterManagerLock()
+    {
+        return "bergamot.lock.cluster.manager";
     }
 }

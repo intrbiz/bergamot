@@ -1,16 +1,15 @@
-package com.intrbiz.bergamot.model.message.cluster.manager.request;
+package com.intrbiz.bergamot.model.message.event.site;
 
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
 
 /**
  * Stop a site in the UI cluster
  */
-@JsonTypeName("bergamot.cluster.manager.deinit_site")
-public class DeinitSite extends ClusterManagerRequest
+@JsonTypeName("bergamot.event.site.deinit")
+public class DeinitSite extends SiteEvent
 {
     @JsonProperty("site_id")
     private UUID siteId;

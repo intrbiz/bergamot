@@ -18,6 +18,7 @@ import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
@@ -62,9 +63,9 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     
     private Accounting accounting = Accounting.create(DefaultResultProcessor.class);
 
-    public DefaultResultProcessor(UUID poolId, ResultConsumer resultConsumer)
+    public DefaultResultProcessor(UUID poolId, ProcessingPoolConsumer consumer)
     {
-        super(poolId, resultConsumer);
+        super(poolId, consumer);
     }    
 
     @Override

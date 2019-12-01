@@ -27,11 +27,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-queue</artifactId>
+			<artifactId>bergamot-accounting-model</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-accounting-model</artifactId>
+			<artifactId>bergamot-cluster</artifactId>
 		</dependency>
 	</dependencies>
 </project>

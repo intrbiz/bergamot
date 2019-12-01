@@ -6,31 +6,25 @@ import java.util.concurrent.TimeUnit;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
-import com.intrbiz.bergamot.cluster.coordinator.ClusterNames;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerSchedulerCoordinator;
+import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 
-public class ResultConsumer implements com.intrbiz.bergamot.result.ResultConsumer
-{       
-    /**
-     * The hazelcast instance to use
-     */
-    private final HazelcastInstance hazelcast;
+public class ProcessingPoolConsumer
+{
     
-    private final WorkerSchedulerCoordinator coordinator;
+    private final HazelcastInstance hazelcast;
     
     private final UUID poolId;
     
     private final IQueue<ResultMO> resultQueue;
     
-    public ResultConsumer(HazelcastInstance hazelcast, UUID processingPool, WorkerSchedulerCoordinator coordinator)
+    public ProcessingPoolConsumer(HazelcastInstance hazelcast, UUID poolId)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);
-        this.poolId = Objects.requireNonNull(processingPool);
-        this.coordinator = Objects.requireNonNull(coordinator);
+        this.poolId = Objects.requireNonNull(poolId);
         // Create our queues
-        this.resultQueue = this.hazelcast.getQueue(ClusterNames.buildResultQueueName(this.poolId));
+        this.resultQueue = this.hazelcast.getQueue(ObjectNames.buildResultQueueName(this.poolId));
     }
     
     public ResultMO pollResult()

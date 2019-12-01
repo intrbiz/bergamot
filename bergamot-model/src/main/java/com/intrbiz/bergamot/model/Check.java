@@ -391,6 +391,16 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         this.noteUrl = noteUrl;
     }
     
+    // Pool
+    
+    /**
+     * Compute the pool that this check is in
+     */
+    public int getPool()
+    {
+        return Site.computeSiteProcessingPool(this.id);
+    }
+    
     // some basic actions
 
     /**

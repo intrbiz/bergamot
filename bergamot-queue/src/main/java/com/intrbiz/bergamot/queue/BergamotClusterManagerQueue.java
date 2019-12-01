@@ -1,8 +1,8 @@
 package com.intrbiz.bergamot.queue;
 
 
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
+import com.intrbiz.bergamot.model.message.event.ClusterManagerRequest;
+import com.intrbiz.bergamot.model.message.event.ClusterManagerResponse;
 import com.intrbiz.bergamot.queue.impl.rabbit.RabbitBergamotClusterManagerQueue;
 import com.intrbiz.queue.QueueAdapter;
 import com.intrbiz.queue.QueueManager;

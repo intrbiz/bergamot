@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.cluster.coordinator.model;
+package com.intrbiz.bergamot.cluster.model;
 
 import java.io.Serializable;
 import java.util.Objects;

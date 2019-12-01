@@ -15,11 +15,13 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
+import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
+import com.intrbiz.bergamot.cluster.queue.WorkerProducer.PublishStatus;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
-import com.intrbiz.bergamot.scheduler.CheckProducer.PublishStatus;
 import com.intrbiz.util.IBThreadFactory;
 
 /**
@@ -49,6 +51,10 @@ import com.intrbiz.util.IBThreadFactory;
 public class WheelScheduler extends AbstractScheduler
 {
     private static final Logger logger = Logger.getLogger(WheelScheduler.class);
+    
+    private static final long TICK_PERIOD_MS = 1_000L;
+    
+    private static final int SEGMENTS = 60;
 
     // ticker
     protected volatile boolean run = true;
@@ -58,18 +64,16 @@ public class WheelScheduler extends AbstractScheduler
     protected Thread ticker;
 
     // state
-
     protected volatile boolean schedulerEnabled = true;
 
     // wheel
+    protected final ConcurrentMap<UUID, Job> jobs;
 
-    protected ConcurrentMap<UUID, Job> jobs;
+    protected final Segment[] orange;
 
-    protected Segment[] orange;
+    protected final long tickPeriod;
 
-    protected long tickPeriod;
-
-    protected long orangePeriod;
+    protected final long orangePeriod;
 
     protected volatile int tick = -1;
 
@@ -78,36 +82,23 @@ public class WheelScheduler extends AbstractScheduler
     protected volatile Calendar tickCalendar = Calendar.getInstance();
 
     // initial delay allocation
-
-    protected SecureRandom initialDelay = new SecureRandom();
+    protected final SecureRandom initialDelay = new SecureRandom();
     
     // watch dog
-    protected Timer watchDog = new Timer();
+    protected final Timer watchDog = new Timer();
     
     // task executor
-    
-    protected ExecutorService taskExecutor;
+    protected final ExecutorService taskExecutor;
     
     // accounting
-    
-    protected Accounting accounting = Accounting.create(WheelScheduler.class);
+    protected final Accounting accounting = Accounting.create(WheelScheduler.class);
 
-    public WheelScheduler(UUID poolId, CheckProducer checkProducer)
+    public WheelScheduler(UUID poolId, WorkerProducer WorkerProducer, ProcessingPoolProducer processingPoolProducer)
     {
-        super(poolId, checkProducer);
+        super(poolId, WorkerProducer, processingPoolProducer);
         // setup the wheel structure
-        this.setupWheel(1_000L, 60);
-        // create our task executor
-        this.taskExecutor = Executors.newFixedThreadPool(
-                Integer.getInteger("bergamot.scheduler.task.threads", Runtime.getRuntime().availableProcessors()),
-                new IBThreadFactory("bergamot-scheduler-task", true)
-        );
-    }
-
-    private void setupWheel(long tickPeriod, int segments)
-    {
-        this.tickPeriod = 1_000L;
-        this.orange = new Segment[60];
+        this.tickPeriod = TICK_PERIOD_MS;
+        this.orange = new Segment[SEGMENTS];
         this.orangePeriod = this.orange.length * this.tickPeriod;
         for (int i = 0; i < orange.length; i++)
         {
@@ -115,6 +106,11 @@ public class WheelScheduler extends AbstractScheduler
         }
         this.jobs = new ConcurrentHashMap<UUID, Job>();
         logger.debug("Initalised wheel with " + this.orange.length + " segments, rotation period: " + this.orangePeriod);
+        // create our task executor
+        this.taskExecutor = Executors.newFixedThreadPool(
+                Integer.getInteger("bergamot.scheduler.task.threads", Runtime.getRuntime().availableProcessors()),
+                new IBThreadFactory("bergamot-scheduler-task", true)
+        );
     }
 
     protected void tick()
@@ -386,6 +382,7 @@ public class WheelScheduler extends AbstractScheduler
     
     public void unschedulePool(UUID siteId, int processingPool)
     {
+        logger.info("Unscheduling all checks in pool " + siteId + "." + processingPool);
         for (Segment segment : this.orange)
         {
             for (Job job : segment.jobs.values())

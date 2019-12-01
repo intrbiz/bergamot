@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.ParameterisedMO;
+import com.intrbiz.bergamot.model.message.event.Event;
 
-public class CheckEvent extends Message implements ParameterisedMO
+public class CheckEvent extends Event implements ParameterisedMO
 {
     @JsonProperty("engine")
     private String engine;

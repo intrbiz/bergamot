@@ -22,7 +22,9 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerClientCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerCoordinator;
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
 import com.intrbiz.bergamot.cluster.queue.WorkerConsumer;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
@@ -53,8 +55,6 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     public static final String DEFAULT_CONFIGURATION_FILE = "/etc/bergamot/worker/config.xml";
     
     public static final String DAEMON_NAME = "bergamot-worker";
-    
-    private static final long MAX_STARTUP_WAIT = TimeUnit.MINUTES.toNanos(5);
     
     private static final Logger logger = Logger.getLogger(BergamotWorker.class);
     
@@ -98,9 +98,13 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     
     private HazelcastInstance hazelcast;
     
-    private WorkerClientCoordinator coordinator;
+    private WorkerCoordinator workerCoordinator;
+    
+    private ProcessingPoolCoordinator poolCoordinator;
     
     private WorkerConsumer consumer;
+    
+    private ProcessingPoolProducer producer;
     
     private Thread[] threads;
     
@@ -213,17 +217,11 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         // Connect to Hazelcast
         this.hazelcast = HazelcastClient.newHazelcastClient(cliCfg);
         // Create our worker coordinator
-        this.coordinator = new WorkerClientCoordinator(this.hazelcast);
-        // Wait for the scheduling cluster to be ready
-        long start = System.nanoTime();
-        while (! this.coordinator.canRegisterWorkers())
-        {
-            Thread.sleep(3_000);
-            if ((System.nanoTime() - start) > MAX_STARTUP_WAIT)
-                throw new RuntimeException("Cannot start worker as scheduling cluster is not ready, restarting!");
-        }
+        this.workerCoordinator = new WorkerCoordinator(this.hazelcast);
+        this.poolCoordinator = new ProcessingPoolCoordinator(this.hazelcast);
         // Register ourselves
-        this.consumer = this.coordinator.registerWorker(this.id, false, DAEMON_NAME, this.info, this.sites, this.workerPool, this.engines.keySet()); 
+        this.producer = this.poolCoordinator.createProcessingPoolProducer();
+        this.consumer = this.workerCoordinator.registerWorker(this.id, false, DAEMON_NAME, this.info, this.sites, this.workerPool, this.engines.keySet()); 
     }
     
     protected void createExecutors() throws Exception
@@ -293,13 +291,13 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             @Override
             public void publishResult(ResultMO resultMO)
             {
-                consumer.publishResult(check.getProcessingPool(), resultMO);
+                producer.publishResult(check.getProcessingPool(), resultMO);
             }
 
             @Override
             public void publishReading(ReadingParcelMO readingParcelMO)
             {
-                consumer.publishReading(check.getProcessingPool(), readingParcelMO);
+                producer.publishReading(check.getProcessingPool(), readingParcelMO);
             }            
         };
     }
@@ -355,7 +353,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             this.hazelcast.shutdown();
         // Reset components
         this.consumer = null;
-        this.coordinator = null;
+        this.workerCoordinator = null;
         this.hazelcast = null;
     }
     

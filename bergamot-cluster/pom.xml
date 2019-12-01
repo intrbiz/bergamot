@@ -11,19 +11,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-model</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-message-model</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-scheduler</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-result-processor</artifactId>
 		</dependency>
 	</dependencies>
 </project>

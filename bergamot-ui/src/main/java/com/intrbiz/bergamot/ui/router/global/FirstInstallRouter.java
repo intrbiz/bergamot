@@ -27,10 +27,7 @@ import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
-import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
+import com.intrbiz.bergamot.model.message.event.site.InitSite;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -206,6 +203,8 @@ public class FirstInstallRouter extends Router<BergamotApp>
             }
         }
         // message the UI cluster to setup the site
+        // TODO:
+        /*
         try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
         {
             try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
@@ -224,6 +223,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
                 }
             }
         }
+        */
         // all done
         logger.info("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
         // mark first install as complete

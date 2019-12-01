@@ -33,21 +33,21 @@
     </div>
     <div class="row">
 		<h3 title="The processing pools in this Bergamot cluster which can schedule checks and process results">Processing Pools</h3>
-		<data-set var="pool" value="#{processing_pools}">
+		<data-set var="processor" value="#{cluster_info.processors}">
 			<div class="col3 dash_icon check">
 				<h3>
-					<span class="dash_img status_ok" title="Pool #{pool.id}">
+					<span class="dash_img status_ok" title="Member #{processor.address}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
-					<span class="name" title="The member this processing pool resides on">Member #{pool.memberName}</span>
+					<span class="name" title="The member this processor resides on">Member #{processor.address}</span>
 			    </h3>
 			    <p>
-				    <span class="label" title="The UUID of this pool">UUID: </span>
-				    <span class="value" style="font-size: 13px;">#{pool.id}</span>
+				    <span class="label" title="The UUID of this member">UUID: </span>
+				    <span class="value" style="font-size: 13px;">#{processor.uuid}</span>
 			    </p>				    
 			    <p>
 				    <span class="label" title="The number of site pools being processed">Site Pools: </span>
-				    <span class="value">#{pool.poolCount}</span>
+				    <span class="value">#{processor.pools.size}</span>
 			    </p>
 			</div>
 		</data-set>

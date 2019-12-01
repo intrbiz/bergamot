@@ -3,12 +3,13 @@ package com.intrbiz.bergamot.scheduler;
 import java.util.Collection;
 import java.util.UUID;
 
+import com.intrbiz.bergamot.cluster.listener.ProcessingPoolListener;
 import com.intrbiz.bergamot.model.ActiveCheck;
 
 /**
  * Schedule the execution of stuff, mainly host and service checks
  */
-public interface Scheduler
+public interface Scheduler extends ProcessingPoolListener
 {
     /**
      * Pause scheduling all checks
@@ -61,4 +62,16 @@ public interface Scheduler
      * @throws Exception
      */
     void start() throws Exception;
+
+    @Override
+    default void registerPool(UUID siteId, int processingPool)
+    {
+        this.schedulePool(siteId, processingPool);
+    }
+
+    @Override
+    default void deregisterPool(UUID siteId, int processingPool)
+    {
+        this.unschedulePool(siteId, processingPool);
+    }
 }

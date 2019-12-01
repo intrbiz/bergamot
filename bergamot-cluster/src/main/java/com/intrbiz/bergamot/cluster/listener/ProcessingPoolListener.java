@@ -2,11 +2,14 @@ package com.intrbiz.bergamot.cluster.listener;
 
 import java.util.UUID;
 
+/**
+ * Listen to decisions from the {@code ProcessingPoolCoordinator}
+ */
 public interface ProcessingPoolListener
 {
 
-    void sitePoolAssigned(UUID siteId, int processingPool, UUID processingPoolId);
+    void registerPool(UUID siteId, int processingPool);
     
-    void sitePoolUnassigned(UUID siteId, int processingPool, UUID processingPoolId);
+    void deregisterPool(UUID siteId, int processingPool);
     
 }
