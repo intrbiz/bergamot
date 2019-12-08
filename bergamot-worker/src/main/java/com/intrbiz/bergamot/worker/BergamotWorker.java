@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.apache.log4j.BasicConfigurator;
@@ -21,9 +20,10 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.spi.exception.TargetDisconnectedException;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolCoordinator;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClientCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerClientCoordinator;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
 import com.intrbiz.bergamot.cluster.queue.WorkerConsumer;
 import com.intrbiz.bergamot.config.LoggingCfg;
@@ -98,9 +98,9 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     
     private HazelcastInstance hazelcast;
     
-    private WorkerCoordinator workerCoordinator;
+    private WorkerClientCoordinator workerCoordinator;
     
-    private ProcessingPoolCoordinator poolCoordinator;
+    private ProcessingPoolClientCoordinator poolCoordinator;
     
     private WorkerConsumer consumer;
     
@@ -217,8 +217,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         // Connect to Hazelcast
         this.hazelcast = HazelcastClient.newHazelcastClient(cliCfg);
         // Create our worker coordinator
-        this.workerCoordinator = new WorkerCoordinator(this.hazelcast);
-        this.poolCoordinator = new ProcessingPoolCoordinator(this.hazelcast);
+        this.workerCoordinator = new WorkerClientCoordinator(this.hazelcast);
+        this.poolCoordinator = new ProcessingPoolClientCoordinator(this.hazelcast);
         // Register ourselves
         this.producer = this.poolCoordinator.createProcessingPoolProducer();
         this.consumer = this.workerCoordinator.registerWorker(this.id, false, DAEMON_NAME, this.info, this.sites, this.workerPool, this.engines.keySet()); 
@@ -255,6 +255,10 @@ public class BergamotWorker implements Configurable<WorkerCfg>
                                 context.publishResult(new ActiveResultMO().fromCheck(check).error("No engine found to execute check"));
                             }
                         }
+                    }
+                    catch (TargetDisconnectedException e)
+                    {
+                        // IGNORE
                     }
                     catch (Exception e)
                     {

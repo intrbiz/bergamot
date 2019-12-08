@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 import com.intrbiz.bergamot.cluster.ObjectNames;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 public class WorkerProducer
@@ -18,14 +18,14 @@ public class WorkerProducer
      */
     private final HazelcastInstance hazelcast;
     
-    private final WorkerCoordinator coordinator;
+    private final WorkerClusterCoordinator coordinator;
     
     /**
      * Our cache of worker queues
      */
     private final ConcurrentMap<UUID, IQueue<ExecuteCheck>> workerQueues;
     
-    public WorkerProducer(HazelcastInstance hazelcast, WorkerCoordinator coordinator)
+    public WorkerProducer(HazelcastInstance hazelcast, WorkerClusterCoordinator coordinator)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);

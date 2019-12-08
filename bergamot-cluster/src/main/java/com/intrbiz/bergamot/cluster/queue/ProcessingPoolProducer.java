@@ -55,7 +55,7 @@ public class ProcessingPoolProducer
     {
         if (pool == null)
         {
-            pool = this.coordinator.route(resultMO.getSiteId());
+            pool = this.coordinator.routePassiveCheck(resultMO.getSiteId());
         }
         IQueue<ResultMO> queue = this.getResultQueue(pool);
         try
@@ -86,7 +86,7 @@ public class ProcessingPoolProducer
     {
         if (pool == null)
         {
-            pool = this.coordinator.route(readingParcelMO.getSiteId());
+            pool = this.coordinator.routePassiveCheck(readingParcelMO.getSiteId());
         }
         IQueue<ReadingParcelMO> queue = this.getReadingQueue(pool);
         try

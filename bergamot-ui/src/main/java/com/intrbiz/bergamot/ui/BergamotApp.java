@@ -12,6 +12,9 @@ import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.balsa.util.Util;
 import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
+import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
+import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
 import com.intrbiz.bergamot.cluster.util.HazelcastFactory;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -24,6 +27,7 @@ import com.intrbiz.bergamot.ui.action.ContactActions;
 import com.intrbiz.bergamot.ui.action.DispatchResultAction;
 import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
 import com.intrbiz.bergamot.ui.action.SchedulerActions;
+import com.intrbiz.bergamot.ui.action.SiteActions;
 import com.intrbiz.bergamot.ui.action.TeamActions;
 import com.intrbiz.bergamot.ui.action.TimePeriodActions;
 import com.intrbiz.bergamot.ui.action.U2FAActions;
@@ -133,6 +137,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     private HazelcastFactory hazelcast;
     
+    private SiteEventBroker siteEventBroker;
+    
     private BergamotProcessor processor;
     
     private UpdateServer updateServer;
@@ -152,6 +158,21 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     public BergamotProcessor getProcessor()
     {
         return this.processor;
+    }
+    
+    public WorkerClusterCoordinator getWorkerCoordinator()
+    {
+        return processor.getWorkerCoordinator();
+    }
+
+    public ProcessingPoolClusterCoordinator getProcessingPoolCoordinator()
+    {
+        return processor.getProcessingPoolCoordinator();
+    }
+
+    public SiteEventBroker getSiteEventBroker()
+    {
+        return this.siteEventBroker;
     }
 
     public UpdateServer getUpdateServer()
@@ -263,6 +284,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new CheckActions());
         action(new BergamotAgentActions());
         action(new U2FAActions());
+        action(new SiteActions());
     }
     
     @Override
@@ -374,8 +396,10 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     protected void startApplication() throws Exception
     {
         // Start our cluster components
+        this.siteEventBroker = new SiteEventBroker(this.hazelcast.getHazelcastInstance());
+        this.processor = new BergamotProcessor(this.hazelcast.getHazelcastInstance(), this.siteEventBroker);
+        // start the processor
         logger.info("Starting processor");
-        this.processor = new BergamotProcessor(this.hazelcast.getHazelcastInstance());
         this.processor.start();
         // start the update websocket server
         this.updateServer.start();

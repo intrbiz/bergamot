@@ -400,7 +400,6 @@ public class WheelScheduler extends AbstractScheduler
     @Override
     public void start() throws Exception
     {
-        super.start();
         // ensure that we are ready to run
         this.resumeScheduler();
         // setup the ticker thread

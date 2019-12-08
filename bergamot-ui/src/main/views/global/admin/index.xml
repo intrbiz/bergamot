@@ -53,6 +53,41 @@
 		</data-set>
 	</div>
     <div class="row">
+		<h3>Worker Routes</h3>
+		<table style="width: 100%">
+			<tr>
+				<th>Worker Pool</th>
+				<th>Engine</th>
+				<th>Site</th>
+				<th>Workers</th>
+			</tr>
+			<data-set var="worker_pool_routes" value="#{route_table.entrySet()}">
+				<tr>
+					<td>#{worker_pool_routes.key}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<data-set var="engine_routes" value="#{worker_pool_routes.value.entrySet()}">
+					<tr>
+						<td></td>
+						<td>#{engine_routes.key}</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<data-set var="site_routes" value="#{engine_routes.value.entrySet()}">
+						<tr>
+							<td></td>
+							<td></td>
+							<td>#{site_routes.key}</td>
+							<td>#{list(site_routes.value).size}</td>
+						</tr>
+					</data-set>
+				</data-set>
+			</data-set>
+		</table>
+	</div>
+    <div class="row">
 		<h3>Sites</h3>
 		<table style="width: 100%">
 			<tr>

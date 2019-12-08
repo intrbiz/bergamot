@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Enable the scheduling of an active check
  */
 @JsonTypeName("bergamot.enable_check")
-public class EnableCheck extends ActiveCheckSchedulerAction
+public class EnableCheck extends SchedulerAction
 {
     public EnableCheck()
     {

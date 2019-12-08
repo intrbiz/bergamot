@@ -29,7 +29,6 @@ import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
-import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.metadata.Any;

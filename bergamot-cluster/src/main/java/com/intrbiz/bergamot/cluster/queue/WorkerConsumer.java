@@ -7,11 +7,13 @@ import java.util.concurrent.TimeUnit;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 import com.intrbiz.bergamot.cluster.ObjectNames;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerClientCoordinator;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 public class WorkerConsumer
 {   
+    private static final long POKE_THRESHOLD = TimeUnit.SECONDS.toNanos(10);
+    
     /**
      * The hazelcast instance to use
      */
@@ -25,7 +27,7 @@ public class WorkerConsumer
     /**
      * The coordinator which created us
      */
-    private final WorkerCoordinator coordinator;
+    private final WorkerClientCoordinator coordinator;
     
     /**
      * Our dedicated queue to process work form
@@ -34,7 +36,9 @@ public class WorkerConsumer
     
     private volatile boolean closed;
     
-    public WorkerConsumer(HazelcastInstance hazelcast, UUID workerId, WorkerCoordinator coordinator)
+    private volatile long lastPoke = 0L;
+    
+    public WorkerConsumer(HazelcastInstance hazelcast, UUID workerId, WorkerClientCoordinator coordinator)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);
@@ -54,7 +58,12 @@ public class WorkerConsumer
     
     protected void pokeWatchDog()
     {
-        // TODO
+        long now = System.nanoTime();
+        if ((now - this.lastPoke) > POKE_THRESHOLD)
+        {
+            this.lastPoke = now;
+            // TODO: Poke Poke Poke
+        }
     }
     
     // Check handling

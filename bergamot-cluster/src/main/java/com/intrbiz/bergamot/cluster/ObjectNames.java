@@ -49,6 +49,11 @@ public final class ObjectNames
         return "bergamot.queue.cluster.migrations." + memberUUID;
     }
     
+    public static final String getSiteTopicName()
+    {
+        return "bergamot.topic.event.site";
+    }
+    
     public static final String getClusterManagerLock()
     {
         return "bergamot.lock.cluster.manager";

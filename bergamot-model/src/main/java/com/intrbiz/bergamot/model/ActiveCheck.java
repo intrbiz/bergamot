@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.express.BergamotEntityResolver;
@@ -16,7 +15,6 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
-import com.intrbiz.bergamot.queue.key.WorkerKey;
 import com.intrbiz.bergamot.util.TimeInterval;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -169,19 +167,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
             return db.getCheckSavedState(this.getId());
         }
     }
-
-    /**
-     * Construct the routing key which should be used to route this execute check message
-     * 
-     * @return
-     */
-    public WorkerKey getRoutingKey()
-    {
-        Command command = Util.nullable(this.getCheckCommand(), CheckCommand::getCommand);
-        if (command == null) return null;
-        // the key
-        return new WorkerKey(this.getSiteId(), this.resolveWorkerPool(), command.getEngine(), this.resolveAgentId());
-    }
+    
     /**
      * Get the TTL in ms for the execute check message
      * 

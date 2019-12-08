@@ -67,10 +67,6 @@
 			<artifactId>cache-hazelcast</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-queue</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.yubico</groupId>
 			<artifactId>u2flib-server-core</artifactId>
 		</dependency>

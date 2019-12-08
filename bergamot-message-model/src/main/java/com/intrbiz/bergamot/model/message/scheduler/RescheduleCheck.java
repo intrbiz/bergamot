@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Update the scheduling of an active check
  */
 @JsonTypeName("bergamot.reschedule_check")
-public class RescheduleCheck extends ActiveCheckSchedulerAction
+public class RescheduleCheck extends SchedulerAction
 {
     /**
      * The interval for the check to be rescheduled.

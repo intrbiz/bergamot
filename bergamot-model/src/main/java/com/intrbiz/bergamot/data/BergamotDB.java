@@ -20,6 +20,7 @@ import com.intrbiz.bergamot.config.validator.BergamotConfigResolver;
 import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.AccessControl;
+import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.AgentTemplate;
 import com.intrbiz.bergamot.model.Alert;
@@ -2207,6 +2208,18 @@ public abstract class BergamotDB extends DatabaseAdapter
         if (c != null) return c;
         // cluster
         c = this.getCluster(id);
+        if (c != null) return c;
+        return c;
+    }
+    
+    public ActiveCheck<?,?> getActiveCheck(UUID id)
+    {
+        ActiveCheck<?,?> c = null;
+        // service
+        c = this.getService(id);
+        if (c != null) return c;
+        // host
+        c = this.getHost(id);
         if (c != null) return c;
         return c;
     }

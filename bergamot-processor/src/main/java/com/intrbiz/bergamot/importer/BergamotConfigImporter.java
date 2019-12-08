@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
 import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -89,10 +90,6 @@ import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
 import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
-import com.intrbiz.bergamot.queue.NotificationQueue;
-import com.intrbiz.bergamot.queue.SchedulerQueue;
-import com.intrbiz.bergamot.queue.key.NotificationKey;
-import com.intrbiz.bergamot.queue.key.SchedulerKey;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionParser;
 import com.intrbiz.bergamot.virtual.operator.VirtualCheckOperator;
@@ -109,7 +106,7 @@ public class BergamotConfigImporter
     
     private Site site;
     
-    private BergamotCfg config;
+    private final BergamotCfg config;
     
     private boolean resetState = false;
     
@@ -138,6 +135,8 @@ public class BergamotConfigImporter
     private boolean requirePasswordChange = true;
     
     private Set<String> updatedResourcePools = new HashSet<String>();
+    
+    private SchedulerActionProducer schedulerActions;
     
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
@@ -175,9 +174,10 @@ public class BergamotConfigImporter
         return this;
     }
     
-    public BergamotConfigImporter online()
+    public BergamotConfigImporter online(SchedulerActionProducer schedulerActions)
     {
         this.online = true;
+        this.schedulerActions = schedulerActions;
         return this;
     }
     
@@ -253,17 +253,16 @@ public class BergamotConfigImporter
                         {
                             // we must publish any scheduling changes after we have committed the transaction
                             // publish all scheduling changes
-                            try (SchedulerQueue queue = SchedulerQueue.open())
+                            if (this.schedulerActions != null)
                             {
-                                try (RoutedProducer<SchedulerAction, SchedulerKey> producer = queue.publishSchedulerActions())
+                                for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
                                 {
-                                    for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
-                                    {
-                                        producer.publish(new SchedulerKey(delayedAction.key, 0), delayedAction.action);
-                                    }
+                                    this.schedulerActions.publishSchedulerAction(delayedAction.action);
                                 }
                             }
                             // we must publish and contact registration notifications
+                            // TODO:
+                            /*
                             try (NotificationQueue notificationQueue = NotificationQueue.open())
                             {
                                 try (RoutedProducer<Notification, NotificationKey> notificationsProducer = notificationQueue.publishNotifications())
@@ -288,6 +287,7 @@ public class BergamotConfigImporter
                                     }
                                 }
                             }
+                            */
                         }
                     }
                 }
@@ -1981,21 +1981,21 @@ public class BergamotConfigImporter
     private void scheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Scheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new ScheduleCheck(check.getId())));
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new EnableCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new ScheduleCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new EnableCheck(check.getId())));
     }
     
     private void rescheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Rescheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new RescheduleCheck(check.getId())));
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new EnableCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new RescheduleCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new EnableCheck(check.getId())));
     }
     
     private void unscheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Unscheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(check.getId(), new UnscheduleCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new UnscheduleCheck(check.getId())));
     }
     
     private static class CascadedChange
@@ -2017,13 +2017,10 @@ public class BergamotConfigImporter
     
     public static class DelayedSchedulerAction
     {
-        public UUID key;
-        
         public SchedulerAction action;
         
-        public DelayedSchedulerAction(UUID key, SchedulerAction action)
+        public DelayedSchedulerAction(SchedulerAction action)
         {
-            this.key = key;
             this.action = action;
         }
     }

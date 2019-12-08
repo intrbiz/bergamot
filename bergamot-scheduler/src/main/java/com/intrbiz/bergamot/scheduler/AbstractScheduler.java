@@ -1,6 +1,5 @@
 package com.intrbiz.bergamot.scheduler;
 
-import java.util.Collection;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -39,10 +38,6 @@ public abstract class AbstractScheduler implements Scheduler
         return this.poolId;
     }
     
-    public void start() throws Exception
-    {
-    }
-    
     protected PublishStatus publishExecuteCheck(ExecuteCheck check)
     {
         if (logger.isTraceEnabled())
@@ -73,15 +68,6 @@ public abstract class AbstractScheduler implements Scheduler
         this.processingPoolProducer.publishResult(this.poolId, result);
     }
     
-    @Override
-    public void schedule(Collection<ActiveCheck<?, ?>> checks)
-    {
-        for (ActiveCheck<?, ?> check : checks)
-        {
-            this.schedule(check);
-        }
-    }
-    
     public void schedulePool(UUID siteId, int processingPool)
     {
         logger.info("Scheduling all checks in pool " + siteId + "." + processingPool);
@@ -97,5 +83,17 @@ public abstract class AbstractScheduler implements Scheduler
             }
         }
     }
-    
+
+    @Override
+    public void schedule(UUID checkId)
+    {
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            ActiveCheck<?,?> check = db.getActiveCheck(checkId);
+            if (check != null)
+            {
+                this.schedule(check);
+            }
+        }
+    }
 }

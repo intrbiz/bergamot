@@ -3,8 +3,9 @@ package com.intrbiz.bergamot.processor;
 import java.util.UUID;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolCoordinator;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerCoordinator;
+import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
+import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
@@ -16,9 +17,11 @@ public class BergamotProcessor
 {
     private final HazelcastInstance hazelcastInstance;
     
-    private final WorkerCoordinator workerCoordinator;
+    private final SiteEventBroker siteEventBroker;
     
-    private final ProcessingPoolCoordinator processingPoolCoordinator;
+    private final WorkerClusterCoordinator workerCoordinator;
+    
+    private final ProcessingPoolClusterCoordinator processingPoolCoordinator;
     
     private final UUID id;
     
@@ -26,13 +29,14 @@ public class BergamotProcessor
     
     private ResultProcessor resultProcessor;
 
-    public BergamotProcessor(HazelcastInstance hazelcastInstance)
+    public BergamotProcessor(HazelcastInstance hazelcastInstance, SiteEventBroker siteEventBroker)
     {
         super();
         this.hazelcastInstance = hazelcastInstance;
+        this.siteEventBroker = siteEventBroker;
         // coordinators
-        this.workerCoordinator = new WorkerCoordinator(this.hazelcastInstance);
-        this.processingPoolCoordinator = new ProcessingPoolCoordinator(this.hazelcastInstance);
+        this.workerCoordinator = new WorkerClusterCoordinator(this.hazelcastInstance);
+        this.processingPoolCoordinator = new ProcessingPoolClusterCoordinator(this.hazelcastInstance, this.siteEventBroker);
         this.id = this.processingPoolCoordinator.getId();
     }
     
@@ -61,17 +65,22 @@ public class BergamotProcessor
         }
     }
 
+    public SiteEventBroker getSiteEventBroker()
+    {
+        return siteEventBroker;
+    }
+
     public HazelcastInstance getHazelcastInstance()
     {
         return hazelcastInstance;
     }
 
-    public WorkerCoordinator getWorkerCoordinator()
+    public WorkerClusterCoordinator getWorkerCoordinator()
     {
         return workerCoordinator;
     }
 
-    public ProcessingPoolCoordinator getProcessingPoolCoordinator()
+    public ProcessingPoolClusterCoordinator getProcessingPoolCoordinator()
     {
         return processingPoolCoordinator;
     }

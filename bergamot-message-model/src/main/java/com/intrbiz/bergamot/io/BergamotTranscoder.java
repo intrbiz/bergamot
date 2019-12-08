@@ -119,9 +119,7 @@ import com.intrbiz.bergamot.model.message.result.MatchOnTrapName;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.PauseScheduler;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.ResumeScheduler;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
@@ -208,8 +206,6 @@ public class BergamotTranscoder
         ScheduleCheck.class,
         RescheduleCheck.class,
         UnscheduleCheck.class,
-        PauseScheduler.class,
-        ResumeScheduler.class,
         // API
         APIError.class,
         APIPing.class,
