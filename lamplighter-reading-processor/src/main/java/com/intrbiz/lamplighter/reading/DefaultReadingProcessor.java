@@ -1,9 +1,11 @@
 package com.intrbiz.lamplighter.reading;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
@@ -37,9 +39,9 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
     
     private ReadingScalers scalers = new ReadingScalers();
 
-    public DefaultReadingProcessor()
+    public DefaultReadingProcessor(UUID poolId, ProcessingPoolConsumer consumer)
     {
-        super();
+        super(poolId, consumer);
     }
 
     @Override

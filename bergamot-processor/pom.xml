@@ -19,5 +19,9 @@
   		<groupId>com.intrbiz.bergamot</groupId>
   		<artifactId>bergamot-scheduler</artifactId>
   	</dependency>
+  	<dependency>
+  		<groupId>com.intrbiz.bergamot</groupId>
+  		<artifactId>lamplighter-reading-processor</artifactId>
+  	</dependency>
   </dependencies>
 </project>

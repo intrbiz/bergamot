@@ -6,12 +6,15 @@ import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 import com.intrbiz.bergamot.result.ResultProcessor;
 import com.intrbiz.bergamot.scheduler.Scheduler;
 import com.intrbiz.bergamot.scheduler.WheelScheduler;
+import com.intrbiz.lamplighter.reading.DefaultReadingProcessor;
+import com.intrbiz.lamplighter.reading.ReadingProcessor;
 
 public class BergamotProcessor
 {
@@ -28,6 +31,8 @@ public class BergamotProcessor
     private Scheduler scheduler;
     
     private ResultProcessor resultProcessor;
+    
+    private ReadingProcessor readingProcessor;
 
     public BergamotProcessor(HazelcastInstance hazelcastInstance, SiteEventBroker siteEventBroker)
     {
@@ -45,9 +50,12 @@ public class BergamotProcessor
         // create and start our scheduler
         this.scheduler = new WheelScheduler(this.id, this.workerCoordinator.createCheckProducer(), this.processingPoolCoordinator.createProcessingPoolProducer());
         // create and start our result processor
-        this.resultProcessor = new DefaultResultProcessor(this.id, this.processingPoolCoordinator.startProcessingPool(this.scheduler));
+        ProcessingPoolConsumer consumer = this.processingPoolCoordinator.startProcessingPool(this.scheduler);
+        this.resultProcessor = new DefaultResultProcessor(this.id, consumer);
+        this.readingProcessor = new DefaultReadingProcessor(this.id, consumer);
         // start
         this.resultProcessor.start();
+        this.readingProcessor.start();
         this.scheduler.start();
     }
     

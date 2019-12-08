@@ -25,7 +25,11 @@
     </dependency>
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-queue</artifactId>
+    	<artifactId>bergamot-cluster</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.bergamot</groupId>
+    	<artifactId>bergamot-model</artifactId>
     </dependency>
     <dependency>
     	<groupId>com.intrbiz.bergamot</groupId>
