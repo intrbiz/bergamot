@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.bergamot.agent.config.Configuration;
+import com.intrbiz.configuration.Configuration;
 
 @XmlType(name = "site")
 @XmlRootElement(name = "site")
