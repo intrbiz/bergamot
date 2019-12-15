@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 
 
@@ -40,7 +41,7 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Executing Nagios plugin via Bergamot Agent");
         try
@@ -71,26 +72,26 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
                     result.setStatus(stat.getStatus());
                     result.setOutput(stat.getOutput());
                     result.runtime(runtime);
-                    this.publishActiveResult(executeCheck, result);
+                    context.publishActiveResult(result);
                     // readings
                     if (stat.getReadings().size() > 0)
                     {
                         ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
                         readings.setCaptured(System.currentTimeMillis());
                         readings.getReadings().addAll(stat.getReadings());
-                        this.publishReading(executeCheck, readings);
+                        context.publishReading(readings);
                     }
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

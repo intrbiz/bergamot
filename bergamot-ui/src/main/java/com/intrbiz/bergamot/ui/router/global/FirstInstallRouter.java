@@ -27,7 +27,6 @@ import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
 import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
 import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
 import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.model.message.event.site.InitSite;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
@@ -168,9 +167,10 @@ public class FirstInstallRouter extends Router<BergamotApp>
             }
         }
         // now create the site
+        Site site = new Site(siteId, siteName, siteSummary);
         try (BergamotDB db = BergamotDB.connect())
         {
-            db.setSite(new Site(siteId, siteName, siteSummary));
+            db.setSite(site);
         }
         // setup the readings
         try (LamplighterDB db = LamplighterDB.connect())
@@ -201,28 +201,8 @@ public class FirstInstallRouter extends Router<BergamotApp>
                 }
             }
         }
-        // message the UI cluster to setup the site
-        // TODO:
-        /*
-        try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
-        {
-            try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
-            {
-                try
-                {
-                    ClusterManagerResponse response = client.publish(new InitSite(siteId, siteName)).get(30, TimeUnit.SECONDS);
-                    if (response instanceof InitedSite)
-                    {
-                        logger.info("Initialised site with UI cluster");
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.error("Failed to initialise site with UI cluster");
-                }
-            }
-        }
-        */
+        // broadcast a site init event
+        action("site-init", site);
         // all done
         logger.info("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
         // mark first install as complete

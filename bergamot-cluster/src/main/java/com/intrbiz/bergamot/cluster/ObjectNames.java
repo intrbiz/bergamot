@@ -54,6 +54,16 @@ public final class ObjectNames
         return "bergamot.topic.event.site";
     }
     
+    public static final String getSiteNotificationTopicName(UUID site)
+    {
+        return "bergamot.topic.notification.site." + site;
+    }
+    
+    public static final String getSiteUpdateTopicName(UUID site)
+    {
+        return "bergamot.topic.update.site." + site;
+    }
+    
     public static final String getClusterManagerLock()
     {
         return "bergamot.lock.cluster.manager";

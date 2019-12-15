@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
@@ -40,7 +41,7 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent CPU Usage");
         try
@@ -59,14 +60,14 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
                     CPUStat stat = (CPUStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got CPU usage in " + runtime + "ms: " + stat);
                     // apply the check
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             stat.getTotalUsage().getTotal(), 
                             executeCheck.getPercentParameter("cpu_warning", 0.8D), 
                             executeCheck.getPercentParameter("cpu_critical", 0.9D), 
                             "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
                     ).runtime(runtime));
                     // readings
-                    this.publishReading(executeCheck, 
+                    context.publishReading(executeCheck, 
                         new DoubleGaugeReading("cpu-usage-total", "%", UnitUtil.toPercent(stat.getTotalUsage().getTotal()), UnitUtil.toPercent(executeCheck.getPercentParameter("cpu_warning", 0.8D)), UnitUtil.toPercent(executeCheck.getPercentParameter("cpu_critical", 0.9D)), 1D, 100D),
                         new DoubleGaugeReading("cpu-usage-system", "%", UnitUtil.toPercent(stat.getTotalUsage().getSystem()), null, null, 1D, 100D),
                         new DoubleGaugeReading("cpu-usage-user", "%", UnitUtil.toPercent(stat.getTotalUsage().getUser()), null, null, 1D, 100D),
@@ -77,12 +78,12 @@ public class CPUExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

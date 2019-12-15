@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.cluster.coordinator;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
 
 /**
  * Manage scheduling and result processing services across the cluster

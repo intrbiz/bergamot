@@ -19,7 +19,7 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
 {
     public DefaultResultProcessorTests()
     {
-        super(UUID.randomUUID(), null);
+        super(UUID.randomUUID(), null, null, null, null);
     }
 
     private CheckState newState(Status status, boolean hard, int attempt, boolean transitioning, Status lastStatus, boolean lastHard)

@@ -1,32 +1,27 @@
 package com.intrbiz.bergamot.updater.handler;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
-import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.update.AlertUpdate;
 import com.intrbiz.bergamot.model.message.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.update.GroupUpdate;
 import com.intrbiz.bergamot.model.message.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.update.Update;
-import com.intrbiz.bergamot.queue.UpdateQueue;
-import com.intrbiz.bergamot.queue.key.UpdateKey;
-import com.intrbiz.bergamot.queue.key.UpdateKey.UpdateType;
 import com.intrbiz.bergamot.updater.context.ClientContext;
-import com.intrbiz.queue.Consumer;
-import com.intrbiz.queue.QueueException;
 
 public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates>
 {
+    private static final String VAR_UPDATE_LISTENER_ID = "update.listener.id";
+    
+    private static final String VAR_UPDATE_BINDNGS = "update.bindings";
+    
     private Logger logger = Logger.getLogger(RegisterForUpdatesHandler.class);
     
     public RegisterForUpdatesHandler()
@@ -37,55 +32,23 @@ public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates
     @Override
     public void onRequest(ClientContext context, RegisterForUpdates request)
     {
-        // setup the queue
-        if (context.var("updateConsumer") == null)
+        // setup the listener
+        context.computeVarIfAbsent(VAR_UPDATE_LISTENER_ID, (key) -> {
+            logger.debug("Listening for update on " + context.getSite().getId());
+            return context.app().getUpdateBroker().listen(context.getSite().getId(), (update) -> {
+                sendUpdate(context, update);
+            });
+        });
+        // update the bindings
+        context.mergeVar(VAR_UPDATE_BINDNGS, extractBindings(request), RegisterForUpdatesHandler::mergeBindings);
+    }
+    
+    public void onClose(ClientContext context)
+    {
+        String listenerId = context.removeVar(VAR_UPDATE_LISTENER_ID);
+        if (listenerId != null)
         {
-            try
-            {
-                // the bindings
-                Set<UpdateKey> bindings = this.computeBindings(context, request);
-                logger.debug("Reigster for updates: " + bindings);
-                // setup the queue
-                UpdateQueue queue = context.var("updateQueue", UpdateQueue.open());
-                context.var("updateConsumer", queue.consumeUpdates((h, u) -> { this.sendUpdate(context, u); }, bindings));
-                // on close handler
-                context.onClose((ctx) -> {
-                    Consumer<Update, UpdateKey> c = ctx.var("updateConsumer");
-                    if (c != null) c.close();
-                    UpdateQueue q = ctx.var("updateQueue");
-                    if (q != null) q.close();
-                });
-                // done
-                context.send(new RegisteredForUpdates(request));
-            }
-            catch (QueueException e)
-            {
-                context.var("updateQueue", null);
-                context.var("updateConsumer", null);
-                logger.error("Failed to setup queue", e);
-                context.send(new APIError("Failed to setup queue"));
-            }
-        }
-        else
-        {
-            try
-            {
-                Set<UpdateKey> bindings = this.computeBindings(context, request);
-                logger.debug("Reigster for updates: " + bindings);
-                // update the bindings
-                Consumer<Update, UpdateKey> updateConsumer = context.var("updateConsumer");
-                for (UpdateKey binding : bindings)
-                {
-                    logger.debug("Updating bindings, adding: " + binding);
-                    updateConsumer.addBinding(binding);
-                }
-                context.send(new RegisteredForUpdates(request));
-            }
-            catch (QueueException e)
-            {
-                logger.error("Failed to update queue bindings", e);
-                context.send(new APIError("Failed to setup queue"));
-            }
+            context.app().getUpdateBroker().unlisten(context.getSite().getId(), listenerId);
         }
     }
     
@@ -128,16 +91,16 @@ public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates
         }
     }
     
-    private Set<UpdateKey> computeBindings(ClientContext context, RegisterForUpdates rfsn)
+    private static Set<UUID> extractBindings(RegisterForUpdates rfsn)
     {
-        // the type of updates we are listening for
-        UpdateType type = UpdateType.valueOf(Util.coalesceEmpty(rfsn.getUpdateType(), "check").toUpperCase());
-        // wildcard ?
-        if ((rfsn.getIds() == null || rfsn.getIds().isEmpty()))
-        {
-            return new HashSet<UpdateKey>(Arrays.asList(new UpdateKey(type, context.getSite().getId())));
-        }
-        // compute the bindings
-        return rfsn.getIds().stream().map((id) -> new UpdateKey(type, context.getSite().getId(), id)).collect(Collectors.toSet());
+        return new HashSet<>(rfsn.getIds());
+    }
+    
+    private static Set<UUID> mergeBindings(Set<UUID> a, Set<UUID> b)
+    {
+        Set<UUID> bindings = new HashSet<>();
+        if (a != null)  bindings.addAll(a);
+        if (b != null)  bindings.addAll(b);
+        return bindings;
     }
 }

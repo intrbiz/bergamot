@@ -24,8 +24,10 @@ import com.intrbiz.bergamot.model.message.command.RegisteredBergamotAgent;
 import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.worker.config.AgentWorkerCfg;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.queue.RPCClient;
 import com.intrbiz.queue.name.RoutingKey;
+import com.intrbiz.snmp.SNMPTransport;
 
 /**
  * Execute Bergamot Agent checks via the Bergamot Agent Server
@@ -40,52 +42,39 @@ public class AgentEngine extends AbstractEngine
 
     public AgentEngine()
     {
-        super(NAME);
+        super(NAME,
+                new PresenceExecutor(), 
+                new CPUExecutor(), 
+                new MemoryExecutor(), 
+                new DiskExecutor(),
+                new DisksExecutor(),
+                new OSExecutor(),
+                new UptimeExecutor(),
+                new NagiosExecutor(),
+                new UsersExecutor(),
+                new ProcessesExecutor(),
+                new ProcessStatsExecutor(),
+                new AgentExecutor(),
+                new AgentMemoryExecutor(),
+                new NetConExecutor(),
+                new PortListenerExecutor(),
+                new NetIOExecutor(),
+                new DiskIOExecutor(),
+                new LoadExecutor(),
+                new MetricsExecutor(),
+                new ScriptExecutor()
+        );
     }
     
     @Override
-    public boolean isAgentRouted()
+    public void doPrepare(EngineContext engineContext) throws Exception
     {
-        return true;
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        // setup executors
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new PresenceExecutor());
-            this.addExecutor(new CPUExecutor());
-            this.addExecutor(new MemoryExecutor());
-            this.addExecutor(new DiskExecutor());
-            this.addExecutor(new DisksExecutor());
-            this.addExecutor(new OSExecutor());
-            this.addExecutor(new UptimeExecutor());
-            this.addExecutor(new NagiosExecutor());
-            this.addExecutor(new UsersExecutor());
-            this.addExecutor(new ProcessesExecutor());
-            this.addExecutor(new ProcessStatsExecutor());
-            this.addExecutor(new AgentExecutor());
-            this.addExecutor(new AgentMemoryExecutor());
-            this.addExecutor(new NetConExecutor());
-            this.addExecutor(new PortListenerExecutor());
-            this.addExecutor(new NetIOExecutor());
-            this.addExecutor(new DiskIOExecutor());
-            this.addExecutor(new LoadExecutor());
-            this.addExecutor(new MetricsExecutor());
-            this.addExecutor(new ScriptExecutor());
-        }
-    }
-    
-    @Override
-    public void start() throws Exception
-    {
+        // setup the transport
+        int port = engineContext.getConfiguration().getIntParameterValue("agent-port", 8161);
         // create our agent server
         this.agentServer = new BergamotAgentServer();
-        AgentWorkerCfg workerCfg = (AgentWorkerCfg) this.getWorker().getConfiguration();
-        BergamotAgentServerCfg serverCfg = workerCfg.getAgentServer();
+        // AgentWorkerCfg workerCfg = (AgentWorkerCfg) this.getWorker().getConfiguration();
+        // BergamotAgentServerCfg serverCfg = workerCfg.getAgentServer();
         // use a static configuration or dynamically request certificates from the agent manager
         if (serverCfg == null)
         {
@@ -105,8 +94,11 @@ public class AgentEngine extends AbstractEngine
         });
         // setup the registration callback
         this.agentServer.setOnRequestAgentRegistration(this::registerAgent);
-        // setup queues etc
-        super.start();
+    }
+    
+    @Override
+    public void doStart(EngineContext engineContext) throws Exception
+    {
         // start the agent server
         this.agentServer.start();
     }
@@ -165,6 +157,7 @@ public class AgentEngine extends AbstractEngine
         // log
         logger.info("Got request to register agent using template: " + templateId + ", agent id: " + request.getAgentId() + " common name: " + request.getCommonName());
         // send the command
+        /*
         this.getCommandRPCClient().publish(60_000L, command, (response) -> {
             if (response instanceof RegisteredBergamotAgent)
             {
@@ -183,5 +176,6 @@ public class AgentEngine extends AbstractEngine
         }, (error) -> {
             callback.send(new AgentRegistrationFailed(request, ErrorCode.GENERAL, error.getMessage()));
         });
+        */
     }
 }

@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
@@ -40,7 +41,7 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent Uptime");
         try
@@ -78,20 +79,20 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
                     }
                     // submit
                     result.runtime(runtime);
-                    this.publishActiveResult(executeCheck, result);
+                    context.publishActiveResult(result);
                     // readings
-                    this.publishReading(executeCheck, new DoubleGaugeReading("uptime", "s", stat.getUptime()));
+                    context.publishReading(executeCheck, new DoubleGaugeReading("uptime", "s", stat.getUptime()));
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
     

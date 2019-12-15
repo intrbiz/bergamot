@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
@@ -40,7 +41,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent Memory Usage");
         try
@@ -59,7 +60,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                     MemStat stat = (MemStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got Memory usage in " + runtime + "ms: " + stat);
                     // check
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
                             UnitUtil.toRatio((executeCheck.getBooleanParameter("ignore_caches", true) ? stat.getActualUsedMemory() : stat.getUsedMemory()), stat.getTotalMemory()),
                             executeCheck.getPercentParameter("warning", 0.8F), 
                             executeCheck.getPercentParameter("critical", 0.9F),
@@ -68,7 +69,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                     // readings
                     double warning  = (executeCheck.getPercentParameter("warning", 0.8F) * stat.getTotalMemory()) / UnitUtil.Mi;
                     double critical = (executeCheck.getPercentParameter("critical", 0.9F) * stat.getTotalMemory()) / UnitUtil.Mi;
-                    this.publishReading(executeCheck, 
+                    context.publishReading(executeCheck, 
                         new DoubleGaugeReading("actual-used", "MiB", (double) (stat.getActualUsedMemory() / UnitUtil.Mi), warning, critical, 0D, (double) (stat.getTotalMemory()  / UnitUtil.Mi)),
                         new DoubleGaugeReading("used", "MiB", (double) (stat.getUsedMemory() / UnitUtil.Mi), warning, critical, 0D, (double) (stat.getTotalMemory()  / UnitUtil.Mi))
                     );
@@ -77,12 +78,12 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

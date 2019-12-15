@@ -109,7 +109,7 @@ public abstract class AbstractEngine implements Engine
     }
     
     protected void doPrepare(EngineContext engineContext) throws Exception
-    {        
+    {
     }
     
     protected void doStart(EngineContext engineContext) throws Exception

@@ -18,4 +18,8 @@ public abstract class RequestHandler<T extends APIRequest>
     }
     
     public abstract void onRequest(ClientContext context, T request);
+    
+    public void onClose(ClientContext context)
+    {
+    }
 }

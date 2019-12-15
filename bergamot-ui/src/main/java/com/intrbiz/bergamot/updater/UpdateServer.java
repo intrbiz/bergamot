@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.updater;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -70,6 +71,11 @@ public class UpdateServer implements Runnable
     {
         RequestHandler<?> handler = this.handlers.get(type);
         return handler == null ? this.defaultHandler : handler;
+    }
+    
+    public Collection<RequestHandler<?>> getHandlers()
+    {
+        return this.handlers.values();
     }
 
     public void run()

@@ -9,8 +9,8 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
-import com.intrbiz.bergamot.queue.key.PassiveResultKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 /**
@@ -37,7 +37,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent presence");
         try
@@ -50,18 +50,18 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             if (agent != null)
             {
                 agent.sendOnePingAndOnePingOnly((rtt) -> {
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentName() + " connected. Latency: " + rtt + "ms").runtime(rtt));
-                    this.publishReading(executeCheck, new LongGaugeReading("latency", "ms", rtt));
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentName() + " connected. Latency: " + rtt + "ms").runtime(rtt));
+                    context.publishReading(executeCheck, new LongGaugeReading("latency", "ms", rtt));
                 });
             }
             else
             {
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
     
@@ -74,7 +74,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             // publish a passive result for the presence of this host
             if (logger.isTraceEnabled()) logger.trace("Got agent connection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
             // submit a passive result for the host
-            this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
+            this.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
         });
         // on disconnection
         this.getEngine().getAgentServer().setOnAgentUnregisterHandler((handler) -> {
@@ -82,7 +82,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             // debug log
             if (logger.isTraceEnabled()) logger.trace("Got agent disconnection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
             // submit a passive result for the host
-            this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).disconnected("Bergamot Agent disconnected"));
+            this.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).disconnected("Bergamot Agent disconnected"));
         });
         // on ping?
         // disabled by default as this will send a result every 30 seconds
@@ -92,7 +92,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
                 // publish a passive result for the presence of this host
                 if (logger.isTraceEnabled()) logger.trace("Got agent ping: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
                 // submit a passive result for the host
-                this.publishResult(new PassiveResultKey(handler.getSiteId()), new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
+                this.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
             });
         }
     }

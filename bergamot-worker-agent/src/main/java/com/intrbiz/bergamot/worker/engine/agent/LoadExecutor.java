@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
@@ -39,7 +40,7 @@ public class LoadExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent CPU Usage");
         try
@@ -77,9 +78,9 @@ public class LoadExecutor extends AbstractExecutor<AgentEngine>
                     if (load15Warning > 0 && load15critical > 0)
                         result.applyGreaterThanThreshold(stat.getLoad15(), load15Warning, load15critical, message);
                     // publish
-                    this.publishActiveResult(executeCheck, result.runtime(runtime));
+                    context.publishActiveResult(result.runtime(runtime));
                     // readings
-                    this.publishReading(executeCheck, 
+                    context.publishReading(executeCheck, 
                         new DoubleGaugeReading("load-1",  null, stat.getLoad1(),  load1Warning  < 0 ? null : load1Warning,  load1critical  < 0 ? null : load1critical,  null, null),
                         new DoubleGaugeReading("load-5",  null, stat.getLoad5(),  load5Warning  < 0 ? null : load5Warning,  load5critical  < 0 ? null : load5critical,  null, null),
                         new DoubleGaugeReading("load-15", null, stat.getLoad15(), load15Warning < 0 ? null : load15Warning, load15critical < 0 ? null : load15critical, null, null)
@@ -89,12 +90,12 @@ public class LoadExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 
@@ -49,7 +50,7 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
      *   critical  - the throughput critical threshold in Mb/s
      */
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent network io");
         try
@@ -72,7 +73,7 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
                     double critical = executeCheck.getDoubleParameter("critical", 75);
                     // apply the check
                     boolean peak = executeCheck.getBooleanParameter("peak", false);
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
                             stat.getIfaces(),
                             (v, t) -> (peak ? v.getFiveMinuteRate().getTxPeakRateMbps(): v.getFiveMinuteRate().getTxRateMbps()) > t || (peak ? v.getFiveMinuteRate().getRxPeakRateMbps(): v.getFiveMinuteRate().getRxRateMbps()) > t,
                             warning, 
@@ -93,18 +94,18 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
                         readings.reading(new DoubleGaugeReading("tx-rate-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getTxRateMbps(), warning, critical, null, null));
                         readings.reading(new DoubleGaugeReading("tx-rate-peak-[" + iface.getName() + "]", "Mb/s", iface.getFiveMinuteRate().getTxPeakRateMbps(), warning, critical, null, null));
                     }
-                    this.publishReading(executeCheck, readings);
+                    context.publishReading(readings);
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

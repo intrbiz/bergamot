@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
+import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
+import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
@@ -18,9 +20,13 @@ import com.intrbiz.lamplighter.reading.ReadingProcessor;
 
 public class BergamotProcessor
 {
-    private final HazelcastInstance hazelcastInstance;
+    private final HazelcastInstance hazelcast;
     
     private final SiteEventBroker siteEventBroker;
+    
+    private final SiteNotificationBroker notificationBroker;
+    
+    private final SiteUpdateBroker updateBroker;
     
     private final WorkerClusterCoordinator workerCoordinator;
     
@@ -34,14 +40,17 @@ public class BergamotProcessor
     
     private ReadingProcessor readingProcessor;
 
-    public BergamotProcessor(HazelcastInstance hazelcastInstance, SiteEventBroker siteEventBroker)
+    public BergamotProcessor(HazelcastInstance hazelcast)
     {
         super();
-        this.hazelcastInstance = hazelcastInstance;
-        this.siteEventBroker = siteEventBroker;
+        this.hazelcast = hazelcast;
+        // brokers
+        this.siteEventBroker = new SiteEventBroker(this.hazelcast);
+        this.notificationBroker = new SiteNotificationBroker(this.hazelcast);
+        this.updateBroker = new SiteUpdateBroker(this.hazelcast);
         // coordinators
-        this.workerCoordinator = new WorkerClusterCoordinator(this.hazelcastInstance);
-        this.processingPoolCoordinator = new ProcessingPoolClusterCoordinator(this.hazelcastInstance, this.siteEventBroker);
+        this.workerCoordinator = new WorkerClusterCoordinator(this.hazelcast);
+        this.processingPoolCoordinator = new ProcessingPoolClusterCoordinator(this.hazelcast, this.siteEventBroker);
         this.id = this.processingPoolCoordinator.getId();
     }
     
@@ -51,7 +60,7 @@ public class BergamotProcessor
         this.scheduler = new WheelScheduler(this.id, this.workerCoordinator.createCheckProducer(), this.processingPoolCoordinator.createProcessingPoolProducer());
         // create and start our result processor
         ProcessingPoolConsumer consumer = this.processingPoolCoordinator.startProcessingPool(this.scheduler);
-        this.resultProcessor = new DefaultResultProcessor(this.id, consumer);
+        this.resultProcessor = new DefaultResultProcessor(this.id, consumer, this.processingPoolCoordinator.createSchedulerActionProducer(), this.notificationBroker, this.updateBroker);
         this.readingProcessor = new DefaultReadingProcessor(this.id, consumer);
         // start
         this.resultProcessor.start();
@@ -78,9 +87,19 @@ public class BergamotProcessor
         return siteEventBroker;
     }
 
+    public SiteNotificationBroker getNotificationBroker()
+    {
+        return notificationBroker;
+    }
+
+    public SiteUpdateBroker getUpdateBroker()
+    {
+        return updateBroker;
+    }
+
     public HazelcastInstance getHazelcastInstance()
     {
-        return hazelcastInstance;
+        return hazelcast;
     }
 
     public WorkerClusterCoordinator getWorkerCoordinator()

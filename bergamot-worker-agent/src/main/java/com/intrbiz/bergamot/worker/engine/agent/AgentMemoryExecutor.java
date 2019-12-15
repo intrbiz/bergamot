@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 /**
  * Check internal memory usage of a Bergamot Agent
@@ -36,7 +37,7 @@ public class AgentMemoryExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent memory");
         try
@@ -56,7 +57,7 @@ public class AgentMemoryExecutor extends AbstractExecutor<AgentEngine>
                     if (logger.isTraceEnabled()) logger.trace("Got agent info in " + runtime + "ms: " + stat);
                     // check
                     
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyLessThanThreshold(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyLessThanThreshold(
                             stat.getFreeMemory(),
                             UnitUtil.parse(executeCheck.getParameter("warning", "10MiB"), 5 * UnitUtil.Mi), 
                             UnitUtil.parse(executeCheck.getParameter("critical", "5MiB"), 10 * UnitUtil.Mi),
@@ -67,12 +68,12 @@ public class AgentMemoryExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

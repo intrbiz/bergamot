@@ -136,7 +136,6 @@
     <module>bergamot-worker-jdbc</module>
     <module>bergamot-check-jdbc</module>
     <module>bergamot-accounting-model</module>
-    <module>bergamot-accounting-consumer</module>
     <module>bergamot-check-jmx</module>
     <module>bergamot-worker-jmx</module>
     <module>bergamot-worker-ssh</module>
