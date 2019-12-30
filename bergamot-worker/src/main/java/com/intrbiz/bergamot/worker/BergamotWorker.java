@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.worker;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,6 +95,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     
     private String info;
     
+    private String hostName;
+    
     private int threadCount;
     
     private HazelcastInstance hazelcast;
@@ -158,6 +161,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         }
         this.workerPool = this.configuration.getWorkerPool();
         this.info = this.configuration.getInfo();
+        this.hostName = InetAddress.getLocalHost().getHostName();
         this.threadCount = this.configuration.getThreads();
         // register engines 
         for (Entry<String, Supplier<Engine>> availableEngine : AVAILABLE_ENGINES.entrySet())
@@ -221,7 +225,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         this.poolCoordinator = new ProcessingPoolClientCoordinator(this.hazelcast);
         // Register ourselves
         this.producer = this.poolCoordinator.createProcessingPoolProducer();
-        this.consumer = this.workerCoordinator.registerWorker(this.id, false, DAEMON_NAME, this.info, this.sites, this.workerPool, this.engines.keySet()); 
+        this.consumer = this.workerCoordinator.registerWorker(this.id, false, DAEMON_NAME, this.info, this.hostName, this.sites, this.workerPool, this.engines.keySet()); 
     }
     
     protected void createExecutors() throws Exception
@@ -246,7 +250,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
                             // execute the check
                             CheckExecutionContext context = createExecutionContext(check);
                             Engine engine = this.engines.get(check.getEngine());
-                            if (engine != null)
+                            if (engine != null && engine.accept(check))
                             {
                                 engine.execute(check, context);
                             }

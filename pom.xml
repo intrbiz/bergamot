@@ -103,7 +103,6 @@
     <module>bergamot-util</module>
     <module>bergamot-message-model</module>
     <module>bergamot-model</module>
-    <module>bergamot-queue</module>
     <module>bergamot-notification-api</module>
     <module>bergamot-worker-api</module>
     <module>bergamot-result-processor</module>
@@ -126,7 +125,6 @@
     <module>bergamot-crypto-util</module>
     <module>bergamot-nagios</module>
     <module>bergamot-worker-agent</module>
-    <module>bergamot-agent-manager</module>
     <module>bergamot-agent-config</module>
     <module>bergamot-agent-server-config</module>
     <module>bergamot-worker-dummy</module>
@@ -145,6 +143,7 @@
     <module>bergamot-worker</module>
     <module>bergamot-cluster</module>
     <module>bergamot-processor</module>
+    <module>bergamot-notifier</module>
   </modules>
   
   <dependencyManagement>
@@ -187,11 +186,6 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-message-model</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-queue</artifactId>
   			<version>${project.version}</version>
   		</dependency>
   		<dependency>
@@ -282,6 +276,11 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-processor</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>com.intrbiz.bergamot</groupId>
+  			<artifactId>bergamot-notifier</artifactId>
   			<version>${project.version}</version>
   		</dependency>
   		<dependency>
@@ -459,11 +458,6 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-accounting-model</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-accounting-consumer</artifactId>
   			<version>${project.version}</version>
   		</dependency>
   		<dependency>

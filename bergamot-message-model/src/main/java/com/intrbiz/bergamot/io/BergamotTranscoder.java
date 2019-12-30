@@ -86,7 +86,6 @@ import com.intrbiz.bergamot.model.message.command.GeneralCommandError;
 import com.intrbiz.bergamot.model.message.command.RegisterBergamotAgent;
 import com.intrbiz.bergamot.model.message.command.RegisteredBergamotAgent;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
-import com.intrbiz.bergamot.model.message.event.control.RegisterWatcher;
 import com.intrbiz.bergamot.model.message.event.global.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
@@ -221,8 +220,6 @@ public class BergamotTranscoder
         AdhocResultEvent.class,
         ExecuteAdhocCheck.class,
         ExecutedAdhocCheck.class,
-        // control
-        RegisterWatcher.class,
         // watcher
         RegisterCheck.class,
         UnregisterCheck.class,

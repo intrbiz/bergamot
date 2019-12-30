@@ -16,7 +16,7 @@ import io.netty.handler.ssl.SslHandshakeCompletionEvent;
 
 public class SlackClientHandler extends ChannelInboundHandlerAdapter
 {
-    private final Logger logger = Logger.getLogger(SlackClientHandler.class);
+    private static final Logger logger = Logger.getLogger(SlackClientHandler.class);
     
     private volatile long start;
     
@@ -45,7 +45,7 @@ public class SlackClientHandler extends ChannelInboundHandlerAdapter
         {
             FullHttpResponse response = (FullHttpResponse) msg;
             long runtime = System.currentTimeMillis() - this.start;
-            logger.info("Slack WebHook: Got HTTP response: " + response.getStatus() + " in: " + runtime + "ms");
+            logger.info("Slack WebHook: Got HTTP response: " + response.status() + " in: " + runtime + "ms");
             if (logger.isTraceEnabled())
             {
                 logger.trace("Response:\n" + response);

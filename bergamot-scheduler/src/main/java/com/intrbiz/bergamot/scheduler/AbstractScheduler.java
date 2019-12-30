@@ -4,9 +4,9 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
 import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
-import com.intrbiz.bergamot.cluster.queue.WorkerProducer.PublishStatus;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Host;
@@ -43,7 +43,7 @@ public abstract class AbstractScheduler implements Scheduler
         if (logger.isTraceEnabled())
             logger.trace("Publishing execute check\n" + check);
         // publish
-        PublishStatus status =  this.WorkerProducer.publishCheck(check);
+        PublishStatus status =  this.WorkerProducer.executeCheck(check);
         if (status != PublishStatus.Success)
         {
             this.publishFailedCheck(check, status);

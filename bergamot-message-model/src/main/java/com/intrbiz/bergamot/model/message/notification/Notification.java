@@ -14,8 +14,13 @@ import com.intrbiz.bergamot.model.message.SiteMO;
  */
 public abstract class Notification extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("raised")
     private long raised;
+    
+    @JsonProperty("engine")
+    private String engine;
 
     @JsonProperty("to")
     private List<ContactMO> to = new LinkedList<ContactMO>();
@@ -26,6 +31,13 @@ public abstract class Notification extends Message
     public Notification()
     {
         super();
+    }
+    
+    public <T extends Notification> T cloneNotification(String engine)
+    {
+        T notification = this.cloneMessge();
+        notification.setEngine(engine);
+        return notification;
     }
     
     @JsonIgnore
@@ -39,6 +51,16 @@ public abstract class Notification extends Message
     public void setRaised(long raised)
     {
         this.raised = raised;
+    }
+
+    public String getEngine()
+    {
+        return engine;
+    }
+
+    public void setEngine(String engine)
+    {
+        this.engine = engine;
     }
 
     public List<ContactMO> getTo()

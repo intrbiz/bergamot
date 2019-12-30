@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.cluster.model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -52,13 +53,16 @@ public class WorkerRegistration implements Serializable
      */
     private String info;
     
-    public WorkerRegistration(UUID id, boolean proxy, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
+    private String hostName;
+    
+    public WorkerRegistration(UUID id, boolean proxy, String application, String info, String hostName, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
     {
         super();
         this.id = Objects.requireNonNull(id);
         this.proxy = proxy;
         this.application = application;
         this.info = info;
+        this.hostName = hostName;
         this.restrictedSiteIds = (restrictedSiteIds == null || restrictedSiteIds.isEmpty()) ? null : restrictedSiteIds.toArray(new UUID[restrictedSiteIds.size()]);
         this.workerPool = workerPool;
         this.availableEngines = Objects.requireNonNull(availableEngines).toArray(new String[availableEngines.size()]);
@@ -102,5 +106,40 @@ public class WorkerRegistration implements Serializable
     public String getInfo()
     {
         return info;
+    }
+
+    public String getHostName()
+    {
+        return hostName;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        WorkerRegistration other = (WorkerRegistration) obj;
+        if (id == null)
+        {
+            if (other.id != null) return false;
+        }
+        else if (!id.equals(other.id)) return false;
+        return true;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "WorkerRegistration [id=" + id + ", restrictedSiteIds=" + Arrays.toString(restrictedSiteIds) + ", workerPool=" + workerPool + ", availableEngines=" + Arrays.toString(availableEngines) + ", proxy=" + proxy + ", application=" + application + ", info=" + info + ", hostName=" + hostName + "]";
     }
 }

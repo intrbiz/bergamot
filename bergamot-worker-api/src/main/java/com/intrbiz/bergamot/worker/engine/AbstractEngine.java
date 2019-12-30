@@ -104,10 +104,6 @@ public abstract class AbstractEngine implements Engine
         return this.engineContext;
     }
     
-    protected void doConfigure() throws Exception
-    {
-    }
-    
     protected void doPrepare(EngineContext engineContext) throws Exception
     {
     }

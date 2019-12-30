@@ -32,6 +32,28 @@
 		</data-set>
     </div>
     <div class="row">
+		<h3>Notifiers</h3>
+		<data-set var="notifier" value="#{notifiers}">
+			<div class="col3 dash_icon check">
+				<h3>
+					<span class="dash_img status_ok" title="Notifier #{notifier.id}">
+						<img src="#{public('/images/icons/64/bergamot.png')}" />
+					</span>
+					<span class="name">#{ucFirst(coalesce(notifier.application, 'Notifier'))}</span>
+					<span class="name">(#{notifier.id})</span>
+			    </h3>
+			    <p>
+				    <span class="label">Host: </span>
+				    <span class="value">#{notifier.hostName}</span>
+			    </p>
+			    <p>
+				    <span class="label">&nbsp;</span>
+				    <span class="value">#{notifier.info}</span>
+			    </p>
+			</div>
+		</data-set>
+    </div>
+    <div class="row">
 		<h3 title="The processing pools in this Bergamot cluster which can schedule checks and process results">Processing Pools</h3>
 		<data-set var="processor" value="#{cluster_info.processors}">
 			<div class="col3 dash_icon check">
@@ -61,7 +83,7 @@
 				<th>Site</th>
 				<th>Workers</th>
 			</tr>
-			<data-set var="worker_pool_routes" value="#{route_table.entrySet()}">
+			<data-set var="worker_pool_routes" value="#{worker_route_table.entrySet()}">
 				<tr>
 					<td>#{worker_pool_routes.key}</td>
 					<td></td>
@@ -83,6 +105,30 @@
 							<td>#{list(site_routes.value).size}</td>
 						</tr>
 					</data-set>
+				</data-set>
+			</data-set>
+		</table>
+	</div>
+	<div class="row">
+		<h3>Notifier Routes</h3>
+		<table style="width: 100%">
+			<tr>
+				<th>Engine</th>
+				<th>Site</th>
+				<th>Notifiers</th>
+			</tr>
+			<data-set var="engine_routes" value="#{notifier_route_table.entrySet()}">
+				<tr>
+					<td>#{engine_routes.key}</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<data-set var="site_routes" value="#{engine_routes.value.entrySet()}">
+					<tr>
+						<td></td>
+						<td>#{site_routes.key}</td>
+						<td>#{list(site_routes.value).size}</td>
+					</tr>
 				</data-set>
 			</data-set>
 		</table>
@@ -118,11 +164,6 @@
     					<form path="/global/admin/site/id/#{site.id}/enable" rendered="#{site.disabled}">
 							<input type="hidden" name="id" value="#{site.id}"/>
 							<input type="submit" name="enable" value="Enable" class="danger"/>
-						</form>
-						<!-- Generate Site Certificates -->
-						<form path="/global/admin/site/id/#{site.id}/generate-certificates" rendered="#{! site.disabled}">
-							<input type="hidden" name="id" value="#{site.id}"/>
-							<input type="submit" name="enable" value="Generate Certificates" class="danger"/>
 						</form>
 					</td>
 				</tr>

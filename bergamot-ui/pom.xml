@@ -34,10 +34,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-queue</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-model</artifactId>
 		</dependency>
 		<dependency>
@@ -75,10 +71,6 @@
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-accounting-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-accounting-consumer</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>

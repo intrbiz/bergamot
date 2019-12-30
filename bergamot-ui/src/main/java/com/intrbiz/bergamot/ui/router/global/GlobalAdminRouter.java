@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.ui.router.global;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -14,11 +13,6 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
-import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
@@ -30,8 +24,6 @@ import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
-import com.intrbiz.queue.RPCClient;
-import com.intrbiz.queue.name.RoutingKey;
 
 @Prefix("/global/admin")
 @Template("layout/main")
@@ -53,10 +45,12 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db)
     {
-        // TODO: worker, pool and other cluster information
+        // workers, notifiers, processing pools and other cluster information
         var("workers", app().getProcessor().getWorkerCoordinator().getWorkers());
+        var("worker_route_table", app().getProcessor().getWorkerCoordinator().getRoutingTable());
+        var("notifiers", app().getProcessor().getNotifierCoordinator().getNotifiers());
+        var("notifier_route_table", app().getProcessor().getNotifierCoordinator().getRoutingTable());
         var("cluster_info", app().getProcessor().getProcessingPoolCoordinator().info());
-        var("route_table", app().getProcessor().getWorkerCoordinator().getRoutingTable());
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins
@@ -108,35 +102,6 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         db.setSite(site);
         // init the site for scheduling
         action("site-init", site);
-        redirect(path("/global/admin/"));
-    }
-    
-    @Any("/site/id/:id/generate-certificates")
-    @RequireValidAccessTokenForURL(@Param("access-token"))
-    @WithDataAdapter(BergamotDB.class)
-    public void generateSiteCertificates(BergamotDB db, @IsaUUID UUID id) throws Exception
-    {
-        // get the site 
-        Site site = notNull(db.getSite(id));
-        logger.warn("Generating certificates for site: " + site.getName() + " (" + site.getId() + ")");
-        // message the agent manager
-        try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
-        {
-            try (RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client = queue.createBergamotAgentManagerRPCClient())
-            {
-                try
-                {
-                    AgentManagerResponse response = client.publish(new CreateSiteCA(site.getId(), site.getName())).get(5, TimeUnit.SECONDS);
-                    if (response instanceof CreatedSiteCA)
-                    {
-                        logger.info("Created Bergamot Agent site Certificate Authority");
-                    }
-                }
-                catch (Exception e)
-                {
-                }
-            }
-        }
         redirect(path("/global/admin/"));
     }
     

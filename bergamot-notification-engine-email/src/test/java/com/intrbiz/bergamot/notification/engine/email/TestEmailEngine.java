@@ -8,13 +8,11 @@ import javax.mail.Message;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
-import com.intrbiz.configuration.CfgParameter;
 
 public class TestEmailEngine extends EmailEngine
 {
@@ -23,15 +21,9 @@ public class TestEmailEngine extends EmailEngine
     @Before
     public void setupEmailEngine() throws Exception
     {
-        NotificationEngineCfg cfg = new NotificationEngineCfg(
-                EmailEngine.class, 
-                new CfgParameter("mail.host", "127.0.0.1"), 
-                new CfgParameter("mail.user", ""), 
-                new CfgParameter("mail.password", ""), 
-                new CfgParameter("from", "bergamot@localhost")
-        );
         this.engine = new TestEmailEngine();
-        this.engine.configure(cfg);
+        // TODO:
+        // this.engine.configure(cfg);
     }
     
     private <T> T loadMessage(Class<T> type, String name)

@@ -15,9 +15,9 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
+import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
 import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
-import com.intrbiz.bergamot.cluster.queue.WorkerProducer.PublishStatus;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;

@@ -21,17 +21,57 @@ public final class ObjectNames
     
     public static final String buildProcessingPoolsMapName()
     {
-        return "bergamot.cluster.processing.pools";
+        return "bergamot.cluster.map.processing.pools";
+    }
+    
+    public static final String getClusterManagerLock()
+    {
+        return "bergamot.cluster.lock.manager";
     }
     
     public static final String buildWorkerRegistrationsMapName()
     {
-        return "bergamot.cluster.workers";
+        return "bergamot.cluster.map.workers";
     }
     
-    public static final String buildCheckQueueName(UUID workerId)
+    public static final String buildNotifierRegistrationsMapName()
     {
-        return "bergamot.queue.worker.checks." + workerId;
+        return "bergamot.cluster.map.notifiers";
+    }
+    
+    public static final String buildNotifierRegistrationsLockName()
+    {
+        return "bergamot.cluster.lock.notifiers";
+    }
+    
+    public static final String buildWorkerQueueName(UUID workerId)
+    {
+        return "bergamot.queue.worker." + workerId;
+    }
+    
+    public static final String buildWorkerCleanupQueueName()
+    {
+        return "bergamot.queue.worker.cleanup";
+    }
+    
+    public static final String buildWorkerDeadQueueName()
+    {
+        return "bergamot.queue.worker.dead";
+    }
+    
+    public static final String buildNotifierQueueName(UUID notifierId)
+    {
+        return "bergamot.queue.notifier." + notifierId;
+    }
+    
+    public static final String buildNotifierCleanupQueueName()
+    {
+        return "bergamot.queue.notifier.cleanup";
+    }
+    
+    public static final String buildNotifierDeadQueueName()
+    {
+        return "bergamot.queue.notifier.dead";
     }
     
     public static final String buildResultQueueName(UUID memberId)
@@ -62,10 +102,5 @@ public final class ObjectNames
     public static final String getSiteUpdateTopicName(UUID site)
     {
         return "bergamot.topic.update.site." + site;
-    }
-    
-    public static final String getClusterManagerLock()
-    {
-        return "bergamot.lock.cluster.manager";
     }
 }

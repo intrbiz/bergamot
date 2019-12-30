@@ -6,6 +6,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
+import com.intrbiz.bergamot.cluster.coordinator.NotifierClusterCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
@@ -32,6 +33,8 @@ public class BergamotProcessor
     
     private final ProcessingPoolClusterCoordinator processingPoolCoordinator;
     
+    private final NotifierClusterCoordinator notifierCoordinator;
+    
     private final UUID id;
     
     private Scheduler scheduler;
@@ -50,22 +53,32 @@ public class BergamotProcessor
         this.updateBroker = new SiteUpdateBroker(this.hazelcast);
         // coordinators
         this.workerCoordinator = new WorkerClusterCoordinator(this.hazelcast);
+        this.notifierCoordinator = new NotifierClusterCoordinator(this.hazelcast);
         this.processingPoolCoordinator = new ProcessingPoolClusterCoordinator(this.hazelcast, this.siteEventBroker);
         this.id = this.processingPoolCoordinator.getId();
     }
     
     public void start() throws Exception
     { 
+        // start our coordinators
+        this.notifierCoordinator.start();
+        this.workerCoordinator.stop();
         // create and start our scheduler
-        this.scheduler = new WheelScheduler(this.id, this.workerCoordinator.createCheckProducer(), this.processingPoolCoordinator.createProcessingPoolProducer());
+        this.scheduler = new WheelScheduler(this.id, this.workerCoordinator, this.processingPoolCoordinator.createProcessingPoolProducer());
         // create and start our result processor
         ProcessingPoolConsumer consumer = this.processingPoolCoordinator.startProcessingPool(this.scheduler);
-        this.resultProcessor = new DefaultResultProcessor(this.id, consumer, this.processingPoolCoordinator.createSchedulerActionProducer(), this.notificationBroker, this.updateBroker);
+        this.resultProcessor = new DefaultResultProcessor(this.id, consumer, this.processingPoolCoordinator.createSchedulerActionProducer(), this.notifierCoordinator, this.notificationBroker, this.updateBroker);
         this.readingProcessor = new DefaultReadingProcessor(this.id, consumer);
         // start
         this.resultProcessor.start();
         this.readingProcessor.start();
         this.scheduler.start();
+    }
+    
+    public void stop()
+    {
+        this.notifierCoordinator.stop();
+        this.workerCoordinator.stop();
     }
     
     public void initAllSites()
@@ -112,6 +125,11 @@ public class BergamotProcessor
         return processingPoolCoordinator;
     }
     
+    public NotifierClusterCoordinator getNotifierCoordinator()
+    {
+        return notifierCoordinator;
+    }
+
     public int getMemberCount()
     {
         return this.processingPoolCoordinator.getMemberCount();

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -23,11 +22,6 @@ import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
-import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.metadata.Any;
@@ -36,8 +30,6 @@ import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Template;
-import com.intrbiz.queue.RPCClient;
-import com.intrbiz.queue.name.RoutingKey;
 
 @Prefix("/global/install")
 @Template("layout/install")
@@ -182,24 +174,6 @@ public class FirstInstallRouter extends Router<BergamotApp>
         {
             BergamotImportReport report = new BergamotConfigImporter(vbcfg).offline().defaultPassword(install.getPassword()).requirePasswordChange(false).resetState(true).importConfiguration();
             logger.info(report.toString());
-        }
-        // create the Site CA
-        try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
-        {
-            try (RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client = queue.createBergamotAgentManagerRPCClient())
-            {
-                try
-                {
-                    AgentManagerResponse response = client.publish(new CreateSiteCA(siteId, siteName)).get(5, TimeUnit.SECONDS);
-                    if (response instanceof CreatedSiteCA)
-                    {
-                        logger.info("Created Bergamot Agent site Certificate Authority");
-                    }
-                }
-                catch (Exception e)
-                {
-                }
-            }
         }
         // broadcast a site init event
         action("site-init", site);

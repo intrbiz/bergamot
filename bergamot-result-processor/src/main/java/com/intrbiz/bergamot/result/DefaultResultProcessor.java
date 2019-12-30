@@ -20,6 +20,7 @@ import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.Result
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
+import com.intrbiz.bergamot.cluster.queue.NotificationProducer;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -70,10 +71,11 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         UUID poolId, 
         ProcessingPoolConsumer consumer,
         SchedulerActionProducer schedulerActions,
+        NotificationProducer notificationProducer,
         SiteNotificationBroker notificationBroker,
         SiteUpdateBroker updateBroker
     ) {
-        super(poolId, consumer, schedulerActions, notificationBroker, updateBroker);
+        super(poolId, consumer, schedulerActions, notificationProducer, notificationBroker, updateBroker);
     }    
 
     @Override

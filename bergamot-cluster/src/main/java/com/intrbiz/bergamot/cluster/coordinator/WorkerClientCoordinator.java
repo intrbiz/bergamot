@@ -29,7 +29,7 @@ public class WorkerClientCoordinator extends WorkerCoordinator
      * @param availableEngines the check engines this worker has
      * @return the {@code WorkerConsumer} associated to this worker
      */
-    public WorkerConsumer registerWorker(UUID workerId, boolean proxy, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
+    public WorkerConsumer registerWorker(UUID workerId, boolean proxy, String application, String info, String hostName, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
     {
         // We don't really want to allow multiple workers with the same id to register
         // TODO: we should probably just do the equivalent of ConcurrentMap.compute()
@@ -37,10 +37,16 @@ public class WorkerClientCoordinator extends WorkerCoordinator
             throw new RuntimeException("Worker already registered, wait for registration to timeout or use a new id");
         // Register the worker
         logger.info("Registering worker " + workerId);
-        WorkerRegistration reg = new WorkerRegistration(workerId, proxy, application, info, restrictedSiteIds, workerPool, availableEngines);
+        WorkerRegistration reg = new WorkerRegistration(workerId, proxy, application, info, hostName, restrictedSiteIds, workerPool, availableEngines);
         this.workers.put(workerId, reg);
         // Build the consumer for this registered worker
-        return new WorkerConsumer(this.hazelcast, workerId, this);
+        return new WorkerConsumer(this.hazelcast, workerId, this::unregisterWorker, this::updateWorkerWatchdog);
+    }
+    
+    private void updateWorkerWatchdog(UUID workerId)
+    {
+        // Perform a get on the key to invalidate the idle timeouts
+        this.workers.get(workerId);
     }
     
     /**

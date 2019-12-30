@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.accounting.model.BergamotAccountingEvent;
 
 public class BergamotLoggingConsumer extends AsyncConsumer
 {
-    private Logger logger = Logger.getLogger(BergamotLoggingConsumer.class);
+    private static final Logger logger = Logger.getLogger(BergamotLoggingConsumer.class);
     
     private BergamotAccountingTranscoder transcoder = BergamotAccountingTranscoder.getDefault();
     

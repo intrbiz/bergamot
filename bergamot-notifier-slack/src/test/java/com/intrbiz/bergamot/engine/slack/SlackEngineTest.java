@@ -4,7 +4,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
@@ -17,7 +16,8 @@ public class SlackEngineTest
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         SlackEngine slack = new SlackEngine();
-        slack.configure(new NotificationEngineCfg());
+        // TODO:
+        // slack.configure(new NotificationEngineCfg());
         // our dummy alert
         SendAlert alert;
         SendRecovery recovery;

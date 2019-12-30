@@ -10,7 +10,6 @@ import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.balsa.util.Util;
-import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
@@ -21,8 +20,6 @@ import com.intrbiz.bergamot.cluster.util.HazelcastFactory;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.processor.BergamotProcessor;
-import com.intrbiz.bergamot.queue.util.QueueUtil;
-import com.intrbiz.bergamot.ui.action.BergamotAgentActions;
 import com.intrbiz.bergamot.ui.action.CheckActions;
 import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
 import com.intrbiz.bergamot.ui.action.ContactActions;
@@ -228,9 +225,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void setupEngines() throws Exception
     {
-        // setup the queue manager
-        logger.info("Setting up RabbitMQ");
-        QueueUtil.setupQueueBroker(this.config.getBroker(), "bergamot-ui");
         // setup data manager
         logger.info("Setting up PostgreSQL");
         DataManager.getInstance().registerDefaultServer(
@@ -243,9 +237,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         );
         // setup accounting
         AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
-        AccountingManager.getInstance().registerConsumer("queue", new BergamotAccountingQueueConsumer());
         AccountingManager.getInstance().bindRootConsumer("logger");
-        AccountingManager.getInstance().bindRootConsumer("queue");
         // TODO: Don't bother sending metric yet
         // Setup Gerald - Service name: Bergamot.UI, send every minute
         // Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
@@ -293,7 +285,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new ContactActions());
         action(new ConfigChangeActions());
         action(new CheckActions());
-        action(new BergamotAgentActions());
         action(new U2FAActions());
         action(new SiteActions());
         action(new UpdateActions());

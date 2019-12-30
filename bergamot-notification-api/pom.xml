@@ -23,10 +23,6 @@
     	<artifactId>bergamot-message-model</artifactId>
     </dependency>
     <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-queue</artifactId>
-    </dependency>
-    <dependency>
     	<groupId>com.intrbiz.express</groupId>
     	<artifactId>express</artifactId>
     </dependency>
@@ -39,8 +35,8 @@
 		<artifactId>bergamot-accounting-model</artifactId>
 	</dependency>
     <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-accounting-consumer</artifactId>
+    	<groupId>com.intrbiz.accounting</groupId>
+    	<artifactId>accounting</artifactId>
     </dependency>
   </dependencies>
 </project>

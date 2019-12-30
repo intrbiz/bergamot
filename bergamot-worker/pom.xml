@@ -24,7 +24,6 @@
         <dependency>
             <groupId>com.intrbiz.bergamot</groupId>
             <artifactId>bergamot-cluster</artifactId>
-            <version>${project.version}</version>
         </dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>

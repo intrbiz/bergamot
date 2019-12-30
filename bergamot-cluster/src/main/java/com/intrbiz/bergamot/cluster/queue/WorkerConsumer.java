@@ -3,16 +3,16 @@ package com.intrbiz.bergamot.cluster.queue;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 import com.intrbiz.bergamot.cluster.ObjectNames;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerClientCoordinator;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 public class WorkerConsumer
 {   
-    private static final long POKE_THRESHOLD = TimeUnit.SECONDS.toNanos(10);
+    private static final long POKE_THRESHOLD = TimeUnit.SECONDS.toNanos(3);
     
     /**
      * The hazelcast instance to use
@@ -25,9 +25,14 @@ public class WorkerConsumer
     private final UUID workerId;
     
     /**
-     * The coordinator which created us
+     * On Close callback
      */
-    private final WorkerClientCoordinator coordinator;
+    private final Consumer<UUID> onClose;
+    
+    /**
+     * Watchdog to notify routinely
+     */
+    private final Consumer<UUID> watchdog;
     
     /**
      * Our dedicated queue to process work form
@@ -38,15 +43,16 @@ public class WorkerConsumer
     
     private volatile long lastPoke = 0L;
     
-    public WorkerConsumer(HazelcastInstance hazelcast, UUID workerId, WorkerClientCoordinator coordinator)
+    public WorkerConsumer(HazelcastInstance hazelcast, UUID workerId, Consumer<UUID> onClose, Consumer<UUID> watchdog)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);
         this.workerId = Objects.requireNonNull(workerId);
-        this.coordinator = Objects.requireNonNull(coordinator);
+        this.onClose = Objects.requireNonNull(onClose);
+        this.watchdog = Objects.requireNonNull(watchdog);
         this.closed = false;
         // Get the check queue
-        this.checkQueue = this.hazelcast.getQueue(ObjectNames.buildCheckQueueName(this.workerId));
+        this.checkQueue = this.hazelcast.getQueue(ObjectNames.buildWorkerQueueName(this.workerId));
     }
     
     public UUID getWorkerId()
@@ -62,7 +68,8 @@ public class WorkerConsumer
         if ((now - this.lastPoke) > POKE_THRESHOLD)
         {
             this.lastPoke = now;
-            // TODO: Poke Poke Poke
+            // Poke the dog
+            this.watchdog.accept(this.workerId);
         }
     }
     
@@ -86,8 +93,6 @@ public class WorkerConsumer
     public void close()
     {
         // unregister
-        this.coordinator.unregisterWorker(this.workerId);
-        // close this queue
-        this.checkQueue.destroy();
+        this.onClose.accept(this.workerId);
     }
 }

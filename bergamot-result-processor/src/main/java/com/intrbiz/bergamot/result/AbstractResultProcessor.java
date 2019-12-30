@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
+import com.intrbiz.bergamot.cluster.queue.NotificationProducer;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
 import com.intrbiz.bergamot.model.ActiveCheck;
@@ -33,6 +34,8 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     
     protected final SiteNotificationBroker notificationBroker;
     
+    protected final NotificationProducer notificationProducer;
+    
     protected final SiteUpdateBroker updateBroker;
 
     protected int threadCount;
@@ -45,6 +48,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         UUID poolId, 
         ProcessingPoolConsumer consumer,
         SchedulerActionProducer schedulerActions,
+        NotificationProducer notificationProducer,
         SiteNotificationBroker notificationBroker,
         SiteUpdateBroker updateBroker
     ) {
@@ -52,6 +56,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         this.poolId = poolId;
         this.consumer = consumer;
         this.schedulerActions = schedulerActions;
+        this.notificationProducer = notificationProducer;
         this.notificationBroker = notificationBroker;
         this.updateBroker = updateBroker;
         this.threadCount = Runtime.getRuntime().availableProcessors();
@@ -118,7 +123,8 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         if (logger.isTraceEnabled()) logger.trace("Sending notification:\r\n" + notification);
         // Broadcast our notification first
         this.notificationBroker.publish(check.getSiteId(), notification);
-        // TODO: Route to specific notification engines
+        // Route to specific notification engines
+        this.notificationProducer.sendNotification(notification);
     }
     
     protected void publishAlertUpdate(Alert alert, AlertUpdate update)
