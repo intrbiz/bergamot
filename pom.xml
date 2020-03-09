@@ -4,7 +4,7 @@
 
 	<groupId>com.intrbiz.bergamot</groupId>
 	<artifactId>bergamot</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>bergamot</name>
@@ -125,7 +125,6 @@
     <module>bergamot-crypto-util</module>
     <module>bergamot-nagios</module>
     <module>bergamot-worker-agent</module>
-    <module>bergamot-agent-server-config</module>
     <module>bergamot-worker-dummy</module>
     <module>bergamot-notifier-webhook</module>
     <module>lamplighter-model</module>
@@ -244,11 +243,6 @@
   		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-config-converter</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-agent-server-config</artifactId>
   			<version>${project.version}</version>
   		</dependency>
   		<dependency>

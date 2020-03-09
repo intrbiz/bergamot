@@ -78,7 +78,7 @@ public abstract class AgentClientHandler extends SimpleChannelInboundHandler<Obj
         if (! AgentUtil.isEmpty(this.templateName)) headers.set(AgentHTTPHeaderNames.TEMPLATE_NAME, this.templateName);
         headers.set(AgentHTTPHeaderNames.KEY_ID, this.key.getId().toString());
         headers.set(AgentHTTPHeaderNames.TIMESTAMP, timestamp);
-        headers.set(HttpHeaderNames.AUTHORIZATION, this.key.sign(timestamp, this.agentId, this.hostName, this.templateName));
+        headers.set(HttpHeaderNames.AUTHORIZATION, this.key.signBase64(timestamp, this.agentId, this.hostName, this.templateName));
         // Start the WS connection
         this.handshaker = WebSocketClientHandshakerFactory.newHandshaker(this.server, WebSocketVersion.V13, null, false, headers);
         this.handshaker.handshake(ctx.channel());

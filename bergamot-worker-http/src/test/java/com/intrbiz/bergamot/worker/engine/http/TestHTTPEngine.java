@@ -12,10 +12,13 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
+import com.intrbiz.bergamot.worker.engine.EngineContext;
+import com.intrbiz.configuration.Configuration;
 
 public class TestHTTPEngine
 {
@@ -30,6 +33,39 @@ public class TestHTTPEngine
         Logger.getRootLogger().setLevel(Level.TRACE);
         //
         this.engine = new HTTPEngine();
+        this.engine.prepare(new EngineContext() {
+            @Override
+            public Configuration getConfiguration()
+            {
+                return new Configuration();
+            }
+
+            @Override
+            public AgentKeyLookup getAgentKeyLookup()
+            {
+                return null;
+            }
+
+            @Override
+            public void registerAgent(UUID agentId)
+            {
+            }
+
+            @Override
+            public void unregisterAgent(UUID agentId)
+            {
+            }
+
+            @Override
+            public void publishResult(ResultMO result)
+            {
+            }
+
+            @Override
+            public void publishReading(ReadingParcelMO readingParcelMO)
+            {
+            }
+        });
     }
     
     @Test

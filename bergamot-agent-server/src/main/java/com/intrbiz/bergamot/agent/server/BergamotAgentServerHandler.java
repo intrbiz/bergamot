@@ -17,6 +17,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.AgentHTTPHeaderNames;
 import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
+import com.intrbiz.bergamot.model.message.SiteMO;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckAgent;
 import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
@@ -165,6 +166,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
         this.channel = ctx.channel();
+        this.remoteAddress = ctx.channel().remoteAddress();
     }
 
     @Override
@@ -220,6 +222,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
                         // Allow WebSocket traffic to flow
                         this.handshaked = true;
                         // fire connect event
+                        logger.info("Accepted Agent connection from " + this.remoteAddress + " agent id " + this.agentId + "/" + this.agentHostName + " for site " + this.siteId);
                         this.server.fireAgentConnect(this);
                     }
                 });
@@ -244,6 +247,8 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             this.agentTemplateName = req.headers().get(AgentHTTPHeaderNames.TEMPLATE_NAME);
             this.authenticationTimestamp = Long.parseLong(requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.TIMESTAMP), "authentication timestamp"));
             this.agentKeyId = UUID.fromString(requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.KEY_ID), "key id"));
+            // We can extract the site id from the key id
+            this.siteId = SiteMO.getSiteId(this.agentKeyId);
             String authSig = requireNonEmpty(req.headers().get(HttpHeaderNames.AUTHORIZATION), "authorization");
             // Fetch the agent key
             AgentAuthenticationKey key = this.server.getAgentKeyResolver().resolveKey(this.agentKeyId);

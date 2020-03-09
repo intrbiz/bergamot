@@ -13,6 +13,8 @@ import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
+import com.intrbiz.bergamot.notification.NotificationEngineContext;
+import com.intrbiz.configuration.Configuration;
 
 public class TestEmailEngine extends EmailEngine
 {
@@ -22,8 +24,13 @@ public class TestEmailEngine extends EmailEngine
     public void setupEmailEngine() throws Exception
     {
         this.engine = new TestEmailEngine();
-        // TODO:
-        // this.engine.configure(cfg);
+        this.engine.prepare(new NotificationEngineContext() {
+            @Override
+            public Configuration getConfiguration()
+            {
+                return new Configuration();
+            }
+        });
     }
     
     private <T> T loadMessage(Class<T> type, String name)
