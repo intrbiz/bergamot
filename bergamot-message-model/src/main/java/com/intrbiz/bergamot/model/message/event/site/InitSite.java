@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.event.site.init")
 public class InitSite extends SiteEvent
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("site_id")
     private UUID siteId;
     

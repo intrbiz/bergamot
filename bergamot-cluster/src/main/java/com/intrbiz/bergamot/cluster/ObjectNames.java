@@ -34,6 +34,11 @@ public final class ObjectNames
         return "bergamot.cluster.map.workers";
     }
     
+    public static final String buildAgentsMapName()
+    {
+        return "bergamot.cluster.map.agents";
+    }
+    
     public static final String buildNotifierRegistrationsMapName()
     {
         return "bergamot.cluster.map.notifiers";
@@ -102,5 +107,10 @@ public final class ObjectNames
     public static final String getSiteUpdateTopicName(UUID site)
     {
         return "bergamot.topic.update.site." + site;
+    }
+    
+    public static final String buildAgentKeyLookupMapName()
+    {
+        return "bergamot.cluster.map.lookup.agent.key";
     }
 }

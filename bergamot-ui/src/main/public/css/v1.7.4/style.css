@@ -866,18 +866,19 @@ form > div input[type=text] {
 }
 
 form > div select {
-    width: 420px;
+    width: 428px;
 }
 
 form > div textarea {
-    width: 411px;
+    width: 414px;
     height: 150px;
+    padding: 3px 6px;
 }
 
 form > div input[type=submit] {
     display: block;
     float: left;
-    margin-left: 175px;
+    margin-left: 170px;
     font-weight: bold;
 }
 

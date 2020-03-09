@@ -56,18 +56,7 @@
 	    <!-- Admin Menu -->
 	    <container rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
 	        <div class="menu-group">
-	            <h4><a href="/agent/">Bergamot Agent Manager</a></h4>
-	            <ul>
-	                <li>
-	                	<a href="/agent/generate-template">Generate Template Certificate</a>
-	                </li>
-		            <li>
-	                    <a href="/agent/sign">Sign Agent Certificate</a>
-	                </li>
-	                <li rendered="#{Balsa().permission('ui.generate.agent')}">
-	                    <a href="/agent/generate-config">Generate Agent Configuration</a>
-	                </li>
-	            </ul>
+	            <h4><a href="/agent/">Bergamot Agent</a></h4>
 	        </div>
 	    </container>
     

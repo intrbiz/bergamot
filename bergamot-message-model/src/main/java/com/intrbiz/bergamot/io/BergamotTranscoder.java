@@ -82,9 +82,6 @@ import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.command.GeneralCommandError;
-import com.intrbiz.bergamot.model.message.command.RegisterBergamotAgent;
-import com.intrbiz.bergamot.model.message.command.RegisteredBergamotAgent;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
 import com.intrbiz.bergamot.model.message.event.global.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
@@ -258,10 +255,6 @@ public class BergamotTranscoder
         // heathchecks
         HealthCheckJoin.class,
         HealthCheckUnjoin.class,
-        // commands
-        RegisterBergamotAgent.class,
-        RegisteredBergamotAgent.class,
-        GeneralCommandError.class,
         // reports
         SLAReportMO.class
     };

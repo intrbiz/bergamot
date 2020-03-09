@@ -10,8 +10,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.EvictionConfig;
+import com.hazelcast.config.EvictionConfig.MaxSizePolicy;
 import com.hazelcast.config.EvictionPolicy;
+import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.Cluster;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.HazelcastInstance;
@@ -26,6 +30,7 @@ import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.model.WorkerRegistration;
 import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
+import com.intrbiz.bergamot.cluster.util.WorkerIdPredicate;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 /**
@@ -78,6 +83,15 @@ public class WorkerClusterCoordinator extends WorkerCoordinator implements Worke
         MapConfig workerMap = hazelcastConfig.getMapConfig(ObjectNames.buildWorkerRegistrationsMapName());
         workerMap.setEvictionPolicy(EvictionPolicy.LRU);
         workerMap.setMaxIdleSeconds(WORKER_MAX_IDLE_SECONDS);
+        // Configure agents registration map
+        MapConfig agentsMap = hazelcastConfig.getMapConfig(ObjectNames.buildAgentsMapName());
+        agentsMap.setEvictionPolicy(EvictionPolicy.NONE);
+        agentsMap.setBackupCount(2);
+        agentsMap.setAsyncBackupCount(2);
+        agentsMap.setReadBackupData(true);
+        agentsMap.setInMemoryFormat(InMemoryFormat.BINARY);
+        // for now use near cache for performance, rather than building our own local maps like with the routing table
+        agentsMap.setNearCacheConfig(new NearCacheConfig(7200, 900, true, InMemoryFormat.OBJECT, new EvictionConfig(1_000_000, MaxSizePolicy.ENTRY_COUNT, EvictionPolicy.LRU)));
     }
     
     public ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<UUID, UUID[]>>> getRoutingTable()
@@ -161,6 +175,8 @@ public class WorkerClusterCoordinator extends WorkerCoordinator implements Worke
         logger.info("Received worker deregistration: " + workerId);
         // Remove routes
         this.removeRoutes(workerId);
+        // Remove registered agents
+        this.agents.removeAll(new WorkerIdPredicate(workerId));
         // Add the worker to the clean up queue
         this.cleanupQueue.offer(workerId);
     }
@@ -297,6 +313,12 @@ public class WorkerClusterCoordinator extends WorkerCoordinator implements Worke
      */
     public UUID routeCheck(ExecuteCheck check)
     {
+        if (check.getAgentId() != null)
+        {
+            // Agent routed check
+            return this.agents.get(check.getAgentId());
+        }
+        // Normally routed check
         return this.route(check.getSiteId(), check.getWorkerPool(), check.getEngine());
     }
 

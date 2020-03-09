@@ -23,33 +23,8 @@
 			<artifactId>bergamot-worker-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.intrbiz.util</groupId>
-			<artifactId>bootstrap</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-agent-server</artifactId>
 		</dependency>
 	</dependencies>
-	<build>
-		<finalName>bergamot-worker-agent</finalName>
-		<plugins>
-			<plugin>
-				<groupId>com.intrbiz.util</groupId>
-				<artifactId>packaging</artifactId>
-				<version>1.1.1</version>
-				<configuration>
-					<appClass>com.intrbiz.bergamot.worker.AgentWorker</appClass>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>intrbiz-package</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>

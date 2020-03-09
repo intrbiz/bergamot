@@ -46,7 +46,7 @@ public class AgentMemoryExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // get the Agent stats
@@ -56,7 +56,6 @@ public class AgentMemoryExecutor extends AbstractExecutor<AgentEngine>
                     AgentStat stat = (AgentStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got agent info in " + runtime + "ms: " + stat);
                     // check
-                    
                     context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyLessThanThreshold(
                             stat.getFreeMemory(),
                             UnitUtil.parse(executeCheck.getParameter("warning", "10MiB"), 5 * UnitUtil.Mi), 

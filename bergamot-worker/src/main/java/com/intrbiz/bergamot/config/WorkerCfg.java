@@ -96,15 +96,14 @@ public class WorkerCfg extends Configuration
         this.engines = engines;
     }
     
-    public boolean isEngineEnabled(String engineName)
+    public boolean isEngineEnabled(String engineName, boolean defaultValue)
     {
         for (EngineCfg engine : this.engines)
         {
             if (engineName.equalsIgnoreCase(engine.getName()))
                 return engine.isEnabled();
         }
-        // enabled by default
-        return true;
+        return defaultValue;
     }
 
     @XmlAttribute(name = "threads")

@@ -3,14 +3,16 @@ package com.intrbiz.bergamot.worker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.apache.log4j.BasicConfigurator;
@@ -20,11 +22,13 @@ import org.apache.log4j.Logger;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.ClientNetworkConfig;
+import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.spi.exception.TargetDisconnectedException;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClientCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.WorkerClientCoordinator;
+import com.intrbiz.bergamot.cluster.lookup.AgentKeyClientLookup;
+import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
 import com.intrbiz.bergamot.cluster.queue.WorkerConsumer;
 import com.intrbiz.bergamot.config.LoggingCfg;
@@ -36,6 +40,7 @@ import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.Engine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
+import com.intrbiz.bergamot.worker.engine.agent.AgentEngine;
 import com.intrbiz.bergamot.worker.engine.dummy.DummyEngine;
 import com.intrbiz.bergamot.worker.engine.http.HTTPEngine;
 import com.intrbiz.bergamot.worker.engine.jdbc.JDBCEngine;
@@ -53,34 +58,27 @@ import com.intrbiz.configuration.Configuration;
  */
 public class BergamotWorker implements Configurable<WorkerCfg>
 {   
-    public static final String DEFAULT_CONFIGURATION_FILE = "/etc/bergamot/worker/config.xml";
+    public static final String DEFAULT_CONFIGURATION_FILE = "/etc/bergamot/worker/default.xml";
     
     public static final String DAEMON_NAME = "bergamot-worker";
     
     private static final Logger logger = Logger.getLogger(BergamotWorker.class);
     
-    private static final Map<String, Supplier<Engine>> AVAILABLE_ENGINES = new HashMap<>();
+    private static final List<AvailableEngine> AVAILABLE_ENGINES = new ArrayList<>();
     
     static
     {
         // register all engines which are available
-        // dummy
-        AVAILABLE_ENGINES.put(DummyEngine.NAME, DummyEngine::new);
-        // nagios
-        AVAILABLE_ENGINES.put(NagiosEngine.NAME, NagiosEngine::new);
-        AVAILABLE_ENGINES.put(NRPEEngine.NAME, NRPEEngine::new);
-        // http
-        AVAILABLE_ENGINES.put(HTTPEngine.NAME, HTTPEngine::new);
-        // jdbc
-        AVAILABLE_ENGINES.put(JDBCEngine.NAME, JDBCEngine::new);
-        // jmx
-        AVAILABLE_ENGINES.put(JMXEngine.NAME, JMXEngine::new);
-        // ssh
-        AVAILABLE_ENGINES.put(SSHEngine.NAME, SSHEngine::new);
-        AVAILABLE_ENGINES.put(SFTPEngine.NAME, SFTPEngine::new);
-        // snmp
-        AVAILABLE_ENGINES.put(SNMPEngine.NAME, SNMPEngine::new);
-        // TODO: add more shizz here
+        AVAILABLE_ENGINES.add(new AvailableEngine(DummyEngine.NAME,  DummyEngine::new,  true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(NagiosEngine.NAME, NagiosEngine::new, true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(NRPEEngine.NAME,   NRPEEngine::new,   true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(HTTPEngine.NAME,   HTTPEngine::new,   true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(JDBCEngine.NAME,   JDBCEngine::new,   true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(JMXEngine.NAME,    JMXEngine::new,    true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(SSHEngine.NAME,    SSHEngine::new,    true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(SFTPEngine.NAME,   SFTPEngine::new,   true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(SNMPEngine.NAME,   SNMPEngine::new,   false));
+        AVAILABLE_ENGINES.add(new AvailableEngine(AgentEngine.NAME,  AgentEngine::new,   false));
     }
     
     private final UUID id = UUID.randomUUID();
@@ -109,9 +107,15 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     
     private ProcessingPoolProducer producer;
     
+    private AgentKeyClientLookup agentKeyLookup;
+    
     private Thread[] threads;
     
-    private volatile boolean run = false;
+    private CountDownLatch executorLatch;
+    
+    private CountDownLatch shutdownLatch;
+    
+    private AtomicBoolean run;
     
     public BergamotWorker()
     {
@@ -164,19 +168,21 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         this.hostName = InetAddress.getLocalHost().getHostName();
         this.threadCount = this.configuration.getThreads();
         // register engines 
-        for (Entry<String, Supplier<Engine>> availableEngine : AVAILABLE_ENGINES.entrySet())
+        for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
         {
-            if (this.configuration.isEngineEnabled(availableEngine.getKey()))
+            if (this.configuration.isEngineEnabled(availableEngine.name, availableEngine.enabledByDefault))
             {
-                Engine engine = availableEngine.getValue().get();
+                Engine engine = availableEngine.constructor.get();
                 this.engines.put(engine.getName(), engine);
                 logger.info("Registering check engine: " + engine.getName());
             }
         }
     }
 
-    public void start() throws Exception
+    protected void start() throws Exception
     {
+        logger.info("Bergamot Worker starting....");
+        this.shutdownLatch = new CountDownLatch(1);
         // connect to the scheduler
         this.connectScheduler();
         // prepare our engines
@@ -187,6 +193,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         this.startEngines();
         // start our executors
         this.startExecutors();
+        logger.info("Bergamot Worker started.");
     }
     
     protected void prepareEngines() throws Exception
@@ -206,12 +213,42 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             {
                 return configuration;
             }
+
+            @Override
+            public AgentKeyLookup getAgentKeyLookup()
+            {
+                return agentKeyLookup;
+            }
+
+            @Override
+            public void registerAgent(UUID agentId)
+            {
+                // TODO
+            }
+
+            @Override
+            public void unregisterAgent(UUID agentId)
+            {
+                // TODO
+            }
+
+            @Override
+            public void publishResult(ResultMO result)
+            {
+                producer.publishResult(result);
+            }
+            
+            @Override
+            public void publishReading(ReadingParcelMO readingParcelMO)
+            {
+                producer.publishReading(readingParcelMO);
+            }
         };
     }
     
     protected void connectScheduler() throws Exception
     {
-        logger.info("Connecting to scheduler");
+        logger.info("Connecting to Bergamot Cluster");
         ClientNetworkConfig netCfg = new ClientNetworkConfig();
         netCfg.setAddresses(this.configuration.getHazelcastClient().getNodes());
         netCfg.setSmartRouting(false);
@@ -220,6 +257,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         cliCfg.setNetworkConfig(netCfg);
         // Connect to Hazelcast
         this.hazelcast = HazelcastClient.newHazelcastClient(cliCfg);
+        // Create our worker lookups
+        this.agentKeyLookup = new AgentKeyClientLookup(this.hazelcast);
         // Create our worker coordinator
         this.workerCoordinator = new WorkerClientCoordinator(this.hazelcast);
         this.poolCoordinator = new ProcessingPoolClientCoordinator(this.hazelcast);
@@ -232,52 +271,70 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     {
         logger.info("Creating " + this.threadCount + " check executors");
         this.threads = new Thread[this.threadCount];
+        this.executorLatch = new CountDownLatch(this.threadCount);
+        this.run = new AtomicBoolean(false);
         for (int i = 0; i < this.threads.length; i++)
         {
             final int threadNum = i;
             this.threads[i] = new Thread(() -> {
-                logger.debug("Worker executor " + threadNum + " starting.");
-                while (this.run)
+                try
                 {
-                    try
+                    logger.debug("Worker executor " + threadNum + " starting.");
+                    while (this.run.get())
                     {
-                        // get a check to execute
-                        ExecuteCheck check = this.consumer.poll();
-                        if (check != null)
+                        try
                         {
-                            if (logger.isTraceEnabled())
-                                logger.trace("Executing check: " + check);
-                            // execute the check
-                            CheckExecutionContext context = createExecutionContext(check);
-                            Engine engine = this.engines.get(check.getEngine());
-                            if (engine != null && engine.accept(check))
+                            // get a check to execute
+                            ExecuteCheck check = this.consumer.poll();
+                            if (check != null)
                             {
-                                engine.execute(check, context);
-                            }
-                            else
-                            {
-                                context.publishResult(new ActiveResultMO().fromCheck(check).error("No engine found to execute check"));
+                                if (logger.isTraceEnabled())
+                                    logger.trace("Executing check: " + check);
+                                // execute the check
+                                CheckExecutionContext context = createExecutionContext(check);
+                                Engine engine = this.engines.get(check.getEngine());
+                                if (engine != null && engine.accept(check))
+                                {
+                                    engine.execute(check, context);
+                                }
+                                else
+                                {
+                                    context.publishResult(new ActiveResultMO().fromCheck(check).error("No engine found to execute check"));
+                                }
                             }
                         }
+                        catch (HazelcastException e)
+                        {
+                            this.clusterPanic(e);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.error("Error executing check", e);
+                        }
                     }
-                    catch (TargetDisconnectedException e)
-                    {
-                        // IGNORE
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("Error executing check", e);
-                    }
+                    logger.debug("Bergamot Worker executor " + threadNum + " stopped.");
                 }
-                logger.debug("Worker executor " + threadNum + " stopped.");
+                finally
+                {
+                    this.executorLatch.countDown();
+                }
             }, "Bergamot-Worker-Executor-" + i);
+        }
+    }
+    
+    protected void clusterPanic(HazelcastException e)
+    {
+        // Trigger a shutdown
+        if (this.run.compareAndSet(true, false))
+        {
+            logger.error("Got error communicating with cluster, triggering halt", e);
         }
     }
     
     protected void startExecutors() throws Exception
     {
         logger.info("Starting " + this.threads.length + " check executors");
-        this.run = true;
+        this.run.set(true);
         for (int i = 0; i < this.threads.length; i++)
         {
             this.threads[i].start();
@@ -310,52 +367,74 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         };
     }
     
-    public void shutdown()
+    public void run() throws Exception
     {
-        logger.info("Shutting down worker");
-        // Shutdown all executors
-        this.shutdownExecutors();
-        // Shutdown all engines
-        this.shutdownEngines();
-        // Disconnect from the scheduler
-        this.disconnectScheduler();
+        // Start this worker
+        this.start();
+        // Await for all execution threads
+        this.awaitExecutors();
+        // Stop this worker
+        this.stop();
     }
     
-    protected void shutdownExecutors()
+    protected void stop()
     {
-        // Stop execution threads
-        if (this.run)
+        try
         {
-            this.run = false;
-            for (Thread thread : this.threads)
-            {
-                try
-                {
-                    thread.join();
-                }
-                catch (InterruptedException e)
-                {
-                }
-            }
-            this.threads = null;
+            logger.info("Bergamot Worker stopping....");
+            // Shutdown all engines
+            this.shutdownEngines();
+            // Disconnect from the scheduler
+            this.disconnectScheduler();
+            logger.info("Bergamot Worker stopped.");
         }
+        finally
+        {
+            this.shutdownLatch.countDown();
+        }
+    }
+    
+    protected void awaitExecutors()
+    {
+        // Wait for all executors to notify the latch
+        while (true)
+        {
+            try
+            {
+                this.executorLatch.await();
+                break;
+            }
+            catch (InterruptedException e)
+            {
+            }
+        }
+        this.threads = null;
+        this.executorLatch = null;
     }
     
     protected void shutdownEngines()
     {
         for (Engine engine : this.getEngines())
         {
-            logger.info("shutting down check engine: " + engine.getName());
+            logger.info("Shutting down check engine: " + engine.getName());
             engine.shutdown(this.createEngineContext(engine));
         }
     }
     
     protected void disconnectScheduler()
     {
-        logger.info("Disconnecting from scheduler");
+        logger.info("Disconnecting from Bergamot cluster");
         // Shutdown our consumer
         if (this.consumer != null)
-            this.consumer.close();
+        {
+            try
+            {
+                this.consumer.close();
+            }
+            catch (HazelcastException e)
+            {
+            }
+        }
         // Shutdown hazelcast
         if (this.hazelcast != null)
             this.hazelcast.shutdown();
@@ -363,6 +442,26 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         this.consumer = null;
         this.workerCoordinator = null;
         this.hazelcast = null;
+    }
+    
+    public void shutdown()
+    {
+        if (this.run.compareAndSet(true, false))
+        {
+            logger.info("Shutting down Bergamot Worker");
+            // Wait for the shutdown to complete
+            while (true)
+            {
+                try
+                {
+                    this.shutdownLatch.await();
+                    break;
+                }
+                catch (InterruptedException e)
+                {
+                }
+            }
+        }
     }
     
     /**
@@ -377,7 +476,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             // Configure logging
             configureLogging(config.getLogging());
             Logger logger = Logger.getLogger(BergamotWorker.class);
-            logger.debug("Bergamot Worker, using configuration:\r\n" + config.toString());
+            logger.info("Bergamot Worker, using configuration:\r\n" + config.toString());
             // Create the worker
             BergamotWorker worker = new BergamotWorker();
             worker.configure(config);
@@ -385,7 +484,9 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             Runtime.getRuntime().addShutdownHook(new Thread(worker::shutdown));
             // Start our worker
             logger.info("Bergamot Worker starting.");
-            worker.start();
+            worker.run();
+            // Terminate normally
+            System.exit(0);
         }
         catch (Exception e)
         {
@@ -426,5 +527,22 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         // configure logging to terminal
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.toLevel(Util.coalesceEmpty(config.getLevel(), "info").toUpperCase()));
+    }
+    
+    private static class AvailableEngine
+    {
+        public final String name;
+        
+        public final Supplier<Engine> constructor;
+        
+        public final boolean enabledByDefault;
+
+        public AvailableEngine(String name, Supplier<Engine> constructor, boolean enabledByDefault)
+        {
+            super();
+            this.name = name;
+            this.constructor = constructor;
+            this.enabledByDefault = enabledByDefault;
+        }
     }
 }

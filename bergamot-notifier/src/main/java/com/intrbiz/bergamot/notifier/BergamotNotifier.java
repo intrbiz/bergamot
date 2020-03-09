@@ -3,11 +3,11 @@ package com.intrbiz.bergamot.notifier;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -45,14 +45,14 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     private static final Logger logger = Logger.getLogger(BergamotNotifier.class);
     
-    private static final Map<String, Supplier<NotificationEngine>> AVAILABLE_ENGINES = new HashMap<>();
+    private static final List<AvailableEngine> AVAILABLE_ENGINES = new ArrayList<>();
     
     static
     {
-        AVAILABLE_ENGINES.put(EmailEngine.NAME, EmailEngine::new);
-        AVAILABLE_ENGINES.put(SMSEngine.NAME, SMSEngine::new);
-        AVAILABLE_ENGINES.put(SlackEngine.NAME, SlackEngine::new);
-        AVAILABLE_ENGINES.put(WebHookEngine.NAME, WebHookEngine::new);
+        AVAILABLE_ENGINES.add(new AvailableEngine(EmailEngine.NAME,   EmailEngine::new,   true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(SMSEngine.NAME,     SMSEngine::new,     false));
+        AVAILABLE_ENGINES.add(new AvailableEngine(SlackEngine.NAME,   SlackEngine::new,   true));
+        AVAILABLE_ENGINES.add(new AvailableEngine(WebHookEngine.NAME, WebHookEngine::new, true));
     }
     
     private final UUID id = UUID.randomUUID();
@@ -124,11 +124,11 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         this.hostName = InetAddress.getLocalHost().getHostName();
         this.threadCount = this.configuration.getThreads();
         // register engines 
-        for (Entry<String, Supplier<NotificationEngine>> availableEngine : AVAILABLE_ENGINES.entrySet())
+        for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
         {
-            if (this.configuration.isEngineEnabled(availableEngine.getKey()))
+            if (this.configuration.isEngineEnabled(availableEngine.name, availableEngine.enabledByDefault))
             {
-                NotificationEngine engine = availableEngine.getValue().get();
+                NotificationEngine engine = availableEngine.constructor.get();
                 this.engines.put(engine.getName(), engine);
                 logger.info("Registering notification engine: " + engine.getName());
             }
@@ -362,5 +362,22 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         // configure logging to terminal
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.toLevel(Util.coalesceEmpty(config.getLevel(), "info").toUpperCase()));
+    }
+    
+    private static class AvailableEngine
+    {
+        public final String name;
+        
+        public final Supplier<NotificationEngine> constructor;
+        
+        public final boolean enabledByDefault;
+
+        public AvailableEngine(String name, Supplier<NotificationEngine> constructor, boolean enabledByDefault)
+        {
+            super();
+            this.name = name;
+            this.constructor = constructor;
+            this.enabledByDefault = enabledByDefault;
+        }
     }
 }

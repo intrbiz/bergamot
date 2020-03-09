@@ -11,6 +11,8 @@ import com.intrbiz.bergamot.model.message.event.Event;
 
 public class CheckEvent extends Event implements ParameterisedMO
 {
+    private static final long serialVersionUID = 1L;
+
     @JsonProperty("engine")
     private String engine;
 

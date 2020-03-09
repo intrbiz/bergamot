@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName("bergamot.event.global.flush_caches")
 public class FlushGlobalCaches extends GlobalEvent
-{    
+{   
+    private static final long serialVersionUID = 1L;
+    
     public FlushGlobalCaches()
     {
         super();

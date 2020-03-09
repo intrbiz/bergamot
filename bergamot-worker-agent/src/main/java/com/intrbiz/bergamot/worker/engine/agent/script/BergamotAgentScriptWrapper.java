@@ -10,9 +10,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
-import com.intrbiz.bergamot.crypto.util.CertInfo;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -39,26 +37,6 @@ public class BergamotAgentScriptWrapper
     public UUID getSiteId()
     {
         return this.agent.getSiteId();
-    }
-
-    public CertInfo getAgentCertificateInfo()
-    {
-        return this.agent.getAgentCertificateInfo();
-    }
-
-    public String getAgentName()
-    {
-        return this.agent.getAgentName();
-    }
-
-    public CertInfo getSiteCertificateInfo()
-    {
-        return this.agent.getSiteCertificateInfo();
-    }
-
-    public AgentHello getHello()
-    {
-        return this.agent.getHello();
     }
 
     public SocketAddress getRemoteAddress()

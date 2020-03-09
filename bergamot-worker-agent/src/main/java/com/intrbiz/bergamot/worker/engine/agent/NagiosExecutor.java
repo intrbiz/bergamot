@@ -53,7 +53,7 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
             String commandLine = executeCheck.getParameter("command_line");
             if (Util.isEmpty(commandLine)) throw new RuntimeException("The command_line must be defined!");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 ExecCheck check = new ExecCheck();

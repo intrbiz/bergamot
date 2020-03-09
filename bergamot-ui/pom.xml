@@ -62,19 +62,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-agent-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>lamplighter-reading-processor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-accounting-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-command-processor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.balsa</groupId>

@@ -9,6 +9,7 @@ import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
 import com.intrbiz.bergamot.cluster.coordinator.NotifierClusterCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
+import com.intrbiz.bergamot.cluster.lookup.AgentKeyClusterLookup;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
@@ -28,6 +29,8 @@ public class BergamotProcessor
     private final SiteNotificationBroker notificationBroker;
     
     private final SiteUpdateBroker updateBroker;
+    
+    private final AgentKeyClusterLookup agentKeyLookup;
     
     private final WorkerClusterCoordinator workerCoordinator;
     
@@ -51,6 +54,8 @@ public class BergamotProcessor
         this.siteEventBroker = new SiteEventBroker(this.hazelcast);
         this.notificationBroker = new SiteNotificationBroker(this.hazelcast);
         this.updateBroker = new SiteUpdateBroker(this.hazelcast);
+        // lookups
+        this.agentKeyLookup = new AgentKeyClusterLookup(this.hazelcast);
         // coordinators
         this.workerCoordinator = new WorkerClusterCoordinator(this.hazelcast);
         this.notifierCoordinator = new NotifierClusterCoordinator(this.hazelcast);
@@ -108,6 +113,31 @@ public class BergamotProcessor
     public SiteUpdateBroker getUpdateBroker()
     {
         return updateBroker;
+    }
+
+    public UUID getId()
+    {
+        return this.id;
+    }
+
+    public Scheduler getScheduler()
+    {
+        return this.scheduler;
+    }
+
+    public ResultProcessor getResultProcessor()
+    {
+        return this.resultProcessor;
+    }
+
+    public ReadingProcessor getReadingProcessor()
+    {
+        return this.readingProcessor;
+    }
+
+    public AgentKeyClusterLookup getAgentKeyLookup()
+    {
+        return this.agentKeyLookup;
     }
 
     public HazelcastInstance getHazelcastInstance()

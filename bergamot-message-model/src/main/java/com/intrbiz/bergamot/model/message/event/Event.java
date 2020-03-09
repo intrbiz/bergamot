@@ -8,6 +8,8 @@ import com.intrbiz.bergamot.model.message.Message;
  */
 public abstract class Event extends Message
 {
+    private static final long serialVersionUID = 1L;
+
     public Event()
     {
         super();

@@ -64,6 +64,11 @@
 			<artifactId>bergamot-worker-ssh</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-worker-agent</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-worker</finalName>

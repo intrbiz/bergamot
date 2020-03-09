@@ -56,7 +56,7 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
             String mount = executeCheck.getParameter("mount");
             if (Util.isEmpty(mount)) throw new RuntimeException("No disk mount point was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // get the CPU stats

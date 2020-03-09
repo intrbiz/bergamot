@@ -19,6 +19,7 @@ import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
@@ -177,6 +178,11 @@ public class FirstInstallRouter extends Router<BergamotApp>
         }
         // broadcast a site init event
         action("site-init", site);
+        // Create bergamot agent keys
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            db.setAgentKey(AgentKey.create(site.getId(), "Default Bergamot Agent Key"));
+        }
         // all done
         logger.info("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
         // mark first install as complete

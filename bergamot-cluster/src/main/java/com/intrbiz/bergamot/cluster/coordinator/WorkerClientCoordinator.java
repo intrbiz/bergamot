@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.cluster.model.WorkerRegistration;
 import com.intrbiz.bergamot.cluster.queue.WorkerConsumer;
 
@@ -29,7 +30,7 @@ public class WorkerClientCoordinator extends WorkerCoordinator
      * @param availableEngines the check engines this worker has
      * @return the {@code WorkerConsumer} associated to this worker
      */
-    public WorkerConsumer registerWorker(UUID workerId, boolean proxy, String application, String info, String hostName, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
+    public WorkerConsumer registerWorker(final UUID workerId, boolean proxy, String application, String info, String hostName, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
     {
         // We don't really want to allow multiple workers with the same id to register
         // TODO: we should probably just do the equivalent of ConcurrentMap.compute()
@@ -37,24 +38,37 @@ public class WorkerClientCoordinator extends WorkerCoordinator
             throw new RuntimeException("Worker already registered, wait for registration to timeout or use a new id");
         // Register the worker
         logger.info("Registering worker " + workerId);
-        WorkerRegistration reg = new WorkerRegistration(workerId, proxy, application, info, hostName, restrictedSiteIds, workerPool, availableEngines);
-        this.workers.put(workerId, reg);
+        final WorkerRegistration workerRegistration = new WorkerRegistration(workerId, proxy, application, info, hostName, restrictedSiteIds, workerPool, availableEngines);
+        this.workers.put(workerId, workerRegistration);
         // Build the consumer for this registered worker
-        return new WorkerConsumer(this.hazelcast, workerId, this::unregisterWorker, this::updateWorkerWatchdog);
+        return new WorkerConsumer(this.hazelcast.getQueue(ObjectNames.buildWorkerQueueName(workerId))) {
+            @Override
+            protected void updateWatchDog()
+            {
+                // Fetch our registration and register if needed
+                WorkerRegistration currentRegistration = WorkerClientCoordinator.this.workers.get(workerId);
+                if (currentRegistration == null)
+                {
+                    logger.info("Reregistering worker " + workerId);
+                    WorkerClientCoordinator.this.workers.put(workerId, workerRegistration);
+                }
+            }
+
+            @Override
+            protected void unregister()
+            {
+                WorkerClientCoordinator.this.workers.remove(workerId);
+            }
+        };
     }
     
-    private void updateWorkerWatchdog(UUID workerId)
+    public void registerAgent(UUID workerId, UUID agentId)
     {
-        // Perform a get on the key to invalidate the idle timeouts
-        this.workers.get(workerId);
+        this.agents.put(agentId, workerId);
     }
     
-    /**
-     * Unregister a worker
-     */
-    public void unregisterWorker(UUID workerId)
+    public void unregisterAgent(UUID workerId, UUID agentId)
     {
-        // Remove the worker from the registration map
-        this.workers.remove(workerId);
+        this.agents.remove(agentId, workerId);
     }
 }

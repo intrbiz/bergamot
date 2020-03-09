@@ -21,8 +21,7 @@ import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.AccessControl;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.AgentRegistration;
-import com.intrbiz.bergamot.model.AgentTemplate;
+import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
@@ -97,7 +96,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({4, 0, 1}),
+        version = @SQLVersion({4, 0, 2}),
         tables = {
             Site.class,
             Location.class,
@@ -124,7 +123,6 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ConfigChange.class,
             CheckStats.class,
             CheckTransition.class,
-            AgentRegistration.class,
             CheckSavedState.class,
             SecurityDomain.class,
             SecurityDomainMembership.class,
@@ -137,13 +135,13 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ContactU2FDeviceRegistration.class,
             ContactHOTPRegistration.class,
             ContactBackupCode.class,
-            AgentTemplate.class,
             GlobalSetting.class,
             Credential.class,
             SLA.class,
             SLARollingPeriod.class,
             SLAFixedPeriod.class,
-            SLAReport.class
+            SLAReport.class,
+            AgentKey.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -2106,42 +2104,17 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // agent
     
-    @SQLSetter(table = AgentRegistration.class, name = "set_agent_registration", since = @SQLVersion({2, 2, 0}))
-    public abstract void setAgentRegistration(AgentRegistration reg);
+    @SQLSetter(table = AgentKey.class, name = "set_agent_key", since = @SQLVersion({4, 0, 2}))
+    public abstract void setAgentKey(AgentKey key);
     
-    @SQLGetter(table = AgentRegistration.class, name = "get_agent_registration", since = @SQLVersion({2, 2, 0}))
-    public abstract AgentRegistration getAgentRegistration(@SQLParam("id") UUID id);
+    @SQLGetter(table = AgentKey.class, name = "get_agent_key", since = @SQLVersion({4, 0, 2}))
+    public abstract AgentKey getAgentKey(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = AgentRegistration.class, name ="get_agent_registration_by_name", since = @SQLVersion({2, 2, 0}))
-    public abstract AgentRegistration getAgentRegistrationByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
+    @SQLRemove(table = AgentKey.class, name = "remove_agent_key", since = @SQLVersion({4, 0, 2}))
+    public abstract void removeAgentKey(@SQLParam("id") UUID id);
     
-    @SQLRemove(table = AgentRegistration.class, name = "remove_agent_registration", since = @SQLVersion({2, 2, 0}))
-    public abstract void removeAgentRegistration(@SQLParam("id") UUID id);
-    
-    @SQLGetter(table = AgentRegistration.class, name = "list_agent_registrations", since = @SQLVersion({2, 2, 0}))
-    public abstract List<AgentRegistration> listAgentRegistrations(@SQLParam("site_id") UUID siteId);
-    
-    // agent template
-    
-    @SQLSetter(table = AgentTemplate.class, name = "set_agent_template", since = @SQLVersion({3, 41, 0}))
-    public abstract void setAgentTemplate(AgentTemplate reg);
-    
-    @SQLGetter(table = AgentTemplate.class, name = "get_agent_template", since = @SQLVersion({3, 41, 0}))
-    public abstract AgentTemplate getAgentTemplate(@SQLParam("id") UUID id);
-    
-    @SQLGetter(table = AgentTemplate.class, name ="get_agent_template_by_name", since = @SQLVersion({3, 41, 0}))
-    public abstract AgentTemplate getAgentTemplateByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
-    
-    @SQLRemove(table = AgentTemplate.class, name = "remove_agent_template", since = @SQLVersion({3, 41, 0}))
-    public abstract void removeAgentTemplate(@SQLParam("id") UUID id);
-    
-    @SQLGetter(table = AgentTemplate.class, name = "list_agent_templates", since = @SQLVersion({3, 41, 0}))
-    public abstract List<AgentTemplate> listAgentTemplates(@SQLParam("site_id") UUID siteId);
-    
-    @SQLGetter(table = Config.class, name = "list_host_templates_without_certificates", since = @SQLVersion({3, 42, 0}),
-            query = @SQLQuery("SELECT c.* FROM bergamot.config c LEFT JOIN bergamot.agent_template t ON (c.id = t.id) WHERE c.type = 'host'  AND c.template AND t.id IS NULL")
-    )
-    public abstract List<Config> listHostTemplatesWithoutCertificates(@SQLParam("site_id") UUID siteId);
+    @SQLGetter(table = AgentKey.class, name = "list_agent_keys", since = @SQLVersion({4, 0, 2}))
+    public abstract List<AgentKey> listAgentKeys(@SQLParam("site_id") UUID siteId);
     
     // generic
     

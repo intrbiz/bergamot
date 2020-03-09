@@ -125,7 +125,6 @@
     <module>bergamot-crypto-util</module>
     <module>bergamot-nagios</module>
     <module>bergamot-worker-agent</module>
-    <module>bergamot-agent-config</module>
     <module>bergamot-agent-server-config</module>
     <module>bergamot-worker-dummy</module>
     <module>bergamot-notifier-webhook</module>
@@ -138,7 +137,6 @@
     <module>bergamot-worker-jmx</module>
     <module>bergamot-worker-ssh</module>
     <module>bergamot-check-ssh</module>
-    <module>bergamot-command-processor</module>
     <module>bergamot-notifier-slack</module>
     <module>bergamot-worker</module>
     <module>bergamot-cluster</module>
@@ -236,11 +234,6 @@
   		  		<dependency>
   			<groupId>com.intrbiz.bergamot</groupId>
   			<artifactId>bergamot-agent-server</artifactId>
-  			<version>${project.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-agent-config</artifactId>
   			<version>${project.version}</version>
   		</dependency>
   		<dependency>
@@ -479,11 +472,6 @@
   			<groupId>com.intrbiz.gerald</groupId>
   			<artifactId>gerald-witchcraft</artifactId>
   			<version>1.1.0</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>com.intrbiz.bergamot</groupId>
-  			<artifactId>bergamot-command-processor</artifactId>
-  			<version>${project.version}</version>
   		</dependency>
   		<dependency>
   			<groupId>org.bouncycastle</groupId>

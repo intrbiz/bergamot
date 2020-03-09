@@ -47,6 +47,10 @@
 			<artifactId>bergamot-message-model</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-agent-message-model</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>data-annotations</artifactId>
 		</dependency>

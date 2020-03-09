@@ -22,6 +22,8 @@ public abstract class WorkerCoordinator
     
     protected final IMap<UUID, WorkerRegistration> workers;
     
+    protected final IMap<UUID, UUID> agents;
+    
     public WorkerCoordinator(HazelcastInstance hazelcast)
     {
         super();
@@ -29,6 +31,7 @@ public abstract class WorkerCoordinator
         this.configureHazelcast(this.hazelcast.getConfig());
         // Get our state maps
         this.workers = this.hazelcast.getMap(ObjectNames.buildWorkerRegistrationsMapName());
+        this.agents = this.hazelcast.getMap(ObjectNames.buildAgentsMapName());
     }
     
     protected void configureHazelcast(Config hazelcastConfig)
@@ -43,5 +46,10 @@ public abstract class WorkerCoordinator
     public WorkerRegistration getWorker(UUID workerId)
     {
         return this.workers.get(workerId);
+    }
+    
+    public UUID getWorkerForAgent(UUID agentId)
+    {
+        return this.agents.get(agentId);
     }
 }

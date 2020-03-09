@@ -17,12 +17,12 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarPermissionDeniedException;
 import org.hyperic.sigar.SigarProxy;
 
+import com.intrbiz.bergamot.agent.util.AgentUtil;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
 import com.intrbiz.bergamot.model.message.agent.stat.process.ProcessInfo;
-import com.intrbiz.bergamot.util.AgentUtil;
 
 public class ProcessInfoHandler extends AbstractAgentHandler
 {

@@ -14,7 +14,7 @@
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
 					<span class="name">#{ucFirst(coalesce(worker.application, 'Worker'))}</span>
-					<span class="name">(#{worker.id})</span>
+					<span class="name" style="font-size: 12px">(#{worker.id})</span>
 			    </h3>
 			    <p>
 				    <span class="label">Worker Pool: </span>
@@ -40,7 +40,7 @@
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
 					<span class="name">#{ucFirst(coalesce(notifier.application, 'Notifier'))}</span>
-					<span class="name">(#{notifier.id})</span>
+					<span class="name" style="font-size: 12px">(#{notifier.id})</span>
 			    </h3>
 			    <p>
 				    <span class="label">Host: </span>
@@ -62,11 +62,8 @@
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
 					<span class="name" title="The member this processor resides on">Member #{processor.address}</span>
+					<span class="name" style="font-size: 12px">(#{processor.uuid})</span>
 			    </h3>
-			    <p>
-				    <span class="label" title="The UUID of this member">UUID: </span>
-				    <span class="value" style="font-size: 13px;">#{processor.uuid}</span>
-			    </p>				    
 			    <p>
 				    <span class="label" title="The number of site pools being processed">Site Pools: </span>
 				    <span class="value">#{processor.pools.size}</span>
@@ -102,7 +99,7 @@
 							<td></td>
 							<td></td>
 							<td>#{site_routes.key}</td>
-							<td>#{list(site_routes.value).size}</td>
+							<td>#{int(site_routes.value)}</td>
 						</tr>
 					</data-set>
 				</data-set>
@@ -127,7 +124,7 @@
 					<tr>
 						<td></td>
 						<td>#{site_routes.key}</td>
-						<td>#{list(site_routes.value).size}</td>
+						<td>#{int(site_routes.value)}</td>
 					</tr>
 				</data-set>
 			</data-set>

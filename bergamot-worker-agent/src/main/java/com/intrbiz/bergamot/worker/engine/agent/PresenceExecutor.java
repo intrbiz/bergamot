@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
 import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
+import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 /**
@@ -46,11 +47,11 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 agent.sendOnePingAndOnePingOnly((rtt) -> {
-                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentName() + " connected. Latency: " + rtt + "ms").runtime(rtt));
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentUserAgent() + " connected. Latency: " + rtt + "ms").runtime(rtt));
                     context.publishReading(executeCheck, new LongGaugeReading("latency", "ms", rtt));
                 });
             }
@@ -66,23 +67,23 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     }
     
     @Override
-    public void start()
+    public void start(AgentEngine engine, EngineContext context)
     {
         // setup event handlers
         // on connection
-        this.getEngine().getAgentServer().setOnAgentRegisterHandler((handler) -> {
+        this.getEngine().getAgentServer().setOnAgentConnectHandler((handler) -> {
             // publish a passive result for the presence of this host
-            if (logger.isTraceEnabled()) logger.trace("Got agent connection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
+            if (logger.isTraceEnabled()) logger.trace("Got agent connection: " + handler.getAgentUserAgent() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
             // submit a passive result for the host
-            this.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
+            context.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentUserAgent() + " connected"));
         });
         // on disconnection
-        this.getEngine().getAgentServer().setOnAgentUnregisterHandler((handler) -> {
+        this.getEngine().getAgentServer().setOnAgentDisconnectHandler((handler) -> {
             // publish a passive result for the presence of this host
             // debug log
-            if (logger.isTraceEnabled()) logger.trace("Got agent disconnection: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
+            if (logger.isTraceEnabled()) logger.trace("Got agent disconnection: " + handler.getAgentUserAgent() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
             // submit a passive result for the host
-            this.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).disconnected("Bergamot Agent disconnected"));
+            context.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).disconnected("Bergamot Agent disconnected"));
         });
         // on ping?
         // disabled by default as this will send a result every 30 seconds
@@ -90,9 +91,9 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
         {
             this.getEngine().getAgentServer().setOnAgentPingHandler((handler) -> {
                 // publish a passive result for the presence of this host
-                if (logger.isTraceEnabled()) logger.trace("Got agent ping: " + handler.getAgentName() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
+                if (logger.isTraceEnabled()) logger.trace("Got agent ping: " + handler.getAgentUserAgent() + " " + handler.getAgentId() + ", site: " + handler.getSiteId());
                 // submit a passive result for the host
-                this.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentName() + " connected"));
+                context.publishResult(new PassiveResultMO().passive(handler.getSiteId(), new MatchOnAgentId(handler.getAgentId())).ok("Bergamot Agent " + handler.getAgentUserAgent() + " connected"));
             });
         }
     }
