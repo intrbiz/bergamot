@@ -48,6 +48,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         // workers, notifiers, processing pools and other cluster information
         var("workers", app().getProcessor().getWorkerCoordinator().getWorkers());
         var("worker_route_table", app().getProcessor().getWorkerCoordinator().getRoutingTable());
+        var("worker_agents", app().getProcessor().getWorkerCoordinator().countAgents());
         var("notifiers", app().getProcessor().getNotifierCoordinator().getNotifiers());
         var("notifier_route_table", app().getProcessor().getNotifierCoordinator().getRoutingTable());
         var("cluster_info", app().getProcessor().getProcessingPoolCoordinator().info());

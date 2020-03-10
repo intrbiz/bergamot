@@ -12,7 +12,7 @@
 		</p>
 		<hr/>
 		<p class="centre">
-		  It might take a few minutes to create #{intall.siteSummary}, please be paitent.
+		  It might take a few minutes to create #{install.siteSummary}, please be paitent.
 		</p>
 		<form method="post" action="#{path('/global/install/go')}">
 			<p>

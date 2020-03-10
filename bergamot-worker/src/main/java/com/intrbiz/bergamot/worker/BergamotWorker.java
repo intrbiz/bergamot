@@ -223,13 +223,13 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             @Override
             public void registerAgent(UUID agentId)
             {
-                // TODO
+                workerCoordinator.registerAgent(id, agentId);
             }
 
             @Override
             public void unregisterAgent(UUID agentId)
             {
-                // TODO
+                workerCoordinator.unregisterAgent(id, agentId);
             }
 
             @Override

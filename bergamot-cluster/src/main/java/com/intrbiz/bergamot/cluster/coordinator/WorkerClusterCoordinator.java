@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.cluster.coordinator;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -30,6 +31,7 @@ import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.model.WorkerRegistration;
 import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
+import com.intrbiz.bergamot.cluster.util.WorkerAgentCountAggregator;
 import com.intrbiz.bergamot.cluster.util.WorkerIdPredicate;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
@@ -281,6 +283,11 @@ public class WorkerClusterCoordinator extends WorkerCoordinator implements Worke
             logger.info("Removing worker " + workerId + " to routing table");
             removeRoutesFromTable(this.routingTable, workerId);
         }
+    }
+    
+    public Map<UUID, Integer> countAgents()
+    {
+        return this.agents.aggregate(new WorkerAgentCountAggregator());
     }
     
     public UUID route(UUID siteId, String workerPool, String engine)

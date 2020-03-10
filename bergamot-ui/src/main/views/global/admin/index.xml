@@ -31,6 +31,7 @@
 			</div>
 		</data-set>
     </div>
+    
     <div class="row">
 		<h3>Notifiers</h3>
 		<data-set var="notifier" value="#{notifiers}">
@@ -53,6 +54,7 @@
 			</div>
 		</data-set>
     </div>
+    
     <div class="row">
 		<h3 title="The processing pools in this Bergamot cluster which can schedule checks and process results">Processing Pools</h3>
 		<data-set var="processor" value="#{cluster_info.processors}">
@@ -71,6 +73,7 @@
 			</div>
 		</data-set>
 	</div>
+	
     <div class="row">
 		<h3>Worker Routes</h3>
 		<table style="width: 100%">
@@ -106,6 +109,23 @@
 			</data-set>
 		</table>
 	</div>
+	
+	<div class="row">
+		<h3>Agents</h3>
+		<table style="width: 100%">
+			<tr>
+				<th>Worker</th>
+				<th>Agents</th>
+			</tr>
+			<data-set var="worker_agent" value="#{worker_agents.entrySet()}">
+				<tr>
+					<td>#{worker_agent.key}</td>
+					<td>#{worker_agent.value}</td>
+				</tr>
+			</data-set>
+		</table>
+	</div>
+	
 	<div class="row">
 		<h3>Notifier Routes</h3>
 		<table style="width: 100%">
@@ -130,6 +150,7 @@
 			</data-set>
 		</table>
 	</div>
+	
     <div class="row">
 		<h3>Sites</h3>
 		<table style="width: 100%">
@@ -167,7 +188,8 @@
 			</data-set>
 		</table>
 	</div>
-	    <div class="row">
+	
+	<div class="row">
 		<h3>Global Admins</h3>
 		<table style="width: 100%">
 			<tr>
@@ -220,4 +242,5 @@
 			</tr>
 		</table>
 	</div>
+	
 </fragment>
