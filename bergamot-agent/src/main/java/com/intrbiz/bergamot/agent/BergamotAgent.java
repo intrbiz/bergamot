@@ -1,26 +1,21 @@
 package com.intrbiz.bergamot.agent;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
-import java.security.KeyStore;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLParameters;
-import javax.net.ssl.TrustManagerFactory;
-import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -29,10 +24,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 
-import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
-import com.intrbiz.bergamot.agent.config.Configurable;
 import com.intrbiz.bergamot.agent.handler.AgentInfoHandler;
-import com.intrbiz.bergamot.agent.handler.AgentRegistrationHandler;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
 import com.intrbiz.bergamot.agent.handler.DiskIOHandler;
@@ -50,6 +42,8 @@ import com.intrbiz.bergamot.agent.handler.UptimeInfoHandler;
 import com.intrbiz.bergamot.agent.handler.WhoInfoHandler;
 import com.intrbiz.bergamot.agent.statsd.StatsDProcessor;
 import com.intrbiz.bergamot.agent.statsd.StatsDReceiver;
+import com.intrbiz.bergamot.agent.util.AgentUtil;
+import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
@@ -76,17 +70,25 @@ import io.netty.util.concurrent.GenericFutureListener;
 
 /**
  */
-public class BergamotAgent implements Configurable<BergamotAgentCfg>
+public class BergamotAgent
 {
     public static final String AGENT_VENDOR = "Bergamot Monitoring";
     
     public static final String AGENT_PRODUCT = "Bergamot Agent";
     
-    public static final String AGENT_VERSION = "3.0.0";
+    public static final String AGENT_VERSION = "4.0.0";
     
     private static final Logger logger = Logger.getLogger(BergamotAgent.class);
     
     private URI server;
+    
+    private UUID agentId;
+    
+    private String hostName;
+    
+    private String templateName;
+    
+    private AgentAuthenticationKey key;
 
     private EventLoopGroup eventLoop;
     
@@ -96,13 +98,11 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     private AgentHandler defaultHandler;
     
-    private SSLContext sslContext;
-    
-    private BergamotAgentCfg configuration;
-    
     private volatile Channel channel;
     
     private AtomicInteger connectionAttempt = new AtomicInteger(0);
+    
+    private int statsDPort = 0;
     
     private StatsDProcessor statsDProcessor;
     
@@ -134,7 +134,6 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         }, 30000L, 30000L);
         // handlers
         this.setDefaultHandler(new DefaultHandler());
-        this.registerHandler(new AgentRegistrationHandler());
         this.registerHandler(new CPUInfoHandler());
         this.registerHandler(new MemInfoHandler());
         this.registerHandler(new DiskInfoHandler());
@@ -168,73 +167,120 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     {
         return this.statsDProcessor;
     }
-    
-    public BergamotAgentCfg getConfiguration()
-    {
-        return this.configuration;
-    }
 
-    @Override
-    public void configure(BergamotAgentCfg cfg) throws Exception
+    public void configure() throws Exception
     {
-        this.configuration = cfg;
-        // configure this agent
-        this.server = new URI(cfg.getServer());
-        logger.info("Bergamot Agent, connecting to " + this.server + " configured");
+        // Configure the server URL
+        this.configureServerURL();
+        // Configure agent details
+        this.configureAgentId();
+        this.configureAgentHostName();
+        this.configureAgentTemplateName();
+        // Configure authentication
+        this.configureAgentKey();
+        // Configure statsD
+        this.configureStatsD();
+        // Finish configuration
+        logger.info("Bergamot Agent, connecting to " + this.server);
         this.eventLoop = new NioEventLoopGroup(1);
-        this.sslContext = this.createContext();
     }
     
-    private SSLContext createContext()
+    private String getProperty(String propertyName, boolean required) throws Exception
+    {
+        String envVarName = propertyName.toUpperCase().replace('.', '_');
+        String value = AgentUtil.coalesce(System.getProperty(propertyName), System.getenv(envVarName));
+        if (AgentUtil.isEmpty(value) && required) {
+           throw new RuntimeException("Could not find configuration value for property " + propertyName + " (ENV[" + envVarName + "])");
+        }
+        return value;
+    }
+    
+    private void configureServerURL() throws Exception
+    {
+        this.server = new URI(getProperty("bergamot.agent.url", true));
+    }
+    
+    private void configureStatsD() throws Exception
+    {
+        String port = getProperty("statsd.port", false);
+        if (! AgentUtil.isEmpty(port))
+        {
+            this.statsDPort = Integer.parseInt(port);
+        }
+    }
+    
+    private void configureAgentId() throws Exception
+    {
+        // Search for the agent Id
+        String agentId = getProperty("bergamot.agent.id", false);
+        // TODO: fall back to another agent id source
+        // Try to set the agent id
+        if (AgentUtil.isEmpty(agentId))
+        {
+            throw new RuntimeException("Failed to work out Bergamot agent Id, please set 'bergamot.agent.id'!");
+        }
+        else
+        {
+            this.agentId = UUID.fromString(agentId);
+        }
+    }
+    
+    private void configureAgentHostName() throws Exception
+    {
+        // Search for the host name
+        String hostName = getProperty("bergamot.agent.host.name", false);
+        if (AgentUtil.isEmpty(hostName))
+            hostName = this.getHostNameFromLocalHost();
+        // Try to set the hostname
+        if (AgentUtil.isEmpty(hostName))
+        {
+            throw new RuntimeException("Failed to work out Bergamot agent host name, please set 'bergamot.agent.host.name'!");
+        }
+        else
+        {
+            this.hostName = hostName;
+        }
+    }
+        
+    private String getHostNameFromLocalHost()
     {
         try
         {
-            String pass = "abc123";
-            // create the keystore
-            KeyStore sks = KeyStoreUtil.loadClientAuthKeyStore(pass, this.configuration.getKeyTrimmed(), this.configuration.getCertificateTrimmed(), this.configuration.getSiteCaCertificateTrimmed(), this.configuration.getCaCertificateTrimmed());
-            KeyStore tks = KeyStoreUtil.loadTrustKeyStore(this.configuration.getCaCertificateTrimmed());
-            // the key manager
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(sks, pass.toCharArray());
-            // the trust manager
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(tks);
-            // the context
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
-            return context;
+            return InetAddress.getLocalHost().getCanonicalHostName();
         }
-        catch (Exception e)
+        catch (UnknownHostException e)
         {
-            throw new RuntimeException("Failed to init SSLContext", e);
         }
+        return null;
+    }
+    
+    private void configureAgentTemplateName() throws Exception
+    {
+        this.templateName = getProperty("bergamot.agent.template.name", false);
+    }
+    
+    private void configureAgentKey() throws Exception
+    {
+        this.key = new AgentAuthenticationKey(getProperty("bergamot.agent.key", true));
+    }
+    
+    private boolean isSecure()
+    {
+        return "wss".equalsIgnoreCase(this.server.getScheme()) ||
+               "https".equalsIgnoreCase(this.server.getScheme());
     }
     
     private SSLEngine createSSLEngine(String host, int port)
     {
         try
         {
-            SSLEngine sslEngine = this.sslContext.createSSLEngine(host, port);
-            sslEngine.setUseClientMode(true);
-            sslEngine.setNeedClientAuth(true);
-            // set TLS protocols
-            sslEngine.setEnabledProtocols(TLSUtils.computeSupportedProtocols(sslEngine, TLSUtils.PROTOCOLS.SAFE_PROTOCOLS));
-            SSLParameters params = new SSLParameters();
-            // can't do this in JDK 6
-            // params.setEndpointIdentificationAlgorithm("HTTPS");
-            params.setNeedClientAuth(true);
-            sslEngine.setSSLParameters(params);
-            return sslEngine;
+            return SSLContext.getDefault().createSSLEngine();
         }
-        catch (Exception e)
+        catch (NoSuchAlgorithmException e)
         {
-            throw new RuntimeException("Failed to init SSLEngine", e);
+            logger.error("Failed to create default SSLContext", e);
         }
-    }
-    
-    public URI getServer()
-    {
-        return this.server;
+        return null;
     }
     
     public void registerHandler(AgentHandler handler)
@@ -271,12 +317,12 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             throw new RuntimeException("Failed to setup Sigar, aborting!", e);
         }
         // setup StatsD
-        if (this.configuration.getStatsDPort() > 0)
+        if (this.statsDPort > 0)
         {
             try
             {
                 this.statsDProcessor = new StatsDProcessor();
-                this.statsDReceiver = new StatsDReceiver(this.configuration.getStatsDPort(), this.statsDProcessor);
+                this.statsDReceiver = new StatsDReceiver(this.statsDPort, this.statsDProcessor);
                 this.statsDRunner = new Thread(this.statsDReceiver);
                 this.statsDRunner.start();
             }
@@ -291,7 +337,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
 
     private void connect()
     {
-        final SSLEngine engine = createSSLEngine(this.server.getHost(), this.server.getPort());
+        final SSLEngine engine = isSecure() ? createSSLEngine(this.server.getHost(), this.server.getPort()) : null;
         // configure the client
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
@@ -306,10 +352,10 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  90 /* seconds */ )); 
                 pipeline.addLast("write-timeout", new WriteTimeoutHandler( 90 /* seconds */ ));
-                pipeline.addLast("ssl",           new SslHandler(engine));
+                if (engine != null) pipeline.addLast("ssl", new SslHandler(engine));
                 pipeline.addLast("codec",         new HttpClientCodec()); 
                 pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
-                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server)
+                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.agentId, BergamotAgent.this.hostName, BergamotAgent.this.templateName, BergamotAgent.this.key)
                 {
                     @Override
                     protected AgentMessage processAgentMessage(final ChannelHandlerContext ctx, final AgentMessage request)
@@ -379,7 +425,7 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
     
     protected void scheduleReconnect()
     {
-        long wait = Math.min(Math.max(connectionAttempt.get(), 1) * 1000L, 15000L);
+        long wait = Math.min(Math.max(connectionAttempt.get(), 1) * 1000L, 12000L) + (new SecureRandom().nextInt(3000));
         logger.info("Scheduling reconnection in " + wait + "ms");
         this.timer.schedule(new TimerTask() {
             @Override
@@ -422,28 +468,6 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
         }
     }
     
-    public void restart(final BergamotAgentCfg newConfig)
-    {
-        this.timer.schedule(new TimerTask() {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    BergamotAgent.this.terminate();
-                    // reconfigure
-                    BergamotAgent.this.configure(newConfig);
-                    // start
-                    BergamotAgent.this.start();
-                }
-                catch (Exception e)
-                {
-                    BergamotAgent.logger.error("Failed to restart BergamotAgent", e);
-                }
-            }
-        }, 500L);
-    }
-    
     private static void configureLogging() throws Exception
     {
         String logging = System.getProperty("bergamot.logging", "console");
@@ -459,55 +483,23 @@ public class BergamotAgent implements Configurable<BergamotAgentCfg>
             PropertyConfigurator.configure(new File(logging).getAbsolutePath());
         }
     }
-    
-    public static BergamotAgentCfg readConfig() throws JAXBException, FileNotFoundException, IOException
-    {
-        // our possible configuration files
-        for (File config : new File[] { new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml")), new File(System.getProperty("bergamot.agent.config.template", "/etc/bergamot/agent-template.xml"))})
-        {
-            config = config.getAbsoluteFile();
-            logger.info("Trying configuration file: " + config.getAbsolutePath());
-            if (config.exists())
-            {
-                FileInputStream input = new FileInputStream(config);
-                try
-                {
-                    return BergamotAgentCfg.read(BergamotAgentCfg.class, input);
-                }
-                finally
-                {
-                    input.close();
-                }
-            }
-        }
-        throw new FileNotFoundException("Failed to find bergamot agent configuration file");
-    }
-    
-    public static void saveConfig(BergamotAgentCfg newConfig) throws JAXBException, FileNotFoundException, IOException
-    {
-        File configFile = new File(System.getProperty("bergamot.agent.config", "/etc/bergamot/agent.xml")).getAbsoluteFile();
-        logger.info("Writing configuration to: " + configFile);
-        // write the file
-        FileOutputStream output = new FileOutputStream(configFile);
-        try
-        {
-            BergamotAgentCfg.write(BergamotAgentCfg.class, newConfig, output);
-        }
-        finally
-        {
-            output.close();
-        }
-    }
 
     public static void main(String[] args) throws Exception
     {
-        // setup loggiing
-        configureLogging();
-        // load our config
-        BergamotAgentCfg config = readConfig();
-        // start the agent
-        BergamotAgent agent = new BergamotAgent();
-        agent.configure(config);
-        agent.start();
+        try
+        {
+            // setup logging
+            configureLogging();
+            // start the agent
+            BergamotAgent agent = new BergamotAgent();
+            agent.configure();
+            agent.start();
+        }
+        catch (Throwable e)
+        {
+            System.out.println("Failed to start Bergamot Agent");
+            e.printStackTrace(System.out);
+            System.exit(1);
+        }
     }
 }

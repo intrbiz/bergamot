@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Remove the check from the scheduler
  */
 @JsonTypeName("bergamot.unschedule_check")
-public class UnscheduleCheck extends ActiveCheckSchedulerAction
+public class UnscheduleCheck extends SchedulerAction
 {
     public UnscheduleCheck()
     {

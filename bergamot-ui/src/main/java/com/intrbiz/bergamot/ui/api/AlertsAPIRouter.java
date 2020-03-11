@@ -21,15 +21,8 @@ import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.AlertMO;
-import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
 import com.intrbiz.bergamot.model.message.update.AlertUpdate;
-import com.intrbiz.bergamot.model.message.update.Update;
-import com.intrbiz.bergamot.queue.NotificationQueue;
-import com.intrbiz.bergamot.queue.UpdateQueue;
-import com.intrbiz.bergamot.queue.key.NotificationKey;
-import com.intrbiz.bergamot.queue.key.UpdateKey;
-import com.intrbiz.bergamot.queue.key.UpdateKey.UpdateType;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
@@ -43,7 +36,6 @@ import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Var;
 import com.intrbiz.metadata.doc.Desc;
 import com.intrbiz.metadata.doc.Title;
-import com.intrbiz.queue.RoutedProducer;
 
 
 @Title("Alert API Methods")
@@ -56,29 +48,10 @@ public class AlertsAPIRouter extends Router<BergamotApp>
 {
     private Logger logger = Logger.getLogger(AlertsAPIRouter.class);
     
-    private NotificationQueue notificationQueue;
-    
-    private RoutedProducer<Notification, NotificationKey> notificationsProducer;
-    
-    private UpdateQueue updateQueue;
-    
-    private RoutedProducer<Update, UpdateKey> updateProducer;
-    
     private Accounting accounting = Accounting.create(AlertsAPIRouter.class);
     
     public AlertsAPIRouter()
     {
-    }
-    
-    @Override
-    public void start() throws Exception
-    {
-        // notifications
-        this.notificationQueue = NotificationQueue.open();
-        this.notificationsProducer = this.notificationQueue.publishNotifications();
-        // updates
-        this.updateQueue = UpdateQueue.open();
-        this.updateProducer = this.updateQueue.publishUpdates();   
     }
     
     @Title("List alerts")
@@ -177,7 +150,8 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                     if (sendAck != null && (! sendAck.getTo().isEmpty()))
                     {
                         logger.warn("Sending acknowledge for " + alert.getId());
-                        this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
+                        // TODO
+                        // this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
                         // accounting
                         this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
                     }
@@ -192,7 +166,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 }
             }
             // send alert update
-            this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), new AlertUpdate(alert.toMO(currentPrincipal())));
+            action("publish-update", alert.getSiteId(), new AlertUpdate(alert.toMO(currentPrincipal())));
         }
         return alert.toMO(currentPrincipal());
     }
@@ -230,7 +204,7 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 db.setAlert(alert);
             });
             // send alert update
-            this.updateProducer.publish(new UpdateKey(UpdateType.ALERT, alert.getSiteId(), alert.getId()), new AlertUpdate(alert.toMO(currentPrincipal())));
+            action("publish-update", alert.getSiteId(), new AlertUpdate(alert.toMO(currentPrincipal())));
         }
         return alert.toMO(currentPrincipal());
     }

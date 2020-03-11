@@ -15,7 +15,7 @@ import io.netty.handler.ssl.SslHandshakeCompletionEvent;
 
 public class WebHookClientHandler extends ChannelInboundHandlerAdapter
 {
-    private final Logger logger = Logger.getLogger(WebHookClientHandler.class);
+    private static final Logger logger = Logger.getLogger(WebHookClientHandler.class);
     
     private volatile long start;
     
@@ -44,7 +44,7 @@ public class WebHookClientHandler extends ChannelInboundHandlerAdapter
         {
             FullHttpResponse response = (FullHttpResponse) msg;
             long runtime = System.currentTimeMillis() - this.start;
-            logger.info("WebHook: Got HTTP response: " + response.getStatus() + " in: " + runtime + "ms");
+            logger.info("WebHook: Got HTTP response: " + response.status() + " in: " + runtime + "ms");
             if (logger.isTraceEnabled()) logger.trace("Response:\n" + response);
             // cancel the timeout
             if (this.timeoutTask != null) this.timeoutTask.cancel();

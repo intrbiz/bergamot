@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -20,19 +19,10 @@ import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
-import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
-import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
-import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
-import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.metadata.Any;
@@ -41,8 +31,6 @@ import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Template;
-import com.intrbiz.queue.RPCClient;
-import com.intrbiz.queue.name.RoutingKey;
 
 @Prefix("/global/install")
 @Template("layout/install")
@@ -172,9 +160,10 @@ public class FirstInstallRouter extends Router<BergamotApp>
             }
         }
         // now create the site
+        Site site = new Site(siteId, siteName, siteSummary);
         try (BergamotDB db = BergamotDB.connect())
         {
-            db.setSite(new Site(siteId, siteName, siteSummary));
+            db.setSite(site);
         }
         // setup the readings
         try (LamplighterDB db = LamplighterDB.connect())
@@ -187,42 +176,12 @@ public class FirstInstallRouter extends Router<BergamotApp>
             BergamotImportReport report = new BergamotConfigImporter(vbcfg).offline().defaultPassword(install.getPassword()).requirePasswordChange(false).resetState(true).importConfiguration();
             logger.info(report.toString());
         }
-        // create the Site CA
-        try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
+        // broadcast a site init event
+        action("site-init", site);
+        // Create bergamot agent keys
+        try (BergamotDB db = BergamotDB.connect())
         {
-            try (RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client = queue.createBergamotAgentManagerRPCClient())
-            {
-                try
-                {
-                    AgentManagerResponse response = client.publish(new CreateSiteCA(siteId, siteName)).get(5, TimeUnit.SECONDS);
-                    if (response instanceof CreatedSiteCA)
-                    {
-                        logger.info("Created Bergamot Agent site Certificate Authority");
-                    }
-                }
-                catch (Exception e)
-                {
-                }
-            }
-        }
-        // message the UI cluster to setup the site
-        try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
-        {
-            try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
-            {
-                try
-                {
-                    ClusterManagerResponse response = client.publish(new InitSite(siteId, siteName)).get(30, TimeUnit.SECONDS);
-                    if (response instanceof InitedSite)
-                    {
-                        logger.info("Initialised site with UI cluster");
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.error("Failed to initialise site with UI cluster");
-                }
-            }
+            db.setAgentKey(AgentKey.create(site.getId(), "Default Bergamot Agent Key"));
         }
         // all done
         logger.info("Created the site '" + siteName + "' and imported the default configuration, have fun :)");

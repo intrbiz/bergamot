@@ -15,15 +15,13 @@ import com.amazonaws.services.sns.model.MessageAttributeValue;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.notification.engine.sms.model.SMSMessage;
 import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
+import com.intrbiz.configuration.Configuration;
 
 public class AWSTransport implements SMSTransport
 {
     private static final Logger logger = Logger.getLogger(AWSTransport.class);
-    
-    private NotificationEngineCfg config;
     
     private AWSCredentialsProvider awsCredentials;
     
@@ -35,9 +33,8 @@ public class AWSTransport implements SMSTransport
     }
 
     @Override
-    public void configure(NotificationEngineCfg cfg) throws Exception
+    public void configure(Configuration cfg) throws Exception
     {
-        this.config = cfg;
         // auth details
         String awsAccessKeyId = cfg.getStringParameterValue("aws.accessKeyId", null);
         String awsSecretKey   = cfg.getStringParameterValue("aws.secretKey", null);
@@ -56,12 +53,6 @@ public class AWSTransport implements SMSTransport
                 .withCredentials(this.awsCredentials)
                 .withRegion(cfg.getStringParameterValue("aws.region", "eu-west-1"))
                 .build();
-    }
-
-    @Override
-    public NotificationEngineCfg getConfiguration()
-    {
-        return this.config;
     }
 
     @Override

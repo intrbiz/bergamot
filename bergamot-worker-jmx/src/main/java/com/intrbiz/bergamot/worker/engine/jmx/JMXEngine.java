@@ -14,18 +14,7 @@ public class JMXEngine extends AbstractEngine
 
     public JMXEngine()
     {
-        super(NAME);
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        // add the default executor
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new ScriptedJMXExecutor());
-        }
+        super(NAME, new ScriptedJMXExecutor());
         // setup the checker
         this.checker = new JMXChecker();
     }

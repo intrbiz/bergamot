@@ -14,6 +14,7 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 
@@ -50,7 +51,7 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
      *   peak      - check the peak IO rate rather than 5 minute average
      */
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent disk io");
         try
@@ -59,7 +60,7 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // get the user stats
@@ -73,7 +74,7 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
                     double critical = executeCheck.getDoubleParameter("critical", 250);
                     // apply the check
                     boolean peak = executeCheck.getBooleanParameter("peak", false);
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
                             stat.getDisks(),
                             (v, t) -> (peak ? v.getFiveMinuteRate().getReadPeakRateMBps(): v.getFiveMinuteRate().getReadRateMBps()) > t || (peak ? v.getFiveMinuteRate().getWritePeakRateMBps(): v.getFiveMinuteRate().getWriteRateMBps()) > t,
                             warning, 
@@ -97,18 +98,18 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
                         readings.reading(new DoubleGaugeReading("reads-[" + disk.getName() + "]", null, disk.getFiveMinuteRate().getReads(), warning, critical, null, null));
                         readings.reading(new DoubleGaugeReading("writes-[" + disk.getName() + "]", null, disk.getFiveMinuteRate().getWrites(), warning, critical, null, null));
                     }
-                    this.publishReading(executeCheck, readings);
+                    context.publishReading(readings);
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

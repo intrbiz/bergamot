@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.worker.engine.nagios;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 
 /**
- * Execute 
+ * Nagios check engine
  */
 public class NagiosEngine extends AbstractEngine
 {
@@ -11,16 +11,6 @@ public class NagiosEngine extends AbstractEngine
 
     public NagiosEngine()
     {
-        super(NAME);
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new NagiosExecutor());
-        }
+        super(NAME, new NagiosExecutor());
     }
 }

@@ -1,16 +1,18 @@
 package com.intrbiz.bergamot.notification;
 
-import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.configuration.Configurable;
 
-public interface NotificationEngine extends Configurable<NotificationEngineCfg>
+public interface NotificationEngine
 {
     String getName();
     
-    Notifier getNotifier();
+    void prepare(NotificationEngineContext context) throws Exception;
     
-    void setNotifier(Notifier notifier);
+    void start(NotificationEngineContext context) throws Exception;
+    
+    boolean accept(Notification notification);
     
     void sendNotification(Notification notification);
+    
+    void shutdown(NotificationEngineContext engineContext);
 }

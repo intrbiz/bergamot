@@ -4,14 +4,10 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 
-import com.intrbiz.bergamot.config.ExecutorCfg;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
-import com.intrbiz.bergamot.queue.key.ResultKey;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
-import com.intrbiz.bergamot.worker.engine.Executor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
@@ -32,48 +28,29 @@ public class ScriptExample
         ScriptEngine engine = manager.getEngineByName("nashorn");
         //
         ExecuteCheck check = new ExecuteCheck();
-        Executor<?> exec = new TestExecutor();
-        ActiveCheckScriptContext context = new ActiveCheckScriptContext(check, exec);
-        //
+        TestContext context = new TestContext();
+        // create the script context
         SimpleBindings bindings = new SimpleBindings();
         bindings.put("check", check);
-        bindings.put("bergamot", context);
+        bindings.put("bergamot", new ActiveCheckScriptContext(check, context));
         engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-        //
+        // execute
         engine.eval("bergamot.publishReadings([ "
                 + "{ type: 'double', name: 'one', unit: '', value: 0.0 }, "
                 + "{ type: 'long', name: 'two', unit: '', value: 1 } "
         + "]);");
-
     }
     
-    @SuppressWarnings("rawtypes")
-    public static class TestExecutor extends AbstractExecutor
+    public static class TestContext implements CheckExecutionContext
     {
-        public void publishResult(ResultKey key, ResultMO resultMO)
+        public void publishResult(ResultMO resultMO)
         {
-            System.out.println("Result: " + key + " => " + resultMO);
+            System.out.println("Result: " + resultMO);
         }
         
-        public void publishReading(ReadingKey key, ReadingParcelMO readingParcelMO)
+        public void publishReading(ReadingParcelMO readingParcelMO)
         {
-            System.out.println("Readings: " + key + " => " + readingParcelMO);
-        }
-
-        @Override
-        public boolean accept(ExecuteCheck task)
-        {
-            return false;
-        }
-
-        @Override
-        public void execute(ExecuteCheck executeCheck)
-        {            
-        }
-
-        @Override
-        public void configure(ExecutorCfg cfg) throws Exception
-        {   
+            System.out.println("Readings: " + readingParcelMO);
         }
     }
 }

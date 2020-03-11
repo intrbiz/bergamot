@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="https://bergamot-monitoring.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.intrbiz.bergamot</groupId>
     <artifactId>bergamot</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>bergamot-notification-api</artifactId>
   <name>bergamot-notification-api</name>
@@ -24,10 +23,6 @@
     	<artifactId>bergamot-message-model</artifactId>
     </dependency>
     <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-queue</artifactId>
-    </dependency>
-    <dependency>
     	<groupId>com.intrbiz.express</groupId>
     	<artifactId>express</artifactId>
     </dependency>
@@ -36,20 +31,12 @@
     	<artifactId>bergamot-daemon-config</artifactId>
     </dependency>
     <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-healthcheck-agent</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-healthcheck-tracker</artifactId>
-    </dependency>
-    <dependency>
 		<groupId>com.intrbiz.bergamot</groupId>
 		<artifactId>bergamot-accounting-model</artifactId>
 	</dependency>
     <dependency>
-    	<groupId>com.intrbiz.bergamot</groupId>
-    	<artifactId>bergamot-accounting-consumer</artifactId>
+    	<groupId>com.intrbiz.accounting</groupId>
+    	<artifactId>accounting</artifactId>
     </dependency>
   </dependencies>
 </project>

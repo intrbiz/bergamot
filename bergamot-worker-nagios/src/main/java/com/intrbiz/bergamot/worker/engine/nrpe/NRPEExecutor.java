@@ -12,8 +12,8 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -23,7 +23,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
 {
-    private Logger logger = Logger.getLogger(NRPEExecutor.class);
+    private static final Logger logger = Logger.getLogger(NRPEExecutor.class);
     
     private final Timer nrpeRequestTimer;
     
@@ -48,7 +48,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
     }
     
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         logger.info("Executing NRPE check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Timer.Context tctx = this.nrpeRequestTimer.time();
@@ -78,7 +78,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                     resultMO.setOutput(response.getOutput());
                     resultMO.setRuntime(response.getRuntime());
                     tctx.stop();
-                    this.publishActiveResult(executeCheck, resultMO);
+                    context.publishActiveResult(resultMO);
                     // readings
                     ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
                     for (NagiosPerfData perfData : response.getPerfData())
@@ -86,12 +86,12 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                         Reading reading = perfData.toReading();
                         if (reading != null) readings.reading(reading);
                     }
-                    if (readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId(), executeCheck.getProcessingPool()), readings);
+                    if (readings.getReadings().size() > 0) context.publishReading(readings);
                 }, 
                 (exception) -> {
                     tctx.stop();
                     failedRequests.inc();
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(exception));
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(exception));
                 },
                 command,
                 args
@@ -102,7 +102,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             logger.error("Failed to execute NRPE check", e);
             tctx.stop();
             this.failedRequests.inc();
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }        
     }
 }

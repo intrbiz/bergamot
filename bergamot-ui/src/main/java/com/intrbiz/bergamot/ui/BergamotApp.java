@@ -10,25 +10,27 @@ import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.balsa.util.Util;
-import com.intrbiz.bergamot.accounting.BergamotAccountingQueueConsumer;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
-import com.intrbiz.bergamot.cluster.ClusterManager;
+import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
+import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
+import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
+import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
+import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
+import com.intrbiz.bergamot.cluster.util.HazelcastFactory;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.health.HealthAgent;
-import com.intrbiz.bergamot.health.HealthTracker;
-import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.queue.util.QueueUtil;
-import com.intrbiz.bergamot.ui.action.BergamotAgentActions;
+import com.intrbiz.bergamot.processor.BergamotProcessor;
 import com.intrbiz.bergamot.ui.action.CheckActions;
 import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
 import com.intrbiz.bergamot.ui.action.ContactActions;
 import com.intrbiz.bergamot.ui.action.DispatchResultAction;
 import com.intrbiz.bergamot.ui.action.ExecuteCheckAction;
 import com.intrbiz.bergamot.ui.action.SchedulerActions;
+import com.intrbiz.bergamot.ui.action.SiteActions;
 import com.intrbiz.bergamot.ui.action.TeamActions;
 import com.intrbiz.bergamot.ui.action.TimePeriodActions;
 import com.intrbiz.bergamot.ui.action.U2FAActions;
+import com.intrbiz.bergamot.ui.action.UpdateActions;
 import com.intrbiz.bergamot.ui.api.APIRouter;
 import com.intrbiz.bergamot.ui.api.AgentAPIRouter;
 import com.intrbiz.bergamot.ui.api.AlertsAPIRouter;
@@ -111,13 +113,15 @@ import com.intrbiz.util.pool.database.DatabasePool;
  */
 public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
 {   
+    private static final Logger logger = Logger.getLogger(BergamotApp.class);
+    
     public static final class VERSION
     {
         public static final String NAME = "Bergamot Monitoring";
         
-        public static final String NUMBER = "3.0.0";
+        public static final String NUMBER = "4.0.0";
         
-        public static final String CODE_NAME = "Red Snow";
+        public static final String CODE_NAME = "Red Beard";
         
         public static final class COMPONENTS
         {
@@ -131,13 +135,13 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     private UICfg config;
     
-    private ClusterManager clusterManager;
+    private HazelcastFactory hazelcast;
+    
+    private BergamotProcessor processor;
     
     private UpdateServer updateServer;
     
     private final UUID id = UUID.randomUUID();
-    
-    private boolean loggingConfigured = false;
     
     public BergamotApp()
     {
@@ -147,6 +151,41 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     public UUID id()
     {
         return id;
+    }
+    
+    public BergamotProcessor getProcessor()
+    {
+        return this.processor;
+    }
+    
+    public WorkerClusterCoordinator getWorkerCoordinator()
+    {
+        return processor.getWorkerCoordinator();
+    }
+
+    public ProcessingPoolClusterCoordinator getProcessingPoolCoordinator()
+    {
+        return processor.getProcessingPoolCoordinator();
+    }
+
+    public SiteEventTopic getSiteEventBroker()
+    {
+        return this.processor.getSiteEventTopic();
+    }
+    
+    public SiteNotificationTopic getNotificationBroker()
+    {
+        return this.processor.getNotificationTopic();
+    }
+    
+    public SiteUpdateTopic getUpdateBroker()
+    {
+        return this.processor.getUpdateTopic();
+    }
+
+    public UpdateServer getUpdateServer()
+    {
+        return updateServer;
     }
     
     @Override
@@ -166,15 +205,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
      */
     protected void configureLogging()
     {
-        if (! this.loggingConfigured)
-        {
-            // TODO
-            // configure logging to terminal
-            BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(Level.toLevel(this.config.getLogging().getLevel().toUpperCase()));
-            // only run logging config once
-            this.loggingConfigured = true;
-        }
+        // configure logging to terminal
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.toLevel(this.config.getLogging().getLevel().toUpperCase()));
     }
     
     protected int getListenerPort(String listenerType, int defaultPort)
@@ -192,17 +225,33 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     @Override
     protected void setupEngines() throws Exception
     {
+        // setup data manager
+        logger.info("Setting up PostgreSQL");
+        DataManager.getInstance().registerDefaultServer(
+            DatabasePool.Default.with()
+                .postgresql()
+                .url(this.config.getDatabase().getUrl())
+                .username(this.config.getDatabase().getUsername())
+                .password(this.config.getDatabase().getPassword())
+                .build()
+        );
+        // setup accounting
+        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
+        AccountingManager.getInstance().bindRootConsumer("logger");
         // TODO: Don't bother sending metric yet
         // Setup Gerald - Service name: Bergamot.UI, send every minute
         // Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
+        // Hazelcast factory
+        this.hazelcast = new HazelcastFactory();
+        this.hazelcast.configure(this.getInstanceName());
+        // session engine
+        sessionEngine(new HazelcastSessionEngine(this.hazelcast::getHazelcastInstance));
         // task engine
         /*
          * TODO: disable the shared task engine as we are getting issues with 
          * serialising Apache Log4J Loggers
          * taskEngine(new HazelcastTaskEngine());
          */
-        // session engine
-        sessionEngine(new HazelcastSessionEngine());
         // security engine
         securityEngine(new BergamotSecurityEngine());
         // setup the application security key
@@ -211,14 +260,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             // set the key
             this.getSecurityEngine().applicationKey(SecretKey.fromString(this.getConfiguration().getSecurityKey()));
         }
-        // setup accounting
-        AccountingManager.getInstance().registerConsumer("logger", new BergamotLoggingConsumer());
-        AccountingManager.getInstance().registerConsumer("queue", new BergamotAccountingQueueConsumer());
-        AccountingManager.getInstance().bindRootConsumer("logger");
-        AccountingManager.getInstance().bindRootConsumer("queue");
-        // setup ClusterManager to manage our critical
-        // resources across the cluster
-        this.clusterManager = new ClusterManager();
         // websocket update server
         this.updateServer = new UpdateServer(this.config.getListen().getWebsocketPort());
     }
@@ -244,8 +285,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         action(new ContactActions());
         action(new ConfigChangeActions());
         action(new CheckActions());
-        action(new BergamotAgentActions());
         action(new U2FAActions());
+        action(new SiteActions());
+        action(new UpdateActions());
     }
     
     @Override
@@ -328,53 +370,51 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     }
     
     @Override
-    protected void startApplication() throws Exception
+    protected void startApplicationEarly() throws Exception
     {
-        // setup healthcheck tracker
-        HealthTracker.getInstance().init();
-        // setup healthcheck agent
-        HealthAgent.getInstance().init("ui", "bergamot-ui");
+        // compile database
+        logger.info("Compiling DB");
+        BergamotDB.load();
+        LamplighterDB.load();
         // setup the database
         BergamotDB.install();
         try (BergamotDB db = BergamotDB.connect())
         {
-            System.out.println("Database module: " + db.getName() + " " + db.getVersion());
+            logger.info("Database module: " + db.getName() + " " + db.getVersion());
         }
         LamplighterDB.install();
         try (LamplighterDB db = LamplighterDB.connect())
         {
-            System.out.println("Database module: " + db.getName() + " " + db.getVersion());
+            logger.info("Database module: " + db.getName() + " " + db.getVersion());
         }
-        // don't bother starting scheduler etc on ui only nodes
-        if (!Boolean.getBoolean("bergamot.ui.only"))
-        {
-            // start the cluster manager
-            this.clusterManager.start(this.getInstanceName());
-            // register sites with the cluster manager
-            try (BergamotDB db = BergamotDB.connect())
-            {
-                for (Site site : db.listSites())
-                {
-                    if (! site.isDisabled())
-                        this.clusterManager.registerSite(site);
-                }
-            }
-        }
+        // Start Hazelcast
+        this.hazelcast.start();
+        // Setup the database cache
+        System.out.println("Setting up Hazelcast cache");
+        DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(this.hazelcast.getHazelcastInstance()));
+        DataManager.get().registerDefaultCacheProvider(DataManager.get().cacheProvider("hazelcast"));
+    }
+    
+    @Override
+    protected void startApplication() throws Exception
+    {
+        // Start our cluster components
+        this.processor = new BergamotProcessor(this.hazelcast.getHazelcastInstance());
+        // start the processor
+        logger.info("Starting processor");
+        this.processor.start();
         // start the update websocket server
         this.updateServer.start();
         // Start Gerald
         // Gerald.theMole().start();
-        System.out.println("Application startup finished");
     }
     
-    public ClusterManager getClusterManager()
+    @Override
+    protected void startApplicationLate() throws Exception
     {
-        return this.clusterManager;
-    }
-
-    public UpdateServer getUpdateServer()
-    {
-        return updateServer;
+        logger.info("Initing all sites");
+        this.processor.initAllSites();
+        logger.info("Application startup finished");
     }
 
     public static void main(String[] args) throws Exception
@@ -388,24 +428,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             // create the application
             BergamotApp bergamotApp = new BergamotApp();
             bergamotApp.configure(config);
-            // Setup logging ASAP
-            bergamotApp.configureLogging();
-            // compile database
-            System.out.println("Compiling DB");
-            BergamotDB.load();
-            LamplighterDB.load();
-            // setup the cache
-            System.out.println("Setting up Hazelcast");
-            DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(BergamotApp.getApplicationInstanceName()));
-            DataManager.get().registerDefaultCacheProvider(DataManager.get().cacheProvider("hazelcast"));
-            // setup the queue manager
-            System.out.println("Setting up RabbitMQ");
-            QueueUtil.setupQueueBroker(config.getBroker(), "bergamot-ui");
-            // setup data manager
-            System.out.println("Setting up PostgreSQL");
-            DataManager.getInstance().registerDefaultServer(DatabasePool.Default.with().postgresql().url(config.getDatabase().getUrl()).username(config.getDatabase().getUsername()).password(config.getDatabase().getPassword()).build());
             // start the app
-            System.out.println("Starting Bergamot UI");
+            System.out.println("Starting Bergamot");
             bergamotApp.start();
         }
         catch (Exception e)

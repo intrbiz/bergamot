@@ -6,26 +6,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.UUID;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.config.EngineCfg;
+import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
+import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
-import com.intrbiz.bergamot.queue.key.ResultKey;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
+import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
-import com.intrbiz.bergamot.worker.engine.ssh.ScriptedSSHExecutor;
+import com.intrbiz.configuration.Configuration;
 
 public class TestScriptedSSHExecutor
 {
     private SSHEngine engine;
-    
-    private ScriptExecutorTester runner;
     
     private String publicKey;
     
@@ -37,11 +36,46 @@ public class TestScriptedSSHExecutor
     @Before
     public void setup() throws Exception
     {
-        this.engine = new TestSSHEngine();
-        this.engine.configure(new EngineCfg(SSHEngine.class));
-        this.engine.start();
-        this.runner = new ScriptExecutorTester();
-        this.runner.setEngine(engine);
+        this.engine = new SSHEngine();
+        this.engine.prepare(new EngineContext() {
+            @Override
+            public Configuration getConfiguration()
+            {
+                return new Configuration();
+            }
+
+            @Override
+            public AgentKeyLookup getAgentKeyLookup()
+            {
+                return null;
+            }
+            
+            @Override
+            public AgentEventQueue getAgentEventQueue()
+            {
+                return null;
+            }
+
+            @Override
+            public void registerAgent(UUID agentId)
+            {
+            }
+
+            @Override
+            public void unregisterAgent(UUID agentId)
+            {
+            }
+
+            @Override
+            public void publishResult(ResultMO result)
+            {
+            }
+
+            @Override
+            public void publishReading(ReadingParcelMO readingParcelMO)
+            {
+            }            
+        });
         // keys
         this.privateKey = new String(readFile(new File(System.getProperty("user.home") + "/.ssh/id_rsa")));
         this.publicKey = new String(readFile(new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub")));
@@ -76,9 +110,9 @@ public class TestScriptedSSHExecutor
             "ssh.connect(check.getParameter('username'), check.getParameter('host'), function(session) {" +
             "    bergamot.info('Host Id: ' + session.hostId());" +
             "});");
-        this.runner.test(
+        this.run(
             executeCheck, 
-            (key, res) -> {
+            (res) -> {
                 ActiveResultMO result = (ActiveResultMO) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -95,44 +129,41 @@ public class TestScriptedSSHExecutor
         );
     }
     
-    private static class ScriptExecutorTester extends ScriptedSSHExecutor
+    private void run(ExecuteCheck check, Consumer<ResultMO> onResult)
     {
-        private BiConsumer<ResultKey, ResultMO> onResult;
+        this.run(check, onResult, null);
+    }
+    
+    private void run(ExecuteCheck check, Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
+    {
+        TestContext context = new TestContext(onResult, onReading);
+        this.engine.execute(check, context);
+    }
+    
+    private static class TestContext implements CheckExecutionContext
+    {
+        private Consumer<ResultMO> onResult;
         
-        private BiConsumer<ReadingKey, ReadingParcelMO> onReading;
-
-        public void setOnResult(BiConsumer<ResultKey, ResultMO> onResult)
+        private Consumer<ReadingParcelMO> onReading;
+        
+        public TestContext(Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
         {
             this.onResult = onResult;
-        }
-
-        public void setOnReading(BiConsumer<ReadingKey, ReadingParcelMO> onReading)
-        {
             this.onReading = onReading;
         }
 
         @Override
-        public void publishReading(ReadingKey key, ReadingParcelMO readingParcelMO)
+        public void publishReading(ReadingParcelMO readingParcelMO)
         {
-            if (this.onReading != null) this.onReading.accept(key, readingParcelMO);
+            if (this.onReading != null)
+                this.onReading.accept(readingParcelMO);
         }
 
         @Override
-        public void publishResult(ResultKey key, ResultMO resultMO)
+        public void publishResult(ResultMO resultMO)
         {
-            if (this.onResult != null) this.onResult.accept(key, resultMO);
-        }
-        
-        public void test(ExecuteCheck check, BiConsumer<ResultKey, ResultMO> onResult, BiConsumer<ReadingKey, ReadingParcelMO> onReading)
-        {
-            this.setOnResult(onResult);
-            this.setOnReading(onReading);
-            this.execute(check);
-        }
-        
-        public void test(ExecuteCheck check, BiConsumer<ResultKey, ResultMO> onResult)
-        {
-            this.test(check, onResult, null);
+            if (this.onResult != null)
+                this.onResult.accept(resultMO);
         }
     }
     
@@ -150,14 +181,6 @@ public class TestScriptedSSHExecutor
                 }
             }
             return baos.toByteArray();
-        }
-    }
-    
-    private static class TestSSHEngine extends SSHEngine
-    {
-        public void start() throws Exception
-        {
-            startEngineServices();   
         }
     }
 }

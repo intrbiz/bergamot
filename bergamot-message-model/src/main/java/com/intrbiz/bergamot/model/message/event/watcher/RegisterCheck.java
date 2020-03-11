@@ -9,6 +9,8 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
 @JsonTypeName("bergamot.register_check")
 public class RegisterCheck extends CheckEvent
 {   
+    private static final long serialVersionUID = 1L;
+
     public RegisterCheck()
     {
         super();

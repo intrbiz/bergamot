@@ -12,8 +12,8 @@ import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -66,7 +66,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         logger.debug("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
@@ -102,7 +102,8 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
             logger.error("Failed to execute nagios check command", e);
             resultMO.error(e);
         }
-        this.publishActiveResult(executeCheck, resultMO);
-        if (readings != null && readings.getReadings().size() > 0) this.publishReading(new ReadingKey(executeCheck.getCheckId(), executeCheck.getProcessingPool()), readings);
+        context.publishActiveResult(resultMO);
+        if (readings != null && readings.getReadings().size() > 0) 
+            context.publishReading(readings);
     }
 }

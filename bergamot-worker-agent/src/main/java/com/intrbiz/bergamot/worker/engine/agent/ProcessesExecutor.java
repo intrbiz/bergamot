@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 
 
@@ -39,7 +40,7 @@ public class ProcessesExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent processes");
         try
@@ -48,7 +49,7 @@ public class ProcessesExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // build the check
@@ -69,25 +70,25 @@ public class ProcessesExecutor extends AbstractExecutor<AgentEngine>
                     ProcessStat stat = (ProcessStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got processes in " + runtime + "ms: " + stat);
                     // apply the check
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyRange(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyRange(
                             stat.getProcesses().size(),
                             executeCheck.getIntRangeParameter("warning",  new Integer[] {1, 1}), 
                             executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
                             "found " + stat.getProcesses().size() + " processes"
                     ).runtime(runtime));
                     // readings
-                    this.publishReading(executeCheck, new IntegerGaugeReading("processes", null, stat.getProcesses().size()));
+                    context.publishReading(executeCheck, new IntegerGaugeReading("processes", null, stat.getProcesses().size()));
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

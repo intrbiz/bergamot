@@ -11,6 +11,8 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
+import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
 /**
@@ -40,7 +42,7 @@ public class ScriptedJMXExecutor extends AbstractExecutor<JMXEngine>
     }
     
     @Override
-    public void execute(final ExecuteCheck executeCheck)
+    public void execute(final ExecuteCheck executeCheck, final CheckExecutionContext context)
     {
         try
         {
@@ -51,9 +53,9 @@ public class ScriptedJMXExecutor extends AbstractExecutor<JMXEngine>
             SimpleBindings bindings = new SimpleBindings();
             bindings.put("check", executeCheck);
             bindings.put("jmx", this.getEngine().getChecker().createContext((t) -> {
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(t));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(t));
             }));
-            bindings.put("bergamot", this.createScriptContext(executeCheck));
+            bindings.put("bergamot", new ActiveCheckScriptContext(executeCheck, context));
             script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
             // execute
             script.eval(executeCheck.getScript());
@@ -61,7 +63,7 @@ public class ScriptedJMXExecutor extends AbstractExecutor<JMXEngine>
         catch (Exception e)
         {
             logger.error("Error executing check", e);
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

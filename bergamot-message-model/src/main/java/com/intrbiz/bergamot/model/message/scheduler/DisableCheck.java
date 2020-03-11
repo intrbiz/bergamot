@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Disable the scheduling of an active check
  */
 @JsonTypeName("bergamot.disable_check")
-public class DisableCheck extends ActiveCheckSchedulerAction
+public class DisableCheck extends SchedulerAction
 {
     public DisableCheck()
     {

@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public abstract class Message extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("id")
     private UUID id = UUID.randomUUID();
 

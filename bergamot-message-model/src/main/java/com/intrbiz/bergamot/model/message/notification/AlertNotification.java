@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * A notification about a alerted check
  */
 public abstract class AlertNotification extends CheckNotification
-{    
+{   
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("alert_id")
     private UUID alertId;
     

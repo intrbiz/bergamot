@@ -1,74 +1,57 @@
 <!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
 <?RenderLibrary com.intrbiz.balsa?>
 <!-- The index view -->
-<fragment xmlns="com.intrbiz.balsa" title="Bergamot Agent Manager">
-
-    <div clas="row">
-    	<p class="pull-right">
-    		<a style="margin-left: 15px;" href="/agent/generate-template">Generate Template Certificate</a>
-    		<a style="margin-left: 15px;" href="/agent/sign">Sign Agent Certificate</a>
-	    	<a style="margin-left: 15px;" href="/agent/generate-config" rendered="#{Balsa().permission('ui.generate.agent')}">Generate Agent Configuration</a>
-    	</p>
-    </div>
+<fragment xmlns="com.intrbiz.balsa" title="Bergamot Agent">
     
-       <div clas="row">
+	<div clas="row">
     	<div class="col12">
-    		<h3>Bergamot Agent Template Certificates</h3>
+    		<h3>Bergamot Agent Keys</h3>
     		<p class="text-body">
-    			These are certificates which can bed used to automatically register a Bergamot Agent upon first 
-    			connection and instance of the template.
+    			These are the authentication keys that Bergamot Agents can use to authenticate with Bergamot Monitoring.
     		</p>
     		<table>
 	    		<tr>
-		    		<th>Name</th>
-	    			<th>Template Id</th>
-	    			<th>Generated</th>
+		    		<th>Id</th>
+		    		<th>Secret Key</th>
+		    		<th>Revoked</th>
+	    			<th>Created</th>
+	    			<th>Purpose</th>
 	    			<th></th>
 	    		</tr>
-	    		<data-set var="agentTemplate" value="#{agentTemplates}">
+	    		<data-set var="agentKey" value="#{agentKeys}">
 	    			<tr>
-	    				<td><a href="/admin/config/id/#{agentTemplate.id}">#{agentTemplate.summary}</a></td>
-	    				<td>#{agentTemplate.id}</td>
-	    				<td>#{dateformat('HH:mm:ss', agentTemplate.created)} on #{dateformat('EEEE dd/MM/yyyy', agentTemplate.created)}</td>
-	    				<td><a href="/agent/show-template/#{agentTemplate.id}">View Agent Configuration</a></td>
+	    				<td>#{agentKey.id}</td>
+	    				<td><pre>#{agentKey.toAgentAuthenticationKey()}</pre></td>
+	    				<td>
+	    					<span rendered="#{! agentKey.revoked}">no</span>
+	    					<span rendered="#{agentKey.revoked}">#{dateformat('HH:mm:ss', agentKey.created)} on #{dateformat('EEEE dd/MM/yyyy', agentKey.created)}</span>
+    					</td>
+	    				<td>#{agentKey.purpose}</td>
+	    				<td>#{dateformat('HH:mm:ss', agentKey.created)} on #{dateformat('EEEE dd/MM/yyyy', agentKey.created)}</td>
+	    				<td><a href="/agent/revoke/#{agentKey.id}">Revoke</a></td>
 	    			</tr>
 	    		</data-set>
 	    	</table>
     	</div>
     </div>
     
-    <div clas="row">
-    	<div class="col12">
-    		<h3>Bergamot Agent Certificates</h3>
+   	<div class="row">
+		<div class="col12">
+    		<h3>Create Bergamot Agent Key</h3>
     		<p class="text-body">
-    			These are certificates that have been generated and assigned to hosts running the Bergamot Agent
+    			Ideal create different Bergamot Agent Keys for different sets of agents, to reduce impact should you need to 
+    			revoke a key.
     		</p>
-	    	<table>
-	    		<tr>
-		    		<th>Name</th>
-	    			<th>Agent Id</th>
-	    			<th>Serial</th>
-	    			<th>Signed</th>
-	    			<th>Revoked</th>
-	    		</tr>
-	    		<data-set var="agent" value="#{agents}">
-	    			<tr>
-	    				<td>#{agent.name}</td>
-	    				<td>#{agent.id}</td>
-	    				<td>#{agent.certificateSerial}</td>
-	    				<td>#{dateformat('HH:mm:ss', agent.created)} on #{dateformat('EEEE dd/MM/yyyy', agent.created)}</td>
-	    				<td>
-	    					<span rendered="#{agent.revoked}">#{dateformat('HH:mm:ss', agent.revokedOn) + ' on ' + dateformat('EEEE dd/MM/yyyy', agent.revokedOn)}</span>
-	    					<!-- Revoke -->
-							<form action="#{path('/agent/revoke')}" method="post" rendered="#{! agent.revoked}">
-								<input type="hidden" name="id" value="#{agent.id}"/>
-								<input type="submit" name="lock" value="Revoke" class="danger"/>
-							</form>
-	    				</td>
-	    			</tr>
-	    		</data-set>
-	    	</table>
-    	</div>
-    </div>
+			<form id="create_agent_key" name="create_agent_key" method="post" action="#{path('/agent/create')}">
+				<div>
+					<label for="purpose" title="The intended use of this Agent Key">Purpose</label>
+					<input type="text" id="purpose" name="purpose" placeholder="Key for web servers"/>
+				</div>
+				<div>
+					<input type="submit" value="Create Bergamot Agent Key"/>
+				</div>
+			</form>
+		</div>
+	</div>
     
 </fragment>

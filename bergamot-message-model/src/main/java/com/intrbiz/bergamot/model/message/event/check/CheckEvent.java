@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.ParameterisedMO;
+import com.intrbiz.bergamot.model.message.event.Event;
 
-public class CheckEvent extends Message implements ParameterisedMO
+public class CheckEvent extends Event implements ParameterisedMO
 {
+    private static final long serialVersionUID = 1L;
+
     @JsonProperty("engine")
     private String engine;
 
@@ -29,8 +31,11 @@ public class CheckEvent extends Message implements ParameterisedMO
     @JsonProperty("site_id")
     private UUID siteId;
     
+    @JsonProperty("worker_pool")
+    private String workerPool;
+    
     @JsonProperty("processing_pool")
-    private int processingPool;
+    private UUID processingPool;
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>(); 
@@ -120,16 +125,25 @@ public class CheckEvent extends Message implements ParameterisedMO
         this.parameters = parameters;
     }
     
-    public int getProcessingPool()
+    public UUID getProcessingPool()
     {
         return processingPool;
     }
 
-    public void setProcessingPool(int processingPool)
+    public void setProcessingPool(UUID processingPool)
     {
         this.processingPool = processingPool;
     }
-    
+
+    public String getWorkerPool()
+    {
+        return workerPool;
+    }
+
+    public void setWorkerPool(String workerPool)
+    {
+        this.workerPool = workerPool;
+    }
 
     public UUID getAdhocId()
     {

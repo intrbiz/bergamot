@@ -14,17 +14,7 @@ public class NRPEEngine extends AbstractEngine
 
     public NRPEEngine()
     {
-        super(NAME); 
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new NRPEExecutor());
-        }
+        super(NAME, new NRPEExecutor());
         // setup the NRPE poller
         this.poller = new NRPEPoller();
     }

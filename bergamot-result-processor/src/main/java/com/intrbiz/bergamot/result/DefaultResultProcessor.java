@@ -18,6 +18,11 @@ import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
+import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
+import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
+import com.intrbiz.bergamot.cluster.queue.NotificationProducer;
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
+import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
@@ -56,15 +61,21 @@ import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
 public class DefaultResultProcessor extends AbstractResultProcessor
 {
-    private Logger logger = Logger.getLogger(DefaultResultProcessor.class);
+    private static final Logger logger = Logger.getLogger(DefaultResultProcessor.class);
     
     private Matchers matchers = new Matchers();
     
     private Accounting accounting = Accounting.create(DefaultResultProcessor.class);
 
-    public DefaultResultProcessor()
-    {
-        super();
+    public DefaultResultProcessor(
+        UUID poolId, 
+        ProcessingPoolConsumer consumer,
+        SchedulerActionProducer schedulerActions,
+        NotificationProducer notificationProducer,
+        SiteNotificationTopic notificationBroker,
+        SiteUpdateTopic updateBroker
+    ) {
+        super(poolId, consumer, schedulerActions, notificationProducer, notificationBroker, updateBroker);
     }    
 
     @Override

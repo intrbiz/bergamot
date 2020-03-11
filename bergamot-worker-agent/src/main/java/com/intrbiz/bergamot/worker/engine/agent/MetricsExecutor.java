@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.MetricsStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ScriptedCheckManager;
 
 /**
@@ -23,7 +24,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
     
     private static final Logger logger = Logger.getLogger(MetricsExecutor.class);
     
-    private final ScriptedCheckManager scriptManager = new ScriptedCheckManager(this);
+    private final ScriptedCheckManager scriptManager = new ScriptedCheckManager();
 
     public MetricsExecutor()
     {
@@ -40,7 +41,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent Metrics");
         try
@@ -49,7 +50,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // What metrics should we get
@@ -66,7 +67,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
                     // error from agent?
                     if (response instanceof GeneralError)
                     {
-                        this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(((GeneralError) response).getMessage()));
+                        context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(((GeneralError) response).getMessage()));
                         return;
                     }
                     // process the stat
@@ -75,7 +76,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
                     // if we have a script execute it otherwise just publish an informational result
                     if (Util.isEmpty(executeCheck.getScript()))
                     {
-                        this.publishActiveResult(executeCheck, 
+                        context.publishActiveResult( 
                                 new ActiveResultMO().fromCheck(executeCheck)
                                  .runtime(runtime)
                                  .info("Got " + stat.getReadings().size() + " metric readings")
@@ -83,25 +84,25 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
                     }
                     else
                     {
-                        this.scriptManager.createExecutor(executeCheck)
+                        this.scriptManager.createExecutor(executeCheck, context)
                             .bind("runtime", runtime)
                             .bind("metrics", stat.getReadings())
                             .bind("readings", stat.getReadings())
                             .execute();
                     }
                     // finally publish all readings we got
-                    this.publishReading(executeCheck, stat.getReadings());
+                    context.publishReading(executeCheck, stat.getReadings());
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
     

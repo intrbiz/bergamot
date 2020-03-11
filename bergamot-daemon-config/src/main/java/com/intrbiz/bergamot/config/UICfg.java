@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
@@ -23,8 +21,6 @@ public class UICfg extends Configuration
 {
     private static final long serialVersionUID = 1L;
 
-    private List<BrokerCfg> broker = new LinkedList<BrokerCfg>();
-
     private DatabaseCfg database;
 
     private String securityKey;
@@ -36,17 +32,6 @@ public class UICfg extends Configuration
     public UICfg()
     {
         super();
-    }
-
-    @XmlElementRef(type = BrokerCfg.class)
-    public List<BrokerCfg> getBroker()
-    {
-        return broker;
-    }
-
-    public void setBroker(List<BrokerCfg> broker)
-    {
-        this.broker = broker;
     }
 
     @XmlElementRef(type = DatabaseCfg.class)
@@ -96,15 +81,6 @@ public class UICfg extends Configuration
     @Override
     public void applyDefaults()
     {
-        // the broker
-        if (this.broker == null)
-        {
-            this.broker = new LinkedList<BrokerCfg>();
-        }
-        if (this.broker.isEmpty())
-        {
-            this.broker.add(new BrokerCfg("hcq", new String[] { "ws://127.0.0.1:1543/hcq", "ws://127.0.0.1:1544/hcq", "ws://127.0.0.1:1545/hcq" }));
-        }
         // the database
         if (this.database == null)
         {

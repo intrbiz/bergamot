@@ -8,7 +8,9 @@ import com.intrbiz.bergamot.model.message.event.check.CheckEvent;
  */
 @JsonTypeName("bergamot.unregister_check")
 public class UnregisterCheck extends CheckEvent
-{    
+{   
+    private static final long serialVersionUID = 1L;
+    
     public UnregisterCheck()
     {
         super();

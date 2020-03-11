@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.ui.router;
 
 import java.io.IOException;
-import java.security.cert.Certificate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -11,20 +10,14 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
-import com.intrbiz.bergamot.agent.config.BergamotAgentCfg;
-import com.intrbiz.bergamot.agent.config.CfgParameter;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.GroupCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.config.model.LocationCfg;
-import com.intrbiz.bergamot.crypto.util.CertificatePair;
-import com.intrbiz.bergamot.crypto.util.PEMUtil;
-import com.intrbiz.bergamot.crypto.util.SerialNum;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
-import com.intrbiz.bergamot.model.AgentRegistration;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
@@ -33,7 +26,6 @@ import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.ui.BergamotApp;
-import com.intrbiz.bergamot.ui.router.agent.AgentRouter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
@@ -246,9 +238,6 @@ public class HostRouter extends Router<BergamotApp>
         if ("yes".equalsIgnoreCase(generateAgentConfig))
         {
             agentId = site.randomObjectId();
-            // is an agent already registered
-            AgentRegistration agentReg = db.getAgentRegistrationByName(site.getId(), name);
-            if (agentReg != null) throw new RuntimeException("Cannot generate configuration for an agent which already exists!");
         }
         if (agentId != null) config.setAgentId(agentId);
         // the container
@@ -263,26 +252,6 @@ public class HostRouter extends Router<BergamotApp>
         // apply the change
         BergamotImportReport report = action("apply-config-change", site.getId(), change.getId(), balsa().url(balsa().path("/reset")), user);
         logger.info("Created host " + name + " success=" + report.isSuccessful() + ":\n" + report.toString());
-        // generate agent config
-        if ("yes".equalsIgnoreCase(generateAgentConfig) && report.isSuccessful())
-        {
-            // generate
-            Certificate     rootCert = action("get-root-ca");
-            Certificate     siteCert = action("get-site-ca", site.getId());
-            CertificatePair pair     = action("generate-agent", site.getId(), agentId, name);
-            // build the config
-            BergamotAgentCfg cfg = new BergamotAgentCfg();
-            cfg.setCaCertificate(AgentRouter.padCert(PEMUtil.saveCertificate(rootCert)));
-            cfg.setSiteCaCertificate(AgentRouter.padCert(PEMUtil.saveCertificate(siteCert)));
-            cfg.setCertificate(AgentRouter.padCert(pair.getCertificateAsPEM()));
-            cfg.setKey(AgentRouter.padCert(pair.getKeyAsPEM()));
-            cfg.setName(name);
-            cfg.addParameter(new CfgParameter("agent-id", null, null, agentId.toString()));
-            // store the agent registration
-            db.setAgentRegistration(new AgentRegistration(site.getId(), agentId, name, SerialNum.fromBigInt(pair.getCertificate().getSerialNumber()).toString()));
-            // display
-            var("agentConfig", cfg.toString() + "\n<!-- Agent: UUID=" + agentId + " CN=" + name + " -->");
-        }
         // success
         var("report", report);
         var("config", config);

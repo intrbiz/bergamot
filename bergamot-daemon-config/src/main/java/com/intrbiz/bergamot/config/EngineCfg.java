@@ -1,59 +1,41 @@
 package com.intrbiz.bergamot.config;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.intrbiz.configuration.Configuration;
-
 @XmlType(name = "engine")
 @XmlRootElement(name = "engine")
-public class EngineCfg extends Configuration
+public class EngineCfg
 {
-    private static final long serialVersionUID = 1L;
+    private String name;
     
-    private List<ExecutorCfg> executors = new LinkedList<ExecutorCfg>();
-    
+    private boolean enabled;
+
     public EngineCfg()
     {
         super();
     }
-    
-    public EngineCfg(String engine, ExecutorCfg... executors)
+
+    @XmlAttribute(name = "name")
+    public String getName()
     {
-        super();
-        this.setClassname(engine);
-        for (ExecutorCfg listener : executors)
-        {
-            this.executors.add(listener);
-        }
-    }
-    
-    public EngineCfg(Class<?> engine, ExecutorCfg... executors)
-    {
-        this(engine.getCanonicalName(), executors);
-    }
-    
-    @XmlElementRef(type = ExecutorCfg.class)
-    public List<ExecutorCfg> getExecutors()
-    {
-        return executors;
+        return name;
     }
 
-    public void setExecutors(List<ExecutorCfg> executors)
+    public void setName(String name)
     {
-        this.executors = executors;
+        this.name = name;
     }
-    
-    @Override
-    public void applyDefaults()
+
+    @XmlAttribute(name = "enabled")
+    public boolean isEnabled()
     {
-        for (ExecutorCfg executor : this.executors)
-        {
-            executor.applyDefaults();
-        }
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
     }
 }

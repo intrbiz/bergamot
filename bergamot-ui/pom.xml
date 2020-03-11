@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="https://bergamot-monitoring.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
         <artifactId>bergamot</artifactId>
         <groupId>com.intrbiz.bergamot</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 	<artifactId>bergamot-ui</artifactId>
 	<packaging>jar</packaging>
@@ -31,10 +31,6 @@
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-result-processor</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-queue</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
@@ -66,31 +62,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-agent-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>lamplighter-reading-processor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-accounting-model</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-healthcheck-agent</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-healthcheck-tracker</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-accounting-consumer</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-command-processor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.balsa</groupId>
@@ -104,10 +80,31 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-cluster</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-processor</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>
 		<plugins>
+			<!--
             <plugin>
                 <groupId>com.intrbiz.balsa</groupId>
                 <artifactId>balsa-executor-compiler-plugin</artifactId>
@@ -124,6 +121,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>packaging</artifactId>

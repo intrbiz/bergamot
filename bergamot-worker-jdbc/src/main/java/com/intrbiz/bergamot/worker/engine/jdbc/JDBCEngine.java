@@ -14,18 +14,7 @@ public class JDBCEngine extends AbstractEngine
 
     public JDBCEngine()
     {
-        super(NAME);
-    }
-
-    @Override
-    protected void configure() throws Exception
-    {
-        super.configure();
-        // add the default executor
-        if (this.executors.isEmpty())
-        {
-            this.addExecutor(new ScriptedJDBCExecutor());
-        }
+        super(NAME, new ScriptedJDBCExecutor());
         // setup the checker
         this.checker = new JDBCChecker();
     }

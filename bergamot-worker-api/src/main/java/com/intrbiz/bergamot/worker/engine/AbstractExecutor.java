@@ -1,65 +1,40 @@
 package com.intrbiz.bergamot.worker.engine;
 
-import com.intrbiz.bergamot.config.ExecutorCfg;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
-import com.intrbiz.bergamot.queue.key.ResultKey;
-
 public abstract class AbstractExecutor<T extends Engine> implements Executor<T>
 {
-    protected T Engine;
-
-    protected ExecutorCfg config;
+    protected T engine;
+    
+    protected EngineContext engineContext;
 
     public AbstractExecutor()
     {
         super();
     }
 
-    @Override
-    public T getEngine()
+    protected final T getEngine()
     {
-        return this.Engine;
+        return this.engine;
+    }
+    
+    protected final EngineContext getEngineContext()
+    {
+        return engineContext;
     }
 
     @Override
-    public void setEngine(T engine)
+    public final void prepare(T engine, EngineContext engineContext)
     {
-        this.Engine = engine;
+        this.engine = engine;
+        this.engineContext = engineContext;
+        this.doPrepare(engine, engineContext);
     }
-
-    @Override
-    public void configure(ExecutorCfg config) throws Exception
-    {
-        this.config = config;
-        this.configure();
-    }
-
-    @Override
-    public ExecutorCfg getConfiguration()
-    {
-        return this.config;
-    }
-
-    protected void configure() throws Exception
+    
+    protected void doPrepare(T engine, EngineContext engineContext)
     {
     }
     
     @Override
-    public void start()
+    public void start(T engine, EngineContext context)
     {
-    }
-
-    @Override
-    public void publishResult(ResultKey key, ResultMO resultMO)
-    {
-        this.getEngine().publishResult(key, resultMO);
-    }
-    
-    @Override
-    public void publishReading(ReadingKey key, ReadingParcelMO readingParcelMO)
-    {
-        this.getEngine().publishReading(key, readingParcelMO);
     }
 }

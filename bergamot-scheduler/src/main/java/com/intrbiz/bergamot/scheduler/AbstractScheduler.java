@@ -2,140 +2,98 @@ package com.intrbiz.bergamot.scheduler;
 
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+
+import com.intrbiz.bergamot.cluster.model.PublishStatus;
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
+import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
+import com.intrbiz.bergamot.model.Host;
+import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.PauseScheduler;
-import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.ResumeScheduler;
-import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
-import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
-import com.intrbiz.bergamot.queue.SchedulerQueue;
-import com.intrbiz.bergamot.queue.WorkerQueue;
-import com.intrbiz.bergamot.queue.key.SchedulerKey;
-import com.intrbiz.bergamot.queue.key.WorkerKey;
-import com.intrbiz.queue.Consumer;
-import com.intrbiz.queue.QueueException;
-import com.intrbiz.queue.RoutedProducer;
+import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 
 
 public abstract class AbstractScheduler implements Scheduler
 {   
-    private WorkerQueue workerQueue;
+    private static final Logger logger = Logger.getLogger(AbstractScheduler.class);
     
-    private RoutedProducer<ExecuteCheck, WorkerKey> executeCheckProducer;
+    protected final UUID poolId;
     
-    private SchedulerQueue schedulerQueue;
+    protected final WorkerProducer WorkerProducer;
     
-    private Consumer<SchedulerAction, SchedulerKey> schedulerActionConsumer;
+    protected final ProcessingPoolProducer processingPoolProducer;
     
-    public AbstractScheduler()
+    public AbstractScheduler(UUID poolId, WorkerProducer WorkerProducer, ProcessingPoolProducer processingPoolProducer)
     {
         super();
+        this.poolId = poolId;
+        this.WorkerProducer = WorkerProducer;
+        this.processingPoolProducer = processingPoolProducer;
     }
     
-    protected void startQueues() throws Exception
+    public UUID getPoolId()
     {
-        this.workerQueue = WorkerQueue.open();
-        this.executeCheckProducer = this.workerQueue.publishChecks();
-        this.schedulerQueue = SchedulerQueue.open();
-        // TODO scheduler names
-        this.schedulerActionConsumer = this.schedulerQueue.consumeSchedulerActions((h, a) -> { executeAction(a); });
+        return this.poolId;
     }
     
-    public void start() throws Exception
+    protected PublishStatus publishExecuteCheck(ExecuteCheck check)
     {
-        this.startQueues();
+        if (logger.isTraceEnabled())
+            logger.trace("Publishing execute check\n" + check);
+        // publish
+        PublishStatus status =  this.WorkerProducer.executeCheck(check);
+        if (status != PublishStatus.Success)
+        {
+            this.publishFailedCheck(check, status);
+        }
+        return status;
     }
     
-    protected void shutdownQueues()
+    protected void publishFailedCheck(ExecuteCheck check, PublishStatus status)
     {
-        this.schedulerActionConsumer.close();
-        this.schedulerQueue.close();
-        this.executeCheckProducer.close();
-        this.workerQueue.close();
+        // we failed to execute the given check in time, oops!
+        logger.warn("Failed to execute check (" + status + "): " + check.getId() + "\r\n" + check);
+        // fake a timeout / error result and submit it
+        ActiveResultMO result = new ActiveResultMO().fromCheck(check);
+        if (status == PublishStatus.Unroutable)
+        {
+            result.error("No workers available which support this check");
+        }
+        else
+        {
+            result.timeout("Unable to publish check to worker");
+        }
+        this.processingPoolProducer.publishResult(this.poolId, result);
     }
     
-    public void shutdown()
+    public void schedulePool(UUID siteId, int processingPool)
     {
-        this.shutdownQueues();
-    }
-    
-    @Override
-    public void ownPool(UUID site, int pool)
-    {
-        // bind any queues for the given pool
-        this.schedulerActionConsumer.addBinding(new SchedulerKey(site, pool));
+        logger.info("Scheduling all checks in pool " + siteId + "." + processingPool);
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            for (Host host : db.listHostsInPool(siteId, processingPool))
+            {
+                this.schedule(host);
+            }
+            for (Service service : db.listServicesInPool(siteId, processingPool))
+            {
+                this.schedule(service);
+            }
+        }
     }
 
     @Override
-    public void disownPool(UUID site, int pool)
+    public void schedule(UUID checkId)
     {
-        // unbind any queues for the given pool
-        try
+        try (BergamotDB db = BergamotDB.connect())
         {
-            this.schedulerActionConsumer.removeBinding(new SchedulerKey(site, pool));
-        }
-        catch (QueueException e)
-        {
-        }
-        // remove the jobs in the given pool
-        this.removeJobsInPool(site, pool);
-    }
-    
-    protected abstract void removeJobsInPool(UUID site, int pool);
-
-    protected void publishExecuteCheck(ExecuteCheck check, WorkerKey routingKey, long ttl)
-    {
-        this.executeCheckProducer.publish(routingKey, check, ttl);
-    }
-    
-    protected void executeAction(SchedulerAction action)
-    {
-        if (action instanceof PauseScheduler)
-        {
-            this.pause();
-        }
-        else if (action instanceof ResumeScheduler)
-        {
-            this.resume();
-        }
-        else if (action instanceof ScheduleCheck)
-        {
-            try (BergamotDB db = BergamotDB.connect())
+            ActiveCheck<?,?> check = db.getActiveCheck(checkId);
+            if (check != null)
             {
-                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((ScheduleCheck) action).getCheck());
-                if (check != null)
-                {
-                    this.schedule(check);
-                }
+                this.schedule(check);
             }
-        }
-        else if (action instanceof RescheduleCheck)
-        {
-            try (BergamotDB db = BergamotDB.connect())
-            {
-                ActiveCheck<?,?> check = (ActiveCheck<?,?>) db.getCheck(((RescheduleCheck) action).getCheck());
-                if (check != null)
-                {
-                    this.reschedule(check, ((RescheduleCheck) action).getInterval());
-                }
-            }
-        }
-        else if (action instanceof EnableCheck)
-        {
-            this.enable(((EnableCheck) action).getCheck());
-        }
-        else if (action instanceof DisableCheck)
-        {
-            this.disable(((DisableCheck) action).getCheck());
-        }
-        else if (action instanceof UnscheduleCheck)
-        {
-            this.unschedule(((UnscheduleCheck) action).getCheck());
         }
     }
 }

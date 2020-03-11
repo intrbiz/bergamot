@@ -45,10 +45,23 @@ public abstract class ResultMO extends Message implements ParameterisedMO
      */
     @JsonProperty("adhoc_id")
     private UUID adhocId;
+    
+    @JsonProperty("site_id")
+    private UUID siteId;
 
     public ResultMO()
     {
         super();
+    }
+    
+    public UUID getSiteId()
+    {
+        return siteId;
+    }
+
+    public void setSiteId(UUID siteId)
+    {
+        this.siteId = siteId;
     }
 
     public boolean isOk()

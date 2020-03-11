@@ -12,7 +12,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.command.AcknowledgeAlertCommand;
-import com.intrbiz.bergamot.command.AgentCommand;
 import com.intrbiz.bergamot.command.AlertsCommand;
 import com.intrbiz.bergamot.command.ApplyConfigChangeCommand;
 import com.intrbiz.bergamot.command.ConfigCommand;
@@ -21,17 +20,6 @@ import com.intrbiz.bergamot.command.HelpCommand;
 import com.intrbiz.bergamot.command.SiteXMLCommand;
 import com.intrbiz.bergamot.command.TestCommand;
 import com.intrbiz.bergamot.command.ValidateConfigCommand;
-import com.intrbiz.bergamot.command.admin.AddSiteAliasCommand;
-import com.intrbiz.bergamot.command.admin.CreateSiteCommand;
-import com.intrbiz.bergamot.command.admin.DBImportConfigCommand;
-import com.intrbiz.bergamot.command.admin.DBInstallCommand;
-import com.intrbiz.bergamot.command.admin.DBVersionCommand;
-import com.intrbiz.bergamot.command.admin.DiscoverDaemonsCommand;
-import com.intrbiz.bergamot.command.admin.GenerateSiteCAsCommand;
-import com.intrbiz.bergamot.command.admin.ListSitesCommand;
-import com.intrbiz.bergamot.command.admin.SecurityKeyCommand;
-import com.intrbiz.bergamot.command.admin.ServerCommand;
-import com.intrbiz.bergamot.command.admin.UnjoinDaemonCommand;
 
 public class BergamotCLI
 {
@@ -53,20 +41,7 @@ public class BergamotCLI
         this.addCommand(new SiteXMLCommand());
         this.addCommand(new AlertsCommand());
         this.addCommand(new AcknowledgeAlertCommand());
-        this.addCommand(new AgentCommand());
         this.addCommand(new ApplyConfigChangeCommand());
-        // local commands
-        this.addCommand(new CreateSiteCommand());
-        this.addCommand(new ListSitesCommand());
-        this.addCommand(new DBVersionCommand());
-        this.addCommand(new DBInstallCommand());
-        this.addCommand(new AddSiteAliasCommand());
-        this.addCommand(new DBImportConfigCommand());
-        this.addCommand(new GenerateSiteCAsCommand());
-        this.addCommand(new ServerCommand());
-        this.addCommand(new SecurityKeyCommand());
-        this.addCommand(new DiscoverDaemonsCommand());
-        this.addCommand(new UnjoinDaemonCommand());
     }
 
     public void addCommand(BergamotCLICommand command)

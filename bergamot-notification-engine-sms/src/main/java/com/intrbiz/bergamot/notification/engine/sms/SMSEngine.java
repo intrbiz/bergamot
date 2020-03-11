@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.notification.engine.sms;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -14,24 +12,23 @@ import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
-import com.intrbiz.bergamot.health.HealthTracker;
-import com.intrbiz.bergamot.health.model.KnownDaemon;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
+import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.engine.sms.io.AWSTransport;
 import com.intrbiz.bergamot.notification.engine.sms.io.SMSTransport;
 import com.intrbiz.bergamot.notification.engine.sms.io.SMSTransportException;
 import com.intrbiz.bergamot.notification.engine.sms.io.TwilioTransport;
 import com.intrbiz.bergamot.notification.engine.sms.model.SMSMessage;
 import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
-import com.intrbiz.configuration.CfgParameter;
+import com.intrbiz.bergamot.notification.template.TemplatedNotificationEngine;
+import com.intrbiz.configuration.Configuration;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.QueueException;
 
-public class SMSEngine extends AbstractNotificationEngine
+public class SMSEngine extends TemplatedNotificationEngine
 {
     public static final String NAME = "sms";
 
@@ -44,8 +41,6 @@ public class SMSEngine extends AbstractNotificationEngine
     private final Counter smsSendErrors;
     
     private Accounting accounting = Accounting.create(SMSEngine.class);
-    
-    private List<String> healthcheckAdmins = new LinkedList<String>();
     
     private SMSTransport transport;
 
@@ -71,61 +66,24 @@ public class SMSEngine extends AbstractNotificationEngine
     }
 
     @Override
-    protected void configure() throws Exception
+    protected void doPrepare(NotificationEngineContext engineContext) throws Exception
     {
-        super.configure();
+        super.doPrepare(engineContext);
+        Configuration config = engineContext.getConfiguration();
         // from number
-        this.from = this.config.getStringParameterValue("from", "");
+        this.from = config.getStringParameterValue("sms.from", "");
         logger.info("Sending SMS messages from: " + this.from);
         // load our SMS transport
-        this.transport = this.loadTransport(this.config.getStringParameterValue("transport", "twilio"));
-        this.transport.configure(this.config);
+        this.transport = this.loadTransport(config.getStringParameterValue("sms.transport", "twilio"));
+        this.transport.configure(config);
         logger.info("Using " + this.transport + " to send SMS messages");
-        // who to contact in the event we get a warning from the healthcheck subsystem
-        for (CfgParameter param : this.config.getParameters())
-        {
-            if ("healthcheck.admin".equals(param.getName()) && (! Util.isEmpty(param.getValueOrText())))
-                this.healthcheckAdmins.add(param.getValueOrText());
-        }
-        logger.info("Healthcheck alerts will be sent to " + this.healthcheckAdmins);
-        // setup healthchecking
-        HealthTracker.getInstance().addAlertHandler(this::raiseHealthcheckAlert);
     }
-    
-    
-    
-    public void raiseHealthcheckAlert(KnownDaemon failed)
+
+    @Override
+    public boolean accept(Notification notification)
     {
-        logger.error("Got healthcheck alert for " + failed.getDaemonName() + " [" + failed.getInstanceId() + "] on host " + failed.getHostName() + " [" + failed.getHostId() + "]");
-        if (! this.healthcheckAdmins.isEmpty())
-        {
-            // really try to send
-            for (int i = 0; i < 10; i++)
-            {
-                try
-                {
-                    String message = this.buildMessage(failed);
-                    // send the SMSes
-                    for (String admin : this.healthcheckAdmins)
-                    {
-                        try
-                        {
-                            this.transport.sendSMS(new SMSMessage(admin, this.from, message));
-                        }
-                        catch (SMSTransportException e)
-                        {
-                            logger.error("Failed to send healthcheck SMS to " + admin, e);
-                        }
-                    }
-                    // successfully sent
-                    break;
-                }
-                catch (Exception e)
-                {
-                    logger.error("Failed to send SMS healthcheck notification", e);
-                }
-            }
-        }
+        Map<String, ContactMO> tos = this.getTo(notification);
+        return ! tos.isEmpty();
     }
 
     @Override
@@ -207,10 +165,5 @@ public class SMSEngine extends AbstractNotificationEngine
         {
             return this.applyTemplate(notification.getNotificationType() + ".message", notification);
         }
-    }
-    
-    protected String buildMessage(KnownDaemon daemon) throws Exception
-    {
-        return this.applyTemplate("healthcheck.alert.message", daemon);
     }
 }

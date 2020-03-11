@@ -19,12 +19,9 @@ public class ActiveResultMO extends ResultMO
 
     @JsonProperty("check_id")
     private UUID checkId;
-
-    @JsonProperty("site_id")
-    private UUID siteId;
     
     @JsonProperty("processing_pool")
-    private int processingPool;
+    private UUID processingPool;
 
     @JsonProperty("check")
     private CheckEvent check;
@@ -66,24 +63,13 @@ public class ActiveResultMO extends ResultMO
     {
         this.check = check;
     }
-    
-    
-    public UUID getSiteId()
-    {
-        return siteId;
-    }
 
-    public void setSiteId(UUID siteId)
-    {
-        this.siteId = siteId;
-    }
-
-    public int getProcessingPool()
+    public UUID getProcessingPool()
     {
         return processingPool;
     }
 
-    public void setProcessingPool(int processingPool)
+    public void setProcessingPool(UUID processingPool)
     {
         this.processingPool = processingPool;
     }    

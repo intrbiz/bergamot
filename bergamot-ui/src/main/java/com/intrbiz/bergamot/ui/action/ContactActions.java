@@ -12,30 +12,20 @@ import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Contact.LockOutReason;
-import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
-import com.intrbiz.bergamot.queue.NotificationQueue;
-import com.intrbiz.bergamot.queue.key.NotificationKey;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Action;
-import com.intrbiz.queue.RoutedProducer;
 
 public class ContactActions
 {
     private Logger logger = Logger.getLogger(ContactActions.class);
-    
-    private NotificationQueue notificationQueue;
-    
-    private RoutedProducer<Notification, NotificationKey> notificationsProducer;
     
     private Accounting accounting = Accounting.create(ContactActions.class);
     
     public ContactActions()
     {
         super();
-        this.notificationQueue = NotificationQueue.open();
-        this.notificationsProducer = this.notificationQueue.publishNotifications();
     }
     
     @Action("set-password")
@@ -68,7 +58,7 @@ public class ContactActions
             }
             // send a notification, only via email
             PasswordResetNotification resetNotification = new PasswordResetNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url);
-            this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), resetNotification);
+            // TODO: this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), resetNotification);
             logger.info("Sent password reset for contact " + contact.getSite().getName() + "::" + contact.getName() + " (" + contact.getId() + ")");
             // accounting
             this.accounting.account(new SendNotificationAccountingEvent(contact.getSiteId(), resetNotification.getId(), contact.getId(), AccountingNotificationType.RESET, resetNotification.getTo().size(), 0, null));

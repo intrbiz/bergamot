@@ -20,11 +20,12 @@ import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccounting
 import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
-import com.intrbiz.bergamot.notification.NotificationException;
+import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.engine.slack.express.SlackEncode;
 import com.intrbiz.bergamot.notification.engine.slack.io.SlackClientHandler;
 import com.intrbiz.bergamot.notification.engine.slack.model.SlackMessage;
+import com.intrbiz.bergamot.notification.template.NotificationException;
+import com.intrbiz.bergamot.notification.template.TemplatedNotificationEngine;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.template.ExpressTemplate;
 import com.intrbiz.util.IBThreadFactory;
@@ -42,17 +43,18 @@ import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.ssl.SslHandler;
 
-public class SlackEngine extends AbstractNotificationEngine
+public class SlackEngine extends TemplatedNotificationEngine
 {
     public static final String NAME = "slack";
 
-    private Logger logger = Logger.getLogger(SlackEngine.class);
+    private static final Logger logger = Logger.getLogger(SlackEngine.class);
     
     private SSLContext sslContext;
     
@@ -80,9 +82,9 @@ public class SlackEngine extends AbstractNotificationEngine
     }
 
     @Override
-    protected void configure() throws Exception
+    protected void doPrepare(NotificationEngineContext engineContext) throws Exception
     {
-        super.configure();
+        super.doPrepare(engineContext);
         // setup our custom functions for templating
         this.expressExtensions.addFunction("slack_encode", SlackEncode.class);
         // setup our HTTP engine
@@ -95,7 +97,8 @@ public class SlackEngine extends AbstractNotificationEngine
         logger.info("Slack notifier configured");
     }
     
-    public void shutdown()
+    @Override
+    protected void doShutdown(NotificationEngineContext engineContext)
     {
         try
         {
@@ -122,88 +125,93 @@ public class SlackEngine extends AbstractNotificationEngine
     }
 
     @Override
-    public void sendNotification(Notification notification)
+    public boolean accept(Notification notification)
     {
-        // we only handle check notifications
         if (notification instanceof CheckNotification)
         {
-            // the slack URL is stored as a parameter on either: contacts, teams, hosts or services
-            for (String slackUrl : this.findNotificationParameters((CheckNotification) notification, "slack.url"))
+            return ! this.findNotificationParameters((CheckNotification) notification, "slack.url").isEmpty();
+        }
+        return false;
+    }
+
+    @Override
+    public void sendNotification(Notification notification)
+    {
+        // the slack URL is stored as a parameter on either: contacts, teams, hosts or services
+        for (String slackUrl : this.findNotificationParameters((CheckNotification) notification, "slack.url"))
+        {
+            try
             {
-                try
+                // parse the URL
+                URL url = new URL(slackUrl);
+                // build the message to send
+                SlackMessage slackMessage = new SlackMessage()
+                    .username("Bergamot Monitoring")
+                    .iconUrl("https://github.com/intrbiz/bergamot-site/raw/master/src/main/public/logo/disk/64/bergamot_disk_64.png");
+                // optionally set the channel
+                if (! Util.isEmpty(url.getRef()))
                 {
-                    // parse the URL
-                    URL url = new URL(slackUrl);
-                    // build the message to send
-                    SlackMessage slackMessage = new SlackMessage()
-                            .username("Bergamot Monitoring")
-                            .iconUrl("https://github.com/intrbiz/bergamot-site/raw/master/src/main/public/logo/disk/64/bergamot_disk_64.png");
-                    // optionally set the channel
-                    if (! Util.isEmpty(url.getRef()))
+                    if (logger.isDebugEnabled()) logger.debug("Sending slack message to channel: " + url.getRef());
+                    slackMessage.channel(url.getRef());
+                }
+                // template the message
+                this.buildMessage((CheckNotification) notification, slackMessage);
+                // build the request to send
+                FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, url.getPath(), Unpooled.wrappedBuffer(slackMessage.toBytes()));
+                request.headers().add(HttpHeaderNames.HOST, url.getPort() == -1 ? url.getHost() : url.getHost() + ":" + url.getPort());
+                request.headers().add(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+                request.headers().add(HttpHeaderNames.USER_AGENT, "Bergamot Monitoring Slack Notifier 1.0.0");
+                request.headers().add(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8");
+                request.headers().add(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
+                // make a HTTP request
+                Bootstrap b = new Bootstrap();
+                b.group(this.eventLoop);
+                b.channel(NioSocketChannel.class);
+                b.option(ChannelOption.ALLOCATOR, new UnpooledByteBufAllocator(false));
+                b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) TimeUnit.SECONDS.toMillis(5));
+                b.handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) throws Exception
                     {
-                        if (logger.isDebugEnabled()) logger.debug("Sending slack message to channel: " + url.getRef());
-                        slackMessage.channel(url.getRef());
+                        // Force SSL handling
+                        SSLEngine sslEngine = null;
+                        sslEngine = sslContext.createSSLEngine(url.getHost(), url.getPort() == -1 ? 443 : url.getPort());
+                        sslEngine.setUseClientMode(true);
+                        SSLParameters params = new SSLParameters();
+                        params.setEndpointIdentificationAlgorithm("HTTPS");
+                        sslEngine.setSSLParameters(params);
+                        ch.pipeline().addLast(new SslHandler(sslEngine));
+                        // HTTP handling
+                        ch.pipeline().addLast(
+                                new HttpClientCodec(),
+                                new HttpContentDecompressor(),
+                                new HttpObjectAggregator(1 * 1024 * 1024 /* 1 MiB */),
+                                new SlackClientHandler(timer, sslEngine, request)
+                        );
                     }
-                    // template the message
-                    this.buildMessage((CheckNotification) notification, slackMessage);
-                    // build the request to send
-                    FullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, url.getPath(), Unpooled.wrappedBuffer(slackMessage.toBytes()));
-                    request.headers().add(HttpHeaders.Names.HOST, url.getPort() == -1 ? url.getHost() : url.getHost() + ":" + url.getPort());
-                    request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-                    request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring Slack Notifier 1.0.0");
-                    request.headers().add(HttpHeaders.Names.CONTENT_TYPE, "application/json; charset=utf-8");
-                    request.headers().add(HttpHeaders.Names.CONTENT_LENGTH, request.content().readableBytes());
-                    // make a HTTP request
-                    Bootstrap b = new Bootstrap();
-                    b.group(this.eventLoop);
-                    b.channel(NioSocketChannel.class);
-                    b.option(ChannelOption.ALLOCATOR, new UnpooledByteBufAllocator(false));
-                    b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, (int) TimeUnit.SECONDS.toMillis(60));
-                    b.handler(new ChannelInitializer<SocketChannel>()
-                    {
-                        @Override
-                        public void initChannel(SocketChannel ch) throws Exception
-                        {
-                            // Force SSL handling
-                            SSLEngine sslEngine = null;
-                            sslEngine = sslContext.createSSLEngine(url.getHost(), url.getPort() == -1 ? 443 : url.getPort());
-                            sslEngine.setUseClientMode(true);
-                            SSLParameters params = new SSLParameters();
-                            params.setEndpointIdentificationAlgorithm("HTTPS");
-                            sslEngine.setSSLParameters(params);
-                            ch.pipeline().addLast(new SslHandler(sslEngine));
-                            // HTTP handling
-                            ch.pipeline().addLast(
-                                    new HttpClientCodec(),
-                                    new HttpContentDecompressor(),
-                                    new HttpObjectAggregator(1 * 1024 * 1024 /* 1 MiB */),
-                                    new SlackClientHandler(timer, sslEngine, request)
-                            );
-                        }
-                    });
-                    // connect the client
-                    b.connect(url.getHost(), url.getPort() == -1 ? url.getDefaultPort() : url.getPort());
-                    // accounting
-                    this.accounting.account(new SendNotificationToContactAccountingEvent(
-                        notification.getSite().getId(),
-                        notification.getId(),
-                        getObjectId(notification),
-                        getNotificationType(notification),
-                        null,
-                        this.getName(),
-                        "slack",
-                        url.toString(),
-                        null
-                    ));
-                }
-                catch (MalformedURLException e)
-                {
-                    logger.error("Cannot send Slack notification to malformed url", e);
-                }
-                catch (Exception e)
-                {
-                    logger.error("Failed to send Slack notification", e);
-                }
+                });
+                // connect the client
+                b.connect(url.getHost(), url.getPort() == -1 ? url.getDefaultPort() : url.getPort());
+                // accounting
+                this.accounting.account(new SendNotificationToContactAccountingEvent(
+                    notification.getSite().getId(),
+                    notification.getId(),
+                    getObjectId(notification),
+                    getNotificationType(notification),
+                    null,
+                    this.getName(),
+                    "slack",
+                    url.toString(),
+                    null
+                ));
+            }
+            catch (MalformedURLException e)
+            {
+                logger.error("Cannot send Slack notification to malformed url", e);
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to send Slack notification", e);
             }
         }
     }

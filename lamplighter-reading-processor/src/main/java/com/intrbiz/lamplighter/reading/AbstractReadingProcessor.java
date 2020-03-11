@@ -1,86 +1,72 @@
 package com.intrbiz.lamplighter.reading;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.queue.WorkerQueue;
-import com.intrbiz.bergamot.queue.key.ReadingKey;
-import com.intrbiz.queue.Consumer;
 
 public abstract class AbstractReadingProcessor implements ReadingProcessor
 {
     private Logger logger = Logger.getLogger(AbstractReadingProcessor.class);
     
-    private UUID instanceId = UUID.randomUUID();
-
-    private WorkerQueue workerQueue;
-
-    private List<Consumer<ReadingParcelMO, ReadingKey>> readingConsumers = new LinkedList<Consumer<ReadingParcelMO, ReadingKey>>();
+    protected final UUID poolId;
     
-    private List<Consumer<ReadingParcelMO, ReadingKey>> fallbackConsumers = new LinkedList<Consumer<ReadingParcelMO, ReadingKey>>();
+    private final ProcessingPoolConsumer consumer;
 
-    private int threads = Runtime.getRuntime().availableProcessors();
+    private int threadCount;
+    
+    private Thread[] threads;
+    
+    protected volatile boolean run = false;
 
-    public AbstractReadingProcessor()
+    public AbstractReadingProcessor(UUID poolId, ProcessingPoolConsumer consumer)
     {
         super();
+        this.poolId = Objects.requireNonNull(poolId);
+        this.consumer = Objects.requireNonNull(consumer);
+        this.threadCount = Runtime.getRuntime().availableProcessors();
     }
-
-    @Override
-    public int getThreads()
+    
+    public UUID getPoolId()
     {
-        return threads;
-    }
-
-    @Override
-    public void setThreads(int threads)
-    {
-        this.threads = threads;
-    }
-
-    @Override
-    public void ownPool(UUID site, int pool)
-    {
-        for (Consumer<ReadingParcelMO, ReadingKey> consumer : this.readingConsumers)
-        {
-            consumer.addBinding(new ReadingKey(site, pool));
-            break;
-        }
-    }
-
-    @Override
-    public void disownPool(UUID site, int pool)
-    {
-        for (Consumer<ReadingParcelMO, ReadingKey> consumer : this.readingConsumers)
-        {
-            consumer.removeBinding(new ReadingKey(site, pool));
-            break;
-        }
+        return this.poolId;
     }
 
     @Override
     public void start()
     {
-        // setup the consumer
-        logger.info("Creating readings consumer");
-        this.workerQueue = WorkerQueue.open();
-        // create the consumers
-        for (int i = 0; i < this.getThreads(); i++)
+        this.startExecutors();
+    }
+    
+    protected void startExecutors()
+    {
+        this.run = true;
+        this.threads = new Thread[this.threadCount];
+        for (int i = 0; i < this.threads.length; i++)
         {
-            // consume results, currently for all sites
-            this.readingConsumers.add(this.workerQueue.consumeReadings((h, r) -> {
-                logger.trace("Processing pooled/site readings");
-                processReadings(r);
-            }, this.instanceId.toString()));
-            // consume results, currently for all sites
-            this.fallbackConsumers.add(this.workerQueue.consumeFallbackReadings((h, r) -> {
-                logger.debug("Processing fallback readings");
-                processReadings(r);
-            }));
+            final int threadNum = i;
+            this.threads[i] = new Thread(() -> {
+                logger.debug("Reading processor executor " + threadNum + " starting.");
+                while (this.run)
+                {
+                    try
+                    {
+                        ReadingParcelMO reading = this.consumer.pollReading();
+                        if (reading != null)
+                        {
+                            this.processReadings(reading);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.error("Error processing result", e);
+                    }
+                }
+                logger.debug("Reading processor executor " + threadNum + " stopped.");
+            }, "Bergamot-Reading-Processor-Executor-" + i);
         }
     }
 }

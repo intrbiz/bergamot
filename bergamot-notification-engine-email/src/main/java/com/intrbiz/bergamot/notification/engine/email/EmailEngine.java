@@ -1,8 +1,6 @@
 package com.intrbiz.bergamot.notification.engine.email;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,8 +20,6 @@ import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
-import com.intrbiz.bergamot.health.HealthTracker;
-import com.intrbiz.bergamot.health.model.KnownDaemon;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.GenericNotification;
@@ -31,16 +27,17 @@ import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
-import com.intrbiz.configuration.CfgParameter;
+import com.intrbiz.bergamot.notification.NotificationEngineContext;
+import com.intrbiz.bergamot.notification.template.TemplatedNotificationEngine;
+import com.intrbiz.configuration.Configuration;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
-import com.intrbiz.queue.QueueException;
 
-public class EmailEngine extends AbstractNotificationEngine
+public class EmailEngine extends TemplatedNotificationEngine
 {
     public static final String NAME = "email";
 
-    private Logger logger = Logger.getLogger(EmailEngine.class);
+    private static final Logger logger = Logger.getLogger(EmailEngine.class);
 
     private Properties properties = new Properties();
 
@@ -57,8 +54,6 @@ public class EmailEngine extends AbstractNotificationEngine
     private final Counter emailSendErrors;
     
     private Accounting accounting = Accounting.create(AbstractNotificationEngine.class);
-    
-    private List<String> healthcheckAdmins = new LinkedList<String>();
 
     public EmailEngine()
     {
@@ -69,127 +64,36 @@ public class EmailEngine extends AbstractNotificationEngine
         this.emailSendErrors = source.getRegistry().counter("email-errors");
     }
 
-    public List<String> getHealthcheckAdmins()
-    {
-        return healthcheckAdmins;
-    }
-
     @Override
-    protected void configure() throws Exception
+    protected void doPrepare(NotificationEngineContext engineContext) throws Exception
     {
-        super.configure();
+        super.doPrepare(engineContext);
+        Configuration config = engineContext.getConfiguration();
         // setup the JavaMail properties
         this.properties = new Properties();
-        this.properties.put("mail.smtp.host", this.config.getStringParameterValue("mail.host", "127.0.0.1"));
-        this.properties.put("mail.smtp.port", this.config.getStringParameterValue("mail.port", "25"));
-        if (this.config.getBooleanParameterValue("mail.tls", false))
+        this.properties.put("mail.smtp.host", config.getStringParameterValue("mail.host", "127.0.0.1"));
+        this.properties.put("mail.smtp.port", config.getStringParameterValue("mail.port", "25"));
+        if (config.getBooleanParameterValue("mail.tls", false))
         {
-            this.properties.put("mail.smtp.port", this.config.getStringParameterValue("mail.port", "587"));
+            this.properties.put("mail.smtp.port", config.getStringParameterValue("mail.port", "587"));
             this.properties.put("mail.smtp.starttls.enable", true);
             this.properties.put("mail.smtp.auth", true);
         }
-        this.properties.put("mail.smtp.from", this.config.getStringParameterValue("from", "bergamot@localhost"));
+        this.properties.put("mail.smtp.from", config.getStringParameterValue("from", "bergamot@localhost"));
         // auth details
-        this.user = this.config.getStringParameterValue("mail.user", "");
-        this.password = this.config.getStringParameterValue("mail.password", "");
+        this.user = config.getStringParameterValue("mail.user", "");
+        this.password = config.getStringParameterValue("mail.password", "");
         // from address
-        this.fromAddress = this.config.getStringParameterValue("from", "bergamot@localhost");
+        this.fromAddress = config.getStringParameterValue("mail.from", "bergamot@localhost");
         // setup the JavaMail session
         this.session = Session.getDefaultInstance(properties);
         this.session.setDebug(true);
-        // who to contact in the event we get a warning from the healthcheck subsystem
-        for (CfgParameter param : this.config.getParameters())
-        {
-            if ("healthcheck.admin".equals(param.getName()) && (! Util.isEmpty(param.getValueOrText())))
-                this.healthcheckAdmins.add(param.getValueOrText());
-        }
-        logger.info("Healthcheck alerts will be sent to " + this.healthcheckAdmins);
-        // setup healthchecking
-        HealthTracker.getInstance().addAlertHandler(this::raiseHealthcheckAlert);
     }
-    
-    public void raiseHealthcheckAlert(KnownDaemon failed)
+
+    @Override
+    public boolean accept(Notification notification)
     {
-        logger.error("Got healthcheck alert for " + failed.getDaemonName() + " [" + failed.getInstanceId() + "] on host " + failed.getHostName() + " [" + failed.getHostId() + "]");
-        if (! this.healthcheckAdmins.isEmpty())
-        {
-            // really try to send
-            for (int i = 0; i < 10; i++)
-            {
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-                try
-                {
-                    // build the message
-                    Message message = this.buildHealhCheckMessage(this.session, failed);
-                    // send the message
-                    Transport transport = null;
-                    try
-                    {
-                        transport = session.getTransport("smtp");
-                        // connect
-                        if (Util.isEmpty(this.user))
-                        {
-                            logger.debug("Transport connecting to: " + this.properties.getProperty("mail.smtp.host"));
-                            transport.connect();
-                            logger.debug("Transport connected");
-                        }
-                        else
-                        {
-                            logger.debug("Transport connecting to: " + this.properties.getProperty("mail.smtp.host") + " with username: " + this.user);
-                            transport.connect(this.user, this.password);
-                            logger.debug("Transport connected");
-                        }
-                        // send the message
-                        logger.info("Sending healthcheck message...");
-                        transport.sendMessage(message, message.getAllRecipients());
-                        logger.info("Message healthcheck sent");
-                    }
-                    finally
-                    {
-                        if (transport != null) transport.close();
-                    }
-                    // successfully sent
-                    break;
-                }
-                catch (Throwable e)
-                {
-                    logger.error("Failed to send healthcheck email notification", e);
-                }
-                // pause after each attempt
-                if (i > 0)
-                {
-                    try
-                    {
-                        Thread.sleep(i * 1000);
-                    }
-                    catch (InterruptedException e)
-                    {
-                    }
-                }
-            }
-        }
-        else
-        {
-            logger.info("No admins configured, not sending health check alert");
-        }
-    }
-    
-    protected Message buildHealhCheckMessage(Session session, KnownDaemon daemon) throws Exception
-    {
-        Message message = new MimeMessage(session);
-        // from
-        message.setFrom(new InternetAddress(this.fromAddress));
-        // to address
-        for (String admin : this.healthcheckAdmins)
-        {
-            message.addRecipient(RecipientType.TO, new InternetAddress(admin));
-        }
-        // sent date
-        message.setSentDate(new Date());
-        // content
-        message.setSubject(this.applyTemplate("healthcheck.alert.subject", daemon));
-        message.setContent(this.applyTemplate("healthcheck.alert.content", daemon), "text/plain");
-        return message;
+        return this.checkAtLeastOneRecipient(notification);
     }
 
     @Override
@@ -198,17 +102,12 @@ public class EmailEngine extends AbstractNotificationEngine
         if (logger.isTraceEnabled()) logger.trace(notification.toString());
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
         logger.info("Sending email notification for " + notification.getNotificationType() + " to " + notification.getTo().stream().map(ContactMO::getEmail).filter((e) -> { return e != null; }).collect(Collectors.toList()));
-        Timer.Context tctx = this.emailSendTimer.time();
-        try
+        try (Timer.Context tctx = this.emailSendTimer.time())
         {
-            if (! this.checkAtLeastOneRecipient(notification))
-            {
-                logger.info("Not sending email, no recipients");
-                return;
-            }
             // build the message
             Message message = this.buildMessage(notification);
-            logger.debug("Built message");
+            if (logger.isDebugEnabled())
+                logger.debug("Built message: " + message);
             // send the message
             Transport transport = null;
             try
@@ -259,11 +158,6 @@ public class EmailEngine extends AbstractNotificationEngine
         {
             this.emailSendErrors.inc();
             logger.error("Failed to send email notification", e);
-            throw new QueueException("Failed to send email notification", e);
-        }
-        finally
-        {
-            tctx.stop();
         }
     }
     

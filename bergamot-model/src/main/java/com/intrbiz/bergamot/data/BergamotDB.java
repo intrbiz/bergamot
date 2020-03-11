@@ -20,8 +20,8 @@ import com.intrbiz.bergamot.config.validator.BergamotConfigResolver;
 import com.intrbiz.bergamot.config.validator.BergamotObjectLocator;
 import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.AccessControl;
-import com.intrbiz.bergamot.model.AgentRegistration;
-import com.intrbiz.bergamot.model.AgentTemplate;
+import com.intrbiz.bergamot.model.ActiveCheck;
+import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.AlertEncompasses;
 import com.intrbiz.bergamot.model.AlertEscalation;
@@ -96,7 +96,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({3, 60, 0}),
+        version = @SQLVersion({4, 0, 2}),
         tables = {
             Site.class,
             Location.class,
@@ -123,7 +123,6 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ConfigChange.class,
             CheckStats.class,
             CheckTransition.class,
-            AgentRegistration.class,
             CheckSavedState.class,
             SecurityDomain.class,
             SecurityDomainMembership.class,
@@ -136,13 +135,13 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             ContactU2FDeviceRegistration.class,
             ContactHOTPRegistration.class,
             ContactBackupCode.class,
-            AgentTemplate.class,
             GlobalSetting.class,
             Credential.class,
             SLA.class,
             SLARollingPeriod.class,
             SLAFixedPeriod.class,
-            SLAReport.class
+            SLAReport.class,
+            AgentKey.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -1599,8 +1598,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Host> listHostsThatAreNotOk(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Host.class, name = "list_hosts_in_pool", since = @SQLVersion({1, 0, 0}))
-    public abstract List<Host> listHostsInPool(@SQLParam("site_id") UUID siteId, @SQLParam("pool") int pool);
+    @SQLGetter(table = Host.class, name = "list_hosts_in_pool", since = @SQLVersion({4, 0, 0}), 
+            query = @SQLQuery("SELECT * FROM bergamot.host WHERE site_id = p_site_id AND bergamot.compute_processing_pool(id) = p_pool")
+    )
+    public abstract List<Host> listHostsInPool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "pool", virtual = true) int pool);
     
     @Cacheable
     @CacheInvalidate({
@@ -1726,8 +1727,10 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Service> listServicesThatAreNotOk(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Service.class, name = "list_services_in_pool", since = @SQLVersion({1, 0, 0}))
-    public abstract List<Service> listServicesInPool(@SQLParam("site_id") UUID siteId, @SQLParam("pool") int pool);
+    @SQLGetter(table = Service.class, name = "list_services_in_pool", since = @SQLVersion({1, 0, 0}),
+            query = @SQLQuery("SELECT * FROM bergamot.service WHERE site_id = p_site_id AND bergamot.compute_processing_pool(id) = p_pool")
+    )
+    public abstract List<Service> listServicesInPool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "pool", virtual = true) int pool);
     
     @Cacheable
     @CacheInvalidate({
@@ -2101,42 +2104,17 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // agent
     
-    @SQLSetter(table = AgentRegistration.class, name = "set_agent_registration", since = @SQLVersion({2, 2, 0}))
-    public abstract void setAgentRegistration(AgentRegistration reg);
+    @SQLSetter(table = AgentKey.class, name = "set_agent_key", since = @SQLVersion({4, 0, 2}))
+    public abstract void setAgentKey(AgentKey key);
     
-    @SQLGetter(table = AgentRegistration.class, name = "get_agent_registration", since = @SQLVersion({2, 2, 0}))
-    public abstract AgentRegistration getAgentRegistration(@SQLParam("id") UUID id);
+    @SQLGetter(table = AgentKey.class, name = "get_agent_key", since = @SQLVersion({4, 0, 2}))
+    public abstract AgentKey getAgentKey(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = AgentRegistration.class, name ="get_agent_registration_by_name", since = @SQLVersion({2, 2, 0}))
-    public abstract AgentRegistration getAgentRegistrationByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
+    @SQLRemove(table = AgentKey.class, name = "remove_agent_key", since = @SQLVersion({4, 0, 2}))
+    public abstract void removeAgentKey(@SQLParam("id") UUID id);
     
-    @SQLRemove(table = AgentRegistration.class, name = "remove_agent_registration", since = @SQLVersion({2, 2, 0}))
-    public abstract void removeAgentRegistration(@SQLParam("id") UUID id);
-    
-    @SQLGetter(table = AgentRegistration.class, name = "list_agent_registrations", since = @SQLVersion({2, 2, 0}))
-    public abstract List<AgentRegistration> listAgentRegistrations(@SQLParam("site_id") UUID siteId);
-    
-    // agent template
-    
-    @SQLSetter(table = AgentTemplate.class, name = "set_agent_template", since = @SQLVersion({3, 41, 0}))
-    public abstract void setAgentTemplate(AgentTemplate reg);
-    
-    @SQLGetter(table = AgentTemplate.class, name = "get_agent_template", since = @SQLVersion({3, 41, 0}))
-    public abstract AgentTemplate getAgentTemplate(@SQLParam("id") UUID id);
-    
-    @SQLGetter(table = AgentTemplate.class, name ="get_agent_template_by_name", since = @SQLVersion({3, 41, 0}))
-    public abstract AgentTemplate getAgentTemplateByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
-    
-    @SQLRemove(table = AgentTemplate.class, name = "remove_agent_template", since = @SQLVersion({3, 41, 0}))
-    public abstract void removeAgentTemplate(@SQLParam("id") UUID id);
-    
-    @SQLGetter(table = AgentTemplate.class, name = "list_agent_templates", since = @SQLVersion({3, 41, 0}))
-    public abstract List<AgentTemplate> listAgentTemplates(@SQLParam("site_id") UUID siteId);
-    
-    @SQLGetter(table = Config.class, name = "list_host_templates_without_certificates", since = @SQLVersion({3, 42, 0}),
-            query = @SQLQuery("SELECT c.* FROM bergamot.config c LEFT JOIN bergamot.agent_template t ON (c.id = t.id) WHERE c.type = 'host'  AND c.template AND t.id IS NULL")
-    )
-    public abstract List<Config> listHostTemplatesWithoutCertificates(@SQLParam("site_id") UUID siteId);
+    @SQLGetter(table = AgentKey.class, name = "list_agent_keys", since = @SQLVersion({4, 0, 2}))
+    public abstract List<AgentKey> listAgentKeys(@SQLParam("site_id") UUID siteId);
     
     // generic
     
@@ -2203,6 +2181,18 @@ public abstract class BergamotDB extends DatabaseAdapter
         if (c != null) return c;
         // cluster
         c = this.getCluster(id);
+        if (c != null) return c;
+        return c;
+    }
+    
+    public ActiveCheck<?,?> getActiveCheck(UUID id)
+    {
+        ActiveCheck<?,?> c = null;
+        // service
+        c = this.getService(id);
+        if (c != null) return c;
+        // host
+        c = this.getHost(id);
         if (c != null) return c;
         return c;
     }
@@ -3290,6 +3280,26 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new SQLScript(
                 "CREATE INDEX config_name_idx ON bergamot.config (site_id ASC NULLS LAST, type ASC NULLS LAST, name ASC NULLS LAST)"
+        );
+    }
+    
+    @SQLPatch(name = "add_compute_processing_pool", index = 17, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
+    public static SQLScript computeProcessingPool()
+    {
+        return new SQLScript(
+                "CREATE OR REPLACE FUNCTION bergamot.compute_processing_pool(id UUID)\n" + 
+                "RETURNS INTEGER\n" + 
+                "LANGUAGE plpgsql IMMUTABLE\n" + 
+                "AS $$\n" + 
+                "DECLARE\n" + 
+                "    v_lsb_hex TEXT;\n" + 
+                "    v_lsb INTEGER;\n" + 
+                "BEGIN\n" + 
+                "    v_lsb_hex := substring(id::TEXT FROM 35 FOR 2);\n" + 
+                "    EXECUTE 'SELECT X''' || v_lsb_hex || '''::int' INTO v_lsb;\n" + 
+                "    RETURN v_lsb % 48;\n" + 
+                "END;\n" + 
+                "$$;"
         );
     }
     

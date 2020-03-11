@@ -6,67 +6,154 @@
 		<a href="/global/admin/utils/">Global System Utilities</a>
 	</div>
     <div class="row">
-		<h3>Global System Status</h3>
-		<data-set var="daemon" value="#{daemons}">
+		<h3>Workers</h3>
+		<data-set var="worker" value="#{workers}">
 			<div class="col3 dash_icon check">
 				<h3>
-					<span class="dash_img status_#{if(daemon.isAlive(),'ok', 'critical')}" title="Daemon #{if(daemon.isAlive(), 'is alive', 'has failed')}">
+					<span class="dash_img status_ok" title="Worker #{worker.id}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
-					<span class="name">#{ucFirst(daemon.daemonName.replace('-', ' '))}</span>
-					<span class="name">(#{ucFirst(coalesce(daemon.daemonKind, ''))})</span>
+					<span class="name">#{ucFirst(coalesce(worker.application, 'Worker'))}</span>
+					<span class="name" style="font-size: 12px">(#{worker.id})</span>
 			    </h3>
 			    <p>
-				    <span class="label">Host: </span>
-				    <span class="value">#{daemon.hostName}</span>
-			    </p>				    
-			    <p>
-				    <span class="label">Started At: </span>
-				    <span class="value">#{dateformat('HH:mm:ss', daemon.startedAt)} on #{dateformat('EEEE dd/MM/yyyy', daemon.startedAt)}</span>
+				    <span class="label">Worker Pool: </span>
+				    <span class="value">#{coalesce(worker.workerPool, 'any')}</span>
 			    </p>
 			    <p>
-				    <span class="label">Last Seen: </span>
-				    <span class="value">#{dateformat('HH:mm:ss', daemon.lastHeartbeatTime)} on #{dateformat('EEEE dd/MM/yyyy', daemon.lastHeartbeatTime)}</span>
+				    <span class="label">Host: </span>
+				    <span class="value">#{worker.hostName}</span>
 			    </p>
 			    <p>
 				    <span class="label">&nbsp;</span>
-				    <span class="value">(#{daemon.getLastHeartbeatAge() / 1000} seconds ago)</span>
-			    </p>
-			    <p>
-				    <span class="label">Instance Id:</span>
-				    <span class="value" style="font-size: 13px;">#{daemon.instanceId}</span>
-			    </p>
-			    <p>
-				    <span class="label">Runtime Id:</span>
-				    <span class="value" style="font-size: 13px;">#{daemon.runtimeId}</span>
+				    <span class="value">#{worker.info}</span>
 			    </p>
 			</div>
 		</data-set>
     </div>
+    
     <div class="row">
-		<h3 title="The cluster members which are participating in scheduling and processing checks">UI Cluster Members</h3>
-		<data-set var="member" value="#{cluster_info.members}">
+		<h3>Notifiers</h3>
+		<data-set var="notifier" value="#{notifiers}">
 			<div class="col3 dash_icon check">
 				<h3>
-					<span class="dash_img status_ok" title="Member #{member.address}">
+					<span class="dash_img status_ok" title="Notifier #{notifier.id}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
-					<span class="name" title="The IP address of this member">Member #{member.address}</span>
+					<span class="name">#{ucFirst(coalesce(notifier.application, 'Notifier'))}</span>
+					<span class="name" style="font-size: 12px">(#{notifier.id})</span>
 			    </h3>
 			    <p>
-				    <span class="label" title="The UUID of this member">UUID: </span>
-				    <span class="value" style="font-size: 13px;">#{member.uuid}</span>
-			    </p>				    
+				    <span class="label">Host: </span>
+				    <span class="value">#{notifier.hostName}</span>
+			    </p>
 			    <p>
-				    <span class="label" title="The number of processing pools this member has">Pools: </span>
-				    <span class="value">#{member.pools.size()}</span>
+				    <span class="label">&nbsp;</span>
+				    <span class="value">#{notifier.info}</span>
+			    </p>
+			</div>
+		</data-set>
+    </div>
+    
+    <div class="row">
+		<h3 title="The processing pools in this Bergamot cluster which can schedule checks and process results">Processing Pools</h3>
+		<data-set var="processor" value="#{cluster_info.processors}">
+			<div class="col3 dash_icon check">
+				<h3>
+					<span class="dash_img status_ok" title="Member #{processor.address}">
+						<img src="#{public('/images/icons/64/bergamot.png')}" />
+					</span>
+					<span class="name" title="The member this processor resides on">Member #{processor.address}</span>
+					<span class="name" style="font-size: 12px">(#{processor.uuid})</span>
+			    </h3>
+			    <p>
+				    <span class="label" title="The number of site pools being processed">Site Pools: </span>
+				    <span class="value">#{processor.pools.size}</span>
 			    </p>
 			</div>
 		</data-set>
 	</div>
+	
+    <div class="row">
+		<h3>Worker Routes</h3>
+		<table style="width: 100%">
+			<tr>
+				<th>Worker Pool</th>
+				<th>Engine</th>
+				<th>Site</th>
+				<th>Workers</th>
+			</tr>
+			<data-set var="worker_pool_routes" value="#{worker_route_table.entrySet()}">
+				<tr>
+					<td>#{worker_pool_routes.key}</td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<data-set var="engine_routes" value="#{worker_pool_routes.value.entrySet()}">
+					<tr>
+						<td></td>
+						<td>#{engine_routes.key}</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<data-set var="site_routes" value="#{engine_routes.value.entrySet()}">
+						<tr>
+							<td></td>
+							<td></td>
+							<td>#{site_routes.key}</td>
+							<td>#{int(site_routes.value)}</td>
+						</tr>
+					</data-set>
+				</data-set>
+			</data-set>
+		</table>
+	</div>
+	
+	<div class="row">
+		<h3>Agents</h3>
+		<table style="width: 100%">
+			<tr>
+				<th>Worker</th>
+				<th>Agents</th>
+			</tr>
+			<data-set var="worker_agent" value="#{worker_agents.entrySet()}">
+				<tr>
+					<td>#{worker_agent.key}</td>
+					<td>#{worker_agent.value}</td>
+				</tr>
+			</data-set>
+		</table>
+	</div>
+	
+	<div class="row">
+		<h3>Notifier Routes</h3>
+		<table style="width: 100%">
+			<tr>
+				<th>Engine</th>
+				<th>Site</th>
+				<th>Notifiers</th>
+			</tr>
+			<data-set var="engine_routes" value="#{notifier_route_table.entrySet()}">
+				<tr>
+					<td>#{engine_routes.key}</td>
+					<td></td>
+					<td></td>
+				</tr>
+				<data-set var="site_routes" value="#{engine_routes.value.entrySet()}">
+					<tr>
+						<td></td>
+						<td>#{site_routes.key}</td>
+						<td>#{int(site_routes.value)}</td>
+					</tr>
+				</data-set>
+			</data-set>
+		</table>
+	</div>
+	
     <div class="row">
 		<h3>Sites</h3>
-		<table>
+		<table style="width: 100%">
 			<tr>
 				<th>Name</th>
 				<th>Summary</th>
@@ -96,19 +183,15 @@
 							<input type="hidden" name="id" value="#{site.id}"/>
 							<input type="submit" name="enable" value="Enable" class="danger"/>
 						</form>
-						<!-- Generate Site Certificates -->
-						<form path="/global/admin/site/id/#{site.id}/generate-certificates" rendered="#{! site.disabled}">
-							<input type="hidden" name="id" value="#{site.id}"/>
-							<input type="submit" name="enable" value="Generate Certificates" class="danger"/>
-						</form>
 					</td>
 				</tr>
 			</data-set>
 		</table>
 	</div>
-	    <div class="row">
+	
+	<div class="row">
 		<h3>Global Admins</h3>
-		<table>
+		<table style="width: 100%">
 			<tr>
 				<th>Site</th>
 				<th>Username</th>
@@ -159,4 +242,5 @@
 			</tr>
 		</table>
 	</div>
+	
 </fragment>

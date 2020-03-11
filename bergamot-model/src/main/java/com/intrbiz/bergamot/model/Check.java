@@ -61,12 +61,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     protected List<UUID> groupIds = new LinkedList<UUID>();
     
     /**
-     * The processing pool to which this check is assigned
-     */
-    @SQLColumn(index = 8, name = "pool", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    protected int pool = 0;
-    
-    /**
      * External systems reference for this check
      */
     @SQLColumn(index = 9, name = "external_ref", since = @SQLVersion({ 2, 1, 0 }))
@@ -288,28 +282,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     }
     
     /**
-     * Get the pool to which this check has been assigned
-     * @return
-     */
-    public int getPool()
-    {
-        return pool;
-    }
-
-    public void setPool(int pool)
-    {
-        this.pool = pool;
-    }
-
-    /**
-     * Get the processing pool for this check
-     */
-    public int computePool()
-    {
-        return this.getSite().computeProcessingPool(this.getId());
-    }
-    
-    /**
      * Get the current downtimes for this check
      */
     public List<Downtime> getDowntime()
@@ -417,6 +389,16 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     public void setNoteUrl(String noteUrl)
     {
         this.noteUrl = noteUrl;
+    }
+    
+    // Pool
+    
+    /**
+     * Compute the pool that this check is in
+     */
+    public int getPool()
+    {
+        return Site.computeSiteProcessingPool(this.id);
     }
     
     // some basic actions
@@ -606,7 +588,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         mo.setState(this.getState().toMO(contact));
         mo.setSuppressed(this.isSuppressed());
         mo.setInDowntime(this.isInDowntime());
-        mo.setPool(this.getPool());
         mo.setExternalRef(this.getExternalRef());
         if (options.contains(MOFlag.NOTE) && (! Util.isEmpty(this.getNote()))) 
             mo.setNote(new NoteMO(this.getNoteTitle(), this.getNoteUrl(), this.getNote()));

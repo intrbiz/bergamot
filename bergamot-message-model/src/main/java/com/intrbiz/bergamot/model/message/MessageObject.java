@@ -1,15 +1,19 @@
 package com.intrbiz.bergamot.model.message;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
-public abstract class MessageObject
+public abstract class MessageObject implements Serializable, Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Use the JsonTypeName annotation to lookup the given message type name
      */
@@ -26,6 +30,19 @@ public abstract class MessageObject
     public MessageObject()
     {
         super();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T extends MessageObject> T cloneMessge()
+    {
+        try
+        {
+            return (T) super.clone();
+        }
+        catch (CloneNotSupportedException e)
+        {
+        }
+        return null;
     }
 
     public final String toString()

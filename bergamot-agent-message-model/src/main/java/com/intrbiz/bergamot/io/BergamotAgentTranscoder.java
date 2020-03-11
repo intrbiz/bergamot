@@ -37,13 +37,8 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.check.ShellCheck;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
-import com.intrbiz.bergamot.model.message.agent.hello.AgentHello;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
-import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationComplete;
-import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationFailed;
-import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequest;
-import com.intrbiz.bergamot.model.message.agent.registration.AgentRegistrationRequired;
 import com.intrbiz.bergamot.model.message.agent.stat.AgentStat;
 import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
@@ -83,8 +78,6 @@ public class BergamotAgentTranscoder
     public static final Class<?>[] CLASSES = {
         // error
         GeneralError.class,
-        // hello
-        AgentHello.class,
         // ping
         AgentPing.class,
         AgentPong.class,
@@ -142,11 +135,6 @@ public class BergamotAgentTranscoder
         DiskIOStat.class,
         DiskIOInfo.class,
         DiskIORateInfo.class,
-        // registration
-        AgentRegistrationRequired.class,
-        AgentRegistrationRequest.class,
-        AgentRegistrationComplete.class,
-        AgentRegistrationFailed.class,
         // metrics
         CheckMetrics.class,
         MetricsStat.class,

@@ -31,7 +31,7 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
     /**
      * Construct the register check message for this check
      */
-    public final RegisterCheck registerCheck()
+    public final RegisterCheck registerCheck(UUID processingPool)
     {
         Logger logger = Logger.getLogger(PassiveCheck.class);
         CheckCommand checkCommand = this.getCheckCommand();
@@ -44,7 +44,7 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
         registerCheck.setSiteId(this.getSiteId());
         registerCheck.setCheckType(this.getType());
         registerCheck.setCheckId(this.getId());
-        registerCheck.setProcessingPool(this.getPool());
+        registerCheck.setProcessingPool(processingPool);
         registerCheck.setEngine(command.getEngine());
         registerCheck.setExecutor(command.getExecutor());
         registerCheck.setName(command.getName());
@@ -84,7 +84,6 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
         unregisterCheck.setSiteId(this.getSiteId());
         unregisterCheck.setCheckType(this.getType());
         unregisterCheck.setCheckId(this.getId());
-        unregisterCheck.setProcessingPool(this.getPool());
         unregisterCheck.setEngine(command.getEngine());
         unregisterCheck.setExecutor(command.getExecutor());
         unregisterCheck.setName(command.getName());

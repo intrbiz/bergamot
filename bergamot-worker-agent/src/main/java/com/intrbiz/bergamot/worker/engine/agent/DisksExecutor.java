@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 
@@ -47,7 +48,7 @@ public class DisksExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent Disks Usage");
         try
@@ -56,7 +57,7 @@ public class DisksExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // get the CPU stats
@@ -68,7 +69,7 @@ public class DisksExecutor extends AbstractExecutor<AgentEngine>
                     // apply the check
                     double warning = executeCheck.getPercentParameter("warning", 0.8D);
                     double critical = executeCheck.getPercentParameter("critical", 0.9D);
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThresholds(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThresholds(
                             stat.getDisks().stream().map(DiskInfo::getUsedPercent).map(UnitUtil::fromPercent).collect(Collectors.toList()),
                             warning,
                             critical,
@@ -84,18 +85,18 @@ public class DisksExecutor extends AbstractExecutor<AgentEngine>
                         readings.reading(new DoubleGaugeReading("disk-space-available-[" + disk.getMount() + "]", "MB", UnitUtil.toM(disk.getAvailable()), UnitUtil.toM(disk.getSize()) * (1D - warning), UnitUtil.toM(disk.getSize()) * (1D - critical), 0D, UnitUtil.toM(disk.getSize()) ));
                         readings.reading(new DoubleGaugeReading("disk-space-used-percent-[" + disk.getMount() + "]", "%", disk.getUsedPercent(), UnitUtil.toPercent(warning), UnitUtil.toPercent(critical), 0D, 100D));
                     }
-                    this.publishReading(executeCheck, readings);
+                    context.publishReading(readings);
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

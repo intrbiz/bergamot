@@ -2,18 +2,19 @@ package com.intrbiz.bergamot.updater.context;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
+import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.session.BalsaSession;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.api.APIObject;
+import com.intrbiz.bergamot.ui.BergamotApp;
 
 public abstract class ClientContext
-{
+{    
     private ConcurrentMap<String, Object> vars = new ConcurrentHashMap<String, Object>();
-
-    private CopyOnWriteArrayList<OnClose> closeHandlers = new CopyOnWriteArrayList<OnClose>();
 
     private Site site;
 
@@ -24,6 +25,11 @@ public abstract class ClientContext
     public ClientContext()
     {
         super();
+    }
+    
+    public BergamotApp app()
+    {
+        return (BergamotApp) BalsaApplication.getInstance();
     }
 
     public Site getSite()
@@ -77,17 +83,37 @@ public abstract class ClientContext
         return value;
     }
 
-    public void onClose(OnClose close)
+    @SuppressWarnings("unchecked")
+    public <T> T computeVarIfAbsent(String key, Function<? super String, T> mappingFunction)
     {
-        this.closeHandlers.add(close);
+        return (T) this.vars.computeIfAbsent(key, (k) -> (T) mappingFunction.apply(k));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T computeVarIfPresent(String key, BiFunction<? super String, T, T> remappingFunction)
+    {
+        return (T) this.vars.computeIfPresent(key, (k, v) -> (T) remappingFunction.apply(k, (T) v));
+    }
+
+    @SuppressWarnings("unchecked")
+    public  <T> T computeVar(String key, BiFunction<? super String, T, T> remappingFunction)
+    {
+        return (T) this.vars.compute(key, (k, v) -> (T) remappingFunction.apply(k, (T) v));
+    }
+    
+    @SuppressWarnings("unchecked")
+    public  <T> T mergeVar(String key, T value, BiFunction<T, T, T> remappingFunction)
+    {
+        return (T) this.vars.merge(key, value, (k, v) -> (T) remappingFunction.apply((T) v, value));
     }
 
     public void close()
     {
-        for (OnClose handler : this.closeHandlers)
-        {
-            handler.onClose(this);
-        }
+        this.vars.clear();
+        this.principal = null;
+        this.session = null;
+        this.site = null;
+        this.vars = null;
     }
 
     public abstract void send(APIObject value);

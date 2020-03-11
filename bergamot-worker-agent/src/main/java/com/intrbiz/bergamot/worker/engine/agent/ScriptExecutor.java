@@ -8,6 +8,7 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.agent.script.BergamotAgentScriptWrapper;
 import com.intrbiz.bergamot.worker.engine.script.ScriptedCheckManager;
 
@@ -20,7 +21,7 @@ public class ScriptExecutor extends AbstractExecutor<AgentEngine>
     
     private static final Logger logger = Logger.getLogger(ScriptExecutor.class);
     
-    private final ScriptedCheckManager scriptManager = new ScriptedCheckManager(this);
+    private final ScriptedCheckManager scriptManager = new ScriptedCheckManager();
 
     public ScriptExecutor()
     {
@@ -37,7 +38,7 @@ public class ScriptExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Running script Bergamot Agent check");
         try
@@ -46,23 +47,23 @@ public class ScriptExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // execute the script
-                this.scriptManager.createExecutor(executeCheck)
+                this.scriptManager.createExecutor(executeCheck, context)
                     .bind("agent", new BergamotAgentScriptWrapper(agent))
                     .execute();
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
     

@@ -1,8 +1,8 @@
 package com.intrbiz.bergamot.updater;
 
-import static io.netty.handler.codec.http.HttpHeaders.*;
-import static io.netty.handler.codec.http.HttpHeaders.Names.*;
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
+import static io.netty.handler.codec.http.HttpUtil.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 
 import org.apache.log4j.Logger;
@@ -31,7 +31,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
@@ -69,8 +68,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
     {
         final Channel channel = ctx.channel();
         // setup the context
-        this.context = new ClientContext()
-        {
+        this.context = new ClientContext() {
             @Override
             public void send(APIObject value)
             {
@@ -84,7 +82,15 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
     public void channelInactive(ChannelHandlerContext ctx) throws Exception
     {
         // shutdown the context
-        if (this.context != null) this.context.close();
+        if (this.context != null)
+        {
+            for (RequestHandler<?> handler : this.server.getHandlers())
+            {
+                handler.onClose(this.context);
+            }
+            // close the context
+            this.context.close();
+        }
         super.channelInactive(ctx);
     }
 
@@ -104,7 +110,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
     private void authenticateContext(FullHttpRequest request) throws BalsaSecurityException
     {
         // extract the Balsa session cookie
-        CookieJar cookies = CookieJar.parseCookies(HttpHeaders.getHeader(request, HttpHeaders.Names.COOKIE));
+        CookieJar cookies = CookieJar.parseCookies(request.headers().get(COOKIE));
         String sessionId = cookies.cookie(BalsaSession.COOKIE_NAME);
         if (Util.isEmpty(sessionId)) 
             throw new BalsaSecurityException("No Blasa session cookie found");
@@ -138,7 +144,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception
     {
         // Handle a bad request.
-        if (!req.getDecoderResult().isSuccess())
+        if (! req.decoderResult().isSuccess())
         {
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
@@ -230,9 +236,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
     private static void sendHttpResponse(ChannelHandlerContext ctx, FullHttpRequest req, FullHttpResponse res)
     {
         // Generate an error page if response getStatus code is not OK (200).
-        if (res.getStatus().code() != 200)
+        if (res.status().code() != 200)
         {
-            ByteBuf buf = Unpooled.copiedBuffer(res.getStatus().toString(), CharsetUtil.UTF_8);
+            ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(), CharsetUtil.UTF_8);
             res.content().writeBytes(buf);
             buf.release();
             setContentLength(res, res.content().readableBytes());
@@ -240,7 +246,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
 
         // Send the response and close the connection if necessary.
         ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!isKeepAlive(req) || res.getStatus().code() != 200)
+        if (! isKeepAlive(req) || res.status().code() != 200)
         {
             f.addListener(ChannelFutureListener.CLOSE);
         }

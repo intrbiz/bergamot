@@ -6,10 +6,11 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.config.NotificationEngineCfg;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
+import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.engine.webhook.WebHookEngine;
+import com.intrbiz.configuration.Configuration;
 
 public class WebHookEngineTest
 {
@@ -18,7 +19,13 @@ public class WebHookEngineTest
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.TRACE);
         WebHookEngine webhook = new WebHookEngine();
-        webhook.configure(new NotificationEngineCfg());
+        webhook.prepare(new NotificationEngineContext() {
+            @Override
+            public Configuration getConfiguration()
+            {
+                return new Configuration();
+            }
+        });
         // our dummy alert
         HostMO host = new HostMO();
         host.setId(UUID.randomUUID());

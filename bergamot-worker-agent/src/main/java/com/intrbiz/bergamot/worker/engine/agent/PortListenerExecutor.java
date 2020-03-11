@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.NetConStat;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 
 
@@ -39,7 +40,7 @@ public class PortListenerExecutor extends AbstractExecutor<AgentEngine>
     }
 
     @Override
-    public void execute(ExecuteCheck executeCheck)
+    public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Checking Bergamot Agent listening port");
         try
@@ -48,7 +49,7 @@ public class PortListenerExecutor extends AbstractExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getRegisteredAgent(agentId);
+            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 // build the check
@@ -70,25 +71,25 @@ public class PortListenerExecutor extends AbstractExecutor<AgentEngine>
                     NetConStat stat = (NetConStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got net cons in " + runtime + "ms: " + stat);
                     // apply the check
-                    this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).applyRange(
+                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyRange(
                             stat.getConnections().size(),
                             executeCheck.getIntRangeParameter("warning",  new Integer[] {1, 1}), 
                             executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
                             "found " + stat.getConnections().size() + " listeners: " + stat.getConnections().stream().map((nc) -> nc.getProtocol() + " " + nc.getLocalAddress() + ":" + nc.getLocalPort()).collect(Collectors.joining(", "))
                     ).runtime(runtime));
                     // readings
-                    this.publishReading(executeCheck, new IntegerGaugeReading("connections", null, stat.getConnections().size()));
+                    context.publishReading(executeCheck, new IntegerGaugeReading("connections", null, stat.getConnections().size()));
                 });
             }
             else
             {
                 // raise an error
-                this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            this.publishActiveResult(executeCheck, new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
         }
     }
 }

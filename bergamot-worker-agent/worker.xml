@@ -1,4 +1,0 @@
-<worker name="hub.bergamot.dev" port="15443">
-    <broker password="bergamot" url="amqp://127.0.0.1" username="bergamot"/>
-    <logging level="info"/>
-</worker>

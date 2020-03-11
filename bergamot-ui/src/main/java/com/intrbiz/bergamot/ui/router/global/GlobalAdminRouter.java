@@ -3,7 +3,6 @@ package com.intrbiz.bergamot.ui.router.global;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -11,22 +10,9 @@ import org.apache.log4j.Logger;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.health.HealthTracker;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerRequest;
-import com.intrbiz.bergamot.model.message.agent.manager.AgentManagerResponse;
-import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerRequest;
-import com.intrbiz.bergamot.model.message.cluster.manager.ClusterManagerResponse;
-import com.intrbiz.bergamot.model.message.cluster.manager.request.DeinitSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.request.InitSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.response.DeinitedSite;
-import com.intrbiz.bergamot.model.message.cluster.manager.response.InitedSite;
-import com.intrbiz.bergamot.queue.BergamotAgentManagerQueue;
-import com.intrbiz.bergamot.queue.BergamotClusterManagerQueue;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
@@ -38,8 +24,6 @@ import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
-import com.intrbiz.queue.RPCClient;
-import com.intrbiz.queue.name.RoutingKey;
 
 @Prefix("/global/admin")
 @Template("layout/main")
@@ -61,10 +45,13 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void index(BergamotDB db)
     {
-        // the list of global daemons
-        var("daemons", HealthTracker.getInstance().getDaemons());
-        // cluster info
-        var("cluster_info", this.app().getClusterManager().info());
+        // workers, notifiers, processing pools and other cluster information
+        var("workers", app().getProcessor().getWorkerCoordinator().getWorkers());
+        var("worker_route_table", app().getProcessor().getWorkerCoordinator().getRoutingTable());
+        var("worker_agents", app().getProcessor().getWorkerCoordinator().countAgents());
+        var("notifiers", app().getProcessor().getNotifierCoordinator().getNotifiers());
+        var("notifier_route_table", app().getProcessor().getNotifierCoordinator().getRoutingTable());
+        var("cluster_info", app().getProcessor().getProcessingPoolCoordinator().info());
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins
@@ -98,25 +85,8 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         // mark the site as disabled
         site.setDisabled(true);
         db.setSite(site);
-        // message the UI cluster to tear down the site
-        try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
-        {
-            try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
-            {
-                try
-                {
-                    ClusterManagerResponse response = client.publish(new DeinitSite(site.getId(), site.getName())).get(30, TimeUnit.SECONDS);
-                    if (response instanceof DeinitedSite)
-                    {
-                        logger.info("Deinitialised site with UI cluster");
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.error("Failed to deinitialise site with UI cluster");
-                }
-            }
-        }
+        // deinit the site from scheduling
+        action("site-deinit", site);
         redirect(path("/global/admin/"));
     }
     
@@ -131,54 +101,8 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         // mark the site as enabled
         site.setDisabled(false);
         db.setSite(site);
-        // message the UI cluster to setup the site
-        try (BergamotClusterManagerQueue queue = BergamotClusterManagerQueue.open())
-        {
-            try (RPCClient<ClusterManagerRequest, ClusterManagerResponse, RoutingKey> client = queue.createBergamotClusterManagerRPCClient())
-            {
-                try
-                {
-                    ClusterManagerResponse response = client.publish(new InitSite(site.getId(), site.getName())).get(30, TimeUnit.SECONDS);
-                    if (response instanceof InitedSite)
-                    {
-                        logger.info("Initialised site with UI cluster");
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.error("Failed to initialise site with UI cluster");
-                }
-            }
-        }
-        redirect(path("/global/admin/"));
-    }
-    
-    @Any("/site/id/:id/generate-certificates")
-    @RequireValidAccessTokenForURL(@Param("access-token"))
-    @WithDataAdapter(BergamotDB.class)
-    public void generateSiteCertificates(BergamotDB db, @IsaUUID UUID id) throws Exception
-    {
-        // get the site 
-        Site site = notNull(db.getSite(id));
-        logger.warn("Generating certificates for site: " + site.getName() + " (" + site.getId() + ")");
-        // message the agent manager
-        try (BergamotAgentManagerQueue queue = BergamotAgentManagerQueue.open())
-        {
-            try (RPCClient<AgentManagerRequest, AgentManagerResponse, RoutingKey> client = queue.createBergamotAgentManagerRPCClient())
-            {
-                try
-                {
-                    AgentManagerResponse response = client.publish(new CreateSiteCA(site.getId(), site.getName())).get(5, TimeUnit.SECONDS);
-                    if (response instanceof CreatedSiteCA)
-                    {
-                        logger.info("Created Bergamot Agent site Certificate Authority");
-                    }
-                }
-                catch (Exception e)
-                {
-                }
-            }
-        }
+        // init the site for scheduling
+        action("site-init", site);
         redirect(path("/global/admin/"));
     }
     
