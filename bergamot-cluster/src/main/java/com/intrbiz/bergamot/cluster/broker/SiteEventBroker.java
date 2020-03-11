@@ -8,6 +8,6 @@ public class SiteEventBroker extends GenericGlobalBroker<SiteEvent>
 {
     public SiteEventBroker(HazelcastInstance hazelcast)
     {
-        super(hazelcast, ObjectNames.getSiteTopicName());
+        super(hazelcast, ObjectNames.getAgentEventTopicName());
     }
 }

@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.processor;
 import java.util.UUID;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.intrbiz.bergamot.cluster.broker.AgentEventBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
@@ -32,6 +33,8 @@ public class BergamotProcessor
     
     private final AgentKeyClusterLookup agentKeyLookup;
     
+    private final AgentEventBroker agentEventBroker;
+    
     private final WorkerClusterCoordinator workerCoordinator;
     
     private final ProcessingPoolClusterCoordinator processingPoolCoordinator;
@@ -54,6 +57,7 @@ public class BergamotProcessor
         this.siteEventBroker = new SiteEventBroker(this.hazelcast);
         this.notificationBroker = new SiteNotificationBroker(this.hazelcast);
         this.updateBroker = new SiteUpdateBroker(this.hazelcast);
+        this.agentEventBroker = new AgentEventBroker(this.hazelcast);
         // lookups
         this.agentKeyLookup = new AgentKeyClusterLookup(this.hazelcast);
         // coordinators
@@ -64,7 +68,7 @@ public class BergamotProcessor
     }
     
     public void start() throws Exception
-    { 
+    {
         // start our coordinators
         this.notifierCoordinator.start();
         this.workerCoordinator.stop();
@@ -138,6 +142,11 @@ public class BergamotProcessor
     public AgentKeyClusterLookup getAgentKeyLookup()
     {
         return this.agentKeyLookup;
+    }
+
+    public AgentEventBroker getAgentEventBroker()
+    {
+        return this.agentEventBroker;
     }
 
     public HazelcastInstance getHazelcastInstance()

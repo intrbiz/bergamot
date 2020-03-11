@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.intrbiz.bergamot.cluster.broker.AgentEventBroker;
 import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
@@ -45,6 +46,12 @@ public class TestNagiosSSHExecutor
 
             @Override
             public AgentKeyLookup getAgentKeyLookup()
+            {
+                return null;
+            }
+            
+            @Override
+            public AgentEventBroker getAgentEventBroker()
             {
                 return null;
             }

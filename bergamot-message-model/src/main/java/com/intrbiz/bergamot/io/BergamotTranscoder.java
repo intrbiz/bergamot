@@ -48,23 +48,6 @@ import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
-import com.intrbiz.bergamot.model.message.agent.manager.request.CreateSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.request.GetAgent;
-import com.intrbiz.bergamot.model.message.agent.manager.request.GetRootCA;
-import com.intrbiz.bergamot.model.message.agent.manager.request.GetServer;
-import com.intrbiz.bergamot.model.message.agent.manager.request.GetSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.request.SignAgent;
-import com.intrbiz.bergamot.model.message.agent.manager.request.SignServer;
-import com.intrbiz.bergamot.model.message.agent.manager.request.SignTemplate;
-import com.intrbiz.bergamot.model.message.agent.manager.response.AgentManagerError;
-import com.intrbiz.bergamot.model.message.agent.manager.response.CreatedSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.response.GotAgent;
-import com.intrbiz.bergamot.model.message.agent.manager.response.GotRootCA;
-import com.intrbiz.bergamot.model.message.agent.manager.response.GotServer;
-import com.intrbiz.bergamot.model.message.agent.manager.response.GotSiteCA;
-import com.intrbiz.bergamot.model.message.agent.manager.response.SignedAgent;
-import com.intrbiz.bergamot.model.message.agent.manager.response.SignedServer;
-import com.intrbiz.bergamot.model.message.agent.manager.response.SignedTemplate;
 import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 import com.intrbiz.bergamot.model.message.api.call.VerifiedCommand;
 import com.intrbiz.bergamot.model.message.api.check.ExecuteAdhocCheck;
@@ -83,13 +66,12 @@ import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
+import com.intrbiz.bergamot.model.message.event.agent.AgentConnect;
 import com.intrbiz.bergamot.model.message.event.global.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
-import com.intrbiz.bergamot.model.message.health.HealthCheckJoin;
-import com.intrbiz.bergamot.model.message.health.HealthCheckUnjoin;
 import com.intrbiz.bergamot.model.message.importer.BergamotImportReportMO;
 import com.intrbiz.bergamot.model.message.notification.BackupCodeUsed;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
@@ -225,24 +207,6 @@ public class BergamotTranscoder
         // stats
         CheckStatsMO.class,
         CheckTransitionMO.class,
-        // bergamot agent manager
-        CreateSiteCA.class,
-        CreatedSiteCA.class,
-        GetSiteCA.class,
-        GotSiteCA.class,
-        GetRootCA.class,
-        GotRootCA.class,
-        GetAgent.class,
-        GotAgent.class,
-        GetServer.class,
-        GotServer.class,
-        SignAgent.class,
-        SignedAgent.class,
-        SignServer.class,
-        SignedServer.class,
-        AgentManagerError.class,
-        SignTemplate.class,
-        SignedTemplate.class,
         // cluster manager
         InitSite.class,
         FlushGlobalCaches.class,
@@ -252,9 +216,8 @@ public class BergamotTranscoder
         AppliedConfigChange.class,
         BergamotValidationReportMO.class,
         VerifiedCommand.class,
-        // heathchecks
-        HealthCheckJoin.class,
-        HealthCheckUnjoin.class,
+        // agent events
+        AgentConnect.class,
         // reports
         SLAReportMO.class
     };

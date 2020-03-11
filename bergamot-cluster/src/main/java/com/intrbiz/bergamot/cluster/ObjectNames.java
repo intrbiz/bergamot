@@ -113,4 +113,9 @@ public final class ObjectNames
     {
         return "bergamot.cluster.map.lookup.agent.key";
     }
+    
+    public static final String getAgentEventTopicName()
+    {
+        return "bergamot.topic.event.agent";
+    }
 }

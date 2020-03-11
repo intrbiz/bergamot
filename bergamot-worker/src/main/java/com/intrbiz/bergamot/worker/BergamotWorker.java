@@ -25,6 +25,7 @@ import com.hazelcast.client.config.ClientNetworkConfig;
 import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.cluster.broker.AgentEventBroker;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClientCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.WorkerClientCoordinator;
 import com.intrbiz.bergamot.cluster.lookup.AgentKeyClientLookup;
@@ -108,6 +109,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     private ProcessingPoolProducer producer;
     
     private AgentKeyClientLookup agentKeyLookup;
+    
+    private AgentEventBroker agentEventBroker;
     
     private Thread[] threads;
     
@@ -221,6 +224,12 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             }
 
             @Override
+            public AgentEventBroker getAgentEventBroker()
+            {
+                return agentEventBroker;
+            }
+
+            @Override
             public void registerAgent(UUID agentId)
             {
                 workerCoordinator.registerAgent(id, agentId);
@@ -259,6 +268,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         this.hazelcast = HazelcastClient.newHazelcastClient(cliCfg);
         // Create our worker lookups
         this.agentKeyLookup = new AgentKeyClientLookup(this.hazelcast);
+        this.agentEventBroker = new AgentEventBroker(this.hazelcast);
         // Create our worker coordinator
         this.workerCoordinator = new WorkerClientCoordinator(this.hazelcast);
         this.poolCoordinator = new ProcessingPoolClientCoordinator(this.hazelcast);
