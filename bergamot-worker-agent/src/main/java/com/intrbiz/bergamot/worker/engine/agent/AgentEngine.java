@@ -82,7 +82,7 @@ public class AgentEngine extends AbstractEngine
         this.server.setOnAgentConnectHandler((agent) -> {
             logger.debug("Registering agent: " + agent.getAgentId());
             engineContext.registerAgent(agent.getAgentId());
-            engineContext.getAgentEventBroker().publish(agent.getSiteId(), new AgentConnect(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentTemplateName()));
+            //engineContext.getAgentEventBroker().publish(agent.getSiteId(), new AgentConnect(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentTemplateName()));
         });
         this.server.setOnAgentDisconnectHandler((agent) -> {
             logger.debug("Unregistering agent: " + agent.getAgentId());
