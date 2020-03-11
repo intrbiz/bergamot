@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.cluster.coordinator.NotifierClusterCoordinator;
 import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
 import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
@@ -81,7 +82,6 @@ import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
-import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
 import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
 import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
@@ -98,10 +98,11 @@ import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.DataException;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
-import com.intrbiz.queue.RoutedProducer;
 
 public class BergamotConfigImporter
-{    
+{   
+    private static final Logger logger = Logger.getLogger(BergamotConfigImporter.class);
+    
     private BergamotImportReport  report;
     
     private Site site;
@@ -122,8 +123,6 @@ public class BergamotConfigImporter
     
     private List<Contact> delayedContactRegistrations = new LinkedList<Contact>();
     
-    private Function<Contact, String> registrationURLSupplier;
-    
     private boolean rebuildPermissions = false;
     
     private boolean clearPermissionsCache = false;
@@ -137,6 +136,10 @@ public class BergamotConfigImporter
     private Set<String> updatedResourcePools = new HashSet<String>();
     
     private SchedulerActionProducer schedulerActions;
+    
+    private NotifierClusterCoordinator notificationProducer;
+    
+    private Function<Contact, String> registrationURLSupplier;
     
     public BergamotConfigImporter(ValidatedBergamotConfiguration validated)
     {
@@ -168,28 +171,18 @@ public class BergamotConfigImporter
         return this;
     }
     
-    public BergamotConfigImporter online(boolean online)
-    {
-        this.online = online;
-        return this;
-    }
-    
-    public BergamotConfigImporter online(SchedulerActionProducer schedulerActions)
+    public BergamotConfigImporter online(SchedulerActionProducer schedulerActions, NotifierClusterCoordinator notificationProducer, Function<Contact, String> registrationURLSupplier)
     {
         this.online = true;
         this.schedulerActions = schedulerActions;
+        this.notificationProducer = notificationProducer;
+        this.registrationURLSupplier = registrationURLSupplier;
         return this;
     }
     
     public BergamotConfigImporter offline()
     {
         this.online = false;
-        return this;
-    }
-    
-    public BergamotConfigImporter registrationURLSupplier(Function<Contact, String> registrationURLSupplier)
-    {
-        this.registrationURLSupplier = registrationURLSupplier;
         return this;
     }
     
@@ -260,40 +253,30 @@ public class BergamotConfigImporter
                                     this.schedulerActions.publishSchedulerAction(delayedAction.action);
                                 }
                             }
-                            // we must publish and contact registration notifications
-                            // TODO:
-                            /*
-                            try (NotificationQueue notificationQueue = NotificationQueue.open())
+                            // send notifications for contact registrations
+                            for (Contact contact : this.delayedContactRegistrations)
                             {
-                                try (RoutedProducer<Notification, NotificationKey> notificationsProducer = notificationQueue.publishNotifications())
+                                try
                                 {
-                                    for (Contact contact : this.delayedContactRegistrations)
-                                    {
-                                        try
-                                        {
-                                            // get the registration url
-                                            String url = this.registrationURLSupplier.apply(contact);
-                                            // send a notification, only via email
-                                            notificationsProducer.publish(
-                                                    new NotificationKey(contact.getSite().getId()),
-                                                    new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) 
-                                            );
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Logger.getLogger(BergamotConfigImporter.class).error("Failed to send registration notification", e);
-                                            throw e;
-                                        }
-                                    }
+                                    // get the registration url
+                                    String url = this.registrationURLSupplier.apply(contact);
+                                    // send a notification, only via email
+                                    this.notificationProducer.sendNotification(
+                                        new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) 
+                                    );
+                                }
+                                catch (Exception e)
+                                {
+                                    logger.error("Failed to send registration notification", e);
+                                    throw e;
                                 }
                             }
-                            */
                         }
                     }
                 }
                 catch (Throwable e)
                 {
-                    Logger.getLogger(BergamotConfigImporter.class).error("Failed to import configuration", e);
+                    logger.error("Failed to import configuration", e);
                     this.report.error("Configuration change aborted due to unhandled error: " + e.getMessage());
                     StringWriter sw = new StringWriter();
                     e.printStackTrace(new PrintWriter(sw));

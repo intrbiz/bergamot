@@ -2,11 +2,12 @@ package com.intrbiz.bergamot.worker.engine.agent;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.server.AgentKeyResolver;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer;
 import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.event.agent.AgentConnect;
+import com.intrbiz.bergamot.model.message.event.agent.AgentRegister;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 
@@ -82,7 +83,11 @@ public class AgentEngine extends AbstractEngine
         this.server.setOnAgentConnectHandler((agent) -> {
             logger.debug("Registering agent: " + agent.getAgentId());
             engineContext.registerAgent(agent.getAgentId());
-            //engineContext.getAgentEventBroker().publish(agent.getSiteId(), new AgentConnect(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentTemplateName()));
+            // Offer a register message
+            if (! Util.isEmpty(agent.getAgentTemplateName()))
+            {
+                engineContext.getAgentEventQueue().offer(new AgentRegister(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentTemplateName()));
+            }
         });
         this.server.setOnAgentDisconnectHandler((agent) -> {
             logger.debug("Unregistering agent: " + agent.getAgentId());

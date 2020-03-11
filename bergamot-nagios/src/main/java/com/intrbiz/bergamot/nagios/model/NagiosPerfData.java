@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.nagios.model;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.CharBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -217,7 +218,7 @@ public class NagiosPerfData
         {
             if (! Character.isWhitespace(buffer.get()))
             {
-                buffer.position(buffer.position() - 1);
+                ((Buffer) buffer).position(buffer.position() - 1);
                 break;
             }
         }

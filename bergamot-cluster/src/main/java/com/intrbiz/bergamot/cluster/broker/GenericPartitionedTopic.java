@@ -14,7 +14,7 @@ import com.hazelcast.topic.impl.reliable.ReliableTopicService;
 import com.intrbiz.bergamot.cluster.util.ConsumerMessageListenerAdapter;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
-public class GenericPartitionedBroker<K, T extends MessageObject>
+public abstract class GenericPartitionedTopic<K, T extends MessageObject>
 {
     protected final HazelcastInstance hazelcast;
     
@@ -22,7 +22,7 @@ public class GenericPartitionedBroker<K, T extends MessageObject>
     
     protected final ConcurrentMap<String, ITopic<T>> topics;
 
-    protected GenericPartitionedBroker(HazelcastInstance hazelcast, Function<K, String> topicName)
+    protected GenericPartitionedTopic(HazelcastInstance hazelcast, Function<K, String> topicName)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);
@@ -68,7 +68,7 @@ public class GenericPartitionedBroker<K, T extends MessageObject>
         {
             if (ReliableTopicService.SERVICE_NAME.equals(event.getServiceName()))
             {
-                GenericPartitionedBroker.this.topics.remove(event.getObjectName());
+                GenericPartitionedTopic.this.topics.remove(event.getObjectName());
             }
         }
     }

@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
-import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
+import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
+import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
 import com.intrbiz.bergamot.cluster.queue.NotificationProducer;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
@@ -32,11 +32,11 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     
     protected final SchedulerActionProducer schedulerActions;
     
-    protected final SiteNotificationBroker notificationBroker;
+    protected final SiteNotificationTopic notificationBroker;
     
     protected final NotificationProducer notificationProducer;
     
-    protected final SiteUpdateBroker updateBroker;
+    protected final SiteUpdateTopic updateBroker;
 
     protected int threadCount;
     
@@ -49,8 +49,8 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         ProcessingPoolConsumer consumer,
         SchedulerActionProducer schedulerActions,
         NotificationProducer notificationProducer,
-        SiteNotificationBroker notificationBroker,
-        SiteUpdateBroker updateBroker
+        SiteNotificationTopic notificationBroker,
+        SiteUpdateTopic updateBroker
     ) {
         super();
         this.poolId = poolId;

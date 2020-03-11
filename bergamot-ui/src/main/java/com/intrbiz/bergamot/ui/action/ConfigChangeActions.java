@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.balsa.action.BalsaAction;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -15,18 +16,20 @@ import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Action;
 
 
-public class ConfigChangeActions
+public class ConfigChangeActions implements BalsaAction<BergamotApp>
 {
     private Logger logger = Logger.getLogger(ConfigChangeActions.class);
 
     @Action("apply-config-change")
     public BergamotImportReport applyConfigChange(UUID siteId, UUID changeId, String resetUrl, Contact user)
     {
+        // TODO: move this to be behind a queue
         logger.info("Applying configuration change: " + siteId + "::" + changeId);
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -37,8 +40,11 @@ public class ConfigChangeActions
             // import
             BergamotImportReport report = new BergamotConfigImporter(validated)
                 .resetState(false)
-                .online(true)
-                .registrationURLSupplier((contact) -> resetUrl + "?token=" + Balsa().app().getSecurityEngine().generateAuthenticationTokenForPrincipal(contact, Expires.after(1, TimeUnit.DAYS), CryptoCookie.Flags.Reset))
+                .online(
+                    app().getProcessor().getProcessingPoolCoordinator().createSchedulerActionProducer(),
+                    app().getProcessor().getNotifierCoordinator(),
+                    (contact) -> resetUrl + "?token=" + Balsa().app().getSecurityEngine().generateAuthenticationTokenForPrincipal(contact, Expires.after(1, TimeUnit.DAYS), CryptoCookie.Flags.Reset)
+                )
                 .importConfiguration();
                 
             // update the db

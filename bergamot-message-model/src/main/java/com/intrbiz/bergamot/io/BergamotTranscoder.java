@@ -66,7 +66,7 @@ import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
-import com.intrbiz.bergamot.model.message.event.agent.AgentConnect;
+import com.intrbiz.bergamot.model.message.event.agent.AgentRegister;
 import com.intrbiz.bergamot.model.message.event.global.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
@@ -217,7 +217,7 @@ public class BergamotTranscoder
         BergamotValidationReportMO.class,
         VerifiedCommand.class,
         // agent events
-        AgentConnect.class,
+        AgentRegister.class,
         // reports
         SLAReportMO.class
     };

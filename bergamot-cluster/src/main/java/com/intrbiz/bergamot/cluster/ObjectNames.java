@@ -94,7 +94,7 @@ public final class ObjectNames
         return "bergamot.queue.cluster.migrations." + memberUUID;
     }
     
-    public static final String getSiteTopicName()
+    public static final String getSiteEventTopicName()
     {
         return "bergamot.topic.event.site";
     }
@@ -114,8 +114,8 @@ public final class ObjectNames
         return "bergamot.cluster.map.lookup.agent.key";
     }
     
-    public static final String getAgentEventTopicName()
+    public static final String getAgentEventQueueName()
     {
-        return "bergamot.topic.event.agent";
+        return "bergamot.queue.event.agent";
     }
 }

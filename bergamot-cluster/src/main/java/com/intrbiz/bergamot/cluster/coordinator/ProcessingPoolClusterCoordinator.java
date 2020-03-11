@@ -22,7 +22,7 @@ import com.hazelcast.core.MemberAttributeEvent;
 import com.hazelcast.core.MembershipEvent;
 import com.hazelcast.query.Predicates;
 import com.intrbiz.bergamot.cluster.ObjectNames;
-import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
+import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
 import com.intrbiz.bergamot.cluster.coordinator.task.ProcessingPoolTask;
 import com.intrbiz.bergamot.cluster.listener.ProcessingPoolListener;
 import com.intrbiz.bergamot.cluster.model.ProcessingPoolRegistration;
@@ -64,7 +64,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
 {
     private static final Logger logger = Logger.getLogger(ProcessingPoolClusterCoordinator.class);
     
-    private final SiteEventBroker siteEventBroker;
+    private final SiteEventTopic siteEventBroker;
     
     /**
      * The lock used when making decisions about managing the cluster. The general principle is that the first node to acquire the lock makes the decision about where resources run.
@@ -93,7 +93,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
      */
     private ProcessingPoolListener poolListener;
 
-    public ProcessingPoolClusterCoordinator(HazelcastInstance hazelcastInstance, SiteEventBroker siteEventBroker)
+    public ProcessingPoolClusterCoordinator(HazelcastInstance hazelcastInstance, SiteEventTopic siteEventBroker)
     {
         super(hazelcastInstance);
         this.siteEventBroker = Objects.requireNonNull(siteEventBroker);

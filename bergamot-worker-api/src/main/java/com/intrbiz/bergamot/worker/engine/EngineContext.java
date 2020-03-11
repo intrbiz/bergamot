@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.worker.engine;
 
 import java.util.UUID;
 
+import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
 import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
@@ -21,6 +22,11 @@ public interface EngineContext
      * The agent key lookup service
      */
     AgentKeyLookup getAgentKeyLookup();
+    
+    /**
+     * The agent event queue for sending register events
+     */
+    AgentEventQueue getAgentEventQueue();
     
     /**
      * Register this worker as being the route for the given agent id

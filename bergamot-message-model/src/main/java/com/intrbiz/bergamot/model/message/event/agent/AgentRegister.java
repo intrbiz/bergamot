@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model.message.event.agent;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 /**
  * An agent has connected
  */
-@JsonTypeName("bergamot.event.agent.connect")
-public class AgentConnect extends AgentEvent
+@JsonTypeName("bergamot.event.agent.register")
+public class AgentRegister extends AgentEvent
 {
     private static final long serialVersionUID = 1L;
     
@@ -28,19 +29,19 @@ public class AgentConnect extends AgentEvent
     @JsonProperty("template_name")
     private String templateName;
     
-    public AgentConnect()
+    public AgentRegister()
     {
         super();
     }
 
-    public AgentConnect(UUID siteId, UUID agentId, UUID keyId, String agentName, String templateName)
+    public AgentRegister(UUID siteId, UUID agentId, UUID keyId, String agentName, String templateName)
     {
         super();
-        this.siteId = siteId;
-        this.agentId = agentId;
-        this.keyId = keyId;
-        this.agentName = agentName;
-        this.templateName = templateName;
+        this.siteId = Objects.requireNonNull(siteId);
+        this.agentId = Objects.requireNonNull(agentId);
+        this.keyId = Objects.requireNonNull(keyId);
+        this.agentName = Objects.requireNonNull(agentName);
+        this.templateName = Objects.requireNonNull(templateName);
     }
 
     public UUID getSiteId()

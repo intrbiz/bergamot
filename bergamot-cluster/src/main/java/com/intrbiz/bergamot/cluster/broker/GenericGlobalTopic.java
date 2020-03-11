@@ -8,13 +8,13 @@ import com.hazelcast.core.ITopic;
 import com.intrbiz.bergamot.cluster.util.ConsumerMessageListenerAdapter;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
-public class GenericGlobalBroker<T extends MessageObject>
+public abstract class GenericGlobalTopic<T extends MessageObject>
 {
     protected final HazelcastInstance hazelcast;
     
     protected final ITopic<T> topic;
 
-    protected GenericGlobalBroker(HazelcastInstance hazelcast, String topicName)
+    protected GenericGlobalTopic(HazelcastInstance hazelcast, String topicName)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);

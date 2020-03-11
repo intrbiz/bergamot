@@ -11,9 +11,9 @@ import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.balsa.util.Util;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
-import com.intrbiz.bergamot.cluster.broker.SiteEventBroker;
-import com.intrbiz.bergamot.cluster.broker.SiteNotificationBroker;
-import com.intrbiz.bergamot.cluster.broker.SiteUpdateBroker;
+import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
+import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
+import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
 import com.intrbiz.bergamot.cluster.util.HazelcastFactory;
@@ -168,19 +168,19 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         return processor.getProcessingPoolCoordinator();
     }
 
-    public SiteEventBroker getSiteEventBroker()
+    public SiteEventTopic getSiteEventBroker()
     {
-        return this.processor.getSiteEventBroker();
+        return this.processor.getSiteEventTopic();
     }
     
-    public SiteNotificationBroker getNotificationBroker()
+    public SiteNotificationTopic getNotificationBroker()
     {
-        return this.processor.getNotificationBroker();
+        return this.processor.getNotificationTopic();
     }
     
-    public SiteUpdateBroker getUpdateBroker()
+    public SiteUpdateTopic getUpdateBroker()
     {
-        return this.processor.getUpdateBroker();
+        return this.processor.getUpdateTopic();
     }
 
     public UpdateServer getUpdateServer()
