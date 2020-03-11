@@ -12,6 +12,8 @@ public interface ResultProcessor
     
     void start();
     
+    void stop();
+    
     /**
      * Process the result of a check which executed
      * @param resultMO

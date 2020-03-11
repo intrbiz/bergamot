@@ -280,9 +280,9 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     protected void createExecutors() throws Exception
     {
         logger.info("Creating " + this.threadCount + " check executors");
-        this.threads = new Thread[this.threadCount];
         this.executorLatch = new CountDownLatch(this.threadCount);
         this.run = new AtomicBoolean(false);
+        this.threads = new Thread[this.threadCount];
         for (int i = 0; i < this.threads.length; i++)
         {
             final int threadNum = i;
@@ -454,7 +454,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         this.hazelcast = null;
     }
     
-    public void shutdown()
+    public void triggerShutdown()
     {
         if (this.run.compareAndSet(true, false))
         {
@@ -491,9 +491,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             BergamotWorker worker = new BergamotWorker();
             worker.configure(config);
             // Register a shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(worker::shutdown));
+            Runtime.getRuntime().addShutdownHook(new Thread(worker::triggerShutdown));
             // Start our worker
-            logger.info("Bergamot Worker starting.");
             worker.run();
             // Terminate normally
             System.exit(0);

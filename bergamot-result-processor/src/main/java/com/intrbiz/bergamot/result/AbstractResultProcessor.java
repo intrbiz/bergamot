@@ -75,6 +75,23 @@ public abstract class AbstractResultProcessor implements ResultProcessor
         this.startExecutors();
     }
     
+    @Override
+    public void stop()
+    {
+        logger.info("Shutting down result processor");
+        this.run = false;
+        for (Thread thread : this.threads)
+        {
+            try
+            {
+                thread.join();
+            }
+            catch (InterruptedException e)
+            {
+            }
+        }
+    }
+    
     protected void startExecutors()
     {
         this.run = true;
@@ -103,6 +120,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
                 }
                 logger.debug("Result processor executor " + threadNum + " stopped.");
             }, "Bergamot-Result-Processor-Executor-" + i);
+            this.threads[i].start();
         }
     }
     

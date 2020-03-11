@@ -92,6 +92,7 @@ public class BergamotProcessor
     
     public void stop()
     {
+        
         this.agentRegistrationService.stop();
         this.notifierCoordinator.stop();
         this.workerCoordinator.stop();
