@@ -82,12 +82,12 @@ public class WorkerClusterCoordinator extends WorkerCoordinator implements Worke
     protected void configureHazelcast(Config hazelcastConfig)
     {
         // Configure TTLs for the worker map
-        MapConfig workerMap = hazelcastConfig.getMapConfig(ObjectNames.buildWorkerRegistrationsMapName());
-        workerMap.setMaxIdleSeconds(WORKER_MAX_IDLE_SECONDS);
+        MapConfig workersMap = hazelcastConfig.getMapConfig(ObjectNames.buildWorkerRegistrationsMapName());
+        workersMap.setBackupCount(2);
+        workersMap.setMaxIdleSeconds(WORKER_MAX_IDLE_SECONDS);
         // Configure agents registration map
         MapConfig agentsMap = hazelcastConfig.getMapConfig(ObjectNames.buildAgentsMapName());
         agentsMap.setBackupCount(2);
-        agentsMap.setAsyncBackupCount(2);
         agentsMap.setReadBackupData(true);
         agentsMap.setInMemoryFormat(InMemoryFormat.BINARY);
         // for now use near cache for performance, rather than building our own local maps like with the routing table
@@ -100,8 +100,8 @@ public class WorkerClusterCoordinator extends WorkerCoordinator implements Worke
             .setInMemoryFormat(InMemoryFormat.OBJECT)
             .setEvictionConfig(
                 new EvictionConfig()
-                .setSize(10_000)
-                .setMaxSizePolicy(MaxSizePolicy.PER_NODE)
+                .setSize(100_000)
+                .setMaxSizePolicy(MaxSizePolicy.ENTRY_COUNT)
                 .setEvictionPolicy(EvictionPolicy.LRU)
             )
         );

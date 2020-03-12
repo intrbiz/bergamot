@@ -74,8 +74,9 @@ public class NotifierClusterCoordinator extends NotifierCoordinator implements N
     protected void configureHazelcast(Config hazelcastConfig)
     {
         // Configure TTLs for the worker map
-        MapConfig workerMap = hazelcastConfig.getMapConfig(ObjectNames.buildNotifierRegistrationsMapName());
-        workerMap.setMaxIdleSeconds(NOTIFIER_MAX_IDLE_SECONDS);
+        MapConfig notifiersMap = hazelcastConfig.getMapConfig(ObjectNames.buildNotifierRegistrationsMapName());
+        notifiersMap.setBackupCount(2);
+        notifiersMap.setMaxIdleSeconds(NOTIFIER_MAX_IDLE_SECONDS);
     }
     
     public ConcurrentMap<String, ConcurrentMap<UUID, UUID[]>> getRoutingTable()
