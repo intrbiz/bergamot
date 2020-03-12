@@ -10,14 +10,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.hazelcast.cluster.Cluster;
+import com.hazelcast.collection.IQueue;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.EvictionConfig;
 import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.MapConfig;
-import com.hazelcast.core.Cluster;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.IQueue;
+import com.hazelcast.map.IMap;
 import com.hazelcast.map.listener.EntryAddedListener;
 import com.hazelcast.map.listener.EntryEvictedListener;
 import com.hazelcast.map.listener.EntryRemovedListener;
@@ -76,7 +77,7 @@ public class NotifierClusterCoordinator extends NotifierCoordinator implements N
     {
         // Configure TTLs for the worker map
         MapConfig workerMap = hazelcastConfig.getMapConfig(ObjectNames.buildNotifierRegistrationsMapName());
-        workerMap.setEvictionPolicy(EvictionPolicy.LRU);
+        workerMap.setEvictionConfig(new EvictionConfig().setEvictionPolicy(EvictionPolicy.LRU));
         workerMap.setMaxIdleSeconds(NOTIFIER_MAX_IDLE_SECONDS);
     }
     

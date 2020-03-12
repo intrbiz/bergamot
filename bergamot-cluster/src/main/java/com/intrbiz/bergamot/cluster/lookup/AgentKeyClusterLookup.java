@@ -11,7 +11,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.config.MapStoreConfig.InitialLoadMode;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.MapStoreAdapter;
+import com.hazelcast.map.MapStoreAdapter;
 import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.AgentKey;

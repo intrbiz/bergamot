@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.updater.handler;
 
+import java.util.UUID;
+
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.model.message.api.error.APIError;
@@ -56,7 +58,7 @@ public class RegisterForNotificationsHandler extends RequestHandler<RegisterForN
     
     public void onClose(ClientContext context)
     {
-        String listenerId = context.removeVar(VAR_NOTIFICATION_LISTENER_ID);
+        UUID listenerId = context.removeVar(VAR_NOTIFICATION_LISTENER_ID);
         if (listenerId != null)
         {
             context.app().getNotificationBroker().unlisten(context.getSite().getId(), listenerId);

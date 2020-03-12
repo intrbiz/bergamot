@@ -3,8 +3,8 @@ package com.intrbiz.bergamot.cluster.queue;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.hazelcast.collection.IQueue;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
 import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolCoordinator;
 import com.intrbiz.bergamot.cluster.coordinator.task.ProcessingPoolTask;

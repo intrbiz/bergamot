@@ -12,14 +12,16 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
+import com.hazelcast.cluster.InitialMembershipEvent;
+import com.hazelcast.cluster.InitialMembershipListener;
+import com.hazelcast.cluster.Member;
+import com.hazelcast.cluster.MembershipEvent;
+import com.hazelcast.collection.IQueue;
+import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ILock;
-import com.hazelcast.core.IQueue;
-import com.hazelcast.core.InitialMembershipEvent;
-import com.hazelcast.core.InitialMembershipListener;
-import com.hazelcast.core.Member;
 import com.hazelcast.core.MemberAttributeEvent;
-import com.hazelcast.core.MembershipEvent;
+import com.hazelcast.cp.CPSubsystem;
+import com.hazelcast.cp.lock.FencedLock;
 import com.hazelcast.query.Predicates;
 import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
@@ -67,9 +69,14 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
     private final SiteEventTopic siteEventBroker;
     
     /**
+     * CP subsystem used for locking and pool management
+     */
+    private final CPSubsystem cpSubsytem;
+    
+    /**
      * The lock used when making decisions about managing the cluster. The general principle is that the first node to acquire the lock makes the decision about where resources run.
      */
-    private final ILock clusterManagerLock;
+    private final FencedLock clusterManagerLock;
 
     /**
      * A queue of migration events we must apply
@@ -83,10 +90,10 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
     private final AtomicBoolean started = new AtomicBoolean(false);
     
     @SuppressWarnings("unused")
-    private String membershipListenerId = null;
+    private UUID membershipListenerId = null;
     
     @SuppressWarnings("unused")
-    private String siteEventListenerId = null;
+    private UUID siteEventListenerId = null;
     
     /**
      * Listener for processing pool actions
@@ -98,14 +105,22 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
         super(hazelcastInstance);
         this.siteEventBroker = Objects.requireNonNull(siteEventBroker);
         // setup our data structures
-        this.clusterManagerLock = this.hazelcastInstance.getLock(ObjectNames.getClusterManagerLock());
+        this.cpSubsytem = this.hazelcastInstance.getCPSubsystem();
+        this.clusterManagerLock = this.cpSubsytem.getLock(ObjectNames.getClusterManagerLock());
+        
         // listen to site events
         this.siteEventListenerId = this.siteEventBroker.listen(this::handleSiteEvent);
     }
 
+    @Override
+    protected void configureHazelcast(Config hazelcastConfig)
+    {
+        super.configureHazelcast(hazelcastConfig);
+    }
+
     public UUID getId()
     {
-        return UUID.fromString(this.cluster.getLocalMember().getUuid());
+        return this.cluster.getLocalMember().getUuid();
     }
     
     public ClusterInfo info()
@@ -116,11 +131,11 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
             ClusterInfo ci = new ClusterInfo(this.cluster.getLocalMember().getUuid(), this.cluster.getLocalMember().getAddress().getInetAddress().getHostAddress());
             for (Member member : this.cluster.getMembers())
             {
-                if (isProcessingPool(member))
+                if (this.isProcessingPool(member))
                 {
                     ProcessorInfo mi = new ProcessorInfo(member.getUuid(), member.getAddress().getInetAddress().getHostAddress());
                     // pools for this member
-                    for (ProcessingPoolRegistration pool : this.pools.values(new OwnerPredicate(UUID.fromString(member.getUuid()))))
+                    for (ProcessingPoolRegistration pool : this.pools.values(new OwnerPredicate(member.getUuid())))
                     {
                         mi.getPools().add(new PoolInfo(pool.getSite(), pool.getPool()));
                     }
@@ -141,7 +156,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
         if (this.started.compareAndSet(true, false))
         {
             // Mark our local member as not a processing node
-            this.cluster.getLocalMember().setBooleanAttribute(ObjectNames.Attributes.MEMBER_TYPE_PROCESSOR, false);
+            this.cluster.getLocalMember().setAttribute(ObjectNames.Attributes.MEMBER_TYPE_PROCESSOR, ObjectNames.AttributeValues.FALSE);
         }
     }
 
@@ -156,12 +171,12 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
             // Mark our local member as a processing node
             this.cluster.getLocalMember().setBooleanAttribute(ObjectNames.Attributes.MEMBER_TYPE_PROCESSOR, true);
             // setup our migration task consumer
-            this.migrations = this.getMigrationQueue(UUID.fromString(this.cluster.getLocalMember().getUuid()));
+            this.migrations = this.getMigrationQueue(this.cluster.getLocalMember().getUuid());
             this.runMigrations = true;
             this.migrationsConsumer = new Thread(this::migrationRunner, "BergamotClusterMigrator");
             this.migrationsConsumer.start();
         }
-        return new ProcessingPoolConsumer(this.hazelcastInstance, UUID.fromString(this.cluster.getLocalMember().getUuid()));
+        return new ProcessingPoolConsumer(this.hazelcastInstance, this.cluster.getLocalMember().getUuid());
     }
     
     private void sendMigration(Member runOn, ProcessingPoolTask migration)
@@ -170,7 +185,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
         {
             try
             {
-                this.getMigrationQueue(UUID.fromString(runOn.getUuid())).put(migration);
+                this.getMigrationQueue(runOn.getUuid()).put(migration);
             }
             catch (Exception e)
             {
@@ -305,7 +320,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
             {
                 ProcessingPoolRegistration pool = new ProcessingPoolRegistration(site.getId(), i);
                 Member owner = processingMembers[Math.abs(pool.getPool() % processingMembers.length)];
-                pool.owner(UUID.fromString(owner.getUuid()));
+                pool.owner(owner.getUuid());
                 ProcessingPoolRegistration previous = this.pools.putIfAbsent(pool.getKey(), pool);
                 logger.trace("Pool " + pool.getKey() + " owner " + owner.getUuid());
                 if (previous == null) altered.add(pool);
@@ -332,11 +347,11 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
             logger.info("Taking over pools from member: " + removed);
             Member[] processingMembers = memberSet.stream().filter(ProcessingPoolClusterCoordinator::isProcessingPool).toArray(Member[]::new);
             Set<ProcessingPoolRegistration> altered = new HashSet<ProcessingPoolRegistration>();
-            for (ProcessingPoolRegistration pool : this.pools.values(new OwnerPredicate(UUID.fromString(removed.getUuid()))))
+            for (ProcessingPoolRegistration pool : this.pools.values(new OwnerPredicate(removed.getUuid())))
             {
                 Member newOwner = processingMembers[Math.abs(pool.getPool() % processingMembers.length)];
                 logger.trace("Redistributing pool " + pool.getKey() + " from " + pool.getOwner() + " to " + newOwner.getUuid());
-                pool.migrate(UUID.fromString(newOwner.getUuid()));
+                pool.migrate(newOwner.getUuid());
                 this.pools.put(pool.getKey(), pool);
                 altered.add(pool);
             }
@@ -344,7 +359,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
             // setup pools
             this.registerPools(altered, memberSet);
             // clear the queue of the removed member
-            this.clearQueue(UUID.fromString(removed.getUuid()));
+            this.clearQueue(removed.getUuid());
         }
         finally
         {
@@ -367,10 +382,10 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
                 // reassign pools
                 logger.info("Giving up pools to member: " + added);
                 Set<ProcessingPoolRegistration> altered = new HashSet<ProcessingPoolRegistration>();
-                for (ProcessingPoolRegistration pool : this.pools.values(Predicates.not(new OwnerPredicate(UUID.fromString(added.getUuid())))))
+                for (ProcessingPoolRegistration pool : this.pools.values(Predicates.not(new OwnerPredicate(added.getUuid()))))
                 {
                     logger.trace("Redistributing pool " + pool.getKey() + " from " + pool.getOwner() + " to " + added.getUuid());
-                    pool.migrate(UUID.fromString(added.getUuid()));
+                    pool.migrate(added.getUuid());
                     this.pools.put(pool.getKey(), pool);
                     altered.add(pool);
                     // have we reassigned enough pools
@@ -393,7 +408,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
      */
     private void registerPools(Collection<ProcessingPoolRegistration> pools, Set<Member> memberSet)
     {
-        Map<UUID, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> UUID.fromString(m.getUuid()), (m) -> m));
+        Map<UUID, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> m.getUuid(), (m) -> m));
         for (ProcessingPoolRegistration pool : pools)
         {
             this.sendMigration(members.get(pool.getOwner()), new ProcessingPoolTask(ProcessingPoolTask.Action.REGISTER, pool.getSite(), pool.getPool()));
@@ -405,7 +420,7 @@ public class ProcessingPoolClusterCoordinator extends ProcessingPoolCoordinator
      */
     private void deregisterPools(Collection<ProcessingPoolRegistration> pools, Set<Member> memberSet)
     {
-        Map<UUID, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> UUID.fromString(m.getUuid()), (m) -> m));
+        Map<UUID, Member> members = memberSet.stream().collect(Collectors.toMap((m) -> m.getUuid(), (m) -> m));
         for (ProcessingPoolRegistration pool : pools)
         {
             this.sendMigration(members.get(pool.getPreviousOwner()), new ProcessingPoolTask(ProcessingPoolTask.Action.DEREGISTER, pool.getSite(), pool.getPool()));

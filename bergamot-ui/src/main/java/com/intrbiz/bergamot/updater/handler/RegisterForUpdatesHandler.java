@@ -45,7 +45,7 @@ public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates
     
     public void onClose(ClientContext context)
     {
-        String listenerId = context.removeVar(VAR_UPDATE_LISTENER_ID);
+        UUID listenerId = context.removeVar(VAR_UPDATE_LISTENER_ID);
         if (listenerId != null)
         {
             context.app().getUpdateBroker().unlisten(context.getSite().getId(), listenerId);

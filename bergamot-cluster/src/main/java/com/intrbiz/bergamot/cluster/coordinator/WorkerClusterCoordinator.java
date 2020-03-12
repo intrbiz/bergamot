@@ -10,18 +10,18 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.hazelcast.cluster.Cluster;
+import com.hazelcast.collection.IQueue;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.EvictionConfig;
-import com.hazelcast.config.EvictionConfig.MaxSizePolicy;
 import com.hazelcast.config.EvictionPolicy;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MaxSizePolicy;
 import com.hazelcast.config.NearCacheConfig;
-import com.hazelcast.core.Cluster;
 import com.hazelcast.core.EntryEvent;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.IQueue;
+import com.hazelcast.map.IMap;
 import com.hazelcast.map.listener.EntryAddedListener;
 import com.hazelcast.map.listener.EntryEvictedListener;
 import com.hazelcast.map.listener.EntryRemovedListener;
@@ -83,17 +83,25 @@ public class WorkerClusterCoordinator extends WorkerCoordinator implements Worke
     {
         // Configure TTLs for the worker map
         MapConfig workerMap = hazelcastConfig.getMapConfig(ObjectNames.buildWorkerRegistrationsMapName());
-        workerMap.setEvictionPolicy(EvictionPolicy.LRU);
+        workerMap.setEvictionConfig(new EvictionConfig().setEvictionPolicy(EvictionPolicy.LRU));
         workerMap.setMaxIdleSeconds(WORKER_MAX_IDLE_SECONDS);
         // Configure agents registration map
         MapConfig agentsMap = hazelcastConfig.getMapConfig(ObjectNames.buildAgentsMapName());
-        agentsMap.setEvictionPolicy(EvictionPolicy.NONE);
+        agentsMap.setEvictionConfig(new EvictionConfig().setEvictionPolicy(EvictionPolicy.LRU));
         agentsMap.setBackupCount(2);
         agentsMap.setAsyncBackupCount(2);
         agentsMap.setReadBackupData(true);
         agentsMap.setInMemoryFormat(InMemoryFormat.BINARY);
         // for now use near cache for performance, rather than building our own local maps like with the routing table
-        agentsMap.setNearCacheConfig(new NearCacheConfig(7200, 900, true, InMemoryFormat.OBJECT, new EvictionConfig(1_000_000, MaxSizePolicy.ENTRY_COUNT, EvictionPolicy.LRU)));
+        agentsMap.setNearCacheConfig(
+            new NearCacheConfig()
+            .setTimeToLiveSeconds(7200)
+            .setMaxIdleSeconds(900)
+            .setInvalidateOnChange(true)
+            .setCacheLocalEntries(true)
+            .setInMemoryFormat(InMemoryFormat.OBJECT)
+            .setEvictionConfig(new EvictionConfig().setSize(1_000_000).setMaxSizePolicy(MaxSizePolicy.ENTRY_COUNT).setEvictionPolicy(EvictionPolicy.LRU))
+        );
     }
     
     public ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<UUID, UUID[]>>> getRoutingTable()

@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.cluster.broker;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
@@ -9,7 +10,7 @@ import java.util.function.Function;
 import com.hazelcast.core.DistributedObjectEvent;
 import com.hazelcast.core.DistributedObjectListener;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ITopic;
+import com.hazelcast.topic.ITopic;
 import com.hazelcast.topic.impl.reliable.ReliableTopicService;
 import com.intrbiz.bergamot.cluster.util.ConsumerMessageListenerAdapter;
 import com.intrbiz.bergamot.model.message.MessageObject;
@@ -44,13 +45,13 @@ public abstract class GenericPartitionedTopic<K, T extends MessageObject>
             .publish(message);
     }
     
-    public String listen(K key, Consumer<T> listener)
+    public UUID listen(K key, Consumer<T> listener)
     {
         return this.getSiteTopic(key)
             .addMessageListener(new ConsumerMessageListenerAdapter<>(listener));
     }
     
-    public void unlisten(K key, String listenId)
+    public void unlisten(K key, UUID listenId)
     {
         this.getSiteTopic(key)
             .removeMessageListener(listenId);
