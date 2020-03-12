@@ -10,6 +10,9 @@ import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 
+/**
+ * Consume result and reading to be processed
+ */
 public class ProcessingPoolConsumer
 {
     private final HazelcastInstance hazelcast;

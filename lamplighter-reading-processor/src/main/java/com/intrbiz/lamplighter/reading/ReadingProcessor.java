@@ -10,6 +10,8 @@ public interface ReadingProcessor
 {    
     void start();
     
+    void stop();
+    
     /**
      * Process the readings of a check which executed
      * @param readings - the readings to process

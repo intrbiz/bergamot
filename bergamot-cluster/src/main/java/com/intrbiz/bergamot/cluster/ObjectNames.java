@@ -11,7 +11,7 @@ public final class ObjectNames
     
     public static final String buildProcessorRegistrationQueue()
     {
-        return "bergamot.cluster.queue.processor.registration";
+        return "bergamot.cluster.queue.processors.registration";
     }
     
     public static final String buildProcessorMigrationQueue(UUID id)

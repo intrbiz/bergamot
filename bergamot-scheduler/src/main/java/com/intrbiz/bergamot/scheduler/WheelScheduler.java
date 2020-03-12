@@ -3,13 +3,12 @@ package com.intrbiz.bergamot.scheduler;
 import java.security.SecureRandom;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -83,9 +82,6 @@ public class WheelScheduler extends AbstractScheduler
 
     // initial delay allocation
     protected final SecureRandom initialDelay = new SecureRandom();
-    
-    // watch dog
-    protected final Timer watchDog = new Timer();
     
     // task executor
     protected final ExecutorService taskExecutor;
@@ -408,24 +404,28 @@ public class WheelScheduler extends AbstractScheduler
             this.ticker = new Thread(new Ticker(), "WheelScheduler-Ticker");
             this.ticker.start();
         }
-        // setup a watch dog task to check that the scheduler is working correctly
-        this.watchDog.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run()
-            {
-                boolean enabled = WheelScheduler.this.schedulerEnabled;
-                if (enabled)
-                {
-                    long lastTick = WheelScheduler.this.tickTime;
-                    long delay = System.currentTimeMillis() - lastTick;
-                    if (delay >= 60_000L)
-                    {
-                        // last tick was over a minute ago !!!
-                        logger.fatal("Last tick was over a minute ago, delay: " + delay + "ms");
-                    }
-                }
-            }
-        }, 60_000L, 60_000L);
+    }
+    
+    @Override
+    public void stop()
+    {
+        this.run = false;
+        this.tickerWaitLock.notifyAll();
+        try
+        {
+            this.ticker.join();
+        }
+        catch (InterruptedException e)
+        {
+        }
+        this.taskExecutor.shutdown();
+        try
+        {
+            this.taskExecutor.awaitTermination(5, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException e)
+        {
+        }
     }
 
     /**
