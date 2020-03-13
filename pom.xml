@@ -12,11 +12,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<intrbiz.util.version>1.4.0-SNAPSHOT</intrbiz.util.version>
+		<intrbiz.util.version>1.5.0</intrbiz.util.version>
 		<intrbiz.snmpib.version>[1.0,)</intrbiz.snmpib.version>
 		<intrbiz.gerald.version>1.2.2</intrbiz.gerald.version>
-		<intrbiz.balsa.version>5.0.2-SNAPSHOT</intrbiz.balsa.version>
-		<intrbiz.express.version>4.1.0-SNAPSHOT</intrbiz.express.version>
+		<intrbiz.balsa.version>5.1.0</intrbiz.balsa.version>
+		<intrbiz.express.version>4.1.2</intrbiz.express.version>
 		<intrbiz.core.version>[1.0,)</intrbiz.core.version>
 		<bouncycastle.version>1.54</bouncycastle.version>
 		<jackson.version>[2.10,)</jackson.version>
