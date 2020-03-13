@@ -108,6 +108,8 @@ public interface Scheduler extends ProcessingPoolListener
      * @throws Exception
      */
     void start() throws Exception;
+    
+    void stop();
 
     @Override
     default void registerPool(UUID siteId, int processingPool)

@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.cluster.queue;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import com.hazelcast.core.IQueue;
+import com.hazelcast.collection.IQueue;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 public abstract class WorkerConsumer

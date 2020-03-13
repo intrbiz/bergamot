@@ -2,10 +2,11 @@ package com.intrbiz.bergamot.cluster.model.info;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class ClusterInfo
 {
-    private String localUUID;
+    private UUID localUUID;
     
     private String localAddress;
     
@@ -16,19 +17,19 @@ public class ClusterInfo
         super();
     }
 
-    public ClusterInfo(String localUUID, String localAddress)
+    public ClusterInfo(UUID localUUID, String localAddress)
     {
         super();
         this.localUUID = localUUID;
         this.localAddress = localAddress;
     }
 
-    public String getLocalUUID()
+    public UUID getLocalUUID()
     {
         return localUUID;
     }
 
-    public void setLocalUUID(String localUUID)
+    public void setLocalUUID(UUID localUUID)
     {
         this.localUUID = localUUID;
     }

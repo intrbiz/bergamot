@@ -79,11 +79,13 @@ public class BergamotProcessor
         this.agentRegistrationService = new AgentRegistrationService(this.agentEventQueue, this.processingPoolCoordinator, this.notifierCoordinator);
         // create and start our scheduler
         this.scheduler = new WheelScheduler(this.id, this.workerCoordinator, this.processingPoolCoordinator.createProcessingPoolProducer());
-        // create and start our result processor
-        ProcessingPoolConsumer consumer = this.processingPoolCoordinator.startProcessingPool(this.scheduler);
+        // setup the procesing pools
+        this.processingPoolCoordinator.listen(this.scheduler);
+        ProcessingPoolConsumer consumer = this.processingPoolCoordinator.createConsumer();
         this.resultProcessor = new DefaultResultProcessor(this.id, consumer, this.processingPoolCoordinator.createSchedulerActionProducer(), this.notifierCoordinator, this.notificationTopic, this.updateTopic);
         this.readingProcessor = new DefaultReadingProcessor(this.id, consumer);
-        // start
+        // go go go
+        this.processingPoolCoordinator.start();
         this.agentRegistrationService.start();
         this.resultProcessor.start();
         this.readingProcessor.start();
@@ -92,7 +94,12 @@ public class BergamotProcessor
     
     public void stop()
     {
-        
+        // shutdown the processing pool
+        this.scheduler.stop();
+        this.resultProcessor.stop();
+        this.readingProcessor.stop();
+        // stop our coordinators
+        this.processingPoolCoordinator.stop();
         this.agentRegistrationService.stop();
         this.notifierCoordinator.stop();
         this.workerCoordinator.stop();

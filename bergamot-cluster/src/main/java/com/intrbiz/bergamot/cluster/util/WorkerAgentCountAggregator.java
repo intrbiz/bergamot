@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import com.hazelcast.aggregation.Aggregator;
 
-public class WorkerAgentCountAggregator extends Aggregator<Map.Entry<UUID, UUID>, Map<UUID, Integer>>
+public class WorkerAgentCountAggregator implements Aggregator<Map.Entry<UUID, UUID>, Map<UUID, Integer>>
 {
     private static final long serialVersionUID = 1L;
     

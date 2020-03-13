@@ -6,11 +6,11 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import com.hazelcast.collection.IQueue;
 import com.hazelcast.collection.impl.queue.QueueService;
 import com.hazelcast.core.DistributedObjectEvent;
 import com.hazelcast.core.DistributedObjectListener;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
 public abstract class GenericPartitionedQueue<K, T extends MessageObject>

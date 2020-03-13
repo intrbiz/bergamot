@@ -5,8 +5,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import com.hazelcast.collection.IQueue;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
 import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 

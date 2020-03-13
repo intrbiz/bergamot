@@ -3,8 +3,8 @@ package com.intrbiz.bergamot.cluster.broker;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import com.hazelcast.collection.IQueue;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
 public abstract class GenericGlobalQueue<T extends MessageObject>

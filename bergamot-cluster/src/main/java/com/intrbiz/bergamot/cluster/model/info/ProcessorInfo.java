@@ -2,10 +2,11 @@ package com.intrbiz.bergamot.cluster.model.info;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class ProcessorInfo
 {
-    private String uuid;
+    private UUID uuid;
 
     private String address;
 
@@ -16,19 +17,19 @@ public class ProcessorInfo
         super();
     }
 
-    public ProcessorInfo(String uuid, String address)
+    public ProcessorInfo(UUID uuid, String address)
     {
         super();
         this.uuid = uuid;
         this.address = address;
     }
 
-    public String getUuid()
+    public UUID getUuid()
     {
         return uuid;
     }
 
-    public void setUuid(String uuid)
+    public void setUuid(UUID uuid)
     {
         this.uuid = uuid;
     }

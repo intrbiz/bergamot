@@ -1,10 +1,11 @@
 package com.intrbiz.bergamot.cluster.broker;
 
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ITopic;
+import com.hazelcast.topic.ITopic;
 import com.intrbiz.bergamot.cluster.util.ConsumerMessageListenerAdapter;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
@@ -27,12 +28,12 @@ public abstract class GenericGlobalTopic<T extends MessageObject>
         this.topic.publish(event);
     }
     
-    public String listen(Consumer<T> listener)
+    public UUID listen(Consumer<T> listener)
     {
         return this.topic.addMessageListener(new ConsumerMessageListenerAdapter<>(listener));
     }
     
-    public void unlisten(String listenId)
+    public void unlisten(UUID listenId)
     {
         this.topic.removeMessageListener(listenId);
     }

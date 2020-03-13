@@ -3,20 +3,20 @@ package com.intrbiz.bergamot.cluster;
 import java.util.UUID;
 
 public final class ObjectNames
-{
-    public static final class Attributes
+{   
+    public static final String buildProcessorsMapName()
     {
-
-        public static final String MEMBER_TYPE_UI = "bergamot.member.type.ui";
-        
-        public static final String MEMBER_TYPE_API = "bergamot.member.type.ui";
-        
-        public static final String MEMBER_TYPE_PROCESSOR = "bergamot.member.type.processor";
-        
-        public static final String MEMBER_TYPE_WORKER = "bergamot.member.type.worker";
-        
-        public static final String MEMBER_TYPE_NOTIFIER = "bergamot.member.type.notifier";
-        
+        return "bergamot.cluster.map.processors";
+    }
+    
+    public static final String buildProcessorRegistrationQueue()
+    {
+        return "bergamot.cluster.queue.processors.registration";
+    }
+    
+    public static final String buildProcessorMigrationQueue(UUID id)
+    {
+        return "bergamot.cluster.queue.processors.migration." + id;
     }
     
     public static final String buildProcessingPoolsMapName()

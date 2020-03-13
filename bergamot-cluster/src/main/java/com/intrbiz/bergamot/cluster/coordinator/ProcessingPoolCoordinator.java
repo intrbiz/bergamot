@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.hazelcast.cluster.Cluster;
+import com.hazelcast.cluster.Member;
 import com.hazelcast.config.Config;
-import com.hazelcast.core.Cluster;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.Member;
+import com.hazelcast.map.IMap;
 import com.intrbiz.bergamot.cluster.ObjectNames;
 import com.intrbiz.bergamot.cluster.model.ProcessingPoolRegistration;
 import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
@@ -43,6 +43,11 @@ public abstract class ProcessingPoolCoordinator
     protected final Cluster cluster;
     
     /**
+     * Map of which members are processors
+     */
+    protected final IMap<UUID, Boolean> processors;
+    
+    /**
      * The distributed map of site processing pools
      */
     protected final IMap<UUID, ProcessingPoolRegistration> pools;
@@ -53,8 +58,9 @@ public abstract class ProcessingPoolCoordinator
     {
         super();
         this.hazelcastInstance = hazelcastInstance;
-        this.cluster = this.hazelcastInstance.getCluster();
         this.configureHazelcast(this.hazelcastInstance.getConfig());
+        this.cluster = this.hazelcastInstance.getCluster();
+        this.processors = this.hazelcastInstance.getMap(ObjectNames.buildProcessorsMapName());
         this.pools = this.hazelcastInstance.getMap(ObjectNames.buildProcessingPoolsMapName());
     }
     
@@ -65,13 +71,13 @@ public abstract class ProcessingPoolCoordinator
     public List<Member> getProcessingMembers()
     {
         return this.cluster.getMembers().stream()
-                .filter(ProcessingPoolCoordinator::isProcessingPool)
+                .filter(this::isProcessingPool)
                 .collect(Collectors.toList());
     }
     
-    public static boolean isProcessingPool(Member member)
+    public boolean isProcessingPool(Member member)
     {
-        return Boolean.TRUE.equals(member.getBooleanAttribute(ObjectNames.Attributes.MEMBER_TYPE_PROCESSOR));
+        return Boolean.TRUE.equals(this.processors.get(member.getUuid()));
     }
     
     /**
