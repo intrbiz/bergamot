@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
@@ -22,6 +23,7 @@ import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
 import com.intrbiz.configuration.Configuration;
 
+@Ignore
 public class TestNagiosSSHExecutor
 {
     private SSHEngine engine;
