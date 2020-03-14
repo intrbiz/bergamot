@@ -16,7 +16,7 @@ build:
     - "mvn clean install package deploy -B"
   artifacts:
     paths:
-      - 'target/*.jar'
+      - '*/target/*.jar'
 
 release:
   image: 'bergamotmonitoring/bergamot-build:latest'
@@ -30,4 +30,4 @@ release:
     - "mvn clean install package deploy -B"
   artifacts:
     paths:
-      - 'target/*.jar'
+      - '*/target/*.jar'
