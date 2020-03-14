@@ -6,7 +6,7 @@ stages:
   - build
 
 build:
-  image: maven:3-jdk-11
+  image: 'bergamotmonitoring/bergamot-build:latest'
   stage: build
   except:
     - tags
@@ -19,7 +19,7 @@ build:
       - 'target/*.jar'
 
 release:
-  image: maven:3-jdk-11
+  image: 'bergamotmonitoring/bergamot-build:latest'
   stage: build
   only:
     - tags
