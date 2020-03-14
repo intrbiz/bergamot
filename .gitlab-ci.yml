@@ -1,0 +1,33 @@
+image: docker:latest
+services:
+  - docker:dind
+
+stages:
+  - build
+
+build:
+  image: maven:3-jdk-11
+  stage: build
+  except:
+    - tags
+  script: 
+    - "mkdir -p $HOME/.m2"
+    - "./.settings.sh > $HOME/.m2/settings.xml"
+    - "mvn clean install package deploy -B"
+  artifacts:
+    paths:
+      - 'target/*.jar'
+
+release:
+  image: maven:3-jdk-11
+  stage: build
+  only:
+    - tags
+  script: 
+    - "mkdir -p $HOME/.m2"
+    - "./.settings.sh > $HOME/.m2/settings.xml"
+    - "mvn versions:set -DnewVersion=$CI_COMMIT_TAG -B"
+    - "mvn clean install package deploy -B"
+  artifacts:
+    paths:
+      - 'target/*.jar'

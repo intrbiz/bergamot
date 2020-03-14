@@ -16,14 +16,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<intrbiz.util.version>1.5.0</intrbiz.util.version>
-		<intrbiz.snmpib.version>[1.0,)</intrbiz.snmpib.version>
+		<intrbiz.snmpib.version>1.1.0</intrbiz.snmpib.version>
 		<intrbiz.gerald.version>1.2.2</intrbiz.gerald.version>
-		<intrbiz.balsa.version>5.1.0</intrbiz.balsa.version>
+		<intrbiz.balsa.version>[5.1,)</intrbiz.balsa.version>
 		<intrbiz.express.version>4.1.2</intrbiz.express.version>
 		<intrbiz.core.version>[1.0,)</intrbiz.core.version>
-		<bouncycastle.version>1.54</bouncycastle.version>
+		<bouncycastle.version>1.64</bouncycastle.version>
 		<jackson.version>[2.10,)</jackson.version>
-		<u2f.version>0.16.0</u2f.version>
+		<u2f.version>0.19.9</u2f.version>
 		<jsoup.version>[1.8,)</jsoup.version>
 		<jsch.version>0.1.54</jsch.version>
 		<twilio.version>[7.17,)</twilio.version>
@@ -50,7 +50,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>3.8.0</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -75,6 +75,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>package-javadocs</id>
@@ -85,6 +86,7 @@
 						<configuration>
 							<additionalparam>-Xdoclint:none</additionalparam>
 							<source>8</source>
+							<failOnError>false</failOnError>
 						</configuration>
 					</execution>
 				</executions>

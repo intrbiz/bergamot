@@ -34,6 +34,7 @@ import com.yubico.u2f.attestation.MetadataService;
 import com.yubico.u2f.data.DeviceRegistration;
 import com.yubico.u2f.data.messages.RegisterRequestData;
 import com.yubico.u2f.data.messages.RegisterResponse;
+import com.yubico.u2f.exceptions.U2fBadConfigurationException;
 
 import net.glxn.qrgen.core.image.ImageType;
 import net.glxn.qrgen.javase.QRCode;
@@ -51,7 +52,7 @@ public class ProfileRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db, @GetBergamotSite() Site site)
+    public void index(BergamotDB db, @GetBergamotSite() Site site) throws U2fBadConfigurationException
     {
         // generate a new U2F registration token
         Contact contact = currentPrincipal();

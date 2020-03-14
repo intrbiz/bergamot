@@ -51,8 +51,6 @@ import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 import com.intrbiz.metadata.RequireValidPrincipal;
 import com.intrbiz.metadata.Template;
-import com.yubico.u2f.data.messages.AuthenticateRequestData;
-import com.yubico.u2f.data.messages.AuthenticateResponse;
 
 @Prefix("/")
 @Template("layout/single")
@@ -289,9 +287,7 @@ public class LoginRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void finishU2FAuthentication(BergamotDB db, @Param("u2f-authenticate-request") String u2fAuthenticateRequest, @Param("u2f-authenticate-response") String u2fAuthenticateResponse, @Param("redirect") String redirect) throws Exception
     {
-        AuthenticateRequestData challenge = AuthenticateRequestData.fromJson(u2fAuthenticateRequest);
-        AuthenticateResponse response = AuthenticateResponse.fromJson(u2fAuthenticateResponse);
-        AuthenticationResponse authResp = authenticate(new U2FAuthenticationChallengeResponse(challenge, response));
+        AuthenticationResponse authResp = authenticate(new U2FAuthenticationChallengeResponse(u2fAuthenticateRequest, u2fAuthenticateResponse));
         this.completeLogin(authResp, redirect);
     }
     

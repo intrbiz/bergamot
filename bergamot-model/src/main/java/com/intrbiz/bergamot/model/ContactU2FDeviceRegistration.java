@@ -19,6 +19,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.yubico.u2f.data.DeviceRegistration;
 import com.yubico.u2f.data.messages.key.util.CertificateParser;
 import com.yubico.u2f.data.messages.key.util.U2fB64Encoding;
+import com.yubico.u2f.exceptions.U2fBadInputException;
 
 /**
  * A U2F device which has been registered to a user
@@ -164,7 +165,7 @@ public class ContactU2FDeviceRegistration implements Serializable
         this.attestationCert = U2fB64Encoding.encode(attestationCert.getEncoded());
     }
     
-    public X509Certificate loadAttestationCert() throws CertificateException
+    public X509Certificate loadAttestationCert() throws CertificateException, U2fBadInputException
     {
         if (Util.isEmpty(this.attestationCert)) return null;
         // parse the cert
