@@ -10,6 +10,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
@@ -21,6 +22,7 @@ import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.configuration.Configuration;
 
+@Ignore
 public class TestHTTPEngine
 {
     private HTTPEngine engine;
