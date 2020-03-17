@@ -1,0 +1,29 @@
+<notifier>
+    <hazelcast-client>
+        <node>bergamot-ui:5701</node>
+    </hazelcast-client>
+    <logging level="info"/>
+    <!-- Email Configuration -->
+    <parameter name="mail.from">bergamot@localhost</parameter>
+    <parameter name="mail.host">smtp</parameter>
+    <parameter name="mail.tls">false</parameter>
+    <!-- Authentication if needed
+    <parameter name="mail.user"></parameter>
+    <parameter name="mail.password"></parameter>
+    -->
+    <!-- Set smtp port for odd setups
+    <parameter name="mail.port">25</parameter>
+    -->
+    <!-- SMS Configuration -->
+    <engine name="sms" enabled="false"/>
+    <parameter name="sms.from">+447848123456</parameter>
+    <!-- SMS transport: twilio or aws -->
+    <parameter name="sms.transport">twilio</parameter>
+    <!-- Twilio configuration -->
+    <parameter name="twilio.account"></parameter>
+    <parameter name="twilio.token"></parameter>
+    <!-- AWS configuration -->
+    <parameter name="aws.accessKeyId"></parameter>
+    <parameter name="aws.secretKey"></parameter>
+    <parameter name="aws.region">eu-west-1</parameter>
+</notifier>

@@ -1,0 +1,12 @@
+<worker>
+    <hazelcast-client>
+        <node>bergamot-ui:5701</node>
+    </hazelcast-client>
+    <logging level="info"/>
+    <!-- Agent Configuration -->
+    <engine name="agent" enabled="true"/>
+    <parameter name="agent-port">15080</parameter>
+    <!-- SNMP Configuration -->
+    <engine name="snmp" enabled="true"/>
+    <parameter name="snmp-port">8161</parameter>
+</worker>

@@ -79,7 +79,7 @@ public class EmailEngine extends TemplatedNotificationEngine
             this.properties.put("mail.smtp.starttls.enable", true);
             this.properties.put("mail.smtp.auth", true);
         }
-        this.properties.put("mail.smtp.from", config.getStringParameterValue("from", "bergamot@localhost"));
+        this.properties.put("mail.smtp.from", config.getStringParameterValue("mail.from", "bergamot@localhost"));
         // auth details
         this.user = config.getStringParameterValue("mail.user", "");
         this.password = config.getStringParameterValue("mail.password", "");

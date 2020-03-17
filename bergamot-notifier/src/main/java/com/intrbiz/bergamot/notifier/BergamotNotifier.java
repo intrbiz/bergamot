@@ -374,7 +374,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             // Configure logging
             configureLogging(config.getLogging());
             Logger logger = Logger.getLogger(BergamotNotifier.class);
-            logger.debug("Bergamot Notifier, using configuration:\r\n" + config.toString());
+            logger.info("Bergamot Notifier, using configuration:\r\n" + config.toString());
             // Create the worker
             BergamotNotifier worker = new BergamotNotifier();
             worker.configure(config);

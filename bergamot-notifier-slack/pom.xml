@@ -26,7 +26,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>bergamot-notifier-webhook</finalName>
+		<finalName>bergamot-notifier-slack</finalName>
 		<plugins>
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
