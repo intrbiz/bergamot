@@ -7,9 +7,10 @@ stages:
   - build
 
 prep:
-  image: docker:latest
+  image: opensuse:tumbleweed
   stage: prep
   script: 
+    - 'zypper -q -n ref && zypper -q -n in docker'
     - 'echo "${DOCKER_PASS}" | docker login --username "bergamotmonitoring" --password-stdin'
     - "cd containers && ./build_base.sh"
   
