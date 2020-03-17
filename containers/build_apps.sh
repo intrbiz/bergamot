@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 . ./build_functions.sh
 
 BERGAMOT_VERSION=$(get_app_version)

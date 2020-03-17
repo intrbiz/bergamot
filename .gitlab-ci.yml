@@ -7,6 +7,7 @@ stages:
   - build
 
 prep:
+  image: docker:latest
   stage: prep
   script: 
     - 'echo "${DOCKER_PASS}" | docker login --username "bergamotmonitoring" --password-stdin'
