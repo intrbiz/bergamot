@@ -27,7 +27,7 @@
 		<jsoup.version>[1.8,)</jsoup.version>
 		<jsch.version>0.1.54</jsch.version>
 		<twilio.version>[7.17,)</twilio.version>
-		<aws.sns.version>[1.11,)</aws.sns.version>
+		<aws.sns.version>1.11.744</aws.sns.version>
 		<hazelcast.version>4.0</hazelcast.version>
 		<hazelcast.aws.version>[1.1,)</hazelcast.aws.version>
 		<mysql.version>[5.1,)</mysql.version>
