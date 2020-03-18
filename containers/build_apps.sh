@@ -15,12 +15,17 @@ cp ../bergamot-ui/target/bergamot-ui-$BERGAMOT_VERSION.app ./bergamot-ui/bergamo
 cp ../bergamot-ui/target/bergamot-ui-$BERGAMOT_VERSION.app ./bergamot-ui-nginx/bergamot-ui.app
 cp ../bergamot-agent/target/bergamot-agent-$BERGAMOT_VERSION.app ./bergamot-agent/bergamot-agent.app
 
+# Build the template configuration
+pushd ../bergamot-ui/src/main/cfg/template
+tar -czvf bergamot-site-config-template.tar.gz *
+popd
+cp ../bergamot-ui/src/main/cfg/template/bergamot-site-config-template.tar.gz ./bergamot-ui/bergamot-site-config-template.tar.gz
+
 # Build containers
+docker_build_app bergamot-agent $BERGAMOT_VERSION
+
 docker_build_app bergamot-worker $BERGAMOT_VERSION
 docker_build_app bergamot-notifier $BERGAMOT_VERSION
 
 docker_build_app bergamot-ui $BERGAMOT_VERSION
-
 docker_build_app bergamot-ui-nginx $BERGAMOT_VERSION
-
-docker_build_app bergamot-agent $BERGAMOT_VERSION
