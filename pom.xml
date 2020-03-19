@@ -18,9 +18,10 @@
 		<intrbiz.util.version>1.5.0</intrbiz.util.version>
 		<intrbiz.snmpib.version>1.1.0</intrbiz.snmpib.version>
 		<intrbiz.gerald.version>1.2.2</intrbiz.gerald.version>
-		<intrbiz.balsa.version>[5.1,)</intrbiz.balsa.version>
+		<intrbiz.balsa.version>5.1.2</intrbiz.balsa.version>
+		<intrbiz.balsa.plugin.version>5.1.2</intrbiz.balsa.plugin.version>
 		<intrbiz.express.version>4.1.2</intrbiz.express.version>
-		<intrbiz.core.version>[1.0,)</intrbiz.core.version>
+		<intrbiz.core.version>1.0.1</intrbiz.core.version>
 		<bouncycastle.version>1.64</bouncycastle.version>
 		<jackson.version>[2.10,)</jackson.version>
 		<u2f.version>0.19.9</u2f.version>
@@ -29,7 +30,8 @@
 		<twilio.version>[7.17,)</twilio.version>
 		<aws.sns.version>1.11.744</aws.sns.version>
 		<hazelcast.version>4.0</hazelcast.version>
-		<hazelcast.aws.version>[1.1,)</hazelcast.aws.version>
+		<hazelcast.aws.version>3.1</hazelcast.aws.version>
+		<hazelcast.kubernetes.version>2.0.1</hazelcast.kubernetes.version>
 		<mysql.version>[5.1,)</mysql.version>
 		<postgresql.version>[42.2,)</postgresql.version>
 		<netty.version>4.1.44.Final</netty.version>
@@ -506,6 +508,11 @@
 				<groupId>com.hazelcast</groupId>
 				<artifactId>hazelcast-aws</artifactId>
 				<version>${hazelcast.aws.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast-kubernetes</artifactId>
+				<version>${hazelcast.kubernetes.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>

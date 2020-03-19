@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 NAME=$1
 ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
-buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 8080 --user nginx --workingdir '/opt/bergamot/ui' --cmd '[ "/usr/sbin/nginx", "-g", "daemon off;", "-c", "/etc/nginx/nginx.conf" ]' $ID
+buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 8080 --workingdir '/opt/bergamot/ui' --cmd '[ "/usr/sbin/nginx", "-g", "daemon off;", "-c", "/etc/nginx/nginx.conf" ]' $ID
 
 # Install nginx
 buildah run $ID zypper -q -n ref 
@@ -28,6 +28,9 @@ buildah run $ID chown nginx /etc/nginx/conf.d
 buildah copy $ID ./nginx.conf /etc/nginx/nginx.conf
 buildah copy $ID ./balsa_scgi_params.conf /etc/nginx/balsa_scgi_params.conf
 buildah copy $ID ./upstream.conf /etc/nginx/conf.d/upstream.conf
+
+# Set the user the container should run as
+buildah config --user nginx $ID
 
 # Make the image
 buildah commit $ID $NAME

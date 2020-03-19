@@ -73,10 +73,6 @@
 			<artifactId>balsa-2fa</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-aws</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
 		</dependency>
@@ -100,15 +96,26 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-processor</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-kubernetes</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-aws</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-ui</finalName>
 		<plugins>
-			<!--
             <plugin>
                 <groupId>com.intrbiz.balsa</groupId>
                 <artifactId>balsa-executor-compiler-plugin</artifactId>
-                <version>${intrbiz.balsa.version}</version>
+                <version>${intrbiz.balsa.plugin.version}</version>
                 <configuration>
                 	<appClass>com.intrbiz.bergamot.ui.BergamotApp</appClass>
                 </configuration>
@@ -121,7 +128,6 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>packaging</artifactId>
