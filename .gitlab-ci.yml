@@ -4,7 +4,7 @@ stages:
   - containers
 
 prep:
-  image: opensuse/tumbleweed:latest
+  image: 'opensuse/tumbleweed:latest'
   stage: prep
   script: 
     - 'zypper -q -n ref && zypper -q -n in buildah'
@@ -43,9 +43,9 @@ release:
       - '*/target/*.jar'
 
 containers:
-  image: opensuse/tumbleweed:latest
+  image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: containers
   script: 
     - 'zypper -q -n ref && zypper -q -n in buildah'
     - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
-    - 'cd containers && ./build_base.sh'
+    - 'cd containers && ./build_apps.sh'
