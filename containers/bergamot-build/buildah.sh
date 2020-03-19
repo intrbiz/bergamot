@@ -5,7 +5,7 @@ buildah config --author='Chris Ellis <chris@intrbiz.com>' $ID
 
 # Install build tools
 buildah run $ID zypper -q -n ref
-buildah run $ID zypper -q -n in maven buildah
+buildah run $ID zypper -q -n in maven
 
 # Install utils needed for unit test
 buildah run $ID zypper -q -n in monitoring-plugins-dummy
