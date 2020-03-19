@@ -15,10 +15,10 @@ buildah copy $ID ./hazelcast.xml /etc/bergamot/ui/hazelcast.xml
 buildah copy $ID ./bergamot-site-config-template.tar.gz /etc/bergamot/config/bergamot-site-config-template.tar.gz
 
 # Extract the application
-buildah run $ID cd /opt/bergamot/ui && java -Dbootstrap.extract.only=true -jar bergamot-ui.app
+buildah run $ID sh -c 'cd /opt/bergamot/ui && java -Dbootstrap.extract.only=true -jar bergamot-ui.app'
 
 # Add the default site configuration templates
-buildah run $ID cd /etc/bergamot/config && tar -xzf bergamot-site-config-template.tar.gz
+buildah run $ID sh -c 'cd /etc/bergamot/config && tar -xzf bergamot-site-config-template.tar.gz'
 
 # Make the image
 buildah commit $ID $NAME

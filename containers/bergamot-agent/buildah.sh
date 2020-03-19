@@ -11,7 +11,7 @@ buildah copy $ID ./bergamot-agent.app /opt/bergamot/agent/bergamot-agent.app
 buildah copy $ID ./libsigar-amd64-linux.so /usr/lib64/libsigar-amd64-linux.so
 
 # Extract the application
-buildah run $ID cd /opt/bergamot/agent && java -Dbootstrap.extract.only=true -jar bergamot-agent.app
+buildah run $ID sh -c 'cd /opt/bergamot/agent && java -Dbootstrap.extract.only=true -jar bergamot-agent.app'
 
 # Make the image
 buildah commit $ID $NAME
