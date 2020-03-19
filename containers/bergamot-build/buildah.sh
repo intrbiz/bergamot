@@ -1,6 +1,6 @@
 #!/bin/bash
 NAME=$1
-ID=$(buildah from opensuse/tumbleweed:latest)
+ID=$(buildah from bergamotmonitoring/bergamot-base:latest)
 buildah config --author='Chris Ellis <chris@intrbiz.com>' $ID
 
 # Install build tools
