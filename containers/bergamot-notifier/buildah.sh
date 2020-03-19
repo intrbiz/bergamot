@@ -13,7 +13,7 @@ buildah copy $ID ./bergamot-notifier.app /opt/bergamot/notifier/bergamot-notifie
 buildah copy $ID ./default.xml /etc/bergamot/notifier/default.xml
 
 # Extract the application
-buildah run $ID sh -c' cd /opt/bergamot/notifier && java -Dbootstrap.extract.only=true -jar bergamot-notifier.app'
+buildah run $ID sh -c 'cd /opt/bergamot/notifier && java -Dbootstrap.extract.only=true -jar bergamot-notifier.app'
 
 # Make the image
 buildah commit $ID $NAME
