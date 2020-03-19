@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -ex
 NAME=$1
-ID=$(buildah from bergamotmonitoring/bergamot-base:latest)
+ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
 buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 8080 --user nginx --workingdir '/opt/bergamot/ui' --cmd '[ "/usr/sbin/nginx", "-g", "daemon off;", "-c", "/etc/nginx/nginx.conf" ]' $ID
 
 # Install nginx

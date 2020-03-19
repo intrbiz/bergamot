@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -ex
 NAME=$1
-ID=$(buildah from opensuse/tumbleweed:latest)
+ID=$(buildah from docker.io/opensuse/tumbleweed:latest)
 buildah config --author='Chris Ellis <chris@intrbiz.com>' $ID
 
 # Install the base JDK

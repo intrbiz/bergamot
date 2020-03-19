@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -ex
 NAME=$1
-ID=$(buildah from bergamotmonitoring/bergamot-base:latest)
+ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
 buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 5701 --port 8090 --port 8081 --workingdir '/opt/bergamot/ui' --cmd '["java", "-Dbootstrap.extract=false", "-jar", "bergamot-ui.app"]' $ID
 
 # Setup our directories
