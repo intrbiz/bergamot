@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -27,7 +26,7 @@ public class NotifierCfg extends Configuration
     
     private int threads = -1;
     
-    private UUID site;
+    private String site;
     
     private String info;
 
@@ -42,12 +41,12 @@ public class NotifierCfg extends Configuration
     
     @XmlAttribute(name = "site")
     @XmlJavaTypeAdapter(UUIDAdapter.class)
-    public UUID getSite()
+    public String getSite()
     {
         return site;
     }
 
-    public void setSite(UUID site)
+    public void setSite(String site)
     {
         this.site = site;
     }

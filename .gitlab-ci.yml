@@ -25,6 +25,7 @@ build:
       - 'pom.xml'
       - '*/pom.xml'
       - '*/target/*.jar'
+      - '*/target/*.app'
 
 release:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
@@ -41,6 +42,7 @@ release:
       - 'pom.xml'
       - '*/pom.xml'
       - '*/target/*.jar'
+      - '*/target/*.app'
 
 containers:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'

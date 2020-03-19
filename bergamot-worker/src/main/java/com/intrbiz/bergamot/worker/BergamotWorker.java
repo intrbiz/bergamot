@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -155,21 +157,44 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         return this.engines.values();
     }
     
-    //
+    protected String getConfigurationParameter(String name, Supplier<String> cfgValue, String defaultValue)
+    {
+        /*
+         * Fetch configuration in order of:
+         *  - Env var
+         *  - System property
+         *  - Configuration parameter
+         *  - Specific configuration method
+         *  - Default value
+         */
+        return Util.coalesceEmpty(
+            System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')),
+            System.getProperty(name),
+            configuration.getStringParameterValue(name, null),
+            cfgValue == null ? null : cfgValue.get(),
+            defaultValue
+        );
+    }
+    
+    protected String getConfigurationParameter(String name, String defaultValue)
+    {
+        return this.getConfigurationParameter(name, null, defaultValue);
+    }
     
     @Override
     public final void configure(WorkerCfg cfg) throws Exception
     {
         this.configuration = cfg;
         // TODO: support multiple sites
-        if (this.configuration.getSite() != null)
+        String site = this.getConfigurationParameter("site", this.configuration::getSite, null);
+        if (! Util.isEmpty(site))
         {
-            this.sites.add(this.configuration.getSite());
+            this.sites.add(UUID.fromString(site));
         }
-        this.workerPool = this.configuration.getWorkerPool();
-        this.info = this.configuration.getInfo();
+        this.workerPool = this.getConfigurationParameter("worker-pool", this.configuration::getWorkerPool, null);
+        this.info = this.getConfigurationParameter("info", this.configuration::getInfo, null);
         this.hostName = InetAddress.getLocalHost().getHostName();
-        this.threadCount = this.configuration.getThreads();
+        this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", String.valueOf(this.configuration.getThreads())));
         // register engines 
         for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
         {
@@ -214,13 +239,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             @Override
             public String getParameter(String name, String defaultValue)
             {
-                // Environment variable take preference of system property which takes preference over configuration file
-                String value = Util.coalesceEmpty(
-                    System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')),
-                    System.getProperty(name),
-                    configuration.getStringParameterValue(name, null)
-                );
-                return Util.isEmpty(value) ? defaultValue : value; 
+                return getConfigurationParameter(name, defaultValue);
             }
 
             @Override
@@ -260,11 +279,26 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         };
     }
     
+    protected List<String> getHazelcastNodes()
+    {
+        List<String> addresses = new LinkedList<>();
+        if (this.configuration.getHazelcastClient() != null)
+        {
+            addresses.addAll(this.configuration.getHazelcastClient().getNodes());
+        }
+        String nodesCfg = this.getConfigurationParameter("hazelcast.nodes", null);
+        if (! Util.isEmpty(nodesCfg))
+        {
+            addresses.addAll(Arrays.asList(nodesCfg.split(", ?")));
+        }
+        return addresses;
+    }
+    
     protected void connectScheduler() throws Exception
     {
         logger.info("Connecting to Bergamot Cluster");
         ClientNetworkConfig netCfg = new ClientNetworkConfig();
-        netCfg.setAddresses(this.configuration.getHazelcastClient().getNodes());
+        netCfg.setAddresses(this.getHazelcastNodes());
         netCfg.setSmartRouting(false);
         ClientConfig cliCfg = new ClientConfig();
         cliCfg.setInstanceName("worker");
