@@ -1,5 +1,3 @@
-image: docker:latest
-
 stages:
   - prep
   - build
@@ -8,8 +6,8 @@ prep:
   image: opensuse/tumbleweed:latest
   stage: prep
   script: 
-    - 'zypper -q -n ref && zypper -q -n in docker'
-    - 'echo "${DOCKER_PASS}" | docker login --username "bergamotmonitoring" --password-stdin'
+    - 'zypper -q -n ref && zypper -q -n in buildah'
+    - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - "cd containers && ./build_base.sh"
   
 build:
@@ -20,7 +18,7 @@ build:
   script: 
     - "mkdir -p $HOME/.m2"
     - "./.settings.sh > $HOME/.m2/settings.xml"
-    - 'echo "${DOCKER_PASS}" | docker login --username "bergamotmonitoring" --password-stdin'
+    - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - "mvn clean install package deploy -B"
     - "cd containers && ./build_apps.sh"
   artifacts:
@@ -35,7 +33,7 @@ release:
   script: 
     - "mkdir -p $HOME/.m2"
     - "./.settings.sh > $HOME/.m2/settings.xml"
-    - 'echo "${DOCKER_PASS}" | docker login --username "bergamotmonitoring" --password-stdin'
+    - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - "mvn versions:set -DnewVersion=$CI_COMMIT_TAG -B"
     - "mvn clean install package deploy -B"
     - "cd containers && ./build_apps.sh"

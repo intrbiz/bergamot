@@ -1,21 +1,21 @@
 #!/bin/bash
 
-function docker_build_util {
+function build_util {
     NAME=$1
     echo "Building util container $NAME"
     cd $NAME
-    docker build --no-cache $DOCKER_OPTS -t $NAME:latest -t bergamotmonitoring/$NAME:latest .
-    docker push bergamotmonitoring/$NAME:latest
+    ./buildah.sh "bergamotmonitoring/$NAME:latest"
+    buildah push "bergamotmonitoring/$NAME:latest" "docker://docker.io/bergamotmonitoring/$NAME:latest"
     cd ..
 }
 
-function docker_build_app {
+function build_app {
     NAME=$1
     BERGAMOT_VERSION=$2
     echo "Building application container $NAME version $BERGAMOT_VERSION"
     cd $NAME
-    docker build --no-cache $DOCKER_OPTS --build-arg bergamot_version=$BERGAMOT_VERSION -t $NAME:$BERGAMOT_VERSION -t bergamotmonitoring/$NAME:$BERGAMOT_VERSION .
-    docker push bergamotmonitoring/$NAME:$BERGAMOT_VERSION
+    ./buildah.sh "bergamotmonitoring/$NAME:$BERGAMOT_VERSION"
+    buildah push "bergamotmonitoring/$NAME:$BERGAMOT_VERSION" "docker://docker.io/bergamotmonitoring/$NAME:$BERGAMOT_VERSION"
     cd ..
 }
 

@@ -22,10 +22,10 @@ popd
 cp ../bergamot-ui/src/main/cfg/template/bergamot-site-config-template.tar.gz ./bergamot-ui/bergamot-site-config-template.tar.gz
 
 # Build containers
-docker_build_app bergamot-agent $BERGAMOT_VERSION
+#build_app bergamot-agent $BERGAMOT_VERSION
 
-docker_build_app bergamot-worker $BERGAMOT_VERSION
-docker_build_app bergamot-notifier $BERGAMOT_VERSION
+#build_app bergamot-worker $BERGAMOT_VERSION
+#build_app bergamot-notifier $BERGAMOT_VERSION
 
-docker_build_app bergamot-ui $BERGAMOT_VERSION
-docker_build_app bergamot-ui-nginx $BERGAMOT_VERSION
+#build_app bergamot-ui $BERGAMOT_VERSION
+#build_app bergamot-ui-nginx $BERGAMOT_VERSION
