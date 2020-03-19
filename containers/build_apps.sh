@@ -24,8 +24,8 @@ cp ../bergamot-ui/src/main/cfg/template/bergamot-site-config-template.tar.gz ./b
 # Build containers
 build_app bergamot-agent $BERGAMOT_VERSION
 
-#build_app bergamot-worker $BERGAMOT_VERSION
-#build_app bergamot-notifier $BERGAMOT_VERSION
+build_app bergamot-worker $BERGAMOT_VERSION
+build_app bergamot-notifier $BERGAMOT_VERSION
 
-#build_app bergamot-ui $BERGAMOT_VERSION
-#build_app bergamot-ui-nginx $BERGAMOT_VERSION
+build_app bergamot-ui $BERGAMOT_VERSION
+build_app bergamot-ui-nginx $BERGAMOT_VERSION
