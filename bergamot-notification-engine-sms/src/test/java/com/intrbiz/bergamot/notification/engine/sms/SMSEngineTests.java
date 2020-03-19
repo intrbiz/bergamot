@@ -28,11 +28,6 @@ public class SMSEngineTests
         cfg.addParameter(new CfgParameter("aws.accessKeyId", "", System.getProperty("aws.accessKeyId")));
         cfg.addParameter(new CfgParameter("aws.secretKey", "", System.getProperty("aws.secretKey")));
         sms.prepare(new NotificationEngineContext() {
-            @Override
-            public Configuration getConfiguration()
-            {
-                return cfg;
-            }
         });
         // our to test number
         String to = System.getProperty("to");

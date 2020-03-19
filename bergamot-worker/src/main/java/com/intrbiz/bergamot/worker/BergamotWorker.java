@@ -212,9 +212,15 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     {
         return new EngineContext() {
             @Override
-            public Configuration getConfiguration()
+            public String getParameter(String name, String defaultValue)
             {
-                return configuration;
+                // Environment variable take preference of system property which takes preference over configuration file
+                String value = Util.coalesceEmpty(
+                    System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')),
+                    System.getProperty(name),
+                    configuration.getStringParameterValue(name, null)
+                );
+                return Util.isEmpty(value) ? defaultValue : value; 
             }
 
             @Override

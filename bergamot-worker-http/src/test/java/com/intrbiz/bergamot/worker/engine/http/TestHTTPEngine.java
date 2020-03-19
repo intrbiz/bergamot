@@ -20,7 +20,6 @@ import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
-import com.intrbiz.configuration.Configuration;
 
 @Ignore
 public class TestHTTPEngine
@@ -37,11 +36,6 @@ public class TestHTTPEngine
         //
         this.engine = new HTTPEngine();
         this.engine.prepare(new EngineContext() {
-            @Override
-            public Configuration getConfiguration()
-            {
-                return new Configuration();
-            }
 
             @Override
             public AgentKeyLookup getAgentKeyLookup()

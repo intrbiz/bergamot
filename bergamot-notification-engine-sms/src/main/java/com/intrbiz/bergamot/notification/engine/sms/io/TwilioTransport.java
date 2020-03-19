@@ -2,9 +2,9 @@ package com.intrbiz.bergamot.notification.engine.sms.io;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.engine.sms.model.SMSMessage;
 import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
-import com.intrbiz.configuration.Configuration;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.rest.api.v2010.account.MessageCreator;
@@ -24,11 +24,11 @@ public class TwilioTransport implements SMSTransport
     }
 
     @Override
-    public void configure(Configuration cfg) throws Exception
+    public void configure(NotificationEngineContext engineContext) throws Exception
     {
         // auth details
-        this.accountSid = cfg.getStringParameterValue("twilio.account", "");
-        this.authToken = cfg.getStringParameterValue("twilio.token", "");
+        this.accountSid = engineContext.getParameter("twilio.account", "");
+        this.authToken = engineContext.getParameter("twilio.token", "");
         logger.info("Using the Twilio account: " + this.accountSid);
         // setup the client
         Twilio.init(this.accountSid, this.authToken);

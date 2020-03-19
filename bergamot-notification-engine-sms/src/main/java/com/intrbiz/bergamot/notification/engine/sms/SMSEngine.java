@@ -23,7 +23,6 @@ import com.intrbiz.bergamot.notification.engine.sms.io.TwilioTransport;
 import com.intrbiz.bergamot.notification.engine.sms.model.SMSMessage;
 import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
 import com.intrbiz.bergamot.notification.template.TemplatedNotificationEngine;
-import com.intrbiz.configuration.Configuration;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 import com.intrbiz.queue.QueueException;
@@ -69,13 +68,12 @@ public class SMSEngine extends TemplatedNotificationEngine
     protected void doPrepare(NotificationEngineContext engineContext) throws Exception
     {
         super.doPrepare(engineContext);
-        Configuration config = engineContext.getConfiguration();
         // from number
-        this.from = config.getStringParameterValue("sms.from", "");
+        this.from = engineContext.getParameter("sms.from", "");
         logger.info("Sending SMS messages from: " + this.from);
         // load our SMS transport
-        this.transport = this.loadTransport(config.getStringParameterValue("sms.transport", "twilio"));
-        this.transport.configure(config);
+        this.transport = this.loadTransport(engineContext.getParameter("sms.transport", "twilio"));
+        this.transport.configure(engineContext);
         logger.info("Using " + this.transport + " to send SMS messages");
     }
 

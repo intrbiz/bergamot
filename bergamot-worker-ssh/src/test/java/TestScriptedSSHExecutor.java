@@ -21,7 +21,6 @@ import com.intrbiz.bergamot.model.message.result.ResultMO;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
-import com.intrbiz.configuration.Configuration;
 
 @Ignore
 public class TestScriptedSSHExecutor
@@ -40,12 +39,7 @@ public class TestScriptedSSHExecutor
     {
         this.engine = new SSHEngine();
         this.engine.prepare(new EngineContext() {
-            @Override
-            public Configuration getConfiguration()
-            {
-                return new Configuration();
-            }
-
+            
             @Override
             public AgentKeyLookup getAgentKeyLookup()
             {

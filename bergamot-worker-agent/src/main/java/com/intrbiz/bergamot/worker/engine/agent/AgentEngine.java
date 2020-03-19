@@ -52,7 +52,7 @@ public class AgentEngine extends AbstractEngine
     public void doPrepare(EngineContext engineContext) throws Exception
     {
         // setup the server
-        int port = engineContext.getConfiguration().getIntParameterValue("agent-port", 15080);
+        int port = engineContext.getIntParameter("agent-port", 15080);
         logger.info("Accepting Bergamot Agent connections on port " + port);
         this.server = new BergamotAgentServer(port, createAgentKeyResolver(engineContext));
     }

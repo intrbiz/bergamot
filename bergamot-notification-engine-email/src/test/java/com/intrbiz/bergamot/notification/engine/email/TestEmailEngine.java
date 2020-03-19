@@ -14,7 +14,6 @@ import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
-import com.intrbiz.configuration.Configuration;
 
 public class TestEmailEngine extends EmailEngine
 {
@@ -25,11 +24,6 @@ public class TestEmailEngine extends EmailEngine
     {
         this.engine = new TestEmailEngine();
         this.engine.prepare(new NotificationEngineContext() {
-            @Override
-            public Configuration getConfiguration()
-            {
-                return new Configuration();
-            }
         });
     }
     

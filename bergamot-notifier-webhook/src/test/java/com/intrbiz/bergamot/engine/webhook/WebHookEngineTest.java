@@ -10,7 +10,6 @@ import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.engine.webhook.WebHookEngine;
-import com.intrbiz.configuration.Configuration;
 
 public class WebHookEngineTest
 {
@@ -20,11 +19,6 @@ public class WebHookEngineTest
         Logger.getRootLogger().setLevel(Level.TRACE);
         WebHookEngine webhook = new WebHookEngine();
         webhook.prepare(new NotificationEngineContext() {
-            @Override
-            public Configuration getConfiguration()
-            {
-                return new Configuration();
-            }
         });
         // our dummy alert
         HostMO host = new HostMO();

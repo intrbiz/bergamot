@@ -29,7 +29,6 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.template.TemplatedNotificationEngine;
-import com.intrbiz.configuration.Configuration;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
 
@@ -68,23 +67,22 @@ public class EmailEngine extends TemplatedNotificationEngine
     protected void doPrepare(NotificationEngineContext engineContext) throws Exception
     {
         super.doPrepare(engineContext);
-        Configuration config = engineContext.getConfiguration();
         // setup the JavaMail properties
         this.properties = new Properties();
-        this.properties.put("mail.smtp.host", config.getStringParameterValue("mail.host", "127.0.0.1"));
-        this.properties.put("mail.smtp.port", config.getStringParameterValue("mail.port", "25"));
-        if (config.getBooleanParameterValue("mail.tls", false))
+        this.properties.put("mail.smtp.host", engineContext.getParameter("mail.host", "127.0.0.1"));
+        this.properties.put("mail.smtp.port", engineContext.getParameter("mail.port", "25"));
+        if (engineContext.getBooleanParameter("mail.tls", false))
         {
-            this.properties.put("mail.smtp.port", config.getStringParameterValue("mail.port", "587"));
+            this.properties.put("mail.smtp.port", engineContext.getParameter("mail.port", "587"));
             this.properties.put("mail.smtp.starttls.enable", true);
             this.properties.put("mail.smtp.auth", true);
         }
-        this.properties.put("mail.smtp.from", config.getStringParameterValue("mail.from", "bergamot@localhost"));
+        this.properties.put("mail.smtp.from", engineContext.getParameter("mail.from", "bergamot@localhost"));
         // auth details
-        this.user = config.getStringParameterValue("mail.user", "");
-        this.password = config.getStringParameterValue("mail.password", "");
+        this.user = engineContext.getParameter("mail.user", "");
+        this.password = engineContext.getParameter("mail.password", "");
         // from address
-        this.fromAddress = config.getStringParameterValue("mail.from", "bergamot@localhost");
+        this.fromAddress = engineContext.getParameter("mail.from", "bergamot@localhost");
         // setup the JavaMail session
         this.session = Session.getDefaultInstance(properties);
         this.session.setDebug(true);

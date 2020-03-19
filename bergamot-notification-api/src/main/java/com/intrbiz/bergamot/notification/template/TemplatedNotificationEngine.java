@@ -9,7 +9,6 @@ import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.template.express.NotificationEngineEntityResolver;
 import com.intrbiz.bergamot.notification.template.express.function.StatusColour;
-import com.intrbiz.configuration.Configuration;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.ExpressExtensionRegistry;
@@ -35,20 +34,20 @@ public abstract class TemplatedNotificationEngine extends AbstractNotificationEn
     protected void doPrepare(NotificationEngineContext engineContext) throws Exception
     {
         // configure our template engine
-        this.configureTemplateEngine(engineContext, engineContext.getConfiguration());
+        this.configureTemplateEngine(engineContext);
     }
     
-    protected void configureTemplateEngine(NotificationEngineContext engineContext, Configuration cfg)
+    protected void configureTemplateEngine(NotificationEngineContext engineContext)
     {
         // register our default express functions
         this.expressExtensions.addFunction("status_colour", StatusColour.class);
         // setup our template loader
         this.templateLoader = new TemplateLoader();
-        String templatePath = cfg.getStringParameterValue("template." + this.getName() + ".path", "/etc/bergamot/notifier/" + this.getName() + "/templates");
+        String templatePath = engineContext.getParameter("template." + this.getName() + ".path", "/etc/bergamot/notifier/" + this.getName() + "/templates");
         logger.info("Prefering templates from " + templatePath);
         this.templateLoader.addSource(new FileTemplateSource(new File(templatePath)));
         this.templateLoader.addSource(new ClassPathTemplateSource("/templates/" + this.getName()));
-        this.templateLoader.setCacheOn(cfg.getBooleanParameterValue("template.cache", true));
+        this.templateLoader.setCacheOn(engineContext.getBooleanParameter("template.cache", true));
     }
 
     public TemplateLoader getTemplateLoader()

@@ -15,9 +15,9 @@ import com.amazonaws.services.sns.model.MessageAttributeValue;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.engine.sms.model.SMSMessage;
 import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
-import com.intrbiz.configuration.Configuration;
 
 public class AWSTransport implements SMSTransport
 {
@@ -33,11 +33,11 @@ public class AWSTransport implements SMSTransport
     }
 
     @Override
-    public void configure(Configuration cfg) throws Exception
+    public void configure(NotificationEngineContext engineContext) throws Exception
     {
         // auth details
-        String awsAccessKeyId = cfg.getStringParameterValue("aws.accessKeyId", null);
-        String awsSecretKey   = cfg.getStringParameterValue("aws.secretKey", null);
+        String awsAccessKeyId = engineContext.getParameter("aws.accessKeyId", null);
+        String awsSecretKey   = engineContext.getParameter("aws.secretKey", null);
         if (Util.isEmpty(awsAccessKeyId) || Util.isEmpty(awsSecretKey))
         {
             this.awsCredentials = new EC2ContainerCredentialsProviderWrapper();
@@ -51,7 +51,7 @@ public class AWSTransport implements SMSTransport
         // setup the client
         this.snsClient = AmazonSNSClientBuilder.standard()
                 .withCredentials(this.awsCredentials)
-                .withRegion(cfg.getStringParameterValue("aws.region", "eu-west-1"))
+                .withRegion(engineContext.getParameter("aws.region", "eu-west-1"))
                 .build();
     }
 

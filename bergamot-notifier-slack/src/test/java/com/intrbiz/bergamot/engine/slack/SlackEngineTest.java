@@ -9,7 +9,6 @@ import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
 import com.intrbiz.bergamot.notification.engine.slack.SlackEngine;
-import com.intrbiz.configuration.Configuration;
 
 public class SlackEngineTest
 {
@@ -19,11 +18,6 @@ public class SlackEngineTest
         Logger.getRootLogger().setLevel(Level.TRACE);
         SlackEngine slack = new SlackEngine();
         slack.prepare(new NotificationEngineContext() {
-            @Override
-            public Configuration getConfiguration()
-            {
-                return new Configuration();
-            }
         });
         // our dummy alert
         SendAlert alert;
