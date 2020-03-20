@@ -62,7 +62,8 @@ containers:
 sync:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: sync
-  script: 
+  script:
+    - 'git checkout $CI_COMMIT_REF_NAME'
     - 'git status'
     - 'git remote add github "https://intrbiz:${GITHUB_PASS}@github.com/intrbiz/bergamot.git"'
-    - 'git push --tags github master'
+    - 'git push --tags github $CI_COMMIT_REF_NAME'
