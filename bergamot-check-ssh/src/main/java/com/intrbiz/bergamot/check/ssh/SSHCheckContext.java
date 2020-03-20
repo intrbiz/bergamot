@@ -53,6 +53,11 @@ public class SSHCheckContext
         return this;
     }
     
+    public SSHCheckContext connect(String username, String host, String port, Consumer<SSHSessionContext> onConnected)
+    {
+        return this.connect(username, host, Integer.parseInt(port), onConnected);
+    }
+    
     public SSHCheckContext connect(String username, String host, int port, Consumer<SSHSessionContext> onConnected)
     {
         try

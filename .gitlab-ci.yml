@@ -16,6 +16,9 @@ build:
   stage: build
   except:
     - tags
+  services:
+    - name: 'docker.io/bergamotmonitoring/bergamot-test-ssh:latest'
+      alias: 'bergamot-test-ssh'
   script: 
     - "mkdir -p $HOME/.m2"
     - "./.settings.sh > $HOME/.m2/settings.xml"
@@ -32,6 +35,9 @@ release:
   stage: build
   only:
     - tags
+  services:
+    - name: 'docker.io/bergamotmonitoring/bergamot-test-ssh:latest'
+      alias: 'bergamot-test-ssh'
   script: 
     - "mkdir -p $HOME/.m2"
     - "./.settings.sh > $HOME/.m2/settings.xml"
