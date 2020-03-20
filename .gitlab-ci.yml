@@ -2,6 +2,7 @@ stages:
   - prep
   - build
   - containers
+  - sync
 
 prep:
   image: 'opensuse/tumbleweed:latest'
@@ -57,3 +58,10 @@ containers:
     - 'zypper -q -n ref && zypper -q -n in buildah'
     - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - 'cd containers && ./build_apps.sh'
+
+sync:
+  image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
+  stage: sync
+  script: 
+    - 'git remote add github "https://intrbiz:${GITHUB_PASS}@github.com/intrbiz/bergamot.git"'
+    - 'git push --tags github master'
