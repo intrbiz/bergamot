@@ -63,5 +63,6 @@ sync:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: sync
   script: 
+    - 'git status'
     - 'git remote add github "https://intrbiz:${GITHUB_PASS}@github.com/intrbiz/bergamot.git"'
     - 'git push --tags github master'
