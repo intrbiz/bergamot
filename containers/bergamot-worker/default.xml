@@ -1,6 +1,6 @@
 <worker>
     <hazelcast-client>
-        <node>bergamot-ui:5701</node>
+        <node>localhost:5701</node>
     </hazelcast-client>
     <logging level="info"/>
     <!-- Agent Configuration -->

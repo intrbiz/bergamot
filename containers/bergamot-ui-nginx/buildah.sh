@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 NAME=$1
 ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
-buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 8080 --workingdir '/opt/bergamot/ui' --entrypoint '/usr/sbin/nginx, -g "daemon off;" -c /etc/nginx/nginx.conf' $ID
+buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 8080 --workingdir '/opt/bergamot/ui' --entrypoint '[ "/usr/sbin/nginx", "-g", "daemon off;", "-c", "/etc/nginx/nginx.conf" ]' --cmd '[]' $ID
 
 # Install nginx
 buildah run $ID zypper -q -n ref 
