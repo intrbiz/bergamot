@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 NAME=$1
 ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
-buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 5701 --port 8090 --port 8081 --workingdir '/opt/bergamot/ui' --entrypoint '["java", "-Dbootstrap.extract=false", "-jar", "bergamot-ui.app"]' $ID
+buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 5701 --port 8090 --port 8081 --workingdir '/opt/bergamot/ui' --cmd '/usr/bin/java' --entrypoint '[ "-Dbootstrap.extract=false", "-jar", "bergamot-ui.app" ]' $ID
 
 # Setup our directories
 buildah run $ID mkdir -p /etc/bergamot/ui
