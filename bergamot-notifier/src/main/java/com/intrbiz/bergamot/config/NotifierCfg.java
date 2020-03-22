@@ -11,10 +11,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.intrbiz.configuration.Configuration;
-import com.intrbiz.util.uuid.UUIDAdapter;
 
 @XmlType(name = "notifier")
 @XmlRootElement(name = "notifier")
@@ -40,7 +38,6 @@ public class NotifierCfg extends Configuration
     }
     
     @XmlAttribute(name = "site")
-    @XmlJavaTypeAdapter(UUIDAdapter.class)
     public String getSite()
     {
         return site;
