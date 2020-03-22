@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 NAME=$1
 ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
-buildah config --author='Chris Ellis <chris@intrbiz.com>' --workingdir '/opt/bergamot/agent' --entrypoint '[ "/usr/bin/java" ]' --cmd '[ "-Dbootstrap.extract=false", "-jar", "bergamot-agent.app" ]' $ID
+buildah config --author='Chris Ellis <chris@intrbiz.com>' --workingdir '/opt/bergamot/agent' --cmd '/usr/bin/java "-Dbootstrap.extract=false" "-jar" "bergamot-agent.app"' $ID
 
 # Setup our directories
 buildah run $ID mkdir -p /opt/bergamot/agent
