@@ -4,6 +4,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 
 import java.net.SocketAddress;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,7 +50,10 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
@@ -57,6 +61,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 
 
@@ -67,6 +72,22 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     private static final Logger logger = Logger.getLogger(BergamotAgentServerHandler.class);
 
     private static final String WEBSOCKET_PATH = "/agent";
+    
+    private static final String HEALTH_CHECK = "/health";
+    
+    private static final String HEALTH_CHECK_ALIVE = HEALTH_CHECK + "/alive";
+    
+    private static final String HEALTH_CHECK_READY = HEALTH_CHECK + "/ready";
+    
+    private static final Charset UTF8 = Charset.forName("UTF8");
+    
+    private static final String TEXT_PLAIN = "text/plain; charset=utf-8";
+    
+    private static final byte[] ALIVE_CONTENT = "OK\r\n".getBytes(UTF8);
+    
+    private static final byte[] UNKNOWN_CONTENT = "Unknown Healthcheck\r\n".getBytes(UTF8);
+    
+    private static final AsciiString SERVER_NAME = AsciiString.cached("Bergamot Agent Server");
     
     private final BergamotAgentServer server;
 
@@ -205,6 +226,17 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
         }
+        // Health check end point
+        String path = req.uri();
+        if (path != null && path.startsWith(HEALTH_CHECK))
+        {
+            // handle this health request
+            DefaultFullHttpResponse response = this.handleHealthCheck(req);
+            // send the response
+            ctx.writeAndFlush(response)
+                .addListener(ChannelFutureListener.CLOSE);
+            return;
+        }
         // authenticate the client
         this.authenticated = this.authenticateAgent(req);
         if (this.authenticated)
@@ -234,6 +266,38 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             logger.warn("Failed to authenticate agent connection from " + this.remoteAddress + " possible agent id " + this.agentId);
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
         }
+    }
+    
+    protected DefaultFullHttpResponse handleHealthCheck(FullHttpRequest request) throws Exception {
+        switch (request.uri()) {
+            case HEALTH_CHECK_ALIVE:
+                return this.handleAlive(request);
+            case HEALTH_CHECK_READY:
+                return this.handleReady(request);
+        }
+        return this.handleUnknown(request);
+    }
+    
+    protected DefaultFullHttpResponse handleAlive(FullHttpRequest request) throws Exception {
+        return this.buildResponse(HttpResponseStatus.OK, Unpooled.wrappedBuffer(ALIVE_CONTENT));
+    }
+    
+    protected DefaultFullHttpResponse handleReady(FullHttpRequest request) throws Exception {
+        // Currently ready is the same as alive
+        return this.handleAlive(request);
+    }
+    
+    protected DefaultFullHttpResponse handleUnknown(FullHttpRequest request) throws Exception {
+        return this.buildResponse(HttpResponseStatus.NOT_FOUND, Unpooled.wrappedBuffer(UNKNOWN_CONTENT));
+    }
+    
+    protected DefaultFullHttpResponse buildResponse(HttpResponseStatus status, ByteBuf content) throws Exception {
+        DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status, content, false, false);
+        response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+        response.headers().set(HttpHeaderNames.SERVER, SERVER_NAME);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, TEXT_PLAIN);
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+        return response;
     }
     
     private boolean authenticateAgent(FullHttpRequest req) throws Exception
