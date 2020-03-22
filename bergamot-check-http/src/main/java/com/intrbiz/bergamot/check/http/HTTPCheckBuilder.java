@@ -20,9 +20,12 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.util.AsciiString;
 import io.netty.util.CharsetUtil;
 
 /**
@@ -64,7 +67,7 @@ public abstract class HTTPCheckBuilder
     
     private String password;
     
-    private String contentType;
+    private AsciiString contentType;
     
     private String content;
     
@@ -338,28 +341,28 @@ public abstract class HTTPCheckBuilder
     
     public HTTPCheckBuilder content(String contentType, String content)
     {
-        this.contentType = contentType;
+        this.contentType = AsciiString.of(contentType);
         this.content = content;
         return this;
     }
     
     public HTTPCheckBuilder contentJSON(String content)
     {
-        this.contentType = HttpHeaders.Values.APPLICATION_JSON;
+        this.contentType = HttpHeaderValues.APPLICATION_JSON;
         this.content = content;
         return this;
     }
     
     public HTTPCheckBuilder contentFormData(String content)
     {
-        this.contentType = HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+        this.contentType = HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
         this.content = content;
         return this;
     }
     
     public HTTPCheckBuilder contentFormData(Map<String, String> content)
     {
-        this.contentType = HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
+        this.contentType = HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
         StringBuilder contentStr = new StringBuilder();
         boolean ns = false;
         for (Entry<String, String> entry : content.entrySet())
@@ -410,27 +413,27 @@ public abstract class HTTPCheckBuilder
         // build the request
         FullHttpRequest request = new DefaultFullHttpRequest(this.version, this.method, this.path, content);
         // default to connection close
-        request.headers().add(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+        request.headers().add(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
         // virtual host
-        if (this.port == 80 || this.port == 443) request.headers().add(HttpHeaders.Names.HOST, this.virtualHost);
-        else request.headers().add(HttpHeaders.Names.HOST, this.virtualHost + ":" + this.port);
+        if (this.port == 80 || this.port == 443) request.headers().add(HttpHeaderNames.HOST, this.virtualHost);
+        else request.headers().add(HttpHeaderNames.HOST, this.virtualHost + ":" + this.port);
         // user agent
-        request.headers().add(HttpHeaders.Names.USER_AGENT, "Bergamot Monitoring Check HTTP 1.0.0");
+        request.headers().add(HttpHeaderNames.USER_AGENT, "Bergamot Monitoring Check HTTP 1.0.0");
         // Content Type
         if (this.contentType != null)
         {
-            request.headers().add(HttpHeaders.Names.CONTENT_TYPE, this.contentType);
+            request.headers().add(HttpHeaderNames.CONTENT_TYPE, this.contentType);
         }
         // Content Length
         if (this.content != null)
         {
-            request.headers().add(HttpHeaders.Names.CONTENT_LENGTH, request.content().readableBytes());
+            request.headers().add(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
         }
         // HTTP auth
         if (! Util.isEmpty(this.username))
         {
             String encodedCredentials = new String(Base64.getEncoder().encode((this.username + ":" + Util.coalesce(this.password, "")).getBytes(Util.UTF8)), Util.UTF8);
-            request.headers().add(HttpHeaders.Names.AUTHORIZATION, "Basic " + encodedCredentials);
+            request.headers().add(HttpHeaderNames.AUTHORIZATION, "Basic " + encodedCredentials);
         }
         // add headers
         for (Entry<String, String> e : this.headers)

@@ -53,7 +53,7 @@ public class HTTPCheckResponse
     
     public int status()
     {
-        return this.getResponse().getStatus().code();
+        return this.getResponse().status().code();
     }
     
     public String content()
@@ -82,6 +82,6 @@ public class HTTPCheckResponse
 
     public String toString()
     {
-        return "http-check-response { runtime: " + this.runtime + "ms, status: " + this.response.getStatus() + " }" + (this.tlsInfo == null ? "" : "\n" + this.tlsInfo.toString());
+        return "http-check-response { runtime: " + this.runtime + "ms, status: " + this.response.status() + " }" + (this.tlsInfo == null ? "" : "\n" + this.tlsInfo.toString());
     }
 }

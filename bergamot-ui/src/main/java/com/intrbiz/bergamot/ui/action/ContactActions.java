@@ -7,17 +7,19 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.accounting.Accounting;
+import com.intrbiz.balsa.action.BalsaAction;
 import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Contact.LockOutReason;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
+import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Action;
 
-public class ContactActions
+public class ContactActions implements BalsaAction<BergamotApp>
 {
     private Logger logger = Logger.getLogger(ContactActions.class);
     
@@ -58,7 +60,7 @@ public class ContactActions
             }
             // send a notification, only via email
             PasswordResetNotification resetNotification = new PasswordResetNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url);
-            // TODO: this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), resetNotification);
+            app().getProcessor().getNotifierCoordinator().sendNotification(resetNotification);
             logger.info("Sent password reset for contact " + contact.getSite().getName() + "::" + contact.getName() + " (" + contact.getId() + ")");
             // accounting
             this.accounting.account(new SendNotificationAccountingEvent(contact.getSiteId(), resetNotification.getId(), contact.getId(), AccountingNotificationType.RESET, resetNotification.getTo().size(), 0, null));

@@ -12,7 +12,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -68,17 +67,7 @@ public class HTTPChecker
         // timer
         this.timer = new Timer();
         // some util timer tasks
-        // log some GC stats
-        this.timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run()
-            {
-                Runtime rt = Runtime.getRuntime();
-                logger.info("Memory: " + rt.freeMemory() + " free of " + rt.totalMemory() + " committed of " + rt.maxMemory() + " max");
-            }
-        }, 60_000L, 60_000L);
-        // every 5 minutes forcefully purge the timer queue
-        // we cancel most task (hopefully)
+        // purge the timer queue we cancel most task (hopefully)
         this.timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run()
@@ -86,15 +75,7 @@ public class HTTPChecker
                 // purge the timer queue
                 HTTPChecker.this.timer.purge();
             }
-        }, 300_000L, 300_000L);
-        // force a GC?
-        this.timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run()
-            {
-                System.gc();
-            }
-        }, 120_000L, 120_000L);
+        }, 180_000L, 180_000L);
     }
 
     public HTTPChecker()
@@ -208,7 +189,7 @@ public class HTTPChecker
     )
     {
         // build the url
-        String url = (ssl ? "https" : "http") + "://" + host + (port > 0 ? ":" + port : "") + "" + request.getUri();
+        String url = (ssl ? "https" : "http") + "://" + host + (port > 0 ? ":" + port : "") + "" + request.uri();
         // configure the client
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
@@ -240,7 +221,7 @@ public class HTTPChecker
             public void operationComplete(ChannelFuture future) throws Exception
             {
                 if (logger.isTraceEnabled()) 
-                    logger.trace("Connection to " + host + ":" + port + " " + HttpHeaders.getHeader(request, "Host"));
+                    logger.trace("Connection to " + host + ":" + port + " " + request.headers().get("Host"));
                 if (future.isDone() && (!future.isSuccess()))
                 {
                     if (errorHandler != null)

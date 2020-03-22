@@ -58,7 +58,7 @@ public class HTTPClientHandler extends ChannelInboundHandlerAdapter
         {
             FullHttpResponse response = (FullHttpResponse) msg;
             long runtime = System.currentTimeMillis() - this.start;
-            logger.debug("Got HTTP response: " + response.getStatus() + " in: " + runtime + "ms");
+            logger.debug("Got HTTP response: " + response.status() + " in: " + runtime + "ms");
             if (logger.isTraceEnabled()) logger.trace("Response:\n" + response);
             // cancel the timeout
             if (this.timeoutTask != null) this.timeoutTask.cancel();
