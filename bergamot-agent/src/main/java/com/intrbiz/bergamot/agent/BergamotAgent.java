@@ -96,6 +96,8 @@ public class BergamotAgent
     
     private ConcurrentMap<Class<?>, AgentHandler> handlers = new ConcurrentHashMap<Class<?>, AgentHandler>();
     
+    private SSLContext sslContext;
+    
     private AgentHandler defaultHandler;
     
     private volatile Channel channel;
@@ -113,10 +115,17 @@ public class BergamotAgent
     public BergamotAgent()
     {
         super();
+        // Create our SSL context
+        try
+        {
+            this.sslContext = SSLContext.getDefault();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new RuntimeException("Failed to create default SSLContext", e);
+        }
+        // background GC task, we want to deliberately keep memory to a minimum
         this.timer = new Timer();
-        // background GC task
-        // we want to deliberately 
-        // keep memory to a minimum
         this.timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run()
@@ -271,16 +280,11 @@ public class BergamotAgent
     }
     
     private SSLEngine createSSLEngine(String host, int port)
-    {
-        try
-        {
-            return SSLContext.getDefault().createSSLEngine();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            logger.error("Failed to create default SSLContext", e);
-        }
-        return null;
+    {        
+        SSLEngine sslEngine = this.sslContext.createSSLEngine(host, port);
+        sslEngine.setUseClientMode(true);
+        sslEngine.setNeedClientAuth(false);
+        return sslEngine;
     }
     
     public void registerHandler(AgentHandler handler)
@@ -338,6 +342,7 @@ public class BergamotAgent
     private void connect()
     {
         final SSLEngine engine = isSecure() ? createSSLEngine(this.server.getHost(), (this.server.getPort() <= 0 ? 443 : this.server.getPort())) : null;
+        
         // configure the client
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);
