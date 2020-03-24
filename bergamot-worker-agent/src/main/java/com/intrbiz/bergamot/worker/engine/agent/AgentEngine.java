@@ -86,7 +86,7 @@ public class AgentEngine extends AbstractEngine
             // Offer a register message
             if (! Util.isEmpty(agent.getAgentTemplateName()))
             {
-                engineContext.getAgentEventQueue().offer(new AgentRegister(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentTemplateName()));
+                engineContext.getAgentEventQueue().offer(new AgentRegister(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentHostSummary(), agent.getAgentAddress(), agent.getAgentTemplateName()));
             }
         });
         this.server.setOnAgentDisconnectHandler((agent) -> {

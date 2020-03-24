@@ -26,6 +26,12 @@ public class AgentRegister extends AgentEvent
     @JsonProperty("agent_name")
     private String agentName;
     
+    @JsonProperty("agent_summary")
+    private String agentSummary;
+    
+    @JsonProperty("agent_address")
+    private String agentAddress;
+    
     @JsonProperty("template_name")
     private String templateName;
     
@@ -34,13 +40,15 @@ public class AgentRegister extends AgentEvent
         super();
     }
 
-    public AgentRegister(UUID siteId, UUID agentId, UUID keyId, String agentName, String templateName)
+    public AgentRegister(UUID siteId, UUID agentId, UUID keyId, String agentName, String agentSummary, String agentAddress, String templateName)
     {
         super();
         this.siteId = Objects.requireNonNull(siteId);
         this.agentId = Objects.requireNonNull(agentId);
         this.keyId = Objects.requireNonNull(keyId);
         this.agentName = Objects.requireNonNull(agentName);
+        this.agentSummary = agentSummary;
+        this.agentAddress = agentAddress;
         this.templateName = Objects.requireNonNull(templateName);
     }
 
@@ -82,6 +90,26 @@ public class AgentRegister extends AgentEvent
     public void setAgentName(String agentName)
     {
         this.agentName = agentName;
+    }
+
+    public String getAgentSummary()
+    {
+        return this.agentSummary;
+    }
+
+    public void setAgentSummary(String agentSummary)
+    {
+        this.agentSummary = agentSummary;
+    }
+
+    public String getAgentAddress()
+    {
+        return this.agentAddress;
+    }
+
+    public void setAgentAddress(String agentAddress)
+    {
+        this.agentAddress = agentAddress;
     }
 
     public String getTemplateName()

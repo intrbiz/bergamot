@@ -41,6 +41,8 @@ public abstract class AgentClientHandler extends SimpleChannelInboundHandler<Obj
     
     private final String hostName;
     
+    private final String hostSummary;
+    
     private final String templateName;
     
     private final AgentAuthenticationKey key;
@@ -51,13 +53,14 @@ public abstract class AgentClientHandler extends SimpleChannelInboundHandler<Obj
     
     private WebSocketClientHandshaker handshaker;
 
-    public AgentClientHandler(Timer timer, URI server, UUID agentId, String hostName, String templateName, AgentAuthenticationKey key)
+    public AgentClientHandler(Timer timer, URI server, UUID agentId, String hostName, String hostSummary, String templateName, AgentAuthenticationKey key)
     {
         super();
         this.timer = timer;
         this.server = server;
         this.agentId = agentId;
         this.hostName = hostName;
+        this.hostSummary = hostSummary;
         this.templateName = templateName;
         this.key = key;
     }
@@ -75,6 +78,7 @@ public abstract class AgentClientHandler extends SimpleChannelInboundHandler<Obj
         headers.set(HttpHeaderNames.USER_AGENT, BergamotAgent.AGENT_VENDOR + "(" + BergamotAgent.AGENT_PRODUCT + ")/" + BergamotAgent.AGENT_VERSION);
         headers.set(AgentHTTPHeaderNames.AGENT_ID, this.agentId.toString());
         headers.set(AgentHTTPHeaderNames.HOST_NAME, this.hostName);
+        headers.set(AgentHTTPHeaderNames.HOST_SUMMARY, this.hostSummary);
         if (! AgentUtil.isEmpty(this.templateName)) headers.set(AgentHTTPHeaderNames.TEMPLATE_NAME, this.templateName);
         headers.set(AgentHTTPHeaderNames.KEY_ID, this.key.getId().toString());
         headers.set(AgentHTTPHeaderNames.TIMESTAMP, timestamp);

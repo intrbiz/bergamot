@@ -6,6 +6,8 @@ public final class AgentHTTPHeaderNames
     
     public static final String HOST_NAME = "x-bergamot-host-name";
     
+    public static final String HOST_SUMMARY = "x-bergamot-host-summary";
+    
     public static final String TEMPLATE_NAME = "x-bergamot-template-name";
     
     public static final String TIMESTAMP = "x-bergamot-timestamp";

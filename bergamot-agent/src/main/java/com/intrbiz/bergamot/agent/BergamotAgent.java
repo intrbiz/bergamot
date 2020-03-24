@@ -86,6 +86,8 @@ public class BergamotAgent
     
     private String hostName;
     
+    private String hostSummary;
+    
     private String templateName;
     
     private AgentAuthenticationKey key;
@@ -184,6 +186,7 @@ public class BergamotAgent
         // Configure agent details
         this.configureAgentId();
         this.configureAgentHostName();
+        this.configureAgentHostSummary();
         this.configureAgentTemplateName();
         // Configure authentication
         this.configureAgentKey();
@@ -194,10 +197,20 @@ public class BergamotAgent
         this.eventLoop = new NioEventLoopGroup(1);
     }
     
-    private String getProperty(String propertyName, boolean required) throws Exception
+    private static String getProperty(String propertyName, boolean required)
+    {
+        return getProperty(propertyName, null, required);
+    }
+    
+    private static String getProperty(String propertyName, String defaultValue)
+    {
+        return getProperty(propertyName, defaultValue, false);
+    }
+    
+    private static String getProperty(String propertyName, String defaultValue, boolean required)
     {
         String envVarName = propertyName.toUpperCase().replace('.', '_');
-        String value = AgentUtil.coalesce(System.getProperty(propertyName), System.getenv(envVarName));
+        String value = AgentUtil.coalesce(System.getProperty(propertyName), System.getenv(envVarName), defaultValue);
         if (AgentUtil.isEmpty(value) && required) {
            throw new RuntimeException("Could not find configuration value for property " + propertyName + " (ENV[" + envVarName + "])");
         }
@@ -232,6 +245,11 @@ public class BergamotAgent
         {
             this.agentId = UUID.fromString(agentId);
         }
+    }
+    
+    private void configureAgentHostSummary() throws Exception
+    {
+        this.hostSummary = getProperty("bergamot.agent.host.summary", false);
     }
     
     private void configureAgentHostName() throws Exception
@@ -360,7 +378,7 @@ public class BergamotAgent
                 if (engine != null) pipeline.addLast("ssl", new SslHandler(engine));
                 pipeline.addLast("codec",         new HttpClientCodec()); 
                 pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
-                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.agentId, BergamotAgent.this.hostName, BergamotAgent.this.templateName, BergamotAgent.this.key)
+                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.agentId, BergamotAgent.this.hostName, BergamotAgent.this.hostSummary, BergamotAgent.this.templateName, BergamotAgent.this.key)
                 {
                     @Override
                     protected AgentMessage processAgentMessage(final ChannelHandlerContext ctx, final AgentMessage request)
@@ -475,12 +493,12 @@ public class BergamotAgent
     
     private static void configureLogging() throws Exception
     {
-        String logging = System.getProperty("bergamot.logging", "console");
+        String logging = getProperty("bergamot.logging", "console");
         if ("console".equals(logging))
         {
             // configure logging to terminal
             BasicConfigurator.configure();
-            Logger.getRootLogger().setLevel(Level.toLevel(System.getProperty("bergamot.logging.level", "info").toUpperCase()));
+            Logger.getRootLogger().setLevel(Level.toLevel(getProperty("bergamot.logging.level", "info").toUpperCase()));
         }
         else
         {

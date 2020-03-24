@@ -42,7 +42,7 @@ public class ExecHandler extends AbstractAgentHandler
         //
         ExecStat stat = new ExecStat(request);
         //
-        if (Boolean.getBoolean("bergamot.agent.no-exec"))
+        if (Boolean.getBoolean("bergamot.agent.no-exec") || "true".equals(System.getenv("BERGAMOT_AGENT_NO_EXEC")))
         {
             logger.error("Cannot execute check, administratively disabled!");
             stat.error("Cannot execute check, administratively disabled!");

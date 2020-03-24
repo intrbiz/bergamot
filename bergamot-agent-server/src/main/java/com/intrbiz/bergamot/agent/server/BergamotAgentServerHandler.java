@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.agent.server;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.*;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -115,6 +116,8 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     
     private String agentHostName;
     
+    private String agentHostSummary;
+    
     private String agentTemplateName;
     
     private long authenticationTimestamp;
@@ -156,6 +159,16 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     public String getAgentHostName()
     {
         return this.agentHostName;
+    }
+
+    public String getAgentHostSummary()
+    {
+        return this.agentHostSummary;
+    }
+
+    public String getAgentAddress()
+    {
+        return ((InetSocketAddress) this.channel.remoteAddress()).getAddress().getHostAddress();
     }
 
     public String getAgentTemplateName()
@@ -308,6 +321,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             this.agentUserAgent = Util.coalesce(req.headers().get(HttpHeaderNames.USER_AGENT), "Unknown");
             this.agentId = UUID.fromString(requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.AGENT_ID), "agent id"));
             this.agentHostName = requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.HOST_NAME), "agent host name");
+            this.agentHostSummary = req.headers().get(AgentHTTPHeaderNames.HOST_SUMMARY);
             this.agentTemplateName = req.headers().get(AgentHTTPHeaderNames.TEMPLATE_NAME);
             this.authenticationTimestamp = Long.parseLong(requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.TIMESTAMP), "authentication timestamp"));
             this.agentKeyId = UUID.fromString(requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.KEY_ID), "key id"));

@@ -1,6 +1,8 @@
 package com.intrbiz.bergamot.agent;
 
 import java.sql.Timestamp;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -109,15 +111,26 @@ public class AgentRegistrationService
                 logger.warn("Failed to register agent " + agent.getSiteId() + "::" + agent.getAgentId() + " as site is disabled");
                 return;
             }
-            // Is the template name valid
-            Config templateCfg = db.getConfigByName(agent.getSiteId(), "host", agent.getTemplateName());
-            if (templateCfg == null)
+            // Resolve all templates
+            List<HostCfg> templateCfgs = new LinkedList<>();
+            for (String templateName : agent.getTemplateName().split(","))
             {
-                logger.warn("Failed to register agent " + agent.getSiteId() + "::" + agent.getAgentId() + " as no such template " + agent.getTemplateName() + " exists");
+                Config templateCfg = db.getConfigByName(agent.getSiteId(), "host", templateName.trim());
+                if (templateCfg != null)
+                {
+                    templateCfgs.add((HostCfg) templateCfg.getConfiguration());
+                }
+                else
+                {
+                    // TODO: raise a notification in this instance
+                }
+            }
+            if (templateCfgs.isEmpty())
+            {
+                logger.warn("Failed to register agent " + agent.getSiteId() + "::" + agent.getAgentId() + " as no such templates " + agent.getTemplateName() + " exists");
                 // TODO: raise a notification in this instance
                 return;
             }
-            HostCfg template = (HostCfg) templateCfg.getConfiguration();
             // create the configuration change
             BergamotCfg changeCfg = new BergamotCfg();
             changeCfg.setSite(site.getName());
@@ -126,15 +139,12 @@ public class AgentRegistrationService
             HostCfg host = new HostCfg();
             host.setAgentId(agent.getAgentId());
             host.setName(agent.getAgentName());
-            if (! Util.isEmpty(template.getSummary()))
+            host.setSummary(Util.coalesceEmpty(agent.getAgentSummary(), agent.getAgentName()));
+            host.setAddress(agent.getAgentAddress());
+            for (HostCfg templateCfg : templateCfgs)
             {
-                host.setSummary(agent.getAgentName() + " (" + template.getSummary() + ")");
+                host.getInheritedTemplates().add(templateCfg.getName());
             }
-            else
-            {
-                host.setSummary(agent.getAgentName());
-            }
-            host.getInheritedTemplates().add(template.getName());
             changeCfg.addObject(host);
             // log the config change
             ConfigChange change = new ConfigChange(site.getId(), null, changeCfg);
@@ -157,7 +167,7 @@ public class AgentRegistrationService
                 {
                     logger.warn("Failed to auto register agent " + agent.getSiteId() + "::" + agent.getAgentId() + ", the configuration import failed");
                     // keep the config change, it can be manually applied later
-                    // TODO: raise a notification in this instance    
+                    // TODO: raise a notification in this instance
                 }
             }
             else
