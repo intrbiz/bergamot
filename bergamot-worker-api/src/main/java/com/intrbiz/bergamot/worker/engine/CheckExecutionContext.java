@@ -1,10 +1,10 @@
 package com.intrbiz.bergamot.worker.engine;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.PassiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.gerald.polyakov.Reading;
 
 /**
@@ -15,31 +15,31 @@ public interface CheckExecutionContext
     /**
      * Publish a result
      */
-    void publishResult(ResultMO resultMO);
+    void publishResult(ResultMessage result);
     
     /**
      * Publish an active result for the given check
      * @param resultMO the active result
      */
-    default void publishActiveResult(ActiveResultMO resultMO)
+    default void publishActiveResult(ActiveResult result)
     {
-        this.publishResult(resultMO);
+        this.publishResult(result);
     }
     
     /**
      * Publish a passive result for a check of the given site
      * @param resultMO the passive result
      */
-    default void publishPassiveResult(PassiveResultMO resultMO)
+    default void publishPassiveResult(PassiveResult result)
     {
-        this.publishResult(resultMO);
+        this.publishResult(result);
     }
     
     /**
      * Publish a readings
      * @param readingParcelMO the readings all parcelled up and addressed
      */
-    void publishReading(ReadingParcelMO readingParcelMO);
+    void publishReading(ReadingParcelMO reading);
     
     /**
      * Publish the given readings for the given check execution

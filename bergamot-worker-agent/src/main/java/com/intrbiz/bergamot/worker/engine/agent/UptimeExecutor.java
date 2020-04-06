@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
@@ -63,7 +63,7 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
                     long critical = executeCheck.getLongParameter("critical", TimeUnit.MINUTES.toSeconds(5));
                     long warning  = executeCheck.getLongParameter("warning",  TimeUnit.MINUTES.toSeconds(10));
                     // the result
-                    ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
+                    ActiveResult result = new ActiveResult().fromCheck(executeCheck);
                     // apply the check
                     if (stat.getUptime() <= warning)
                     {
@@ -87,12 +87,12 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
     

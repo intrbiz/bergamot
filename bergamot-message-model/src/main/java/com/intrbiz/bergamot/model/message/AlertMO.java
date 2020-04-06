@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.alert")
 public class AlertMO extends MessageObject implements CommentedMO
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The alert id
      */

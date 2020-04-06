@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.auth_token")
 public class AuthTokenMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("token")
     private String token;
     

@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.worker.engine.dummy;
 
 import java.util.Calendar;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.bergamot.timerange.TimeRangeParser;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
@@ -30,7 +30,7 @@ public class TimedExecutor extends AbstractExecutor<DummyEngine>
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         long start = System.nanoTime();
-        ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
+        ActiveResult result = new ActiveResult().fromCheck(executeCheck);
         String output = executeCheck.getParameter("output", "");
         // parse time ranges
         TimeRange warning = TimeRangeParser.parseTimeRange(executeCheck.getParameter("warning", "01:00-02:00, 05:00-06:00, 08:00-09:00, 11:00-12:00, 14:00-15:00, 17:00-18:00, 20:00-21:00, 23:00-24:00"));

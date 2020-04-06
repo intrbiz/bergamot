@@ -10,9 +10,9 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIOInfo;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
@@ -74,7 +74,7 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
                     double critical = executeCheck.getDoubleParameter("critical", 250);
                     // apply the check
                     boolean peak = executeCheck.getBooleanParameter("peak", false);
-                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyThresholds(
+                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyThresholds(
                             stat.getDisks(),
                             (v, t) -> (peak ? v.getFiveMinuteRate().getReadPeakRateMBps(): v.getFiveMinuteRate().getReadRateMBps()) > t || (peak ? v.getFiveMinuteRate().getWritePeakRateMBps(): v.getFiveMinuteRate().getWriteRateMBps()) > t,
                             warning, 
@@ -104,12 +104,12 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
 }

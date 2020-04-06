@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.notification_engine")
 public class NotificationEngineMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("enabled")
     private boolean enabled = true;
 

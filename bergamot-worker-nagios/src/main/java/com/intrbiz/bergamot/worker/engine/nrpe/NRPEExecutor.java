@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
@@ -72,7 +72,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             this.getEngine().getPoller().command(
                 host, 5666, 5,  60, 
                 (response) -> {
-                    ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+                    ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
                     resultMO.setOk(response.toOk());
                     resultMO.setStatus(response.toStatus());
                     resultMO.setOutput(response.getOutput());
@@ -91,7 +91,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                 (exception) -> {
                     tctx.stop();
                     failedRequests.inc();
-                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(exception));
+                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(exception));
                 },
                 command,
                 args
@@ -102,7 +102,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
             logger.error("Failed to execute NRPE check", e);
             tctx.stop();
             this.failedRequests.inc();
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }        
     }
 }

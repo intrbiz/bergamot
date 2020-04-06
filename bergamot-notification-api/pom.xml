@@ -38,5 +38,9 @@
     	<groupId>com.intrbiz.accounting</groupId>
     	<artifactId>accounting</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.gerald</groupId>
+    	<artifactId>gerald-witchcraft</artifactId>
+    </dependency>
   </dependencies>
 </project>

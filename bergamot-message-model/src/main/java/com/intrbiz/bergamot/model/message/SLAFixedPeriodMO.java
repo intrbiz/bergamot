@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.sla.fixed-period")
 public class SLAFixedPeriodMO extends SLAPeriodMO
 {   
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("start")
     private Date start;
     

@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.result.matcher;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostName;
-import com.intrbiz.bergamot.model.message.result.MatchableMO;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostName;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchableMO;
 
 public class HostNameMatcher implements Matcher<MatchOnHostName>
 {

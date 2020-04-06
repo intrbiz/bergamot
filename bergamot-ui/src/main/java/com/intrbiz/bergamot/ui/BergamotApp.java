@@ -1,22 +1,18 @@
 package com.intrbiz.bergamot.ui;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
-import com.intrbiz.balsa.util.Util;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
-import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
-import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
-import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
-import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerClusterCoordinator;
-import com.intrbiz.bergamot.cluster.util.HazelcastFactory;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.processor.BergamotProcessor;
@@ -125,17 +121,15 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         
         public static final class COMPONENTS
         {
-        
             public static final String JS = "v1.6.0";
             
             public static final String CSS = "v1.7.4";
-        
         }
     }
     
-    private UICfg config;
+    public static final String DAEMON_NAME = "bergamot-ui";
     
-    private HazelcastFactory hazelcast;
+    private UICfg config;
     
     private BergamotProcessor processor;
     
@@ -157,31 +151,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     {
         return this.processor;
     }
-    
-    public WorkerClusterCoordinator getWorkerCoordinator()
-    {
-        return processor.getWorkerCoordinator();
-    }
-
-    public ProcessingPoolClusterCoordinator getProcessingPoolCoordinator()
-    {
-        return processor.getProcessingPoolCoordinator();
-    }
-
-    public SiteEventTopic getSiteEventBroker()
-    {
-        return this.processor.getSiteEventTopic();
-    }
-    
-    public SiteNotificationTopic getNotificationBroker()
-    {
-        return this.processor.getNotificationTopic();
-    }
-    
-    public SiteUpdateTopic getUpdateBroker()
-    {
-        return this.processor.getUpdateTopic();
-    }
 
     public UpdateServer getUpdateServer()
     {
@@ -198,6 +167,19 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     public UICfg getConfiguration()
     {
         return this.config;
+    }
+    
+    protected String getHostName()
+    {
+        try
+        {
+            return Util.coalesceEmpty(System.getenv("HOSTNAME"), System.getProperty("host.name"), InetAddress.getLocalHost().getHostName());
+        }
+        catch (UnknownHostException e)
+        {
+            logger.warn("Failed to get node host name", e);
+        }
+        return null;
     }
     
     /**
@@ -226,7 +208,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     protected void setupEngines() throws Exception
     {
         // setup data manager
-        logger.info("Setting up PostgreSQL");
         DataManager.getInstance().registerDefaultServer(
             DatabasePool.Default.with()
                 .postgresql()
@@ -241,11 +222,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         // TODO: Don't bother sending metric yet
         // Setup Gerald - Service name: Bergamot.UI, send every minute
         // Gerald.theMole().from(this.getInstanceName()).period(1, TimeUnit.MINUTES);
-        // Hazelcast factory
-        this.hazelcast = new HazelcastFactory();
-        this.hazelcast.configure(this.getInstanceName());
         // session engine
-        sessionEngine(new HazelcastSessionEngine(this.hazelcast::getHazelcastInstance));
+        sessionEngine(new HazelcastSessionEngine((instanceName) -> this.processor.getHazelcast()));
         // task engine
         /*
          * TODO: disable the shared task engine as we are getting issues with 
@@ -387,19 +365,17 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         {
             logger.info("Database module: " + db.getName() + " " + db.getVersion());
         }
-        // Start Hazelcast
-        this.hazelcast.start();
+        // Connect to ZooKeeper and start Hazelcast
+        this.processor = new BergamotProcessor(this.config.getCluster(), this::clusterPanic, DAEMON_NAME, VERSION.NAME + " " + VERSION.NUMBER, this.getHostName());
         // Setup the database cache
         System.out.println("Setting up Hazelcast cache");
-        DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(this.hazelcast.getHazelcastInstance()));
+        DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(this.processor.getHazelcast()));
         DataManager.get().registerDefaultCacheProvider(DataManager.get().cacheProvider("hazelcast"));
     }
     
     @Override
     protected void startApplication() throws Exception
     {
-        // Start our cluster components
-        this.processor = new BergamotProcessor(this.hazelcast.getHazelcastInstance());
         // start the processor
         logger.info("Starting processor");
         this.processor.start();
@@ -409,12 +385,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         // Gerald.theMole().start();
     }
     
-    @Override
-    protected void startApplicationLate() throws Exception
+    protected void clusterPanic(Void v)
     {
-        logger.info("Initing all sites");
-        this.processor.initAllSites();
-        logger.info("Application startup finished");
+        // TODO
     }
 
     public static void main(String[] args) throws Exception

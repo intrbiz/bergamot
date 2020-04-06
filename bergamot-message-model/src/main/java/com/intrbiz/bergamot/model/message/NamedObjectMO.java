@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class NamedObjectMO extends MessageObject implements ParameterisedMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("id")
     protected UUID id;
 

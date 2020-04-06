@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.parameter")
 public class ParameterMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("name")
     private String name;
 

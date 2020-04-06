@@ -5,8 +5,8 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.snmp.SNMPContext;
@@ -53,7 +53,7 @@ public abstract class AbstractSNMPExecutor extends AbstractExecutor<SNMPEngine>
         catch (Exception e)
         {
             logger.error("Error executing check", e);
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
     

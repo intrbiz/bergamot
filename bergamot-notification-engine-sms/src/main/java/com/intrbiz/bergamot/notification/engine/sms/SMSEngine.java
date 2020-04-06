@@ -25,7 +25,6 @@ import com.intrbiz.bergamot.notification.engine.sms.model.SentSMS;
 import com.intrbiz.bergamot.notification.template.TemplatedNotificationEngine;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
-import com.intrbiz.queue.QueueException;
 
 public class SMSEngine extends TemplatedNotificationEngine
 {
@@ -131,7 +130,6 @@ public class SMSEngine extends TemplatedNotificationEngine
             {
                 this.smsSendErrors.inc();
                 logger.error("Failed to send SMS notification", e);
-                throw new QueueException("Failed to send email notification", e);
             }
         }
         finally

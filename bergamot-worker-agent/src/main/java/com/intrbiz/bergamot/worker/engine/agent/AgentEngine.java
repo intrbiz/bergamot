@@ -7,7 +7,7 @@ import com.intrbiz.bergamot.agent.server.AgentKeyResolver;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer;
 import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.event.agent.AgentRegister;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentRegister;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 
@@ -60,7 +60,7 @@ public class AgentEngine extends AbstractEngine
     private AgentKeyResolver createAgentKeyResolver(EngineContext engineContext)
     {
         return (keyId) -> {
-            AgentKey key = engineContext.getAgentKeyLookup().lookupAgentKey(keyId);
+            AgentKey key = engineContext.lookupAgentKey(keyId);
             if (key != null)
             {
                 if (! key.isRevoked())
@@ -86,7 +86,7 @@ public class AgentEngine extends AbstractEngine
             // Offer a register message
             if (! Util.isEmpty(agent.getAgentTemplateName()))
             {
-                engineContext.getAgentEventQueue().offer(new AgentRegister(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentHostSummary(), agent.getAgentAddress(), agent.getAgentTemplateName()));
+                engineContext.publishAgentAction(new AgentRegister(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentHostSummary(), agent.getAgentAddress(), agent.getAgentTemplateName()));
             }
         });
         this.server.setOnAgentDisconnectHandler((agent) -> {

@@ -3,19 +3,13 @@ package com.intrbiz.bergamot.scheduler;
 import java.util.Collection;
 import java.util.UUID;
 
-import com.intrbiz.bergamot.cluster.listener.ProcessingPoolListener;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
-import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
+import com.intrbiz.bergamot.model.message.pool.scheduler.SchedulerMessage;
 
 /**
  * Schedule the execution of stuff, mainly host and service checks
  */
-public interface Scheduler extends ProcessingPoolListener
+public interface Scheduler
 {
     /**
      * Pause scheduling all checks
@@ -40,7 +34,7 @@ public interface Scheduler extends ProcessingPoolListener
         }
     }
     
-    void schedulePool(UUID siteId, int processingPool);
+    void schedulePool(int pool);
     
     void schedule(UUID checkId);
     
@@ -48,7 +42,16 @@ public interface Scheduler extends ProcessingPoolListener
      * Reschedule the given check due to some form of state change
      * @param interval - the new interval of the check, optional if <= 0
      */
-    void reschedule(ActiveCheck<?,?> check, long interval);
+    default void reschedule(ActiveCheck<?,?> check, long interval)
+    {
+        this.reschedule(check.getId(), interval);
+    }
+    
+    /**
+     * Reschedule the given check due to some form of state change
+     * @param interval - the new interval of the check, optional if <= 0
+     */
+    void reschedule(UUID check, long interval);
     
     default void reschedule(ActiveCheck<?,?> check)
     {
@@ -101,7 +104,13 @@ public interface Scheduler extends ProcessingPoolListener
         }
     }
     
-    void unschedulePool(UUID siteId, int processingPool);
+    void unschedulePool(int pool);
+    
+    /**
+     * Process the given scheduler message
+     * @param message the message to process
+     */
+    void process(SchedulerMessage message);
     
     /**
      * Start the scheduler
@@ -109,42 +118,8 @@ public interface Scheduler extends ProcessingPoolListener
      */
     void start() throws Exception;
     
-    void stop();
-
-    @Override
-    default void registerPool(UUID siteId, int processingPool)
-    {
-        this.schedulePool(siteId, processingPool);
-    }
-
-    @Override
-    default void deregisterPool(UUID siteId, int processingPool)
-    {
-        this.unschedulePool(siteId, processingPool);
-    }
-
-    @Override
-    default void handleSchedulerAction(SchedulerAction action)
-    {
-        if (action instanceof ScheduleCheck)
-        {
-            this.schedule(action.getCheck());
-        }
-        else if (action instanceof RescheduleCheck)
-        {
-            this.reschedule(action.getCheck());
-        }
-        else if (action instanceof UnscheduleCheck)
-        {
-            this.unschedule(action.getCheck());
-        }
-        else if (action instanceof EnableCheck)
-        {
-            this.enable(action.getCheck());
-        }
-        else if (action instanceof DisableCheck)
-        {
-            this.disable(action.getCheck());
-        }
-    }
+    /**
+     * Shutdown this scheduler
+     */
+    void shutdown();
 }

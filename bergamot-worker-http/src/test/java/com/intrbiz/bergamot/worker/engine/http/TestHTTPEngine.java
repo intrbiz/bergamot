@@ -13,11 +13,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 
@@ -25,8 +25,6 @@ import com.intrbiz.bergamot.worker.engine.EngineContext;
 public class TestHTTPEngine
 {
     private HTTPEngine engine;
-    
-    private UUID poolId = UUID.randomUUID();
     
     @Before
     public void setupEngine() throws Exception
@@ -38,15 +36,14 @@ public class TestHTTPEngine
         this.engine.prepare(new EngineContext() {
 
             @Override
-            public AgentKeyLookup getAgentKeyLookup()
+            public AgentKey lookupAgentKey(UUID keyId)
             {
                 return null;
             }
-            
+
             @Override
-            public AgentEventQueue getAgentEventQueue()
+            public void publishAgentAction(AgentMessage event)
             {
-                return null;
             }
 
             @Override
@@ -60,7 +57,7 @@ public class TestHTTPEngine
             }
 
             @Override
-            public void publishResult(ResultMO result)
+            public void publishResult(ResultMessage result)
             {
             }
 
@@ -80,13 +77,13 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(this.poolId);
+        check.setPool(0);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
         check.setParameter("ssl", "false");
         // execute
-        ResultMO resultMO = this.run(check);
+        ResultMessage resultMO = this.run(check);
         // check
         System.out.println("Got result: " + resultMO);
     }
@@ -100,7 +97,7 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(this.poolId);
+        check.setPool(0);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -108,7 +105,7 @@ public class TestHTTPEngine
         check.setParameter("contains", "Intrbiz Blog");
         check.setParameter("length", "1024");
         // execute
-        ResultMO resultMO = this.run(check);
+        ResultMessage resultMO = this.run(check);
         System.out.println("Got result: " + resultMO);
     }
     
@@ -121,12 +118,12 @@ public class TestHTTPEngine
         check.setName("check_certificate");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(this.poolId);
+        check.setPool(0);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
         // execute
-        ResultMO resultMO = this.run(check);
+        ResultMessage resultMO = this.run(check);
         System.out.println("Got result: " + resultMO);
     }
     
@@ -175,7 +172,7 @@ public class TestHTTPEngine
         check.setName("check_http_script");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessingPool(this.poolId);
+        check.setPool(0);
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setScript(
@@ -199,17 +196,17 @@ public class TestHTTPEngine
                 + ");"
         );
         // execute
-        ResultMO resultMO = this.run(check);
+        ResultMessage resultMO = this.run(check);
         assertThat(resultMO, is(notNullValue()));
         assertThat(resultMO.getStatus(), is(equalTo("OK")));
         System.out.println("Got result: " + resultMO);
     }
     
-    private ResultMO run(ExecuteCheck check) throws InterruptedException
+    private ResultMessage run(ExecuteCheck check) throws InterruptedException
     {
         // multi-threaded so we need to wait
         final Object lock = new Object();
-        final ResultMO[] results = new ResultMO[1];
+        final ResultMessage[] results = new ResultMessage[1];
         TestContext context = new TestContext((result) -> {
             // ok we got a result
             results[0] = result;
@@ -233,11 +230,11 @@ public class TestHTTPEngine
     
     private static class TestContext implements CheckExecutionContext
     {
-        private Consumer<ResultMO> onResult;
+        private Consumer<ResultMessage> onResult;
         
         private Consumer<ReadingParcelMO> onReading;
         
-        public TestContext(Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
+        public TestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
         {
             this.onResult = onResult;
             this.onReading = onReading;
@@ -251,7 +248,7 @@ public class TestHTTPEngine
         }
 
         @Override
-        public void publishResult(ResultMO resultMO)
+        public void publishResult(ResultMessage resultMO)
         {
             if (this.onResult != null)
                 this.onResult.accept(resultMO);

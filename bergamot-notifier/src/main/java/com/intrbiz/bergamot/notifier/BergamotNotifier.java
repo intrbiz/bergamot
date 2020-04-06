@@ -4,16 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -21,15 +20,10 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.config.ClientNetworkConfig;
-import com.hazelcast.core.HazelcastException;
-import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.client.HazelcastClientNotActiveException;
 import com.hazelcast.spi.exception.TargetDisconnectedException;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.coordinator.NotifierClientCoordinator;
-import com.intrbiz.bergamot.cluster.queue.NotifierConsumer;
+import com.intrbiz.bergamot.cluster.client.NotifierClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.model.message.notification.Notification;
@@ -60,6 +54,8 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         AVAILABLE_ENGINES.add(new AvailableEngine(WebHookEngine.NAME, WebHookEngine::new, true));
     }
     
+    private static final int CONNECTION_ERROR_LIMIT = 60;
+    
     private final UUID id = UUID.randomUUID();
     
     private NotifierCfg configuration;
@@ -74,11 +70,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     private int threadCount;
     
-    private HazelcastInstance hazelcast;
-    
-    private NotifierClientCoordinator notifierCoordinator;
-    
-    private NotifierConsumer consumer;
+    private NotifierClient client;
     
     private Thread[] threads;
 
@@ -203,36 +195,10 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         };
     }
     
-    protected List<String> getHazelcastNodes()
-    {
-        List<String> addresses = new LinkedList<>();
-        if (this.configuration.getHazelcastClient() != null)
-        {
-            addresses.addAll(this.configuration.getHazelcastClient().getNodes());
-        }
-        String nodesCfg = this.getConfigurationParameter("hazelcast.nodes", null);
-        if (! Util.isEmpty(nodesCfg))
-        {
-            addresses.addAll(Arrays.asList(nodesCfg.split(", ?")));
-        }
-        return addresses;
-    }
-    
     protected void connectScheduler() throws Exception
     {
-        logger.info("Connecting to cluster");
-        ClientNetworkConfig netCfg = new ClientNetworkConfig();
-        netCfg.setAddresses(this.getHazelcastNodes());
-        netCfg.setSmartRouting(false);
-        ClientConfig cliCfg = new ClientConfig();
-        cliCfg.setInstanceName("notifier");
-        cliCfg.setNetworkConfig(netCfg);
-        // Connect to Hazelcast
-        this.hazelcast = HazelcastClient.newHazelcastClient(cliCfg);
-        // Create our notifier coordinator
-        this.notifierCoordinator = new NotifierClientCoordinator(this.hazelcast);
-        // Register ourselves
-        this.consumer = this.notifierCoordinator.registerNotifier(this.id, false, DAEMON_NAME, this.info, this.hostName, this.sites, this.engines.keySet()); 
+        this.client = new NotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, this.info, this.hostName);
+        this.client.register(this.sites, this.engines.keySet());
     }
     
     protected void createExecutors() throws Exception
@@ -245,6 +211,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         {
             final int threadNum = i;
             this.threads[i] = new Thread(() -> {
+                int connectionErrors = 0;
                 try
                 {
                     logger.debug("Notifier executor " + threadNum + " starting.");
@@ -253,7 +220,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
                         try
                         {
                             // get a notification to send
-                            Notification notification = this.consumer.poll();
+                            Notification notification = this.client.getConsumer().poll(5, TimeUnit.SECONDS);
                             if (notification != null)
                             {
                                 if (logger.isTraceEnabled())
@@ -265,10 +232,26 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
                                     engine.sendNotification(notification);
                                 }
                             }
+                            connectionErrors = 0;
                         }
-                        catch (TargetDisconnectedException e)
+                        catch (TargetDisconnectedException | HazelcastClientNotActiveException e)
                         {
-                            this.clusterPanic(e);
+                            if (this.run.get())
+                            {
+                                connectionErrors ++;
+                                if (connectionErrors > CONNECTION_ERROR_LIMIT)
+                                {
+                                    logger.fatal("Got too many connection errors from Hazelcast, shutting down!");
+                                    this.clusterPanic(null);
+                                }
+                                try
+                                {
+                                    Thread.sleep(5_000);
+                                }
+                                catch (InterruptedException ie)
+                                {
+                                }
+                            }
                         }
                         catch (Exception e)
                         {
@@ -285,12 +268,12 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         }
     }
     
-    protected void clusterPanic(HazelcastException e)
+    protected void clusterPanic(Void v)
     {
         // Trigger a shutdown
         if (this.run.compareAndSet(true, false))
         {
-            logger.error("Got error communicating with cluster, triggering halt", e);
+            logger.fatal("Connection to cluster lost, forcing shutdown now!");
         }
     }
     
@@ -390,16 +373,15 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     protected void disconnectScheduler()
     {
         logger.info("Disconnecting from cluster");
-        // Shutdown our consumer
-        if (this.consumer != null)
-            this.consumer.close();
-        // Shutdown hazelcast
-        if (this.hazelcast != null)
-            this.hazelcast.shutdown();
-        // Reset components
-        this.consumer = null;
-        this.notifierCoordinator = null;
-        this.hazelcast = null;
+        try
+        {
+            this.client.unregister();
+        }
+        catch (Exception e)
+        {
+            // ignore
+        }
+        this.client.close();
     }
     
     /**
@@ -438,7 +420,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
      */
     private static File getConfigurationFile()
     {
-        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("bergamot_config"), System.getenv("BERGAMOT_CONFIG"), DEFAULT_CONFIGURATION_FILE));
+        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("BERGAMOT_CONFIG"), DEFAULT_CONFIGURATION_FILE));
     }
     
     private static NotifierCfg loadConfiguration() throws Exception

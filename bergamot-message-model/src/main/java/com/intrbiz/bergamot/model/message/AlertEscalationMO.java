@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.alert-escalation")
 public class AlertEscalationMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("escalation_id")
     private UUID escalationId;
 

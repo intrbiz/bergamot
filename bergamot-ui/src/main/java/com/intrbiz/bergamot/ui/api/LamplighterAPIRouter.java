@@ -16,7 +16,7 @@ import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.VirtualCheck;
-import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
+import com.intrbiz.bergamot.model.message.CheckReadingMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.lamplighter.model.CheckReading;

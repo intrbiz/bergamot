@@ -12,7 +12,7 @@ public class ManualTestWheelScheduler extends WheelScheduler
 {
     public ManualTestWheelScheduler()
     {
-        super(UUID.randomUUID(), null, null);
+        super(null, null);
     }
     
     protected void startQueues() throws Exception

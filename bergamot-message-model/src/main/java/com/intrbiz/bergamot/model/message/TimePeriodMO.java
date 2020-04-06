@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.time_period")
 public class TimePeriodMO extends SecuredObjectMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("excludes")
     private List<TimePeriodMO> excludes = new LinkedList<TimePeriodMO>();
     

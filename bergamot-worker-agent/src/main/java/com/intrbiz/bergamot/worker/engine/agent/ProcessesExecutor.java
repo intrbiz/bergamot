@@ -8,8 +8,8 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
@@ -70,7 +70,7 @@ public class ProcessesExecutor extends AbstractExecutor<AgentEngine>
                     ProcessStat stat = (ProcessStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got processes in " + runtime + "ms: " + stat);
                     // apply the check
-                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyRange(
+                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyRange(
                             stat.getProcesses().size(),
                             executeCheck.getIntRangeParameter("warning",  new Integer[] {1, 1}), 
                             executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
@@ -83,12 +83,12 @@ public class ProcessesExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
 }

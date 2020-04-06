@@ -14,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.contact")
 public class ContactMO extends SecuredObjectMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("email")
     private String email;
 

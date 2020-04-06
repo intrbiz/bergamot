@@ -11,6 +11,8 @@ import com.intrbiz.bergamot.model.message.SiteMO;
 @JsonTypeName("bergamot.u2fa.device_registered")
 public class U2FADeviceRegistered extends ContactNotification
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("device_name")
     private String deviceName;
 

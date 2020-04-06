@@ -25,6 +25,7 @@ import com.intrbiz.bergamot.model.message.AlertEncompassesMO;
 import com.intrbiz.bergamot.model.message.AlertEscalationMO;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
+import com.intrbiz.bergamot.model.message.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.message.CommentMO;
@@ -64,12 +65,20 @@ import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
+import com.intrbiz.bergamot.model.message.cluster.NodeRegistration;
+import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
+import com.intrbiz.bergamot.model.message.cluster.PoolRegistration;
+import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
+import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
-import com.intrbiz.bergamot.model.message.event.agent.AgentRegister;
 import com.intrbiz.bergamot.model.message.event.global.FlushGlobalCaches;
 import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
+import com.intrbiz.bergamot.model.message.event.update.AlertUpdate;
+import com.intrbiz.bergamot.model.message.event.update.CheckUpdate;
+import com.intrbiz.bergamot.model.message.event.update.GroupUpdate;
+import com.intrbiz.bergamot.model.message.event.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
 import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
 import com.intrbiz.bergamot.model.message.importer.BergamotImportReportMO;
@@ -81,42 +90,33 @@ import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.model.message.notification.U2FADeviceRegistered;
-import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentRegister;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.PassiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnAgentId;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnCheckId;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostAddress;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostExternalRef;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostName;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnServiceExternalRef;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnServiceName;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnTrapExternalRef;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnTrapName;
+import com.intrbiz.bergamot.model.message.pool.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.report.SLAReportMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
-import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostAddress;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostExternalRef;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostName;
-import com.intrbiz.bergamot.model.message.result.MatchOnServiceExternalRef;
-import com.intrbiz.bergamot.model.message.result.MatchOnServiceName;
-import com.intrbiz.bergamot.model.message.result.MatchOnTrapExternalRef;
-import com.intrbiz.bergamot.model.message.result.MatchOnTrapName;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
-import com.intrbiz.bergamot.model.message.scheduler.DisableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
-import com.intrbiz.bergamot.model.message.update.AlertUpdate;
-import com.intrbiz.bergamot.model.message.update.CheckUpdate;
-import com.intrbiz.bergamot.model.message.update.GroupUpdate;
-import com.intrbiz.bergamot.model.message.update.LocationUpdate;
 import com.intrbiz.gerald.polyakov.io.PolyakovTranscoder;
-import com.intrbiz.queue.QueueEventTranscoder;
-import com.intrbiz.queue.QueueException;
 
 /**
  * Encode and decode messages
  */
 public class BergamotTranscoder
-{   
+{
     public static final Class<?>[] CLASSES = {
         // message objects
         NotificationEngineMO.class,
@@ -151,8 +151,8 @@ public class BergamotTranscoder
         // messages
         // check
         ExecuteCheck.class,
-        ActiveResultMO.class,
-        PassiveResultMO.class,
+        ActiveResult.class,
+        PassiveResult.class,
         MatchOnAgentId.class,
         MatchOnCheckId.class,
         MatchOnHostAddress.class,
@@ -179,11 +179,7 @@ public class BergamotTranscoder
         LocationUpdate.class,
         AlertUpdate.class,
         // scheduler
-        EnableCheck.class,
-        DisableCheck.class,
         ScheduleCheck.class,
-        RescheduleCheck.class,
-        UnscheduleCheck.class,
         // API
         APIError.class,
         APIPing.class,
@@ -219,8 +215,22 @@ public class BergamotTranscoder
         // agent events
         AgentRegister.class,
         // reports
-        SLAReportMO.class
+        SLAReportMO.class,
+        // cluster registry
+        WorkerRegistration.class,
+        NotifierRegistration.class,
+        ProcessorRegistration.class,
+        AgentRegistration.class,
+        NodeRegistration.class,
+        PoolRegistration.class
     };
+    
+    private static final BergamotTranscoder DEFAULT = new BergamotTranscoder();
+    
+    public static final BergamotTranscoder getDefaultInstance()
+    {
+        return DEFAULT;
+    }
     
     private final ObjectMapper factory = new ObjectMapper();
     
@@ -475,26 +485,5 @@ public class BergamotTranscoder
         {
             throw new RuntimeException("Failed to read file", e);
         }
-    }
-    
-    /**
-     * Adapt this transcoder for use as a QueueTranscoder
-     */
-    public <T> QueueEventTranscoder<T> asQueueEventTranscoder(final Class<T> type)
-    {
-        return new QueueEventTranscoder<T>()
-        {
-            @Override
-            public byte[] encodeAsBytes(T event) throws QueueException
-            {
-                return BergamotTranscoder.this.encodeAsBytes(event);
-            }
-
-            @Override
-            public T decodeFromBytes(byte[] data) throws QueueException
-            {
-                return (T) BergamotTranscoder.this.decodeFromBytes(data, type);
-            }
-        };
     }
 }

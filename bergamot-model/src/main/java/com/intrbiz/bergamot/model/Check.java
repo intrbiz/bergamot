@@ -30,6 +30,9 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
 {
     private static final long serialVersionUID = 1L;
     
+    @SQLColumn(index = 1, name = "pool", since = @SQLVersion({ 1, 0, 0 }))
+    protected int pool;
+    
     /**
      * Is the result of this check suppressed
      */
@@ -393,12 +396,22 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     
     // Pool
     
-    /**
-     * Compute the pool that this check is in
-     */
     public int getPool()
     {
-        return Site.computeSiteProcessingPool(this.id);
+        return this.pool;
+    }
+
+    public void setPool(int pool)
+    {
+        this.pool = pool;
+    }
+    
+    /**
+     * Compute the processing pool number for this check.
+     */
+    public final int computePool()
+    {
+        return CheckMO.computePool(this.id);
     }
     
     // some basic actions
@@ -584,6 +597,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     protected void toMO(CheckMO mo, Contact contact, EnumSet<MOFlag> options)
     {
         super.toMO(mo, contact, options);
+        mo.setPool(this.getPool());
         mo.setEnabled(this.isEnabled());
         mo.setState(this.getState().toMO(contact));
         mo.setSuppressed(this.isSuppressed());
@@ -613,6 +627,8 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     public void configure(C configuration, C resolvedConfiguration)
     {
         super.configure(configuration, resolvedConfiguration);
+        // compute the pool
+        this.pool = this.computePool();
         // configure basic check state
         this.enabled    = resolvedConfiguration.getEnabledBooleanValue(this.enabled);
         this.suppressed = resolvedConfiguration.getSuppressedBooleanValue(this.suppressed);

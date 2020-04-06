@@ -6,8 +6,8 @@ import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
 
@@ -77,7 +77,7 @@ public class ScriptedCheckManager
                 }
                 catch (Exception e)
                 {
-                    context.publishActiveResult(new ActiveResultMO().fromCheck(check).error(e));
+                    context.publishActiveResult(new ActiveResult().fromCheck(check).error(e));
                 }
             }
         };

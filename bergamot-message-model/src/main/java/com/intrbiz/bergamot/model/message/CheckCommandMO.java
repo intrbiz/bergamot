@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.command")
 public class CheckCommandMO extends NamedObjectMO implements ParameterisedMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("command")
     private CommandMO command;
 

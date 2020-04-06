@@ -8,8 +8,8 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMem;
 import com.intrbiz.bergamot.model.message.agent.stat.MemStat;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
@@ -60,7 +60,7 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
                     MemStat stat = (MemStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got Memory usage in " + runtime + "ms: " + stat);
                     // check
-                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThreshold(
                             UnitUtil.toRatio((executeCheck.getBooleanParameter("ignore_caches", true) ? stat.getActualUsedMemory() : stat.getUsedMemory()), stat.getTotalMemory()),
                             executeCheck.getPercentParameter("warning", 0.8F), 
                             executeCheck.getPercentParameter("critical", 0.9F),
@@ -78,12 +78,12 @@ public class MemoryExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
 }

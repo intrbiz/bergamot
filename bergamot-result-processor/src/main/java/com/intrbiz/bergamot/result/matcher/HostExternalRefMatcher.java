@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.result.matcher;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostExternalRef;
-import com.intrbiz.bergamot.model.message.result.MatchableMO;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostExternalRef;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchableMO;
 
 public class HostExternalRefMatcher implements Matcher<MatchOnHostExternalRef>
 {

@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.team")
 public class TeamMO extends SecuredObjectMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("teams")
     private List<TeamMO> teams = new LinkedList<TeamMO>();
 

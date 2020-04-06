@@ -37,5 +37,9 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-cluster</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.gerald</groupId>
+			<artifactId>gerald-witchcraft</artifactId>
+		</dependency>
 	</dependencies>
 </project>

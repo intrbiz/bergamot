@@ -11,6 +11,8 @@ import com.intrbiz.bergamot.model.message.SiteMO;
 @JsonTypeName("bergamot.u2fa.backup_code_used")
 public class BackupCodeUsed extends ContactNotification
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("code")
     private String code;
     

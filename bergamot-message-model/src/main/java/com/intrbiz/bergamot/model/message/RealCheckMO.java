@@ -8,6 +8,8 @@ import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
 
 public abstract class RealCheckMO extends CheckMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("alert_attempt_threshold")
     protected int alertAttemptThreshold;
 

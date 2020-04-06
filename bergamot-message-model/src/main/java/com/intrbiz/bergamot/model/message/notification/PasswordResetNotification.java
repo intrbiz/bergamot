@@ -8,6 +8,8 @@ import com.intrbiz.bergamot.model.message.SiteMO;
 @JsonTypeName("bergamot.password_reset")
 public class PasswordResetNotification extends ContactNotification
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("url")
     private String url;
 

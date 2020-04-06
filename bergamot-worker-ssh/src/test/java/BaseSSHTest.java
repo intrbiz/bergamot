@@ -6,11 +6,11 @@ import java.util.function.Consumer;
 
 import org.junit.Before;
 
-import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
@@ -33,15 +33,14 @@ public abstract class BaseSSHTest
         this.engine.prepare(new EngineContext() {
             
             @Override
-            public AgentKeyLookup getAgentKeyLookup()
+            public AgentKey lookupAgentKey(UUID keyId)
             {
                 return null;
             }
-            
+
             @Override
-            public AgentEventQueue getAgentEventQueue()
+            public void publishAgentAction(AgentMessage event)
             {
-                return null;
             }
 
             @Override
@@ -55,7 +54,7 @@ public abstract class BaseSSHTest
             }
 
             @Override
-            public void publishResult(ResultMO result)
+            public void publishResult(ResultMessage result)
             {
             }
 
@@ -69,12 +68,12 @@ public abstract class BaseSSHTest
         this.publicKey = new String(readResource("/test_key.pub"));
     }
     
-    protected void run(ExecuteCheck check, Consumer<ResultMO> onResult)
+    protected void run(ExecuteCheck check, Consumer<ResultMessage> onResult)
     {
         this.run(check, onResult, null);
     }
     
-    protected void run(ExecuteCheck check, Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
+    protected void run(ExecuteCheck check, Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
     {
         TestContext context = new TestContext(onResult, onReading);
         this.engine.execute(check, context);
@@ -82,11 +81,11 @@ public abstract class BaseSSHTest
     
     public static class TestContext implements CheckExecutionContext
     {
-        private Consumer<ResultMO> onResult;
+        private Consumer<ResultMessage> onResult;
         
         private Consumer<ReadingParcelMO> onReading;
         
-        public TestContext(Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
+        public TestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
         {
             this.onResult = onResult;
             this.onReading = onReading;
@@ -100,7 +99,7 @@ public abstract class BaseSSHTest
         }
 
         @Override
-        public void publishResult(ResultMO resultMO)
+        public void publishResult(ResultMessage resultMO)
         {
             if (this.onResult != null)
                 this.onResult.accept(resultMO);

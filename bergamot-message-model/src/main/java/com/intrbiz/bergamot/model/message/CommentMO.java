@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.comment")
 public class CommentMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * The comment id
      */

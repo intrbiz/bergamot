@@ -1,7 +1,7 @@
 package com.intrbiz.bergamot.worker.engine.dummy;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
@@ -26,7 +26,7 @@ public class StaticExecutor extends AbstractExecutor<DummyEngine>
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         long start = System.nanoTime();
-        ActiveResultMO result = new ActiveResultMO().fromCheck(executeCheck);
+        ActiveResult result = new ActiveResult().fromCheck(executeCheck);
         if (Boolean.getBoolean("dummy.static.critical"))
         {
             result.setOk(false);

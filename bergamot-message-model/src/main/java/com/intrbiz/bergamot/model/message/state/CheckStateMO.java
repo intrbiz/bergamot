@@ -9,6 +9,8 @@ import com.intrbiz.bergamot.model.message.MessageObject;
 @JsonTypeName("bergamot.state.check")
 public class CheckStateMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("ok")
     private boolean ok;
 

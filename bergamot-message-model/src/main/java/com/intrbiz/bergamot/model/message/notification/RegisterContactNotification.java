@@ -8,6 +8,8 @@ import com.intrbiz.bergamot.model.message.SiteMO;
 @JsonTypeName("bergamot.register_contact")
 public class RegisterContactNotification extends ContactNotification
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("url")
     private String url;
 

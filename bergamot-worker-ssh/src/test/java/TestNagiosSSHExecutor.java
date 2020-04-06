@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 
 public class TestNagiosSSHExecutor extends BaseSSHTest
 {
@@ -40,7 +40,7 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
         this.run(
             executeCheck, 
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 System.out.println("testDummyOkCheck\n" + result);
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -67,7 +67,7 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
         this.run(
             executeCheck, 
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 System.out.println("testBadAuth\n" + result);
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -91,7 +91,7 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
         this.run(
             executeCheck, 
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 System.out.println("testBadCommand\n" + result);
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
@@ -117,7 +117,7 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
         this.run(
             executeCheck, 
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 System.out.println("testBadPasswordAuth\n" + result);
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));

@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName("bergamot.security_domain")
 public class SecurityDomainMO extends NamedObjectMO
-{    
+{   
+    private static final long serialVersionUID = 1L;
+    
     public SecurityDomainMO()
     {
         super();

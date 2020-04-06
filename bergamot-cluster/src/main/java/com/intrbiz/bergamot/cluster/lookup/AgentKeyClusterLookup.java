@@ -12,7 +12,7 @@ import com.hazelcast.config.MapStoreConfig;
 import com.hazelcast.config.MapStoreConfig.InitialLoadMode;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.MapStoreAdapter;
-import com.intrbiz.bergamot.cluster.ObjectNames;
+import com.intrbiz.bergamot.cluster.util.HZNames;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.data.DataException;
@@ -29,7 +29,7 @@ public class AgentKeyClusterLookup extends AgentKeyLookup
     protected void configureHazelcast(Config hazelcastConfig)
     {
         // Setup the map TTL, backups
-        MapConfig agentMapConfig = hazelcastConfig.getMapConfig(ObjectNames.buildAgentKeyLookupMapName());
+        MapConfig agentMapConfig = hazelcastConfig.getMapConfig(HZNames.buildAgentKeyLookupMapName());
         agentMapConfig.setTimeToLiveSeconds(KEY_TTL);
         agentMapConfig.setInMemoryFormat(InMemoryFormat.BINARY);
         agentMapConfig.setBackupCount(0);

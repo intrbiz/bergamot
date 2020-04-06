@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class SLAPeriodMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("name")
     private String name;
     

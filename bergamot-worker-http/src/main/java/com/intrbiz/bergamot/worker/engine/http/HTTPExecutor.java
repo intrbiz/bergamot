@@ -11,10 +11,10 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.check.http.HTTPCheckBuilder;
 import com.intrbiz.bergamot.check.http.HTTPCheckResponse;
 import com.intrbiz.bergamot.model.message.ParameterMO;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -87,7 +87,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             check.execute((response) -> {
                 logger.info("Got response for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);           
+                ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);           
                 // check the response
                 boolean   cont = checkStatus(executeCheck, response, resultMO);
                 if (cont) cont = checkRuntime(executeCheck, response, resultMO);
@@ -108,7 +108,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 tctx.stop();
                 failedRequests.inc();
                 logger.error("Error for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(error));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(error));
             });
         }
         catch (Exception e)
@@ -116,11 +116,11 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             logger.error("Failed to execute HTTP check", e);
             tctx.stop();
             this.failedRequests.inc();
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }        
     }
     
-    protected boolean checkStatus(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
+    protected boolean checkStatus(ExecuteCheck check, HTTPCheckResponse response, ResultMessage resultMO)
     {
         if (check.getIntParameterCSV("status", "200, 301, 302, 304").stream().anyMatch((stat) -> { return response.getResponse().getStatus().code() == stat; }))
         {
@@ -131,7 +131,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
         return false;
     }
     
-    protected boolean checkRuntime(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
+    protected boolean checkRuntime(ExecuteCheck check, HTTPCheckResponse response, ResultMessage resultMO)
     {
         if (check.containsParameter("critical_response_time"))
         {
@@ -160,7 +160,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
         return true;
     }
     
-    protected boolean checkLength(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
+    protected boolean checkLength(ExecuteCheck check, HTTPCheckResponse response, ResultMessage resultMO)
     {
         if (check.containsParameter("length"))
         {
@@ -178,7 +178,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
         return true;
     }
     
-    protected boolean checkContent(ExecuteCheck check, HTTPCheckResponse response, ResultMO resultMO)
+    protected boolean checkContent(ExecuteCheck check, HTTPCheckResponse response, ResultMessage resultMO)
     {
         if (check.containsParameter("contains"))
         {

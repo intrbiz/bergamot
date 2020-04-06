@@ -12,14 +12,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
+import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
-import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
-import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
+import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.util.IBThreadFactory;
 
@@ -33,27 +34,27 @@ import com.intrbiz.util.IBThreadFactory;
  * jobs. The rotationPeriod, the time to complete a full cycle of the 
  * wheel is tickPeriod * segmentCount.
  * 
- * By default the wheel has 60 segments ticking at 1Hz. As such the 
- * wheel rotates once every minute.
+ * By default the wheel has 1200 segments ticking at 4Hz. As such the 
+ * wheel rotates once 5 minutes.
  * 
  * Jobs are balanced over the segments within the wheel when they 
  * are first scheduled. As such, the first execution of a job is at 
  * most rotationPeriod.
  * 
  * Note: this scheduler is an approximating scheduler. It can never 
- * be more accurate than the tickPeriod. Currently this implementation 
- * can never be more accurate than the rotation period.
+ * be more accurate than the tickPeriod.
  * 
  * @author Chris Ellis
- * 
  */
 public class WheelScheduler extends AbstractScheduler
 {
     private static final Logger logger = Logger.getLogger(WheelScheduler.class);
     
-    private static final long TICK_PERIOD_MS = 1_000L;
+    // Wheel ticks 4 times a second
+    private static final long TICK_PERIOD_MS = 250;
     
-    private static final int SEGMENTS = 60;
+    // Wheel represents 5 minutes
+    private static final int SEGMENTS = 300 * ((int)(1000L / TICK_PERIOD_MS));
 
     // ticker
     protected volatile boolean run = true;
@@ -89,9 +90,9 @@ public class WheelScheduler extends AbstractScheduler
     // accounting
     protected final Accounting accounting = Accounting.create(WheelScheduler.class);
 
-    public WheelScheduler(UUID poolId, WorkerProducer WorkerProducer, ProcessingPoolProducer processingPoolProducer)
+    public WheelScheduler(CheckDispatcher checkDispatcher, PoolDispatcher poolDispatcher)
     {
-        super(poolId, WorkerProducer, processingPoolProducer);
+        super(checkDispatcher, poolDispatcher);
         // setup the wheel structure
         this.tickPeriod = TICK_PERIOD_MS;
         this.orange = new Segment[SEGMENTS];
@@ -104,7 +105,7 @@ public class WheelScheduler extends AbstractScheduler
         logger.debug("Initalised wheel with " + this.orange.length + " segments, rotation period: " + this.orangePeriod);
         // create our task executor
         this.taskExecutor = Executors.newFixedThreadPool(
-                Integer.getInteger("bergamot.scheduler.task.threads", Runtime.getRuntime().availableProcessors()),
+                Integer.parseInt(Util.coalesceEmpty(System.getenv("BERGAMOT_SCHEDULER_TASK_THREADS"), System.getProperty("bergamot.scheduler.task.threads"), String.valueOf(Runtime.getRuntime().availableProcessors()))),
                 new IBThreadFactory("bergamot-scheduler-task", true)
         );
     }
@@ -252,6 +253,25 @@ public class WheelScheduler extends AbstractScheduler
             this.rescheduleJob(id, interval, timeRange, command);
         }
     }
+    
+    protected void rescheduleJob(UUID id, long newInterval)
+    {
+        newInterval = this.validateInterval(newInterval);
+        Job job = this.jobs.get(id);
+        if (job != null)
+        {
+            job.interval = newInterval;
+            // compute the new expiry
+            job.expires = job.lastExpires + newInterval;
+            job.enabled = true;
+            logger.info("Rescheduled job " + job.id + ", new expiry: " + job.expires);
+            // move the job between segments
+            // remove the job from all segments
+            this.removeJobFromSegments(id);
+            // add the job to segments
+            this.addJobToSegments(job, newInterval, job.initialDelay);
+        }
+    }
 
     protected void rescheduleJob(UUID id, long newInterval, TimeRange timeRange, Runnable command)
     {
@@ -366,8 +386,31 @@ public class WheelScheduler extends AbstractScheduler
     public void reschedule(ActiveCheck<?,?> check, long interval)
     {
         interval = interval > 0 ? interval : check.getCurrentInterval();
-        logger.info("Rescheduling " + check + " with interval " + interval);
+        logger.info("Rescheduling " + check.getId() + " with interval " + interval);
         this.rescheduleJob(check.getId(), interval, check.getTimePeriod(), new CheckRunner(check));
+    }
+    
+    @Override
+    public void reschedule(UUID checkId, long interval)
+    {
+        if (interval > 0)
+        {
+            logger.info("Rescheduling " + checkId + " with interval " + interval);
+            this.rescheduleJob(checkId, interval);
+        }
+        else
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                ActiveCheck<?,?> check = db.getActiveCheck(checkId);
+                if (check != null)
+                {
+                    interval = check.getCurrentInterval();
+                    logger.info("Rescheduling " + check.getId() + " with interval " + interval);
+                    this.rescheduleJob(check.getId(), interval, check.getTimePeriod(), new CheckRunner(check));            
+                }
+            }
+        }
     }
     
     @Override
@@ -376,18 +419,19 @@ public class WheelScheduler extends AbstractScheduler
         this.removeJobs(checks);
     }
     
-    public void unschedulePool(UUID siteId, int processingPool)
+    public void unschedulePool(int pool)
     {
-        logger.info("Unscheduling all checks in pool " + siteId + "." + processingPool);
+        logger.info("Unscheduling all checks in pool: " + pool);
         for (Segment segment : this.orange)
         {
             for (Job job : segment.jobs.values())
             {
-                if ( siteId.equals(Site.getSiteId(job.id)) && processingPool == job.processingPool)
+                if (pool == job.pool)
                 {
                     segment.jobs.remove(job.id);
                     this.jobs.remove(job.id);
-                    if (logger.isTraceEnabled() && job != null) logger.trace("Removed job " + job.id + " from segment " + segment.id);
+                    if (logger.isTraceEnabled() && job != null)
+                        logger.trace("Removed job " + job.id + " from segment " + segment.id);
                 }
             }
         }
@@ -401,13 +445,13 @@ public class WheelScheduler extends AbstractScheduler
         // setup the ticker thread
         if (this.ticker == null)
         {
-            this.ticker = new Thread(new Ticker(), "WheelScheduler-Ticker");
+            this.ticker = new Thread(new Ticker(), "wheel-scheduler");
             this.ticker.start();
         }
     }
     
     @Override
-    public void stop()
+    public void shutdown()
     {
         this.run = false;
         this.tickerWaitLock.notifyAll();
@@ -435,14 +479,16 @@ public class WheelScheduler extends AbstractScheduler
     {
         public void run()
         {
-            logger.debug("Ticker starting running: " + run + ", tick every " + tickPeriod + "ms, rotating every " + orangePeriod + "ms, currently " + jobs.size() + " jobs loaded");
+            if (logger.isTraceEnabled())
+                logger.trace("Ticker starting running: " + run + ", tick every " + tickPeriod + "ms, rotating every " + orangePeriod + "ms, currently " + jobs.size() + " jobs loaded");
             while (run)
             {
                 long tickStart = System.currentTimeMillis();
                 tick();
                 long tickEnd = System.currentTimeMillis();
                 long sleepDuration = tickPeriod - (tickEnd - tickStart);
-                if (logger.isTraceEnabled()) logger.trace("Tick took " + (tickEnd - tickStart) + "ms to run, sleeping for " + sleepDuration + "ms");
+                if (logger.isTraceEnabled())
+                    logger.trace("Tick took " + (tickEnd - tickStart) + "ms to run, sleeping for " + sleepDuration + "ms");
                 if (sleepDuration > 0)
                 {
                     try
@@ -483,30 +529,29 @@ public class WheelScheduler extends AbstractScheduler
     private static class Job
     {
         // details
-
         public final UUID id;
         
-        public final int processingPool;
+        public final int pool;
+        
+        public final long initialDelay;
 
         public volatile Runnable command;
 
+        public volatile TimeRange timeRange;
+        
         public volatile boolean enabled = true;
 
         public volatile long interval;
 
-        public volatile TimeRange timeRange;
-
         public volatile long expires;
 
         public volatile long lastExpires;
-        
-        public long initialDelay;
 
-        public Job(UUID id, int processingPool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
+        public Job(UUID id, int pool, long interval, long initialDelay, TimeRange timeRange, Runnable command)
         {
             super();
             this.id = id;
-            this.processingPool = processingPool;
+            this.pool = pool;
             this.interval = interval;
             this.timeRange = timeRange;
             this.command = command;
@@ -552,7 +597,7 @@ public class WheelScheduler extends AbstractScheduler
         public void run()
         {
             // fire off the check
-            ExecuteCheck executeCheck = this.check.executeCheck(getPoolId());
+            ExecuteCheck executeCheck = this.check.executeCheck();
             if (executeCheck != null)
             {
                 // publish the check

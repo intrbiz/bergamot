@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.result.matcher;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.model.message.result.MatchOn;
-import com.intrbiz.bergamot.model.message.result.MatchableMO;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOn;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchableMO;
 
 /**
  * Match the given passive result to a check

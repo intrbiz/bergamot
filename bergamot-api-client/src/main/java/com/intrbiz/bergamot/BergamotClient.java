@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.credentials.ClientCredentials;
 import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.CheckMO;
+import com.intrbiz.bergamot.model.message.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.CommandMO;
 import com.intrbiz.bergamot.model.message.CommentMO;
@@ -24,7 +25,6 @@ import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
 import com.intrbiz.bergamot.model.message.TimePeriodMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
-import com.intrbiz.bergamot.model.message.reading.CheckReadingMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 

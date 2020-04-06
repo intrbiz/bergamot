@@ -6,8 +6,8 @@ import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;
@@ -40,7 +40,7 @@ public class ScriptedSNMPExecutor extends AbstractSNMPExecutor
         // we need a script!
         if (Util.isEmpty(executeCheck.getScript())) throw new RuntimeException("The script must be defined!");
         // setup wrapped context
-        SNMPContext<?> wrapped = agent.with((error) -> context.publishActiveResult(new ActiveResultMO().error(error)));
+        SNMPContext<?> wrapped = agent.with((error) -> context.publishActiveResult(new ActiveResult().error(error)));
         // setup the script engine
         ScriptEngine script = factory.getEngineByName("nashorn");
         SimpleBindings bindings = new SimpleBindings();

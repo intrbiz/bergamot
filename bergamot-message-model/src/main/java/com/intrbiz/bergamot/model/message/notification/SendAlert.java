@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.send_alert")
 public class SendAlert extends AlertNotification
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Is this alert notification an escalation of a previous alert
      */

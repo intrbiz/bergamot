@@ -17,7 +17,9 @@ import com.intrbiz.bergamot.model.message.MessageObject;
  */
 @JsonTypeName("bergamot.transition.check")
 public class CheckTransitionMO extends MessageObject
-{    
+{   
+    private static final long serialVersionUID = 1L;
+    
     /**
      * The transition id, this should match the id of the execution / result
      */

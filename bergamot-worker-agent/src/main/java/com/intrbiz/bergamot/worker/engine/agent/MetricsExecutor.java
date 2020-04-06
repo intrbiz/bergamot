@@ -9,8 +9,8 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMetrics;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.MetricsStat;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ScriptedCheckManager;
@@ -67,7 +67,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
                     // error from agent?
                     if (response instanceof GeneralError)
                     {
-                        context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(((GeneralError) response).getMessage()));
+                        context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(((GeneralError) response).getMessage()));
                         return;
                     }
                     // process the stat
@@ -77,7 +77,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
                     if (Util.isEmpty(executeCheck.getScript()))
                     {
                         context.publishActiveResult( 
-                                new ActiveResultMO().fromCheck(executeCheck)
+                                new ActiveResult().fromCheck(executeCheck)
                                  .runtime(runtime)
                                  .info("Got " + stat.getReadings().size() + " metric readings")
                         );
@@ -97,12 +97,12 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
     

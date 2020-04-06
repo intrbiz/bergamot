@@ -4,16 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.intrbiz.bergamot.model.message.result.MatchOn;
-import com.intrbiz.bergamot.model.message.result.MatchOnAgentId;
-import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostAddress;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostExternalRef;
-import com.intrbiz.bergamot.model.message.result.MatchOnHostName;
-import com.intrbiz.bergamot.model.message.result.MatchOnServiceExternalRef;
-import com.intrbiz.bergamot.model.message.result.MatchOnServiceName;
-import com.intrbiz.bergamot.model.message.result.MatchOnTrapExternalRef;
-import com.intrbiz.bergamot.model.message.result.MatchOnTrapName;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOn;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnAgentId;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnCheckId;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostAddress;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostExternalRef;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnHostName;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnServiceExternalRef;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnServiceName;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnTrapExternalRef;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnTrapName;
 
 public class Matchers
 {

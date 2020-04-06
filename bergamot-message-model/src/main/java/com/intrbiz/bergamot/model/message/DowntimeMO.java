@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.downtime")
 public class DowntimeMO extends MessageObject implements CommentedMO
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * The unique ID for this downtime
      */

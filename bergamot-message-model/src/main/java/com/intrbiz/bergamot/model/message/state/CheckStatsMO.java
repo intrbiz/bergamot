@@ -7,6 +7,8 @@ import com.intrbiz.bergamot.model.message.MessageObject;
 @JsonTypeName("bergamot.stats.check")
 public class CheckStatsMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     // stats
 
     @JsonProperty("last_runtime")

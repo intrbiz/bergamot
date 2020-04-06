@@ -6,7 +6,7 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.api.check.ExecuteAdhocCheck;
 import com.intrbiz.bergamot.model.message.api.check.ExecutedAdhocCheck;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
 import com.intrbiz.bergamot.updater.context.ClientContext;
 
 public class ExecuteAdhocChecksHandler extends RequestHandler<ExecuteAdhocCheck>

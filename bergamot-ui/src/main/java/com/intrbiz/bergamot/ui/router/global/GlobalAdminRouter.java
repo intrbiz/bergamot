@@ -1,7 +1,11 @@
 package com.intrbiz.bergamot.ui.router.global;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -13,6 +17,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
@@ -33,6 +38,8 @@ public class GlobalAdminRouter extends Router<BergamotApp>
 {    
     private static final Logger logger = Logger.getLogger(GlobalAdminRouter.class);
     
+    private static final String[] COLOURS = { "#55aa00", "#ffaa00", "#ff557f", "#55aaff", "#ffaaff", "#aaaaff", "#aaaa00", "#aaff7f" };
+    
     @Before()
     @Any("**")
     @WithDataAdapter(BergamotDB.class)
@@ -43,15 +50,24 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db)
+    public void index(BergamotDB db) throws Exception
     {
         // workers, notifiers, processing pools and other cluster information
-        var("workers", app().getProcessor().getWorkerCoordinator().getWorkers());
-        var("worker_route_table", app().getProcessor().getWorkerCoordinator().getRoutingTable());
-        var("worker_agents", app().getProcessor().getWorkerCoordinator().countAgents());
-        var("notifiers", app().getProcessor().getNotifierCoordinator().getNotifiers());
-        var("notifier_route_table", app().getProcessor().getNotifierCoordinator().getRoutingTable());
-        var("cluster_info", app().getProcessor().getProcessingPoolCoordinator().info());
+        var("workers", app().getProcessor().getWorkerRegistry().getWorkers());
+        var("worker_route_table", app().getProcessor().getWorkerRegistry().getRouteTable().toString());
+        var("notifiers", app().getProcessor().getNotifierRegistry().getNotifiers());
+        var("notifier_route_table", app().getProcessor().getNotifierRegistry().getRouteTable().toString());
+        Set<ProcessorRegistration> processors = app().getProcessor().getProcessorRegistry().getProcessors();
+        Map<UUID, String> colours = new HashMap<>();
+        int idx = 0;
+        for (ProcessorRegistration processor : processors)
+        {
+            colours.put(processor.getId(), COLOURS[idx ++ % COLOURS.length]);
+        }
+        var("processors", processors);
+        var("colours", colours);
+        var("leaders", app().getProcessor().getElector().getElectionMembers());
+        var("pools", Arrays.asList(app().getProcessor().getPoolElectors()));
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins

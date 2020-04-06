@@ -9,8 +9,8 @@ import org.junit.Test;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Status;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 
@@ -19,7 +19,7 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
 {
     public DefaultResultProcessorTests()
     {
-        super(UUID.randomUUID(), null, null, null, null, null);
+        super(null, null, null, null);
     }
 
     private CheckState newState(Status status, boolean hard, int attempt, boolean transitioning, Status lastStatus, boolean lastHard)
@@ -40,9 +40,9 @@ public class DefaultResultProcessorTests extends DefaultResultProcessor
         return state;
     }
     
-    private ResultMO newResult(boolean ok, String status, String output)
+    private ResultMessage newResult(boolean ok, String status, String output)
     {
-        ResultMO resultMO = new ActiveResultMO();
+        ResultMessage resultMO = new ActiveResult();
         resultMO.setOk(ok);
         resultMO.setStatus(status);
         resultMO.setOutput(output);

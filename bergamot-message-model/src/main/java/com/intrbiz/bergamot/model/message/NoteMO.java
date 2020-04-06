@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.note")
 public class NoteMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("title")
     private String title;
     

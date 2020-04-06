@@ -20,9 +20,8 @@ import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.Result
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
-import com.intrbiz.bergamot.cluster.queue.NotificationProducer;
-import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
-import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
+import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
@@ -40,17 +39,17 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.ContactMO;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.event.update.AlertUpdate;
+import com.intrbiz.bergamot.model.message.event.update.CheckUpdate;
+import com.intrbiz.bergamot.model.message.event.update.GroupUpdate;
+import com.intrbiz.bergamot.model.message.event.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
-import com.intrbiz.bergamot.model.message.update.AlertUpdate;
-import com.intrbiz.bergamot.model.message.update.CheckUpdate;
-import com.intrbiz.bergamot.model.message.update.GroupUpdate;
-import com.intrbiz.bergamot.model.message.update.LocationUpdate;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.PassiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
@@ -67,39 +66,17 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     
     private Accounting accounting = Accounting.create(DefaultResultProcessor.class);
 
-    public DefaultResultProcessor(
-        UUID poolId, 
-        ProcessingPoolConsumer consumer,
-        SchedulerActionProducer schedulerActions,
-        NotificationProducer notificationProducer,
-        SiteNotificationTopic notificationBroker,
-        SiteUpdateTopic updateBroker
-    ) {
-        super(poolId, consumer, schedulerActions, notificationProducer, notificationBroker, updateBroker);
-    }    
-
-    @Override
-    public void processDead(ExecuteCheck check)
+    public DefaultResultProcessor(PoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, SiteNotificationTopic notificationBroker, SiteUpdateTopic updateBroker)
     {
-        // we failed to execute the given check in time, oops!
-        logger.warn("Failed to execute check, workers aren't working hard enough: " + check.getId() + "\r\n" + check);
-        // fake a timeout result and submit it
-        this.processExecuted(new ActiveResultMO().fromCheck(check).timeout("Worker timeout whilst executing check"));
-    }
-    
-    @Override
-    public void processDeadAgent(ExecuteCheck check)
-    {
-        // submit a disconnected result
-        this.processExecuted(new ActiveResultMO().fromCheck(check).disconnected("Bergamot Agent disconnected"));
+        super(poolDispatcher, notificationDispatcher, notificationBroker, updateBroker);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected Check<?, ?> matchCheck(BergamotDB db, ResultMO resultMO)
+    protected Check<?, ?> matchCheck(BergamotDB db, ResultMessage resultMO)
     {
-        if (resultMO instanceof ActiveResultMO)
+        if (resultMO instanceof ActiveResult)
         {
-            ActiveResultMO activeResult = (ActiveResultMO) resultMO;
+            ActiveResult activeResult = (ActiveResult) resultMO;
             logger.debug("Matching active result for check: " + activeResult.getCheckType() + "::" + activeResult.getCheckId());
             if (Util.isEmpty(activeResult.getCheckType()))
             {
@@ -121,9 +98,9 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 return db.getCheck(activeResult.getCheckId());
             }
         }
-        else if (resultMO instanceof PassiveResultMO)
+        else if (resultMO instanceof PassiveResult)
         {
-            PassiveResultMO passiveResult = (PassiveResultMO) resultMO;
+            PassiveResult passiveResult = (PassiveResult) resultMO;
             // use the match engine to find the result
             Matcher<?> matcher = this.matchers.buildMatcher(passiveResult.getMatchOn());
             if (matcher == null) return null;
@@ -134,7 +111,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     }
 
     @Override
-    public void processExecuted(ResultMO resultMO)
+    public void process(ResultMessage resultMO)
     {
         // stamp in processed time
         resultMO.setProcessed(System.currentTimeMillis());
@@ -165,7 +142,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 }
                 // account this processing
                 // account
-                this.accounting.account(new ProcessResultAccountingEvent(check.getSiteId(), resultMO.getId(), check.getId(), resultMO instanceof ActiveResultMO ? ResultType.ACTIVE : ResultType.PASSIVE));
+                this.accounting.account(new ProcessResultAccountingEvent(check.getSiteId(), resultMO.getId(), check.getId(), resultMO instanceof ActiveResult ? ResultType.ACTIVE : ResultType.PASSIVE));
                 // only process for enabled checks
                 if (!check.isEnabled())
                 {
@@ -183,14 +160,14 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 // make our state available as soon as possible
                 db.commit();
                 // compute the check stats
-                if (resultMO instanceof ActiveResultMO)
+                if (resultMO instanceof ActiveResult)
                 {
-                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), (ActiveResultMO) resultMO);
+                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), (ActiveResult) resultMO);
                     db.setCheckStats(stats);
                     // saved state
-                    if (resultMO instanceof ActiveResultMO)
+                    if (resultMO instanceof ActiveResult)
                     {
-                        ActiveResultMO arm = (ActiveResultMO) resultMO;
+                        ActiveResult arm = (ActiveResult) resultMO;
                         if (arm.getSavedState() != null)
                         {
                             db.setCheckSavedState(new CheckSavedState(check.getId(), arm.getSavedState()));
@@ -525,7 +502,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
     
-    protected Transition computeResultTransition(RealCheck<?,?> check, CheckState currentState, ResultMO resultMO)
+    protected Transition computeResultTransition(RealCheck<?,?> check, CheckState currentState, ResultMessage resultMO)
     {
         // validate that status matches ok
         Status resultStatus = Status.parse(resultMO.getStatus());
@@ -682,12 +659,12 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     }
 
     // virtual check handling
-    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, ResultMO resultMO, BergamotDB db)
+    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, ResultMessage resultMO, BergamotDB db)
     {
         this.updateVirtualChecks(check, transition, resultMO, db, new HashSet<UUID>());
     }
     
-    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, ResultMO resultMO, BergamotDB db, Set<UUID> processedVirtualChecks)
+    protected void updateVirtualChecks(Check<?, ?> check, Transition transition, ResultMessage resultMO, BergamotDB db, Set<UUID> processedVirtualChecks)
     {
         for (VirtualCheck<?, ?> referencedBy : check.getReferencedBy())
         {
@@ -745,7 +722,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
 
-    protected Transition applyVirtualResult(VirtualCheck<?, ?> check, CheckState currentState, boolean ok, Status status, boolean allHard, ResultMO cause)
+    protected Transition applyVirtualResult(VirtualCheck<?, ?> check, CheckState currentState, boolean ok, Status status, boolean allHard, ResultMessage cause)
     {
         // the next state
         CheckState nextState = currentState.clone();
@@ -869,7 +846,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         }
     }
     
-    protected CheckStats computeStats(CheckStats stats, ActiveResultMO resultMO)
+    protected CheckStats computeStats(CheckStats stats, ActiveResult resultMO)
     {
         CheckStats nextStats = stats.clone();
         // compute the stats

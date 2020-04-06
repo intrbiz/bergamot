@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.site")
 public class SiteMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+
     @JsonProperty("id")
     protected UUID id;
 

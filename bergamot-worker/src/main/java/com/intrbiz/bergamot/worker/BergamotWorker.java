@@ -4,42 +4,35 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.zookeeper.KeeperException;
 
-import com.hazelcast.client.HazelcastClient;
-import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.config.ClientNetworkConfig;
-import com.hazelcast.core.HazelcastException;
-import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.client.HazelcastClientNotActiveException;
+import com.hazelcast.spi.exception.TargetDisconnectedException;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
-import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClientCoordinator;
-import com.intrbiz.bergamot.cluster.coordinator.WorkerClientCoordinator;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyClientLookup;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
-import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
-import com.intrbiz.bergamot.cluster.queue.WorkerConsumer;
+import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.Engine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
@@ -84,6 +77,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         AVAILABLE_ENGINES.add(new AvailableEngine(AgentEngine.NAME,  AgentEngine::new,   false));
     }
     
+    private static final int CONNECTION_ERROR_LIMIT = 60;
+    
     private final UUID id = UUID.randomUUID();
     
     private WorkerCfg configuration;
@@ -100,19 +95,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     
     private int threadCount;
     
-    private HazelcastInstance hazelcast;
-    
-    private WorkerClientCoordinator workerCoordinator;
-    
-    private ProcessingPoolClientCoordinator poolCoordinator;
-    
-    private WorkerConsumer consumer;
-    
-    private ProcessingPoolProducer producer;
-    
-    private AgentKeyClientLookup agentKeyLookup;
-    
-    private AgentEventQueue agentEventQueue;
+    private WorkerClient client;
     
     private Thread[] threads;
     
@@ -243,78 +226,61 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             }
 
             @Override
-            public AgentKeyLookup getAgentKeyLookup()
+            public AgentKey lookupAgentKey(UUID keyId)
             {
-                return agentKeyLookup;
+                return client.getAgentKeyLookup().lookupAgentKey(keyId);
             }
-            
-            public AgentEventQueue getAgentEventQueue()
+
+            @Override
+            public void publishAgentAction(AgentMessage event)
             {
-                return agentEventQueue;
+                client.getDispatcher().dispatchAgentAction(event);
             }
 
             @Override
             public void registerAgent(UUID agentId)
             {
-                workerCoordinator.registerAgent(id, agentId);
+                try
+                {
+                    client.registerAgent(agentId);
+                }
+                catch (KeeperException | InterruptedException e)
+                {
+                    throw new RuntimeException("Failed to register agent", e);
+                }
             }
 
             @Override
             public void unregisterAgent(UUID agentId)
             {
-                workerCoordinator.unregisterAgent(id, agentId);
+                try
+                {
+                    client.unregisterAgent(agentId);
+                }
+                catch (KeeperException | InterruptedException e)
+                {
+                    logger.warn("Failed to unregister agent", e);
+                }
             }
 
             @Override
-            public void publishResult(ResultMO result)
+            public void publishResult(ResultMessage result)
             {
-                producer.publishResult(result);
+                client.getDispatcher().dispatchResult(result);
             }
             
             @Override
-            public void publishReading(ReadingParcelMO readingParcelMO)
+            public void publishReading(ReadingParcelMO reading)
             {
-                producer.publishReading(readingParcelMO);
+                client.getDispatcher().dispatchReading(reading);
             }
         };
     }
     
-    protected List<String> getHazelcastNodes()
-    {
-        List<String> addresses = new LinkedList<>();
-        if (this.configuration.getHazelcastClient() != null)
-        {
-            addresses.addAll(this.configuration.getHazelcastClient().getNodes());
-        }
-        String nodesCfg = this.getConfigurationParameter("hazelcast.nodes", null);
-        if (! Util.isEmpty(nodesCfg))
-        {
-            addresses.addAll(Arrays.asList(nodesCfg.split(", ?")));
-        }
-        return addresses;
-    }
-    
     protected void connectScheduler() throws Exception
     {
-        logger.info("Connecting to Bergamot Cluster");
-        ClientNetworkConfig netCfg = new ClientNetworkConfig();
-        netCfg.setAddresses(this.getHazelcastNodes());
-        netCfg.setSmartRouting(false);
-        ClientConfig cliCfg = new ClientConfig();
-        cliCfg.setInstanceName("worker");
-        cliCfg.setNetworkConfig(netCfg);
-        // Connect to Hazelcast
-        this.hazelcast = HazelcastClient.newHazelcastClient(cliCfg);
-        // Create our worker lookups
-        this.agentKeyLookup = new AgentKeyClientLookup(this.hazelcast);
-        // Create our queues
-        this.agentEventQueue = new AgentEventQueue(this.hazelcast); 
-        // Create our worker coordinator
-        this.workerCoordinator = new WorkerClientCoordinator(this.hazelcast);
-        this.poolCoordinator = new ProcessingPoolClientCoordinator(this.hazelcast);
-        // Register ourselves
-        this.producer = this.poolCoordinator.createProcessingPoolProducer();
-        this.consumer = this.workerCoordinator.registerWorker(this.id, false, DAEMON_NAME, this.info, this.hostName, this.sites, this.workerPool, this.engines.keySet()); 
+        this.client = new WorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, this.info, this.hostName);
+        this.client.register(this.sites, this.workerPool, this.engines.keySet()); 
     }
     
     protected void createExecutors() throws Exception
@@ -327,6 +293,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         {
             final int threadNum = i;
             this.threads[i] = new Thread(() -> {
+                int connectionErrors = 0;
                 try
                 {
                     logger.debug("Worker executor " + threadNum + " starting.");
@@ -335,7 +302,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
                         try
                         {
                             // get a check to execute
-                            ExecuteCheck check = this.consumer.poll();
+                            ExecuteCheck check = this.client.getConsumer().poll(5, TimeUnit.SECONDS);
                             if (check != null)
                             {
                                 if (logger.isTraceEnabled())
@@ -349,13 +316,29 @@ public class BergamotWorker implements Configurable<WorkerCfg>
                                 }
                                 else
                                 {
-                                    context.publishResult(new ActiveResultMO().fromCheck(check).error("No engine found to execute check"));
+                                    context.publishResult(new ActiveResult().fromCheck(check).error("No engine found to execute check"));
                                 }
                             }
+                            connectionErrors = 0;
                         }
-                        catch (HazelcastException e)
+                        catch (TargetDisconnectedException | HazelcastClientNotActiveException e)
                         {
-                            this.clusterPanic(e);
+                            if (this.run.get())
+                            {
+                                connectionErrors ++;
+                                if (connectionErrors > CONNECTION_ERROR_LIMIT)
+                                {
+                                    logger.fatal("Got too many connection errors from Hazelcast, shutting down!");
+                                    this.clusterPanic(null);
+                                }
+                                try
+                                {
+                                    Thread.sleep(5_000);
+                                }
+                                catch (InterruptedException ie)
+                                {
+                                }
+                            }
                         }
                         catch (Exception e)
                         {
@@ -372,12 +355,11 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         }
     }
     
-    protected void clusterPanic(HazelcastException e)
+    protected void clusterPanic(Void v)
     {
-        // Trigger a shutdown
         if (this.run.compareAndSet(true, false))
         {
-            logger.error("Got error communicating with cluster, triggering halt", e);
+            logger.fatal("Connection to cluster lost, forcing shutdown now!");
         }
     }
     
@@ -404,15 +386,15 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     {
         return new CheckExecutionContext() {
             @Override
-            public void publishResult(ResultMO resultMO)
+            public void publishResult(ResultMessage result)
             {
-                producer.publishResult(check.getProcessingPool(), resultMO);
+                client.getDispatcher().dispatchResult(check.getPool(), result);
             }
 
             @Override
-            public void publishReading(ReadingParcelMO readingParcelMO)
+            public void publishReading(ReadingParcelMO reading)
             {
-                producer.publishReading(check.getProcessingPool(), readingParcelMO);
+                client.getDispatcher().dispatchReading(check.getPool(), reading);
             }            
         };
     }
@@ -473,25 +455,16 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     
     protected void disconnectScheduler()
     {
-        logger.info("Disconnecting from Bergamot cluster");
-        // Shutdown our consumer
-        if (this.consumer != null)
+        logger.info("Disconnecting from cluster");
+        try
         {
-            try
-            {
-                this.consumer.close();
-            }
-            catch (HazelcastException e)
-            {
-            }
+            this.client.unregister();
         }
-        // Shutdown hazelcast
-        if (this.hazelcast != null)
-            this.hazelcast.shutdown();
-        // Reset components
-        this.consumer = null;
-        this.workerCoordinator = null;
-        this.hazelcast = null;
+        catch (Exception e)
+        {
+            // ignore
+        }
+        this.client.close();
     }
     
     public void triggerShutdown()
@@ -549,7 +522,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
      */
     private static File getConfigurationFile()
     {
-        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("bergamot_config"), System.getenv("BERGAMOT_CONFIG"), DEFAULT_CONFIGURATION_FILE));
+        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("BERGAMOT_CONFIG"), DEFAULT_CONFIGURATION_FILE));
     }
     
     private static WorkerCfg loadConfiguration() throws Exception

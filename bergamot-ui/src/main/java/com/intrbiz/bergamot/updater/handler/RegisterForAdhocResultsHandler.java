@@ -8,7 +8,6 @@ import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.api.result.RegisterForAdhocResults;
 import com.intrbiz.bergamot.model.message.api.result.RegisteredForAdhocResults;
 import com.intrbiz.bergamot.updater.context.ClientContext;
-import com.intrbiz.queue.QueueException;
 
 public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAdhocResults>
 {
@@ -53,7 +52,7 @@ public class RegisterForAdhocResultsHandler extends RequestHandler<RegisterForAd
                 context.var("adhocCheckProducer", queue.publishChecks());
                 */
             }
-            catch (QueueException e)
+            catch (Exception e)
             {
                 logger.warn("Failed to setup adhoc results queue", e);
                 context.send(new APIError(request, "Failed to setup queue"));

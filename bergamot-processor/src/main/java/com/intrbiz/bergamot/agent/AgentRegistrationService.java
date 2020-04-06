@@ -3,14 +3,12 @@ package com.intrbiz.bergamot.agent;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
-import com.intrbiz.bergamot.cluster.coordinator.NotifierClusterCoordinator;
-import com.intrbiz.bergamot.cluster.coordinator.ProcessingPoolClusterCoordinator;
+import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
@@ -21,70 +19,25 @@ import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.event.agent.AgentEvent;
-import com.intrbiz.bergamot.model.message.event.agent.AgentRegister;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentRegister;
 
 public class AgentRegistrationService
 {
     private static final Logger logger = Logger.getLogger(AgentRegistrationService.class);
     
-    private final AgentEventQueue agentEventQueue;
+    private final PoolDispatcher poolDispatcher;
     
-    private final ProcessingPoolClusterCoordinator processingPoolClusterCoordinator;
+    private final NotificationDispatcher notificationDispatcher;
     
-    private final NotifierClusterCoordinator notifierClusterCoordinator;
-    
-    private volatile boolean run;
-    
-    private Thread thread;
-    
-    public AgentRegistrationService(AgentEventQueue agentEventQueue, ProcessingPoolClusterCoordinator processingPoolClusterCoordinator, NotifierClusterCoordinator notifierClusterCoordinator)
+    public AgentRegistrationService(PoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher)
     {
         super();
-        this.agentEventQueue = agentEventQueue;
-        this.processingPoolClusterCoordinator = processingPoolClusterCoordinator;
-        this.notifierClusterCoordinator = notifierClusterCoordinator;
+        this.poolDispatcher = poolDispatcher;
+        this.notificationDispatcher = notificationDispatcher;
     }
     
-    public void start()
-    {
-        this.run = true;
-        this.thread = new Thread(this::processAgentEvents, "agent-registration-thread");
-        this.thread.start();
-    }
-    
-    public void stop()
-    {
-        this.run = false;
-        try
-        {
-            this.thread.join();
-        }
-        catch (InterruptedException e)
-        {
-        }
-    }
-    
-    protected void processAgentEvents()
-    {
-        while (this.run)
-        {
-            try
-            {
-                AgentEvent event = this.agentEventQueue.poll(500, TimeUnit.MILLISECONDS);
-                if (event != null)
-                {
-                    this.processAgentEvent(event);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.error("Failed to process agent registration", e);
-            }
-        }
-    }
-    
-    protected void processAgentEvent(AgentEvent event)
+    public void process(AgentMessage event)
     {
         if (event instanceof AgentRegister)
         {
@@ -154,7 +107,7 @@ public class AgentRegistrationService
             if (validatedConfiguration.getReport().isValid())
             {
                 // good we have a valid configuration, import it
-                BergamotConfigImporter importer = new BergamotConfigImporter(validatedConfiguration).online(this.processingPoolClusterCoordinator.createSchedulerActionProducer(), this.notifierClusterCoordinator, null);
+                BergamotConfigImporter importer = new BergamotConfigImporter(validatedConfiguration).online(this.poolDispatcher, this.notificationDispatcher, null);
                 BergamotImportReport importReport = importer.importConfiguration();
                 if (importReport.isSuccessful())
                 {

@@ -18,12 +18,12 @@ public class SiteActions implements BalsaAction<BergamotApp>
     @Action("site-init")
     public void initSite(Site site)
     {
-        this.app().getSiteEventBroker().publish(new InitSite(site.getId(), site.getName()));
+        this.app().getProcessor().getSiteEventTopic().publish(new InitSite(site.getId(), site.getName()));
     }
     
     @Action("site-deinit")
     public void disableCheck(Site site)
     {
-        this.app().getSiteEventBroker().publish(new DeinitSite(site.getId(), site.getName()));
+        this.app().getProcessor().getSiteEventTopic().publish(new DeinitSite(site.getId(), site.getName()));
     }
 }

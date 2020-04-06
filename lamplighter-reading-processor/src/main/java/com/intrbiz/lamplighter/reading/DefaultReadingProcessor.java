@@ -1,15 +1,13 @@
 package com.intrbiz.lamplighter.reading;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.cluster.queue.ProcessingPoolConsumer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 import com.intrbiz.data.DataException;
@@ -33,19 +31,19 @@ import com.intrbiz.lamplighter.reading.scaling.ReadingScalers;
 
 public class DefaultReadingProcessor extends AbstractReadingProcessor
 {
-    private Logger logger = Logger.getLogger(DefaultReadingProcessor.class);
+    private static final Logger logger = Logger.getLogger(DefaultReadingProcessor.class);
     
     private Matchers matchers = new Matchers();
     
     private ReadingScalers scalers = new ReadingScalers();
 
-    public DefaultReadingProcessor(UUID poolId, ProcessingPoolConsumer consumer)
+    public DefaultReadingProcessor()
     {
-        super(poolId, consumer);
+        super();
     }
 
     @Override
-    public void processReadings(ReadingParcelMO readings)
+    public void process(ReadingParcelMO readings)
     {
         if (logger.isTraceEnabled()) logger.trace("Processing readings: " + readings);
         // store the readings

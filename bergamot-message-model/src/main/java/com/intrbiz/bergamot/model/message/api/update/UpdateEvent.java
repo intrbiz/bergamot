@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.model.message.api.update;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.api.APIEvent;
-import com.intrbiz.bergamot.model.message.update.Update;
+import com.intrbiz.bergamot.model.message.event.update.Update;
 
 @JsonTypeName("bergamot.api.event.update")
 public class UpdateEvent extends APIEvent

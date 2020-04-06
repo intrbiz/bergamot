@@ -5,6 +5,8 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 
 public abstract class ContactNotification extends GenericNotification
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("contact")
     private ContactMO contact;
     

@@ -9,10 +9,10 @@ import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 public class TestNagiosEngine
@@ -65,7 +65,7 @@ public class TestNagiosEngine
         this.run(
             executeCheck, 
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -88,7 +88,7 @@ public class TestNagiosEngine
         this.run(
             executeCheck,
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -111,7 +111,7 @@ public class TestNagiosEngine
         this.run(
             executeCheck,
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -134,7 +134,7 @@ public class TestNagiosEngine
         this.run(
             executeCheck,
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -157,7 +157,7 @@ public class TestNagiosEngine
         this.run(
             executeCheck,
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
@@ -220,12 +220,12 @@ public class TestNagiosEngine
         );
     }*/
     
-    private void run(ExecuteCheck check, Consumer<ResultMO> onResult)
+    private void run(ExecuteCheck check, Consumer<ResultMessage> onResult)
     {
         this.run(check, onResult, null);
     }
     
-    private void run(ExecuteCheck check, Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
+    private void run(ExecuteCheck check, Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
     {
         NagiosTestContext context = new NagiosTestContext(onResult, onReading);
         this.engine.execute(check, context);
@@ -233,11 +233,11 @@ public class TestNagiosEngine
     
     private static class NagiosTestContext implements CheckExecutionContext
     {
-        private Consumer<ResultMO> onResult;
+        private Consumer<ResultMessage> onResult;
         
         private Consumer<ReadingParcelMO> onReading;
         
-        public NagiosTestContext(Consumer<ResultMO> onResult, Consumer<ReadingParcelMO> onReading)
+        public NagiosTestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
         {
             this.onResult = onResult;
             this.onReading = onReading;
@@ -251,7 +251,7 @@ public class TestNagiosEngine
         }
 
         @Override
-        public void publishResult(ResultMO resultMO)
+        public void publishResult(ResultMessage resultMO)
         {
             if (this.onResult != null)
                 this.onResult.accept(resultMO);

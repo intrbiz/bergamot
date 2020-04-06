@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.escalation")
 public class EscalationMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("after")
     protected long after;
     

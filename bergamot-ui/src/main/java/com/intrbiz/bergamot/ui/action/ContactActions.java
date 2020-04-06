@@ -60,7 +60,7 @@ public class ContactActions implements BalsaAction<BergamotApp>
             }
             // send a notification, only via email
             PasswordResetNotification resetNotification = new PasswordResetNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url);
-            app().getProcessor().getNotifierCoordinator().sendNotification(resetNotification);
+            app().getProcessor().getNotificationDispatcher().dispatchNotification(resetNotification);
             logger.info("Sent password reset for contact " + contact.getSite().getName() + "::" + contact.getName() + " (" + contact.getId() + ")");
             // accounting
             this.accounting.account(new SendNotificationAccountingEvent(contact.getSiteId(), resetNotification.getId(), contact.getId(), AccountingNotificationType.RESET, resetNotification.getTo().size(), 0, null));

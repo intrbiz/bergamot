@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 
 public abstract class AbstractEngine implements Engine
 {
@@ -69,7 +69,7 @@ public abstract class AbstractEngine implements Engine
         }
         else
         {
-            context.publishResult(new ActiveResultMO().fromCheck(check).error("No executor found to execute check"));
+            context.publishResult(new ActiveResult().fromCheck(check).error("No executor found to execute check"));
         }
     }
     

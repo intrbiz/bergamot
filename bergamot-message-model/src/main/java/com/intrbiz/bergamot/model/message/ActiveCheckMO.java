@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class ActiveCheckMO extends RealCheckMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("check_interval")
     protected long checkInterval;
 

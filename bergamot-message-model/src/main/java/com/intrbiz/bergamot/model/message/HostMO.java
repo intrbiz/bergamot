@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.host")
 public class HostMO extends ActiveCheckMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("address")
     private String address;
     

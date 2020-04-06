@@ -7,6 +7,8 @@ import com.intrbiz.bergamot.model.message.MessageObject;
 @JsonTypeName("bergamot.state.group")
 public class GroupStateMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("ok")
     private boolean ok;
 

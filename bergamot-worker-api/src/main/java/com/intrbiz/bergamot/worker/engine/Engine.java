@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.worker.engine;
 
 import java.util.Collection;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
 
 public interface Engine
 {    

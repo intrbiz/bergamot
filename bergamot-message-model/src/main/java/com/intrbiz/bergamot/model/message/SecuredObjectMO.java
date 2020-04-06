@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public abstract class SecuredObjectMO extends NamedObjectMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("security_domains")
     private List<SecurityDomainMO> securityDomains = new LinkedList<SecurityDomainMO>();
     

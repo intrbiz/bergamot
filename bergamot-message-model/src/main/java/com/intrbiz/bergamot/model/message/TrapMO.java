@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.trap")
 public class TrapMO extends PassiveCheckMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("host")
     private HostMO host;
     

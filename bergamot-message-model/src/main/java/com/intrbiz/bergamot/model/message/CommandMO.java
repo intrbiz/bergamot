@@ -13,6 +13,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.command")
 public class CommandMO extends SecuredObjectMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("engine")
     private String engine;
 

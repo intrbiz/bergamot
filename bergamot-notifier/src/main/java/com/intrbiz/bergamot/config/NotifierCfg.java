@@ -20,7 +20,7 @@ public class NotifierCfg extends Configuration
 {
     private static final long serialVersionUID = 1L;
     
-    private HazelcastClientCfg hazelcastClient;
+    private ClusterCfg cluster;
     
     private int threads = -1;
     
@@ -101,15 +101,15 @@ public class NotifierCfg extends Configuration
     }
     
     
-    @XmlElementRef(type = HazelcastClientCfg.class)
-    public HazelcastClientCfg getHazelcastClient()
+    @XmlElementRef(type = ClusterCfg.class)
+    public ClusterCfg getCluster()
     {
-        return hazelcastClient;
+        return cluster;
     }
 
-    public void setHazelcastClient(HazelcastClientCfg hazelcastClient)
+    public void setCluster(ClusterCfg cluster)
     {
-        this.hazelcastClient = hazelcastClient;
+        this.cluster = cluster;
     }
     
     @XmlElementRef(type = LoggingCfg.class)
@@ -127,9 +127,9 @@ public class NotifierCfg extends Configuration
     public void applyDefaults()
     {
         // the broker
-        if (this.hazelcastClient == null)
+        if (this.cluster == null)
         {
-            this.hazelcastClient = new HazelcastClientCfg("127.0.0.1:5701");
+            this.cluster = new ClusterCfg(new String[] { "127.0.0.1:2181" });
         }
         // default number of threads
         if (this.threads <= 0)

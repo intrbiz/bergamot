@@ -16,8 +16,8 @@ import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.coordinator.NotifierClusterCoordinator;
-import com.intrbiz.bergamot.cluster.queue.SchedulerActionProducer;
+import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
 import com.intrbiz.bergamot.config.model.AccessControlCfg;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
@@ -83,11 +83,8 @@ import com.intrbiz.bergamot.model.TimePeriod;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.notification.RegisterContactNotification;
-import com.intrbiz.bergamot.model.message.scheduler.EnableCheck;
-import com.intrbiz.bergamot.model.message.scheduler.RescheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
-import com.intrbiz.bergamot.model.message.scheduler.SchedulerAction;
-import com.intrbiz.bergamot.model.message.scheduler.UnscheduleCheck;
+import com.intrbiz.bergamot.model.message.pool.scheduler.ScheduleCheck;
+import com.intrbiz.bergamot.model.message.pool.scheduler.SchedulerMessage;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
@@ -135,9 +132,9 @@ public class BergamotConfigImporter
     
     private Set<String> updatedResourcePools = new HashSet<String>();
     
-    private SchedulerActionProducer schedulerActions;
+    private PoolDispatcher poolDispatcher;
     
-    private NotifierClusterCoordinator notificationProducer;
+    private NotificationDispatcher notificationDispatcher;
     
     private Function<Contact, String> registrationURLSupplier;
     
@@ -171,11 +168,11 @@ public class BergamotConfigImporter
         return this;
     }
     
-    public BergamotConfigImporter online(SchedulerActionProducer schedulerActions, NotifierClusterCoordinator notificationProducer, Function<Contact, String> registrationURLSupplier)
+    public BergamotConfigImporter online(PoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, Function<Contact, String> registrationURLSupplier)
     {
         this.online = true;
-        this.schedulerActions = schedulerActions;
-        this.notificationProducer = notificationProducer;
+        this.poolDispatcher = poolDispatcher;
+        this.notificationDispatcher = notificationDispatcher;
         this.registrationURLSupplier = registrationURLSupplier;
         return this;
     }
@@ -246,11 +243,11 @@ public class BergamotConfigImporter
                         {
                             // we must publish any scheduling changes after we have committed the transaction
                             // publish all scheduling changes
-                            if (this.schedulerActions != null)
+                            if (this.poolDispatcher != null)
                             {
                                 for (DelayedSchedulerAction delayedAction : this.delayedSchedulerActions)
                                 {
-                                    this.schedulerActions.publishSchedulerAction(delayedAction.action);
+                                    this.poolDispatcher.dispatchSchedulerAction(delayedAction.action);
                                 }
                             }
                             // send notifications for contact registrations
@@ -261,9 +258,7 @@ public class BergamotConfigImporter
                                     // get the registration url
                                     String url = this.registrationURLSupplier.apply(contact);
                                     // send a notification, only via email
-                                    this.notificationProducer.sendNotification(
-                                        new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) 
-                                    );
+                                    this.notificationDispatcher.dispatchNotification(new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) );
                                 }
                                 catch (Exception e)
                                 {
@@ -1964,21 +1959,21 @@ public class BergamotConfigImporter
     private void scheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Scheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new ScheduleCheck(check.getId())));
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new EnableCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new ScheduleCheck(check.getId(), ScheduleCheck.Command.SCHEDULE)));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new ScheduleCheck(check.getId(), ScheduleCheck.Command.ENABLE)));
     }
     
     private void rescheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Rescheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new RescheduleCheck(check.getId())));
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new EnableCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new ScheduleCheck(check.getId(), ScheduleCheck.Command.RESCHEDULE)));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new ScheduleCheck(check.getId(), ScheduleCheck.Command.ENABLE)));
     }
     
     private void unscheduleCheck(ActiveCheck<?,?> check)
     {
         this.report.info("Unscheduling " + check.getType() + " " + check.getName() + " (" + check.getId() + ")");
-        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new UnscheduleCheck(check.getId())));
+        this.delayedSchedulerActions.add(new DelayedSchedulerAction(new ScheduleCheck(check.getId(), ScheduleCheck.Command.UNSCHEDULE)));
     }
     
     private static class CascadedChange
@@ -2000,9 +1995,9 @@ public class BergamotConfigImporter
     
     public static class DelayedSchedulerAction
     {
-        public SchedulerAction action;
+        public SchedulerMessage action;
         
-        public DelayedSchedulerAction(SchedulerAction action)
+        public DelayedSchedulerAction(SchedulerMessage action)
         {
             this.action = action;
         }

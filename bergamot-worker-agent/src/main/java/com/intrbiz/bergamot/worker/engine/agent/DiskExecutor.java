@@ -12,8 +12,8 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDisk;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskStat;
 import com.intrbiz.bergamot.model.message.agent.stat.disk.DiskInfo;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.util.UnitUtil;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
@@ -72,7 +72,7 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
                         // apply the check
                         double warning = executeCheck.getPercentParameter("warning", 0.8D);
                         double critical = executeCheck.getPercentParameter("critical", 0.9D);
-                        context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
+                        context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThreshold(
                                 fromPercent(disk.getUsedPercent()), 
                                 warning,
                                 critical,
@@ -87,19 +87,19 @@ public class DiskExecutor extends AbstractExecutor<AgentEngine>
                     }
                     else
                     {
-                        context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error("No such mount point: " + mount).runtime(runtime));
+                        context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error("No such mount point: " + mount).runtime(runtime));
                     }
                 });
             }
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
 }

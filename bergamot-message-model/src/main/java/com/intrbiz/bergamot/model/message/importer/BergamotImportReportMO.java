@@ -10,6 +10,8 @@ import com.intrbiz.bergamot.model.message.MessageObject;
 @JsonTypeName("bergamot.import.report")
 public class BergamotImportReportMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("site")
     private String site;
     

@@ -12,8 +12,8 @@ import com.intrbiz.bergamot.check.http.HTTPCheckBuilder;
 import com.intrbiz.bergamot.crypto.util.CertInfo;
 import com.intrbiz.bergamot.crypto.util.TLSInfo;
 import com.intrbiz.bergamot.model.message.ParameterMO;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -86,7 +86,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
             check.execute((response) -> {
                 logger.info("Got response for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+                ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
                 // check the response
                 TLSInfo tls = response.getTlsInfo();
                 CertInfo serverCert = tls.getServerCertInfo();
@@ -119,7 +119,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
                 tctx.stop();
                 failedRequests.inc();
                 logger.error("Error for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(error));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(error));
             });
         }
         catch (Exception e)
@@ -127,7 +127,7 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
             logger.error("Failed to execute TLS Certificate check", e);
             tctx.stop();
             this.failedRequests.inc();
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }        
     }
 

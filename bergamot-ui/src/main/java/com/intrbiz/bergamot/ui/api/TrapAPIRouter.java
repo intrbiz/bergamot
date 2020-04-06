@@ -11,8 +11,8 @@ import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
 import com.intrbiz.bergamot.model.message.TrapMO;
-import com.intrbiz.bergamot.model.message.result.MatchOnCheckId;
-import com.intrbiz.bergamot.model.message.result.PassiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.result.PassiveResult;
+import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnCheckId;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -77,7 +77,7 @@ public class TrapAPIRouter extends Router<BergamotApp>
         Trap trap = notNull(db.getTrap(id));
         require(permission("submit", trap));
         // the result
-        PassiveResultMO resultMO = new PassiveResultMO();
+        PassiveResult resultMO = new PassiveResult();
         resultMO.setId(UUID.randomUUID());
         resultMO.setSiteId(site.getId());
         resultMO.setMatchOn(new MatchOnCheckId(id));

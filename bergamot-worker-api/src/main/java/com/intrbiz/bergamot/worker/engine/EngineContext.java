@@ -3,10 +3,10 @@ package com.intrbiz.bergamot.worker.engine;
 import java.util.UUID;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.broker.AgentEventQueue;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ResultMO;
+import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
 
 /**
  * The context this engine is executing within
@@ -54,12 +54,12 @@ public interface EngineContext
     /**
      * The agent key lookup service
      */
-    AgentKeyLookup getAgentKeyLookup();
+    AgentKey lookupAgentKey(UUID keyId);
     
     /**
      * The agent event queue for sending register events
      */
-    AgentEventQueue getAgentEventQueue();
+    void publishAgentAction(AgentMessage action);
     
     /**
      * Register this worker as being the route for the given agent id
@@ -74,10 +74,10 @@ public interface EngineContext
     /**
      * Publish a (probably passive) result
      */
-    void publishResult(ResultMO result);
+    void publishResult(ResultMessage result);
     
     /**
      * Publish a set of readings
      */
-    void publishReading(ReadingParcelMO readingParcelMO);
+    void publishReading(ReadingParcelMO reading);
 }

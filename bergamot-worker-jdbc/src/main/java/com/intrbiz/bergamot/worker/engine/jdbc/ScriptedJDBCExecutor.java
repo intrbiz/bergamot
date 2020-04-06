@@ -8,8 +8,8 @@ import javax.script.SimpleBindings;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
@@ -53,7 +53,7 @@ public class ScriptedJDBCExecutor extends AbstractExecutor<JDBCEngine>
             SimpleBindings bindings = new SimpleBindings();
             bindings.put("check", executeCheck);
             bindings.put("jdbc", this.getEngine().getChecker().createContext((t) -> {
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(t));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(t));
             }, executeCheck.getTimeout()));
             bindings.put("bergamot", new ActiveCheckScriptContext(executeCheck, context));
             script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
@@ -63,7 +63,7 @@ public class ScriptedJDBCExecutor extends AbstractExecutor<JDBCEngine>
         catch (Exception e)
         {
             logger.error("Error executing check", e);
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
 }

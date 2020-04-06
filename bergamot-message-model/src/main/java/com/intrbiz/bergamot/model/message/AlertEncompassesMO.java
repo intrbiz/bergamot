@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.alert-encompasses")
 public class AlertEncompassesMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("check")
     private CheckMO check;
 

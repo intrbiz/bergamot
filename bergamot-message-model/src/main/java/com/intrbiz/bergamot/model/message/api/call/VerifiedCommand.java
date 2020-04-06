@@ -3,8 +3,8 @@ package com.intrbiz.bergamot.model.message.api.call;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.api.APIResponse;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
 
 @JsonTypeName("bergamot.api.command_editor.verified_command")
 public class VerifiedCommand extends APIResponse

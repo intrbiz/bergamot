@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.sla")
 public class SLAMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("id")
     private UUID id;
     

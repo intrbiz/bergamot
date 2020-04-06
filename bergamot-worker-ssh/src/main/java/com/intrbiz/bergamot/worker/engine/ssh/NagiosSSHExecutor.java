@@ -5,9 +5,9 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.check.ssh.ExecStat;
 import com.intrbiz.bergamot.check.ssh.SSHCheckContext;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
@@ -49,7 +49,7 @@ public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
             if (Util.isEmpty(executeCheck.getParameter("command_line"))) throw new RuntimeException("The 'command_line' parameter must be given");
             // create our context
             SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { 
-                checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e)); 
+                checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e)); 
              });
             // setup the context - this will add SSH keys etc
             SSHCheckUtil.setupSSHCheckContext(executeCheck, context);
@@ -65,7 +65,7 @@ public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
                 // parse the nagios result
                 NagiosResult response = new NagiosResult(stat.getStdOut(), stat.getExit(), runtime);
                 // publish the result
-                ActiveResultMO resultMO = new ActiveResultMO().fromCheck(executeCheck);
+                ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
                 resultMO.setOk(response.toOk());
                 resultMO.setStatus(response.toStatus());
                 resultMO.setOutput(response.getOutput());
@@ -88,7 +88,7 @@ public class NagiosSSHExecutor extends AbstractExecutor<SSHEngine>
         catch (Exception e)
         {
             logger.error("Failed to execute Nagios over SSH check", e);
-            checkContext.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
 }

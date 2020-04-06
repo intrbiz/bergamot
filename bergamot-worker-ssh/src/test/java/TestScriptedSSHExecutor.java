@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 
 public class TestScriptedSSHExecutor extends BaseSSHTest
 {
@@ -43,7 +43,7 @@ public class TestScriptedSSHExecutor extends BaseSSHTest
         this.run(
             executeCheck, 
             (res) -> {
-                ActiveResultMO result = (ActiveResultMO) res;
+                ActiveResult result = (ActiveResult) res;
                 System.out.println("testGetHostId:\n" + result);
                 assertThat(result, is(not(nullValue())));
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));

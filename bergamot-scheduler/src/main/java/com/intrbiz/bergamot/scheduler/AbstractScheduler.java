@@ -4,38 +4,32 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
-import com.intrbiz.bergamot.cluster.queue.ProcessingPoolProducer;
-import com.intrbiz.bergamot.cluster.queue.WorkerProducer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.pool.scheduler.ScheduleCheck;
+import com.intrbiz.bergamot.model.message.pool.scheduler.SchedulerMessage;
 
 
 public abstract class AbstractScheduler implements Scheduler
 {   
     private static final Logger logger = Logger.getLogger(AbstractScheduler.class);
     
-    protected final UUID poolId;
+    protected final CheckDispatcher checkDispatcher;
     
-    protected final WorkerProducer WorkerProducer;
+    protected final PoolDispatcher poolDispatcher;
     
-    protected final ProcessingPoolProducer processingPoolProducer;
-    
-    public AbstractScheduler(UUID poolId, WorkerProducer WorkerProducer, ProcessingPoolProducer processingPoolProducer)
+    public AbstractScheduler(CheckDispatcher checkDispatcher, PoolDispatcher poolDispatcher)
     {
         super();
-        this.poolId = poolId;
-        this.WorkerProducer = WorkerProducer;
-        this.processingPoolProducer = processingPoolProducer;
-    }
-    
-    public UUID getPoolId()
-    {
-        return this.poolId;
+        this.checkDispatcher = checkDispatcher;
+        this.poolDispatcher = poolDispatcher;
     }
     
     protected PublishStatus publishExecuteCheck(ExecuteCheck check)
@@ -43,7 +37,7 @@ public abstract class AbstractScheduler implements Scheduler
         if (logger.isTraceEnabled())
             logger.trace("Publishing execute check\n" + check);
         // publish
-        PublishStatus status =  this.WorkerProducer.executeCheck(check);
+        PublishStatus status =  this.checkDispatcher.dispatchCheck(check);
         if (status != PublishStatus.Success)
         {
             this.publishFailedCheck(check, status);
@@ -56,7 +50,7 @@ public abstract class AbstractScheduler implements Scheduler
         // we failed to execute the given check in time, oops!
         logger.warn("Failed to execute check (" + status + "): " + check.getId() + "\r\n" + check);
         // fake a timeout / error result and submit it
-        ActiveResultMO result = new ActiveResultMO().fromCheck(check);
+        ActiveResult result = new ActiveResult().fromCheck(check);
         if (status == PublishStatus.Unroutable)
         {
             result.error("No workers available which support this check");
@@ -65,19 +59,19 @@ public abstract class AbstractScheduler implements Scheduler
         {
             result.timeout("Unable to publish check to worker");
         }
-        this.processingPoolProducer.publishResult(this.poolId, result);
+        this.poolDispatcher.dispatchResult(check.getPool(), result);
     }
     
-    public void schedulePool(UUID siteId, int processingPool)
+    public void schedulePool(int pool)
     {
-        logger.info("Scheduling all checks in pool " + siteId + "." + processingPool);
+        logger.info("Scheduling all checks in pool: " + pool);
         try (BergamotDB db = BergamotDB.connect())
         {
-            for (Host host : db.listHostsInPool(siteId, processingPool))
+            for (Host host : db.listHostsInPool(pool))
             {
                 this.schedule(host);
             }
-            for (Service service : db.listServicesInPool(siteId, processingPool))
+            for (Service service : db.listServicesInPool(pool))
             {
                 this.schedule(service);
             }
@@ -93,6 +87,32 @@ public abstract class AbstractScheduler implements Scheduler
             if (check != null)
             {
                 this.schedule(check);
+            }
+        }
+    }
+    
+    public void process(SchedulerMessage message)
+    {
+        if (message instanceof ScheduleCheck)
+        {
+            ScheduleCheck check = (ScheduleCheck) message;
+            switch (check.getCommand())
+            {
+                case DISABLE:
+                    this.disable(check.getCheckId());
+                    break;
+                case ENABLE:
+                    this.enable(check.getCheckId());
+                    break;
+                case RESCHEDULE:
+                    this.reschedule(check.getId(), check.getInterval());
+                    break;
+                case SCHEDULE:
+                    this.schedule(check.getId());
+                    break;
+                case UNSCHEDULE:
+                    this.unschedule(check.getId());
+                    break;
             }
         }
     }

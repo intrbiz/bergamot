@@ -10,6 +10,8 @@ import com.intrbiz.bergamot.model.message.ContactMO;
 @JsonTypeName("bergamot.send_acknowledge")
 public class SendAcknowledge extends AlertNotification
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("acknowledged_by")
     private ContactMO acknowledgedBy;
     

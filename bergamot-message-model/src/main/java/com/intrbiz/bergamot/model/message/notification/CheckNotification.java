@@ -8,6 +8,8 @@ import com.intrbiz.bergamot.model.message.CheckMO;
  */
 public abstract class CheckNotification extends Notification
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("check")
     private CheckMO check;
     

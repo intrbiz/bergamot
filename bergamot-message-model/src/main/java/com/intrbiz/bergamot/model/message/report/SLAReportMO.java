@@ -9,6 +9,8 @@ import com.intrbiz.bergamot.model.message.MessageObject;
 @JsonTypeName("bergamot.report.sla")
 public class SLAReportMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("check_id")
     private UUID checkId;
     

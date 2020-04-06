@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.notifications")
 public class NotificationsMO extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("enabled")
     private boolean enabled = true;
     

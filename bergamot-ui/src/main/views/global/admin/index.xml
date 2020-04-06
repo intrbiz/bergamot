@@ -5,6 +5,45 @@
 	<div class="row submenu pull-right">
 		<a href="/global/admin/utils/">Global System Utilities</a>
 	</div>
+	
+	<div class="row">
+		<h3>Processors</h3>
+		<data-set var="processor" value="#{processors}">
+			<div class="col3 dash_icon check">
+				<h3>
+					<span class="dash_img" style="background-color: #{colours.get(processor.id)};" title="Processor #{processor.id}">
+						<img src="#{public('/images/icons/64/bergamot.png')}" />
+					</span>
+					<span class="name">#{ucFirst(coalesce(processor.application, 'Processor'))}</span>
+					<span class="name" style="font-size: 12px">(#{processor.id})</span>
+			    </h3>
+			    <p>
+				    <span class="label">State: </span>
+				    <span class="value">#{leaders.get(processor.id).state}</span>
+			    </p>
+			    <p>
+				    <span class="label">Host: </span>
+				    <span class="value">#{processor.hostName}</span>
+			    </p>
+			    <p>
+				    <span class="label">&nbsp;</span>
+				    <span class="value">#{processor.info}</span>
+			    </p>
+			</div>
+		</data-set>
+    </div>
+    
+   	<div class="row">
+		<h3>Processing Pools</h3>
+		<data-set var="pool" value="#{pools}">
+			<container data-leader="#{pool.getLeader()}">
+				<div class="col1" style="width: 50px; height: 50px; margin: 5px; background-color: #{colours.get(leader)}; box-shadow: 0px 3px 6px #747474;" title="Pool #{pool.pool} is on processor #{leader}">
+				    <h4 style="font-size: 26px; text-align: center; padding-top: 8px;">#{pool.pool}</h4>
+				</div>
+			</container>
+		</data-set>
+    </div>
+	
     <div class="row">
 		<h3>Workers</h3>
 		<data-set var="worker" value="#{workers}">
@@ -55,6 +94,7 @@
 		</data-set>
     </div>
     
+    <!--
     <div class="row">
 		<h3 title="The processing pools in this Bergamot cluster which can schedule checks and process results">Processing Pools</h3>
 		<data-set var="processor" value="#{cluster_info.processors}">
@@ -73,82 +113,16 @@
 			</div>
 		</data-set>
 	</div>
+	-->
 	
     <div class="row">
 		<h3>Worker Routes</h3>
-		<table style="width: 100%">
-			<tr>
-				<th>Worker Pool</th>
-				<th>Engine</th>
-				<th>Site</th>
-				<th>Workers</th>
-			</tr>
-			<data-set var="worker_pool_routes" value="#{worker_route_table.entrySet()}">
-				<tr>
-					<td>#{worker_pool_routes.key}</td>
-					<td></td>
-					<td></td>
-					<td></td>
-				</tr>
-				<data-set var="engine_routes" value="#{worker_pool_routes.value.entrySet()}">
-					<tr>
-						<td></td>
-						<td>#{engine_routes.key}</td>
-						<td></td>
-						<td></td>
-					</tr>
-					<data-set var="site_routes" value="#{engine_routes.value.entrySet()}">
-						<tr>
-							<td></td>
-							<td></td>
-							<td>#{site_routes.key}</td>
-							<td>#{int(site_routes.value)}</td>
-						</tr>
-					</data-set>
-				</data-set>
-			</data-set>
-		</table>
-	</div>
-	
-	<div class="row">
-		<h3>Agents</h3>
-		<table style="width: 100%">
-			<tr>
-				<th>Worker</th>
-				<th>Agents</th>
-			</tr>
-			<data-set var="worker_agent" value="#{worker_agents.entrySet()}">
-				<tr>
-					<td>#{worker_agent.key}</td>
-					<td>#{worker_agent.value}</td>
-				</tr>
-			</data-set>
-		</table>
+		<pre>#{worker_route_table}</pre>
 	</div>
 	
 	<div class="row">
 		<h3>Notifier Routes</h3>
-		<table style="width: 100%">
-			<tr>
-				<th>Engine</th>
-				<th>Site</th>
-				<th>Notifiers</th>
-			</tr>
-			<data-set var="engine_routes" value="#{notifier_route_table.entrySet()}">
-				<tr>
-					<td>#{engine_routes.key}</td>
-					<td></td>
-					<td></td>
-				</tr>
-				<data-set var="site_routes" value="#{engine_routes.value.entrySet()}">
-					<tr>
-						<td></td>
-						<td>#{site_routes.key}</td>
-						<td>#{int(site_routes.value)}</td>
-					</tr>
-				</data-set>
-			</data-set>
-		</table>
+		<pre>#{notifier_route_table}</pre>
 	</div>
 	
     <div class="row">

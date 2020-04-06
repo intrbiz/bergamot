@@ -37,7 +37,7 @@ public class RegisterForNotificationsHandler extends RequestHandler<RegisterForN
             context.computeVarIfAbsent(VAR_NOTIFICATION_LISTENER_ID, (key) -> {
                 // listen for notifications
                 logger.debug("Registering for notifications, for site: " + context.getSite().getId());
-                return context.app().getNotificationBroker().listen(context.getSite().getId(), (message) -> this.sendNotification(context, message));
+                return context.app().getProcessor().getNotificationTopic().listen(context.getSite().getId(), (message) -> this.sendNotification(context, message));
             });
             // done
             context.send(new RegisteredForNotifications(request));
@@ -61,7 +61,7 @@ public class RegisterForNotificationsHandler extends RequestHandler<RegisterForN
         UUID listenerId = context.removeVar(VAR_NOTIFICATION_LISTENER_ID);
         if (listenerId != null)
         {
-            context.app().getNotificationBroker().unlisten(context.getSite().getId(), listenerId);
+            context.app().getProcessor().getNotificationTopic().unlisten(context.getSite().getId(), listenerId);
         }
     }
 }

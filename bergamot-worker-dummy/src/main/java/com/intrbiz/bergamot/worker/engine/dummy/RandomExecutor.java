@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.worker.engine.dummy;
 
 import java.security.SecureRandom;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
@@ -32,7 +32,7 @@ public class RandomExecutor extends AbstractExecutor<DummyEngine>
         // apply a threshold to a random double from 0 - 1
         long start = System.nanoTime();
         context.publishActiveResult(
-            new ActiveResultMO().fromCheck(executeCheck)
+            new ActiveResult().fromCheck(executeCheck)
             .applyGreaterThanThreshold(
                     this.random.nextDouble(), 
                     executeCheck.getDoubleParameter("warning", 0.7D), 

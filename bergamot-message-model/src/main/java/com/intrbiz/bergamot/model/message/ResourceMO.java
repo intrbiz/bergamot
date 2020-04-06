@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.resource")
 public class ResourceMO extends VirtualCheckMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("cluster")
     private ClusterMO cluster;
     

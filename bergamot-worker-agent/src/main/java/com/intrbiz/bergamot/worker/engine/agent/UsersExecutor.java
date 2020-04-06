@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.stat.WhoStat;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
@@ -57,7 +57,7 @@ public class UsersExecutor extends AbstractExecutor<AgentEngine>
                     WhoStat stat = (WhoStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got who in " + runtime + "ms: " + stat);
                     // apply the check
-                    context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThreshold(
                             stat.getUsers().size(), 
                             executeCheck.getIntParameter("warning",  2), 
                             executeCheck.getIntParameter("critical", 5), 
@@ -70,12 +70,12 @@ public class UsersExecutor extends AbstractExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResultMO().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }
 }

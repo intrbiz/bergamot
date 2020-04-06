@@ -151,10 +151,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      */
     static
     {
-        DataManager.getInstance().registerDatabaseAdapter(
-                BergamotDB.class, 
-                DatabaseAdapterCompiler.defaultPGSQLCompiler().compileAdapterFactory(BergamotDB.class)
-        );
+        DataManager.getInstance().registerDatabaseAdapter(BergamotDB.class, DatabaseAdapterCompiler.defaultPGSQLCompiler().compileAdapterFactory(BergamotDB.class));
     }
     
     public static void load()
@@ -1598,10 +1595,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Host> listHostsThatAreNotOk(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Host.class, name = "list_hosts_in_pool", since = @SQLVersion({4, 0, 0}), 
-            query = @SQLQuery("SELECT * FROM bergamot.host WHERE site_id = p_site_id AND bergamot.compute_processing_pool(id) = p_pool")
-    )
-    public abstract List<Host> listHostsInPool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "pool", virtual = true) int pool);
+    @SQLGetter(table = Host.class, name = "list_hosts_in_pool", since = @SQLVersion({4, 0, 0}))
+    public abstract List<Host> listHostsInPool(@SQLParam(value = "pool") int pool);
     
     @Cacheable
     @CacheInvalidate({
@@ -1727,10 +1722,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Service> listServicesThatAreNotOk(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Service.class, name = "list_services_in_pool", since = @SQLVersion({1, 0, 0}),
-            query = @SQLQuery("SELECT * FROM bergamot.service WHERE site_id = p_site_id AND bergamot.compute_processing_pool(id) = p_pool")
-    )
-    public abstract List<Service> listServicesInPool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "pool", virtual = true) int pool);
+    @SQLGetter(table = Service.class, name = "list_services_in_pool", since = @SQLVersion({1, 0, 0}))
+    public abstract List<Service> listServicesInPool(@SQLParam(value = "pool") int pool);
     
     @Cacheable
     @CacheInvalidate({
@@ -3280,26 +3273,6 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new SQLScript(
                 "CREATE INDEX config_name_idx ON bergamot.config (site_id ASC NULLS LAST, type ASC NULLS LAST, name ASC NULLS LAST)"
-        );
-    }
-    
-    @SQLPatch(name = "add_compute_processing_pool", index = 17, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
-    public static SQLScript computeProcessingPool()
-    {
-        return new SQLScript(
-                "CREATE OR REPLACE FUNCTION bergamot.compute_processing_pool(id UUID)\n" + 
-                "RETURNS INTEGER\n" + 
-                "LANGUAGE plpgsql IMMUTABLE\n" + 
-                "AS $$\n" + 
-                "DECLARE\n" + 
-                "    v_lsb_hex TEXT;\n" + 
-                "    v_lsb INTEGER;\n" + 
-                "BEGIN\n" + 
-                "    v_lsb_hex := substring(id::TEXT FROM 35 FOR 2);\n" + 
-                "    EXECUTE 'SELECT X''' || v_lsb_hex || '''::int' INTO v_lsb;\n" + 
-                "    RETURN v_lsb % 48;\n" + 
-                "END;\n" + 
-                "$$;"
         );
     }
     

@@ -9,11 +9,11 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.api.update.RegisterForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
-import com.intrbiz.bergamot.model.message.update.AlertUpdate;
-import com.intrbiz.bergamot.model.message.update.CheckUpdate;
-import com.intrbiz.bergamot.model.message.update.GroupUpdate;
-import com.intrbiz.bergamot.model.message.update.LocationUpdate;
-import com.intrbiz.bergamot.model.message.update.Update;
+import com.intrbiz.bergamot.model.message.event.update.AlertUpdate;
+import com.intrbiz.bergamot.model.message.event.update.CheckUpdate;
+import com.intrbiz.bergamot.model.message.event.update.GroupUpdate;
+import com.intrbiz.bergamot.model.message.event.update.LocationUpdate;
+import com.intrbiz.bergamot.model.message.event.update.Update;
 import com.intrbiz.bergamot.updater.context.ClientContext;
 
 public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates>
@@ -35,7 +35,7 @@ public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates
         // setup the listener
         context.computeVarIfAbsent(VAR_UPDATE_LISTENER_ID, (key) -> {
             logger.debug("Listening for update on " + context.getSite().getId());
-            return context.app().getUpdateBroker().listen(context.getSite().getId(), (update) -> {
+            return context.app().getProcessor().getUpdateTopic().listen(context.getSite().getId(), (update) -> {
                 sendUpdate(context, update);
             });
         });
@@ -48,7 +48,7 @@ public class RegisterForUpdatesHandler extends RequestHandler<RegisterForUpdates
         UUID listenerId = context.removeVar(VAR_UPDATE_LISTENER_ID);
         if (listenerId != null)
         {
-            context.app().getUpdateBroker().unlisten(context.getSite().getId(), listenerId);
+            context.app().getProcessor().getUpdateTopic().unlisten(context.getSite().getId(), listenerId);
         }
     }
     

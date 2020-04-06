@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("bergamot.sla.rolling-period")
 public class SLARollingPeriodMO extends SLAPeriodMO
 {   
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("granularity")
     private String granularity;
     

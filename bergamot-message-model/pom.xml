@@ -31,10 +31,6 @@
 			<artifactId>jackson-annotations</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.intrbiz.util</groupId>
-			<artifactId>queue</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-util</artifactId>
 		</dependency>
@@ -45,6 +41,10 @@
     <dependency>
     	<groupId>com.intrbiz.gerald</groupId>
     	<artifactId>polyakov-model</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.core</groupId>
+    	<artifactId>core</artifactId>
     </dependency>
 	</dependencies>
 </project>

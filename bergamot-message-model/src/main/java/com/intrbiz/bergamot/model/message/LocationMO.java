@@ -13,6 +13,8 @@ import com.intrbiz.bergamot.model.message.state.GroupStateMO;
 @JsonTypeName("bergamot.location")
 public class LocationMO extends SecuredObjectMO
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("state")
     private GroupStateMO state;
 

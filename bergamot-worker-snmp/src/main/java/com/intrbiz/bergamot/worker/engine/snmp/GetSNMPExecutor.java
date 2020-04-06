@@ -1,8 +1,8 @@
 package com.intrbiz.bergamot.worker.engine.snmp;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.result.ActiveResultMO;
+import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.error.SNMPTimeout;
@@ -38,7 +38,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
                 (vb) -> {
                     long runtime = System.currentTimeMillis() - start;
                     context.publishActiveResult( 
-                            new ActiveResultMO()
+                            new ActiveResult()
                             .fromCheck(executeCheck)
                             .info(Util.coalesce(executeCheck.getParameter("prefix"), "") + vb.valueToString() + Util.coalesce(executeCheck.getParameter("suffix"), ""))
                             .runtime(runtime)
@@ -50,7 +50,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
                     {
                         // timeout
                         context.publishActiveResult( 
-                                new ActiveResultMO()
+                                new ActiveResult()
                                 .fromCheck(executeCheck)
                                 .timeout(ex.getMessage())
                                 .runtime(runtime)
@@ -60,7 +60,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
                     {
                         // generic error
                         context.publishActiveResult( 
-                                new ActiveResultMO()
+                                new ActiveResult()
                                 .fromCheck(executeCheck)
                                 .error(ex)
                                 .runtime(runtime)
