@@ -24,4 +24,9 @@ public final class PoolElector extends GenericElector
     {
         return this.pool;
     }
+    
+    public String toString()
+    {
+        return String.valueOf(this.pool);
+    }
 }

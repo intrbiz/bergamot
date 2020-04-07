@@ -1,11 +1,9 @@
 package com.intrbiz.bergamot.ui.router.global;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -13,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.cluster.election.PoolElector;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
@@ -38,7 +37,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
 {    
     private static final Logger logger = Logger.getLogger(GlobalAdminRouter.class);
     
-    private static final String[] COLOURS = { "#55aa00", "#ffaa00", "#ff557f", "#55aaff", "#ffaaff", "#aaaaff", "#aaaa00", "#aaff7f" };
+    private static final String[] COLOURS = { "#a98cff", "#ff829d", "#6b9aff", "#dec1ff", "#ffa595", "#3973ac", "#bf5ad8", "#D9E1D9", "#00BF00", "#F3C300", "#E85752"  };
     
     @Before()
     @Any("**")
@@ -57,17 +56,26 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         var("worker_route_table", app().getProcessor().getWorkerRegistry().getRouteTable().toString());
         var("notifiers", app().getProcessor().getNotifierRegistry().getNotifiers());
         var("notifier_route_table", app().getProcessor().getNotifierRegistry().getRouteTable().toString());
-        Set<ProcessorRegistration> processors = app().getProcessor().getProcessorRegistry().getProcessors();
+        Map<UUID, ProcessorRegistration> processors = app().getProcessor().getProcessorRegistry().getProcessors().stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
         Map<UUID, String> colours = new HashMap<>();
         int idx = 0;
-        for (ProcessorRegistration processor : processors)
+        for (ProcessorRegistration processor : processors.values())
         {
             colours.put(processor.getId(), COLOURS[idx ++ % COLOURS.length]);
         }
-        var("processors", processors);
-        var("colours", colours);
-        var("leaders", app().getProcessor().getElector().getElectionMembers());
-        var("pools", Arrays.asList(app().getProcessor().getPoolElectors()));
+        Map<Integer, ProcessorRegistration> pools = new HashMap<>();
+        Map<UUID, Integer> poolCounts = new HashMap<>();
+        for (PoolElector pool : app().getProcessor().getPoolElectors())
+        {
+            UUID leader = pool.getLeader();
+            pools.put(pool.getPool(), processors.get(leader));
+            poolCounts.merge(leader, 1, (a, b) -> a + b);
+        }
+        var("processors", processors.values());
+        var("processor_colours", colours);
+        var("processor_pools", poolCounts);
+        var("processor_leaders", app().getProcessor().getLeaderElector().getElectionMembers());
+        var("pools", pools.entrySet());
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins

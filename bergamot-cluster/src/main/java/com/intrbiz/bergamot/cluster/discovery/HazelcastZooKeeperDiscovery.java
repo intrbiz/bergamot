@@ -105,13 +105,13 @@ public class HazelcastZooKeeperDiscovery implements DiscoveryStrategy
             data.setPublicPort(node.getPublicAddress().getPort());
         }
         this.registeredPath = this.zooKeeper.create(ZKPaths.BERGAMOT + "/" + ZKPaths.NODES + "/node_", this.transcoder.encodeAsBytes(data), Arrays.asList(new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.ANYONE_ID_UNSAFE)), CreateMode.EPHEMERAL_SEQUENTIAL);
-        logger.info("Registered member into ZooKeeper: " + this.registeredPath + " => " + data);
+        logger.debug("Registered member into ZooKeeper: " + this.registeredPath + " => " + data);
     }
     
     protected final void unregisterMember() throws KeeperException, InterruptedException
     {
         this.zooKeeper.delete(this.registeredPath, -1);
-        logger.info("Unregistered member form ZooKeeper: " + this.registeredPath);
+        logger.debug("Unregistered member form ZooKeeper: " + this.registeredPath);
     }
 
     @Override

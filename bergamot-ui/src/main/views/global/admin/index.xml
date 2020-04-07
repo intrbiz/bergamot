@@ -11,7 +11,7 @@
 		<data-set var="processor" value="#{processors}">
 			<div class="col3 dash_icon check">
 				<h3>
-					<span class="dash_img" style="background-color: #{colours.get(processor.id)};" title="Processor #{processor.id}">
+					<span class="dash_img" style="background-color: #{processor_colours.get(processor.id)};" title="Processor #{processor.id}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
 					<span class="name">#{ucFirst(coalesce(processor.application, 'Processor'))}</span>
@@ -19,11 +19,15 @@
 			    </h3>
 			    <p>
 				    <span class="label">State: </span>
-				    <span class="value">#{leaders.get(processor.id).state}</span>
+				    <span class="value">#{ucFirst(lc(processor_leaders.get(processor.id).state))}</span>
 			    </p>
 			    <p>
 				    <span class="label">Host: </span>
 				    <span class="value">#{processor.hostName}</span>
+			    </p>
+			    <p>
+				    <span class="label">Pools: </span>
+				    <span class="value">#{processor_pools.get(processor.id)}</span>
 			    </p>
 			    <p>
 				    <span class="label">&nbsp;</span>
@@ -36,11 +40,9 @@
    	<div class="row">
 		<h3>Processing Pools</h3>
 		<data-set var="pool" value="#{pools}">
-			<container data-leader="#{pool.getLeader()}">
-				<div class="col1" style="width: 50px; height: 50px; margin: 5px; background-color: #{colours.get(leader)}; box-shadow: 0px 3px 6px #747474;" title="Pool #{pool.pool} is on processor #{leader}">
-				    <h4 style="font-size: 26px; text-align: center; padding-top: 8px;">#{pool.pool}</h4>
-				</div>
-			</container>
+			<div class="col1" style="width: 50px; height: 50px; margin: 5px; background-color: #{processor_colours.get(pool.value.id)}; box-shadow: 0px 3px 6px #747474;" title="Pool #{pool.key} is on processor #{pool.value.hostName} (#{pool.value.id})">
+			    <h4 style="font-size: 24px; text-align: center; padding-top: 10px;">#{pool.key}</h4>
+			</div>
 		</data-set>
     </div>
 	

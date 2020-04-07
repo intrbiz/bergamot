@@ -63,6 +63,7 @@ public class ProcessingPool
             // Create our execution thread
             this.shutdownLatch = new CountDownLatch(1);
             this.runner = new Thread(this::run, "bergamot-processing-pool" + this.pool);
+            this.runner.setDaemon(true);
             this.runner.start();
         }
     }

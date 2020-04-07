@@ -2,13 +2,16 @@ package com.intrbiz.bergamot.cluster.election;
 
 import static com.intrbiz.bergamot.cluster.util.ZKPaths.*;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -16,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.Transaction;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
@@ -33,25 +37,27 @@ public abstract class GenericElector
     
     protected static final int SEQUENCE_LENGTH = 10;
     
-    private final ZooKeeper zooKeeper;
+    protected static final int MAX_START_DELAY = 250;
     
-    private final UUID id;
+    protected final ZooKeeper zooKeeper;
     
-    private final String parentPath;
+    protected final UUID id;
     
-    private final String containerPath;
+    protected final String parentPath;
     
-    private final String nodePrefix;
+    protected final String containerPath;
     
-    private final int nodePrefixLength;
+    protected final String nodePrefix;
     
-    private final String nodePathPrefix;
+    protected final int nodePrefixLength;
     
-    private Consumer<ElectionState> leaderTrigger;
+    protected final String nodePathPrefix;
     
-    private String electionNodePath;
+    protected Consumer<ElectionState> leaderTrigger;
     
-    private ElectionState currentState;
+    protected String electionNodePath;
+    
+    protected ElectionState currentState;
     
     public GenericElector(ZooKeeper zooKeeper, String parent, String container, UUID id) throws KeeperException, InterruptedException
     {
@@ -67,6 +73,7 @@ public abstract class GenericElector
         this.createRoot();
         this.createParent();
         this.createContainer();
+        
     }
     
     private void createRoot() throws KeeperException, InterruptedException
@@ -96,13 +103,7 @@ public abstract class GenericElector
     public synchronized ElectionState elect(Consumer<ElectionState> leaderTrigger) throws KeeperException, InterruptedException
     {
         this.leaderTrigger = Objects.requireNonNull(leaderTrigger);
-        // Create our election node
-        this.createElectionNode();
-        // Watch ourself
-        this.watchOurself();
-        // Do the election
-        this.doElection();
-        // Return the election state
+        this.startElection();
         return this.currentState;
     }
     
@@ -116,14 +117,70 @@ public abstract class GenericElector
     
     public void releaseMember(UUID memberId) throws KeeperException, InterruptedException
     {
-        String idStr = memberId.toString();
-        for (String path : this.zooKeeper.getChildren(this.containerPath, false))
+        ElectionMember member = this.getElectionMembers().get(memberId);
+        if (member != null)
         {
-            if (path.contains(idStr))
-            {
-                this.zooKeeper.delete(zkPath(this.containerPath, path), -1);
-            }
+            logger.debug("Releasing election member " + member.getPath());
+            this.zooKeeper.delete(zkPath(this.containerPath, member.getPath()), -1);
         }
+    }
+    
+    public void releaseMembers(Set<UUID> memberIds) throws KeeperException, InterruptedException
+    {
+        // Get all the node paths we need to delete
+        List<ElectionMember> membersToRelease = new LinkedList<>();
+        for (Entry<UUID, ElectionMember> member : this.getElectionMembers().entrySet())
+        {
+            if (memberIds.contains(member.getKey()))
+                membersToRelease.add(member.getValue());
+        }
+        if (membersToRelease.size() > 0)
+        {
+            // Delete all nodes as a transaction
+            logger.debug("Releasing election members " + membersToRelease);
+            Transaction transaction = this.zooKeeper.transaction();
+            for (ElectionMember path : membersToRelease)
+            {
+                transaction.delete(zkPath(this.containerPath, path.getPath()), -1);
+            }
+            transaction.commit();
+        }
+    }
+    
+    public void promoteMember(UUID memberId) throws KeeperException, InterruptedException
+    {
+        // Get all the node paths we need to delete
+        LinkedHashMap<UUID, ElectionMember> members = this.getElectionMembers();
+        List<ElectionMember> membersToRelease = new LinkedList<>();
+        for (Entry<UUID, ElectionMember> member : members.entrySet())
+        {
+            if (memberId.equals(member.getKey()))
+                break;
+            membersToRelease.add(member.getValue());
+        }
+        if (membersToRelease.size() != members.size() && membersToRelease.size() > 0)
+        {
+            // Delete all nodes as a transaction
+            Transaction transaction = this.zooKeeper.transaction();
+            for (ElectionMember member : membersToRelease)
+            {
+                transaction.delete(zkPath(this.containerPath, member.getPath()), -1);
+            }
+            transaction.commit();
+        }
+    }
+    
+    public void releaseAll() throws KeeperException, InterruptedException
+    {
+        List<String> paths = this.getElectionNodes();
+        // Delete all nodes as a transaction
+        logger.debug("Releasing all election members " + paths);
+        Transaction transaction = this.zooKeeper.transaction();
+        for (String path : paths)
+        {
+            transaction.delete(zkPath(this.containerPath, path), -1);
+        }
+        transaction.commit();
     }
     
     public synchronized ElectionState getOurElectionState()
@@ -137,46 +194,53 @@ public abstract class GenericElector
         return nodes.size() > 0 ? UUID.fromString(nodes.get(0).substring(0, this.nodePrefixLength - 1)) : null;
     }
     
-    public Map<UUID, ElectionMember> getElectionMembers()
+    public LinkedHashMap<UUID, ElectionMember> getElectionMembers() throws KeeperException, InterruptedException
     {
-        Map<UUID, ElectionMember> nodeElectionStates = new HashMap<>();
-        try
+        LinkedHashMap<UUID, ElectionMember> nodeElectionStates = new LinkedHashMap<>();
+        int position = 0;
+        for (String node : this.getElectionNodes())
         {
-            int position = 0;
-            for (String node : this.getElectionNodes())
-            {
-                UUID id = UUID.fromString(node.substring(0, this.nodePrefixLength - 1));
-                nodeElectionStates.put(id, new ElectionMember(position == 0 ? ElectionState.LEADER : ElectionState.FOLLOWER, position));
-                position ++;
-            }
-        }
-        catch (Exception e)
-        {
-            logger.warn("Failed to get election members", e);
+            UUID id = UUID.fromString(node.substring(0, this.nodePrefixLength - 1));
+            nodeElectionStates.put(id, new ElectionMember(id, position == 0 ? ElectionState.LEADER : ElectionState.FOLLOWER, position, node));
+            position ++;
         }
         return nodeElectionStates;
     }
     
+    protected synchronized void startElection() throws KeeperException, InterruptedException
+    {
+        // Wait a randomised period of time before trying to win the election
+        try
+        {
+            Thread.sleep(new SecureRandom().nextInt(MAX_START_DELAY));
+        }
+        catch (InterruptedException e)
+        {
+        }
+        // Create our election node
+        this.createElectionNode();
+        // Watch ourself
+        this.watchOurself();
+        // Do the election
+        this.doElection();
+    }
+    
     protected synchronized void doElection() throws KeeperException, InterruptedException
     {
-        // Get the nodes that are part of the election
+        // Are we a leader of follower
         List<String> electionNodes = this.getElectionNodes();
-        // What position are we in the election
         int position = this.findOurPosition(electionNodes);
-        // Sanity check
+        logger.info("Doing election (" + this.toString() + ") we " + this.id + " are " + position + " in " + electionNodes);
         if (position < 0 || position >= electionNodes.size())
         {
-            // Shite something has gone very wrong
-            this.currentState = ElectionState.FAILED;
-            logger.fatal("Leader election went horribly wrong!");
-            return;
+            // We couldn't find our node, start the election process again
+            this.startElection();
         }
-        // Are we a leader of follower
-        if (position == 0)
+        else if (position == 0)
         {
             // We are the leader
             this.currentState = ElectionState.LEADER;
-            logger.info("We are the leader!");
+            logger.debug("We are the leader!");
             // fire callback
             this.leaderTrigger.accept(this.currentState);
         }
@@ -185,7 +249,7 @@ public abstract class GenericElector
             // We are a follower
             this.currentState = ElectionState.FOLLOWER;
             String followerOf = electionNodes.get(position - 1);
-            logger.info("We are a follower of: " + followerOf);
+            logger.debug("We are a follower of: " + followerOf);
             // Setup a watch on the node to follow
             this.followOtherMember(followerOf);
             // fire callback
@@ -196,14 +260,14 @@ public abstract class GenericElector
     protected void createElectionNode() throws KeeperException, InterruptedException
     {
         this.electionNodePath = this.zooKeeper.create(this.nodePathPrefix, null, Arrays.asList(new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.ANYONE_ID_UNSAFE)), CreateMode.EPHEMERAL_SEQUENTIAL);
-        logger.info("Created election: " + this.electionNodePath);
+        logger.debug("Created election: " + this.electionNodePath);
     }
     
     protected List<String> getElectionNodes() throws KeeperException, InterruptedException
     {
         List<String> nodes = new ArrayList<>(this.zooKeeper.getChildren(this.containerPath, false));
         Collections.sort(nodes, GenericElector::compareNodes);
-        logger.info("Election nodes: " + nodes);
+        logger.debug("Election nodes: " + nodes);
         return nodes;
     }
     
@@ -220,7 +284,7 @@ public abstract class GenericElector
                 }
                 catch (KeeperException | InterruptedException e)
                 {
-                    logger.info("Failed to determine election status", e);
+                    logger.warn("Failed to determine election status", e);
                 }
             }
         }, AddWatchMode.PERSISTENT);
@@ -238,7 +302,7 @@ public abstract class GenericElector
                 }
                 catch (KeeperException | InterruptedException e)
                 {
-                    logger.info("Failed to determine election status", e);
+                    logger.warn("Failed to determine election status", e);
                 }
             }
         }, AddWatchMode.PERSISTENT);
@@ -251,15 +315,20 @@ public abstract class GenericElector
     
     protected int findOurPosition(List<String> sortedNodes)
     {
-        String idStr = this.id.toString();
-        int position = -1;
+        return findPosition(sortedNodes, this.id);
+    }
+    
+    protected static int findPosition(List<String> sortedNodes, UUID id)
+    {
+        String idStr = id.toString();
+        int position = 0;
         for (String node : sortedNodes)
         {
-            position++;
             if (node.contains(idStr))
-                break;
+                return position;
+            position++;
         }
-        return position;
+        return -1;
     }
     
     protected static int nodeSequence(String node)

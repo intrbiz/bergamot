@@ -15,7 +15,7 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     /**
      * The global number of processing pools that checks can be in.
      */
-    public static final int PROCESSING_POOL_COUNT = 120;
+    public static final int PROCESSING_POOL_COUNT = 240;
 
     @JsonProperty("pool")
     protected int pool;

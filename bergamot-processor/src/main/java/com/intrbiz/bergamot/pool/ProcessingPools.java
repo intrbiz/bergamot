@@ -1,6 +1,5 @@
 package com.intrbiz.bergamot.pool;
 
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -62,12 +61,10 @@ public class ProcessingPools
         this.scheduler.start();
         // Join the election for each pool
         logger.info("Starting processing pool election");
-        SecureRandom random = new SecureRandom();
         for (PoolElector pool : this.shufflePools())
         {
             logger.info("Electing pool " + pool.getPool());
             pool.elect((state) -> this.poolTrigger(pool.getPool(), state));
-            Thread.sleep(random.nextInt(250));
         }
         logger.info("Finished processing pool election");
         logger.info("Started " + this.pools.size() + " processing pools");
@@ -82,6 +79,7 @@ public class ProcessingPools
     
     protected void poolTrigger(int pool, ElectionState state)
     {
+        logger.info("Got trigger for pool " + pool + " " + state);
         if (state == ElectionState.LEADER)
         {
             this.startPool(pool);
@@ -103,6 +101,7 @@ public class ProcessingPools
                 ProcessingPool processingPool = new ProcessingPool(pool, this.poolConsumerFactory.apply(pool), this.scheduler, this.resultProcessor, this.readingProcessor, this.agentRegistrationService);
                 this.pools.put(pool, processingPool);
                 processingPool.start();
+                logger.info("Now running " + this.pools.size() + " processing pools");
             }
         }
     }
@@ -118,6 +117,7 @@ public class ProcessingPools
                 logger.info("Stopping processing pool " + pool);
                 // Shutdown the pool
                 processingPool.shutdown();
+                logger.info("Now running " + this.pools.size() + " processing pools");
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.processor;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
@@ -69,7 +71,7 @@ public class BergamotProcessor extends BergamotMember
     
     // electors
     
-    private final LeaderElector elector;
+    private final LeaderElector leaderElector;
     
     private final PoolElector[] poolElectors;
     
@@ -98,6 +100,14 @@ public class BergamotProcessor extends BergamotMember
     // leader
     
     private final BergamotClusterLeader leader;
+    
+    // Runner for our processing
+    
+    private final AtomicBoolean run = new AtomicBoolean(false);
+    
+    private Thread runner;
+    
+    private CountDownLatch shutdownLatch;
 
     public BergamotProcessor(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
     {
@@ -116,7 +126,7 @@ public class BergamotProcessor extends BergamotMember
         // registars
         this.processorRegistar = new ProcessorRegistar(this.zooKeeper.getZooKeeper());
         // elector
-        this.elector = new LeaderElector(this.zooKeeper.getZooKeeper(), this.id);
+        this.leaderElector = new LeaderElector(this.zooKeeper.getZooKeeper(), this.id);
         // coordinator
         this.poolElectors = new PoolElector[CheckMO.PROCESSING_POOL_COUNT];
         for (int i = 0; i < this.poolElectors.length; i++)
@@ -135,7 +145,7 @@ public class BergamotProcessor extends BergamotMember
         // processing pool executor
         this.processingPools = new ProcessingPools(this.poolElectors, this::createPoolConsumer, this.scheduler, this.resultProcessor, this.readingProcessor, this.agentRegistrationService);
         // leader
-        this.leader = new BergamotClusterLeader(this.poolElectors, this.processorRegistry);
+        this.leader = new BergamotClusterLeader(this.poolElectors, this.processorRegistry, this.leaderElector);
     }
     
     @Override
@@ -147,17 +157,35 @@ public class BergamotProcessor extends BergamotMember
         super.panic();
     }
 
-    public void start() throws Exception
+    public void start()
     {
-        logger.info("Bergamot Processor starting");
-        // Register as a processor
-        this.processorRegistar.registerProcessor(new ProcessorRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName));
-        // Wait for other processors to join
-        this.waitForProcessors();
-        // Start our processing pool executor
-        this.processingPools.start();
-        // Elect a leader
-        this.elector.elect(this::leaderLauncher);
+        if (this.run.compareAndSet(false, true))
+        {
+            this.shutdownLatch = new CountDownLatch(1);
+            this.runner = new Thread(() -> {
+                try
+                {
+                    logger.info("Bergamot Processor " + this.id + " starting");
+                    // Register as a processor
+                    this.processorRegistar.registerProcessor(new ProcessorRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName));
+                    // Wait for other processors to join
+                    this.waitForProcessors();
+                    // Start our processing pool executor
+                    this.processingPools.start();
+                    // Elect a leader
+                    this.leaderElector.elect(this::leaderLauncher);
+                }
+                catch (Exception e)
+                {
+                    logger.error("Error starting Bergamot Processor", e);
+                }
+                finally
+                {
+                    this.shutdownLatch.countDown();
+                }
+            }, "bergamot-processor");
+            this.runner.start();
+        }
     }
     
     protected void waitForProcessors() throws Exception
@@ -166,12 +194,12 @@ public class BergamotProcessor extends BergamotMember
         {
             int waitFor = (int) Math.ceil(((double) this.config.getExpectedMembers()) / 2d);
             logger.info("Waiting for " + waitFor + " processors to join");
-            for (int i = 0; i < 60; i++)
+            for (int i = 0; i < 300; i++)
             {
                 int count = this.processorRegistry.count();
                 if (count >= waitFor)
                     break;
-                Thread.sleep(5_000);
+                Thread.sleep(1_000);
             }
         }
     }
@@ -192,6 +220,7 @@ public class BergamotProcessor extends BergamotMember
     
     public void shutdown()
     {
+        this.run.set(false);
         try
         {
             this.leader.halt();
@@ -202,11 +231,18 @@ public class BergamotProcessor extends BergamotMember
         }
         try
         {
-            this.elector.release();
+            this.leaderElector.release();
         }
         catch (Exception e)
         {
             logger.error("Failed to release leader election", e);
+        }
+        try
+        {
+            this.shutdownLatch.await();
+        }
+        catch (InterruptedException e)
+        {
         }
     }
 
@@ -255,9 +291,9 @@ public class BergamotProcessor extends BergamotMember
         return this.processorRegistar;
     }
 
-    public LeaderElector getElector()
+    public LeaderElector getLeaderElector()
     {
-        return this.elector;
+        return this.leaderElector;
     }
 
     public PoolElector[] getPoolElectors()
