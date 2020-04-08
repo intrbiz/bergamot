@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Check;
@@ -16,15 +16,15 @@ import com.intrbiz.bergamot.model.message.event.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.event.update.GroupUpdate;
 import com.intrbiz.bergamot.model.message.event.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.notification.Notification;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
-import com.intrbiz.bergamot.model.message.pool.scheduler.ScheduleCheck;
-import com.intrbiz.bergamot.model.message.pool.scheduler.ScheduleCheck.Command;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
+import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck.Command;
 
 public abstract class AbstractResultProcessor implements ResultProcessor
 {
     private static final Logger logger = Logger.getLogger(AbstractResultProcessor.class);
     
-    protected final PoolDispatcher poolDispatcher;
+    protected final SchedulingPoolDispatcher poolDispatcher;
     
     protected final SiteNotificationTopic notificationTopic;
     
@@ -32,7 +32,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     
     protected final SiteUpdateTopic updateTopic;
 
-    public AbstractResultProcessor(PoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, SiteNotificationTopic notificationBroker, SiteUpdateTopic updateBroker)
+    public AbstractResultProcessor(SchedulingPoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, SiteNotificationTopic notificationBroker, SiteUpdateTopic updateBroker)
     {
         super();
         this.poolDispatcher = poolDispatcher;
@@ -60,7 +60,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     {
         if (logger.isTraceEnabled()) logger.trace("Rescheduling " + check.getType() + "::" + check.getId() + " [" + check.getName() + "]" + " with new interval " + interval + " due to state change");
         // Publish a message to the scheduler
-        this.poolDispatcher.dispatchSchedulerAction(new ScheduleCheck(check.getId(), Command.RESCHEDULE, interval));
+        this.poolDispatcher.dispatch(check.getPool(), new ScheduleCheck(check.getId(), Command.RESCHEDULE, interval));
     }
 
     protected void publishNotification(Check<?, ?> check, Notification notification)

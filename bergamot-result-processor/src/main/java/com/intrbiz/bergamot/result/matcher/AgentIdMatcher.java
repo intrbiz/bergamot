@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.result.matcher;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnAgentId;
-import com.intrbiz.bergamot.model.message.pool.result.match.MatchableMO;
+import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnAgentId;
+import com.intrbiz.bergamot.model.message.processor.result.match.MatchableMO;
 
 public class AgentIdMatcher implements Matcher<MatchOnAgentId>
 {

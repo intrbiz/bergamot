@@ -186,7 +186,7 @@ public class WorkerRouteTable
                 if (workers != null)
                 {
                     // Choose a random route
-                    return workers[this.random.nextInt(workers.length)];
+                    return workers[Math.abs(this.random.nextInt() % workers.length)];
                 }
             }
         }

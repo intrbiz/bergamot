@@ -406,14 +406,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         this.pool = pool;
     }
     
-    /**
-     * Compute the processing pool number for this check.
-     */
-    public final int computePool()
-    {
-        return CheckMO.computePool(this.id);
-    }
-    
     // some basic actions
 
     /**
@@ -627,8 +619,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
     public void configure(C configuration, C resolvedConfiguration)
     {
         super.configure(configuration, resolvedConfiguration);
-        // compute the pool
-        this.pool = this.computePool();
         // configure basic check state
         this.enabled    = resolvedConfiguration.getEnabledBooleanValue(this.enabled);
         this.suppressed = resolvedConfiguration.getSuppressedBooleanValue(this.suppressed);

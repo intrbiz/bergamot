@@ -3,8 +3,8 @@ package com.intrbiz.bergamot.result.matcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Host;
-import com.intrbiz.bergamot.model.message.pool.result.match.MatchOnTrapName;
-import com.intrbiz.bergamot.model.message.pool.result.match.MatchableMO;
+import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnTrapName;
+import com.intrbiz.bergamot.model.message.processor.result.match.MatchableMO;
 
 public class TrapNameMatcher implements Matcher<MatchOnTrapName>
 {

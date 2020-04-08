@@ -15,7 +15,7 @@ import com.intrbiz.bergamot.cluster.registry.AgentRegistry;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistry;
 import com.intrbiz.bergamot.cluster.registry.WorkerRouteTable;
 import com.intrbiz.bergamot.cluster.util.HZNames;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 /**
  * Dispatch checks to workers

@@ -9,9 +9,9 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
 import com.intrbiz.bergamot.model.message.agent.util.Parameter;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 

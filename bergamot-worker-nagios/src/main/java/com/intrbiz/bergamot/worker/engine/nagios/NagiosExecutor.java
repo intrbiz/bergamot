@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;

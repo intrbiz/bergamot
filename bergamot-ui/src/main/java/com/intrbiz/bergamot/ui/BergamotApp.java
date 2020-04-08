@@ -378,7 +378,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     {
         // start the processor
         logger.info("Starting processor");
-        this.processor.start();
+        this.processor.startInBackground();
         // start the update websocket server
         this.updateServer.start();
         // Start Gerald
@@ -387,7 +387,20 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     protected void clusterPanic(Void v)
     {
-        // TODO
+        logger.info("Got cluster panic, shutting down!");
+        try
+        {
+            this.stop();
+        }
+        finally
+        {
+            System.exit(1);
+        }
+    }
+    
+    protected void shutdown()
+    {
+        this.processor.shutdown();
     }
 
     public static void main(String[] args) throws Exception
@@ -407,8 +420,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         }
         catch (Exception e)
         {
+            System.err.println("Failed to start Bergamot UI!");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
     }
     

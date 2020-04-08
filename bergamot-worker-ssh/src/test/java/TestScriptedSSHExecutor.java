@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 
 public class TestScriptedSSHExecutor extends BaseSSHTest
 {

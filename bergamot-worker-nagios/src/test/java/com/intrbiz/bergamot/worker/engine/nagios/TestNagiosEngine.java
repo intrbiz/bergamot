@@ -9,10 +9,10 @@ import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 public class TestNagiosEngine

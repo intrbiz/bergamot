@@ -12,7 +12,7 @@ public class ManualTestWheelScheduler extends WheelScheduler
 {
     public ManualTestWheelScheduler()
     {
-        super(null, null);
+        super(null,null, null, null);
     }
     
     protected void startQueues() throws Exception

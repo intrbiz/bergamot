@@ -4,9 +4,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.SimpleBindings;
 
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
 import com.intrbiz.scripting.RestrictedScriptEngineManager;

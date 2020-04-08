@@ -230,7 +230,7 @@ public abstract class GenericElector
         // Are we a leader of follower
         List<String> electionNodes = this.getElectionNodes();
         int position = this.findOurPosition(electionNodes);
-        logger.info("Doing election (" + this.toString() + ") we " + this.id + " are " + position + " in " + electionNodes);
+        logger.debug("Doing election (" + this.toString() + ") we " + this.id + " are " + position + " in " + electionNodes);
         if (position < 0 || position >= electionNodes.size())
         {
             // We couldn't find our node, start the election process again

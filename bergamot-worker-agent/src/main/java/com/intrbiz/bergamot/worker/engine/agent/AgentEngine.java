@@ -7,7 +7,7 @@ import com.intrbiz.bergamot.agent.server.AgentKeyResolver;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer;
 import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.pool.agent.AgentRegister;
+import com.intrbiz.bergamot.model.message.processor.agent.AgentRegister;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 

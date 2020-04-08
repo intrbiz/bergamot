@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
@@ -19,22 +19,25 @@ import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.pool.agent.AgentRegister;
+import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.processor.agent.AgentRegister;
 
 public class AgentRegistrationService
 {
     private static final Logger logger = Logger.getLogger(AgentRegistrationService.class);
     
-    private final PoolDispatcher poolDispatcher;
+    private final SchedulingPoolDispatcher poolDispatcher;
     
     private final NotificationDispatcher notificationDispatcher;
     
-    public AgentRegistrationService(PoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher)
+    private final int schedulingPoolCount;
+    
+    public AgentRegistrationService(SchedulingPoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, int schedulingPoolCount)
     {
         super();
         this.poolDispatcher = poolDispatcher;
         this.notificationDispatcher = notificationDispatcher;
+        this.schedulingPoolCount = schedulingPoolCount;
     }
     
     public void process(AgentMessage event)
@@ -107,7 +110,7 @@ public class AgentRegistrationService
             if (validatedConfiguration.getReport().isValid())
             {
                 // good we have a valid configuration, import it
-                BergamotConfigImporter importer = new BergamotConfigImporter(validatedConfiguration).online(this.poolDispatcher, this.notificationDispatcher, null);
+                BergamotConfigImporter importer = new BergamotConfigImporter(validatedConfiguration, this.schedulingPoolCount).online(this.poolDispatcher, this.notificationDispatcher, null);
                 BergamotImportReport importReport = importer.importConfiguration();
                 if (importReport.isSuccessful())
                 {

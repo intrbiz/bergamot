@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.stat.OSStat;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 

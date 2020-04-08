@@ -9,8 +9,8 @@ import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
 import com.intrbiz.bergamot.express.BergamotEntityResolver;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.PassiveCheckMO;
-import com.intrbiz.bergamot.model.message.event.watcher.RegisterCheck;
-import com.intrbiz.bergamot.model.message.event.watcher.UnregisterCheck;
+import com.intrbiz.bergamot.model.message.check.RegisterCheck;
+import com.intrbiz.bergamot.model.message.check.UnregisterCheck;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.express.DefaultContext;
 import com.intrbiz.express.ExpressContext;
@@ -44,7 +44,6 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
         registerCheck.setSiteId(this.getSiteId());
         registerCheck.setCheckType(this.getType());
         registerCheck.setCheckId(this.getId());
-        registerCheck.setPool(this.getPool());
         registerCheck.setEngine(command.getEngine());
         registerCheck.setExecutor(command.getExecutor());
         registerCheck.setName(command.getName());
@@ -84,7 +83,6 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
         unregisterCheck.setSiteId(this.getSiteId());
         unregisterCheck.setCheckType(this.getType());
         unregisterCheck.setCheckId(this.getId());
-        unregisterCheck.setPool(this.getPool());
         unregisterCheck.setEngine(command.getEngine());
         unregisterCheck.setExecutor(command.getExecutor());
         unregisterCheck.setName(command.getName());

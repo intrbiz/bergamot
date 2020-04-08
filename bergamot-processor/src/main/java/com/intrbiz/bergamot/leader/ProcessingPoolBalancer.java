@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.cluster.election.PoolElector;
+import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
 
@@ -21,11 +21,11 @@ public class ProcessingPoolBalancer
 {
     private static final Logger logger = Logger.getLogger(ProcessingPoolBalancer.class);
     
-    private final PoolElector[] poolElectors;
+    private final SchedulingPoolElector[] poolElectors;
     
     private final ProcessorRegistry processorRegistry;
 
-    public ProcessingPoolBalancer(PoolElector[] poolElectors, ProcessorRegistry processorRegistry)
+    public ProcessingPoolBalancer(SchedulingPoolElector[] poolElectors, ProcessorRegistry processorRegistry)
     {
         super();
         this.poolElectors = Objects.requireNonNull(poolElectors);
@@ -39,10 +39,9 @@ public class ProcessingPoolBalancer
             // Compute our targets
             int processors = this.processorRegistry.count();
             int poolsPerProcessor = (int) Math.ceil(((double) this.poolElectors.length) / ((double) processors));
-            logger.info("Balancing processing pools across processors, target: " + poolsPerProcessor);
             // Compute the current distribution of the pools
             Map<UUID, Stack<Integer>> poolDistribution = new HashMap<>();
-            for (PoolElector pool : this.shufflePools())
+            for (SchedulingPoolElector pool : this.shufflePools())
             {
                 poolDistribution.computeIfAbsent(pool.getLeader(), (key) -> new Stack<>()).push(pool.getPool());
             }
@@ -83,10 +82,10 @@ public class ProcessingPoolBalancer
                     }
                 }
                 // Actually move stuff around
-                logger.info("Reassigning pools: " + reasignments.keySet());
+                logger.info("Reassigning pools, target " + poolsPerProcessor + ": " + reasignments.keySet());
                 for (Entry<Integer, UUID> entry : reasignments.entrySet())
                 {
-                    logger.info("Reassigning pools " + entry.getKey() + " to " + entry.getValue());
+                    logger.info("Reassigning pool " + entry.getKey() + " to " + entry.getValue());
                     this.poolElectors[entry.getKey()].promoteMember(entry.getValue());
                 }
             }
@@ -97,9 +96,9 @@ public class ProcessingPoolBalancer
         }
     }
     
-    protected List<PoolElector> shufflePools()
+    protected List<SchedulingPoolElector> shufflePools()
     {
-        List<PoolElector> pools = new LinkedList<>(Arrays.asList(this.poolElectors));
+        List<SchedulingPoolElector> pools = new LinkedList<>(Arrays.asList(this.poolElectors));
         Collections.shuffle(pools);
         return pools;
     }

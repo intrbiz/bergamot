@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.cluster.election.LeaderElector;
-import com.intrbiz.bergamot.cluster.election.PoolElector;
+import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 
 public class BergamotClusterLeader
@@ -27,7 +27,7 @@ public class BergamotClusterLeader
     
     private UUID processorListener;
     
-    public BergamotClusterLeader(PoolElector[] poolElectors, ProcessorRegistry processorRegistry, LeaderElector leaderElector)
+    public BergamotClusterLeader(SchedulingPoolElector[] poolElectors, ProcessorRegistry processorRegistry, LeaderElector leaderElector)
     {
         super();
         this.leaderElector = leaderElector;

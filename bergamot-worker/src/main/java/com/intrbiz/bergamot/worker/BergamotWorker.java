@@ -28,11 +28,11 @@ import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.model.AgentKey;
-import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.Engine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
@@ -234,7 +234,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             @Override
             public void publishAgentAction(AgentMessage event)
             {
-                client.getDispatcher().dispatchAgentAction(event);
+                client.getDispatcher().dispatchAgentMessage(event);
             }
 
             @Override
@@ -388,13 +388,13 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             @Override
             public void publishResult(ResultMessage result)
             {
-                client.getDispatcher().dispatchResult(check.getPool(), result);
+                client.getDispatcher().dispatchResult(check.getProcessor(), result);
             }
 
             @Override
             public void publishReading(ReadingParcelMO reading)
             {
-                client.getDispatcher().dispatchReading(check.getPool(), reading);
+                client.getDispatcher().dispatchReading(check.getProcessor(), reading);
             }            
         };
     }

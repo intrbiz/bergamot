@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.function.BiPredicate;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;

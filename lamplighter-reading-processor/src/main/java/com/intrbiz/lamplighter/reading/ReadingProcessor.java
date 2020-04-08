@@ -1,6 +1,6 @@
 package com.intrbiz.lamplighter.reading;
 
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
 
 
 /**

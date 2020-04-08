@@ -19,8 +19,8 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
 
-import com.intrbiz.bergamot.cluster.registry.event.RegistryEvent;
-import com.intrbiz.bergamot.cluster.registry.event.RegistryEvent.Type;
+import com.intrbiz.bergamot.cluster.registry.model.RegistryEvent;
+import com.intrbiz.bergamot.cluster.registry.model.RegistryEvent.Type;
 import com.intrbiz.bergamot.cluster.util.ZKPaths;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 

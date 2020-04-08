@@ -14,9 +14,9 @@ public final class HZNames
         return "bergamot.queue.notifier." + notifierId;
     }
     
-    public static final String buildPoolQueueName(int poolId)
+    public static final String buildSchedulingPoolQueueName(int poolId)
     {
-        return "bergamot.queue.pool." + poolId;
+        return "bergamot.queue.scheduling.pool." + poolId;
     }
     
     public static final String buildProcessorQueueName(UUID processorId)

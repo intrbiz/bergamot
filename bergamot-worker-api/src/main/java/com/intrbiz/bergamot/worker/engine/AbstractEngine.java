@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 
 public abstract class AbstractEngine implements Engine
 {

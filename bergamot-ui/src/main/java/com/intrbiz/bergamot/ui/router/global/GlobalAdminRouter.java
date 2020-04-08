@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
-import com.intrbiz.bergamot.cluster.election.PoolElector;
+import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
@@ -65,7 +65,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         }
         Map<Integer, ProcessorRegistration> pools = new HashMap<>();
         Map<UUID, Integer> poolCounts = new HashMap<>();
-        for (PoolElector pool : app().getProcessor().getPoolElectors())
+        for (SchedulingPoolElector pool : app().getProcessor().getPoolElectors())
         {
             UUID leader = pool.getLeader();
             pools.put(pool.getPool(), processors.get(leader));

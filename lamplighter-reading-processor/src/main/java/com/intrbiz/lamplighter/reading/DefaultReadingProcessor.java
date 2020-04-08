@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 import com.intrbiz.data.DataException;

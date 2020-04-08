@@ -38,7 +38,7 @@ public class ConfigChangeActions implements BalsaAction<BergamotApp>
             BergamotCfg cfg = (BergamotCfg) change.getConfiguration();
             ValidatedBergamotConfiguration validated = cfg.validate(db.getObjectLocator(siteId));
             // import
-            BergamotImportReport report = new BergamotConfigImporter(validated)
+            BergamotImportReport report = new BergamotConfigImporter(validated, app().getProcessor().getSchedulingPoolCount())
                 .resetState(false)
                 .online(
                     app().getProcessor().getPoolDispatcher(),

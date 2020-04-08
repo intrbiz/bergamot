@@ -173,7 +173,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
         // now import the site config
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)
         {
-            BergamotImportReport report = new BergamotConfigImporter(vbcfg).offline().defaultPassword(install.getPassword()).requirePasswordChange(false).resetState(true).importConfiguration();
+            BergamotImportReport report = new BergamotConfigImporter(vbcfg, app().getProcessor().getSchedulingPoolCount()).offline().defaultPassword(install.getPassword()).requirePasswordChange(false).resetState(true).importConfiguration();
             logger.info(report.toString());
         }
         // broadcast a site init event

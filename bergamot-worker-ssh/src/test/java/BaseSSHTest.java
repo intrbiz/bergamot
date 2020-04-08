@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 import org.junit.Before;
 
 import com.intrbiz.bergamot.model.AgentKey;
-import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;

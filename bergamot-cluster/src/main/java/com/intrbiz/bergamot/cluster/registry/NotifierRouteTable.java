@@ -158,7 +158,7 @@ public class NotifierRouteTable
             if (routes != null)
             {
                 // Choose a random route
-                return routes[this.random.nextInt(routes.length)];
+                return routes[Math.abs(this.random.nextInt() % routes.length)];
             }
         }
         return null;

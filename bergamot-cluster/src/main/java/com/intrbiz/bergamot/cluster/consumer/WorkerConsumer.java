@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import com.hazelcast.collection.IQueue;
 import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.bergamot.cluster.util.HZNames;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 public class WorkerConsumer
 {   

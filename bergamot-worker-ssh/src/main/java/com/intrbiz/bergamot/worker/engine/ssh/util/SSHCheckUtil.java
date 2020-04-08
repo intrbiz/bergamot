@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.worker.engine.ssh.util;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.check.ssh.SSHCheckContext;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
 public class SSHCheckUtil
 {

@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.model.message;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,11 +10,6 @@ import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
 {
     private static final long serialVersionUID = 1L;
-    
-    /**
-     * The global number of processing pools that checks can be in.
-     */
-    public static final int PROCESSING_POOL_COUNT = 240;
 
     @JsonProperty("pool")
     protected int pool;
@@ -78,12 +72,6 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     public void setPool(int pool)
     {
         this.pool = pool;
-    }
-    
-    @JsonIgnore
-    public int computePool()
-    {
-        return computePool(this.id);
     }
 
     public CheckStateMO getState()
@@ -226,13 +214,5 @@ public abstract class CheckMO extends SecuredObjectMO implements CommentedMO
     public void setNote(NoteMO note)
     {
         this.note = note;
-    }
-    
-    /**
-     * Compute the processing pool number for this check.
-     */
-    public static final int computePool(UUID checkId)
-    {
-        return (int) (checkId.getLeastSignificantBits() % CheckMO.PROCESSING_POOL_COUNT);
     }
 }

@@ -17,11 +17,34 @@ public class ProcessorRegistry extends GenericRegistry<UUID, ProcessorRegistrati
 {
     public static final Logger logger = Logger.getLogger(ProcessorRegistry.class);
     
+    private final ProcessorRouteTable routeTable = new ProcessorRouteTable();
+    
     public ProcessorRegistry(ZooKeeper zooKeeper) throws KeeperException, InterruptedException
     {
         super(zooKeeper, ProcessorRegistration.class, UUID::fromString, ZKPaths.PROCESSORS);
+        this.init();
     }
     
+    private void init() throws KeeperException, InterruptedException
+    {
+        for (ProcessorRegistration processor : this.getProcessors())
+        {
+            this.routeTable.registerProcessor(processor.getId(), 1);
+        }
+    }
+    
+    @Override
+    protected void onItemAdded(UUID id, ProcessorRegistration item)
+    {
+        this.routeTable.registerProcessor(id, 1);
+    }
+
+    @Override
+    protected void onItemRemoved(UUID id)
+    {
+        this.routeTable.unregisterProcessor(id);
+    }
+
     /**
      * Get the registration data for a specific Processor from ZooKeeper
      * @param processorId the processor id
@@ -44,5 +67,9 @@ public class ProcessorRegistry extends GenericRegistry<UUID, ProcessorRegistrati
     {
         return this.getItems();
     }
-    
+
+    public ProcessorRouteTable getRouteTable()
+    {
+        return this.routeTable;
+    }
 }

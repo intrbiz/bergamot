@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.message.pool.scheduler.SchedulerMessage;
+import com.intrbiz.bergamot.model.message.scheduler.SchedulerMessage;
 
 /**
  * Schedule the execution of stuff, mainly host and service checks

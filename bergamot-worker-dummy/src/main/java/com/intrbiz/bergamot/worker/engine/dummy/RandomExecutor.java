@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.worker.engine.dummy;
 
 import java.security.SecureRandom;
 
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 

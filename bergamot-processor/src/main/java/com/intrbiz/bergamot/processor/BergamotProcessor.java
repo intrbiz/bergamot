@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.processor;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
@@ -10,12 +8,14 @@ import com.intrbiz.bergamot.agent.AgentRegistrationService;
 import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
-import com.intrbiz.bergamot.cluster.consumer.PoolConsumer;
+import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
+import com.intrbiz.bergamot.cluster.consumer.SchedulingPoolConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.cluster.election.LeaderElector;
-import com.intrbiz.bergamot.cluster.election.PoolElector;
+import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.cluster.election.model.ElectionState;
 import com.intrbiz.bergamot.cluster.lookup.AgentKeyClusterLookup;
 import com.intrbiz.bergamot.cluster.member.BergamotMember;
@@ -25,13 +25,13 @@ import com.intrbiz.bergamot.cluster.registry.ProcessorRegistar;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistry;
 import com.intrbiz.bergamot.config.ClusterCfg;
+import com.intrbiz.bergamot.executor.ProcessorExecutor;
 import com.intrbiz.bergamot.leader.BergamotClusterLeader;
-import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
-import com.intrbiz.bergamot.pool.ProcessingPools;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 import com.intrbiz.bergamot.result.ResultProcessor;
 import com.intrbiz.bergamot.scheduler.Scheduler;
+import com.intrbiz.bergamot.scheduler.SchedulingPoolsController;
 import com.intrbiz.bergamot.scheduler.WheelScheduler;
 import com.intrbiz.lamplighter.reading.DefaultReadingProcessor;
 import com.intrbiz.lamplighter.reading.ReadingProcessor;
@@ -73,7 +73,7 @@ public class BergamotProcessor extends BergamotMember
     
     private final LeaderElector leaderElector;
     
-    private final PoolElector[] poolElectors;
+    private final SchedulingPoolElector[] poolElectors;
     
     // dispatchers
     
@@ -81,7 +81,9 @@ public class BergamotProcessor extends BergamotMember
     
     private final NotificationDispatcher notificationDispatcher;
     
-    private final PoolDispatcher poolDispatcher;
+    private final SchedulingPoolDispatcher poolDispatcher;
+    
+    private final ProcessorDispatcher processorDispatcher;
     
     // services
     
@@ -93,21 +95,23 @@ public class BergamotProcessor extends BergamotMember
     
     private final AgentRegistrationService agentRegistrationService;
     
-    // pool executor
+    // consumer
     
-    private final ProcessingPools processingPools;
+    private final ProcessorConsumer processorConsumer;
+    
+    // schedule controller
+    
+    private final SchedulingPoolsController processingPools;
+    
+    // executor
+    
+    private final ProcessorExecutor processorExecutor;
     
     // leader
     
     private final BergamotClusterLeader leader;
     
     // Runner for our processing
-    
-    private final AtomicBoolean run = new AtomicBoolean(false);
-    
-    private Thread runner;
-    
-    private CountDownLatch shutdownLatch;
 
     public BergamotProcessor(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
     {
@@ -127,23 +131,28 @@ public class BergamotProcessor extends BergamotMember
         this.processorRegistar = new ProcessorRegistar(this.zooKeeper.getZooKeeper());
         // elector
         this.leaderElector = new LeaderElector(this.zooKeeper.getZooKeeper(), this.id);
-        // coordinator
-        this.poolElectors = new PoolElector[CheckMO.PROCESSING_POOL_COUNT];
+        // TODO: Eventually make scheduling pool count configurable
+        this.poolElectors = new SchedulingPoolElector[420];
         for (int i = 0; i < this.poolElectors.length; i++)
         {
-            this.poolElectors[i] = new PoolElector(this.zooKeeper.getZooKeeper(), i, this.id);
+            this.poolElectors[i] = new SchedulingPoolElector(this.zooKeeper.getZooKeeper(), i, this.id);
         }
         // dispatchers
         this.checkDispatcher = new CheckDispatcher(this.workerRegistry, this.agentRegistry, this.hazelcast);
         this.notificationDispatcher = new NotificationDispatcher(this.notifierRegistry, this.hazelcast);
-        this.poolDispatcher = new PoolDispatcher(this.hazelcast);
+        this.poolDispatcher = new SchedulingPoolDispatcher(this.hazelcast);
+        this.processorDispatcher = new ProcessorDispatcher(this.hazelcast, this.processorRegistry.getRouteTable());
         // services
-        this.scheduler = new WheelScheduler(this.checkDispatcher, this.poolDispatcher);
+        this.scheduler = new WheelScheduler(this.id, this.checkDispatcher, this.poolDispatcher, this.processorDispatcher);
         this.resultProcessor = new DefaultResultProcessor(this.poolDispatcher, this.notificationDispatcher, this.notificationTopic, this.updateTopic);
         this.readingProcessor = new DefaultReadingProcessor();
-        this.agentRegistrationService = new AgentRegistrationService(this.poolDispatcher, this.notificationDispatcher);
-        // processing pool executor
-        this.processingPools = new ProcessingPools(this.poolElectors, this::createPoolConsumer, this.scheduler, this.resultProcessor, this.readingProcessor, this.agentRegistrationService);
+        this.agentRegistrationService = new AgentRegistrationService(this.poolDispatcher, this.notificationDispatcher, this.poolElectors.length);
+        // consumer
+        this.processorConsumer = new ProcessorConsumer(this.hazelcast, this.id);
+        // scheduling controller
+        this.processingPools = new SchedulingPoolsController(this.poolElectors, this.scheduler, this::createPoolConsumer);
+        // processor executor
+        this.processorExecutor = new ProcessorExecutor(this.resultProcessor, this.readingProcessor, this.agentRegistrationService, this.processorConsumer);
         // leader
         this.leader = new BergamotClusterLeader(this.poolElectors, this.processorRegistry, this.leaderElector);
     }
@@ -157,35 +166,34 @@ public class BergamotProcessor extends BergamotMember
         super.panic();
     }
 
-    public void start()
+    /**
+     * Launch this processor
+     */
+    public void start() throws Exception
     {
-        if (this.run.compareAndSet(false, true))
-        {
-            this.shutdownLatch = new CountDownLatch(1);
-            this.runner = new Thread(() -> {
-                try
-                {
-                    logger.info("Bergamot Processor " + this.id + " starting");
-                    // Register as a processor
-                    this.processorRegistar.registerProcessor(new ProcessorRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName));
-                    // Wait for other processors to join
-                    this.waitForProcessors();
-                    // Start our processing pool executor
-                    this.processingPools.start();
-                    // Elect a leader
-                    this.leaderElector.elect(this::leaderLauncher);
-                }
-                catch (Exception e)
-                {
-                    logger.error("Error starting Bergamot Processor", e);
-                }
-                finally
-                {
-                    this.shutdownLatch.countDown();
-                }
-            }, "bergamot-processor");
-            this.runner.start();
-        }
+        logger.info("Bergamot Processor " + this.id + " starting");
+        // Register as a processor
+        this.processorRegistar.registerProcessor(new ProcessorRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName));
+        // Wait for other processors to join
+        this.waitForProcessors();
+        // Start our processing pool executor
+        this.processingPools.start();
+        // Elect a leader
+        this.leaderElector.elect(this::leaderLauncher);
+    }
+    
+    public void startInBackground()
+    {
+        new Thread(() -> {
+            try
+            {
+                this.start();
+            }
+            catch (Exception e)
+            {
+                logger.error("Error starting Bergamot Processor", e);
+            }
+        }, "bergamot-processor-launcher").start();
     }
     
     protected void waitForProcessors() throws Exception
@@ -220,7 +228,6 @@ public class BergamotProcessor extends BergamotMember
     
     public void shutdown()
     {
-        this.run.set(false);
         try
         {
             this.leader.halt();
@@ -236,13 +243,6 @@ public class BergamotProcessor extends BergamotMember
         catch (Exception e)
         {
             logger.error("Failed to release leader election", e);
-        }
-        try
-        {
-            this.shutdownLatch.await();
-        }
-        catch (InterruptedException e)
-        {
         }
     }
 
@@ -296,7 +296,7 @@ public class BergamotProcessor extends BergamotMember
         return this.leaderElector;
     }
 
-    public PoolElector[] getPoolElectors()
+    public SchedulingPoolElector[] getPoolElectors()
     {
         return this.poolElectors;
     }
@@ -311,9 +311,14 @@ public class BergamotProcessor extends BergamotMember
         return this.notificationDispatcher;
     }
 
-    public PoolDispatcher getPoolDispatcher()
+    public SchedulingPoolDispatcher getPoolDispatcher()
     {
         return this.poolDispatcher;
+    }
+    
+    public ProcessorDispatcher getProcessorDispatcher()
+    {
+        return this.processorDispatcher;
     }
 
     public Scheduler getScheduler()
@@ -336,12 +341,12 @@ public class BergamotProcessor extends BergamotMember
         return this.agentRegistrationService;
     }
     
-    public PoolConsumer createPoolConsumer(int pool)
+    public SchedulingPoolConsumer createPoolConsumer(int pool)
     {
-        return new PoolConsumer(this.hazelcast, pool);
+        return new SchedulingPoolConsumer(this.hazelcast, pool);
     }
 
-    public ProcessingPools getProcessingPools()
+    public SchedulingPoolsController getSchedulingController()
     {
         return this.processingPools;
     }
@@ -349,5 +354,20 @@ public class BergamotProcessor extends BergamotMember
     public BergamotClusterLeader getLeader()
     {
         return this.leader;
+    }
+
+    public ProcessorConsumer getProcessorConsumer()
+    {
+        return this.processorConsumer;
+    }
+
+    public ProcessorExecutor getProcessorExecutor()
+    {
+        return this.processorExecutor;
+    }
+    
+    public int getSchedulingPoolCount()
+    {
+        return this.poolElectors.length;
     }
 }

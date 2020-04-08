@@ -38,10 +38,10 @@
     </div>
     
    	<div class="row">
-		<h3>Processing Pools</h3>
+		<h3>Scheduling Pools</h3>
 		<data-set var="pool" value="#{pools}">
-			<div class="col1" style="width: 50px; height: 50px; margin: 5px; background-color: #{processor_colours.get(pool.value.id)}; box-shadow: 0px 3px 6px #747474;" title="Pool #{pool.key} is on processor #{pool.value.hostName} (#{pool.value.id})">
-			    <h4 style="font-size: 24px; text-align: center; padding-top: 10px;">#{pool.key}</h4>
+			<div class="col1" style="width: 60px; height: 60px; margin: 5px; background-color: #{processor_colours.get(pool.value.id)}; box-shadow: 0px 3px 6px #747474;" title="Pool #{pool.key} is on processor #{pool.value.hostName} (#{pool.value.id})">
+			    <h4 style="font-size: 24px; text-align: center; padding-top: 15px;">#{pool.key}</h4>
 			</div>
 		</data-set>
     </div>

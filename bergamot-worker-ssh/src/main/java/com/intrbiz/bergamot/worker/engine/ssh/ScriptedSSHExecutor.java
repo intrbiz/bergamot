@@ -8,8 +8,8 @@ import javax.script.SimpleBindings;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;

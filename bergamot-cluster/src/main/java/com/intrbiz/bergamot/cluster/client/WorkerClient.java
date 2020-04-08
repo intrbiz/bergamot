@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import org.apache.zookeeper.KeeperException;
 
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
-import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.lookup.AgentKeyClientLookup;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistar;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistar;
@@ -24,7 +24,7 @@ public class WorkerClient extends BergamotClient
     
     private final WorkerConsumer consumer;
     
-    private final PoolDispatcher dispatcher;
+    private final ProcessorDispatcher dispatcher;
     
     private final AgentKeyClientLookup agentKeyLookup;
     
@@ -36,7 +36,7 @@ public class WorkerClient extends BergamotClient
         this.registar = new WorkerRegistar(this.zooKeeper.getZooKeeper());
         this.agentRegistar = new AgentRegistar(this.zooKeeper.getZooKeeper());
         this.consumer = new WorkerConsumer(this.hazelcast, this.id);
-        this.dispatcher = new PoolDispatcher(this.hazelcast);
+        this.dispatcher = new ProcessorDispatcher(this.hazelcast, this.registar.getRouteTable());
         this.agentKeyLookup = new AgentKeyClientLookup(this.hazelcast);
     }
 
@@ -45,7 +45,7 @@ public class WorkerClient extends BergamotClient
         return this.consumer;
     }
 
-    public PoolDispatcher getDispatcher()
+    public ProcessorDispatcher getDispatcher()
     {
         return this.dispatcher;
     }

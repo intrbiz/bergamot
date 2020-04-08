@@ -14,10 +14,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.model.AgentKey;
-import com.intrbiz.bergamot.model.message.pool.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.reading.ReadingParcelMO;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 
@@ -77,7 +77,7 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setPool(0);
+        check.setProcessor(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -97,7 +97,7 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setPool(0);
+        check.setProcessor(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -118,7 +118,7 @@ public class TestHTTPEngine
         check.setName("check_certificate");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setPool(0);
+        check.setProcessor(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -172,7 +172,7 @@ public class TestHTTPEngine
         check.setName("check_http_script");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setPool(0);
+        check.setProcessor(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setScript(

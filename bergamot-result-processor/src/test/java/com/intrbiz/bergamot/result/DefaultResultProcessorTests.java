@@ -9,8 +9,8 @@ import org.junit.Test;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Status;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.result.DefaultResultProcessor;
 

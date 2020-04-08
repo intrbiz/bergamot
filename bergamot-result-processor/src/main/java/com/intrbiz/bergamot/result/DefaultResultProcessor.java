@@ -21,7 +21,7 @@ import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
@@ -39,6 +39,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.ContactMO;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.event.update.AlertUpdate;
 import com.intrbiz.bergamot.model.message.event.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.event.update.GroupUpdate;
@@ -46,10 +47,9 @@ import com.intrbiz.bergamot.model.message.event.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
-import com.intrbiz.bergamot.model.message.pool.result.PassiveResult;
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
@@ -66,7 +66,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     
     private Accounting accounting = Accounting.create(DefaultResultProcessor.class);
 
-    public DefaultResultProcessor(PoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, SiteNotificationTopic notificationBroker, SiteUpdateTopic updateBroker)
+    public DefaultResultProcessor(SchedulingPoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, SiteNotificationTopic notificationBroker, SiteUpdateTopic updateBroker)
     {
         super(poolDispatcher, notificationDispatcher, notificationBroker, updateBroker);
     }

@@ -1,6 +1,6 @@
 package com.intrbiz.bergamot.result;
 
-import com.intrbiz.bergamot.model.message.pool.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 
 
 /**

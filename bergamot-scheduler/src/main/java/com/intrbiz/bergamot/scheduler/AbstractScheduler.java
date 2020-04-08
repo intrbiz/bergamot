@@ -5,31 +5,38 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
-import com.intrbiz.bergamot.model.message.pool.scheduler.ScheduleCheck;
-import com.intrbiz.bergamot.model.message.pool.scheduler.SchedulerMessage;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
+import com.intrbiz.bergamot.model.message.scheduler.SchedulerMessage;
 
 
 public abstract class AbstractScheduler implements Scheduler
-{   
+{
     private static final Logger logger = Logger.getLogger(AbstractScheduler.class);
+    
+    protected final UUID processorId;
     
     protected final CheckDispatcher checkDispatcher;
     
-    protected final PoolDispatcher poolDispatcher;
+    protected final SchedulingPoolDispatcher poolDispatcher;
     
-    public AbstractScheduler(CheckDispatcher checkDispatcher, PoolDispatcher poolDispatcher)
+    protected final ProcessorDispatcher processorDispatcher;
+    
+    public AbstractScheduler(UUID processorId, CheckDispatcher checkDispatcher, SchedulingPoolDispatcher poolDispatcher, ProcessorDispatcher processorDispatcher)
     {
         super();
+        this.processorId = processorId;
         this.checkDispatcher = checkDispatcher;
         this.poolDispatcher = poolDispatcher;
+        this.processorDispatcher = processorDispatcher;
     }
     
     protected PublishStatus publishExecuteCheck(ExecuteCheck check)
@@ -59,7 +66,7 @@ public abstract class AbstractScheduler implements Scheduler
         {
             result.timeout("Unable to publish check to worker");
         }
-        this.poolDispatcher.dispatchResult(check.getPool(), result);
+        this.processorDispatcher.dispatchResult(this.processorId, result);
     }
     
     public void schedulePool(int pool)

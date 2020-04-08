@@ -16,11 +16,12 @@ import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.PoolDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.util.IBThreadFactory;
 
@@ -90,9 +91,9 @@ public class WheelScheduler extends AbstractScheduler
     // accounting
     protected final Accounting accounting = Accounting.create(WheelScheduler.class);
 
-    public WheelScheduler(CheckDispatcher checkDispatcher, PoolDispatcher poolDispatcher)
+    public WheelScheduler(UUID processorId, CheckDispatcher checkDispatcher, SchedulingPoolDispatcher poolDispatcher, ProcessorDispatcher processorDispatcher)
     {
-        super(checkDispatcher, poolDispatcher);
+        super(processorId, checkDispatcher, poolDispatcher, processorDispatcher);
         // setup the wheel structure
         this.tickPeriod = TICK_PERIOD_MS;
         this.orange = new Segment[SEGMENTS];

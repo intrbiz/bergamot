@@ -6,7 +6,7 @@ import com.intrbiz.accounting.Accounting;
 import com.intrbiz.balsa.action.BalsaAction;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Action;
 

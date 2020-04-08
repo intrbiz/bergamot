@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.express.BergamotEntityResolver;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
-import com.intrbiz.bergamot.model.message.pool.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;
@@ -195,7 +195,6 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         executeCheck.setAgentId(this.resolveAgentId());
         executeCheck.setCheckType(this.getType());
         executeCheck.setCheckId(this.getId());
-        executeCheck.setPool(this.getPool());
         executeCheck.setEngine(command.getEngine());
         executeCheck.setExecutor(command.getExecutor());
         executeCheck.setName(command.getName());

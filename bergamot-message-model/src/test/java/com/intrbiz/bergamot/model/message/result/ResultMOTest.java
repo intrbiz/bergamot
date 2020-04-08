@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.message.pool.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.*;
