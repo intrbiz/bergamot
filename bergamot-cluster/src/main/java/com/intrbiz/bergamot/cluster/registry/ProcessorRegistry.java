@@ -29,14 +29,14 @@ public class ProcessorRegistry extends GenericRegistry<UUID, ProcessorRegistrati
     {
         for (ProcessorRegistration processor : this.getProcessors())
         {
-            this.routeTable.registerProcessor(processor.getId(), 1);
+            this.routeTable.registerProcessor(processor.getId());
         }
     }
     
     @Override
     protected void onItemAdded(UUID id, ProcessorRegistration item)
     {
-        this.routeTable.registerProcessor(id, 1);
+        this.routeTable.registerProcessor(id);
     }
 
     @Override

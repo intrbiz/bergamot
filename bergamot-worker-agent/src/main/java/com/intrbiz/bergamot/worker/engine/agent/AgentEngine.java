@@ -81,11 +81,12 @@ public class AgentEngine extends AbstractEngine
     {
         // Setup event handlers
         this.server.setOnAgentConnectHandler((agent) -> {
-            logger.debug("Registering agent: " + agent.getAgentId());
+            logger.info("Registering agent: " + agent.getAgentId());
             engineContext.registerAgent(agent.getAgentId());
             // Offer a register message
             if (! Util.isEmpty(agent.getAgentTemplateName()))
             {
+                logger.info("Sending agent register message");
                 engineContext.publishAgentAction(new AgentRegister(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentHostSummary(), agent.getAgentAddress(), agent.getAgentTemplateName()));
             }
         });

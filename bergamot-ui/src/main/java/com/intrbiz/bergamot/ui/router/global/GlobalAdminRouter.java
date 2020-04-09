@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.ui.router.global;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +21,9 @@ import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
+import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.CurrentPrincipal;
+import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.IsaUUID;
 import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Prefix;
@@ -49,7 +52,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     
     @Any("/")
     @WithDataAdapter(BergamotDB.class)
-    public void index(BergamotDB db) throws Exception
+    public void index(BergamotDB db, @Param("level") @IsaInt(defaultValue = 0, coalesce = CoalesceMode.ALWAYS) Integer level) throws Exception
     {
         // workers, notifiers, processing pools and other cluster information
         var("workers", app().getProcessor().getWorkerRegistry().getWorkers());
@@ -67,15 +70,21 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         Map<UUID, Integer> poolCounts = new HashMap<>();
         for (SchedulingPoolElector pool : app().getProcessor().getPoolElectors())
         {
-            UUID leader = pool.getLeader();
+            UUID leader = pool.getElectionMember(level);
             pools.put(pool.getPool(), processors.get(leader));
             poolCounts.merge(leader, 1, (a, b) -> a + b);
+        }
+        List<Integer> levels = new ArrayList<>();
+        for (int i = 0; i < processors.size(); i++)
+        {
+            levels.add(i);
         }
         var("processors", processors.values());
         var("processor_colours", colours);
         var("processor_pools", poolCounts);
         var("processor_leaders", app().getProcessor().getLeaderElector().getElectionMembers());
         var("pools", pools.entrySet());
+        var("levels", levels);
         // list sites
         List<Site> sites = var("sites", db.listSites());
         // list global admins

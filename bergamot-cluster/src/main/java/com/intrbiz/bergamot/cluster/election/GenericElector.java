@@ -27,6 +27,7 @@ import org.apache.zookeeper.data.ACL;
 
 import com.intrbiz.bergamot.cluster.election.model.ElectionMember;
 import com.intrbiz.bergamot.cluster.election.model.ElectionState;
+import com.intrbiz.bergamot.cluster.util.ZKPaths;
 
 /**
  * A leader, follower election
@@ -49,8 +50,6 @@ public abstract class GenericElector
     
     protected final String nodePrefix;
     
-    protected final int nodePrefixLength;
-    
     protected final String nodePathPrefix;
     
     protected Consumer<ElectionState> leaderTrigger;
@@ -67,7 +66,6 @@ public abstract class GenericElector
         this.parentPath = zkPath(BERGAMOT, parent);
         this.containerPath = zkPath(this.parentPath, container);
         this.nodePrefix = this.id.toString() + "_";
-        this.nodePrefixLength = this.nodePrefix.length();
         this.nodePathPrefix = this.containerPath + "/" + this.nodePrefix;
         // Ensure registration nodes are there
         this.createRoot();
@@ -190,8 +188,18 @@ public abstract class GenericElector
     
     public UUID getLeader() throws KeeperException, InterruptedException
     {
+        return this.getElectionMember(0);
+    }
+    
+    public UUID getElectionMember(int level) throws KeeperException, InterruptedException
+    {
         List<String> nodes = this.getElectionNodes();
-        return nodes.size() > 0 ? UUID.fromString(nodes.get(0).substring(0, this.nodePrefixLength - 1)) : null;
+        return nodes.size() > level ? ZKPaths.uuidPrefixFromName(nodes.get(level)) : null;
+    }
+    
+    public int getElectionMemberCount() throws KeeperException, InterruptedException
+    {
+        return this.getElectionNodes().size();
     }
     
     public LinkedHashMap<UUID, ElectionMember> getElectionMembers() throws KeeperException, InterruptedException
@@ -200,7 +208,7 @@ public abstract class GenericElector
         int position = 0;
         for (String node : this.getElectionNodes())
         {
-            UUID id = UUID.fromString(node.substring(0, this.nodePrefixLength - 1));
+            UUID id = ZKPaths.uuidPrefixFromName(node);
             nodeElectionStates.put(id, new ElectionMember(id, position == 0 ? ElectionState.LEADER : ElectionState.FOLLOWER, position, node));
             position ++;
         }
@@ -277,7 +285,7 @@ public abstract class GenericElector
             logger.debug("Got follower event " + watchedEvent);
             if (watchedEvent.getType() == EventType.NodeDeleted)
             {
-                logger.info("Following (" + watchedEvent.getPath() + ") node has failed");
+                logger.debug("Following (" + watchedEvent.getPath() + ") node has failed");
                 try
                 {
                     this.doElection();
@@ -331,13 +339,8 @@ public abstract class GenericElector
         return -1;
     }
     
-    protected static int nodeSequence(String node)
-    {
-        return Integer.parseInt(node.substring(node.length() - SEQUENCE_LENGTH));
-    }
-    
     protected static int compareNodes(String a, String b)
     {
-        return Integer.compare(nodeSequence(a), nodeSequence(b));
+        return Integer.compare(ZKPaths.sequenceFromPath(a), ZKPaths.sequenceFromPath(b));
     }
 }

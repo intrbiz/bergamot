@@ -76,10 +76,12 @@ public abstract class AbstractScheduler implements Scheduler
         {
             for (Host host : db.listHostsInPool(pool))
             {
+                logger.info("Scheduling host " + host.getId());
                 this.schedule(host);
             }
             for (Service service : db.listServicesInPool(pool))
             {
+                logger.info("Scheduling service " + service.getId());
                 this.schedule(service);
             }
         }

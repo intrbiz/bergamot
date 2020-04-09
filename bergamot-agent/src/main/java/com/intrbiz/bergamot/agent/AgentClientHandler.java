@@ -78,7 +78,7 @@ public abstract class AgentClientHandler extends SimpleChannelInboundHandler<Obj
         headers.set(HttpHeaderNames.USER_AGENT, BergamotAgent.AGENT_VENDOR + "(" + BergamotAgent.AGENT_PRODUCT + ")/" + BergamotAgent.AGENT_VERSION);
         headers.set(AgentHTTPHeaderNames.AGENT_ID, this.agentId.toString());
         headers.set(AgentHTTPHeaderNames.HOST_NAME, this.hostName);
-        headers.set(AgentHTTPHeaderNames.HOST_SUMMARY, this.hostSummary);
+        if (this.hostSummary != null) headers.set(AgentHTTPHeaderNames.HOST_SUMMARY, this.hostSummary);
         if (! AgentUtil.isEmpty(this.templateName)) headers.set(AgentHTTPHeaderNames.TEMPLATE_NAME, this.templateName);
         headers.set(AgentHTTPHeaderNames.KEY_ID, this.key.getId().toString());
         headers.set(AgentHTTPHeaderNames.TIMESTAMP, timestamp);

@@ -2,14 +2,13 @@ package com.intrbiz.bergamot.cluster.registry;
 
 import java.security.SecureRandom;
 import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 public class ProcessorRouteTable
 {
-    private final ConcurrentMap<UUID, Integer> processorsWithSequence = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, UUID> processorsWithSequence = new ConcurrentHashMap<>();
     
     private final SecureRandom random = new SecureRandom();
     
@@ -20,9 +19,9 @@ public class ProcessorRouteTable
         super();
     }
     
-    void registerProcessor(UUID processor, int sequence)
+    void registerProcessor(UUID processor)
     {
-        this.processorsWithSequence.put(processor, sequence);
+        this.processorsWithSequence.put(processor, processor);
         this.updateProcessors();
     }
     
@@ -34,9 +33,8 @@ public class ProcessorRouteTable
     
     private void updateProcessors()
     {
-        this.processors = this.processorsWithSequence.entrySet().stream()
-                            .sorted((a, b) -> Integer.compare(a.getValue(), b.getValue()))
-                            .map(Entry::getKey)
+        this.processors = this.processorsWithSequence.keySet().stream()
+                            .sorted()
                             .collect(Collectors.toList())
                             .toArray(new UUID[0]);
     }

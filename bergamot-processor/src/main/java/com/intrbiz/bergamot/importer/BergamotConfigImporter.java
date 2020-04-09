@@ -1373,8 +1373,7 @@ public class BergamotConfigImporter
             }
         }
         // Assign scheduling pool
-        // TODO
-        check.setPool((int) (check.getId().getLeastSignificantBits() % this.schedulingPoolCount));
+        check.setPool(Math.abs((int) (check.getId().getLeastSignificantBits() % this.schedulingPoolCount)));
     }
     
     private void loadCheckState(Check<?,?> check, CheckCfg<?> configuration, BergamotDB db)

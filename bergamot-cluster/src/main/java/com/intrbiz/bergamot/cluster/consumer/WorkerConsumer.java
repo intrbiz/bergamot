@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.cluster.consumer;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import com.hazelcast.collection.IQueue;
 import com.hazelcast.core.HazelcastInstance;
@@ -36,5 +37,19 @@ public class WorkerConsumer
             // ignore
         }
         return null;
+    }
+    
+    public void drainTo(Consumer<ExecuteCheck> consumer)
+    {
+        ExecuteCheck check;
+        while ((check = this.queue.poll()) != null)
+        {
+            consumer.accept(check);
+        }
+    }
+    
+    public void destroy()
+    {
+        this.queue.destroy();
     }
 }

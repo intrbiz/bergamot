@@ -62,7 +62,7 @@ public class WorkerRegistar extends GenericRegistar<UUID, WorkerRegistration>
                 switch (watchedEvent.getType())
                 {
                     case NodeCreated:
-                        this.routeTable.registerProcessor(uuidPrefixFromName(watchedEvent.getPath()), sequenceFromPath(watchedEvent.getPath()));
+                        this.routeTable.registerProcessor(uuidPrefixFromName(watchedEvent.getPath()));
                         break;
                     case NodeDeleted:
                         this.routeTable.unregisterProcessor(uuidPrefixFromName(watchedEvent.getPath()));
@@ -82,7 +82,7 @@ public class WorkerRegistar extends GenericRegistar<UUID, WorkerRegistration>
     {
         for (String path : this.zooKeeper.getChildren(this.processorsContainer, false))
         {
-            this.routeTable.registerProcessor(uuidPrefixFromName(path), sequenceFromPath(path));
+            this.routeTable.registerProcessor(uuidPrefixFromName(path));
         }
     }
     

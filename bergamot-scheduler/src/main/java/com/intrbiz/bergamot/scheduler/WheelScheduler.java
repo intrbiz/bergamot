@@ -117,7 +117,7 @@ public class WheelScheduler extends AbstractScheduler
         this.tick = (this.tick + 1) % this.orange.length;
         this.tickTime = System.currentTimeMillis();
         this.tickCalendar.setTimeInMillis(this.tickTime);
-        if (logger.isTraceEnabled()) logger.trace("Tick " + this.tick + " at " + this.tickTime);
+        // if (logger.isTraceEnabled()) logger.trace("Tick " + this.tick + " at " + this.tickTime);
         // process any jobs in the current segment
         if (this.schedulerEnabled)
         {
@@ -488,8 +488,7 @@ public class WheelScheduler extends AbstractScheduler
                 tick();
                 long tickEnd = System.currentTimeMillis();
                 long sleepDuration = tickPeriod - (tickEnd - tickStart);
-                if (logger.isTraceEnabled())
-                    logger.trace("Tick took " + (tickEnd - tickStart) + "ms to run, sleeping for " + sleepDuration + "ms");
+                // if (logger.isTraceEnabled()) logger.trace("Tick took " + (tickEnd - tickStart) + "ms to run, sleeping for " + sleepDuration + "ms");
                 if (sleepDuration > 0)
                 {
                     try

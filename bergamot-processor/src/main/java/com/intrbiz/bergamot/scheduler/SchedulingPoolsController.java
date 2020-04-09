@@ -86,13 +86,13 @@ public class SchedulingPoolsController
         {
             if (! this.pools.containsKey(pool))
             {
-                logger.info("Starting processing pool " + pool + ", now running " + this.pools.size() + " processing pools");
                 // Schedule the pool
                 this.scheduler.schedulePool(pool);
                 // Register message consumer
                 SchedulingPoolConsumer consumer = this.schedulingPoolConsumerFactory.apply(pool);
                 this.pools.put(pool, consumer);
                 consumer.listen(this.scheduler::process);
+                logger.info("Starting processing pool " + pool + ", now running " + this.pools.size() + " processing pools");
             }
         }
     }
@@ -105,11 +105,11 @@ public class SchedulingPoolsController
             SchedulingPoolConsumer consumer = this.pools.remove(pool);
             if (consumer != null)
             {
-                logger.info("Stopping scheduling pool " + pool + ", now running " + this.pools.size() + " processing pools");
                 // Stop scheduler messages
                 consumer.unlistenAll();
                 // Unschedule the pool
                 this.scheduler.unschedulePool(pool);
+                logger.info("Stopping scheduling pool " + pool + ", now running " + this.pools.size() + " processing pools");
             }
         }
     }
