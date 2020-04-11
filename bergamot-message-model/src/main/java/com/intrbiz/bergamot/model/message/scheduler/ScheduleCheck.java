@@ -30,16 +30,16 @@ public class ScheduleCheck extends SchedulerMessage
         super();
     }
     
-    public ScheduleCheck(UUID checkId, Command command)
+    public ScheduleCheck(int pool, UUID checkId, Command command)
     {
-        super();
+        super(pool);
         this.checkId = checkId;
         this.command = command;
     }
     
-    public ScheduleCheck(UUID checkId, Command command, long interval)
+    public ScheduleCheck(int pool, UUID checkId, Command command, long interval)
     {
-        this(checkId, command);
+        this(pool, checkId, command);
         this.interval = interval;
     }
 

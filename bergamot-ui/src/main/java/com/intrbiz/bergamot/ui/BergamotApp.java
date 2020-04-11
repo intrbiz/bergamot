@@ -378,7 +378,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     {
         // start the processor
         logger.info("Starting processor");
-        this.processor.startInBackground();
+        this.processor.start();
         // start the update websocket server
         this.updateServer.start();
         // Start Gerald

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
     
-    <host name="generic-host" template="yes" security-domains="global">
+    <host name="generic-host" location="data-centre" template="yes" security-domains="global">
         <summary>Generic Host</summary>
         <notifications enabled="yes" time-period="24x7" all-engines="yes">
             <!-- escalation policies -->
@@ -17,6 +17,12 @@
         <check-command command="check-host-alive"/>
         <schedule every="5" retry-every="1" time-period="24x7"/>
         <description>A generic host template</description>
+    </host>
+    
+    <host name="generic-agent-host" extends="generic-host" template="yes" security-domains="global">
+        <summary>Generic Bergamot Agent Host</summary>
+        <check-command command="check-agent-presence"/>
+        <description>A generic host template which is checked via Bergamot Agent</description>
     </host>
     
     <host name="web-server" extends="generic-host" template="yes" groups="web-servers" security-domains="web">

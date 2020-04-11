@@ -41,7 +41,7 @@ public class ConfigChangeActions implements BalsaAction<BergamotApp>
             BergamotImportReport report = new BergamotConfigImporter(validated, app().getProcessor().getSchedulingPoolCount())
                 .resetState(false)
                 .online(
-                    app().getProcessor().getPoolDispatcher(),
+                    app().getProcessor().getSchedulingTopic(),
                     app().getProcessor().getNotificationDispatcher(),
                     (contact) -> resetUrl + "?token=" + Balsa().app().getSecurityEngine().generateAuthenticationTokenForPrincipal(contact, Expires.after(1, TimeUnit.DAYS), CryptoCookie.Flags.Reset)
                 )

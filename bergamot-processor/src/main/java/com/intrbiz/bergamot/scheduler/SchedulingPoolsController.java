@@ -7,15 +7,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.cluster.consumer.SchedulingPoolConsumer;
+import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.cluster.election.model.ElectionState;
+import com.intrbiz.bergamot.model.message.scheduler.SchedulerMessage;
 
 /**
  * Controller for running scheduling pools
@@ -28,16 +30,26 @@ public class SchedulingPoolsController
     
     private final Scheduler scheduler;
     
-    private final Function<Integer, SchedulingPoolConsumer> schedulingPoolConsumerFactory;
+    private final SchedulingTopic schedulingTopic;
     
-    private final ConcurrentMap<Integer, SchedulingPoolConsumer> pools = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Integer, UUID> pools = new ConcurrentHashMap<>();
     
-    public SchedulingPoolsController(SchedulingPoolElector[] poolElectors, Scheduler scheduler, Function<Integer, SchedulingPoolConsumer> schedulingPoolConsumerFactory)
+    private final AtomicBoolean[] runningPools;
+    
+    private UUID listenerId;
+    
+    public SchedulingPoolsController(SchedulingPoolElector[] poolElectors, Scheduler scheduler, SchedulingTopic schedulingTopic)
     {
         super();
         this.poolElectors = Objects.requireNonNull(poolElectors);
         this.scheduler = Objects.requireNonNull(scheduler);
-        this.schedulingPoolConsumerFactory = Objects.requireNonNull(schedulingPoolConsumerFactory);
+        this.schedulingTopic = Objects.requireNonNull(schedulingTopic);
+        // Init our internal state
+        this.runningPools = new AtomicBoolean[this.poolElectors.length];
+        for (int i = 0; i < this.runningPools.length; i++)
+        {
+            this.runningPools[i] = new AtomicBoolean(false);
+        }
     }
     
     public Set<Integer> getPools()
@@ -57,6 +69,9 @@ public class SchedulingPoolsController
             pool.elect((state) -> this.poolTrigger(pool.getPool(), state));
         }
         logger.info("Finished processing pool election");
+        // Start listening to scheduler messages
+        this.listenerId = this.schedulingTopic.listen(this::processSchedulingMessage);
+        // All started
         logger.info("Started " + this.pools.size() + " processing pools");
     }
     
@@ -82,40 +97,43 @@ public class SchedulingPoolsController
     
     protected void startPool(int pool)
     {
-        synchronized (this)
+        // Only start the scheduling pool if we don't already have it
+        if (this.runningPools[pool].compareAndSet(false, true))
         {
-            if (! this.pools.containsKey(pool))
-            {
-                // Schedule the pool
-                this.scheduler.schedulePool(pool);
-                // Register message consumer
-                SchedulingPoolConsumer consumer = this.schedulingPoolConsumerFactory.apply(pool);
-                this.pools.put(pool, consumer);
-                consumer.listen(this.scheduler::process);
-                logger.info("Starting processing pool " + pool + ", now running " + this.pools.size() + " processing pools");
-            }
+            // Schedule the pool
+            this.scheduler.schedulePool(pool);
+            logger.info("Scheduling processing pool " + pool + ", now running " + this.pools.size() + " processing pools");
+        }
+    }
+    
+    protected void processSchedulingMessage(SchedulerMessage message)
+    {
+        logger.info("Got scheduling event for pool " + message.getPool() + ":\n" + message);
+        // Only process the message if we are running the given pool
+        if (this.runningPools[message.getPool()].get())
+        {
+            this.scheduler.process(message);
         }
     }
     
     protected void stopPool(int pool)
     {
-        synchronized (this)
+        // Only stop the scheduling pool if we don't already have it
+        if (this.runningPools[pool].compareAndSet(true, false))
         {
-            // Stop the processing pool execution unit
-            SchedulingPoolConsumer consumer = this.pools.remove(pool);
-            if (consumer != null)
-            {
-                // Stop scheduler messages
-                consumer.unlistenAll();
-                // Unschedule the pool
-                this.scheduler.unschedulePool(pool);
-                logger.info("Stopping scheduling pool " + pool + ", now running " + this.pools.size() + " processing pools");
-            }
+            // Unschedule the pool
+            this.scheduler.unschedulePool(pool);
+            logger.info("Unscheduling pool " + pool + ", now running " + this.pools.size() + " processing pools");
         }
     }
     
     public void stop()
     {
+        // Stop listening to scheduler messages
+        if (this.listenerId != null)
+        {
+            this.schedulingTopic.unlisten(this.listenerId);
+        }
         // Stop the scheduler
         this.scheduler.shutdown();
         // Clear our pools map

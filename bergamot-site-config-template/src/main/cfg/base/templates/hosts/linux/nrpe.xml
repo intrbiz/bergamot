@@ -6,50 +6,42 @@
         <notify teams="linux-admins"/>
         <description>Default Linux server checked via NRPE template</description>
         
-        <service extends="linux-service" name="memory">
+        <service extends="linux-system-services" name="memory">
             <summary>Memory</summary>
             <check-command command="check-nrpe-mem"/>
         </service>
         
-        <service extends="linux-service" name="load">
+        <service extends="linux-system-services" name="load">
             <summary>Load</summary>
             <check-command command="check-nrpe-load"/>
         </service>
         
-        <service extends="linux-service" name="ping">
-            <summary>Ping</summary>
-            <check-command command="check-ping">
-                <parameter name="arg1">100.0,20%</parameter>
-                <parameter name="arg2">500.0,60%</parameter>
-            </check-command>
-        </service>
-        
-        <service extends="linux-service" name="users">
+        <service extends="linux-system-services" name="users">
             <summary>Active Users</summary>
             <check-command command="check-nrpe-users"/>
         </service>
         
-        <service extends="linux-service" name="zombie-procs">
+        <service extends="linux-system-services" name="zombie-procs">
             <summary>Zombie Processes</summary>
             <check-command command="check-zombie-procs"/>
         </service>
         
-        <service extends="linux-service" name="total-procs">
+        <service extends="linux-system-services" name="total-procs">
             <summary>Total Processes</summary>
             <check-command command="check-total-procs"/>
         </service>
         
-        <service extends="linux-service" name="disk-space-root">
+        <service extends="linux-storage-services" name="disk-space-root">
             <summary>Disk Space: /</summary>
             <check-command command="check-disk-space-root"/>
         </service>
         
-        <service extends="linux-service" name="service-ssh">
-            <summary>Load</summary>
+        <service extends="linux-daemon-services" name="service-ssh">
+            <summary>SSH</summary>
             <check-command command="check-ssh"/>
         </service>
         
-        <service extends="linux-service" name="local-ntp-offset">
+        <service extends="linux-daemon-services" name="local-ntp-offset">
             <summary>Local NTP Offset</summary>
             <check-command command="check-local-ntp-offset"/>
         </service>

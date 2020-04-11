@@ -23,6 +23,30 @@
         <notify teams="linux-admins"/>
     </service>
     
+    <service name="linux-monitoring-services" groups="linux-monitoring-services" extends="linux-service" template="yes" security-domains="linux">
+        <summary>Generic Linux Monitoring Service</summary>
+    </service>
+    
+    <service name="linux-system-services" groups="linux-system-services" extends="linux-service" template="yes" security-domains="linux">
+        <summary>Generic Linux System Service</summary>
+    </service>
+    
+    <service name="linux-storage-services" groups="linux-storage-services" extends="linux-service" template="yes" security-domains="linux">
+        <summary>Generic Linux Storage Service</summary>
+    </service>
+    
+    <service name="linux-daemon-services" groups="linux-daemon-services" extends="linux-service" template="yes" security-domains="linux">
+        <summary>Generic Linux Daemon Service</summary>
+    </service>
+    
+    <service name="linux-processes-services" groups="linux-processes-services" extends="linux-service" template="yes" security-domains="linux">
+        <summary>Generic Linux Process Service</summary>
+    </service>
+    
+    <service name="linux-network-services" groups="linux-network-services" extends="linux-service" template="yes" security-domains="linux">
+        <summary>Generic Linux Network Service</summary>
+    </service>
+    
     <service name="network-service" groups="network-services" extends="generic-service" template="yes" security-domains="network">
         <notify teams="network-admins"/>
         <schedule every="15" retry-every="5" time-period="24x7"/>

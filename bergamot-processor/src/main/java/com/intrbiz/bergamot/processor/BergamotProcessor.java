@@ -5,17 +5,16 @@ import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.AgentRegistrationService;
+import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
 import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
 import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
-import com.intrbiz.bergamot.cluster.consumer.SchedulingPoolConsumer;
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.cluster.election.LeaderElector;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.cluster.lookup.AgentKeyClusterLookup;
@@ -52,6 +51,8 @@ public class BergamotProcessor extends BergamotMember
     
     private final SiteUpdateTopic updateTopic;
     
+    private final SchedulingTopic schedulingTopic;
+    
     // lookups
     
     private final AgentKeyClusterLookup agentKeyLookup;
@@ -81,8 +82,6 @@ public class BergamotProcessor extends BergamotMember
     private final CheckDispatcher checkDispatcher;
     
     private final NotificationDispatcher notificationDispatcher;
-    
-    private final SchedulingPoolDispatcher poolDispatcher;
     
     private final ProcessorDispatcher processorDispatcher;
     
@@ -121,6 +120,7 @@ public class BergamotProcessor extends BergamotMember
         this.siteEventTopic = new SiteEventTopic(this.hazelcast);
         this.notificationTopic = new SiteNotificationTopic(this.hazelcast);
         this.updateTopic = new SiteUpdateTopic(this.hazelcast);
+        this.schedulingTopic = new SchedulingTopic(this.hazelcast);
         // lookups
         this.agentKeyLookup = new AgentKeyClusterLookup(this.hazelcast);
         // registries
@@ -141,17 +141,16 @@ public class BergamotProcessor extends BergamotMember
         // dispatchers
         this.checkDispatcher = new CheckDispatcher(this.workerRegistry, this.agentRegistry, this.hazelcast);
         this.notificationDispatcher = new NotificationDispatcher(this.notifierRegistry, this.hazelcast);
-        this.poolDispatcher = new SchedulingPoolDispatcher(this.hazelcast);
         this.processorDispatcher = new ProcessorDispatcher(this.hazelcast, this.processorRegistry.getRouteTable());
         // services
-        this.scheduler = new WheelScheduler(this.id, this.checkDispatcher, this.poolDispatcher, this.processorDispatcher);
-        this.resultProcessor = new DefaultResultProcessor(this.poolDispatcher, this.notificationDispatcher, this.notificationTopic, this.updateTopic);
+        this.scheduler = new WheelScheduler(this.id, this.checkDispatcher, this.processorDispatcher);
+        this.resultProcessor = new DefaultResultProcessor(this.schedulingTopic, this.notificationDispatcher, this.notificationTopic, this.updateTopic);
         this.readingProcessor = new DefaultReadingProcessor();
-        this.agentRegistrationService = new AgentRegistrationService(this.poolDispatcher, this.notificationDispatcher, this.poolElectors.length);
+        this.agentRegistrationService = new AgentRegistrationService(this.schedulingTopic, this.notificationDispatcher, this.poolElectors.length);
         // consumer
         this.processorConsumer = new ProcessorConsumer(this.hazelcast, this.id);
         // scheduling controller
-        this.schedulingController = new SchedulingPoolsController(this.poolElectors, this.scheduler, this::createPoolConsumer);
+        this.schedulingController = new SchedulingPoolsController(this.poolElectors, this.scheduler, this.schedulingTopic);
         // processor executor
         this.processorExecutor = new ProcessorExecutor(this.resultProcessor, this.readingProcessor, this.agentRegistrationService, this.processorConsumer);
         // leader
@@ -199,23 +198,9 @@ public class BergamotProcessor extends BergamotMember
         this.leaderElector.elect(this.leader::launch);
     }
     
-    public void startInBackground()
-    {
-        new Thread(() -> {
-            try
-            {
-                this.start();
-            }
-            catch (Exception e)
-            {
-                logger.error("Error starting Bergamot Processor", e);
-            }
-        }, "bergamot-processor-launcher").start();
-    }
-    
     protected void waitForProcessors() throws Exception
     {
-        if (this.config.getExpectedMembers() > 0)
+        if (this.config.getExpectedMembers() > 1)
         {
             int waitFor = (int) Math.ceil(((double) this.config.getExpectedMembers()) / 2d);
             logger.info("Waiting for " + waitFor + " processors to join");
@@ -262,6 +247,11 @@ public class BergamotProcessor extends BergamotMember
     public SiteUpdateTopic getUpdateTopic()
     {
         return updateTopic;
+    }
+
+    public SchedulingTopic getSchedulingTopic()
+    {
+        return this.schedulingTopic;
     }
 
     public AgentKeyClusterLookup getAgentKeyLookup()
@@ -313,11 +303,6 @@ public class BergamotProcessor extends BergamotMember
     {
         return this.notificationDispatcher;
     }
-
-    public SchedulingPoolDispatcher getPoolDispatcher()
-    {
-        return this.poolDispatcher;
-    }
     
     public ProcessorDispatcher getProcessorDispatcher()
     {
@@ -344,11 +329,6 @@ public class BergamotProcessor extends BergamotMember
         return this.agentRegistrationService;
     }
     
-    public SchedulingPoolConsumer createPoolConsumer(int pool)
-    {
-        return new SchedulingPoolConsumer(this.hazelcast, pool);
-    }
-
     public SchedulingPoolsController getSchedulingController()
     {
         return this.schedulingController;

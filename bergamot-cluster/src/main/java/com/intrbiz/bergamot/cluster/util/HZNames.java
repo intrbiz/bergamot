@@ -29,6 +29,11 @@ public final class HZNames
         return "bergamot.topic.event.site";
     }
     
+    public static final String getSchedulingTopicName()
+    {
+        return "bergamot.topic.scheduling";
+    }
+    
     public static final String getSiteNotificationTopicName(UUID site)
     {
         return "bergamot.topic.notification.site." + site;

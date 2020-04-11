@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
 
-    <host name="mysql-server-nrpe" extends="db-server, linux-server-nrpe" template="yes">
+    <host name="mysql-server-nrpe" extends="linux-server-nrpe, db-server" template="yes">
         <summary>MySQL DB Server (NRPE)</summary>
         <description>Default MySQL DB server checked via NRPE template</description>
         
@@ -11,7 +11,7 @@
         </service>
     </host>
 
-    <host name="postgresql-server-nrpe" extends="postgresql-server, linux-server-nrpe" template="yes">
+    <host name="postgresql-server-nrpe" extends="linux-server-nrpe, postgresql-server" template="yes">
         <summary>PostgreSQL DB Server (NRPE)</summary>
         
         <service name="service-postgresql" extends="db-service">

@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
@@ -26,16 +25,13 @@ public abstract class AbstractScheduler implements Scheduler
     
     protected final CheckDispatcher checkDispatcher;
     
-    protected final SchedulingPoolDispatcher poolDispatcher;
-    
     protected final ProcessorDispatcher processorDispatcher;
     
-    public AbstractScheduler(UUID processorId, CheckDispatcher checkDispatcher, SchedulingPoolDispatcher poolDispatcher, ProcessorDispatcher processorDispatcher)
+    public AbstractScheduler(UUID processorId, CheckDispatcher checkDispatcher, ProcessorDispatcher processorDispatcher)
     {
         super();
         this.processorId = processorId;
         this.checkDispatcher = checkDispatcher;
-        this.poolDispatcher = poolDispatcher;
         this.processorDispatcher = processorDispatcher;
     }
     

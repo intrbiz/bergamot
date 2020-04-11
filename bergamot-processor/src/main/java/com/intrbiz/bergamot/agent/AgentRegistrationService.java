@@ -7,8 +7,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
@@ -26,16 +26,16 @@ public class AgentRegistrationService
 {
     private static final Logger logger = Logger.getLogger(AgentRegistrationService.class);
     
-    private final SchedulingPoolDispatcher poolDispatcher;
+    private final SchedulingTopic schedulingTopic;
     
     private final NotificationDispatcher notificationDispatcher;
     
     private final int schedulingPoolCount;
     
-    public AgentRegistrationService(SchedulingPoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, int schedulingPoolCount)
+    public AgentRegistrationService(SchedulingTopic schedulingTopic, NotificationDispatcher notificationDispatcher, int schedulingPoolCount)
     {
         super();
-        this.poolDispatcher = poolDispatcher;
+        this.schedulingTopic = schedulingTopic;
         this.notificationDispatcher = notificationDispatcher;
         this.schedulingPoolCount = schedulingPoolCount;
     }
@@ -110,7 +110,7 @@ public class AgentRegistrationService
             if (validatedConfiguration.getReport().isValid())
             {
                 // good we have a valid configuration, import it
-                BergamotConfigImporter importer = new BergamotConfigImporter(validatedConfiguration, this.schedulingPoolCount).online(this.poolDispatcher, this.notificationDispatcher, null);
+                BergamotConfigImporter importer = new BergamotConfigImporter(validatedConfiguration, this.schedulingPoolCount).online(this.schedulingTopic, this.notificationDispatcher, null);
                 BergamotImportReport importReport = importer.importConfiguration();
                 if (importReport.isSuccessful())
                 {

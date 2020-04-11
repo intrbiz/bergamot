@@ -78,6 +78,12 @@ public class BergamotAgent
     
     public static final String AGENT_VERSION = "4.0.0";
     
+    private static final double BACKOFF_FACTOR = 0.16D;
+    
+    private static final double BACKOFF_MAX_S = 600;
+    
+    private static final int BACKOFF_MIN_BLUR = 8000;
+    
     private static final Logger logger = Logger.getLogger(BergamotAgent.class);
     
     private URI server;
@@ -448,7 +454,7 @@ public class BergamotAgent
     
     protected void scheduleReconnect()
     {
-        long wait = Math.min(Math.max(connectionAttempt.get(), 1) * 1000L, 12000L) + (new SecureRandom().nextInt(3000));
+        long wait = ((long)(Math.min(Math.pow(Math.E, BACKOFF_FACTOR * Math.max(connectionAttempt.get(), 1)), BACKOFF_MAX_S) * 1000L)) + (new SecureRandom().nextInt(BACKOFF_MIN_BLUR));
         logger.info("Scheduling reconnection in " + wait + "ms");
         this.timer.schedule(new TimerTask() {
             @Override

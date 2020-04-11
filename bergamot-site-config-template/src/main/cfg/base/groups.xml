@@ -36,7 +36,7 @@
         <summary>Linux</summary>
     </group>
     
-    <group name="monitoring-services" groups="linux-services" extends="service-group">
+    <group name="linux-monitoring-services" groups="linux-services" extends="service-group">
         <summary>Monitoring</summary>
     </group>
     

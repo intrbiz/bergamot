@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
     
-    <host name="nginx-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
+    <host name="nginx-server-agent" extends="linux-server-agent, web-server" template="yes" groups="web-servers" security-domains="web">
         <summary>Nginx Web Server (Bergamot Agent)</summary>
         <description>Default Nginx web server checked via Bergamot Agent template</description>
         
@@ -16,7 +16,7 @@
         </service>
     </host>
     
-    <host name="apache-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
+    <host name="apache-server-agent" extends="linux-server-agent, web-server" template="yes" groups="web-servers" security-domains="web">
         <summary>Apache Web Server (Bergamot Agent)</summary>
         <description>Default Apache web server checked via Bergamot Agent template</description>
         

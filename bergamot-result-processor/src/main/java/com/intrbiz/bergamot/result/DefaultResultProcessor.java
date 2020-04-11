@@ -18,10 +18,10 @@ import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
 import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
+import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
-import com.intrbiz.bergamot.cluster.dispatcher.SchedulingPoolDispatcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Alert;
@@ -66,9 +66,9 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     
     private Accounting accounting = Accounting.create(DefaultResultProcessor.class);
 
-    public DefaultResultProcessor(SchedulingPoolDispatcher poolDispatcher, NotificationDispatcher notificationDispatcher, SiteNotificationTopic notificationBroker, SiteUpdateTopic updateBroker)
+    public DefaultResultProcessor(SchedulingTopic schedulingTopic, NotificationDispatcher notificationDispatcher, SiteNotificationTopic notificationBroker, SiteUpdateTopic updateBroker)
     {
-        super(poolDispatcher, notificationDispatcher, notificationBroker, updateBroker);
+        super(schedulingTopic, notificationDispatcher, notificationBroker, updateBroker);
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })

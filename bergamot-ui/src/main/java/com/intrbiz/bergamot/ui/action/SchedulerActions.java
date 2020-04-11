@@ -17,12 +17,12 @@ public class SchedulerActions implements BalsaAction<BergamotApp>
     @Action("enable-check")
     public void enableCheck(ActiveCheck<?, ?> check)
     {
-        app().getProcessor().getPoolDispatcher().dispatch(check.getPool(), new ScheduleCheck(check.getId(), Command.ENABLE));
+        app().getProcessor().getSchedulingTopic().publish(new ScheduleCheck(check.getPool(), check.getId(), Command.ENABLE));
     }
     
     @Action("disable-check")
     public void disableCheck(ActiveCheck<?, ?> check)
     {
-        app().getProcessor().getPoolDispatcher().dispatch(check.getPool(), new ScheduleCheck(check.getId(), Command.DISABLE));
+        app().getProcessor().getSchedulingTopic().publish(new ScheduleCheck(check.getPool(), check.getId(), Command.DISABLE));
     }
 }
