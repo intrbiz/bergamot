@@ -30,6 +30,7 @@ build:
       - '*/pom.xml'
       - '*/target/*.jar'
       - '*/target/*.app'
+      - '*/target/*.tar.gz'
 
 release:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
