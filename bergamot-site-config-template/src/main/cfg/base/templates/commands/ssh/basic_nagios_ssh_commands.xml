@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command  name="check-local-disk-over-ssh" extends="ssh-nagios-check" category="System">
+        <parameter name="command_line">#{nagios.path}/check-disk -w #{arg1} -c #{arg2} -p #{arg3}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
+    </command>
+    
+    <command name="check-local-load-over-ssh" extends="ssh-nagios-check" category="System">
+        <parameter name="command_line">#{nagios.path}/check-load -w #{arg1} -c #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
+    </command>
+    
+    <command name="check-local-procs-over-ssh" extends="ssh-nagios-check" category="System">
+        <parameter name="command_line">#{nagios.path}/check-procs -w #{arg1} -c #{arg2} -s #{arg3}</parameter>
+    </command> 
+    
+    <command name="check-local-swap-over-ssh" extends="ssh-nagios-check" category="System">
+        <parameter name="command_line">#{nagios.path}/check-swap -w #{arg1} -c #{arg2}</parameter>
+    </command>
+    
+    <command name="check-local-mrtgtraf-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-mrtgtraf -F #{arg1} -a #{arg2} -w #{arg3} -c #{arg4} -e #{arg5}</parameter>
+    </command>
+    
+    <command name="check-ftp-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-ftp -H #{host.address} #{arg1}</parameter>
+    </command>
+    
+    <command name="check-hpjd-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-hpjd -H #{host.address} #{arg1}</parameter>
+    </command>
+    
+    <command name="check-snmp-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-snmp -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-snmp-v2-public-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-snmp -P 2c -C public -H #{host.address} -o #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-http-over-ssh" extends="ssh-nagios-check" category="Websites">
+        <parameter name="command_line">#{nagios.path}/check-http -I #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+    </command>
+    
+    <command name="check-ssh-over-ssh" extends="ssh-nagios-check" category="System">
+        <parameter name="command_line">#{nagios.path}/check-ssh #{host.address}</parameter>
+    </command>
+    
+    <command name="check-ssh-with-options-over-ssh" extends="ssh-nagios-check" category="System">
+        <parameter name="command_line">#{nagios.path}/check-ssh #{arg1} #{host.address}</parameter>
+    </command>
+    
+    <command name="check-dhcp-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-dhcp #{arg1}</parameter>
+    </command>
+    
+    <command name="check-ping-over-ssh" extends="ssh-nagios-check" category="System">
+        <parameter name="command_line">#{nagios.path}/check-ping -H #{host.address} -w #{arg1} -c #{arg2} -p 5</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-pop-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-pop -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
+    </command>
+    
+    <command name="check-imap-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-imap -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
+    </command>
+    
+    <command name="check-smtp-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-smtp -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
+    </command>
+    
+    <command name="check-tcp-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-tcp -H #{host.address} -p #{arg1} #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-udp-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-udp -H #{host.address} -p #{arg1} #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-nt-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-nt -H #{host.address} -p 12489 -v #{arg1} #{arg2}</parameter>
+    </command>
+    
+    <command name="check-dummy-over-ssh" extends="ssh-nagios-check">
+        <parameter name="command_line">#{nagios.path}/check-dummy #{arg1}</parameter>
+    </command>
+    
+</bergamot>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+
+    <host name="nginx-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers" security-domains="web">
+        <summary>Nginx Web Server (NRPE)</summary>
+        <description>Default Nginx web server checked via NRPE template</description>
+        
+        <service name="service-nginx" extends="web-service">
+            <summary>Service: Nginx</summary>
+            <check-command command="check-nrpe-nginx"/>
+        </service>
+    </host>
+    
+    <host name="apache-server-nrpe" extends="web-server, linux-server-nrpe" template="yes" groups="web-servers" security-domains="web">
+        <summary>Apache Web Server (NRPE)</summary>
+        <description>Default Apache web server checked via NRPE template</description>
+        
+        <service name="service-apache" extends="web-service">
+            <summary>Service: Apache HTTPD</summary>
+            <check-command command="check-nrpe-apache"/>
+        </service>
+    </host>
+    
+</bergamot>

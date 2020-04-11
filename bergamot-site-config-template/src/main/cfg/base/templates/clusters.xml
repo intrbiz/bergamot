@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <cluster template="yes" name="generic-cluster" security-domains="global">
+        <summary>Generic Cluster</summary>
+        <notifications time-period="24x7">
+            <!-- escalation policies -->
+            <escalate after="1h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+            <escalate after="6h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+        </notifications>
+        <notify teams="admins"/>
+        <description>A generic cluster template</description>
+    </cluster>
+    
+</bergamot>

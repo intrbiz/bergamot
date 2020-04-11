@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="nginx-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
+        <summary>Nginx Web Server (Bergamot Agent)</summary>
+        <description>Default Nginx web server checked via Bergamot Agent template</description>
+        
+        <service extends="web-service" name="process-nginx">
+            <summary>Process: Nginx</summary>
+            <check-command command="check-agent-process-nginx"/>
+        </service>
+        
+        <service extends="web-service" name="listener-http">
+            <summary>Port Listener: HTTP</summary>
+            <check-command command="check-agent-listener-http"/>
+        </service>
+    </host>
+    
+    <host name="apache-server-agent" extends="web-server, linux-server-agent" template="yes" groups="web-servers" security-domains="web">
+        <summary>Apache Web Server (Bergamot Agent)</summary>
+        <description>Default Apache web server checked via Bergamot Agent template</description>
+        
+        <service extends="web-service" name="process-apache">
+            <summary>Process: Apache</summary>
+            <check-command command="check-agent-process-apache"/>
+        </service>
+        
+        <service extends="web-service" name="listener-http">
+            <summary>Port Listener: HTTP</summary>
+            <check-command command="check-agent-listener-http"/>
+        </service>
+    </host>
+    
+</bergamot>

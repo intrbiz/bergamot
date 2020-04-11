@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="check-snmp-description" extends="snmp-get-check" category="System" engine="snmp">
+        <summary>Get SNMP Description</summary>
+        <parameter name="oid">1.3.6.1.2.1.1.1.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
+        <description>Get the device description of an SNMP device</description>
+    </command>
+    
+    <command name="check-snmp-contact" extends="snmp-get-check" category="System" engine="snmp">
+        <summary>Get SNMP Contact</summary>
+        <parameter name="oid">1.3.6.1.2.1.1.4.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
+        <description>Get the contact of an SNMP device</description>
+    </command>
+    
+    <command name="check-snmp-name" extends="snmp-get-check" category="System" engine="snmp">
+        <summary>Get SNMP Name</summary>
+        <parameter name="oid">1.3.6.1.2.1.1.5.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
+        <description>Get the name of an SNMP device</description>
+    </command>
+    
+    <command name="check-snmp-location" extends="snmp-get-check" category="System" engine="snmp">
+        <summary>Get SNMP Location</summary>
+        <parameter name="oid">1.3.6.1.2.1.1.6.0</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
+        <description>Get the location of an SNMP device</description>
+    </command>
+    
+    <command name="check-snmp-uptime" extends="snmp-check" category="System" engine="snmp">
+        <parameter description="Warning if uptime is less than" name="warning">30</parameter>
+        <parameter description="Critical if uptime is less than" name="critical">15</parameter>
+        <script>
+            <![CDATA[
+            /* Validate parameters */
+            bergamot.require('warning');
+            bergamot.require('critical');
+            /* Get the system uptime */
+            agent.getValue(
+                '1.3.6.1.2.1.1.3.0', 
+                function(varbind) { 
+                    if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('critical') * 60 * 1000))
+                    {
+                        bergamot.critical('Up ' + varbind.getTimeTicksValue().toInterval());
+                    }
+                    else if (varbind.getTimeTicksValue().getTicksMillis() < (bergamot.check.getParameter('warning') * 60 * 1000))
+                    {
+                        bergamot.warning('Up ' + varbind.getTimeTicksValue().toInterval());
+                    }
+                    else
+                    {
+                        bergamot.ok('Up ' + varbind.getTimeTicksValue().toInterval());
+                    }
+                },
+                function(exception) {
+                    bergamot.error(exception);
+                }
+            );
+            ]]>
+        </script>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
+        <description>Check the uptime of an SNMP device, raising an alert if the agent is restarted</description>
+    </command>
+    
+</bergamot>

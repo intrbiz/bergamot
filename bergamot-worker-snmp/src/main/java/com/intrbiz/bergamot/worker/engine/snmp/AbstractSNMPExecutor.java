@@ -60,23 +60,23 @@ public abstract class AbstractSNMPExecutor extends AbstractExecutor<SNMPEngine>
     protected void validate(ExecuteCheck executeCheck)
     {
         if (Util.isEmpty(executeCheck.getParameter("host"))) throw new RuntimeException("The host must be defined!");
-        if (Util.isEmpty(executeCheck.getParameter("snmp-version"))) throw new RuntimeException("The snmp-version must be defined!");
-        SNMPVersion version = SNMPVersion.parse(executeCheck.getParameter("snmp-version"));
-        if (version == null) throw new RuntimeException("The snmp-version must be one of: '1', '2c', '3'");
+        if (Util.isEmpty(executeCheck.getParameter("snmp_version"))) throw new RuntimeException("The snmp_version must be defined!");
+        SNMPVersion version = SNMPVersion.parse(executeCheck.getParameter("snmp_version"));
+        if (version == null) throw new RuntimeException("The snmp_version must be one of: '1', '2c', '3'");
         if (SNMPVersion.V1 == version || SNMPVersion.V2C == version)
         {
-            if (Util.isEmpty(executeCheck.getParameter("snmp-community"))) throw new RuntimeException("The snmp-community must be defined!");
+            if (Util.isEmpty(executeCheck.getParameter("snmp_community"))) throw new RuntimeException("The snmp_community must be defined!");
         }
         else if (SNMPVersion.V3 == version)
         {
-            if (Util.isEmpty(executeCheck.getParameter("snmp-auth"))) throw new RuntimeException("The snmp-auth must be defined!");
-            if (SNMPAuthMode.parse(executeCheck.getParameter("snmp-auth")) == null) throw new RuntimeException("The snmp-auth must be one of: 'none', 'sha1', 'md5'");
-            if (Util.isEmpty(executeCheck.getParameter("snmp-priv"))) throw new RuntimeException("The snmp-auth must be defined!");
-            if (SNMPPrivMode.parse(executeCheck.getParameter("snmp-priv")) == null) throw new RuntimeException("The snmp-priv must be one of: 'none', 'aes128', 'des'");
-            if (Util.isEmpty(executeCheck.getParameter("snmp-user"))) throw new RuntimeException("The snmp-user must be defined!");
-            if (Util.isEmpty(executeCheck.getParameter("snmp-password"))) throw new RuntimeException("The snmp-password must be defined!");
+            if (Util.isEmpty(executeCheck.getParameter("snmp_auth"))) throw new RuntimeException("The snmp_auth must be defined!");
+            if (SNMPAuthMode.parse(executeCheck.getParameter("snmp_auth")) == null) throw new RuntimeException("The snmp_auth must be one of: 'none', 'sha1', 'md5'");
+            if (Util.isEmpty(executeCheck.getParameter("snmp_priv"))) throw new RuntimeException("The snmp_auth must be defined!");
+            if (SNMPPrivMode.parse(executeCheck.getParameter("snmp_priv")) == null) throw new RuntimeException("The snmp_priv must be one of: 'none', 'aes128', 'des'");
+            if (Util.isEmpty(executeCheck.getParameter("snmp_user"))) throw new RuntimeException("The snmp_user must be defined!");
+            if (Util.isEmpty(executeCheck.getParameter("snmp_password"))) throw new RuntimeException("The snmp_password must be defined!");
             // for now require the SNMP engine id for V3
-            if (Util.isEmpty(executeCheck.getParameter("snmp-engine-id"))) throw new RuntimeException("The snmp-engine-id must be defined!");
+            if (Util.isEmpty(executeCheck.getParameter("snmp_engine_id"))) throw new RuntimeException("The snmp_engine_id must be defined!");
         }
         else
         {
@@ -86,23 +86,23 @@ public abstract class AbstractSNMPExecutor extends AbstractExecutor<SNMPEngine>
     
     protected synchronized SNMPContext<?> openContext(ExecuteCheck executeCheck) throws UnknownHostException
     {
-        SNMPVersion version = SNMPVersion.parse(executeCheck.getParameter("snmp-version"));
+        SNMPVersion version = SNMPVersion.parse(executeCheck.getParameter("snmp_version"));
         String host = executeCheck.getParameter("host");
         if (SNMPVersion.V1 == version)
         {
-            return this.getEngine().getTransport().openV1Context(host, executeCheck.getParameter("snmp-community"));
+            return this.getEngine().getTransport().openV1Context(host, executeCheck.getParameter("snmp_community"));
         }
         else if (SNMPVersion.V2C == version)
         {
-            return this.getEngine().getTransport().openV2Context(host, executeCheck.getParameter("snmp-community"));
+            return this.getEngine().getTransport().openV2Context(host, executeCheck.getParameter("snmp_community"));
         }
         else if (SNMPVersion.V3 == version)
         {
-            String engineId = executeCheck.getParameter("snmp-engine-id");
-            SNMPAuthMode auth = SNMPAuthMode.parse(executeCheck.getParameter("snmp-auth"));
-            SNMPPrivMode priv = SNMPPrivMode.parse(executeCheck.getParameter("snmp-priv"));
-            String user = executeCheck.getParameter("snmp-user");
-            String pass = executeCheck.getParameter("snmp-password");
+            String engineId = executeCheck.getParameter("snmp_engine_id");
+            SNMPAuthMode auth = SNMPAuthMode.parse(executeCheck.getParameter("snmp_auth"));
+            SNMPPrivMode priv = SNMPPrivMode.parse(executeCheck.getParameter("snmp_priv"));
+            String user = executeCheck.getParameter("snmp_user");
+            String pass = executeCheck.getParameter("snmp_password");
             // open the context
             return this.getEngine().getTransport().openV3Context(host, engineId).setUser(user, auth, priv, pass, pass);
         }

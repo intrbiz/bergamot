@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <security-domain name="global">
+        <summary>Global Configuration</summary>
+    </security-domain>
+    
+    <security-domain name="network">
+        <summary>Networking Checks</summary>
+    </security-domain>
+    
+    <security-domain name="web">
+        <summary>Website Checks</summary>
+    </security-domain>
+    
+    <security-domain name="db">
+        <summary>Database Checks</summary>
+    </security-domain>
+    
+    <security-domain name="linux">
+        <summary>Linux Checks</summary>
+    </security-domain>
+    
+</bergamot>

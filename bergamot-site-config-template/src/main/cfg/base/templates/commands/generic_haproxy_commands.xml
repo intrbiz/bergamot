@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="haproxy-stats-check" extends="http-script-check" application="HAProxy" security-domains="global">
+        <summary>Check HAProxy stats</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port">980</parameter>
+        <parameter name="path">/haproxy;csv;norefresh</parameter>
+        <parameter name="username">#{resolve_credentials('haproxy').username}</parameter>
+        <parameter name="password">#{resolve_credentials('haproxy').password}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+        <description>Check HAProxy using it's HTTP stats API</description>
+        <script>
+        <![CDATA[
+            function parseStats(data)
+            {
+                var stats = {};
+                var lines = data.split('\n');
+                var columns = lines[0].substr(1).split(',');
+                for (var i = 1; i < lines.length; i++)
+                {
+                    var stat = {};
+                    var fields = lines[i].split(',');
+                    for (var j = 0; j < fields.length; j++)
+                    {
+                        stat[columns[j].trim()] = fields[j];
+                    }
+                    if (! stats[stat.pxname]) 
+                        stats[stat.pxname] = { frontend: null, backend: null, servers: [] };
+                    if (stat.svname == 'FRONTEND' || stat.svname == 'BACKEND')
+                        stats[stat.pxname][stat.svname.toLowerCase()] = stat;
+                    else
+                        stats[stat.pxname].servers.push(stat);
+                }
+                return stats;
+            }
+        ]]>
+        </script>
+        <category>Network</category>
+        <application>HAProxy</application>
+    </command>
+    
+</bergamot>

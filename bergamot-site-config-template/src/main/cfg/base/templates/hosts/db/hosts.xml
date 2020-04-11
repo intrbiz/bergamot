@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+
+    <host name="postgresql-server" extends="db-server" template="yes">
+        <summary>PostgreSQL DB Server</summary>
+        
+        <service name="service-postgresql-up" extends="db-service">
+            <summary>PostgreSQL Up</summary>
+            <check-command command="postgresql-up"/>
+        </service>
+        
+        <service name="service-postgresql-version" extends="db-service">
+            <summary>PostgreSQL Version</summary>
+            <notifications enabled="no"/>
+            <check-command command="postgresql-version"/>
+        </service>
+        
+        <service name="service-postgresql-active-connections" extends="db-service">
+            <summary>PostgreSQL Active Connections</summary>
+            <check-command command="postgresql-connections-per-database"/>
+        </service>
+    </host>
+
+</bergamot>

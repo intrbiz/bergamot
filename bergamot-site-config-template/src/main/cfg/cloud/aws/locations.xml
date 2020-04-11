@@ -1,0 +1,39 @@
+<bergamot site="bergamot.template">
+    
+    <location name="aws" extends="cloud-location">
+        <summary>Amazon Web Services</summary>
+    </location>
+
+    <location name="aws-eu-ireland" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - EU (Ireland)</summary>
+    </location>
+    
+    <location name="aws-us-east-n-virginia" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - US East (N. Virginia)</summary>
+    </location>
+    
+    <location name="aws-us-west-oregon" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - US West (Oregon)</summary>
+    </location>
+    
+    <location name="aws-us-west-n-california" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - US West (N. California)</summary>
+    </location>
+    
+    <location name="aws-asia-pacific-singapore" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - Asia Pacific (Singapore)</summary>
+    </location>
+    
+    <location name="aws-asia-pacific-tokyo" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - Asia Pacific (Tokyo)</summary>
+    </location>
+    
+    <location name="aws-asia-pacific-sydney" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - Asia Pacific (Sydney)</summary>
+    </location>
+    
+    <location name="aws-south-america-sao-paulo" location="aws" extends="cloud-location">
+        <summary>Amazon Web Services - South America (Sao Paulo)</summary>
+    </location>
+
+</bergamot>

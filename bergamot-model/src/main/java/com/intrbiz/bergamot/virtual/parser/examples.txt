@@ -29,7 +29,7 @@ any hosts in pool 'cluster'
 
 # Any host in the given list
 any of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
-any [ host 'vm1', hostt 'vm2', host 'vm3', host 'vm4' ]
+any [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ]
 
 # One of the hosts in the given pool
 one of hosts in pool 'cluster'

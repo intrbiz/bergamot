@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <group name="bergamot-group" security-domains="bergamot" template="yes">
+        <summary>Bergamot Group Template</summary>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
+    </group>
+    
+    <group name="bergamot-services" groups="services" extends="bergamot-group">
+        <summary>Bergamot Monitoring Services</summary>
+    </group>
+    
+    <group name="bergamot-servers" groups="hosts" extends="bergamot-group">
+        <summary>Bergamot Monitoring Servers</summary>
+    </group>
+    
+</bergamot>

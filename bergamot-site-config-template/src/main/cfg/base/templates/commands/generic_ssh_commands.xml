@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="ssh-nagios-check" engine="ssh" executor="nagios" security-domains="global">
+        <summary>Nagios over SSH Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="username">#{resolve_credentials('ssh').username}</parameter>
+        <parameter name="password">#{resolve_credentials('ssh').password}</parameter>
+        <parameter name="public_key">#{resolve_credentials('ssh').keyId}</parameter>
+        <parameter name="private_key">#{resolve_credentials('ssh').keySecret}</parameter>
+        <parameter name="command_line"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/service.png</parameter>
+        <description>Execute a Nagios check over SSH</description>
+    </command>
+    
+    <command name="ssh-script-check" engine="ssh" executor="script" security-domains="global">
+        <summary>SSH Script Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="username">#{resolve_credentials('ssh').username}</parameter>
+        <parameter name="password">#{resolve_credentials('ssh').password}</parameter>
+        <parameter name="public_key">#{resolve_credentials('ssh').keyId}</parameter>
+        <parameter name="private_key">#{resolve_credentials('ssh').keySecret}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/service.png</parameter>
+        <description>Run checks against an SSH server</description>
+    </command>
+    
+    <command name="sftp-script-check" engine="sftp" executor="script" security-domains="global">
+        <summary>SFTP Script Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="username">#{resolve_credentials('sftp').username}</parameter>
+        <parameter name="password">#{resolve_credentials('sftp').password}</parameter>
+        <parameter name="public_key">#{resolve_credentials('sftp').keyId}</parameter>
+        <parameter name="private_key">#{resolve_credentials('sftp').keySecret}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/service.png</parameter>
+        <description>Run checks against an SFTP server</description>
+    </command>
+    
+</bergamot>

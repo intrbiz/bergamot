@@ -122,7 +122,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
         String siteName    = install.getSiteName();
         String siteSummary = install.getSiteSummary();
         // TODO
-        File templateConfigDir = new File(System.getProperty("bergamot.site.config.template", "cfg/template"));
+        File templateConfigDir = new File(Util.coalesceEmpty(System.getenv("BERGAMOT_SITE_CONFIG_TEMPLATE"), System.getProperty("bergamot.site.config.template"), "cfg/template"));
         // now check that we can create the site and it's aliases
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -146,7 +146,12 @@ public class FirstInstallRouter extends Router<BergamotApp>
         admin.getInheritedTemplates().add("generic_contact");
         admin.getTeams().add("bergamot-admins");
         // load the site configuration template and inject our admin user
-        Collection<ValidatedBergamotConfiguration> vbcfgs = new BergamotConfigReader().overrideSiteName(siteName).includeDir(templateConfigDir).inject(new BergamotCfg(siteName, admin)).build();
+        Collection<ValidatedBergamotConfiguration> vbcfgs = new BergamotConfigReader()
+                .overrideSiteName(siteName)
+                .includeDir(new File(templateConfigDir, "base"))
+                .includeDir(new File(templateConfigDir, "bergamot"))
+                .inject(new BergamotCfg(siteName, admin))
+                .build();
         // assert the configuration is valid
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)
         {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="rabbitmq-api-check" extends="http-script-check" application="RabbitMQ" security-domains="global">
+        <summary>Check RabbitMQ via it's HTTP API</summary>
+		<parameter name="host">#{host.address}</parameter>
+		<parameter name="port">15672</parameter>
+		<parameter name="username">#{resolve_credentials('rabbitmq').username}</parameter>
+        <parameter name="password">#{resolve_credentials('rabbitmq').password}</parameter>
+		<parameter name="vhost">%2f</parameter>
+		<parameter name="script"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+        <description>Check HTTP/HTTPS resources by executing a Javascript script</description>
+    </command>
+    
+</bergamot>

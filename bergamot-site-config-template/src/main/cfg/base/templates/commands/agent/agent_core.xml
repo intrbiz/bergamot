@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command category="System" engine="agent" executor="cpu" extends="check-agent" name="check-agent-cpu">
+        <parameter description="CPU Usage Warning Threshold" name="cpu_warning">80</parameter>
+        <parameter description="CPU Usage Critical Threshold" name="cpu_critical">90</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
+        <summary>Bergamot Agent: CPU</summary>
+        <description>Check the server CPU usage</description>
+    </command>
+    
+    <command category="System" engine="agent" executor="load" extends="check-agent" name="check-agent-load">
+        <parameter description="1 minute load average warning threshold"   name="load_1_warning">-1</parameter>
+        <parameter description="1 minute load average critical threshold"  name="load_1_critical">-1</parameter>
+        <parameter description="5 minute load average warning threshold"   name="load_5_warning">-1</parameter>
+        <parameter description="5 minute load average critical threshold"  name="load_5_critical">-1</parameter>
+        <parameter description="15 minute load average warning threshold"  name="load_15_warning">-1</parameter>
+        <parameter description="15 minute load average critical threshold" name="load_15_critical">-1</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
+        <summary>Bergamot Agent: Load</summary>
+        <description>Check the server load average</description>
+    </command>
+    
+    <command category="System" engine="agent" executor="memory" extends="check-agent" name="check-agent-memory">
+        <parameter description="Memory Usage Warning Threshold" name="warning">80</parameter>
+        <parameter description="Memory Usage Critical Threshold" name="critical">90</parameter>
+        <parameter description="Ignore caches" name="ignore_caches">yes</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/memory.png</parameter>
+        <summary>Bergamot Agent: Memory</summary>
+    </command>
+    
+    <command category="System" engine="agent" executor="os" extends="check-agent" name="check-agent-os">
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/info.png</parameter>
+        <summary>Bergamot Agent: OS Info</summary>
+    </command>
+    
+    <command category="System" engine="agent" executor="users" extends="check-agent" name="check-agent-users">
+        <parameter description="Warning threshold" name="warning">2</parameter>
+        <parameter description="Critical threshold" name="critical">5</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/users.png</parameter>
+        <summary>Bergamot Agent: Active Users</summary>
+    </command>
+    
+    <command category="System" engine="agent" executor="uptime" extends="check-agent" name="check-agent-uptime">
+        <parameter description="Warning threshold (s)" name="warning">900</parameter>
+        <parameter description="Critical threshold (s)" name="critical">300</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/time.png</parameter>
+        <summary>Bergamot Agent: Uptime</summary>
+    </command>
+    
+</bergamot>

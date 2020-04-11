@@ -17,6 +17,13 @@ import com.intrbiz.validator.Validator;
 
 public class BergamotEntityResolver extends ExpressEntityResolver
 {
+    private static final BergamotEntityResolver DEFAULT_INSTANCE = new BergamotEntityResolver();
+    
+    public static BergamotEntityResolver getDefaultInstance()
+    {
+        return DEFAULT_INSTANCE;
+    }
+    
     @Override
     public Object getEntity(String name, Object source)
     {
@@ -47,39 +54,6 @@ public class BergamotEntityResolver extends ExpressEntityResolver
         {
             if (source instanceof NamedObject)
                 return ((NamedObject<?,?>) source).getSite();
-        }
-        else if ("nagios".equals(name))
-        {
-            return new DynamicEntity()
-            {
-                @Override
-                public Object get(String name, ExpressContext context, Object source) throws ExpressException
-                {
-                    // lookup the value as a site parameter
-                    Site site = ((NamedObject<?,?>) source).getSite();
-                    if (site == null) return null;
-                    String value = site.getParameter("nagios." + name);
-                    if (value != null) return value;
-                    return site.getParameter(name);
-                }
-
-                @Override
-                public void set(String name, Object value, ExpressContext context, Object source) throws ExpressException
-                {
-                }
-
-                @Override
-                public Converter<?> getConverter(String name, ExpressContext context, Object source) throws ExpressException
-                {
-                    return null;
-                }
-
-                @Override
-                public Validator<?> getValidator(String name, ExpressContext context, Object source) throws ExpressException
-                {
-                    return null;
-                }
-            };
         }
         else if ("global".equals(name))
         {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <service extends="linux-service" name="linux-service-uptime" template="yes">
+        <summary>Uptime</summary>
+        <notifications enabled="no"/>
+    </service>
+    
+</bergamot>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="snmp-check" engine="snmp" executor="script" security-domains="global" template="yes">
+        <parameter description="The SNMP agent hostname"                  name="host">#{host.address}</parameter>
+        <parameter description="The SNMP version"                         name="snmp_version">#{coalesce(host.getParameter('snmp_version'), host.location.getParameter('snmp_version'), '2')}</parameter>
+        <parameter description="The SNMP community string"                name="snmp_community">#{resolve_credentials('snmp_v2').password}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, sha1, md5"   name="snmp_auth">#{coalesce(host.getParameter('snmp_auth'), host.location.getParameter('snmp_auth'), 'sha1')}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, aes128, des" name="snmp_priv">#{coalesce(host.getParameter('snmp_priv'), host.location.getParameter('snmp_priv'), 'aes128')}</parameter>
+        <parameter description="The SNMP V3 username"                     name="snmp_user">#{resolve_credentials('snmp_v3').username}</parameter>
+        <parameter description="The SNMP V3 password"                     name="snmp_password">#{resolve_credentials('snmp_v3').password}</parameter>
+        <parameter description="The SNMP V3 engine id"                    name="snmp_engine_id">#{coalesce(host.getParameter('snmp_engine_id'), host.location.getParameter('snmp_engine_id'))}</parameter>
+        <description>A generic scripted SNMP check</description>
+    </command>
+    
+    <command name="snmp-get-check" extends="snmp-check" engine="snmp" executor="get" template="yes">
+        <parameter description="The OID to get" name="oid"></parameter>
+        <description>Fetch the given OID from an SNMP agent for informational purposes</description>
+    </command>
+    
+    <command name="snmp-trap" engine="snmp" security-domains="global" template="yes">
+        <parameter description="The SNMP agent hostname"                  name="host">#{host.address}</parameter>
+        <parameter description="The SNMP version"                         name="snmp_version">#{coalesce(host.getParameter('snmp_version'), host.location.getParameter('snmp_version'), '2')}</parameter>
+        <parameter description="The SNMP community string"                name="snmp_community">#{resolve_credentials('snmp_v2').password}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, sha1, md5"   name="snmp_auth">#{coalesce(host.getParameter('snmp_auth'), host.location.getParameter('snmp_auth'), 'sha1')}</parameter>
+        <parameter description="The SNMP V3 auth mode: none, aes128, des" name="snmp_priv">#{coalesce(host.getParameter('snmp_priv'), host.location.getParameter('snmp_priv'), 'aes128')}</parameter>
+        <parameter description="The SNMP V3 username"                     name="snmp_user">#{resolve_credentials('snmp_v3').username}</parameter>
+        <parameter description="The SNMP V3 password"                     name="snmp_password">#{resolve_credentials('snmp_v3').password}</parameter>
+        <parameter description="The SNMP V3 engine id"                    name="snmp_engine_id">#{coalesce(host.getParameter('snmp_engine_id'), host.location.getParameter('snmp_engine_id'))}</parameter>
+        <description>Setup and receive a generic SNMP trap</description>
+    </command>
+    
+</bergamot>

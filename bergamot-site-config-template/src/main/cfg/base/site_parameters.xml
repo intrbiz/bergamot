@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    <parameter description="Nagios Plugin Path" name="nagios_path">/usr/lib/nagios/plugins/</parameter>
+    <parameter description="JMX global port" name="jmx_port"></parameter>    
+</bergamot>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="mysql-server-agent" extends="db-server, linux-server-agent" template="yes">
+        <summary>MySQL DB Server (Bergamot Agent)</summary>
+        <description>Default MySQL DB server checked via Bergamot Agent template</description>
+        
+        <service extends="db-service" name="process-mysql">
+            <summary>Process: MySQL</summary>
+            <check-command command="check_agent_process_mysql"/>
+        </service>
+        
+        <service extends="web-service" name="listener-mysql">
+            <summary>Port Listener: MySQL</summary>
+            <check-command command="check-agent-listener-mysql"/>
+        </service>
+    </host>
+    
+    <host name="postgresql-server-agent" extends="postgresql-server, linux-server-agent" template="yes">
+        <summary>PostgreSQL DB Server (Bergamot Agent)</summary>
+        
+        <service extends="db-service" name="process-postgresql">
+            <summary>Process: PostgreSQL</summary>
+            <check-command command="check-agent-process-postgresql"/>
+        </service>
+        
+        <service extends="web-service" name="listener-postgresql">
+            <summary>Port Listener: PostgreSQL</summary>
+            <check-command command="check-agent-listener-postgresql"/>
+        </service>
+    </host>
+    
+</bergamot>

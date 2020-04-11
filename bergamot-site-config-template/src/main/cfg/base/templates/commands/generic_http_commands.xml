@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="http-check" category="Websites" engine="http" security-domains="global">
+        <summary>HTTP Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port"></parameter>
+        <parameter name="virtual_host">#{host.name}</parameter>
+        <parameter name="ssl">no</parameter>
+        <parameter name="permit_invalid_certs">no</parameter>
+        <parameter name="version"></parameter>
+        <parameter name="method"></parameter>
+        <parameter name="path"></parameter>
+        <parameter name="status">200,301,302,304</parameter>
+        <parameter name="critical_response_time">2500</parameter>
+        <parameter name="warning_response_time">1000</parameter>
+        <parameter name="length"></parameter>
+        <parameter name="contains"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+        <description>Make a HTTP request and check the response</description>
+    </command>
+    
+    <command name="https-check" category="Websites" engine="http">
+        <summary>HTTPS Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port"></parameter>
+        <parameter name="virtual_host">#{host.name}</parameter>
+        <parameter name="ssl">yes</parameter>
+        <parameter name="permit_invalid_certs">no</parameter>
+        <parameter name="version"></parameter>
+        <parameter name="method"></parameter>
+        <parameter name="path"></parameter>
+        <parameter name="status">200,301,302,304</parameter>
+        <parameter name="critical_response_time">2500</parameter>
+        <parameter name="warning_response_time">1000</parameter>
+        <parameter name="length"></parameter>
+        <parameter name="contains"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+        <description>Make a HTTPS request and check the response</description>
+    </command>
+    
+    <command name="certificate-check" category="TLS Certificates" engine="http" executor="certificate">
+        <summary>TLS certificate Check</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port"></parameter>
+        <parameter name="virtual_host">#{host.name}</parameter>
+        <parameter name="version"></parameter>
+        <parameter name="method"></parameter>
+        <parameter name="path"></parameter>
+        <parameter name="expires_in">28</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/security.png</parameter>
+        <description>Check the validity of a TLS certificate presented</description>
+    </command>
+    
+    <command name="http-script-check" engine="http" executor="script">
+        <summary>HTTP Script Check</summary>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+        <description>Check HTTP/HTTPS resources by executing a Javascript script</description>
+    </command>
+    
+</bergamot>

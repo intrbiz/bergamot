@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="check-host-alive" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_ping -H #{host.address} -w 3000.0,80% -c 5000.0,100% -p 5</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command category="System" name="check-local-disk" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_disk -w #{arg1} -c #{arg2} -p #{arg3}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/storage_card.png</parameter>
+    </command>
+    
+    <command category="System" name="check-local-load" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_load -w #{arg1} -c #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/cpu.png</parameter>
+    </command>
+    
+    <command category="System" name="check-local-procs" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_procs -w #{arg1} -c #{arg2} -s #{arg3}</parameter>
+    </command> 
+    
+    <command category="System" name="check-local-swap" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_swap -w #{arg1} -c #{arg2}</parameter>
+    </command>
+    
+    <command name="check-local-mrtgtraf" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_mrtgtraf -F #{arg1} -a #{arg2} -w #{arg3} -c #{arg4} -e #{arg5}</parameter>
+    </command>
+    
+    <command name="check-ftp" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_ftp -H #{host.address} #{arg1}</parameter>
+    </command>
+    
+    <command name="check-hpjd" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_hpjd -H #{host.address} #{arg1}</parameter>
+    </command>
+    
+    <command name="check-snmp" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_snmp -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-snmp-v2-public" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_snmp -P 2c -C public -H #{host.address} -o #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command category="Websites" name="check-http" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_http -I #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/web.png</parameter>
+    </command>
+    
+    <command category="System" name="check-ssh" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_ssh #{host.address}</parameter>
+    </command>
+    
+    <command category="System" name="check-ssh-with-options" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_ssh #{arg1} #{host.address}</parameter>
+    </command>
+    
+    <command name="check-dhcp" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_dhcp #{arg1}</parameter>
+    </command>
+    
+    <command category="System" name="check-ping" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_ping -H #{host.address} -w #{arg1} -c #{arg2} -p 5</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-pop" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_pop -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
+    </command>
+    
+    <command name="check-imap" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_imap -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
+    </command>
+    
+    <command name="check-smtp" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_smtp -H #{host.address} #{arg1}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/mail.png</parameter>
+    </command>
+    
+    <command name="check-tcp" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_tcp -H #{host.address} -p #{arg1} #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-udp" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_udp -H #{host.address} -p #{arg1} #{arg2}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </command>
+    
+    <command name="check-nt" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_nt -H #{host.address} -p 12489 -v #{arg1} #{arg2}</parameter>
+    </command>
+    
+    <command name="check-dummy" extends="check-nagios">
+        <parameter name="command_line">#{global.nagios_path}/check_dummy #{arg1}</parameter>
+    </command>
+    
+</bergamot>

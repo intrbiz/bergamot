@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="postgresql-jdbc-check" extends="jdbc-script-check" application="PostgreSQL" security-domains="global">
+        <summary>Check PostgreSQL by executing SQL</summary>
+        <parameter name="host">#{host.address}</parameter>
+        <parameter name="port">5432</parameter>
+        <parameter name="database">postgres</parameter>
+        <parameter name="username">#{resolve_credentials('postgresql').username}</parameter>
+        <parameter name="password">#{resolve_credentials('postgresql').password}</parameter>
+        <description>Check a PostgreSQL database cluster</description>
+    </command>
+    
+</bergamot>

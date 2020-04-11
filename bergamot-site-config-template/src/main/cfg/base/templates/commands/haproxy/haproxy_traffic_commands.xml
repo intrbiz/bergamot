@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="haproxy-frontend-bytes-info" extends="haproxy-stats-check">
+      <summary>HAProxy Frontend Bytes</summary>
+      <parameter name="proxy_name"></parameter>
+      <script>
+        <![CDATA[
+            function parseStats(data)
+            {
+                var stats = {};
+                var lines = data.split('\n');
+                var columns = lines[0].substr(1).split(',');
+                for (var i = 1; i < lines.length; i++)
+                {
+                    var stat = {};
+                    var fields = lines[i].split(',');
+                    for (var j = 0; j < fields.length; j++)
+                    {
+                        stat[columns[j].trim()] = fields[j];
+                    }
+                    if (! stats[stat.pxname]) 
+                        stats[stat.pxname] = { frontend: null, backend: null, servers: [] };
+                    if (stat.svname == 'FRONTEND' || stat.svname == 'BACKEND')
+                        stats[stat.pxname][stat.svname.toLowerCase()] = stat;
+                    else
+                        stats[stat.pxname].servers.push(stat);
+                }
+                return stats;
+            }
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('proxy_name');
+            /* Execute */
+            http.check()
+            .connect(check.getParameter('host'))
+            .port(check.getIntParameter('port'))
+            .get(check.getParameter('path'))
+            .basicAuth(check.getParameter('username'), check.getParameter('password'))
+            .execute(
+                function(r) {
+                    /* API Error? */
+                    if (r.status() != 200)
+                    { 
+                        bergamot.error('HAProxy API returned: ' + r.status());
+                        return;
+                    }
+                    /* Parse the CSV into something useful */
+                    var stats = parseStats(r.content());
+                    /* Get the stats */
+                    var proxy = stats[check.getParameter('proxy_name')];
+                    if (! proxy)
+                    {
+                        bergamot.error('HAProxy has no such proxy: ' + check.getParameter('proxy_name'));
+                        return;
+                    }
+                    bergamot.info('In: ' + (parseInt(proxy.frontend.bin) / 1048576.0).toFixed(2) + ' MiB , Out: ' + (parseInt(proxy.frontend.bout) / 1048576.0).toFixed(2) + ' MiB');
+                    bergamot.publishReadings(
+                        bergamot.createLongGaugeReading('in',  'B', parseInt(proxy.frontend.bin)),
+                        bergamot.createLongGaugeReading('out', 'B', parseInt(proxy.frontend.bout))
+                    );
+                }, 
+                function(e) { 
+                    bergamot.error(e); 
+                }
+            );
+        ]]>
+        </script>
+        <description>Display the traffic in and out for a HAProxy frontend</description>
+    </command>
+    
+    <command name="haproxy-backend-bytes-info" extends="haproxy-stats-check">
+      <summary>HAProxy Backend Bytes</summary>
+      <parameter name="proxy_name"></parameter>
+      <script>
+        <![CDATA[
+            function parseStats(data)
+            {
+                var stats = {};
+                var lines = data.split('\n');
+                var columns = lines[0].substr(1).split(',');
+                for (var i = 1; i < lines.length; i++)
+                {
+                    var stat = {};
+                    var fields = lines[i].split(',');
+                    for (var j = 0; j < fields.length; j++)
+                    {
+                        stat[columns[j].trim()] = fields[j];
+                    }
+                    if (! stats[stat.pxname]) 
+                        stats[stat.pxname] = { frontend: null, backend: null, servers: [] };
+                    if (stat.svname == 'FRONTEND' || stat.svname == 'BACKEND')
+                        stats[stat.pxname][stat.svname.toLowerCase()] = stat;
+                    else
+                        stats[stat.pxname].servers.push(stat);
+                }
+                return stats;
+            }
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('proxy_name');
+            /* Execute */
+            http.check()
+            .connect(check.getParameter('host'))
+            .port(check.getIntParameter('port'))
+            .get(check.getParameter('path'))
+            .basicAuth(check.getParameter('username'), check.getParameter('password'))
+            .execute(
+                function(r) {
+                    /* API Error? */
+                    if (r.status() != 200)
+                    { 
+                        bergamot.error('HAProxy API returned: ' + r.status());
+                        return;
+                    }
+                    /* Parse the CSV into something useful */
+                    var stats = parseStats(r.content());
+                    /* Get the stats */
+                    var proxy = stats[check.getParameter('proxy_name')];
+                    if (! proxy)
+                    {
+                        bergamot.error('HAProxy has no such proxy: ' + check.getParameter('proxy_name'));
+                        return;
+                    }
+                    bergamot.info('In: ' + (parseInt(proxy.backend.bin) / 1048576.0).toFixed(2) + ' MiB , Out: ' + (parseInt(proxy.backend.bout) / 1048576.0).toFixed(2) + ' MiB');
+                    bergamot.publishReadings(
+                        bergamot.createLongGaugeReading('in',  'B', parseInt(proxy.backend.bin)),
+                        bergamot.createLongGaugeReading('out', 'B', parseInt(proxy.backend.bout))
+                    );
+                }, 
+                function(e) { 
+                    bergamot.error(e); 
+                }
+            );
+        ]]>
+        </script>
+        <description>Display the traffic in and out for a HAProxy backend</description>
+    </command>
+    
+</bergamot>

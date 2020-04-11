@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <!-- Templates -->
+    
+    <group name="generic-group" security-domains="global" template="yes">
+        <summary>Generic Group Template</summary>
+    </group>
+    
+    <group name="host-group" security-domains="global" template="yes">
+        <summary>Host Group Template</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/host.png</parameter>
+    </group>
+    
+    <group name="service-group" security-domains="global" template="yes">
+        <summary>Service Group Template</summary>
+    </group>
+    
+    <group name="website-group" security-domains="global" template="yes">
+        <summary>Website Group Template</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
+    </group>
+    
+    <group name="network-group" security-domains="global" template="yes">
+        <summary>Network Group Template</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
+    </group>
+    
+	<!-- Services -->
+    
+    <group name="services" extends="service-group">
+        <summary>Services</summary>
+    </group>
+    
+    <group name="linux-services" groups="services" extends="service-group">
+        <summary>Linux</summary>
+    </group>
+    
+    <group name="monitoring-services" groups="linux-services" extends="service-group">
+        <summary>Monitoring</summary>
+    </group>
+    
+    <group name="linux-system-services" groups="linux-services" extends="service-group">
+        <summary>System</summary>
+    </group>
+    
+    <group name="linux-storage-services" groups="linux-services" extends="service-group">
+        <summary>Storage</summary>
+    </group>
+    
+    <group name="linux-daemon-services" groups="linux-services" extends="service-group">
+        <summary>Daemons</summary>
+    </group>
+    
+    <group name="linux-processes-services" groups="linux-services" extends="service-group">
+        <summary>Processes</summary>
+    </group>
+    
+    <group name="linux-network-services" groups="linux-services" extends="service-group">
+        <summary>Network</summary>
+    </group>
+    
+    <group name="network-services" groups="services" extends="network-group">
+        <summary>Network Services</summary>
+    </group>
+    
+    <group name="vm-host-services" groups="linux-services" extends="service-group">
+        <summary>VM Host Services</summary>
+    </group>
+    
+    <group name="web-services" groups="services" extends="website-group">
+        <summary>Web Services</summary>
+    </group>
+    
+    <group name="db-services" groups="services" extends="service-group">
+        <summary>DB Services</summary>
+    </group>
+    
+    <!-- Hosts -->
+    
+    <group name="hosts" extends="host-group">
+        <summary>Hosts</summary>
+    </group>
+    
+    <group name="network-devices" group="hosts" extends="host-group">
+        <summary>Network Devices</summary>
+    </group>
+    
+    <group name="routers" groups="network-devices" extends="network-group">
+        <summary>Routers</summary>
+    </group>
+    
+    <group name="switches" groups="network-devices" extends="network-group">
+        <summary>Switches</summary>
+    </group>
+    
+    <group name="linux-servers" groups="hosts" extends="host-group">
+        <summary>Linux Servers</summary>
+    </group>
+    
+    <group name="vm-servers" groups="linux-servers" extends="host-group">
+        <summary>VM Host Servers</summary>
+    </group>
+    
+    <group name="web-servers" groups="hosts" extends="host-group">
+        <summary>Web Servers</summary>
+    </group>
+    
+    <group name="db-servers" groups="hosts" extends="host-group">
+        <summary>DB Servers</summary>
+    </group>
+    
+    <!-- Websites -->
+    
+    <group name="websites" extends="website-group">
+        <summary>Websites</summary>
+    </group>
+    
+</bergamot>

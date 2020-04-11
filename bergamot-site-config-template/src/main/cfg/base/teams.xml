@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <team name="admins" grants="ui.*, api.*">
+        <access-control security-domain="global" grants="*"/>
+        <summary>Administrators</summary>
+    </team>
+    
+    <team name="linux-admins" teams="admins">
+        <access-control security-domain="linux" grants="*"/>
+        <summary>Linux Administrators</summary>
+    </team>
+    
+    <team name="network-admins" teams="admins">
+        <access-control security-domain="network" grants="*"/>
+        <summary>Network Administrators</summary>
+    </team>
+    
+    <team name="web-admins" teams="admins">
+        <access-control security-domain="web" grants="*"/>
+        <summary>Web Administrators</summary>
+    </team>
+    
+    <team name="db-admins" teams="admins">
+        <access-control security-domain="db" grants="*"/>
+        <summary>DB Administrators</summary>
+    </team>
+    
+    <team name="bergamot-admins" teams="admins" grants="*">
+        <summary>Bergamot Administrators</summary>
+    </team>
+    
+    <team name="ops" grants="ui.acces, ui.view.stats, ui.view.stats.transitions, ui.view.readings, api.access, read, suppress, unsuppress, acknowledge">
+        <summary>Operators</summary>
+    </team>
+    
+    <team name="api" grants="api.access, read" revokes="ui.*">
+        <summary>API read access, no UI access</summary>
+    </team>
+    
+</bergamot>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="generic-host" template="yes" security-domains="global">
+        <summary>Generic Host</summary>
+        <notifications enabled="yes" time-period="24x7" all-engines="yes">
+            <!-- escalation policies -->
+            <escalate after="1h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+            <escalate after="6h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+        </notifications>
+        <notify teams="admins"/>
+        <state failed-after="4" recovers-after="10"/>
+        <check-command command="check-host-alive"/>
+        <schedule every="5" retry-every="1" time-period="24x7"/>
+        <description>A generic host template</description>
+    </host>
+    
+    <host name="web-server" extends="generic-host" template="yes" groups="web-servers" security-domains="web">
+        <summary>Web Server</summary>
+        <notify teams="web-admins"/>
+        <description>A web server template</description>
+    </host>
+    
+    <host name="db-server" extends="generic-host" template="yes" groups="db-servers" security-domains="db">
+        <summary>DB Server</summary>
+        <notify teams="db-admins"/>
+        <description>A database server template</description>
+    </host>
+    
+    <host name="vm-host-server" extends="generic-host" template="yes" groups="vm-servers" security-domains="linux">
+        <summary>VM Host Server</summary>
+        <description>A VM host server template</description>
+    </host>
+    
+    <host name="network-device" extends="generic-host" template="yes" groups="network-devices" security-domains="network">
+        <summary>Network Device</summary>
+        <notify teams="network-admins"/>
+        <description>A generic network device template</description>
+    </host>
+    
+    <host name="router" extends="network-device" template="yes" groups="routers">
+        <summary>Router</summary>
+        <description>A generic network router template</description>
+    </host>
+    
+    <host name="switch" extends="network-device" template="yes" groups="switches">
+        <summary>Switch</summary>
+        <description>A generic network switch template</description>
+    </host>
+    
+</bergamot>

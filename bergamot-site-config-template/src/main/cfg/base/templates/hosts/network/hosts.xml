@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="snmp-network-device" extends="network-device" template="yes">
+        <summary>Network Device (SNMP)</summary>
+        <description>A generic SNMP capable network device template</description>
+        
+        <service name="snmp-description" extends="network-service" template="yes">
+            <summary>Device Description</summary>
+            <check-command command="check-snmp-description"/>
+        </service>
+        
+        <service name="snmp-name" extends="network-service" template="yes">
+            <summary>Device Name</summary>
+            <check-command command="check-snmp-name"/>
+        </service>
+        
+        <service name="snmp-location" extends="network-service" template="yes">
+            <summary>Device Location</summary>
+            <check-command command="check-snmp-location"/>
+        </service>
+        
+        <service name="snmp-contact" extends="network-service" template="yes">
+            <summary>Device Contact</summary>
+            <check-command command="check-snmp-contact"/>
+        </service>
+        
+        <service name="snmp-uptime" extends="network-service" template="yes">
+            <summary>Device Uptime</summary>
+            <check-command command="check-snmp-uptime"/>
+        </service>
+    </host>
+
+    <host name="snmp-router" extends="snmp-network-device" template="yes">
+        <summary>Router (SNMP)</summary>
+        <description>A generic SNMP capable network router template</description>
+    </host>
+    
+    <host name="snmp-switch" extends="snmp-network-device" template="yes">
+        <summary>Switch (SNMP)</summary>
+        <description>A generic SNMP capable network switch template</description>
+    </host>
+    
+</bergamot>

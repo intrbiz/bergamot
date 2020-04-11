@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="linux-server-nrpe" extends="generic-host" template="yes" groups="linux-servers" security-domains="linux">
+        <summary>Linux Server (NRPE)</summary>
+        <notify teams="linux-admins"/>
+        <description>Default Linux server checked via NRPE template</description>
+        
+        <service extends="linux-service" name="memory">
+            <summary>Memory</summary>
+            <check-command command="check-nrpe-mem"/>
+        </service>
+        
+        <service extends="linux-service" name="load">
+            <summary>Load</summary>
+            <check-command command="check-nrpe-load"/>
+        </service>
+        
+        <service extends="linux-service" name="ping">
+            <summary>Ping</summary>
+            <check-command command="check-ping">
+                <parameter name="arg1">100.0,20%</parameter>
+                <parameter name="arg2">500.0,60%</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="linux-service" name="users">
+            <summary>Active Users</summary>
+            <check-command command="check-nrpe-users"/>
+        </service>
+        
+        <service extends="linux-service" name="zombie-procs">
+            <summary>Zombie Processes</summary>
+            <check-command command="check-zombie-procs"/>
+        </service>
+        
+        <service extends="linux-service" name="total-procs">
+            <summary>Total Processes</summary>
+            <check-command command="check-total-procs"/>
+        </service>
+        
+        <service extends="linux-service" name="disk-space-root">
+            <summary>Disk Space: /</summary>
+            <check-command command="check-disk-space-root"/>
+        </service>
+        
+        <service extends="linux-service" name="service-ssh">
+            <summary>Load</summary>
+            <check-command command="check-ssh"/>
+        </service>
+        
+        <service extends="linux-service" name="local-ntp-offset">
+            <summary>Local NTP Offset</summary>
+            <check-command command="check-local-ntp-offset"/>
+        </service>
+        
+    </host>
+    
+</bergamot>

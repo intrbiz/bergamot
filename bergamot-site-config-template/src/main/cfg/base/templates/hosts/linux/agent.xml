@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="linux-server-agent" extends="generic-host" template="yes" groups="linux-servers" security-domains="linux">
+        <summary>Linux Server (Bergamot Agent)</summary>
+        <check-command command="check-agent-presence"/>
+        <notify teams="linux-admins"/>
+        <description>Default Linux server checked via Bergamot Agent template</description>
+        
+        <!-- Agent self checks -->
+        <service extends="linux-service" name="agent-info">
+            <summary>Bergamot Agent</summary>
+            <check-command command="check-agent-info"/>
+        </service>
+
+        <service extends="linux-service" name="agent-memory">
+            <summary>Bergamot Agent Free Memory</summary>
+            <check-command command="check-agent-own-memory">
+                <parameter name="warning">10MiB</parameter>
+                <parameter name="critical">5MiB</parameter>
+            </check-command>
+        </service>
+        
+        <!-- Core OS checks -->
+        <service extends="linux-service" name="os-info">
+            <summary>OS Info</summary>
+            <check-command command="check-agent-os"/>
+        </service>
+    
+        <service extends="linux-service" name="cpu-usage">
+            <summary>CPU</summary>
+            <check-command command="check-agent-cpu"/>
+        </service>
+        
+        <service extends="linux-service" name="load">
+            <summary>Load</summary>
+            <check-command command="check-agent-load"/>
+        </service>
+
+        <service extends="linux-service" name="memory">
+            <summary>Memory</summary>
+            <check-command command="check-agent-memory"/>
+        </service>
+        
+        <service extends="linux-service" name="all-disks">
+            <summary>Disk Space</summary>
+            <check-command command="check-agent-disks"/>
+        </service>
+        
+        <service extends="linux-service" name="disk-space-root">
+            <summary>Disk Space: /</summary>
+            <check-command command="check-agent-disk">
+                <parameter name="mount">/</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="linux-service" name="total-processes">
+            <summary>Total Processes</summary>
+            <check-command command="check-agent-total-processes">
+                <parameter name="warning">320</parameter>
+                <parameter name="critical">400</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="linux-service" name="zombie-processes">
+            <summary>Zombie Processes</summary>
+            <check-command command="check-agent-zombie-processes"/>
+        </service>
+        
+        <service extends="linux-service-uptime" name="uptime">
+            <summary>Uptime</summary>
+            <check-command command="check-agent-uptime"/>
+        </service>
+        
+        <service extends="linux-service" name="process-sshd">
+            <summary>Process: SSHD</summary>
+            <check-command command="check-agent-process-sshd"/>
+        </service>
+        
+        <service extends="linux-service" name="listener-sshd">
+            <summary>Port Listener: SSHD</summary>
+            <check-command command="check-agent-listener-ssh"/>
+        </service>
+        
+    </host>
+    
+</bergamot>

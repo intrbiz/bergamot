@@ -148,6 +148,7 @@
 		<module>bergamot-cluster</module>
 		<module>bergamot-processor</module>
 		<module>bergamot-notifier</module>
+		<module>bergamot-site-config-template</module>
 	</modules>
 
 	<dependencyManagement>

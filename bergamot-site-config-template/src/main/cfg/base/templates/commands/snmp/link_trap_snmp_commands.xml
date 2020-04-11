@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="snmp-link-trap" extends="snmp-trap" engine="snmp" executor="link-state">
+        <parameter description="The SNMP Interface Name" name="interface-name"></parameter>
+    </command>
+    
+    <command name="snmp-generic-trap" extends="snmp-trap" engine="snmp" executor="generic" template="yes">
+        <parameter description="The trap script" name="script"></parameter>
+    </command>
+    
+</bergamot>

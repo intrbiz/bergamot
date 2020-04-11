@@ -1,0 +1,47 @@
+<bergamot site="bergamot.template">
+    
+    <!-- Templates -->
+    
+    <location name="generic-location" security-domains="global" template="yes">
+        <summary>Generic Location Template</summary>
+    </location>
+    
+    <location name="data-centre-location" security-domains="global" template="yes">
+        <summary>Data Centre Template</summary>
+    </location>
+    
+    <location name="office-location" security-domains="global" template="yes">
+        <summary>Remote Location Template</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/office.png</parameter>
+    </location>
+    
+    <location name="remote-location" security-domains="global" template="yes">
+        <summary>Remote Location Template</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/globe.png</parameter>
+    </location>
+    
+    <location name="cloud-location" security-domains="global" template="yes">
+        <summary>Cloud Location Template</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cloud_circle.png</parameter>
+    </location>
+
+	<!-- Top Level Locations -->
+
+    <location name="data-centre" extends="data-centre-location">
+        <summary>Data Centre</summary>
+    </location>
+    
+    <location name="office" extends="office-location">
+        <summary>Office</summary>
+        
+    </location>
+    
+    <location name="cloud" extends="cloud-location">
+        <summary>Cloud</summary>
+    </location>
+    
+    <location name="remote" extends="remote-location">
+        <summary>Remote</summary>
+    </location>
+
+</bergamot>

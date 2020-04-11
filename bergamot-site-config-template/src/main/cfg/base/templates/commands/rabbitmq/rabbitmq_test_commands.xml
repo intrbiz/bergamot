@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+
+    <command name="rabbitmq-aliveness-test" extends="rabbitmq-api-check">
+        <summary>RabbitMQ Alive</summary>
+        <script>
+        <![CDATA[
+            /* Validate parameters */
+            bergamot.require('host');
+            bergamot.require('port');
+            bergamot.require('username');
+            bergamot.require('password');
+            bergamot.require('vhost');
+            /* Execute */
+            http.check()
+            .connect(check.getParameter('host'))
+            .port(check.getIntParameter('port'))
+            .get('/api/aliveness-test/' + check.getParameter('vhost'))
+            .basicAuth(check.getParameter('username'), check.getParameter('password'))
+            .execute(
+                function(r) {
+                    if (r.status() == 200)
+                    { 
+                        var res = JSON.parse(r.content());
+                        bergamot.ok('RabbitMQ aliveness test passed, with ' + res.status);
+                    }
+                    else
+                    {
+                        bergamot.critical('RabbitMQ aliveness test failed, with ' + r.status());
+                    }
+                }, 
+                function(e) { 
+                    bergamot.error(e); 
+                }
+            );
+        ]]>
+        </script>
+        <description>Check RabbitMQ aliveness test</description>
+    </command>
+    
+</bergamot>

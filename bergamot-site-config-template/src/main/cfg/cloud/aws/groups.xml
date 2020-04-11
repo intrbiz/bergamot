@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <group name="aws-group" security-domains="global" template="yes">
+        <summary>AWS Group Template</summary>
+    </group>
+    
+</bergamot>

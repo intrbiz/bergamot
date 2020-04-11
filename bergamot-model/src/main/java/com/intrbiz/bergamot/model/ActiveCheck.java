@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.express.BergamotEntityResolver;
+import com.intrbiz.bergamot.express.BergamotExpressExtensionRegistry;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
@@ -203,7 +204,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         CheckSavedState state = this.getSavedState();
         if (state != null) executeCheck.setSavedState(state.getSavedState());
         // eval parameters
-        ExpressContext context = new DefaultContext(new BergamotEntityResolver());
+        ExpressContext context = new DefaultContext(BergamotExpressExtensionRegistry.getDefaultRegistry(), BergamotEntityResolver.getDefaultInstance());
         // configured parameters
         for (Parameter parameter : checkCommand.resolveCheckParameters().values())
         {
