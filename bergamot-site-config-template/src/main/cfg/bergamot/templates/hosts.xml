@@ -39,7 +39,7 @@
         </service>
     </host>
     
-    <host name="bergamot-worker-nagios" extends="bergamot-server" template="yes">
+    <host name="bergamot-worker-server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring Worker server</summary>
         
         <service name="bergamot-worker-nagios" extends="bergamot-service">

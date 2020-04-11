@@ -50,6 +50,7 @@ release:
       - '*/pom.xml'
       - '*/target/*.jar'
       - '*/target/*.app'
+      - '*/target/*.tar.gz'
 
 containers:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
