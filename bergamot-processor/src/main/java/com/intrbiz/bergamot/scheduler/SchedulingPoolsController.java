@@ -8,9 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -32,9 +31,9 @@ public class SchedulingPoolsController
     
     private final SchedulingTopic schedulingTopic;
     
-    private final ConcurrentMap<Integer, UUID> pools = new ConcurrentHashMap<>();
-    
     private final AtomicBoolean[] runningPools;
+    
+    private final AtomicInteger runningPoolsCount = new AtomicInteger(0);
     
     private UUID listenerId;
     
@@ -54,7 +53,13 @@ public class SchedulingPoolsController
     
     public Set<Integer> getPools()
     {
-        return new TreeSet<>(this.pools.keySet());
+        Set<Integer> pools = new TreeSet<>();
+        for (int i = 0; i < this.runningPools.length; i++)
+        {
+            if (this.runningPools[i].get())
+                pools.add(i);
+        }
+        return pools;
     }
     
     public void start() throws Exception
@@ -72,7 +77,7 @@ public class SchedulingPoolsController
         // Start listening to scheduler messages
         this.listenerId = this.schedulingTopic.listen(this::processSchedulingMessage);
         // All started
-        logger.info("Started " + this.pools.size() + " processing pools");
+        logger.info("Started " + this.runningPoolsCount.get() + " processing pools");
     }
     
     protected List<SchedulingPoolElector> shufflePools()
@@ -100,9 +105,10 @@ public class SchedulingPoolsController
         // Only start the scheduling pool if we don't already have it
         if (this.runningPools[pool].compareAndSet(false, true))
         {
+            this.runningPoolsCount.incrementAndGet();
             // Schedule the pool
             this.scheduler.schedulePool(pool);
-            logger.info("Scheduling processing pool " + pool + ", now running " + this.pools.size() + " processing pools");
+            logger.info("Scheduling processing pool " + pool + ", now running " + this.runningPoolsCount.get() + " processing pools");
         }
     }
     
@@ -120,9 +126,10 @@ public class SchedulingPoolsController
     {
         // Stop should be idempotent
         this.runningPools[pool].set(false);
+        this.runningPoolsCount.decrementAndGet();
         // Unschedule the pool
         this.scheduler.unschedulePool(pool);
-        logger.info("Unscheduling pool " + pool + ", now running " + this.pools.size() + " processing pools");
+        logger.info("Unscheduling pool " + pool + ", now running " + this.runningPoolsCount.get() + " processing pools");
     }
     
     public void stop()
@@ -134,8 +141,12 @@ public class SchedulingPoolsController
         }
         // Stop the scheduler
         this.scheduler.shutdown();
-        // Clear our pools map
-        this.pools.clear();
+        // Clear our state
+        this.runningPoolsCount.set(0);
+        for (AtomicBoolean pool : this.runningPools)
+        {
+            pool.set(false);
+        }
         // Leave all pool elections
         for (SchedulingPoolElector pool : this.poolElectors)
         {
