@@ -118,13 +118,11 @@ public class SchedulingPoolsController
     
     protected void stopPool(int pool)
     {
-        // Only stop the scheduling pool if we don't already have it
-        if (this.runningPools[pool].compareAndSet(true, false))
-        {
-            // Unschedule the pool
-            this.scheduler.unschedulePool(pool);
-            logger.info("Unscheduling pool " + pool + ", now running " + this.pools.size() + " processing pools");
-        }
+        // Stop should be idempotent
+        this.runningPools[pool].set(false);
+        // Unschedule the pool
+        this.scheduler.unschedulePool(pool);
+        logger.info("Unscheduling pool " + pool + ", now running " + this.pools.size() + " processing pools");
     }
     
     public void stop()

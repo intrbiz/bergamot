@@ -58,7 +58,7 @@ public class CheckDispatcher
     
     protected UUID routeCheck(ExecuteCheck check)
     {
-        if (check.getAgentId() == null)
+        if (check.getAgentId() != null)
         {
             return this.agents.routeAgent(check.getAgentId());
         }
