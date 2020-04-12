@@ -53,7 +53,8 @@ public class AgentRegistry  extends GenericRegistry<UUID, AgentRegistration>
             try
             {
                 AgentRegistration agentReg = this.getAgent(key);
-                if (agentReg != null) agentReg.getWorkerId();
+                if (agentReg != null) 
+                    return agentReg.getWorkerId();
             }
             catch (KeeperException | InterruptedException e)
             {

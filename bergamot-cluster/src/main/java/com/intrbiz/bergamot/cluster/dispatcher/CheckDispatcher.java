@@ -22,6 +22,8 @@ import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
  */
 public class CheckDispatcher
 {
+    private static final String ENGINE_AGENT = "agent";
+    
     private final WorkerRegistry workers;
     
     private final WorkerRouteTable workerRouteTable;
@@ -58,7 +60,7 @@ public class CheckDispatcher
     
     protected UUID routeCheck(ExecuteCheck check)
     {
-        if (check.getAgentId() != null)
+        if (check.getEngine() != null && check.getEngine().toLowerCase().startsWith(ENGINE_AGENT) && check.getAgentId() != null)
         {
             return this.agents.routeAgent(check.getAgentId());
         }
