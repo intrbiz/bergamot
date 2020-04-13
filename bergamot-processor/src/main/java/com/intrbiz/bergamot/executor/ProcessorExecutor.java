@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 
+import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.AgentRegistrationService;
 import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
@@ -79,6 +80,11 @@ public class ProcessorExecutor
                             this.processMessage(message);
                         });
                     }
+                }
+                catch (HazelcastInstanceNotActiveException e)
+                {
+                    logger.warn("Hazelcast no longer active, exiting processor executor.");
+                    break;
                 }
                 catch (Exception e)
                 {

@@ -5,9 +5,10 @@ import java.net.UnknownHostException;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import com.intrbiz.Util;
 import com.intrbiz.accounting.AccountingManager;
@@ -191,8 +192,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     protected void configureLogging()
     {
         // configure logging to terminal
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.toLevel(this.config.getLogging().getLevel().toUpperCase()));
+        Logger root = Logger.getRootLogger();
+        root.addAppender(new ConsoleAppender(new PatternLayout("%d [%t] %p %c %x - %m%n")));
+        root.setLevel(Level.toLevel(this.config.getLogging().getLevel().toUpperCase()));
     }
     
     protected int getListenerPort(String listenerType, int defaultPort)
@@ -371,7 +373,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         // Connect to ZooKeeper and start Hazelcast
         this.processor = new BergamotProcessor(this.config.getCluster(), this::clusterPanic, DAEMON_NAME, VERSION.NAME + " " + VERSION.NUMBER, this.getHostName());
         // Setup the database cache
-        System.out.println("Setting up Hazelcast cache");
+        logger.info("Setting up Hazelcast cache");
         DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(this.processor.getHazelcast()));
         DataManager.get().registerDefaultCacheProvider(DataManager.get().cacheProvider("hazelcast"));
     }
@@ -392,14 +394,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     protected void clusterPanic(Void v)
     {
         logger.info("Got cluster panic, shutting down!");
-        try
-        {
-            this.stop();
-        }
-        finally
-        {
-            System.exit(1);
-        }
+        this.stop();
     }
     
     protected void shutdown()
@@ -432,17 +427,18 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             // create the application
             BergamotApp bergamotApp = new BergamotApp();
             bergamotApp.configure(config);
-            // start the app
-            System.out.println("Starting Bergamot");
-            bergamotApp.start();
             // setup shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Triggering shutdown of Bergamot UI");
                 bergamotApp.stop();
             }));
+            // start the app
+            System.out.println("Starting Bergamot");
+            bergamotApp.start();
             // Await shutdown
             bergamotApp.awaitShutdown();
             // Terminate normally
+            System.out.println("Exiting Bergamot");
             Thread.sleep(15_000);
             System.exit(0);
         }

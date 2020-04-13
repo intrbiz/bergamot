@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.cluster.client;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,8 @@ public abstract class BergamotClient
     protected final ZooKeeperManager zooKeeper;
     
     protected final HazelcastInstance hazelcast;
+    
+    protected final AtomicBoolean paniced = new AtomicBoolean(false);
     
     public BergamotClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
     {
@@ -99,8 +102,16 @@ public abstract class BergamotClient
     
     protected void panic()
     {
-        logger.fatal("PANIC - lost connection to cluster");
-        this.onPanic.accept(null);
+        if (this.paniced.compareAndSet(false, true))
+        {
+            logger.fatal("PANIC - lost connection to cluster");
+            this.onPanic.accept(null);
+        }
+    }
+    
+    public boolean hasPaniced()
+    {
+        return this.paniced.get();
     }
     
     public UUID getId()

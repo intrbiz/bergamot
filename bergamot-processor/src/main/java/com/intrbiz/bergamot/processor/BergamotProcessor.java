@@ -112,7 +112,7 @@ public class BergamotProcessor extends BergamotMember
     
     private final BergamotClusterLeader leader;
     
-    private final AtomicBoolean stated = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
 
     public BergamotProcessor(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
     {
@@ -184,17 +184,17 @@ public class BergamotProcessor extends BergamotMember
      */
     public void start() throws Exception
     {
-        if (this.stated.compareAndSet(false, true))
+        if (this.started.compareAndSet(false, true))
         {
             logger.info("Bergamot Processor " + this.id + " starting");
             // Register as a processor
             this.processorRegistar.registerProcessor(new ProcessorRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName));
             // Wait for other processors to join
             this.waitForProcessors();
-            // Start our scheduling pools
-            this.schedulingController.start();
             // Start the executor
             this.processorExecutor.start();
+            // Start our scheduling pools
+            this.schedulingController.start();
             // Start the leader service
             this.leader.start();
             // Elect a leader
@@ -220,7 +220,7 @@ public class BergamotProcessor extends BergamotMember
     
     public void shutdown()
     {
-        if (this.stated.compareAndSet(true, false))
+        if (this.started.compareAndSet(true, false))
         {
             try
             {
@@ -232,11 +232,19 @@ public class BergamotProcessor extends BergamotMember
             }
             try
             {
-                this.leaderElector.release();
+                this.processorExecutor.stop();
             }
             catch (Exception e)
             {
-                logger.error("Failed to release leader election", e);
+                logger.error("Failed to stop executor", e);
+            }
+            try
+            {
+                this.schedulingController.stop();
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to stop scheduler", e);
             }
         }
     }

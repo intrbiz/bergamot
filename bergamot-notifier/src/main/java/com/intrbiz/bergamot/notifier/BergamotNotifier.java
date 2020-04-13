@@ -16,9 +16,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 import com.hazelcast.client.HazelcastClientNotActiveException;
 import com.hazelcast.spi.exception.TargetDisconnectedException;
@@ -449,8 +450,9 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     {
         if (config == null) config = new LoggingCfg();
         // configure logging to terminal
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.toLevel(Util.coalesceEmpty(config.getLevel(), "info").toUpperCase()));
+        Logger root = Logger.getRootLogger();
+        root.addAppender(new ConsoleAppender(new PatternLayout("%d [%t] %p %c %x - %m%n")));
+        root.setLevel(Level.toLevel(config.getLevel().toUpperCase()));
     }
     
     private static class AvailableEngine

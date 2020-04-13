@@ -105,6 +105,7 @@ public class SchedulingPoolsController
         // Only start the scheduling pool if we don't already have it
         if (this.runningPools[pool].compareAndSet(false, true))
         {
+            // Maintain running count
             this.runningPoolsCount.incrementAndGet();
             // Schedule the pool
             this.scheduler.schedulePool(pool);
@@ -124,12 +125,15 @@ public class SchedulingPoolsController
     
     protected void stopPool(int pool)
     {
-        // Stop should be idempotent
-        this.runningPools[pool].set(false);
-        this.runningPoolsCount.decrementAndGet();
-        // Unschedule the pool
-        this.scheduler.unschedulePool(pool);
-        logger.info("Unscheduling pool " + pool + ", now running " + this.runningPoolsCount.get() + " processing pools");
+        // Only stop the scheduling pool if it is running
+        if (this.runningPools[pool].compareAndSet(true, false))
+        {
+            // Maintain running count
+            this.runningPoolsCount.decrementAndGet();
+            // Unschedule the pool
+            this.scheduler.unschedulePool(pool);
+            logger.info("Unscheduling pool " + pool + ", now running " + this.runningPoolsCount.get() + " processing pools");
+        }
     }
     
     public void stop()
@@ -146,18 +150,6 @@ public class SchedulingPoolsController
         for (AtomicBoolean pool : this.runningPools)
         {
             pool.set(false);
-        }
-        // Leave all pool elections
-        for (SchedulingPoolElector pool : this.poolElectors)
-        {
-            try
-            {
-                pool.release();
-            }
-            catch (Exception e)
-            {
-                logger.info("Failed to release pool " + pool.getPool());
-            }
         }
     }
 }

@@ -74,6 +74,8 @@ public class BergamotClusterLeader
     
     public void stop()
     {
+        // Stop the leader thread
+        this.haltLeaderOnlyTasks();
         // stop shared tasks
         this.processorCleanup.stop();
         this.workerCleanup.stop();
@@ -93,6 +95,10 @@ public class BergamotClusterLeader
     public void haltLeaderOnlyTasks()
     {
         this.run.set(false);
+        synchronized (this.waitLock)
+        {
+            this.waitLock.notifyAll();
+        }
         this.runner = null;
     }
     
@@ -135,7 +141,7 @@ public class BergamotClusterLeader
             this.lastBalanceRun = 0;
             synchronized (this.waitLock)
             {
-                this.waitLock.notify();
+                this.waitLock.notifyAll();
             }
         });
     }

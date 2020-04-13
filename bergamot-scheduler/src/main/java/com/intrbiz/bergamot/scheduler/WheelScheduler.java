@@ -454,7 +454,10 @@ public class WheelScheduler extends AbstractScheduler
     public void shutdown()
     {
         this.run = false;
-        this.tickerWaitLock.notifyAll();
+        synchronized (this.tickerWaitLock)
+        {
+            this.tickerWaitLock.notifyAll();
+        }
         try
         {
             this.ticker.join();

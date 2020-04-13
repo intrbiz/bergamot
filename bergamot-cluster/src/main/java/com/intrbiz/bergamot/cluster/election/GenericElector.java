@@ -19,6 +19,8 @@ import org.apache.log4j.Logger;
 import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.ConnectionLossException;
+import org.apache.zookeeper.KeeperException.SessionExpiredException;
 import org.apache.zookeeper.Transaction;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.ZooDefs;
@@ -290,6 +292,15 @@ public abstract class GenericElector
                 {
                     this.doElection();
                 }
+                catch (ConnectionLossException e)
+                {
+                    // TODO
+                    logger.warn("Lost connection to ZooKeeper");
+                }
+                catch (SessionExpiredException e)
+                {
+                    // ignore, we're exiting
+                }
                 catch (KeeperException | InterruptedException e)
                 {
                     logger.warn("Failed to determine election status", e);
@@ -307,6 +318,15 @@ public abstract class GenericElector
                 try
                 {
                     this.doElection();
+                }
+                catch (ConnectionLossException e)
+                {
+                    // TODO
+                    logger.warn("Lost connection to ZooKeeper");
+                }
+                catch (SessionExpiredException e)
+                {
+                    // ignore, we're exiting
                 }
                 catch (KeeperException | InterruptedException e)
                 {
