@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.processor;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
@@ -111,7 +112,7 @@ public class BergamotProcessor extends BergamotMember
     
     private final BergamotClusterLeader leader;
     
-    // Runner for our processing
+    private final AtomicBoolean stated = new AtomicBoolean(false);
 
     public BergamotProcessor(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
     {
@@ -183,19 +184,22 @@ public class BergamotProcessor extends BergamotMember
      */
     public void start() throws Exception
     {
-        logger.info("Bergamot Processor " + this.id + " starting");
-        // Register as a processor
-        this.processorRegistar.registerProcessor(new ProcessorRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName));
-        // Wait for other processors to join
-        this.waitForProcessors();
-        // Start our scheduling pools
-        this.schedulingController.start();
-        // Start the executor
-        this.processorExecutor.start();
-        // Start the leader service
-        this.leader.start();
-        // Elect a leader
-        this.leaderElector.elect(this.leader::launch);
+        if (this.stated.compareAndSet(false, true))
+        {
+            logger.info("Bergamot Processor " + this.id + " starting");
+            // Register as a processor
+            this.processorRegistar.registerProcessor(new ProcessorRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName));
+            // Wait for other processors to join
+            this.waitForProcessors();
+            // Start our scheduling pools
+            this.schedulingController.start();
+            // Start the executor
+            this.processorExecutor.start();
+            // Start the leader service
+            this.leader.start();
+            // Elect a leader
+            this.leaderElector.elect(this.leader::launch);
+        }
     }
     
     protected void waitForProcessors() throws Exception
@@ -216,21 +220,24 @@ public class BergamotProcessor extends BergamotMember
     
     public void shutdown()
     {
-        try
+        if (this.stated.compareAndSet(true, false))
         {
-            this.leader.stop();
-        }
-        catch (Exception e)
-        {
-            logger.error("Failed to halt leader", e);
-        }
-        try
-        {
-            this.leaderElector.release();
-        }
-        catch (Exception e)
-        {
-            logger.error("Failed to release leader election", e);
+            try
+            {
+                this.leader.stop();
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to halt leader", e);
+            }
+            try
+            {
+                this.leaderElector.release();
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to release leader election", e);
+            }
         }
     }
 

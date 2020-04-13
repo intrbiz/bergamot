@@ -318,7 +318,7 @@ public abstract class GenericElector
     
     protected void deleteElectionNode() throws KeeperException, InterruptedException
     {
-        this.zooKeeper.delete(this.containerPath + "/" + this.electionNodePath, -1);
+        this.zooKeeper.delete(this.electionNodePath, -1);
     }
     
     protected int findOurPosition(List<String> sortedNodes)
