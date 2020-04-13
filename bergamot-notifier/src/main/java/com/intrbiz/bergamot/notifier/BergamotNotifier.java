@@ -163,12 +163,12 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     {
         logger.info("Bergamot Notifier starting....");
         this.shutdownLatch = new CountDownLatch(1);
-        // connect to the scheduler
-        this.connectScheduler();
         // prepare our engines
         this.prepareEngines();
         // prepare our executors
         this.createExecutors();
+        // connect to the scheduler
+        this.connectScheduler();
         // start our engines
         this.startEngines();
         // start our executors
@@ -270,11 +270,9 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     protected void clusterPanic(Void v)
     {
+        logger.fatal("Connection to cluster lost, forcing shutdown now!");
         // Trigger a shutdown
-        if (this.run.compareAndSet(true, false))
-        {
-            logger.fatal("Connection to cluster lost, forcing shutdown now!");
-        }
+        this.triggerShutdown(false);
     }
     
     protected void startExecutors() throws Exception
@@ -350,13 +348,13 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         }
     }
     
-    public void triggerShutdown()
+    public void triggerShutdown(boolean await)
     {
         if (this.run.compareAndSet(true, false))
         {
             logger.info("Shutting down Bergamot Worker");
             // Wait for the shutdown to complete
-            while (true)
+            while (await)
             {
                 try
                 {
@@ -398,19 +396,25 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             Logger logger = Logger.getLogger(BergamotNotifier.class);
             logger.info("Bergamot Notifier, using configuration:\r\n" + config.toString());
             // Create the worker
-            BergamotNotifier worker = new BergamotNotifier();
-            worker.configure(config);
+            BergamotNotifier notifier = new BergamotNotifier();
+            notifier.configure(config);
             // Register a shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(worker::triggerShutdown));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                logger.info("Triggering shutdown of Bergamot Notifier");
+                notifier.triggerShutdown(true);
+            }));
             // Start our worker
             logger.info("Bergamot Notifier starting.");
-            worker.run();
+            notifier.run();
             // Terminate normally
+            Thread.sleep(15_000);
             System.exit(0);
         }
         catch (Exception e)
         {
+            System.err.println("Failed to start Bergamot Worker!");
             e.printStackTrace();
+            Thread.sleep(15_000);
             System.exit(1);
         }
     }

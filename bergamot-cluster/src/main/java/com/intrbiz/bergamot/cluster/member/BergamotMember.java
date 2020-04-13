@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.LifecycleEvent;
+import com.hazelcast.core.LifecycleEvent.LifecycleState;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.discovery.HazelcastZooKeeperDiscovery;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager;
@@ -53,6 +55,7 @@ public abstract class BergamotMember
         this.zooKeeper = this.connectZooKeeper();
         this.zooKeeper.listen(this::zooKeeperListener);
         this.hazelcast = this.connectHazelcast();
+        this.hazelcast.getLifecycleService().addLifecycleListener(this::hazelcastListener);
         logger.info("Connected to Bergamot Cluster");
     }
     
@@ -89,6 +92,14 @@ public abstract class BergamotMember
     protected void zooKeeperListener(ZooKeeperState state)
     {
         if (state == ZooKeeperState.EXPIRED)
+        {
+            this.panic();
+        }
+    }
+    
+    protected void hazelcastListener(LifecycleEvent event)
+    {
+        if (event.getState() == LifecycleState.SHUTTING_DOWN || event.getState() == LifecycleState.SHUTDOWN)
         {
             this.panic();
         }

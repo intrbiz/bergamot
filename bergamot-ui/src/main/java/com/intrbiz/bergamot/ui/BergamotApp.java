@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.ui;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -136,6 +137,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     private UpdateServer updateServer;
     
     private final UUID id = UUID.randomUUID();
+    
+    private CountDownLatch shutdownLatch;
     
     public BergamotApp()
     {
@@ -378,6 +381,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     {
         // start the processor
         logger.info("Starting processor");
+        this.shutdownLatch = new CountDownLatch(1);
         this.processor.start();
         // start the update websocket server
         this.updateServer.start();
@@ -400,7 +404,21 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     protected void shutdown()
     {
+        logger.info("Shutting down processor!");
         this.processor.shutdown();
+        this.processor.close();
+        this.shutdownLatch.countDown();
+    }
+    
+    public void awaitShutdown()
+    {
+        try
+        {
+            this.shutdownLatch.await();
+        }
+        catch (InterruptedException e)
+        {
+        }
     }
 
     public static void main(String[] args) throws Exception
@@ -417,11 +435,22 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             // start the app
             System.out.println("Starting Bergamot");
             bergamotApp.start();
+            // setup shutdown hook
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                logger.info("Triggering shutdown of Bergamot UI");
+                bergamotApp.stop();
+            }));
+            // Await shutdown
+            bergamotApp.awaitShutdown();
+            // Terminate normally
+            Thread.sleep(15_000);
+            System.exit(0);
         }
         catch (Exception e)
         {
             System.err.println("Failed to start Bergamot UI!");
             e.printStackTrace();
+            Thread.sleep(15_000);
             System.exit(1);
         }
     }

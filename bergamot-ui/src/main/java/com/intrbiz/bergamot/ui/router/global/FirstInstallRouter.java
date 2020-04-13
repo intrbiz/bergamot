@@ -143,7 +143,7 @@ public class FirstInstallRouter extends Router<BergamotApp>
         admin.setPager(install.getUserMobile());
         admin.setSummary(admin.getFullName());
         admin.setObjectState(ObjectState.PRESENT);
-        admin.getInheritedTemplates().add("generic_contact");
+        admin.getInheritedTemplates().add("generic-contact");
         admin.getTeams().add("bergamot-admins");
         // load the site configuration template and inject our admin user
         Collection<ValidatedBergamotConfiguration> vbcfgs = new BergamotConfigReader()
