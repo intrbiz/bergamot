@@ -23,6 +23,7 @@ import org.apache.zookeeper.KeeperException.ConnectionLossException;
 import org.apache.zookeeper.KeeperException.SessionExpiredException;
 import org.apache.zookeeper.Transaction;
 import org.apache.zookeeper.Watcher.Event.EventType;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
@@ -285,26 +286,38 @@ public abstract class GenericElector
     {
         this.zooKeeper.addWatch(this.containerPath + "/" + nodeToFollow, (watchedEvent) -> {
             logger.debug("Got follower event " + watchedEvent);
-            if (watchedEvent.getType() == EventType.NodeDeleted)
+            try
             {
-                logger.debug("Following (" + watchedEvent.getPath() + ") node has failed");
-                try
+                if (watchedEvent.getType() == EventType.NodeDeleted)
                 {
+                    logger.debug("Following (" + watchedEvent.getPath() + ") node has failed");
                     this.doElection();
                 }
-                catch (ConnectionLossException e)
+                else if (watchedEvent.getType() == EventType.None)
                 {
-                    // TODO
-                    logger.warn("Lost connection to ZooKeeper");
+                    if (watchedEvent.getState() == KeeperState.SyncConnected)
+                    {
+                        logger.info("Reconnected to ZooKeeper, recreating watch");
+                        this.doElection();
+                    }
+                    else if (watchedEvent.getState() == KeeperState.Disconnected)
+                    {
+                        logger.warn("Lost connection to ZooKeeper, waiting for reconnect");
+                    }
                 }
-                catch (SessionExpiredException e)
-                {
-                    // ignore, we're exiting
-                }
-                catch (KeeperException | InterruptedException e)
-                {
-                    logger.warn("Failed to determine election status", e);
-                }
+            }
+            catch (ConnectionLossException e)
+            {
+                // TODO
+                logger.warn("Lost connection to ZooKeeper");
+            }
+            catch (SessionExpiredException e)
+            {
+                // ignore, we're exiting
+            }
+            catch (KeeperException | InterruptedException e)
+            {
+                logger.warn("Failed to determine election status", e);
             }
         }, AddWatchMode.PERSISTENT);
     }
@@ -313,25 +326,37 @@ public abstract class GenericElector
     {
         this.zooKeeper.addWatch(this.electionNodePath, (watchedEvent) -> {
             logger.debug("Got self event " + watchedEvent);
-            if (watchedEvent.getType() == EventType.NodeDeleted)
+            try
             {
-                try
+                if (watchedEvent.getType() == EventType.NodeDeleted)
                 {
                     this.doElection();
                 }
-                catch (ConnectionLossException e)
+                else if (watchedEvent.getType() == EventType.None)
                 {
-                    // TODO
-                    logger.warn("Lost connection to ZooKeeper");
+                    if (watchedEvent.getState() == KeeperState.SyncConnected)
+                    {
+                        logger.info("Reconnected to ZooKeeper, recreating watch");
+                        this.watchOurself();
+                    }
+                    else if (watchedEvent.getState() == KeeperState.Disconnected)
+                    {
+                        logger.warn("Lost connection to ZooKeeper, waiting for reconnect");
+                    }
                 }
-                catch (SessionExpiredException e)
-                {
-                    // ignore, we're exiting
-                }
-                catch (KeeperException | InterruptedException e)
-                {
-                    logger.warn("Failed to determine election status", e);
-                }
+            }
+            catch (ConnectionLossException e)
+            {
+                // TODO
+                logger.warn("Lost connection to ZooKeeper");
+            }
+            catch (SessionExpiredException e)
+            {
+                // ignore, we're exiting
+            }
+            catch (KeeperException | InterruptedException e)
+            {
+                logger.warn("Failed to determine election status", e);
             }
         }, AddWatchMode.PERSISTENT);
     }

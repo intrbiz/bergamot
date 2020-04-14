@@ -31,18 +31,21 @@ public class ProcessorRegistry extends GenericRegistry<UUID, ProcessorRegistrati
         {
             this.routeTable.registerProcessor(processor.getId());
         }
+        logger.info("Processor routing table:\n" + this.routeTable);
     }
     
     @Override
     protected void onItemAdded(UUID id, ProcessorRegistration item)
     {
         this.routeTable.registerProcessor(id);
+        logger.info("Processor routing table:\n" + this.routeTable);
     }
 
     @Override
     protected void onItemRemoved(UUID id)
     {
         this.routeTable.unregisterProcessor(id);
+        logger.info("Processor routing table:\n" + this.routeTable);
     }
 
     /**

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
 
 import com.intrbiz.bergamot.cluster.election.model.ElectionEvent;
 import com.intrbiz.bergamot.cluster.election.model.ElectionEvent.Type;
@@ -26,7 +27,7 @@ public final class LeaderElector extends GenericElector
     
     public LeaderElector(ZooKeeper zooKeeper, UUID id) throws KeeperException, InterruptedException
     {
-        super(zooKeeper, ZKPaths.POOLS, ZKPaths.LEADER, id);
+        super(zooKeeper, ZKPaths.GLOBAL, ZKPaths.LEADER, id);
         // Watch for things to join the election
         this.setupWatcher();
     }
@@ -41,6 +42,19 @@ public final class LeaderElector extends GenericElector
                     case NodeCreated:
                         {
                             this.fireEvent(new ElectionEvent(Type.ADDED, UUID.fromString(watchedEvent.getPath().split("_")[0])));
+                        }
+                        break;
+                    case None:
+                        {
+                            if (watchedEvent.getState() == KeeperState.SyncConnected)
+                            {
+                                logger.info("Reconnected to ZooKeeper, recreating watch");
+                                this.setupWatcher();
+                            }
+                            else if (watchedEvent.getState() == KeeperState.Disconnected)
+                            {
+                                logger.warn("Lost connection to ZooKeeper, waiting for reconnect");
+                            }
                         }
                         break;
                     default:

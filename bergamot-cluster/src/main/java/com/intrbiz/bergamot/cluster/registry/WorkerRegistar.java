@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.Watcher.Event.EventType;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 
@@ -67,6 +68,17 @@ public class WorkerRegistar extends GenericRegistar<UUID, WorkerRegistration>
                     case NodeDeleted:
                         this.routeTable.unregisterProcessor(uuidPrefixFromName(watchedEvent.getPath()));
                         break;
+                    case None:
+                        if (watchedEvent.getState() == KeeperState.SyncConnected)
+                        {
+                            logger.info("Reconnected to ZooKeeper, recreating watch");
+                            this.setupProcessorsWatcher();
+                        }
+                        else if (watchedEvent.getState() == KeeperState.Disconnected)
+                        {
+                            logger.warn("Lost connection to ZooKeeper, waiting for reconnect");
+                        }
+                    break;
                     default:
                         break;
                 }

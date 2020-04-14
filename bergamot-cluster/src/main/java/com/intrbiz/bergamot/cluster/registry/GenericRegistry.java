@@ -15,6 +15,7 @@ import org.apache.zookeeper.AddWatchMode;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
@@ -105,6 +106,18 @@ public abstract class GenericRegistry<K, V>
                             V item = this.getItem(watchedEvent.getPath());
                             this.onItemUpdated(itemId, item);
                             this.fireEvent(new RegistryEvent<>(Type.UPDATED, itemId, item));
+                        }
+                    case None:
+                        {
+                            if (watchedEvent.getState() == KeeperState.SyncConnected)
+                            {
+                                logger.info("Reconnected to ZooKeeper, recreating watch");
+                                this.setupWatcher();
+                            }
+                            else if (watchedEvent.getState() == KeeperState.Disconnected)
+                            {
+                                logger.warn("Lost connection to ZooKeeper, waiting for reconnect");
+                            }
                         }
                         break;
                     default:

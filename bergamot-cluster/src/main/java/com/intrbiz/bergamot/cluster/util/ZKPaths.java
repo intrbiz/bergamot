@@ -22,6 +22,8 @@ public class ZKPaths
     
     public static final String POOLS = "pools";
     
+    public static final String GLOBAL = "global";
+    
     public static final String LEADER = "leader";
     
     public static final String NODES = "nodes";
