@@ -40,21 +40,6 @@ public class ProcessorDispatcher
     }
     
     /**
-     * Place the given pool message onto the queue for a random processing pool
-     * @param message the message
-     * @return whether the message was offered successfully ({@code PublishStatus.Success}) or not ({@code PublishStatus.Failed})
-     */
-    public PublishStatus dispatch(ProcessorMessage message)
-    {
-        UUID processor = route(message);
-        if (processor == null) return PublishStatus.Unroutable;
-        // Offer onto the result queue
-        IQueue<ProcessorMessage> queue = this.getProcessorQueue(Objects.requireNonNull(processor));
-        boolean success = queue.offer(message);
-        return success ? PublishStatus.Success : PublishStatus.Failed;
-    }
-    
-    /**
      * Place the given processor message onto the queue for the given processor
      * @param processor the id of the processor
      * @param message the message
@@ -64,10 +49,22 @@ public class ProcessorDispatcher
     {
         if (processor == null)
             processor = route(message);
+        if (processor == null)
+            return PublishStatus.Unroutable;
         // Offer onto the result queue
         IQueue<ProcessorMessage> queue = this.getProcessorQueue(Objects.requireNonNull(processor));
         boolean success = queue.offer(message);
         return success ? PublishStatus.Success : PublishStatus.Failed;
+    }
+    
+    /**
+     * Place the given pool message onto the queue for a random processing pool
+     * @param message the message
+     * @return whether the message was offered successfully ({@code PublishStatus.Success}) or not ({@code PublishStatus.Failed})
+     */
+    public PublishStatus dispatch(ProcessorMessage message)
+    {
+        return this.dispatch(null, message);
     }
     
     private UUID route(ProcessorMessage message)

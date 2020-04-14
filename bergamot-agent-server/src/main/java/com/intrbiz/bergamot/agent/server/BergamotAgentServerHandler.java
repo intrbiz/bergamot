@@ -339,7 +339,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         }
         catch (Exception e)
         {
-            logger.error("Failed to authenticate agent: " + this.agentId, e);
+            logger.error("Failed to authenticate agent: " + this.agentId);
         }
         return false;
     }
@@ -376,7 +376,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         }
         catch (Exception e)
         {
-            logger.error("Failed to decode request", e);
+            logger.warn("Failed to decode request", e);
             ctx.close();
         }
     }
