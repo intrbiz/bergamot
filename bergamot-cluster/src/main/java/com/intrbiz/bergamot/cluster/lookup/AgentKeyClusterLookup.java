@@ -1,7 +1,6 @@
 package com.intrbiz.bergamot.cluster.lookup;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -18,9 +17,7 @@ import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.data.DataException;
 
 public class AgentKeyClusterLookup extends AgentKeyLookup
-{
-    private static final int KEY_TTL = (int) TimeUnit.HOURS.toSeconds(24);
-    
+{   
     public AgentKeyClusterLookup(HazelcastInstance hazelcast)
     {
         super(hazelcast);
@@ -28,12 +25,10 @@ public class AgentKeyClusterLookup extends AgentKeyLookup
     
     protected void configureHazelcast(Config hazelcastConfig)
     {
-        // Setup the map TTL, backups
         MapConfig agentMapConfig = hazelcastConfig.getMapConfig(HZNames.buildAgentKeyLookupMapName());
-        agentMapConfig.setTimeToLiveSeconds(KEY_TTL);
         agentMapConfig.setInMemoryFormat(InMemoryFormat.BINARY);
-        agentMapConfig.setBackupCount(0);
-        agentMapConfig.setAsyncBackupCount(0);
+        agentMapConfig.setBackupCount(1);
+        agentMapConfig.setAsyncBackupCount(1);
         // Setup the map loader
         MapStoreConfig storeConfig = agentMapConfig.getMapStoreConfig();
         storeConfig.setImplementation(new AgentKeyLoader());
@@ -59,5 +54,7 @@ public class AgentKeyClusterLookup extends AgentKeyLookup
             }
             return null;
         }
+        
+        
     }
 }
