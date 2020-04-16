@@ -25,8 +25,6 @@ public class NotifierCfg extends Configuration
     private int threads = -1;
     
     private String site;
-    
-    private String info;
 
     private List<EngineCfg> engines = new LinkedList<EngineCfg>();
     
@@ -46,17 +44,6 @@ public class NotifierCfg extends Configuration
     public void setSite(String site)
     {
         this.site = site;
-    }
-
-    @XmlAttribute(name = "info")
-    public String getInfo()
-    {
-        return info;
-    }
-
-    public void setInfo(String info)
-    {
-        this.info = info;
     }
 
     public NotifierCfg(EngineCfg... engines)

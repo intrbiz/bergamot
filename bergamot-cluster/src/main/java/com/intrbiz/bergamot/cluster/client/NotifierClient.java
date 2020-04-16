@@ -20,9 +20,9 @@ public class NotifierClient extends BergamotClient
     
     private final NotificationConsumer consumer;
 
-    public NotifierClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
+    public NotifierClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
     {
-        super(config, onPanic, application, info, hostName);
+        super(config, onPanic, application, info);
         this.registar = new NotifierRegistar(this.zooKeeper.getZooKeeper());
         this.consumer = new NotificationConsumer(this.hazelcast, this.id);
     }

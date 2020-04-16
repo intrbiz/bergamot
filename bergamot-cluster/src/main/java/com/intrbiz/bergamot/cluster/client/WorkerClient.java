@@ -30,9 +30,9 @@ public class WorkerClient extends BergamotClient
     
     private final AgentRegistar agentRegistar;
 
-    public WorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
+    public WorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
     {
-        super(config, onPanic, application, info, hostName);
+        super(config, onPanic, application, info);
         this.registar = new WorkerRegistar(this.zooKeeper.getZooKeeper());
         this.agentRegistar = new AgentRegistar(this.zooKeeper.getZooKeeper());
         this.consumer = new WorkerConsumer(this.hazelcast, this.id);

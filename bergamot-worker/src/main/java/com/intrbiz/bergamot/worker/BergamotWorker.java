@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.worker;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,6 +24,7 @@ import org.apache.zookeeper.KeeperException;
 import com.hazelcast.client.HazelcastClientNotActiveException;
 import com.hazelcast.spi.exception.TargetDisconnectedException;
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
@@ -90,10 +90,6 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     private String workerPool;
     
-    private String info;
-    
-    private String hostName;
-    
     private int threadCount;
     
     private WorkerClient client;
@@ -129,11 +125,6 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     public final String getWorkerPool()
     {
         return this.workerPool;
-    }
-    
-    public final String getInfo()
-    {
-        return this.info;
     }
 
     public final Collection<Engine> getEngines()
@@ -176,8 +167,6 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             this.sites.add(UUID.fromString(site));
         }
         this.workerPool = this.getConfigurationParameter("worker-pool", this.configuration::getWorkerPool, null);
-        this.info = this.getConfigurationParameter("info", this.configuration::getInfo, null);
-        this.hostName = InetAddress.getLocalHost().getHostName();
         this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", String.valueOf(this.configuration.getThreads())));
         // register engines 
         for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
@@ -280,7 +269,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     
     protected void connectScheduler() throws Exception
     {
-        this.client = new WorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, this.info, this.hostName);
+        this.client = new WorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
         this.client.register(this.sites, this.workerPool, this.engines.keySet()); 
     }
     

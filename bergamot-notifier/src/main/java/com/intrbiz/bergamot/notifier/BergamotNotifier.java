@@ -2,7 +2,6 @@ package com.intrbiz.bergamot.notifier;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +23,7 @@ import org.apache.log4j.PatternLayout;
 import com.hazelcast.client.HazelcastClientNotActiveException;
 import com.hazelcast.spi.exception.TargetDisconnectedException;
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.NotifierClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.NotifierCfg;
@@ -65,10 +65,6 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
 
     private Set<UUID> sites = new HashSet<>();
     
-    private String info;
-    
-    private String hostName;
-    
     private int threadCount;
     
     private NotifierClient client;
@@ -99,11 +95,6 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     public final UUID getId()
     {
         return this.id;
-    }
-    
-    public final String getInfo()
-    {
-        return this.info;
     }
 
     public final Collection<NotificationEngine> getEngines()
@@ -145,8 +136,6 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         {
             this.sites.add(UUID.fromString(site));
         }
-        this.info = this.getConfigurationParameter("info", this.configuration::getInfo, null);
-        this.hostName = InetAddress.getLocalHost().getHostName();
         this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", String.valueOf(this.configuration.getThreads())));
         // register engines 
         for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
@@ -198,7 +187,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     protected void connectScheduler() throws Exception
     {
-        this.client = new NotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, this.info, this.hostName);
+        this.client = new NotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
         this.client.register(this.sites, this.engines.keySet());
     }
     

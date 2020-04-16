@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.ui.router;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.bergamot.ui.model.health.DatabaseHealth;
@@ -45,7 +46,7 @@ public class HealthRouter extends Router<BergamotApp>
     @JSON()
     public ReleaseHealth checkRelease()
     {
-        return new ReleaseHealth(BergamotApp.VERSION.NAME, BergamotApp.VERSION.NUMBER, BergamotApp.VERSION.CODE_NAME);
+        return new ReleaseHealth(BergamotVersion.NAME, BergamotVersion.numberString(), BergamotVersion.CODE_NAME);
     }
     
     @Any("/check/db")

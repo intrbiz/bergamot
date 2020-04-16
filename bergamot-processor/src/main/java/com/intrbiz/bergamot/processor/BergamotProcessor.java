@@ -114,9 +114,9 @@ public class BergamotProcessor extends BergamotMember
     
     private final AtomicBoolean started = new AtomicBoolean(false);
 
-    public BergamotProcessor(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
+    public BergamotProcessor(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
     {
-        super(config, onPanic, application, info, hostName);
+        super(config, onPanic, application, info);
         // topics
         this.siteEventTopic = new SiteEventTopic(this.hazelcast);
         this.notificationTopic = new SiteNotificationTopic(this.hazelcast);

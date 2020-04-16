@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.cluster.client;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,7 +46,7 @@ public abstract class BergamotClient
     
     protected final AtomicBoolean paniced = new AtomicBoolean(false);
     
-    public BergamotClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String hostName) throws Exception
+    public BergamotClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
     {
         super();
         this.config = Objects.requireNonNull(config);
@@ -52,7 +54,7 @@ public abstract class BergamotClient
         this.id = UUID.randomUUID();
         this.application = application;
         this.info = info;
-        this.hostName = hostName;
+        this.hostName = this.getHostName();
         // Connect
         logger.info("Connecting to Bergamot Cluster");
         this.zooKeeper = this.connectZooKeeper();
@@ -69,6 +71,19 @@ public abstract class BergamotClient
             System.getProperty("zookeeper.nodes"), 
             this.config.getZooKeeper().stream().collect(Collectors.joining(","))
         );
+    }
+    
+    protected String getHostName()
+    {
+        try
+        {
+            return Util.coalesceEmpty(System.getenv("BERGAMOT_HOSTNAME"), System.getProperty("bergamot.host.name"), InetAddress.getLocalHost().getHostName());
+        }
+        catch (UnknownHostException e)
+        {
+            logger.warn("Failed to get node host name", e);
+        }
+        return null;
     }
     
     protected HazelcastInstance connectHazelcast() throws Exception

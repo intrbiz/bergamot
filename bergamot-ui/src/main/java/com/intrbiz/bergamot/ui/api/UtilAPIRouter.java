@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
@@ -25,21 +26,14 @@ public class UtilAPIRouter extends Router<BergamotApp>
     @JSON()
     public String version()
     {
-        return BergamotApp.VERSION.NUMBER + " (" + BergamotApp.VERSION.CODE_NAME + ")";
+        return BergamotVersion.versionString();
     }
     
     @Get("/version/number")
     @JSON()
     public String versionNumber()
     {
-        return BergamotApp.VERSION.NUMBER;
-    }
-    
-    @Get("/version/codename")
-    @JSON()
-    public String versionCodeName()
-    {
-        return BergamotApp.VERSION.CODE_NAME;
+        return BergamotVersion.numberString();
     }
     
     @Get("/id/new")

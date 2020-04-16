@@ -17,6 +17,7 @@ import com.intrbiz.balsa.engine.impl.route.exec.argument.ListParameterArgument;
 import com.intrbiz.balsa.engine.impl.route.exec.argument.ParameterArgument;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.util.BalsaWriter;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -36,8 +37,8 @@ public class AboutRouter extends Router<BergamotApp>
     @Any("/")
     public void about()
     {
-        var("bergamot_version",  BergamotApp.VERSION.NUMBER);
-        var("bergamot_codename", BergamotApp.VERSION.CODE_NAME);
+        var("bergamot_version",  BergamotVersion.NUMBER);
+        var("bergamot_codename", BergamotVersion.CODE_NAME);
         encode("about/index");
     }
     

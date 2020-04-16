@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.ui;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
@@ -14,6 +12,7 @@ import com.intrbiz.Util;
 import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -113,23 +112,14 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
 {   
     private static final Logger logger = Logger.getLogger(BergamotApp.class);
     
-    public static final class VERSION
-    {
-        public static final String NAME = "Bergamot Monitoring";
-        
-        public static final String NUMBER = "4.0.0";
-        
-        public static final String CODE_NAME = "Red Beard";
-        
-        public static final class COMPONENTS
-        {
-            public static final String JS = "v1.6.0";
-            
-            public static final String CSS = "v1.7.4";
-        }
-    }
-    
     public static final String DAEMON_NAME = "bergamot-ui";
+    
+    public static final class COMPONENTS
+    {
+        public static final String JS = "v1.6.0";
+        
+        public static final String CSS = "v1.7.4";
+    }
     
     private UICfg config;
     
@@ -171,19 +161,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     public UICfg getConfiguration()
     {
         return this.config;
-    }
-    
-    protected String getHostName()
-    {
-        try
-        {
-            return Util.coalesceEmpty(System.getenv("HOSTNAME"), System.getProperty("host.name"), InetAddress.getLocalHost().getHostName());
-        }
-        catch (UnknownHostException e)
-        {
-            logger.warn("Failed to get node host name", e);
-        }
-        return null;
     }
     
     /**
@@ -371,7 +348,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
             logger.info("Database module: " + db.getName() + " " + db.getVersion());
         }
         // Connect to ZooKeeper and start Hazelcast
-        this.processor = new BergamotProcessor(this.config.getCluster(), this::clusterPanic, DAEMON_NAME, VERSION.NAME + " " + VERSION.NUMBER, this.getHostName());
+        this.processor = new BergamotProcessor(this.config.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
         // Setup the database cache
         logger.info("Setting up Hazelcast cache");
         DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(this.processor.getHazelcast()));

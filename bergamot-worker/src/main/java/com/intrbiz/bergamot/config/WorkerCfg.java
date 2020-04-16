@@ -27,8 +27,6 @@ public class WorkerCfg extends Configuration
     private String site;
 
     private String workerPool;
-    
-    private String info;
 
     private List<EngineCfg> engines = new LinkedList<EngineCfg>();
     
@@ -59,17 +57,6 @@ public class WorkerCfg extends Configuration
     public void setWorkerPool(String workerPool)
     {
         this.workerPool = workerPool;
-    }
-
-    @XmlAttribute(name = "info")
-    public String getInfo()
-    {
-        return info;
-    }
-
-    public void setInfo(String info)
-    {
-        this.info = info;
     }
 
     public WorkerCfg(EngineCfg... engines)

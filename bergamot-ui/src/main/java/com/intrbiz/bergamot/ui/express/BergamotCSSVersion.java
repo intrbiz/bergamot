@@ -15,6 +15,6 @@ public class BergamotCSSVersion extends Function
     @Override
     public Object get(ExpressContext context, Object source) throws ExpressException
     {
-        return BergamotApp.VERSION.COMPONENTS.CSS;
+        return BergamotApp.COMPONENTS.CSS;
     }
 }
