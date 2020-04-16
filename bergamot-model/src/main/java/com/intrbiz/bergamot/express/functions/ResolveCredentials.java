@@ -35,19 +35,19 @@ public class ResolveCredentials extends Function
         Host host = this.getHost(source);
         if (host != null)
         {
-            String newCredentialsName = host.getParameter("credentials." + credentialsName);
+            String newCredentialsName = host.getParameter("credentials_" + credentialsName);
             if (! Util.isEmpty(newCredentialsName))
             {
                 return newCredentialsName;
             }
 
-            newCredentialsName = host.getLocation().getParameter("credentials." + credentialsName);
+            newCredentialsName = host.getLocation().getParameter("credentials_" + credentialsName);
             if (! Util.isEmpty(newCredentialsName))
             {
                 return newCredentialsName;
             }
         }
-        return "default." + credentialsName;
+        return "default_" + credentialsName;
     }
     
     private Host getHost(Object source)

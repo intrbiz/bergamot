@@ -80,7 +80,7 @@ public abstract class GenericRegistry<K, V>
     private void setupWatcher() throws KeeperException, InterruptedException
     {
         this.zooKeeper.addWatch(this.containerPath,  (watchedEvent) -> {
-            logger.debug("Processing registry event for " + this.containerPath + ": " + watchedEvent);
+            logger.info("Processing registry event for " + this.containerPath + ": " + watchedEvent);
             try
             {
                 switch (watchedEvent.getType())

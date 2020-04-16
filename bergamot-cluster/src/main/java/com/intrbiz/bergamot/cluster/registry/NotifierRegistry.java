@@ -29,30 +29,30 @@ public class NotifierRegistry extends GenericRegistry<UUID, NotifierRegistration
     protected void init() throws KeeperException, InterruptedException
     {
         Set<NotifierRegistration> notifiers = this.getNotifiers();
-        logger.info("Initialising with Notifier: " + notifiers);
+        logger.info("Initialising with notifiers: " + notifiers);
         this.routeTable.registerNotifiers(notifiers);
-        logger.info("Notifier routing table: " + this.routeTable);
+        logger.info("Notifier routing table:\n" + this.routeTable);
     }
     
     protected void onItemAdded(UUID id, NotifierRegistration item)
     {
         logger.info("Adding notifier: " + item);
         this.routeTable.registerNotifier(item);
-        logger.info("Updated Notifier routing table: " + this.routeTable);
+        logger.info("Updated Notifier routing table:\n" + this.routeTable);
     }
     
     protected void onItemRemoved(UUID id)
     {
         logger.info("Removing notifier: " + id);
         this.routeTable.unregisterNotifier(id);
-        logger.info("Updated Worker routing table: " + this.routeTable);
+        logger.info("Updated Worker routing table:\n" + this.routeTable);
     }
     
     protected void onItemUpdated(UUID id, NotifierRegistration item)
     {
         logger.info("Updating notifier: " + item);
         this.routeTable.reregisterNotifier(item);
-        logger.info("Updated Notifier routing table: " + this.routeTable);
+        logger.info("Updated Notifier routing table:\n" + this.routeTable);
     }
 
     /**

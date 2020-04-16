@@ -204,7 +204,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         CheckSavedState state = this.getSavedState();
         if (state != null) executeCheck.setSavedState(state.getSavedState());
         // eval parameters
-        ExpressContext context = new DefaultContext(BergamotExpressExtensionRegistry.getDefaultRegistry(), BergamotEntityResolver.getDefaultInstance());
+        ExpressContext context = new DefaultContext(BergamotExpressExtensionRegistry.getRegistry(), BergamotEntityResolver.getDefaultInstance());
         // configured parameters
         for (Parameter parameter : checkCommand.resolveCheckParameters().values())
         {

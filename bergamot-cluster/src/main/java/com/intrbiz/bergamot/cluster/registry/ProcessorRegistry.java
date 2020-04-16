@@ -35,6 +35,13 @@ public class ProcessorRegistry extends GenericRegistry<UUID, ProcessorRegistrati
     }
     
     @Override
+    protected void onItemUpdated(UUID id, ProcessorRegistration item)
+    {
+        this.routeTable.registerProcessor(id);
+        logger.info("Processor routing table:\n" + this.routeTable);
+    }
+
+    @Override
     protected void onItemAdded(UUID id, ProcessorRegistration item)
     {
         this.routeTable.registerProcessor(id);

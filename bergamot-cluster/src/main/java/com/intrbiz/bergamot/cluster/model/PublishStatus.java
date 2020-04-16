@@ -4,5 +4,7 @@ public enum PublishStatus
 {
     Success,
     Failed,
-    Unroutable
+    Unroutable,
+    NoAgentId,
+    AgentUnroutable
 }

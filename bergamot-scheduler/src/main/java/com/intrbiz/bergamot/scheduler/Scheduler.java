@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.scheduler;
 import java.util.Collection;
 import java.util.UUID;
 
+import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerMessage;
 
@@ -11,6 +12,14 @@ import com.intrbiz.bergamot.model.message.scheduler.SchedulerMessage;
  */
 public interface Scheduler
 {
+    /**
+     * Execute the given check
+     * 
+     * @param check
+     * @return
+     */
+    PublishStatus executeCheck(ActiveCheck<?,?> check);
+    
     /**
      * Pause scheduling all checks
      */

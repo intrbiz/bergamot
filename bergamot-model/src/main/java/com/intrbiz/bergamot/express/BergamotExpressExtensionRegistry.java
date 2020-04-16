@@ -5,11 +5,11 @@ import com.intrbiz.express.ExpressExtensionRegistry;
 
 public class BergamotExpressExtensionRegistry extends ExpressExtensionRegistry
 {
-    private static final BergamotExpressExtensionRegistry DEFAULT_INSTANCE = new BergamotExpressExtensionRegistry();
+    private static final BergamotExpressExtensionRegistry INSTANCE = new BergamotExpressExtensionRegistry();
     
-    public static BergamotExpressExtensionRegistry getDefaultInstance()
+    public static BergamotExpressExtensionRegistry getRegistry()
     {
-        return DEFAULT_INSTANCE;
+        return INSTANCE;
     }
     
     public BergamotExpressExtensionRegistry()

@@ -15,8 +15,10 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.LifecycleEvent;
 import com.hazelcast.core.LifecycleEvent.LifecycleState;
+import com.hazelcast.topic.TopicOverloadPolicy;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.discovery.HazelcastZooKeeperDiscovery;
+import com.intrbiz.bergamot.cluster.util.HZNames;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager.ZooKeeperState;
 import com.intrbiz.bergamot.config.ClusterCfg;
@@ -89,7 +91,7 @@ public abstract class BergamotMember
     protected HazelcastInstance connectHazelcast() throws Exception
     {
         logger.info("Connecting Hazelcast");
-        Config config = HazelcastZooKeeperDiscovery.configureHazelcast(this.zooKeeper, new Config());
+        Config config = this.configureHazelcast(HazelcastZooKeeperDiscovery.configureHazelcast(this.zooKeeper, new Config()));
         if (! Util.isEmpty(this.config.getPublicAddress()))
         {
             config.getNetworkConfig().setPublicAddress(this.config.getPublicAddress());
@@ -99,6 +101,38 @@ public abstract class BergamotMember
             config.getNetworkConfig().setPort(this.config.getPort());
         }
         return Hazelcast.newHazelcastInstance(config);
+    }
+    
+    protected Config configureHazelcast(Config config)
+    {
+        // Configure the processors queue
+        config.getQueueConfig(HZNames.buildProcessorQueueName(null))
+            .setBackupCount(0)
+            .setAsyncBackupCount(0)
+            .setMaxSize(1_000);
+        // Configure the worker queues
+        config.getQueueConfig(HZNames.buildWorkerQueueName(null))
+            .setBackupCount(0)
+            .setAsyncBackupCount(0)
+            .setMaxSize(250);
+        // Configure the notifier queues
+        config.getQueueConfig(HZNames.buildWorkerQueueName(null))
+            .setBackupCount(1)
+            .setAsyncBackupCount(0)
+            .setMaxSize(5_000);
+        // Configure site notification topic
+        config.getReliableTopicConfig(HZNames.getSiteNotificationTopicName(null))
+            .setTopicOverloadPolicy(TopicOverloadPolicy.DISCARD_OLDEST);
+        // Configure site update topic
+        config.getReliableTopicConfig(HZNames.getSiteNotificationTopicName(null))
+            .setTopicOverloadPolicy(TopicOverloadPolicy.DISCARD_OLDEST);
+        // Configure site event topic
+        config.getReliableTopicConfig(HZNames.getSiteEventTopicName())
+            .setTopicOverloadPolicy(TopicOverloadPolicy.DISCARD_OLDEST);
+        // Configure scheduler topics
+        config.getReliableTopicConfig(HZNames.getSchedulingTopicName())
+            .setTopicOverloadPolicy(TopicOverloadPolicy.DISCARD_OLDEST);
+        return config;
     }
     
     protected ZooKeeperManager connectZooKeeper() throws Exception

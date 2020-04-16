@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
@@ -27,6 +29,9 @@ public abstract class AbstractScheduler implements Scheduler
     
     protected final ProcessorDispatcher processorDispatcher;
     
+    // accounting
+    protected final Accounting accounting = Accounting.create(this.getClass());
+    
     public AbstractScheduler(UUID processorId, CheckDispatcher checkDispatcher, ProcessorDispatcher processorDispatcher)
     {
         super();
@@ -35,14 +40,31 @@ public abstract class AbstractScheduler implements Scheduler
         this.processorDispatcher = processorDispatcher;
     }
     
+    public PublishStatus executeCheck(ActiveCheck<?,?> check)
+    {
+        ExecuteCheck executeCheck = check.executeCheck();
+        if (executeCheck != null)
+        {
+            // publish the check
+            PublishStatus result = this.publishExecuteCheck(executeCheck);
+            if (result == PublishStatus.Success)
+            {
+                this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), check.getId(), executeCheck.getEngine(), executeCheck.getExecutor(), executeCheck.getName()));
+            }
+            return result;
+        }
+        return PublishStatus.Failed;
+    }
+    
     protected PublishStatus publishExecuteCheck(ExecuteCheck check)
     {
         if (logger.isTraceEnabled())
             logger.trace("Publishing execute check\n" + check);
-        // publish
+        // Publish
         PublishStatus status =  this.checkDispatcher.dispatchCheck(check);
         if (status != PublishStatus.Success)
         {
+            // Publish a failure result
             this.publishFailedCheck(check, status);
         }
         return status;
@@ -50,19 +72,32 @@ public abstract class AbstractScheduler implements Scheduler
     
     protected void publishFailedCheck(ExecuteCheck check, PublishStatus status)
     {
-        // we failed to execute the given check in time, oops!
         logger.warn("Failed to execute check (" + status + "): " + check.getId() + "\r\n" + check);
-        // fake a timeout / error result and submit it
         ActiveResult result = new ActiveResult().fromCheck(check);
-        if (status == PublishStatus.Unroutable)
+        switch (status)
         {
-            result.error("No workers available which support this check");
+            case AgentUnroutable:
+                result.error("The agent is not available");
+                break;
+            case NoAgentId:
+                result.action("The agent id is required");
+                break;
+            case Unroutable:
+                result.error("No workers available which support this check");
+                break;
+            case Failed:
+                result.timeout("Unable to publish check to worker");
+                break;
+            default:
+                result.error("Unexpected publish status: " + status);
+                break;
         }
-        else
+        // Publish the result
+        PublishStatus resultStatus = this.processorDispatcher.dispatchResult(this.processorId, result);
+        if (resultStatus != PublishStatus.Success)
         {
-            result.timeout("Unable to publish check to worker");
+            logger.error("Failed to publish failure result, got: " + resultStatus + "!\n" + result);
         }
-        this.processorDispatcher.dispatchResult(this.processorId, result);
     }
     
     public void schedulePool(int pool)
@@ -93,6 +128,10 @@ public abstract class AbstractScheduler implements Scheduler
             {
                 this.schedule(check);
             }
+            else
+            {
+                logger.warn("Could not get check for id: " + checkId);
+            }
         }
     }
     
@@ -110,13 +149,13 @@ public abstract class AbstractScheduler implements Scheduler
                     this.enable(check.getCheckId());
                     break;
                 case RESCHEDULE:
-                    this.reschedule(check.getId(), check.getInterval());
+                    this.reschedule(check.getCheckId(), check.getInterval());
                     break;
                 case SCHEDULE:
-                    this.schedule(check.getId());
+                    this.schedule(check.getCheckId());
                     break;
                 case UNSCHEDULE:
-                    this.unschedule(check.getId());
+                    this.unschedule(check.getCheckId());
                     break;
             }
         }

@@ -13,14 +13,10 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.accounting.Accounting;
-import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
-import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.util.IBThreadFactory;
 
@@ -86,9 +82,6 @@ public class WheelScheduler extends AbstractScheduler
     
     // task executor
     protected final ExecutorService taskExecutor;
-    
-    // accounting
-    protected final Accounting accounting = Accounting.create(WheelScheduler.class);
 
     public WheelScheduler(UUID processorId, CheckDispatcher checkDispatcher, ProcessorDispatcher processorDispatcher)
     {
@@ -409,6 +402,10 @@ public class WheelScheduler extends AbstractScheduler
                     logger.info("Rescheduling " + check.getId() + " with interval " + interval);
                     this.rescheduleJob(check.getId(), interval, check.getTimePeriod(), new CheckRunner(check));            
                 }
+                else
+                {
+                    logger.warn("Could not get check for id: " + checkId);
+                }
             }
         }
     }
@@ -598,17 +595,7 @@ public class WheelScheduler extends AbstractScheduler
 
         public void run()
         {
-            // fire off the check
-            ExecuteCheck executeCheck = this.check.executeCheck();
-            if (executeCheck != null)
-            {
-                // publish the check
-                PublishStatus result = WheelScheduler.this.publishExecuteCheck(executeCheck);
-                if (result == PublishStatus.Success)
-                {
-                    WheelScheduler.this.accounting.account(new ExecuteCheckAccountingEvent(executeCheck.getSiteId(), executeCheck.getId(), check.getId(), executeCheck.getEngine(), executeCheck.getExecutor(), executeCheck.getName()));
-                }
-            }
+            WheelScheduler.this.executeCheck(this.check);
         }
     }
 }

@@ -47,9 +47,25 @@ public class CheckDispatcher
     
     public PublishStatus dispatchCheck(ExecuteCheck check)
     {
-        // Pick a worker for this check
-        UUID workerId = this.routeCheck(check);
-        if (workerId == null) return PublishStatus.Unroutable;
+        // Route the check
+        UUID workerId = null;
+        if (this.isAgentRouted(check))
+        {
+            if (check.getAgentId() == null)
+            {
+                return PublishStatus.NoAgentId;
+            }
+            else
+            {
+                workerId = this.agents.routeAgent(check.getAgentId());
+                if (workerId == null) return PublishStatus.AgentUnroutable;
+            }
+        }
+        else
+        {
+            workerId = this.workerRouteTable.route(check.getSiteId(), check.getWorkerPool(), check.getEngine());
+            if (workerId == null) return PublishStatus.Unroutable;
+        }
         // Get the worker queue
         IQueue<ExecuteCheck> queue = this.getCheckQueue(workerId);
         // Offer onto the worker queue
@@ -58,16 +74,9 @@ public class CheckDispatcher
 
     }
     
-    protected UUID routeCheck(ExecuteCheck check)
+    protected boolean isAgentRouted(ExecuteCheck check)
     {
-        if (check.getEngine() != null && check.getEngine().toLowerCase().startsWith(ENGINE_AGENT) && check.getAgentId() != null)
-        {
-            return this.agents.routeAgent(check.getAgentId());
-        }
-        else
-        {
-            return this.workerRouteTable.route(check.getSiteId(), check.getWorkerPool(), check.getEngine());
-        }
+        return check.getEngine() != null && check.getEngine().toLowerCase().startsWith(ENGINE_AGENT);
     }
     
     private IQueue<ExecuteCheck> getCheckQueue(UUID workerId)

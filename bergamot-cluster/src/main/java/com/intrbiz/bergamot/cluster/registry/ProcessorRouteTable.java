@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.cluster.registry;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -8,11 +9,11 @@ import java.util.stream.Collectors;
 
 public class ProcessorRouteTable
 {
-    private final ConcurrentMap<UUID, UUID> processorsWithSequence = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, UUID> processorsMap = new ConcurrentHashMap<>();
     
     private final SecureRandom random = new SecureRandom();
     
-    private volatile UUID[] processors = new UUID[0];
+    private volatile UUID[] processorsTable = new UUID[0];
     
     public ProcessorRouteTable()
     {
@@ -21,22 +22,27 @@ public class ProcessorRouteTable
     
     void registerProcessor(UUID processor)
     {
-        this.processorsWithSequence.put(processor, processor);
+        this.processorsMap.put(processor, processor);
         this.updateProcessors();
     }
     
     void unregisterProcessor(UUID processor)
     {
-        this.processorsWithSequence.remove(processor);
+        this.processorsMap.remove(processor);
         this.updateProcessors();
     }
     
     private void updateProcessors()
     {
-        this.processors = this.processorsWithSequence.keySet().stream()
+        this.processorsTable = this.processorsMap.keySet().stream()
                             .sorted()
                             .collect(Collectors.toList())
                             .toArray(new UUID[0]);
+    }
+    
+    public boolean hasProcessor(UUID id)
+    {
+        return this.processorsMap.containsKey(id);
     }
     
     /**
@@ -45,7 +51,7 @@ public class ProcessorRouteTable
      */
     public UUID[] getProcessors()
     {
-        return this.processors;
+        return this.processorsTable;
     }
     
     /**
@@ -54,7 +60,7 @@ public class ProcessorRouteTable
      */
     public UUID routeProcessor()
     {
-        UUID[] procs = this.processors;
+        UUID[] procs = this.processorsTable;
         return procs.length > 0 ? procs[Math.abs(this.random.nextInt() % procs.length)] : null;
     }
     
@@ -65,7 +71,12 @@ public class ProcessorRouteTable
      */
     public UUID routeProcessor(long hash)
     {
-        UUID[] procs = this.processors;
+        UUID[] procs = this.processorsTable;
         return procs.length > 0 ? procs[Math.abs((int)(hash % procs.length))] : null;
+    }
+    
+    public String toString()
+    {
+        return Arrays.toString(this.processorsTable);
     }
 }

@@ -47,10 +47,17 @@ public class ProcessorDispatcher
      */
     public PublishStatus dispatch(UUID processor, ProcessorMessage message)
     {
+        // Pick a processor at random if we have no processor id
+        // TODO: it would be nice to validate the processor exists
         if (processor == null)
+        {
             processor = route(message);
+        }
+        // Did we manage to route the message
         if (processor == null)
+        {
             return PublishStatus.Unroutable;
+        }
         // Offer onto the result queue
         IQueue<ProcessorMessage> queue = this.getProcessorQueue(Objects.requireNonNull(processor));
         boolean success = queue.offer(message);
@@ -69,7 +76,9 @@ public class ProcessorDispatcher
     
     private UUID route(ProcessorMessage message)
     {
-        return (message instanceof ProcessorHashable) ? this.routeTable.routeProcessor(((ProcessorHashable) message).routeHash()) : this.routeTable.routeProcessor();
+        return (message instanceof ProcessorHashable) ? 
+                this.routeTable.routeProcessor(((ProcessorHashable) message).routeHash()) : 
+                this.routeTable.routeProcessor();
     }
 
     /**
