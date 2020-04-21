@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.cluster.lookup;
+package com.intrbiz.bergamot.cluster.lookup.hz;
 
 import java.util.UUID;
 
@@ -16,9 +16,9 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.data.DataException;
 
-public class AgentKeyClusterLookup extends AgentKeyLookup
+public class HZAgentKeyClusterLookup extends HZAgentKeyLookup
 {   
-    public AgentKeyClusterLookup(HazelcastInstance hazelcast)
+    public HZAgentKeyClusterLookup(HazelcastInstance hazelcast)
     {
         super(hazelcast);
     }

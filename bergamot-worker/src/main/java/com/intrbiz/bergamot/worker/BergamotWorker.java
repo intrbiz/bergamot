@@ -25,6 +25,7 @@ import org.apache.zookeeper.KeeperException;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.WorkerClient;
+import com.intrbiz.bergamot.cluster.client.hz.HZWorkerClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.model.AgentKey;
@@ -246,7 +247,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     protected void connectCluster() throws Exception
     {
-        this.client = new WorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
+        // TODO
+        this.client = new HZWorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
         this.client.registerWorker(this.sites, this.workerPool, this.engines.keySet());
     }
     

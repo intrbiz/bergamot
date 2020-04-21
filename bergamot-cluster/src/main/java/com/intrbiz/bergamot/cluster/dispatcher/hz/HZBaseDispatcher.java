@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.cluster.dispatcher;
+package com.intrbiz.bergamot.cluster.dispatcher.hz;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import com.hazelcast.ringbuffer.impl.RingbufferService;
 /**
  * Dispatch results, readings, agent message to a processor
  */
-public abstract class BaseDispatcher<T>
+public abstract class HZBaseDispatcher<T>
 {
     private final HazelcastInstance hazelcast;
     
@@ -23,7 +23,7 @@ public abstract class BaseDispatcher<T>
     
     private final Function<UUID, String> ringbufferName;
     
-    protected BaseDispatcher(HazelcastInstance hazelcast, Function<UUID, String> ringbufferName)
+    protected HZBaseDispatcher(HazelcastInstance hazelcast, Function<UUID, String> ringbufferName)
     {
         super();
         this.hazelcast = Objects.requireNonNull(hazelcast);
@@ -48,7 +48,7 @@ public abstract class BaseDispatcher<T>
         {
             if (RingbufferService.SERVICE_NAME.equals(event.getServiceName()))
             {
-                BaseDispatcher.this.ringbuffersCache.remove(event.getObjectName());
+                HZBaseDispatcher.this.ringbuffersCache.remove(event.getObjectName());
             }
         }
     }

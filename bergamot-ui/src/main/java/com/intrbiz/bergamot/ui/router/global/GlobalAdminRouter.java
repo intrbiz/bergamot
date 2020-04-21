@@ -16,6 +16,9 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
 import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
+import com.intrbiz.bergamot.cluster.consumer.hz.HZNotificationConsumer;
+import com.intrbiz.bergamot.cluster.consumer.hz.HZProcessorConsumer;
+import com.intrbiz.bergamot.cluster.consumer.hz.HZWorkerConsumer;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
@@ -70,7 +73,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         for (WorkerRegistration worker : workers)
         {
             // TODO: we should have a task computing real stats somewhere
-            WorkerConsumer consumer = new WorkerConsumer(app().getProcessor().getHazelcast(), worker.getId());
+            WorkerConsumer consumer = new HZWorkerConsumer(app().getProcessor().getHazelcast(), worker.getId());
             workerTails.put(worker.getId(), consumer.getTailSequence());
             workerCommited.put(worker.getId(), consumer.getSequence());
         }
@@ -85,7 +88,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         for (NotifierRegistration notifier : notifiers)
         {
             // TODO: we should have a task computing real stats somewhere
-            NotificationConsumer consumer = new NotificationConsumer(app().getProcessor().getHazelcast(), notifier.getId());
+            NotificationConsumer consumer = new HZNotificationConsumer(app().getProcessor().getHazelcast(), notifier.getId());
             notifierTails.put(notifier.getId(), consumer.getTailSequence());
             notifierCommited.put(notifier.getId(), consumer.getSequence());
         }
@@ -100,7 +103,7 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         for (ProcessorRegistration processor : processors.values())
         {
             colours.put(processor.getId(), COLOURS[idx ++ % COLOURS.length]);
-            ProcessorConsumer consumer = new ProcessorConsumer(app().getProcessor().getHazelcast(), processor.getId());
+            ProcessorConsumer consumer = new HZProcessorConsumer(app().getProcessor().getHazelcast(), processor.getId());
             processorTails.put(processor.getId(), consumer.getTailSequence());
             processorCommited.put(processor.getId(), consumer.getSequence());
         }

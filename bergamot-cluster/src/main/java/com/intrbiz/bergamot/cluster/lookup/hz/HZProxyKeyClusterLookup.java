@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.cluster.lookup;
+package com.intrbiz.bergamot.cluster.lookup.hz;
 
 import java.util.UUID;
 
@@ -16,9 +16,9 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ProxyKey;
 import com.intrbiz.data.DataException;
 
-public class ProxyKeyClusterLookup extends ProxyKeyLookup
+public class HZProxyKeyClusterLookup extends HZProxyKeyLookup
 {   
-    public ProxyKeyClusterLookup(HazelcastInstance hazelcast)
+    public HZProxyKeyClusterLookup(HazelcastInstance hazelcast)
     {
         super(hazelcast);
     }

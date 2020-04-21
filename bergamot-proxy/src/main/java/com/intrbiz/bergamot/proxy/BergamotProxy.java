@@ -14,6 +14,7 @@ import org.apache.zookeeper.KeeperException;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.client.ProxyClient;
+import com.intrbiz.bergamot.cluster.client.hz.HZProxyClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.ProxyCfg;
 import com.intrbiz.bergamot.proxy.model.AuthenticationKey;
@@ -169,7 +170,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
         logger.info("Bergamot Proxy starting....");
         // connect to the scheduler
         logger.info("Connecting to cluster");
-        this.client = new ProxyClient(this.configuration.getCluster(), this::clusterPanic);
+        this.client = new HZProxyClient(this.configuration.getCluster(), this::clusterPanic);
         // start our server
         this.server = new BergamotProxyServer(this.port, this::resolveKey, this.createMessageProcessorFactory());
         this.server.start();

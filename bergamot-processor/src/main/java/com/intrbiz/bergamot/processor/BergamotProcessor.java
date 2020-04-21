@@ -10,16 +10,20 @@ import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
-import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
 import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
-import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
+import com.intrbiz.bergamot.cluster.consumer.hz.HZNotificationConsumer;
+import com.intrbiz.bergamot.cluster.consumer.hz.HZProcessorConsumer;
+import com.intrbiz.bergamot.cluster.consumer.hz.HZWorkerConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.hz.HZCheckDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.hz.HZNotificationDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.hz.HZProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.election.LeaderElector;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyClusterLookup;
-import com.intrbiz.bergamot.cluster.lookup.ProxyKeyClusterLookup;
+import com.intrbiz.bergamot.cluster.lookup.hz.HZAgentKeyClusterLookup;
+import com.intrbiz.bergamot.cluster.lookup.hz.HZProxyKeyClusterLookup;
 import com.intrbiz.bergamot.cluster.member.BergamotMember;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistry;
 import com.intrbiz.bergamot.cluster.registry.NotifierRegistry;
@@ -57,9 +61,9 @@ public class BergamotProcessor extends BergamotMember
     
     // lookups
     
-    private final AgentKeyClusterLookup agentKeyLookup;
+    private final HZAgentKeyClusterLookup agentKeyLookup;
     
-    private final ProxyKeyClusterLookup proxyKeyLookup;
+    private final HZProxyKeyClusterLookup proxyKeyLookup;
     
     // registries
     
@@ -126,8 +130,8 @@ public class BergamotProcessor extends BergamotMember
         this.updateTopic = new SiteUpdateTopic(this.hazelcast);
         this.schedulingTopic = new SchedulingTopic(this.hazelcast);
         // lookups
-        this.agentKeyLookup = new AgentKeyClusterLookup(this.hazelcast);
-        this.proxyKeyLookup = new ProxyKeyClusterLookup(this.hazelcast);
+        this.agentKeyLookup = new HZAgentKeyClusterLookup(this.hazelcast);
+        this.proxyKeyLookup = new HZProxyKeyClusterLookup(this.hazelcast);
         // registries
         this.workerRegistry = new WorkerRegistry(this.zooKeeper.getZooKeeper());
         this.agentRegistry = new AgentRegistry(this.zooKeeper.getZooKeeper());
@@ -144,16 +148,16 @@ public class BergamotProcessor extends BergamotMember
             this.poolElectors[i] = new SchedulingPoolElector(this.zooKeeper.getZooKeeper(), i, this.id);
         }
         // dispatchers
-        this.checkDispatcher = new CheckDispatcher(this.workerRegistry, this.agentRegistry, this.hazelcast);
-        this.notificationDispatcher = new NotificationDispatcher(this.notifierRegistry, this.hazelcast);
-        this.processorDispatcher = new ProcessorDispatcher(this.hazelcast, this.processorRegistry.getRouteTable());
+        this.checkDispatcher = new HZCheckDispatcher(this.workerRegistry, this.agentRegistry, this.hazelcast);
+        this.notificationDispatcher = new HZNotificationDispatcher(this.notifierRegistry, this.hazelcast);
+        this.processorDispatcher = new HZProcessorDispatcher(this.hazelcast, this.processorRegistry.getRouteTable());
         // services
         this.scheduler = new WheelScheduler(this.id, this.checkDispatcher, this.processorDispatcher);
         this.resultProcessor = new DefaultResultProcessor(this.schedulingTopic, this.notificationDispatcher, this.notificationTopic, this.updateTopic);
         this.readingProcessor = new DefaultReadingProcessor();
         this.agentRegistrationService = new AgentRegistrationService(this.schedulingTopic, this.notificationDispatcher, this.poolElectors.length);
         // consumer
-        this.processorConsumer = new ProcessorConsumer(this.hazelcast, this.id);
+        this.processorConsumer = new HZProcessorConsumer(this.hazelcast, this.id);
         // scheduling controller
         this.schedulingController = new SchedulingPoolsController(this.poolElectors, this.scheduler, this.schedulingTopic);
         // processor executor
@@ -163,13 +167,13 @@ public class BergamotProcessor extends BergamotMember
                 this.poolElectors, 
                 this.leaderElector, 
                 this.processorRegistry,
-                (id) -> new ProcessorConsumer(this.hazelcast, id),
+                (id) -> new HZProcessorConsumer(this.hazelcast, id),
                 this.processorDispatcher,
                 this.workerRegistry,
-                (id) -> new WorkerConsumer(this.hazelcast, id),
+                (id) -> new HZWorkerConsumer(this.hazelcast, id),
                 this.checkDispatcher,
                 this.notifierRegistry,
-                (id) -> new NotificationConsumer(this.hazelcast, id),
+                (id) -> new HZNotificationConsumer(this.hazelcast, id),
                 this.notificationDispatcher
         );
     }
@@ -273,12 +277,12 @@ public class BergamotProcessor extends BergamotMember
         return this.schedulingTopic;
     }
 
-    public AgentKeyClusterLookup getAgentKeyLookup()
+    public HZAgentKeyClusterLookup getAgentKeyLookup()
     {
         return this.agentKeyLookup;
     }
     
-    public ProxyKeyClusterLookup getProxyKeyLookup()
+    public HZProxyKeyClusterLookup getProxyKeyLookup()
     {
         return this.proxyKeyLookup;
     }
