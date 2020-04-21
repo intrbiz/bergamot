@@ -32,10 +32,6 @@ public abstract class BergamotClient
     
     protected final UUID id;
     
-    protected final String application;
-    
-    protected final String info;
-    
     protected final String hostName;
     
     protected final Consumer<Void> onPanic;
@@ -46,14 +42,12 @@ public abstract class BergamotClient
     
     protected final AtomicBoolean paniced = new AtomicBoolean(false);
     
-    public BergamotClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
+    public BergamotClient(ClusterCfg config, Consumer<Void> onPanic) throws Exception
     {
         super();
         this.config = Objects.requireNonNull(config);
         this.onPanic = Objects.requireNonNull(onPanic);
         this.id = UUID.randomUUID();
-        this.application = application;
-        this.info = info;
         this.hostName = this.getHostName();
         // Connect
         logger.info("Connecting to Bergamot Cluster");

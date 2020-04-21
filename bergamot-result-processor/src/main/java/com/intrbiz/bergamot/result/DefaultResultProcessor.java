@@ -57,6 +57,7 @@ import com.intrbiz.bergamot.model.state.CheckTransition;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
+import com.intrbiz.data.DataException;
 
 public class DefaultResultProcessor extends AbstractResultProcessor
 {
@@ -130,98 +131,120 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             return;
         }
         // start the transaction
-        try (BergamotDB db = BergamotDB.connect())
+        for (int attempt = 0; attempt < 3; attempt++)
         {
-            db.execute(() -> {
-                Check<?, ?> check = this.matchCheck(db, resultMO);
-                // should be process this result?
-                if (! (check instanceof RealCheck))
+            try
+            {
+                try (BergamotDB db = BergamotDB.connect())
                 {
-                    logger.warn("Failed to match result to a real check: " + resultMO.getId() + ", discarding!");
-                    return;
-                }
-                // account this processing
-                // account
-                this.accounting.account(new ProcessResultAccountingEvent(check.getSiteId(), resultMO.getId(), check.getId(), resultMO instanceof ActiveResult ? ResultType.ACTIVE : ResultType.PASSIVE));
-                // only process for enabled checks
-                if (!check.isEnabled())
-                {
-                    logger.warn("Discarding result " + resultMO.getId() + " for " + check.getType() + "::" + check.getId() + " because it is disabled.");
-                    return;
-                }
-                // update the state
-                // apply the result
-                Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
-                logger.info("State change for " + check.getType() + "::" + check.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange + ", in downtime: " + transition.nextState.isInDowntime());
-                // log the transition
-                db.logCheckTransition(transition.toCheckTransition(check.getSite().randomObjectId(), check.getId(), new Timestamp(resultMO.getProcessed())));
-                // update the check state
-                db.setCheckState(transition.nextState);
-                // make our state available as soon as possible
-                db.commit();
-                // compute the check stats
-                if (resultMO instanceof ActiveResult)
-                {
-                    CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), (ActiveResult) resultMO);
-                    db.setCheckStats(stats);
-                    // saved state
-                    if (resultMO instanceof ActiveResult)
-                    {
-                        ActiveResult arm = (ActiveResult) resultMO;
-                        if (arm.getSavedState() != null)
+                    db.execute(() -> {
+                        Check<?, ?> check = this.matchCheck(db, resultMO);
+                        // should be process this result?
+                        if (! (check instanceof RealCheck))
                         {
-                            db.setCheckSavedState(new CheckSavedState(check.getId(), arm.getSavedState()));
+                            logger.warn("Failed to match result to a real check: " + resultMO.getId() + ", discarding!");
+                            return;
                         }
-                    }
+                        // account this processing
+                        // account
+                        this.accounting.account(new ProcessResultAccountingEvent(check.getSiteId(), resultMO.getId(), check.getId(), resultMO instanceof ActiveResult ? ResultType.ACTIVE : ResultType.PASSIVE));
+                        // only process for enabled checks
+                        if (!check.isEnabled())
+                        {
+                            logger.warn("Discarding result " + resultMO.getId() + " for " + check.getType() + "::" + check.getId() + " because it is disabled.");
+                            return;
+                        }
+                        // update the state
+                        // apply the result
+                        Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
+                        logger.info("State change for " + check.getType() + "::" + check.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange + ", in downtime: " + transition.nextState.isInDowntime());
+                        // log the transition
+                        db.logCheckTransition(transition.toCheckTransition(check.getSite().randomObjectId(), check.getId(), new Timestamp(resultMO.getProcessed())));
+                        // update the check state
+                        db.setCheckState(transition.nextState);
+                        // make our state available as soon as possible
+                        db.commit();
+                        // compute the check stats
+                        if (resultMO instanceof ActiveResult)
+                        {
+                            CheckStats stats = this.computeStats(((RealCheck<?,?>) check).getStats(), (ActiveResult) resultMO);
+                            db.setCheckStats(stats);
+                            // saved state
+                            if (resultMO instanceof ActiveResult)
+                            {
+                                ActiveResult arm = (ActiveResult) resultMO;
+                                if (arm.getSavedState() != null)
+                                {
+                                    db.setCheckSavedState(new CheckSavedState(check.getId(), arm.getSavedState()));
+                                }
+                            }
+                        }
+                        // reschedule active checks if we have changed state at all
+                        if ((check instanceof ActiveCheck) && transition.hasSchedulingChanged())
+                        {
+                            // inform the scheduler to reschedule this check
+                            long interval = ((ActiveCheck<?,?>) check).computeCurrentInterval(transition.nextState);
+                            logger.info("Sending reschedule for " + check.getType() + "::" + check.getId() + "[" + check.getName() + "]");
+                            this.rescheduleCheck((ActiveCheck<?,?>) check, interval);
+                        }
+                        // send the general state update notifications
+                        this.sendCheckStateUpdate(db, check, transition);
+                        // send group updates
+                        if (transition.hasChanged())
+                        {
+                            // group update
+                            this.sendGroupStateUpdate(db, check, transition);
+                            // location update
+                            if (check instanceof Host)
+                            {
+                                this.sendLocationStateUpdate(db, (Host) check, transition);
+                            }
+                        }
+                        // send notifications
+                        if (transition.alert)
+                        {
+                            this.sendAlert(check, db);
+                        }
+                        else if (transition.recovery)
+                        {
+                            this.sendRecovery(check, db);
+                        }
+                        else if (transition.hasGotWorse())
+                        {
+                            // we should send another alert notification as the situation has gotten worse
+                            this.resendAlert(check, db);
+                        }
+                        else if (transition.previousState.isHardNotOk() && transition.nextState.isHardNotOk())
+                        {
+                            // we are in a hard not ok state, we should check the escalation policies
+                            this.processEscalation(check, db);
+                        }
+                        // update notifications, don't send if we've sent an alert
+                        if (!(transition.alert || transition.recovery || transition.hasGotWorse()))
+                        {
+                            this.sendUpdate(check, db);   
+                        }
+                        // update any virtual checks
+                        this.updateVirtualChecks(check, transition, resultMO, db);
+                    });
                 }
-                // reschedule active checks if we have changed state at all
-                if ((check instanceof ActiveCheck) && transition.hasSchedulingChanged())
+                break;
+            }
+            catch (DataException de)
+            {
+                logger.warn("Database error while computing check transition, retrying", de);
+                try
                 {
-                    // inform the scheduler to reschedule this check
-                    long interval = ((ActiveCheck<?,?>) check).computeCurrentInterval(transition.nextState);
-                    logger.info("Sending reschedule for " + check.getType() + "::" + check.getId() + "[" + check.getName() + "]");
-                    this.rescheduleCheck((ActiveCheck<?,?>) check, interval);
+                    Thread.sleep((attempt + 1) * 100);
                 }
-                // send the general state update notifications
-                this.sendCheckStateUpdate(db, check, transition);
-                // send group updates
-                if (transition.hasChanged())
+                catch (InterruptedException e)
                 {
-                    // group update
-                    this.sendGroupStateUpdate(db, check, transition);
-                    // location update
-                    if (check instanceof Host)
-                    {
-                        this.sendLocationStateUpdate(db, (Host) check, transition);
-                    }
                 }
-                // send notifications
-                if (transition.alert)
-                {
-                    this.sendAlert(check, db);
-                }
-                else if (transition.recovery)
-                {
-                    this.sendRecovery(check, db);
-                }
-                else if (transition.hasGotWorse())
-                {
-                    // we should send another alert notification as the situation has gotten worse
-                    this.resendAlert(check, db);
-                }
-                else if (transition.previousState.isHardNotOk() && transition.nextState.isHardNotOk())
-                {
-                    // we are in a hard not ok state, we should check the escalation policies
-                    this.processEscalation(check, db);
-                }
-                // update notifications, don't send if we've sent an alert
-                if (!(transition.alert || transition.recovery || transition.hasGotWorse()))
-                {
-                    this.sendUpdate(check, db);   
-                }
-                // update any virtual checks
-                this.updateVirtualChecks(check, transition, resultMO, db);
-            });
+            }
+            catch (Exception e)
+            {
+                logger.error("Error while computing check transition", e);
+            }
         }
     }
 

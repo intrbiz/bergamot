@@ -17,8 +17,8 @@
     <command name="dummy-random-check" extends="dummy-check" executor="random">
         <summary>A random dummy check</summary>
         <description>A random dummy check which will randomly change state</description>
-        <parameter description="Warning"  name="warning">0.7</parameter>
-        <parameter description="Critical" name="critical">0.9</parameter>
+        <parameter description="Warning"  name="warning">0.97</parameter>
+        <parameter description="Critical" name="critical">0.99</parameter>
         <parameter description="Check output" name="output">Look at me, I'm random</parameter>
     </command>
     

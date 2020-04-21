@@ -84,6 +84,10 @@
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>crypto</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-proxy-common</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

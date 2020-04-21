@@ -33,9 +33,6 @@ public class CheckMessage extends Message implements ParameterisedMO
     
     @JsonProperty("worker_pool")
     private String workerPool;
-    
-    @JsonProperty("processor")
-    private UUID processor;
 
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>(); 
@@ -47,6 +44,18 @@ public class CheckMessage extends Message implements ParameterisedMO
      */
     @JsonProperty("adhoc_id")
     private UUID adhocId;
+    
+    /**
+     * The processor responsible for this check
+     */
+    @JsonProperty("processor")
+    private UUID processor;
+    
+    /**
+     * The worker that is going to execute this check
+     */
+    @JsonProperty("worker")
+    private UUID worker;
     
     public CheckMessage()
     {
@@ -153,5 +162,15 @@ public class CheckMessage extends Message implements ParameterisedMO
     public void setAdhocId(UUID adhocId)
     {
         this.adhocId = adhocId;
+    }
+
+    public UUID getWorker()
+    {
+        return this.worker;
+    }
+
+    public void setWorker(UUID worker)
+    {
+        this.worker = worker;
     }
 }

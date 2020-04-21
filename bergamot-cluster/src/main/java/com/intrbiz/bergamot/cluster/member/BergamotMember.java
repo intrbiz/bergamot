@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.LifecycleEvent;
@@ -106,20 +107,38 @@ public abstract class BergamotMember
     protected Config configureHazelcast(Config config)
     {
         // Configure the processors queue
-        config.getQueueConfig(HZNames.buildProcessorQueueName(null))
-            .setBackupCount(0)
-            .setAsyncBackupCount(0)
-            .setMaxSize(1_000);
-        // Configure the worker queues
-        config.getQueueConfig(HZNames.buildWorkerQueueName(null))
-            .setBackupCount(0)
-            .setAsyncBackupCount(0)
-            .setMaxSize(250);
-        // Configure the notifier queues
-        config.getQueueConfig(HZNames.buildWorkerQueueName(null))
+        config.getRingbufferConfig(HZNames.buildProcessorRingbufferName(null))
             .setBackupCount(1)
             .setAsyncBackupCount(0)
-            .setMaxSize(5_000);
+            .setCapacity(5000)
+            .setInMemoryFormat(InMemoryFormat.BINARY)
+            .setTimeToLiveSeconds(300_000);
+        config.getMapConfig(HZNames.buildProcessorsSequenceMapName())
+            .setBackupCount(0)
+            .setAsyncBackupCount(1)
+            .setInMemoryFormat(InMemoryFormat.BINARY);
+        // Configure the worker queues
+        config.getRingbufferConfig(HZNames.buildWorkerRingbufferName(null))
+            .setBackupCount(1)
+            .setAsyncBackupCount(0)
+            .setCapacity(1000)
+            .setInMemoryFormat(InMemoryFormat.BINARY)
+            .setTimeToLiveSeconds(300_000);
+        config.getMapConfig(HZNames.buildWorkersSequenceMapName())
+            .setBackupCount(0)
+            .setAsyncBackupCount(1)
+            .setInMemoryFormat(InMemoryFormat.BINARY);
+        // Configure the notifier queues
+        config.getRingbufferConfig(HZNames.buildNotifierRingbufferName(null))
+            .setBackupCount(1)
+            .setAsyncBackupCount(0)
+            .setCapacity(5000)
+            .setInMemoryFormat(InMemoryFormat.BINARY)
+            .setTimeToLiveSeconds(300_000);
+        config.getMapConfig(HZNames.buildNotifiersSequenceMapName())
+            .setBackupCount(1)
+            .setAsyncBackupCount(0)
+            .setInMemoryFormat(InMemoryFormat.BINARY);
         // Configure site notification topic
         config.getReliableTopicConfig(HZNames.getSiteNotificationTopicName(null))
             .setTopicOverloadPolicy(TopicOverloadPolicy.DISCARD_OLDEST);

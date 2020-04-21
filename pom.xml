@@ -149,6 +149,10 @@
 		<module>bergamot-processor</module>
 		<module>bergamot-notifier</module>
 		<module>bergamot-site-config-template</module>
+		<module>bergamot-proxy-common</module>
+		<module>bergamot-proxy-server</module>
+		<module>bergamot-proxy-client</module>
+		<module>bergamot-proxy</module>
 	</modules>
 
 	<dependencyManagement>
@@ -276,6 +280,26 @@
 			<dependency>
 				<groupId>com.intrbiz.bergamot</groupId>
 				<artifactId>bergamot-notifier</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-proxy-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-proxy-server</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-proxy-client</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-proxy</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

@@ -22,6 +22,14 @@
 				    <span class="value">#{ucFirst(lc(processor_leaders.get(processor.id).state))}</span>
 			    </p>
 			    <p>
+				    <span class="label">Dispatcher: </span>
+				    <span class="value">#{processor_tail.get(processor.id)}</span>
+			    </p>
+			    <p>
+				    <span class="label">Consumer: </span>
+				    <span class="value">#{processor_commited.get(processor.id)}</span>
+			    </p>
+			    <p>
 				    <span class="label">Host: </span>
 				    <span class="value">#{processor.hostName}</span>
 			    </p>
@@ -67,6 +75,14 @@
 				    <span class="value">#{coalesce(worker.workerPool, 'any')}</span>
 			    </p>
 			    <p>
+				    <span class="label">Dispatcher: </span>
+				    <span class="value">#{worker_tail.get(worker.id)}</span>
+			    </p>
+			    <p>
+				    <span class="label">Consumer: </span>
+				    <span class="value">#{worker_commited.get(worker.id)}</span>
+			    </p>
+			    <p>
 				    <span class="label">Host: </span>
 				    <span class="value">#{worker.hostName}</span>
 			    </p>
@@ -89,6 +105,14 @@
 					<span class="name">#{ucFirst(coalesce(notifier.application, 'Notifier'))}</span>
 					<span class="name" style="font-size: 12px">(#{notifier.id})</span>
 			    </h3>
+			    <p>
+				    <span class="label">Dispatcher: </span>
+				    <span class="value">#{notifier_tail.get(notifier.id)}</span>
+			    </p>
+			    <p>
+				    <span class="label">Consumer: </span>
+				    <span class="value">#{notifier_commited.get(notifier.id)}</span>
+			    </p>
 			    <p>
 				    <span class="label">Host: </span>
 				    <span class="value">#{notifier.hostName}</span>

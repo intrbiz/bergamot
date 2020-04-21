@@ -1,13 +1,10 @@
 package com.intrbiz.bergamot.model.message.cluster;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.MessageObject;
@@ -51,6 +48,9 @@ public class NotifierRegistration extends MessageObject implements Comparable<No
     @JsonProperty("proxy")
     private boolean proxy;
     
+    @JsonProperty("proxy_id")
+    private UUID proxyId;
+    
     /**
      * The worker application string
      */
@@ -71,17 +71,23 @@ public class NotifierRegistration extends MessageObject implements Comparable<No
         super();
     }
     
-    public NotifierRegistration(UUID id, long registered, boolean proxy, String application, String info, String hostName, Set<UUID> restrictedSiteIds, Set<String> availableEngines)
+    public NotifierRegistration(UUID id, long registered, boolean proxy, UUID proxyId, String application, String info, String hostName, Set<UUID> restrictedSiteIds, Set<String> availableEngines)
     {
         super();
         this.id = Objects.requireNonNull(id);
         this.registered = registered;
         this.proxy = proxy;
+        this.proxyId = proxyId;
         this.application = application;
         this.info = info;
         this.hostName = hostName;
         this.restrictedSiteIds = (restrictedSiteIds == null || restrictedSiteIds.isEmpty()) ? new HashSet<>() : restrictedSiteIds;
         this.availableEngines = Objects.requireNonNull(availableEngines);
+    }
+    
+    public NotifierRegistration(UUID id, long registered, String application, String info, String hostName, Set<UUID> restrictedSiteIds, Set<String> availableEngines)
+    {
+        this(id, registered, false, null, application, info, hostName, restrictedSiteIds, availableEngines);
     }
 
     public UUID getId()
@@ -138,61 +144,15 @@ public class NotifierRegistration extends MessageObject implements Comparable<No
     {
         this.id = id;
     }
-    
-    @JsonIgnore
-    public NotifierRegistration registered(long registered)
-    {
-        this.registered = registered;
-        return this;
-    }
-    
-    @JsonIgnore
-    public NotifierRegistration id(UUID id)
-    {
-        this.id = id;
-        return this;
-    }
 
     public void setRestrictedSiteIds(Set<UUID> restrictedSiteIds)
     {
         this.restrictedSiteIds = restrictedSiteIds;
     }
-    
-    @JsonIgnore
-    public NotifierRegistration restrictedSiteIds(UUID... restrictedSiteIds)
-    {
-        if (this.restrictedSiteIds == null) this.restrictedSiteIds = new HashSet<>();
-        Collections.addAll(this.restrictedSiteIds, restrictedSiteIds);
-        return this;
-    }
-    
-    @JsonIgnore
-    public NotifierRegistration restrictedSiteIds(Collection<UUID> restrictedSiteIds)
-    {
-        if (this.restrictedSiteIds == null) this.restrictedSiteIds = new HashSet<>();
-        this.restrictedSiteIds.addAll(restrictedSiteIds);
-        return this;
-    }
 
     public void setAvailableEngines(Set<String> availableEngines)
     {
         this.availableEngines = availableEngines;
-    }
-    
-    @JsonIgnore
-    public NotifierRegistration availableEngines(String... availableEngines)
-    {
-        if (this.availableEngines == null) this.availableEngines = new HashSet<>();
-        Collections.addAll(this.availableEngines, availableEngines);
-        return this;
-    }
-    
-    @JsonIgnore
-    public NotifierRegistration availableEngines(Collection<String> availableEngines)
-    {
-        if (this.availableEngines == null) this.availableEngines = new HashSet<>();
-        this.availableEngines.addAll(availableEngines);
-        return this;
     }
 
     public void setProxy(boolean proxy)
@@ -220,14 +180,15 @@ public class NotifierRegistration extends MessageObject implements Comparable<No
     {
         this.hostName = hostName;
     }
-    
-    @JsonIgnore
-    public NotifierRegistration info(String application, String hostName, String info)
+
+    public UUID getProxyId()
     {
-        this.application = application;
-        this.hostName = hostName;
-        this.info = info;
-        return this;
+        return this.proxyId;
+    }
+
+    public void setProxyId(UUID proxyId)
+    {
+        this.proxyId = proxyId;
     }
 
     @Override

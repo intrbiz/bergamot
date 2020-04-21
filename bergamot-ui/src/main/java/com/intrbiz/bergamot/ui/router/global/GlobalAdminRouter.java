@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -12,12 +13,17 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
+import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
+import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
+import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
+import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
@@ -55,16 +61,48 @@ public class GlobalAdminRouter extends Router<BergamotApp>
     public void index(BergamotDB db, @Param("level") @IsaInt(defaultValue = 0, coalesce = CoalesceMode.ALWAYS) Integer level) throws Exception
     {
         // workers, notifiers, processing pools and other cluster information
-        var("workers", app().getProcessor().getWorkerRegistry().getWorkers());
+        // workers
+        Set<WorkerRegistration> workers = app().getProcessor().getWorkerRegistry().getWorkers();
+        var("workers", workers);
         var("worker_route_table", app().getProcessor().getWorkerRegistry().getRouteTable().toString());
-        var("notifiers", app().getProcessor().getNotifierRegistry().getNotifiers());
+        Map<UUID, Long> workerTails = new HashMap<UUID, Long>();
+        Map<UUID, Long> workerCommited = new HashMap<UUID, Long>();
+        for (WorkerRegistration worker : workers)
+        {
+            // TODO: we should have a task computing real stats somewhere
+            WorkerConsumer consumer = new WorkerConsumer(app().getProcessor().getHazelcast(), worker.getId());
+            workerTails.put(worker.getId(), consumer.getTailSequence());
+            workerCommited.put(worker.getId(), consumer.getSequence());
+        }
+        var("worker_tail", workerTails);
+        var("worker_commited", workerCommited);
+        // notifiers
+        Set<NotifierRegistration> notifiers = app().getProcessor().getNotifierRegistry().getNotifiers();
+        var("notifiers", notifiers);
         var("notifier_route_table", app().getProcessor().getNotifierRegistry().getRouteTable().toString());
+        Map<UUID, Long> notifierTails = new HashMap<UUID, Long>();
+        Map<UUID, Long> notifierCommited = new HashMap<UUID, Long>();
+        for (NotifierRegistration notifier : notifiers)
+        {
+            // TODO: we should have a task computing real stats somewhere
+            NotificationConsumer consumer = new NotificationConsumer(app().getProcessor().getHazelcast(), notifier.getId());
+            notifierTails.put(notifier.getId(), consumer.getTailSequence());
+            notifierCommited.put(notifier.getId(), consumer.getSequence());
+        }
+        var("notifier_tail", notifierTails);
+        var("notifier_commited", notifierCommited);
+        // processors
         Map<UUID, ProcessorRegistration> processors = app().getProcessor().getProcessorRegistry().getProcessors().stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
         Map<UUID, String> colours = new HashMap<>();
+        Map<UUID, Long> processorTails = new HashMap<UUID, Long>();
+        Map<UUID, Long> processorCommited = new HashMap<UUID, Long>();
         int idx = 0;
         for (ProcessorRegistration processor : processors.values())
         {
             colours.put(processor.getId(), COLOURS[idx ++ % COLOURS.length]);
+            ProcessorConsumer consumer = new ProcessorConsumer(app().getProcessor().getHazelcast(), processor.getId());
+            processorTails.put(processor.getId(), consumer.getTailSequence());
+            processorCommited.put(processor.getId(), consumer.getSequence());
         }
         Map<Integer, ProcessorRegistration> pools = new HashMap<>();
         Map<UUID, Integer> poolCounts = new HashMap<>();
@@ -79,10 +117,18 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         {
             levels.add(i);
         }
+        for (NotifierRegistration notifier : notifiers)
+        {
+            // TODO: we should have a task computing real stats somewhere
+            
+        }
         var("processors", processors.values());
         var("processor_colours", colours);
         var("processor_pools", poolCounts);
         var("processor_leaders", app().getProcessor().getLeaderElector().getElectionMembers());
+        var("processor_tail", processorTails);
+        var("processor_commited", processorCommited);
+        // pools
         var("pools", pools.entrySet());
         var("levels", levels);
         // list sites

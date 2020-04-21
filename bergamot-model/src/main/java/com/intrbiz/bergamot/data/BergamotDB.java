@@ -47,6 +47,7 @@ import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.NotificationEngine;
 import com.intrbiz.bergamot.model.Notifications;
+import com.intrbiz.bergamot.model.ProxyKey;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.SLA;
 import com.intrbiz.bergamot.model.SLAFixedPeriod;
@@ -96,7 +97,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({4, 0, 2}),
+        version = @SQLVersion({4, 0, 3}),
         tables = {
             Site.class,
             Location.class,
@@ -141,7 +142,8 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
             SLARollingPeriod.class,
             SLAFixedPeriod.class,
             SLAReport.class,
-            AgentKey.class
+            AgentKey.class,
+            ProxyKey.class
         }
 )
 public abstract class BergamotDB extends DatabaseAdapter
@@ -2108,6 +2110,25 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(table = AgentKey.class, name = "list_agent_keys", since = @SQLVersion({4, 0, 2}))
     public abstract List<AgentKey> listAgentKeys(@SQLParam("site_id") UUID siteId);
+    
+    // proxy
+    
+    @SQLSetter(table = ProxyKey.class, name = "set_proxy_key", since = @SQLVersion({4, 0, 3}))
+    public abstract void setProxyKey(ProxyKey key);
+    
+    @SQLGetter(table = ProxyKey.class, name = "get_proxy_key", since = @SQLVersion({4, 0, 3}))
+    public abstract ProxyKey getProxyKey(@SQLParam("id") UUID id);
+    
+    @SQLRemove(table = ProxyKey.class, name = "remove_proxy_key", since = @SQLVersion({4, 0, 3}))
+    public abstract void removeProxyKey(@SQLParam("id") UUID id);
+    
+    @SQLGetter(table = ProxyKey.class, name = "list_proxy_keys", since = @SQLVersion({4, 0, 3}))
+    public abstract List<ProxyKey> listProxyKeys(@SQLParam("site_id") UUID siteId);
+    
+    @SQLGetter(table = ProxyKey.class, name = "list_proxy_keys", since = @SQLVersion({4, 0, 3}), 
+            query = @SQLQuery("SELECT * FROM bergamot.proxy_key WHERE site_id IS NULL")
+    )
+    public abstract List<ProxyKey> listGlobalProxyKeys();
     
     // generic
     

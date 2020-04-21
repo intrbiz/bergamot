@@ -1,55 +1,15 @@
 package com.intrbiz.bergamot.cluster.consumer;
 
-import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
-import com.hazelcast.collection.IQueue;
 import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.bergamot.cluster.util.HZNames;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 
-public class NotificationConsumer
-{   
-    private final HazelcastInstance hazelcast;
-    
-    private final UUID id;
-    
-    private final IQueue<Notification> queue;
-    
+public class NotificationConsumer extends BaseConsumer<Notification>
+{    
     public NotificationConsumer(HazelcastInstance hazelcast, UUID id)
     {
-        super();
-        this.hazelcast = Objects.requireNonNull(hazelcast);
-        this.id = Objects.requireNonNull(id);
-        this.queue = this.hazelcast.getQueue(HZNames.buildNotifierQueueName(this.id));
-    }
-    
-    public Notification poll(long timeout, TimeUnit unit)
-    {
-        try
-        {
-            return this.queue.poll(timeout, unit);
-        }
-        catch (InterruptedException e)
-        {
-            // ignore
-        }
-        return null;
-    }
-    
-    public void drainTo(Consumer<Notification> consumer)
-    {
-        Notification notification;
-        while ((notification = this.queue.poll()) != null)
-        {
-            consumer.accept(notification);
-        }
-    }
-    
-    public void destroy()
-    {
-        this.queue.destroy();
+        super(hazelcast, id, HZNames::buildNotifierRingbufferName, HZNames::buildNotifiersSequenceMapName);
     }
 }

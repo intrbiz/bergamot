@@ -1,0 +1,14 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f33450abea5, pid=104189, tid=104206
+#
+# JRE version: OpenJDK Runtime Environment (11.0.6+10) (build 11.0.6+10-suse-3.1-x8664)
+# Java VM: OpenJDK 64-Bit Server VM (11.0.6+10-suse-3.1-x8664, mixed mode, tiered, compressed oops, g1 gc, linux-amd64)
+# Problematic frame:
+# C  [libjimage.so+0x2ea5]  ImageStrings::find(Endian*, char const*, int*, unsigned int)+0x65
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h" (or dumping to /home/cellis/Intrbiz/workspace2/bergamot/bergamot-ui/core.104189)
+#
+# If you would like to submit a bug report, please visit:
+#   

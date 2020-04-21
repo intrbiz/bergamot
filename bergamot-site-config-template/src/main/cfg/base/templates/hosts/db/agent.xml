@@ -10,7 +10,7 @@
             <check-command command="check_agent_process_mysql"/>
         </service>
         
-        <service extends="web-service" name="listener-mysql">
+        <service extends="db-service" name="listener-mysql">
             <summary>Port Listener: MySQL</summary>
             <check-command command="check-agent-listener-mysql"/>
         </service>
@@ -24,7 +24,7 @@
             <check-command command="check-agent-process-postgresql"/>
         </service>
         
-        <service extends="web-service" name="listener-postgresql">
+        <service extends="db-service" name="listener-postgresql">
             <summary>Port Listener: PostgreSQL</summary>
             <check-command command="check-agent-listener-postgresql"/>
         </service>

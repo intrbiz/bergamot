@@ -1,55 +1,15 @@
 package com.intrbiz.bergamot.cluster.consumer;
 
-import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
-import com.hazelcast.collection.IQueue;
 import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.bergamot.cluster.util.HZNames;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 
-public class WorkerConsumer
-{   
-    private final HazelcastInstance hazelcast;
-    
-    private final UUID id;
-    
-    private final IQueue<ExecuteCheck> queue;
-    
+public class WorkerConsumer extends BaseConsumer<ExecuteCheck>
+{
     public WorkerConsumer(HazelcastInstance hazelcast, UUID id)
     {
-        super();
-        this.hazelcast = Objects.requireNonNull(hazelcast);
-        this.id = Objects.requireNonNull(id);
-        this.queue = this.hazelcast.getQueue(HZNames.buildWorkerQueueName(this.id));
-    }
-    
-    public ExecuteCheck poll(long timeout, TimeUnit unit)
-    {
-        try
-        {
-            return this.queue.poll(timeout, unit);
-        }
-        catch (InterruptedException e)
-        {
-            // ignore
-        }
-        return null;
-    }
-    
-    public void drainTo(Consumer<ExecuteCheck> consumer)
-    {
-        ExecuteCheck check;
-        while ((check = this.queue.poll()) != null)
-        {
-            consumer.accept(check);
-        }
-    }
-    
-    public void destroy()
-    {
-        this.queue.destroy();
+        super(hazelcast, id, HZNames::buildWorkerRingbufferName, HZNames::buildWorkersSequenceMapName);
     }
 }

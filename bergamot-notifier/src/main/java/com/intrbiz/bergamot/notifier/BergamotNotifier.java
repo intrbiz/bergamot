@@ -11,8 +11,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 import org.apache.log4j.ConsoleAppender;
@@ -20,8 +21,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
-import com.hazelcast.client.HazelcastClientNotActiveException;
-import com.hazelcast.spi.exception.TargetDisconnectedException;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.NotifierClient;
@@ -36,6 +35,7 @@ import com.intrbiz.bergamot.notification.engine.sms.SMSEngine;
 import com.intrbiz.bergamot.notification.engine.webhook.WebHookEngine;
 import com.intrbiz.configuration.Configurable;
 import com.intrbiz.configuration.Configuration;
+import com.intrbiz.util.IBThreadFactory;
 
 public class BergamotNotifier implements Configurable<NotifierCfg>
 {   
@@ -55,10 +55,6 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         AVAILABLE_ENGINES.add(new AvailableEngine(WebHookEngine.NAME, WebHookEngine::new, true));
     }
     
-    private static final int CONNECTION_ERROR_LIMIT = 60;
-    
-    private final UUID id = UUID.randomUUID();
-    
     private NotifierCfg configuration;
     
     private Map<String, NotificationEngine> engines = new TreeMap<String, NotificationEngine>();
@@ -69,13 +65,9 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     private NotifierClient client;
     
-    private Thread[] threads;
-
-    private CountDownLatch executorLatch;
+    private ExecutorService executor;
     
     private CountDownLatch shutdownLatch;
-    
-    private AtomicBoolean run;
     
     public BergamotNotifier()
     {
@@ -90,11 +82,6 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     public final Set<UUID> getSites()
     {
         return this.sites;
-    }
-    
-    public final UUID getId()
-    {
-        return this.id;
     }
 
     public final Collection<NotificationEngine> getEngines()
@@ -156,13 +143,13 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         // prepare our engines
         this.prepareEngines();
         // prepare our executors
-        this.createExecutors();
+        this.createExecutor();
         // connect to the scheduler
-        this.connectScheduler();
+        this.connectCluster();
         // start our engines
         this.startEngines();
         // start our executors
-        this.startExecutors();
+        this.startConsuming();
     }
     
     protected void prepareEngines() throws Exception
@@ -185,94 +172,23 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         };
     }
     
-    protected void connectScheduler() throws Exception
+    protected void connectCluster() throws Exception
     {
         this.client = new NotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
-        this.client.register(this.sites, this.engines.keySet());
-    }
-    
-    protected void createExecutors() throws Exception
-    {
-        logger.info("Creating " + this.threadCount + " notification executors");
-        this.executorLatch = new CountDownLatch(this.threadCount);
-        this.run = new AtomicBoolean(false);
-        this.threads = new Thread[this.threadCount];
-        for (int i = 0; i < this.threads.length; i++)
-        {
-            final int threadNum = i;
-            this.threads[i] = new Thread(() -> {
-                int connectionErrors = 0;
-                try
-                {
-                    logger.debug("Notifier executor " + threadNum + " starting.");
-                    while (this.run.get())
-                    {
-                        try
-                        {
-                            // get a notification to send
-                            Notification notification = this.client.getConsumer().poll(5, TimeUnit.SECONDS);
-                            if (notification != null)
-                            {
-                                if (logger.isTraceEnabled())
-                                    logger.trace("Sending notification: " + notification);
-                                // send the notification for the requested engine
-                                NotificationEngine engine = this.engines.get(notification.getEngine());
-                                if (engine != null && engine.accept(notification))
-                                {
-                                    engine.sendNotification(notification);
-                                }
-                            }
-                            connectionErrors = 0;
-                        }
-                        catch (TargetDisconnectedException | HazelcastClientNotActiveException e)
-                        {
-                            if (this.run.get())
-                            {
-                                connectionErrors ++;
-                                if (connectionErrors > CONNECTION_ERROR_LIMIT)
-                                {
-                                    logger.fatal("Got too many connection errors from Hazelcast, shutting down!");
-                                    this.clusterPanic(null);
-                                }
-                                try
-                                {
-                                    Thread.sleep(5_000);
-                                }
-                                catch (InterruptedException ie)
-                                {
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            logger.error("Error sending notification", e);
-                        }
-                    }
-                    logger.debug("Notifier executor " + threadNum + " stopped.");
-                }
-                finally
-                {
-                    this.executorLatch.countDown();
-                }
-            }, "Bergamot-Notifier-Executor-" + i);
-        }
+        this.client.registerNotifier(this.sites, this.engines.keySet());
     }
     
     protected void clusterPanic(Void v)
     {
         logger.fatal("Connection to cluster lost, forcing shutdown now!");
         // Trigger a shutdown
-        this.triggerShutdown(false);
+        this.stop();
     }
     
-    protected void startExecutors() throws Exception
+    protected void createExecutor() throws Exception
     {
-        logger.info("Starting " + this.threads.length + " notification executors");
-        this.run.set(true);
-        for (int i = 0; i < this.threads.length; i++)
-        {
-            this.threads[i].start();
-        }
+        logger.info("Creating " + this.threadCount + " notification executors");
+        this.executor = Executors.newFixedThreadPool(this.threadCount, new IBThreadFactory("bergamot-notifier-executor", true));
     }
     
     protected void startEngines() throws Exception
@@ -284,23 +200,88 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         }
     }
     
-    public void run() throws Exception
+    protected void startConsuming() throws Exception
     {
-        // Start this worker
-        this.start();
-        // Await for all execution threads
-        this.awaitExecutors();
-        // Stop this worker
-        this.stop();
+        logger.info("Starting consuming notifications");
+        this.client.getNotifierConsumer().start(this::sendNotification);
+    }
+
+    protected void sendNotification(Notification notification)
+    {
+        if (notification != null)
+        {
+            this.executor.execute(() -> {
+                if (logger.isTraceEnabled()) logger.trace("Sending notification: " + notification);
+                try
+                {
+                 // send the notification for the requested engine
+                    NotificationEngine engine = this.engines.get(notification.getEngine());
+                    if (engine != null && engine.accept(notification))
+                    {
+                        engine.sendNotification(notification);
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.error("Error sending notification", e);
+                    // TODO: We should ack notifications or similar
+                }
+            });
+        }
     }
     
+    protected void stopConsuming()
+    {
+        logger.info("Stopping consuming notifications");
+        this.client.getNotifierConsumer().stop();
+    }
+
+    protected void shutdownEngines()
+    {
+        for (NotificationEngine engine : this.getEngines())
+        {
+            logger.info("Shutting down notification engine: " + engine.getName());
+            engine.shutdown(this.createEngineContext(engine));
+        }
+    }
+
+    protected void shutdownExecutor()
+    {
+        this.executor.shutdown();
+        try
+        {
+            this.executor.awaitTermination(30, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException e)
+        {
+        }
+    }
+
+    protected void disconnectScheduler()
+    {
+        logger.info("Disconnecting from cluster");
+        try
+        {
+            this.client.unregisterNotifier();
+        }
+        catch (Exception e)
+        {
+            // ignore
+        }
+        this.client.close();
+    }
+
     protected void stop()
     {
         try
         {
             logger.info("Bergamot Notifier stopping....");
+            // Stop consuming
+            this.stopConsuming();
             // Shutdown all engines
             this.shutdownEngines();
+            // Shutdown executors
+            this.shutdownExecutor();
             // Disconnect from the scheduler
             this.disconnectScheduler();
             logger.info("Bergamot Notifier stopped.");
@@ -310,66 +291,16 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             this.shutdownLatch.countDown();
         }
     }
-    
-    protected void awaitExecutors()
+
+    public void awaitShutdown()
     {
-        // Wait for all executors to notify the latch
-        while (true)
-        {
-            try
-            {
-                this.executorLatch.await();
-                break;
-            }
-            catch (InterruptedException e)
-            {
-            }
-        }
-        this.threads = null;
-        this.executorLatch = null;
-    }
-    
-    protected void shutdownEngines()
-    {
-        for (NotificationEngine engine : this.getEngines())
-        {
-            logger.info("Shutting down notification engine: " + engine.getName());
-            engine.shutdown(this.createEngineContext(engine));
-        }
-    }
-    
-    public void triggerShutdown(boolean await)
-    {
-        if (this.run.compareAndSet(true, false))
-        {
-            logger.info("Shutting down Bergamot Worker");
-            // Wait for the shutdown to complete
-            while (await)
-            {
-                try
-                {
-                    this.shutdownLatch.await();
-                    break;
-                }
-                catch (InterruptedException e)
-                {
-                }
-            }
-        }
-    }
-    
-    protected void disconnectScheduler()
-    {
-        logger.info("Disconnecting from cluster");
         try
         {
-            this.client.unregister();
+            this.shutdownLatch.await();
         }
-        catch (Exception e)
+        catch (InterruptedException e)
         {
-            // ignore
         }
-        this.client.close();
     }
     
     /**
@@ -391,18 +322,18 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             // Register a shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Triggering shutdown of Bergamot Notifier");
-                notifier.triggerShutdown(true);
+                notifier.stop();
             }));
-            // Start our worker
-            logger.info("Bergamot Notifier starting.");
-            notifier.run();
+            // Start our notifier
+            notifier.start();
+            notifier.awaitShutdown();
             // Terminate normally
             Thread.sleep(15_000);
             System.exit(0);
         }
         catch (Exception e)
         {
-            System.err.println("Failed to start Bergamot Worker!");
+            System.err.println("Failed to start Bergamot Notifier!");
             e.printStackTrace();
             Thread.sleep(15_000);
             System.exit(1);

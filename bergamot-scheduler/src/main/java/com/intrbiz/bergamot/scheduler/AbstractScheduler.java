@@ -46,6 +46,7 @@ public abstract class AbstractScheduler implements Scheduler
         if (executeCheck != null)
         {
             // publish the check
+            executeCheck.setProcessor(this.processorId);
             PublishStatus result = this.publishExecuteCheck(executeCheck);
             if (result == PublishStatus.Success)
             {

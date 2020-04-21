@@ -54,6 +54,7 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     protected void publishAdhocResult(ResultMessage result)
     {
         if (logger.isTraceEnabled()) logger.trace("Publishing adhoc result to " + result.getAdhocId() + " with message " + result);
+        // TODO
     }
 
     protected void rescheduleCheck(ActiveCheck<?, ?> check, long interval)

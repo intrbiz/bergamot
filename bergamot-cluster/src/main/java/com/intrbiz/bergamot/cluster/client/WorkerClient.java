@@ -20,11 +20,15 @@ import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
  */
 public class WorkerClient extends BergamotClient
 {   
-    private final WorkerRegistar registar;
+    protected final String application;
     
-    private final WorkerConsumer consumer;
+    protected final String info;
     
-    private final ProcessorDispatcher dispatcher;
+    private final WorkerRegistar workerRegistar;
+    
+    private final WorkerConsumer workerConsumer;
+    
+    private final ProcessorDispatcher processorDispatcher;
     
     private final AgentKeyClientLookup agentKeyLookup;
     
@@ -32,22 +36,24 @@ public class WorkerClient extends BergamotClient
 
     public WorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
     {
-        super(config, onPanic, application, info);
-        this.registar = new WorkerRegistar(this.zooKeeper.getZooKeeper());
+        super(config, onPanic);
+        this.application = application;
+        this.info = info;
+        this.workerRegistar = new WorkerRegistar(this.zooKeeper.getZooKeeper());
         this.agentRegistar = new AgentRegistar(this.zooKeeper.getZooKeeper());
-        this.consumer = new WorkerConsumer(this.hazelcast, this.id);
-        this.dispatcher = new ProcessorDispatcher(this.hazelcast, this.registar.getRouteTable());
+        this.workerConsumer = new WorkerConsumer(this.hazelcast, this.id);
+        this.processorDispatcher = new ProcessorDispatcher(this.hazelcast, this.workerRegistar.getRouteTable());
         this.agentKeyLookup = new AgentKeyClientLookup(this.hazelcast);
     }
 
-    public WorkerConsumer getConsumer()
+    public WorkerConsumer getWorkerConsumer()
     {
-        return this.consumer;
+        return this.workerConsumer;
     }
 
-    public ProcessorDispatcher getDispatcher()
+    public ProcessorDispatcher getProcessorDispatcher()
     {
-        return this.dispatcher;
+        return this.processorDispatcher;
     }
     
     public AgentKeyClientLookup getAgentKeyLookup()
@@ -55,14 +61,14 @@ public class WorkerClient extends BergamotClient
         return this.agentKeyLookup;
     }
     
-    public void register(Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws KeeperException, InterruptedException
+    public void registerWorker(Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws KeeperException, InterruptedException
     {     
-        this.registar.registerWorker(new WorkerRegistration(this.id, System.currentTimeMillis(), false, this.application, this.info, this.hostName, restrictedSiteIds, workerPool, availableEngines));
+        this.workerRegistar.registerWorker(new WorkerRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName, restrictedSiteIds, workerPool, availableEngines));
     }
     
-    public void unregister() throws KeeperException, InterruptedException
+    public void unregisterWorker() throws KeeperException, InterruptedException
     {
-        this.registar.unregisterWorker(this.id);
+        this.workerRegistar.unregisterWorker(this.id);
     }
 
     public void registerAgent(UUID agentId) throws KeeperException, InterruptedException

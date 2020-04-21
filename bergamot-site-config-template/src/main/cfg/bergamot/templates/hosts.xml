@@ -62,16 +62,6 @@
     <host name="bergamot-postgresql-server" extends="bergamot-server, postgresql-server-agent" template="yes">
         <summary>A Bergamot Monitoring PostgreSQL server</summary>
         
-        <service name="bergamot-postgresql" extends="bergamot-service">
-            <summary>PostgreSQL Server</summary>
-            <check-command command="check-agent-process-postgresql" />
-        </service>
-        
-        <service name="bergamot-port-postgresql" extends="bergamot-service">
-            <summary>Port: PostgreSQL</summary>
-            <check-command command="check-agent-listener-postgresql" />
-        </service>
-        
         <service name="bergamot-transitions-size" extends="bergamot-service">
             <summary>Transitions Size</summary>
             <check-command command="bergamot-transitions-size" />

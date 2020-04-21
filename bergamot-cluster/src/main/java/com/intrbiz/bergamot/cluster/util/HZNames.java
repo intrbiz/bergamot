@@ -3,20 +3,35 @@ package com.intrbiz.bergamot.cluster.util;
 import java.util.UUID;
 
 public final class HZNames
-{
-    public static final String buildWorkerQueueName(UUID workerId)
+{    
+    public static final String buildWorkersSequenceMapName()
     {
-        return "bergamot.queue.worker." + (workerId == null ? "*" : workerId.toString());
+        return "bergamot.map.workers.sequence";
     }
     
-    public static final String buildNotifierQueueName(UUID notifierId)
+    public static final String buildWorkerRingbufferName(UUID workerId)
     {
-        return "bergamot.queue.notifier." + (notifierId == null ? "*" : notifierId.toString());
+        return "bergamot.ringbuffer.worker." + (workerId == null ? "*" : workerId.toString());
     }
     
-    public static final String buildProcessorQueueName(UUID processorId)
+    public static final String buildNotifiersSequenceMapName()
     {
-        return "bergamot.queue.processor." + (processorId == null ? "*" : processorId.toString());
+        return "bergamot.map.notifiers.sequence";
+    }
+    
+    public static final String buildNotifierRingbufferName(UUID notifierId)
+    {
+        return "bergamot.ringbuffer.notifier." + (notifierId == null ? "*" : notifierId.toString());
+    }
+    
+    public static final String buildProcessorsSequenceMapName()
+    {
+        return "bergamot.map.processors.sequence";
+    }
+    
+    public static final String buildProcessorRingbufferName(UUID processorId)
+    {
+        return "bergamot.ringbuffer.processor." + (processorId == null ? "*" : processorId.toString());
     }
     
     public static final String getSiteEventTopicName()
@@ -42,5 +57,10 @@ public final class HZNames
     public static final String buildAgentKeyLookupMapName()
     {
         return "bergamot.cluster.map.lookup.agent.key";
+    }
+    
+    public static final String buildProxyKeyLookupMapName()
+    {
+        return "bergamot.cluster.map.lookup.proxy.key";
     }
 }

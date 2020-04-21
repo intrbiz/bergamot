@@ -2,14 +2,9 @@ package com.intrbiz.bergamot.cluster.dispatcher;
 
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
-import com.hazelcast.collection.IQueue;
-import com.hazelcast.collection.impl.queue.QueueService;
-import com.hazelcast.core.DistributedObjectEvent;
-import com.hazelcast.core.DistributedObjectListener;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.ringbuffer.Ringbuffer;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRouteTable;
 import com.intrbiz.bergamot.cluster.util.HZNames;
@@ -22,21 +17,14 @@ import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 /**
  * Dispatch results, readings, agent message to a processor
  */
-public class ProcessorDispatcher
+public class ProcessorDispatcher extends BaseDispatcher<ProcessorMessage>
 {
-    private final HazelcastInstance hazelcast;
-    
-    private final ConcurrentMap<String, IQueue<ProcessorMessage>> queuesCache = new ConcurrentHashMap<>();
-    
     private final ProcessorRouteTable routeTable;
     
     public ProcessorDispatcher(HazelcastInstance hazelcast, ProcessorRouteTable routeTable)
     {
-        super();
-        this.hazelcast = Objects.requireNonNull(hazelcast);
+        super(hazelcast, HZNames::buildProcessorRingbufferName);
         this.routeTable = Objects.requireNonNull(routeTable);
-        // Setup a object listener to clean up our queue cache
-        this.hazelcast.addDistributedObjectListener(new QueueListener());
     }
     
     /**
@@ -59,9 +47,9 @@ public class ProcessorDispatcher
             return PublishStatus.Unroutable;
         }
         // Offer onto the result queue
-        IQueue<ProcessorMessage> queue = this.getProcessorQueue(Objects.requireNonNull(processor));
-        boolean success = queue.offer(message);
-        return success ? PublishStatus.Success : PublishStatus.Failed;
+        Ringbuffer<ProcessorMessage> queue = this.getRingbuffer(Objects.requireNonNull(processor));
+        queue.add(message);
+        return PublishStatus.Success;
     }
     
     /**
@@ -71,7 +59,7 @@ public class ProcessorDispatcher
      */
     public PublishStatus dispatch(ProcessorMessage message)
     {
-        return this.dispatch(null, message);
+        return this.dispatch(message.getProcessor(), message);
     }
     
     private UUID route(ProcessorMessage message)
@@ -131,27 +119,5 @@ public class ProcessorDispatcher
     public PublishStatus dispatchAgentMessage(AgentMessage action)
     {
         return this.dispatch(action);
-    }
-    
-    private IQueue<ProcessorMessage> getProcessorQueue(UUID processorId)
-    {
-        return this.queuesCache.computeIfAbsent(HZNames.buildProcessorQueueName(processorId), this.hazelcast::getQueue);
-    }
-
-    private class QueueListener implements DistributedObjectListener
-    {
-        @Override
-        public void distributedObjectCreated(DistributedObjectEvent event)
-        {
-        }
-
-        @Override
-        public void distributedObjectDestroyed(DistributedObjectEvent event)
-        {
-            if (QueueService.SERVICE_NAME.equals(event.getServiceName()))
-            {
-                ProcessorDispatcher.this.queuesCache.remove(event.getObjectName());
-            }
-        }
     }
 }

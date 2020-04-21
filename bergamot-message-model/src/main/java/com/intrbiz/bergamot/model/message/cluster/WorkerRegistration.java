@@ -1,13 +1,10 @@
 package com.intrbiz.bergamot.model.message.cluster;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.MessageObject;
@@ -61,6 +58,9 @@ public class WorkerRegistration extends MessageObject implements Comparable<Work
     @JsonProperty("proxy")
     private boolean proxy;
     
+    @JsonProperty("proxy_id")
+    private UUID proxyId;
+    
     /**
      * The worker application string
      */
@@ -84,18 +84,24 @@ public class WorkerRegistration extends MessageObject implements Comparable<Work
         super();
     }
     
-    public WorkerRegistration(UUID id, long registered, boolean proxy, String application, String info, String hostName, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
+    public WorkerRegistration(UUID id, long registered, boolean proxy, UUID proxyId, String application, String info, String hostName, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
     {
         super();
         this.id = Objects.requireNonNull(id);
         this.registered = registered;
         this.proxy = proxy;
+        this.proxyId = proxyId;
         this.application = application;
         this.info = info;
         this.hostName = hostName;
         this.restrictedSiteIds = (restrictedSiteIds == null || restrictedSiteIds.isEmpty()) ? new HashSet<>() : restrictedSiteIds;
         this.workerPool = workerPool;
         this.availableEngines = Objects.requireNonNull(availableEngines);
+    }
+    
+    public WorkerRegistration(UUID id, long registered, String application, String info, String hostName, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines)
+    {
+        this(id, registered, false, null, application, info, hostName, restrictedSiteIds, workerPool, availableEngines);
     }
 
     public UUID getId()
@@ -157,85 +163,35 @@ public class WorkerRegistration extends MessageObject implements Comparable<Work
     {
         this.id = id;
     }
-    
-    @JsonIgnore
-    public WorkerRegistration id(UUID id)
-    {
-        this.id = id;
-        return this;
-    }
-    
-    @JsonIgnore
-    public WorkerRegistration registered(long registered)
-    {
-        this.registered = registered;
-        return this;
-    }
 
     public void setRestrictedSiteIds(Set<UUID> restrictedSiteIds)
     {
         this.restrictedSiteIds = restrictedSiteIds;
-    }
-    
-    @JsonIgnore
-    public WorkerRegistration restrictedSiteIds(UUID... restrictedSiteIds)
-    {
-        if (this.restrictedSiteIds == null) this.restrictedSiteIds = new HashSet<>();
-        Collections.addAll(this.restrictedSiteIds, restrictedSiteIds);
-        return this;
-    }
-    
-    @JsonIgnore
-    public WorkerRegistration restrictedSiteIds(Collection<UUID> restrictedSiteIds)
-    {
-        if (this.restrictedSiteIds == null) this.restrictedSiteIds = new HashSet<>();
-        this.restrictedSiteIds.addAll(restrictedSiteIds);
-        return this;
     }
 
     public void setWorkerPool(String workerPool)
     {
         this.workerPool = workerPool;
     }
-    
-    @JsonIgnore
-    public WorkerRegistration workerPool(String workerPool)
-    {
-        this.workerPool = workerPool;
-        return this;
-    }
 
     public void setAvailableEngines(Set<String> availableEngines)
     {
         this.availableEngines = availableEngines;
-    }
-    
-    @JsonIgnore
-    public WorkerRegistration availableEngines(String... availableEngines)
-    {
-        if (this.availableEngines == null) this.availableEngines = new HashSet<>();
-        Collections.addAll(this.availableEngines, availableEngines);
-        return this;
-    }
-    
-    @JsonIgnore
-    public WorkerRegistration availableEngines(Collection<String> availableEngines)
-    {
-        if (this.availableEngines == null) this.availableEngines = new HashSet<>();
-        this.availableEngines.addAll(availableEngines);
-        return this;
     }
 
     public void setProxy(boolean proxy)
     {
         this.proxy = proxy;
     }
-    
-    @JsonIgnore
-    public WorkerRegistration proxy(boolean proxy)
+
+    public UUID getProxyId()
     {
-        this.proxy = proxy;
-        return this;
+        return this.proxyId;
+    }
+
+    public void setProxyId(UUID proxyId)
+    {
+        this.proxyId = proxyId;
     }
 
     public void setApplication(String application)
@@ -251,15 +207,6 @@ public class WorkerRegistration extends MessageObject implements Comparable<Work
     public void setHostName(String hostName)
     {
         this.hostName = hostName;
-    }
-    
-    @JsonIgnore
-    public WorkerRegistration info(String application, String hostName, String info)
-    {
-        this.application = application;
-        this.hostName = hostName;
-        this.info = info;
-        return this;
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.election.LeaderElector;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.cluster.lookup.AgentKeyClusterLookup;
+import com.intrbiz.bergamot.cluster.lookup.ProxyKeyClusterLookup;
 import com.intrbiz.bergamot.cluster.member.BergamotMember;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistry;
 import com.intrbiz.bergamot.cluster.registry.NotifierRegistry;
@@ -57,6 +58,8 @@ public class BergamotProcessor extends BergamotMember
     // lookups
     
     private final AgentKeyClusterLookup agentKeyLookup;
+    
+    private final ProxyKeyClusterLookup proxyKeyLookup;
     
     // registries
     
@@ -124,6 +127,7 @@ public class BergamotProcessor extends BergamotMember
         this.schedulingTopic = new SchedulingTopic(this.hazelcast);
         // lookups
         this.agentKeyLookup = new AgentKeyClusterLookup(this.hazelcast);
+        this.proxyKeyLookup = new ProxyKeyClusterLookup(this.hazelcast);
         // registries
         this.workerRegistry = new WorkerRegistry(this.zooKeeper.getZooKeeper());
         this.agentRegistry = new AgentRegistry(this.zooKeeper.getZooKeeper());
@@ -272,6 +276,11 @@ public class BergamotProcessor extends BergamotMember
     public AgentKeyClusterLookup getAgentKeyLookup()
     {
         return this.agentKeyLookup;
+    }
+    
+    public ProxyKeyClusterLookup getProxyKeyLookup()
+    {
+        return this.proxyKeyLookup;
     }
 
     public WorkerRegistry getWorkerRegistry()
