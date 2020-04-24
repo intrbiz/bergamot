@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.cluster.registry;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
@@ -27,11 +28,23 @@ public class ProcessorRegistry extends GenericRegistry<UUID, ProcessorRegistrati
     
     private void init() throws KeeperException, InterruptedException
     {
-        for (ProcessorRegistration processor : this.getProcessors())
-        {
-            this.routeTable.registerProcessor(processor.getId());
-        }
+        Set<UUID> processors = this.getProcessors().stream().map(ProcessorRegistration::getId).collect(Collectors.toSet());
+        logger.info("Initialising with processors: " + processors);
+        this.routeTable.registerProcessors(processors);
         logger.info("Processor routing table:\n" + this.routeTable);
+    }
+    
+    @Override
+    protected void onConnect()
+    {
+        try
+        {
+            this.init();
+        }
+        catch (KeeperException | InterruptedException e)
+        {
+            logger.error("");
+        }
     }
     
     @Override

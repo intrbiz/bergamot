@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.cluster.registry.model;
 
 public final class RegistryEvent<K, V>
 {
-    public enum Type { ADDED, REMOVED, UPDATED };
+    public enum Type { ADDED, REMOVED, UPDATED, DISCONNECTED, CONNECTED };
     
     protected final Type type;
     

@@ -366,7 +366,6 @@ public class BergamotAgent
     private void connect()
     {
         final SSLEngine engine = isSecure() ? createSSLEngine(this.server.getHost(), (this.server.getPort() <= 0 ? 443 : this.server.getPort())) : null;
-        
         // configure the client
         Bootstrap b = new Bootstrap();
         b.group(this.eventLoop);

@@ -34,6 +34,19 @@ public class NotifierRegistry extends GenericRegistry<UUID, NotifierRegistration
         logger.info("Notifier routing table:\n" + this.routeTable);
     }
     
+    @Override
+    protected void onConnect()
+    {
+        try
+        {
+            this.init();
+        }
+        catch (KeeperException | InterruptedException e)
+        {
+            logger.error("");
+        }
+    }
+    
     protected void onItemAdded(UUID id, NotifierRegistration item)
     {
         logger.info("Adding notifier: " + item);

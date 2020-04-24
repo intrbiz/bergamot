@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.cluster.registry;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -18,6 +19,16 @@ public class ProcessorRouteTable
     public ProcessorRouteTable()
     {
         super();
+    }
+    
+    void registerProcessors(Set<UUID> processors)
+    {
+        this.processorsMap.clear();
+        for (UUID processor : processors)
+        {
+            this.processorsMap.put(processor, processor);
+        }
+        this.updateProcessors();
     }
     
     void registerProcessor(UUID processor)

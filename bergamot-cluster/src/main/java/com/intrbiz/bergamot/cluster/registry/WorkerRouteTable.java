@@ -128,6 +128,7 @@ public class WorkerRouteTable
     {
         synchronized (this.routeTableWriteLock)
         {
+            this.routingTable.clear();
             for (WorkerRegistration worker : workers)
             {
                 logger.debug("Adding worker " + worker + " to routing table");

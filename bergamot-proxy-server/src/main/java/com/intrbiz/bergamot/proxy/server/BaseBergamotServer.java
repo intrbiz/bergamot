@@ -88,8 +88,8 @@ public abstract class BaseBergamotServer
                     public void initChannel(SocketChannel ch) throws Exception
                     {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast("read-timeout",  new ReadTimeoutHandler(90 /* seconds */)); 
-                        pipeline.addLast("write-timeout", new WriteTimeoutHandler(90 /* seconds */));
+                        pipeline.addLast("read-timeout",  new ReadTimeoutHandler(45 /* seconds */)); 
+                        pipeline.addLast("write-timeout", new WriteTimeoutHandler(45 /* seconds */));
                         pipeline.addLast("codec-http",    new HttpServerCodec());
                         pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
                         pipeline.addLast("health",        this.health);

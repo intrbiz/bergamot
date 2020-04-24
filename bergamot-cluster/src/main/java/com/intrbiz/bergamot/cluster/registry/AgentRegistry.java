@@ -26,6 +26,20 @@ public class AgentRegistry  extends GenericRegistry<UUID, AgentRegistration>
     }
     
     @Override
+    protected void onConnect()
+    {
+        logger.info("Clearing agent cache");
+        this.agentsCache.clear();
+    }
+    
+    @Override
+    protected void onDisconnect()
+    {
+        logger.info("Clearing agent cache");
+        this.agentsCache.clear();
+    }
+    
+    @Override
     protected void onItemRemoved(UUID id)
     {
         logger.info("Removing agent: " + id);

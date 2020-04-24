@@ -112,6 +112,7 @@ public class NotifierRouteTable
     {
         synchronized (this.routeTableWriteLock)
         {
+            this.routingTable.clear();
             for (NotifierRegistration notifier : notifiers)
             {
                 logger.debug("Adding notifier " + notifier + " to routing table");

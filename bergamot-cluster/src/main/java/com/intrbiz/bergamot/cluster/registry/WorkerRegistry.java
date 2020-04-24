@@ -34,6 +34,19 @@ public class WorkerRegistry extends GenericRegistry<UUID, WorkerRegistration>
         logger.info("Worker routing table:\n" + this.routeTable);
     }
     
+    @Override
+    protected void onConnect()
+    {
+        try
+        {
+            this.init();
+        }
+        catch (KeeperException | InterruptedException e)
+        {
+            logger.error("");
+        }
+    }
+    
     protected void onItemAdded(UUID id, WorkerRegistration item)
     {
         logger.info("Adding worker: " + item);

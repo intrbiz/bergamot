@@ -113,10 +113,14 @@ public abstract class GenericRegistry<K, V>
                             {
                                 logger.info("Reconnected to ZooKeeper, recreating watch");
                                 this.setupWatcher();
+                                this.onConnect();
+                                this.fireEvent(new RegistryEvent<>(Type.CONNECTED, null, null));
                             }
                             else if (watchedEvent.getState() == KeeperState.Disconnected)
                             {
                                 logger.warn("Lost connection to ZooKeeper, waiting for reconnect");
+                                this.onDisconnect();
+                                this.fireEvent(new RegistryEvent<>(Type.DISCONNECTED, null, null));
                             }
                         }
                         break;
@@ -252,4 +256,11 @@ public abstract class GenericRegistry<K, V>
     {
     }
     
+    protected void onConnect()
+    {
+    }
+    
+    protected void onDisconnect()
+    {
+    }
 }
