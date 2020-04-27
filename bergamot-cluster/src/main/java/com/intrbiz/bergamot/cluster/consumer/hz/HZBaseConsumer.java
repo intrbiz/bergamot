@@ -40,7 +40,7 @@ public abstract class HZBaseConsumer<T>
     
     private volatile long sequence;
     
-    private long lastCommitsequence;
+    private volatile long lastCommitsequence;
     
     private TimerTask commitTask;
     
@@ -124,32 +124,46 @@ public abstract class HZBaseConsumer<T>
     {
         if (logger.isTraceEnabled()) logger.trace("Reading from " + this.sequence);
         this.ringbuffer.readManyAsync(this.sequence, MIN_SIZE, MAX_SIZE, null).whenComplete((result, error) -> {
-            try
+            if (this.run.get())
             {
-                if (result != null)
+                try
                 {
-                    // Process the messages
-                    for (T message : result)
+                    try
                     {
-                        consumer.accept(message);
-                    }
-                    this.sequence = result.getNextSequenceToReadFrom();
-                }
-            }
-            finally
-            {
-                if (this.run.get())
-                {
-                    if (error != null)
-                    {
-                        logger.warn("Error fetching batch", error);
-                        if (error instanceof StaleSequenceException)
+                        if (result != null)
                         {
-                            this.sequence = ((StaleSequenceException) error).getHeadSeq();
+                            // Process the messages
+                            try
+                            {
+                                for (T message : result)
+                                {
+                                    consumer.accept(message);
+                                }
+                            }
+                            finally
+                            {
+                                if (logger.isTraceEnabled())  logger.trace("Updating sequence to: " + result.getNextSequenceToReadFrom());
+                                this.sequence = result.getNextSequenceToReadFrom();
+                            }
                         }
                     }
-                    // Fetch the next batch
-                    this.consume(consumer);
+                    finally
+                    {
+                        if (error != null)
+                        {
+                            logger.warn("Error fetching batch", error);
+                            if (error instanceof StaleSequenceException)
+                            {
+                                this.sequence = ((StaleSequenceException) error).getHeadSeq();
+                            }
+                        }
+                        // Fetch the next batch
+                        this.consume(consumer);
+                    }
+                }
+                catch (Exception e)
+                {
+                    logger.warn("Unhandled error whilst consuming", e);
                 }
             }
         });
@@ -159,8 +173,11 @@ public abstract class HZBaseConsumer<T>
     {
         if (this.run.compareAndSet(true, false))
         {
+            // stop the period commit
             this.commitTask.cancel();
             this.commitTask = null;
+            // commit
+            this.commit();
         }
     }
     
