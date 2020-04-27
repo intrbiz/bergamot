@@ -10,7 +10,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.apache.zookeeper.KeeperException;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.client.ProxyClient;
@@ -107,10 +106,10 @@ public class BergamotProxy implements Configurable<ProxyCfg>
                             clientHeaders, 
                             channel,
                             client.registerWorker(DAEMON_NAME, clientHeaders.getUserAgent(), clientHeaders.getSiteIds(), clientHeaders.getWorkerPool(), clientHeaders.getEngines()),
-                            client.getProcessorDispatcher()
+                            client
                         );
                     }
-                    catch (KeeperException | InterruptedException e)
+                    catch (Exception e)
                     {
                         logger.error("Failed to register proxy worker", e);
                     }
@@ -126,7 +125,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
                             client.registerNotifier(DAEMON_NAME, clientHeaders.getUserAgent(), clientHeaders.getSiteIds(), clientHeaders.getEngines())
                         );
                     }
-                    catch (KeeperException | InterruptedException e)
+                    catch (Exception e)
                     {
                         logger.error("Failed to register proxy notifier", e);
                     }
@@ -144,7 +143,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
                     {
                         client.unregisterWorker(processor.getId());
                     }
-                    catch (KeeperException | InterruptedException e)
+                    catch (Exception e)
                     {
                         logger.error("Failed to unregister proxy worker", e);
                     }
@@ -156,7 +155,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
                     {
                         client.unregisterNotifier(processor.getId());
                     }
-                    catch (KeeperException | InterruptedException e)
+                    catch (Exception e)
                     {
                         logger.error("Failed to unregister proxy notifier", e);
                     }

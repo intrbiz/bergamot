@@ -155,7 +155,7 @@ public class ProxyKey implements Serializable
     public static final ProxyKey create(UUID siteId, String purpose)
     {
         ProxyKey key = new ProxyKey();
-        key.setId(Site.randomId(siteId));
+        key.setId(siteId == null ? UUID.randomUUID() : Site.randomId(siteId));
         key.setSiteId(siteId);
         key.setPurpose(purpose);
         key.setCreated(new Timestamp(System.currentTimeMillis()));

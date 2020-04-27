@@ -153,6 +153,7 @@
 		<module>bergamot-proxy-server</module>
 		<module>bergamot-proxy-client</module>
 		<module>bergamot-proxy</module>
+		<module>bergamot-cluster-api</module>
 	</modules>
 
 	<dependencyManagement>
@@ -300,6 +301,11 @@
 			<dependency>
 				<groupId>com.intrbiz.bergamot</groupId>
 				<artifactId>bergamot-proxy</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-cluster-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

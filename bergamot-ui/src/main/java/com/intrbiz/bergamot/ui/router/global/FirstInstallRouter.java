@@ -22,6 +22,7 @@ import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
+import com.intrbiz.bergamot.model.ProxyKey;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.lamplighter.data.LamplighterDB;
@@ -183,10 +184,11 @@ public class FirstInstallRouter extends Router<BergamotApp>
         }
         // broadcast a site init event
         action("site-init", site);
-        // Create bergamot agent keys
+        // Create bergamot agent and proxy keys
         try (BergamotDB db = BergamotDB.connect())
         {
             db.setAgentKey(AgentKey.create(site.getId(), "Default Bergamot Agent Key"));
+            db.setProxyKey(ProxyKey.create(site.getId(), "Default Bergamot Proxy Key"));
         }
         // all done
         logger.info("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
@@ -198,6 +200,8 @@ public class FirstInstallRouter extends Router<BergamotApp>
             GlobalSetting globalAdmins = new GlobalSetting(GlobalSetting.NAME.GLOBAL_ADMINS);
             globalAdmins.addParameter(theAdmin.getId().toString(), "true");
             db.setGlobalSetting(globalAdmins);
+            // create global proxy key
+            db.setProxyKey(ProxyKey.createGlobal("Default Bergamot Proxy Key"));
             // mark first install as complete
             db.setGlobalSetting(new GlobalSetting(GlobalSetting.NAME.FIRST_INSTALL, "complete"));
         }

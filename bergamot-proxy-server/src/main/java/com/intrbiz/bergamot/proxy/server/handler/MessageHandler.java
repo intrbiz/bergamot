@@ -44,7 +44,7 @@ public class MessageHandler extends SimpleChannelInboundHandler<Message>
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception
     {
-        logger.info("Got message: " + msg);
+        if (logger.isTraceEnabled()) logger.trace("Got message: " + msg);
         if (this.processor != null)
             this.processor.processMessage(msg);
     }

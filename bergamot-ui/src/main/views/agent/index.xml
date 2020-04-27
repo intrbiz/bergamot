@@ -39,7 +39,7 @@
 		<div class="col12">
     		<h3>Create Bergamot Agent Key</h3>
     		<p class="text-body">
-    			Ideal create different Bergamot Agent Keys for different sets of agents, to reduce impact should you need to 
+    			Ideally create different Bergamot Agent Keys for different sets of agents, to reduce impact should you need to 
     			revoke a key.
     		</p>
 			<form id="create_agent_key" name="create_agent_key" method="post" action="#{path('/agent/create')}">

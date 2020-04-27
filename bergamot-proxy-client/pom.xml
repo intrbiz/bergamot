@@ -23,5 +23,13 @@
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-proxy-common</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-cluster-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-daemon-config</artifactId>
+		</dependency>
 	</dependencies>
 </project>

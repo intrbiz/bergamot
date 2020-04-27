@@ -11,11 +11,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-cluster-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-model</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-message-model</artifactId>
+			<artifactId>bergamot-daemon-config</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.hazelcast</groupId>
@@ -25,10 +29,6 @@
 			<groupId>org.apache.zookeeper</groupId>
 			<artifactId>zookeeper</artifactId>
 			<version>3.6.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-daemon-config</artifactId>
 		</dependency>
 	</dependencies>
 </project>

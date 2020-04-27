@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.agent.AgentHTTPHeaderNames;
 import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.SiteMO;
 import com.intrbiz.bergamot.model.message.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.agent.check.CheckAgent;
@@ -100,27 +99,27 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     
     private Channel channel;
     
-    private ConcurrentMap<String, Consumer<AgentMessage>> pendingRequests = new ConcurrentHashMap<String, Consumer<AgentMessage>>();
+    private final ConcurrentMap<String, Consumer<AgentMessage>> pendingRequests = new ConcurrentHashMap<String, Consumer<AgentMessage>>();
     
-    private boolean handshaked = false;
+    private volatile boolean handshaked = false;
     
-    private boolean authenticated = false;
+    private volatile boolean authenticated = false;
     
-    private UUID agentKeyId;
+    private volatile UUID agentKeyId;
     
-    private UUID agentId;
+    private volatile UUID agentId;
     
-    private UUID siteId;
+    private volatile UUID siteId;
     
-    private String agentUserAgent;
+    private volatile String agentUserAgent;
     
-    private String agentHostName;
+    private volatile String agentHostName;
     
-    private String agentHostSummary;
+    private volatile String agentHostSummary;
     
-    private String agentTemplateName;
+    private volatile String agentTemplateName;
     
-    private long authenticationTimestamp;
+    private volatile long authenticationTimestamp;
     
     public BergamotAgentServerHandler(BergamotAgentServer server)
     {
@@ -251,34 +250,36 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             return;
         }
         // authenticate the client
-        this.authenticated = this.authenticateAgent(req);
-        if (this.authenticated)
-        {
-            WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, false);
-            this.handshaker = wsFactory.newHandshaker(req);
-            if (this.handshaker == null)
+        this.authenticateAgent(req, (result) -> {
+            this.authenticated = result;
+            if (this.authenticated)
             {
-                WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
+                WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, false);
+                this.handshaker = wsFactory.newHandshaker(req);
+                if (this.handshaker == null)
+                {
+                    WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
+                }
+                else
+                {
+                    this.handshaker.handshake(ctx.channel(), req).addListener((future) -> {
+                        if (future.isDone() && future.isSuccess()) {
+                            // Allow WebSocket traffic to flow
+                            this.handshaked = true;
+                            // fire connect event
+                            logger.info("Accepted Agent connection from " + this.remoteAddress + " agent id " + this.agentId + "/" + this.agentHostName + " for site " + this.siteId);
+                            this.server.fireAgentConnect(this);
+                        }
+                    });
+                }
             }
             else
             {
-                this.handshaker.handshake(ctx.channel(), req).addListener((future) -> {
-                    if (future.isDone() && future.isSuccess()) {
-                        // Allow WebSocket traffic to flow
-                        this.handshaked = true;
-                        // fire connect event
-                        logger.info("Accepted Agent connection from " + this.remoteAddress + " agent id " + this.agentId + "/" + this.agentHostName + " for site " + this.siteId);
-                        this.server.fireAgentConnect(this);
-                    }
-                });
+                // bad client certificate, terminate the connection
+                logger.warn("Failed to authenticate agent connection from " + this.remoteAddress + " possible agent id " + this.agentId);
+                sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
             }
-        }
-        else
-        {
-            // bad client certificate, terminate the connection
-            logger.warn("Failed to authenticate agent connection from " + this.remoteAddress + " possible agent id " + this.agentId);
-            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
-        }
+        });
     }
     
     protected DefaultFullHttpResponse handleHealthCheck(FullHttpRequest request) throws Exception {
@@ -313,10 +314,9 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         return response;
     }
     
-    private boolean authenticateAgent(FullHttpRequest req) throws Exception
+    private void authenticateAgent(FullHttpRequest req, Consumer<Boolean> authenticated) throws Exception
     {
-        try
-        {
+        
             // Extract metadata
             this.agentUserAgent = Util.coalesce(req.headers().get(HttpHeaderNames.USER_AGENT), "Unknown");
             this.agentId = UUID.fromString(requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.AGENT_ID), "agent id"));
@@ -329,19 +329,22 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             this.siteId = SiteMO.getSiteId(this.agentKeyId);
             String authSig = requireNonEmpty(req.headers().get(HttpHeaderNames.AUTHORIZATION), "authorization");
             // Fetch the agent key
-            AgentAuthenticationKey key = this.server.getAgentKeyResolver().resolveKey(this.agentKeyId);
-            if (key == null) throw new SecurityException("Failed to resolve agent key " + this.agentKeyId);
-            // Validate the timestamp
-            if (Math.abs((System.currentTimeMillis() / 1000) - this.authenticationTimestamp) > AUTHENTICATION_GRACE_SECONDS)
-                throw new SecurityException("Authentication timestamp is not within the grace period.");
-            // Validate the signature
-            return key.checkBase64(this.authenticationTimestamp, this.agentId, this.agentHostName, this.agentTemplateName, authSig);
-        }
-        catch (Exception e)
-        {
-            logger.error("Failed to authenticate agent: " + this.agentId);
-        }
-        return false;
+            this.server.getAgentKeyResolver().resolveKey(this.agentKeyId, (key) -> {
+                try
+                {
+                    if (key == null) throw new SecurityException("Failed to resolve agent key " + this.agentKeyId);
+                    // Validate the timestamp
+                    if (Math.abs((System.currentTimeMillis() / 1000) - this.authenticationTimestamp) > AUTHENTICATION_GRACE_SECONDS)
+                        throw new SecurityException("Authentication timestamp is not within the grace period.");
+                    // Validate the signature
+                    authenticated.accept(key.checkBase64(this.authenticationTimestamp, this.agentId, this.agentHostName, this.agentTemplateName, authSig));
+                }
+                catch (Exception e)
+                {
+                    logger.error("Failed to authenticate agent: " + this.agentId);
+                    authenticated.accept(false);
+                }
+            });
     }
     
     private String requireNonEmpty(String value, String name)

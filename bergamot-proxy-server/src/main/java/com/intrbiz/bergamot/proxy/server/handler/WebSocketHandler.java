@@ -100,7 +100,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object>
             else
             {
                 // Fire other frames down the pipeline
-                ctx.fireChannelRead(msg);
+                ctx.fireChannelRead(((WebSocketFrame) msg).retain());
             }
         }
     }
@@ -110,7 +110,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object>
         if (req.decoderResult().isSuccess())
         {
             // decode the client header
-            this.clientHeader = ClientHeader.fromRequest(req, ctx.channel().remoteAddress());
+            this.clientHeader = ClientHeader.fromHeaders(req.headers(), ctx.channel().remoteAddress());
             // authenticate the client
             this.clientHeader.authenticate(this.keyResolver).thenAccept((authResult) -> {
                 if (authResult)

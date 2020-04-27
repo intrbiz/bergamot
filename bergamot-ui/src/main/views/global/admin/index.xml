@@ -156,6 +156,57 @@
 		<pre>#{notifier_route_table}</pre>
 	</div>
 	
+	<div clas="row">
+    	<div class="col12">
+    		<h3>Bergamot Proxy Keys</h3>
+    		<p class="text-body">
+    			These are the authentication keys that remote Bergamot Workers and Notifiers can use to authenticate with Bergamot Monitoring.  Remote workers and notifiers which use these keys will be able to process checks for all sites.
+    		</p>
+    		<table>
+	    		<tr>
+		    		<th>Id</th>
+		    		<th>Secret Key</th>
+		    		<th>Revoked</th>
+	    			<th>Created</th>
+	    			<th>Purpose</th>
+	    			<th></th>
+	    		</tr>
+	    		<data-set var="proxyKey" value="#{proxyKeys}">
+	    			<tr>
+	    				<td>#{proxyKey.id}</td>
+	    				<td><pre>#{proxyKey.toAuthenticationKey()}</pre></td>
+	    				<td>
+	    					<span rendered="#{! proxyKey.revoked}">no</span>
+	    					<span rendered="#{proxyKey.revoked}">#{dateformat('HH:mm:ss', proxyKey.created)} on #{dateformat('EEEE dd/MM/yyyy', proxyKey.created)}</span>
+    					</td>
+	    				<td>#{proxyKey.purpose}</td>
+	    				<td>#{dateformat('HH:mm:ss', proxyKey.created)} on #{dateformat('EEEE dd/MM/yyyy', proxyKey.created)}</td>
+	    				<td><a href="/global/admin/proxy/revoke/#{agentKey.id}">Revoke</a></td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+   	<div class="row">
+		<div class="col12">
+    		<h3>Create Bergamot Proxy Key</h3>
+    		<p class="text-body">
+    			Ideally create different Bergamot Proxy Keys for different sets of remote workers and notifiers, to reduce impact should you need to 
+    			revoke a key.
+    		</p>
+			<form id="create_proxy_key" name="create_proxy_key" method="post" action="#{path('/global/admin/proxy/create')}">
+				<div>
+					<label for="purpose" title="The intended use of this Proxy Key">Purpose</label>
+					<input type="text" id="purpose" name="purpose" placeholder="Key for DR site"/>
+				</div>
+				<div>
+					<input type="submit" value="Create Bergamot Proxy Key"/>
+				</div>
+			</form>
+		</div>
+	</div>
+	
     <div class="row">
 		<h3>Sites</h3>
 		<table style="width: 100%">

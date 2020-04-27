@@ -38,7 +38,7 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
     
     private final AgentRegistar agentRegistar;
 
-    public HZWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
+    public HZWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws Exception
     {
         super(config, onPanic);
         this.application = application;
@@ -48,6 +48,8 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
         this.workerConsumer = new HZWorkerConsumer(this.hazelcast, this.id);
         this.processorDispatcher = new HZProcessorDispatcher(this.hazelcast, this.workerRegistar.getRouteTable());
         this.agentKeyLookup = new HZAgentKeyClientLookup(this.hazelcast);
+        // Register this worker
+        this.registerWorker(restrictedSiteIds, workerPool, availableEngines);
     }
 
     public WorkerConsumer getWorkerConsumer()
@@ -65,12 +67,12 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
         return this.agentKeyLookup;
     }
     
-    public void registerWorker(Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws KeeperException, InterruptedException
+    private void registerWorker(Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws KeeperException, InterruptedException
     {     
         this.workerRegistar.registerWorker(new WorkerRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName, restrictedSiteIds, workerPool, availableEngines));
     }
     
-    public void unregisterWorker() throws KeeperException, InterruptedException
+    private void unregisterWorker() throws KeeperException, InterruptedException
     {
         this.workerRegistar.unregisterWorker(this.id);
     }
@@ -83,5 +85,18 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
     public void unregisterAgent(UUID agentId) throws KeeperException, InterruptedException
     {
         this.agentRegistar.unregisterAgent(agentId);
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            this.unregisterWorker();
+        }
+        catch (Exception e)
+        {
+        }
+        super.close();
     }
 }

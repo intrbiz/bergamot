@@ -25,6 +25,8 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.NotifierClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZNotifierClient;
+import com.intrbiz.bergamot.cluster.client.proxy.ProxyBaseClient;
+import com.intrbiz.bergamot.cluster.client.proxy.ProxyNotifierClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.model.message.notification.Notification;
@@ -175,9 +177,16 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     protected void connectCluster() throws Exception
     {
-        // TODO
-        this.client = new HZNotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
-        this.client.registerNotifier(this.sites, this.engines.keySet());
+        if (! Util.isEmpty(ProxyBaseClient.getProxyUrl(this.configuration.getCluster())))
+        {
+            logger.info("Connecting to proxy");
+            this.client = new ProxyNotifierClient(this.configuration.getCluster(), this::clusterPanic, BergamotVersion.fullVersionString(), this.engines.keySet());
+        }
+        else
+        {
+            logger.info("Connecting to cluster");
+            this.client = new HZNotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString(), this.sites, this.engines.keySet());
+        }
     }
     
     protected void clusterPanic(Void v)
@@ -262,14 +271,6 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     protected void disconnectScheduler()
     {
         logger.info("Disconnecting from cluster");
-        try
-        {
-            this.client.unregisterNotifier();
-        }
-        catch (Exception e)
-        {
-            // ignore
-        }
         this.client.close();
     }
 

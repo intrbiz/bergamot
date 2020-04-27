@@ -1,0 +1,6 @@
+<proxy port="14080">
+    <cluster>
+        <zookeeper>127.0.0.1:2181</zookeeper>
+    </cluster>
+    <logging level="info"/>
+</proxy>

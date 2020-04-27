@@ -53,7 +53,7 @@ public class HealthHandler extends SimpleChannelInboundHandler<FullHttpRequest>
         }
         else
         {
-            ctx.fireChannelRead(req);
+            ctx.fireChannelRead(req.retain());
         }
     }
     

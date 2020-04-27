@@ -3,10 +3,7 @@ package com.intrbiz.bergamot.worker.engine.agent;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.agent.server.AgentKeyResolver;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer;
-import com.intrbiz.bergamot.model.AgentKey;
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.agent.AgentRegister;
 import com.intrbiz.bergamot.worker.engine.AbstractEngine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
@@ -54,26 +51,7 @@ public class AgentEngine extends AbstractEngine
         // setup the server
         int port = engineContext.getIntParameter("agent-port", 15080);
         logger.info("Accepting Bergamot Agent connections on port " + port);
-        this.server = new BergamotAgentServer(port, createAgentKeyResolver(engineContext));
-    }
-    
-    private AgentKeyResolver createAgentKeyResolver(EngineContext engineContext)
-    {
-        return (keyId) -> {
-            AgentKey key = engineContext.lookupAgentKey(keyId);
-            if (key != null)
-            {
-                if (! key.isRevoked())
-                {
-                    return new AgentAuthenticationKey(key.getId(), key.getSecret());
-                }
-                else
-                {
-                    logger.warn("Agent attempting to use revoked key, id: " + keyId);
-                }
-            }
-            return null;
-        };
+        this.server = new BergamotAgentServer(port, engineContext::lookupAgentKey);
     }
     
     @Override
@@ -87,7 +65,15 @@ public class AgentEngine extends AbstractEngine
             if (! Util.isEmpty(agent.getAgentTemplateName()))
             {
                 logger.info("Sending agent register message");
-                engineContext.publishAgentAction(new AgentRegister(agent.getSiteId(), agent.getAgentId(), agent.getAgentKeyId(), agent.getAgentHostName(), agent.getAgentHostSummary(), agent.getAgentAddress(), agent.getAgentTemplateName()));
+                engineContext.publishAgentAction(new AgentRegister(
+                    agent.getSiteId(), 
+                    agent.getAgentId(), 
+                    agent.getAgentKeyId(), 
+                    agent.getAgentHostName(), 
+                    agent.getAgentHostSummary(), 
+                    agent.getAgentAddress(), 
+                    agent.getAgentTemplateName()
+                ));
             }
         });
         this.server.setOnAgentDisconnectHandler((agent) -> {

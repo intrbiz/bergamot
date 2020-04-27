@@ -26,13 +26,15 @@ public class HZNotifierClient extends HZBergamotClient implements NotifierClient
     
     private final NotificationConsumer consumer;
 
-    public HZNotifierClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
+    public HZNotifierClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, Set<String> availableEngines) throws Exception
     {
         super(config, onPanic);
         this.application = application;
         this.info = info;
         this.registar = new NotifierRegistar(this.zooKeeper.getZooKeeper());
         this.consumer = new HZNotificationConsumer(this.hazelcast, this.id);
+        // Register this notifier
+        this.registerNotifier(restrictedSiteIds, availableEngines);
     }
 
     public NotificationConsumer getNotifierConsumer()
@@ -40,13 +42,26 @@ public class HZNotifierClient extends HZBergamotClient implements NotifierClient
         return this.consumer;
     }
     
-    public void registerNotifier(Set<UUID> restrictedSiteIds, Set<String> availableEngines) throws KeeperException, InterruptedException
+    private void registerNotifier(Set<UUID> restrictedSiteIds, Set<String> availableEngines) throws KeeperException, InterruptedException
     {     
         this.registar.registerNotifier(new NotifierRegistration(this.id, System.currentTimeMillis(), this.application, this.info, this.hostName, restrictedSiteIds, availableEngines));
     }
     
-    public void unregisterNotifier() throws KeeperException, InterruptedException
+    private void unregisterNotifier() throws KeeperException, InterruptedException
     {
         this.registar.unregisterNotifier(this.id);
+    }
+    
+    @Override
+    public void close()
+    {
+        try
+        {
+            this.unregisterNotifier();
+        }
+        catch (Exception e)
+        {
+        }
+        super.close();
     }
 }

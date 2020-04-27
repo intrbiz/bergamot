@@ -64,7 +64,7 @@ public class AuthenticationKey
         return this.secret;
     }
     
-    public Mac createHMAC() throws InvalidKeyException, NoSuchAlgorithmException
+    private Mac createHMAC() throws InvalidKeyException, NoSuchAlgorithmException
     {
         Mac hmac = Mac.getInstance(HMAC_SHA256);
         hmac.init(new SecretKeySpec(this.secret, HMAC_SHA256));

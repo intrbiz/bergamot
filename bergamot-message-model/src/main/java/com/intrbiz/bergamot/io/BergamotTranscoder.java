@@ -104,6 +104,9 @@ import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnServiceE
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnServiceName;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnTrapExternalRef;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnTrapName;
+import com.intrbiz.bergamot.model.message.proxy.AgentState;
+import com.intrbiz.bergamot.model.message.proxy.FoundAgentKey;
+import com.intrbiz.bergamot.model.message.proxy.LookupAgentKey;
 import com.intrbiz.bergamot.model.message.report.SLAReportMO;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
@@ -222,7 +225,11 @@ public class BergamotTranscoder
         ProcessorRegistration.class,
         AgentRegistration.class,
         NodeRegistration.class,
-        PoolRegistration.class
+        PoolRegistration.class,
+        // proxy
+        LookupAgentKey.class,
+        FoundAgentKey.class,
+        AgentState.class
     };
     
     private static final BergamotTranscoder DEFAULT = new BergamotTranscoder();

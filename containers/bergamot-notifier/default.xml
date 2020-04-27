@@ -1,7 +1,7 @@
 <notifier>
-    <hazelcast-client>
-        <node>localhost:5701</node>
-    </hazelcast-client>
+    <cluster>
+        <zookeeper>127.0.0.1:2181</zookeeper>
+    </cluster>
     <logging level="info"/>
     <!-- Email Configuration -->
     <parameter name="mail.from">bergamot@localhost</parameter>

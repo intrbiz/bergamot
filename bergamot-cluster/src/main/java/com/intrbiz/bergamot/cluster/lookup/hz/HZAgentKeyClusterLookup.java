@@ -14,6 +14,7 @@ import com.hazelcast.map.MapStoreAdapter;
 import com.intrbiz.bergamot.cluster.util.HZNames;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.data.DataException;
 
 public class HZAgentKeyClusterLookup extends HZAgentKeyLookup
@@ -36,21 +37,25 @@ public class HZAgentKeyClusterLookup extends HZAgentKeyLookup
         storeConfig.setEnabled(true);
     }
     
-    public static class AgentKeyLoader extends MapStoreAdapter<UUID, AgentKey>
+    public static class AgentKeyLoader extends MapStoreAdapter<UUID, AgentAuthenticationKey>
     {
         private static final Logger logger = Logger.getLogger(AgentKeyLoader.class);
         
         @Override
-        public AgentKey load(UUID key)
+        public AgentAuthenticationKey load(UUID id)
         {
-            logger.info("Looking up agent key: " + key);
+            logger.info("Looking up agent key: " + id);
             try (BergamotDB db = BergamotDB.connect())
             {
-                return db.getAgentKey(key);
+                AgentKey key = db.getAgentKey(id);
+                if (key != null && (! key.isRevoked()))
+                {
+                    return key.toAgentAuthenticationKey();
+                }
             }
             catch (DataException e)
             {
-                logger.error("Failed to load AgentKey with id " + key);
+                logger.error("Failed to load AgentKey with id " + id);
             }
             return null;
         }

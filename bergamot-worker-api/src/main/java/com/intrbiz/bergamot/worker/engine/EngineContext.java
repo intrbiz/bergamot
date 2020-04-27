@@ -1,9 +1,10 @@
 package com.intrbiz.bergamot.worker.engine;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
@@ -54,7 +55,7 @@ public interface EngineContext
     /**
      * The agent key lookup service
      */
-    AgentKey lookupAgentKey(UUID keyId);
+    void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback);
     
     /**
      * The agent event queue for sending register events

@@ -42,6 +42,7 @@ import com.intrbiz.bergamot.ui.api.HostAPIRouter;
 import com.intrbiz.bergamot.ui.api.LamplighterAPIRouter;
 import com.intrbiz.bergamot.ui.api.LocationAPIRouter;
 import com.intrbiz.bergamot.ui.api.MetricsAPIRouter;
+import com.intrbiz.bergamot.ui.api.ProxyAPIRouter;
 import com.intrbiz.bergamot.ui.api.ResourceAPIRouter;
 import com.intrbiz.bergamot.ui.api.ServiceAPIRouter;
 import com.intrbiz.bergamot.ui.api.StatsAPIRouter;
@@ -96,6 +97,7 @@ import com.intrbiz.bergamot.ui.router.command.CommandEditorRouter;
 import com.intrbiz.bergamot.ui.router.global.FirstInstallRouter;
 import com.intrbiz.bergamot.ui.router.global.GlobalAdminRouter;
 import com.intrbiz.bergamot.ui.router.global.GlobalUtilsAdminRouter;
+import com.intrbiz.bergamot.ui.router.proxy.ProxyRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
 import com.intrbiz.configuration.Configurable;
@@ -279,6 +281,8 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new SLARouter());
         // Agent
         router(new AgentRouter());
+        // Proxy
+        router(new ProxyRouter());
         // About
         router(new AboutRouter());
         // Admin
@@ -326,6 +330,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         router(new StatsAPIRouter());
         router(new UtilAPIRouter());
         router(new AgentAPIRouter());
+        router(new ProxyAPIRouter());
         router(new LamplighterAPIRouter());
     }
     

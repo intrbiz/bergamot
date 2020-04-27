@@ -97,7 +97,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({4, 0, 3}),
+        version = @SQLVersion({4, 0, 4}),
         tables = {
             Site.class,
             Location.class,
@@ -3040,10 +3040,11 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'ui.view.stats.transitions',\n" +
                 "        'ui.view.readings',\n" +
                 "        'ui.sign.agent',\n" +
-                "        'ui.generate.agent',\n" +
+                "        'ui.sign.proxy',\n" +
                 "        'ui.admin',\n" +
                 "        'api.access',\n" +
                 "        'api.sign.agent',\n" +
+                "        'api.sign.proxy',\n" +
                 "        'read',\n" +
                 "        'read.config',\n" +
                 "        'read.comment',\n" +
@@ -3064,6 +3065,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'remove.comment',\n" +
                 "        'remove.downtime',\n" +
                 "        'sign.agent',\n" +
+                "        'sign.proxy',\n" +
                 "        'config.export',\n" +
                 "        'config.change.apply'\n" +
                 "      ])::TEXT;\n" +
@@ -3168,55 +3170,6 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_ui_create_permission", index = 11, type = ScriptType.BOTH, version = @SQLVersion({3, 18, 0}), skip = false)
-    public static SQLScript addUiCreatePermission()
-    {
-        return new SQLScript(
-                
-                "CREATE OR REPLACE FUNCTION bergamot.list_permissions()\n" +
-                "RETURNS SETOF TEXT\n" +
-                "LANGUAGE SQL AS $$\n" +
-                "  SELECT unnest(\n" +
-                "      ARRAY[\n" +
-                "        'ui.access',\n" +
-                "        'ui.view.stats',\n" +
-                "        'ui.view.stats.transitions',\n" +
-                "        'ui.view.readings',\n" +
-                "        'ui.sign.agent',\n" +
-                "        'ui.generate.agent',\n" +
-                "        'ui.admin',\n" +
-                "        'ui.create',\n" +
-                "        'api.access',\n" +
-                "        'api.sign.agent',\n" +
-                "        'read',\n" +
-                "        'read.config',\n" +
-                "        'read.comment',\n" +
-                "        'read.downtime',\n" +
-                "        'read.readings',\n" +
-                "        'enable',\n" +
-                "        'disable',\n" +
-                "        'execute',\n" +
-                "        'suppress',\n" +
-                "        'unsuppress',\n" +
-                "        'submit',\n" +
-                "        'acknowledge',\n" +
-                "        'write',\n" +
-                "        'write.comment',\n" +
-                "        'write.downtime',\n" +
-                "        'create',\n" +
-                "        'remove',\n" +
-                "        'remove.comment',\n" +
-                "        'remove.downtime',\n" +
-                "        'sign.agent',\n" +
-                "        'config.export',\n" +
-                "        'config.change.apply'\n" +
-                "      ])::TEXT;\n" +
-                "$$",
-                
-                "SELECT bergamot.build_permissions(id) FROM bergamot.site"
-        );
-    }
-    
     @SQLPatch(name = "add_suppress_check", index = 12, type = ScriptType.BOTH, version = @SQLVersion({3, 20, 0}), skip = false)
     public static SQLScript addSuppressCheckFunction()
     {
@@ -3294,6 +3247,57 @@ public abstract class BergamotDB extends DatabaseAdapter
     {
         return new SQLScript(
                 "CREATE INDEX config_name_idx ON bergamot.config (site_id ASC NULLS LAST, type ASC NULLS LAST, name ASC NULLS LAST)"
+        );
+    }
+    
+    @SQLPatch(name = "update_permission_v404", index = 17, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 4}), skip = false)
+    public static SQLScript updatePermissionV404()
+    {
+        return new SQLScript(
+                
+                "CREATE OR REPLACE FUNCTION bergamot.list_permissions()\n" +
+                "RETURNS SETOF TEXT\n" +
+                "LANGUAGE SQL AS $$\n" +
+                "  SELECT unnest(\n" +
+                "      ARRAY[\n" +
+                "        'ui.access',\n" +
+                "        'ui.view.stats',\n" +
+                "        'ui.view.stats.transitions',\n" +
+                "        'ui.view.readings',\n" +
+                "        'ui.sign.agent',\n" +
+                "        'ui.sign.proxy',\n" +
+                "        'ui.admin',\n" +
+                "        'ui.create',\n" +
+                "        'api.access',\n" +
+                "        'api.sign.agent',\n" +
+                "        'api.sign.proxy',\n" +
+                "        'read',\n" +
+                "        'read.config',\n" +
+                "        'read.comment',\n" +
+                "        'read.downtime',\n" +
+                "        'read.readings',\n" +
+                "        'enable',\n" +
+                "        'disable',\n" +
+                "        'execute',\n" +
+                "        'suppress',\n" +
+                "        'unsuppress',\n" +
+                "        'submit',\n" +
+                "        'acknowledge',\n" +
+                "        'write',\n" +
+                "        'write.comment',\n" +
+                "        'write.downtime',\n" +
+                "        'create',\n" +
+                "        'remove',\n" +
+                "        'remove.comment',\n" +
+                "        'remove.downtime',\n" +
+                "        'sign.agent',\n" +
+                "        'sign.proxy',\n" +
+                "        'config.export',\n" +
+                "        'config.change.apply'\n" +
+                "      ])::TEXT;\n" +
+                "$$",
+                
+                "SELECT bergamot.build_permissions(id) FROM bergamot.site"
         );
     }
     

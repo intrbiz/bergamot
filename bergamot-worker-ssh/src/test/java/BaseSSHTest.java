@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 import org.junit.Before;
 
-import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
@@ -33,9 +33,8 @@ public abstract class BaseSSHTest
         this.engine.prepare(new EngineContext() {
             
             @Override
-            public AgentKey lookupAgentKey(UUID keyId)
+            public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
             {
-                return null;
             }
 
             @Override

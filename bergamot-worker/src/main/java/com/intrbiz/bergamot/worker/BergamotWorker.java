@@ -14,21 +14,23 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.apache.zookeeper.KeeperException;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZWorkerClient;
+import com.intrbiz.bergamot.cluster.client.proxy.ProxyBaseClient;
+import com.intrbiz.bergamot.cluster.client.proxy.ProxyWorkerClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
-import com.intrbiz.bergamot.model.AgentKey;
+import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
@@ -194,9 +196,9 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             }
 
             @Override
-            public AgentKey lookupAgentKey(UUID keyId)
+            public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
             {
-                return client.getAgentKeyLookup().lookupAgentKey(keyId);
+                client.getAgentKeyLookup().lookupAgentKey(keyId, callback);
             }
 
             @Override
@@ -212,7 +214,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
                 {
                     client.registerAgent(agentId);
                 }
-                catch (KeeperException | InterruptedException e)
+                catch (Exception e)
                 {
                     throw new RuntimeException("Failed to register agent", e);
                 }
@@ -225,7 +227,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
                 {
                     client.unregisterAgent(agentId);
                 }
-                catch (KeeperException | InterruptedException e)
+                catch (Exception e)
                 {
                     logger.warn("Failed to unregister agent", e);
                 }
@@ -247,9 +249,16 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     protected void connectCluster() throws Exception
     {
-        // TODO
-        this.client = new HZWorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
-        this.client.registerWorker(this.sites, this.workerPool, this.engines.keySet());
+        if (! Util.isEmpty(ProxyBaseClient.getProxyUrl(this.configuration.getCluster())))
+        {
+            logger.info("Connecting to proxy");
+            this.client = new ProxyWorkerClient(this.configuration.getCluster(), this::clusterPanic, BergamotVersion.fullVersionString(), this.workerPool, this.engines.keySet());
+        }
+        else
+        {
+            logger.info("Connecting to cluster");
+            this.client = new HZWorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString(), this.sites, this.workerPool, this.engines.keySet());
+        }
     }
     
     protected void clusterPanic(Void v)
@@ -356,14 +365,6 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     protected void disconnectScheduler()
     {
         logger.info("Disconnecting from cluster");
-        try
-        {
-            this.client.unregisterWorker();
-        }
-        catch (Exception e)
-        {
-            // ignore
-        }
         this.client.close();
     }
 

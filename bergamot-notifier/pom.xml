@@ -45,6 +45,10 @@
 			<artifactId>bergamot-notifier-webhook</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.intrbiz.bergamot</groupId>
+			<artifactId>bergamot-proxy-client</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>bergamot-notifier</finalName>

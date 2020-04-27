@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.ui.router.global;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,8 +22,11 @@ import com.intrbiz.bergamot.cluster.consumer.hz.HZProcessorConsumer;
 import com.intrbiz.bergamot.cluster.consumer.hz.HZWorkerConsumer;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.metadata.GetBergamotSite;
+import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
+import com.intrbiz.bergamot.model.ProxyKey;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
@@ -30,6 +34,7 @@ import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
+import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.IsaInt;
@@ -120,11 +125,6 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         {
             levels.add(i);
         }
-        for (NotifierRegistration notifier : notifiers)
-        {
-            // TODO: we should have a task computing real stats somewhere
-            
-        }
         var("processors", processors.values());
         var("processor_colours", colours);
         var("processor_pools", poolCounts);
@@ -152,8 +152,26 @@ public class GlobalAdminRouter extends Router<BergamotApp>
             }
         }
         var("allAdmins", allAdmins);
+        // proxy keys
+        var("proxyKeys", db.listGlobalProxyKeys());
         // render
         encode("/global/admin/index");
+    }
+    
+    @Any("/proxy/create")
+    @WithDataAdapter(BergamotDB.class)
+    public void createProxyKey(BergamotDB db, @GetBergamotSite() Site site, @Param("purpose") @CheckStringLength(min = 1, max = 100, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = "General Proxy Key") String purpose) throws IOException
+    {
+        db.setProxyKey(ProxyKey.createGlobal(purpose));
+        redirect(path("/global/admin/"));
+    }
+    
+    @Any("/proxy/revoke/:id")
+    @WithDataAdapter(BergamotDB.class)
+    public void revokeProxy(BergamotDB db, @GetBergamotSite() Site site, @Param("id") @IsaObjectId() UUID proxyKeyId) throws Exception
+    {
+        db.setProxyKey(notNull(db.getProxyKey(proxyKeyId)).revoke());
+        redirect(path("/global/admin/"));
     }
     
     @Any("/site/id/:id/disable")

@@ -20,6 +20,10 @@ public class ClusterCfg
     private int port;
     
     private int expectedMembers = 0;
+    
+    private String proxyUrl;
+    
+    private String proxyKey;
 
     public ClusterCfg()
     {
@@ -74,5 +78,27 @@ public class ClusterCfg
     public void setExpectedMembers(int expectedMembers)
     {
         this.expectedMembers = expectedMembers;
+    }
+
+    @XmlAttribute(name = "proxy-url")
+    public String getProxyUrl()
+    {
+        return this.proxyUrl;
+    }
+
+    public void setProxyUrl(String proxyUrl)
+    {
+        this.proxyUrl = proxyUrl;
+    }
+
+    @XmlAttribute(name = "proxy-key")
+    public String getProxyKey()
+    {
+        return this.proxyKey;
+    }
+
+    public void setProxyKey(String proxyKey)
+    {
+        this.proxyKey = proxyKey;
     }
 }

@@ -59,6 +59,11 @@
 	            <h4><a href="/agent/">Bergamot Agent</a></h4>
 	        </div>
 	    </container>
+	    <container rendered="#{Balsa().permission('ui.sign.proxy') and Balsa().permission('sign.proxy')}">
+	        <div class="menu-group">
+	            <h4><a href="/proxy/">Bergamot Proxy</a></h4>
+	        </div>
+	    </container>
     
     </div>
     

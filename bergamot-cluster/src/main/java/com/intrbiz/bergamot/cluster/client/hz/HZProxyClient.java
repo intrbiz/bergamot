@@ -80,9 +80,9 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
         this.workerRegistar.unregisterWorker(workerId);
     }
 
-    public void registerAgent(UUID agentId) throws KeeperException, InterruptedException
+    public void registerAgent(UUID agentId, UUID workerId) throws KeeperException, InterruptedException
     {
-        this.agentRegistar.registerAgent(new AgentRegistration(agentId, System.currentTimeMillis(), this.id));
+        this.agentRegistar.registerAgent(new AgentRegistration(agentId, System.currentTimeMillis(), workerId));
     }
     
     public void unregisterAgent(UUID agentId) throws KeeperException, InterruptedException

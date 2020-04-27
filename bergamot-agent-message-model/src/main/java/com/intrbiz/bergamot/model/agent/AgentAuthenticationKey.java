@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model.agent;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
@@ -13,8 +14,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
-public class AgentAuthenticationKey
-{   
+public class AgentAuthenticationKey implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+
     public static final int VERSION_1 = 0x01;
     
     public static final byte MAGIC1 = (byte) 0x1B;

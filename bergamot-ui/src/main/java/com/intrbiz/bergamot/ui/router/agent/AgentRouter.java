@@ -31,7 +31,7 @@ public class AgentRouter extends Router<BergamotApp>
     @WithDataAdapter(BergamotDB.class)
     public void listAgents(BergamotDB db, @GetBergamotSite() Site site)
     {
-        model("agentKeys", db.listAgentKeys(site.getId()));
+        var("agentKeys", db.listAgentKeys(site.getId()));
         encode("agent/index");
     }
     

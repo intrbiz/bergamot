@@ -141,6 +141,7 @@ public abstract class HZBergamotClient implements BergamotClient
 
     public void close()
     {
+        this.paniced.set(true);
         try
         {
             this.hazelcast.shutdown();
