@@ -3,6 +3,7 @@ package com.intrbiz.bergamot.ui.api;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,12 +18,18 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Alert;
+import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.Contact;
+import com.intrbiz.bergamot.model.NotificationType;
+import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.Site;
+import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.AlertMO;
+import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.event.update.AlertUpdate;
 import com.intrbiz.bergamot.model.message.notification.SendAcknowledge;
+import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
@@ -142,33 +149,48 @@ public class AlertsAPIRouter extends Router<BergamotApp>
                 db.acknowledgeCheck(alert.getCheckId(), true);
             });
             // send acknowledge notifications
-            if (! alert.getCheck().getState().isSuppressedOrInDowntime())
+            Calendar now = Calendar.getInstance();
+            Check<?,?> check = alert.getCheck();
+            CheckState state = check.getState();
+            if (! state.isSuppressedOrInDowntime())
             {
-                try
+                // compute the notification engines
+                Set<String> engines = this.getNotificationEngines(check.getSiteId(), check.getNotifications(), NotificationType.RECOVERY, state.getStatus(), now);
+                // Who to notify
+                List<ContactMO> to = alert.getContactsToNotify(check, state.getStatus(), now, engines);
+                // send the ack
+                for (String engine : engines)
                 {
-                    SendAcknowledge sendAck = alert.createAcknowledgeNotification(Calendar.getInstance(), contact, ackCom);
-                    if (sendAck != null && (! sendAck.getTo().isEmpty()))
+                    try
                     {
-                        logger.warn("Sending acknowledge for " + alert.getId());
-                        // TODO
-                        // this.notificationsProducer.publish(new NotificationKey(contact.getSite().getId()), sendAck);
-                        // accounting
-                        this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
+                        SendAcknowledge sendAck = alert.createAcknowledgeNotification(now, to, contact, ackCom, engine);
+                        if (sendAck != null && (! sendAck.getTo().isEmpty()))
+                        {
+                            logger.debug("Sending acknowledge for " + alert.getId());
+                            app().getProcessor().getNotificationDispatcher().dispatchNotification(sendAck);
+                            // accounting
+                            this.accounting.account(new SendNotificationAccountingEvent(alert.getSiteId(), alert.getId(), alert.getCheckId(), AccountingNotificationType.ACKNOWLEDGEMENT, sendAck.getTo().size(), 0, null));
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        logger.warn("Not sending acknowledge for " + alert.getId());
+                        logger.warn("Failed to send acknoweldge notification, for alert " + alert);
                     }
-                }
-                catch (Exception e)
-                {
-                    logger.warn("Failed to send acknoweldge notification, for alert " + alert);
                 }
             }
             // send alert update
             action("publish-update", alert.getSiteId(), new AlertUpdate(alert.toMO(currentPrincipal())));
         }
         return alert.toMO(currentPrincipal());
+    }
+    
+    protected Set<String> getNotificationEngines(UUID siteId, Notifications notifications, NotificationType type, Status status, Calendar now)
+    {
+        Set<String> availableEngines = app().getProcessor().getNotificationDispatcher().getAvailableEngines(siteId);
+        availableEngines.add("web"); // add in the web notification engine which is internal
+        Set<String> enabledEngines = notifications.getEnginesEnabledAt(type, status, now);
+        Set<String> engines = availableEngines.stream().filter(enabledEngines::contains).collect(Collectors.toSet());
+        return engines;
     }
     
     @Title("False positive alert")

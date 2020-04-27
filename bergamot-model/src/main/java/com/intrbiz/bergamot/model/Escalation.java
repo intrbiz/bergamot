@@ -207,11 +207,9 @@ public class Escalation extends BergamotObject<EscalationMO> implements Comparab
      * Compute the list of contacts who should be notified
      * @return a list of contact message objects
      */
-    public List<ContactMO> getContactsToNotify(Check<?,?> check, Status status, Calendar time)
+    public List<ContactMO> getContactsToNotify(Check<?,?> check, Status status, Calendar time, Set<String> engines)
     {
         final Notifications checkNotifications = check.getNotifications();
-        // compute the engines available
-        final Set<String> enabledEngines = checkNotifications.getEnginesEnabledAt(NotificationType.ALERT, status, time);
         // compute the contacts to notify
         return this.getAllContacts().stream()
         .filter((contact) -> contact.getNotifications().isEnabledAt(NotificationType.ALERT, status, time))
@@ -219,7 +217,7 @@ public class Escalation extends BergamotObject<EscalationMO> implements Comparab
             ContactMO cmo = contact.toMOUnsafe();
             cmo.setEngines(
                     contact.getNotifications().getEnginesEnabledAt(NotificationType.ALERT, status, time).stream()
-                    .filter((engine) -> checkNotifications.isAllEnginesEnabled() || enabledEngines.contains(engine))
+                    .filter((engine) -> checkNotifications.isAllEnginesEnabled() || engines.contains(engine))
                     .collect(Collectors.toSet())
             );
             return cmo;

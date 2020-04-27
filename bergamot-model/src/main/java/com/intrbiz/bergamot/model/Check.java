@@ -543,11 +543,9 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
      * Compute the list of contacts who should be notified
      * @return a list of contact message objects
      */
-    public List<ContactMO> getContactsToNotify(NotificationType type, Status status, Calendar time)
+    public List<ContactMO> getContactsToNotify(NotificationType type, Status status, Calendar time, Set<String> engines)
     {
         final Notifications checkNotifications = this.getNotifications();
-        // compute the engines available
-        final Set<String> enabledEngines = checkNotifications.getEnginesEnabledAt(type, status, time);
         // compute the contacts to notify
         return this.getAllContacts().stream()
         .filter((c) -> c != null && c.getNotifications() != null)
@@ -556,16 +554,16 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
             ContactMO cmo = contact.toMOUnsafe();
             cmo.setEngines(
                     contact.getNotifications().getEnginesEnabledAt(type, status, time).stream()
-                    .filter((engine) -> checkNotifications.isAllEnginesEnabled() || enabledEngines.contains(engine))
+                    .filter((engine) -> checkNotifications.isAllEnginesEnabled() || engines.contains(engine))
                     .collect(Collectors.toSet())
             );
             return cmo;
         }).collect(Collectors.toList());
     }
     
-    public List<ContactMO> getContactsToNotify(NotificationType type)
+    public List<ContactMO> getContactsToNotify(NotificationType type, Set<String> engines)
     {
-        return this.getContactsToNotify(type, this.getState().getStatus(), Calendar.getInstance());
+        return this.getContactsToNotify(type, this.getState().getStatus(), Calendar.getInstance(), engines);
     }
     
     public List<SLA> getSLAs()
@@ -633,7 +631,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         }
     }
 
-    public SendUpdate createUpdateNotification(Calendar now, List<ContactMO> to)
+    public SendUpdate createUpdateNotification(Calendar now, List<ContactMO> to, String engine)
     {
         // state
         CheckState state = this.getState();
@@ -641,6 +639,7 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         if (! this.getNotifications().isEnabledAt(NotificationType.UPDATE, state.getStatus(), now)) return null;
         // build the notification
         SendUpdate notification = new SendUpdate();
+        notification.setEngine(engine);
         notification.setSite(this.getSite().toMOUnsafe());
         notification.setRaised(now.getTimeInMillis());
         notification.setCheck(this.toMOUnsafe());

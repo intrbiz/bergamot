@@ -746,7 +746,7 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
      *            the constructor for the notification type
      * @return the notification
      */
-    public <T extends AlertNotification> T createNotification(Calendar now, NotificationType type, Supplier<T> ctor, List<ContactMO> to)
+    public <T extends AlertNotification> T createNotification(Calendar now, NotificationType type, Supplier<T> ctor, List<ContactMO> to, String engine)
     {
         Check<?, ?> check = this.getCheck();
         CheckState state = check.getState();
@@ -754,6 +754,8 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         if (!check.getNotifications().isEnabledAt(type, state.getStatus(), now)) return null;
         // create the notifications
         T notification = ctor.get();
+        // the engine
+        notification.setEngine(engine);
         // the site
         notification.setSite(check.getSite().toMOUnsafe());
         notification.setRaised(now.getTimeInMillis());
@@ -766,28 +768,28 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
         return notification;
     }
 
-    public SendAlert createAlertNotification(Calendar now, List<ContactMO> to)
+    public SendAlert createAlertNotification(Calendar now, List<ContactMO> to, String engine)
     {
-        return this.createNotification(now, NotificationType.ALERT, SendAlert::new, to);
+        return this.createNotification(now, NotificationType.ALERT, SendAlert::new, to, engine);
     }
 
-    public SendAlert createEscalatedAlertNotification(Calendar now, List<ContactMO> to)
+    public SendAlert createEscalatedAlertNotification(Calendar now, List<ContactMO> to, String engine)
     {
-        SendAlert sa = this.createNotification(now, NotificationType.ALERT, SendAlert::new, to);
+        SendAlert sa = this.createNotification(now, NotificationType.ALERT, SendAlert::new, to, engine);
         sa.setEscalation(true);
         return sa;
     }
 
-    public SendRecovery createRecoveryNotification(Calendar now)
+    public SendRecovery createRecoveryNotification(Calendar now, List<ContactMO> to, String engine)
     {
-        List<ContactMO> to = this.getContactsToNotify(this.getCheck(), this.getCheck().getState().getStatus(), now);
-        return this.createNotification(now, NotificationType.RECOVERY, SendRecovery::new, to);
+        //List<ContactMO> to = this.getContactsToNotify(this.getCheck(), this.getCheck().getState().getStatus(), now);
+        return this.createNotification(now, NotificationType.RECOVERY, SendRecovery::new, to, engine);
     }
 
-    public SendAcknowledge createAcknowledgeNotification(Calendar now, Contact acknowledgedBy, Comment acknowledgeComment)
+    public SendAcknowledge createAcknowledgeNotification(Calendar now, List<ContactMO> to, Contact acknowledgedBy, Comment acknowledgeComment, String engine)
     {
-        List<ContactMO> to = this.getContactsToNotify(this.getCheck(), this.getCheck().getState().getStatus(), now);
-        SendAcknowledge sa = this.createNotification(now, NotificationType.ACKNOWLEDGE, SendAcknowledge::new, to);
+        //List<ContactMO> to = this.getContactsToNotify(this.getCheck(), this.getCheck().getState().getStatus(), now);
+        SendAcknowledge sa = this.createNotification(now, NotificationType.ACKNOWLEDGE, SendAcknowledge::new, to, engine);
         if (sa == null) return null;
         // additional detail for acknowledge
         sa.setAcknowledgedBy(acknowledgedBy.toStubMOUnsafe());
@@ -802,21 +804,20 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
      * 
      * @return a list of contact message objects
      */
-    public List<ContactMO> getContactsToNotify(Check<?, ?> check, Status status, Calendar time)
+    public List<ContactMO> getContactsToNotify(Check<?, ?> check, Status status, Calendar time, Set<String> engines)
     {
         final Notifications checkNotifications = check.getNotifications();
-        // compute the engines available
-        final Set<String> enabledEngines = checkNotifications.getEnginesEnabledAt(NotificationType.ALERT, status, time);
         // compute the contacts to notify
         return this.getNotified().stream().filter((contact) -> contact.getNotifications().isEnabledAt(NotificationType.ALERT, status, time)).map((contact) -> {
             ContactMO cmo = contact.toMOUnsafe();
-            cmo.setEngines(contact.getNotifications().getEnginesEnabledAt(NotificationType.ALERT, status, time).stream().filter((engine) -> checkNotifications.isAllEnginesEnabled() || enabledEngines.contains(engine)).collect(Collectors.toSet()));
+            cmo.setEngines(
+                contact.getNotifications().getEnginesEnabledAt(NotificationType.ALERT, status, time).stream().filter((engine) -> checkNotifications.isAllEnginesEnabled() || engines.contains(engine)).collect(Collectors.toSet()));
             return cmo;
         }).collect(Collectors.toList());
     }
 
-    public List<ContactMO> getContactsToNotify(Calendar time)
+    public List<ContactMO> getContactsToNotify(Calendar time, Set<String> engines)
     {
-        return this.getContactsToNotify(this.getCheck(), this.getCheck().getState().getStatus(), time);
+        return this.getContactsToNotify(this.getCheck(), this.getCheck().getState().getStatus(), time, engines);
     }
 }

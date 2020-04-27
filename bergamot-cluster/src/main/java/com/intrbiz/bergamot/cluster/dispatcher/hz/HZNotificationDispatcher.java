@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.cluster.dispatcher.hz;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import com.hazelcast.core.HazelcastInstance;
@@ -43,5 +44,11 @@ public class HZNotificationDispatcher extends HZBaseDispatcher<Notification> imp
     protected UUID routeNotification(Notification check)
     {
         return this.notifierRouteTable.route(check.getSite().getId(), check.getEngine());
+    }
+    
+    @Override
+    public Set<String> getAvailableEngines(UUID siteId)
+    {
+        return this.notifierRouteTable.getAvailableEngines(siteId);
     }
 }

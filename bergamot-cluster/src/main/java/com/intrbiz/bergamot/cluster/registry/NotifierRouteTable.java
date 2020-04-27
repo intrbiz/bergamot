@@ -4,7 +4,9 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -165,9 +167,15 @@ public class NotifierRouteTable
         return null;
     }
     
-    public Set<String> getAvailableEngines()
+    public Set<String> getAvailableEngines(UUID siteId)
     {
-        return new HashSet<String>(this.routingTable.keySet());
+        Set<String> engines = new TreeSet<>();
+        for (Entry<String, ConcurrentMap<UUID, UUID[]>> engine : this.routingTable.entrySet())
+        {
+            if (engine.getValue().containsKey(siteId) || engine.getValue().containsKey(ANY_SITE))
+                engines.add(engine.getKey());
+        }
+        return engines;
     }
     
     public String toString()

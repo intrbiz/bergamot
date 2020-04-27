@@ -67,10 +67,16 @@ public abstract class AbstractResultProcessor implements ResultProcessor
     protected void publishNotification(Check<?, ?> check, Notification notification)
     {
         if (logger.isTraceEnabled()) logger.trace("Sending notification:\r\n" + notification);
-        // Broadcast our notification first
-        this.notificationTopic.publish(check.getSiteId(), notification);
-        // Route to specific notification engines
-        this.notificationDispatcher.dispatchNotification(notification);
+        if ("web".equalsIgnoreCase(notification.getEngine()))
+        {
+            // Broadcast web notification
+            this.notificationTopic.publish(check.getSiteId(), notification);
+        }
+        else
+        {
+            // Route to specific notification engines
+            this.notificationDispatcher.dispatchNotification(notification);
+        }
     }
     
     protected void publishAlertUpdate(Alert alert, AlertUpdate update)
