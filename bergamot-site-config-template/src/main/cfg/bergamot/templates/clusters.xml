@@ -22,5 +22,26 @@
         </resource>
     </cluster>
 
+    <cluster name="bergamot-notifier-cluster" extends="bergamot-cluster" template="yes">
+        <summary>Bergamot Notifier Cluster</summary>
+        
+        <condition>one or more of hosts in pool 'bergamot-notifier-cluster'</condition>
+        
+        <resource name="bergamot-notifier-daemon" extends="bergamot-resource">
+            <summary>Bergamot Notifier Daemon</summary>
+            <condition>one or more of service 'bergamot-notifier-daemon' on hosts in pool 'bergamot-notifier-cluster'</condition>
+        </resource>
+    </cluster>
+    
+    <cluster name="bergamot-worker-cluster" extends="bergamot-cluster" template="yes">
+        <summary>Bergamot Worker Cluster</summary>
+        
+        <condition>one or more of hosts in pool 'bergamot-worker-cluster'</condition>
+        
+        <resource name="bergamot-worker-daemon" extends="bergamot-resource">
+            <summary>Bergamot Worker Daemon</summary>
+            <condition>one or more of service 'bergamot-worker-daemon' on hosts in pool 'bergamot-worker-cluster'</condition>
+        </resource>
+    </cluster>
     
 </bergamot>

@@ -33,7 +33,7 @@
     <host name="bergamot-notifier-server" extends="bergamot-server" template="yes" resource-pool="bergamot-notifier-cluster">
         <summary>A Bergamot Monitoring Notifier server</summary>
         
-        <service name="bergamot-notifier" extends="bergamot-service">
+        <service name="bergamot-notifier-daemon" extends="bergamot-service">
             <summary>Bergamot Notifier Daemon</summary>
             <check-command command="check-bergamot-notifier-process"/>
         </service>
@@ -42,13 +42,13 @@
     <host name="bergamot-worker-server" extends="bergamot-server" template="yes" resource-pool="bergamot-worker-cluster">
         <summary>A Bergamot Monitoring Worker server</summary>
         
-        <service name="bergamot-worker-nagios" extends="bergamot-service">
+        <service name="bergamot-worker-daemon" extends="bergamot-service">
             <summary>Bergamot Worker Daemon</summary>
             <check-command command="check-bergamot-worker-process"/>
         </service>
     </host>
     
-    <host name="bergamot-worker-agent-server" extends="bergamot-server" template="yes" resource-pool="bergamot-worker-agent-cluster">
+    <host name="bergamot-worker-agent-server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring Agent Worker server</summary>
 
         <service name="bergamot-agent-port" extends="bergamot-service">

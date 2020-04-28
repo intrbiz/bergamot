@@ -28,7 +28,7 @@
     
     <group name="cluster-group" security-domains="global" template="yes">
         <summary>Cluster Group Template</summary>
-        <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cluster.png</parameter>
     </group>
     
 	<!-- Services -->
