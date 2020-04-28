@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.cluster.client.NotifierClient;
@@ -45,15 +46,19 @@ public class ProxyNotifierClient extends ProxyBaseClient implements NotifierClie
     {   
         private volatile List<Notification> buffer;
         
+        private volatile Executor executor;
+        
         private volatile Consumer<Notification> consumer;
         
         void acceptNotification(Notification notification)
         {
             synchronized (this)
             {
-                if (this.consumer != null)
+                if (this.consumer != null && this.executor != null)
                 {
-                    this.consumer.accept(notification);
+                    this.executor.execute(() -> {
+                        this.consumer.accept(notification);
+                    });
                 }
                 else
                 {
@@ -88,16 +93,19 @@ public class ProxyNotifierClient extends ProxyBaseClient implements NotifierClie
         }
 
         @Override
-        public boolean start(Consumer<Notification> consumer)
+        public boolean start(Executor executor, Consumer<Notification> consumer)
         {
             synchronized (this)
             {
+                this.executor = executor;
                 this.consumer = consumer;
                 if (this.buffer != null)
                 {
                     for (Notification notification : this.buffer)
                     {
-                        consumer.accept(notification);
+                        this.executor.execute(() -> {
+                            consumer.accept(notification);
+                        });
                     }
                     this.buffer = null;
                 }

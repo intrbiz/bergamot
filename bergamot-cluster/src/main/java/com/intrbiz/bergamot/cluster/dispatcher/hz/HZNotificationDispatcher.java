@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.ringbuffer.Ringbuffer;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.registry.NotifierRegistry;
@@ -34,11 +33,8 @@ public class HZNotificationDispatcher extends HZBaseDispatcher<Notification> imp
         // Pick a notifier for this check
         UUID notifierId = this.routeNotification(notification);
         if (notifierId == null) return PublishStatus.Unroutable;
-        // Get the notifier queue
-        // TODO: maybe we should do an async offer
-        Ringbuffer<Notification> queue = this.getRingbuffer(notifierId);
-        queue.add(notification);
-        return PublishStatus.Success;
+        // Offer to the notifier
+        return this.offer(notifierId, notification);
     }
     
     protected UUID routeNotification(Notification check)

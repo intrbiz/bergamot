@@ -6,17 +6,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import org.apache.log4j.Logger;
+
 import com.hazelcast.core.DistributedObjectEvent;
 import com.hazelcast.core.DistributedObjectListener;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.ringbuffer.OverflowPolicy;
 import com.hazelcast.ringbuffer.Ringbuffer;
 import com.hazelcast.ringbuffer.impl.RingbufferService;
+import com.intrbiz.bergamot.cluster.model.PublishStatus;
 
 /**
  * Dispatch results, readings, agent message to a processor
  */
 public abstract class HZBaseDispatcher<T>
 {
+    private static final Logger logger = Logger.getLogger(HZBaseDispatcher.class);
+    
     private final HazelcastInstance hazelcast;
     
     private final ConcurrentMap<String, Ringbuffer<T>> ringbuffersCache = new ConcurrentHashMap<>();
@@ -31,9 +37,24 @@ public abstract class HZBaseDispatcher<T>
         this.hazelcast.addDistributedObjectListener(new RingbufferListener());
     }
     
-    protected Ringbuffer<T> getRingbuffer(UUID processorId)
+    protected PublishStatus offer(UUID id, T message)
     {
-        return this.ringbuffersCache.computeIfAbsent(this.ringbufferName.apply(processorId), this.hazelcast::getRingbuffer);
+        try
+        {
+            this.getRingbuffer(Objects.requireNonNull(id))
+                .addAsync(message, OverflowPolicy.OVERWRITE);
+            return PublishStatus.Success;
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to offer message to ringbuffer: " + id, e);
+        }
+        return PublishStatus.Failed;
+    }
+    
+    protected Ringbuffer<T> getRingbuffer(UUID id)
+    {
+        return this.ringbuffersCache.computeIfAbsent(this.ringbufferName.apply(id), this.hazelcast::getRingbuffer);
     }
 
     private class RingbufferListener implements DistributedObjectListener

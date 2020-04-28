@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.ringbuffer.Ringbuffer;
 import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistry;
@@ -55,11 +54,8 @@ public class HZCheckDispatcher extends HZBaseDispatcher<ExecuteCheck> implements
             workerId = this.workerRouteTable.route(check.getSiteId(), check.getWorkerPool(), check.getEngine());
             if (workerId == null) return PublishStatus.Unroutable;
         }
-        // Push the check
-        // TODO: maybe we should do an async offer
-        Ringbuffer<ExecuteCheck> queue = this.getRingbuffer(workerId);
-        queue.add(check);
-        return PublishStatus.Success;
+        // Offer to the worker
+        return this.offer(workerId, check);
     }
     
     protected boolean isAgentRouted(ExecuteCheck check)

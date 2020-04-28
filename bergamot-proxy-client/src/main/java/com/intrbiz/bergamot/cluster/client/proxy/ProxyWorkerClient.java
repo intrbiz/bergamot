@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.cluster.client.WorkerClient;
@@ -87,15 +88,19 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
     {
         private volatile List<ExecuteCheck> buffer;
         
+        private volatile Executor executor;
+        
         private volatile Consumer<ExecuteCheck> consumer;
         
         void processMessage(ExecuteCheck check)
         {
             synchronized (this)
             {
-                if (this.consumer != null)
+                if (this.consumer != null && this.executor != null)
                 {
-                    this.consumer.accept(check);
+                    this.executor.execute(() -> {
+                        this.consumer.accept(check);
+                    });
                 }
                 else
                 {
@@ -130,16 +135,19 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
         }
 
         @Override
-        public boolean start(Consumer<ExecuteCheck> consumer)
+        public boolean start(Executor executor, Consumer<ExecuteCheck> consumer)
         {
             synchronized (this)
             {
+                this.executor = executor;
                 this.consumer = consumer;
                 if (this.buffer != null)
                 {
                     for (ExecuteCheck check : this.buffer)
                     {
-                        consumer.accept(check);
+                        this.executor.execute(() -> {
+                            consumer.accept(check);
+                        });
                     }
                     this.buffer = null;
                 }

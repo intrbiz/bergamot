@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.cluster.consumer;
 
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 public interface BaseConsumer<T>
@@ -13,7 +14,7 @@ public interface BaseConsumer<T>
     
     long getHeadSequence();
     
-    boolean start(Consumer<T> consumer);
+    boolean start(Executor executor, Consumer<T> consumer);
     
     void stop();
     

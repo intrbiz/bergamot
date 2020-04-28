@@ -285,33 +285,31 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     protected void startConsuming() throws Exception
     {
         logger.info("Starting consuming checks");
-        this.client.getWorkerConsumer().start(this::executeCheck);
+        this.client.getWorkerConsumer().start(this.executor, this::executeCheck);
     }
 
     protected void executeCheck(ExecuteCheck check)
     {
         if (check != null)
         {
-            this.executor.execute(() -> {
-                if (logger.isTraceEnabled()) logger.trace("Executing check: " + check);
-                CheckExecutionContext context = createExecutionContext(check);
-                try
+            if (logger.isTraceEnabled()) logger.trace("Executing check: " + check);
+            CheckExecutionContext context = createExecutionContext(check);
+            try
+            {
+                Engine engine = this.engines.get(check.getEngine());
+                if (engine != null && engine.accept(check))
                 {
-                    Engine engine = this.engines.get(check.getEngine());
-                    if (engine != null && engine.accept(check))
-                    {
-                        engine.execute(check, context);
-                    }
-                    else
-                    {
-                        context.publishResult(new ActiveResult().fromCheck(check).error("No engine found to execute check"));
-                    }
+                    engine.execute(check, context);
                 }
-                catch (Exception e)
+                else
                 {
-                    context.publishResult(new ActiveResult().fromCheck(check).error("Error executing check: " + e.getMessage()));
+                    context.publishResult(new ActiveResult().fromCheck(check).error("No engine found to execute check"));
                 }
-            });
+            }
+            catch (Exception e)
+            {
+                context.publishResult(new ActiveResult().fromCheck(check).error("Error executing check: " + e.getMessage()));
+            }
         }
     }
 

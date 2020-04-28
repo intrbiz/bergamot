@@ -214,30 +214,28 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     protected void startConsuming() throws Exception
     {
         logger.info("Starting consuming notifications");
-        this.client.getNotifierConsumer().start(this::sendNotification);
+        this.client.getNotifierConsumer().start(this.executor, this::sendNotification);
     }
 
     protected void sendNotification(Notification notification)
     {
         if (notification != null)
         {
-            this.executor.execute(() -> {
-                if (logger.isTraceEnabled()) logger.trace("Sending notification: " + notification);
-                try
+            if (logger.isTraceEnabled()) logger.trace("Sending notification: " + notification);
+            try
+            {
+             // send the notification for the requested engine
+                NotificationEngine engine = this.engines.get(notification.getEngine());
+                if (engine != null && engine.accept(notification))
                 {
-                 // send the notification for the requested engine
-                    NotificationEngine engine = this.engines.get(notification.getEngine());
-                    if (engine != null && engine.accept(notification))
-                    {
-                        engine.sendNotification(notification);
-                    }
+                    engine.sendNotification(notification);
                 }
-                catch (Exception e)
-                {
-                    logger.error("Error sending notification", e);
-                    // TODO: We should ack notifications or similar
-                }
-            });
+            }
+            catch (Exception e)
+            {
+                logger.error("Error sending notification", e);
+                // TODO: We should ack notifications or similar
+            }
         }
     }
     

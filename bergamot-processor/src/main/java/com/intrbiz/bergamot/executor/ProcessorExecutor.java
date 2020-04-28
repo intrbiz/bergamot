@@ -46,34 +46,32 @@ public class ProcessorExecutor
     
     public void start() throws Exception
     {
-        this.processorConsumer.start(this::processMessage);
+        this.processorConsumer.start(this.executor, this::processMessage);
     }
     
     protected void processMessage(ProcessorMessage message)
     {
         if (message != null)
         {
-            this.executor.execute(() -> {
-                try
+            try
+            {
+                if (message instanceof ResultMessage)
                 {
-                    if (message instanceof ResultMessage)
-                    {
-                        this.resultProcessor.process((ResultMessage) message);
-                    }
-                    else if (message instanceof ReadingParcelMO)
-                    {
-                        this.readingProcessor.process((ReadingParcelMO) message);
-                    }
-                    else if (message instanceof AgentMessage)
-                    {
-                        this.agentRegistrationService.process((AgentMessage) message);
-                    }
+                    this.resultProcessor.process((ResultMessage) message);
                 }
-                catch (Exception e)
+                else if (message instanceof ReadingParcelMO)
                 {
-                    logger.error("Error processing message", e);
+                    this.readingProcessor.process((ReadingParcelMO) message);
                 }
-            });
+                else if (message instanceof AgentMessage)
+                {
+                    this.agentRegistrationService.process((AgentMessage) message);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.error("Error processing message", e);
+            }
         }
     }
     

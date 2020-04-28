@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -81,7 +82,7 @@ public abstract class HZBaseConsumer<T>
         return this.ringbuffer.headSequence();
     }
     
-    public boolean start(Consumer<T> consumer)
+    public boolean start(Executor executor, Consumer<T> consumer)
     {
         if (this.run.compareAndSet(false, true))
         {
@@ -95,7 +96,7 @@ public abstract class HZBaseConsumer<T>
             };
             commitTimer.schedule(this.commitTask, COMMIT_INTERVAL_MS, COMMIT_INTERVAL_MS);
             // Start consuming
-            this.consume(consumer);
+            this.consume(executor, consumer);
             return true;
         }
         return false;
@@ -120,50 +121,51 @@ public abstract class HZBaseConsumer<T>
         }
     }
     
-    private void consume(final Consumer<T> consumer)
+    private void consume(final Executor executor, final Consumer<T> consumer)
     {
-        if (logger.isTraceEnabled()) logger.trace("Reading from " + this.sequence);
+        // TODO: detect consumer stall
+        if (logger.isTraceEnabled()) logger.trace("Reading ringbuffer " + this.id + " from " + this.sequence);
         this.ringbuffer.readManyAsync(this.sequence, MIN_SIZE, MAX_SIZE, null).whenComplete((result, error) -> {
             if (this.run.get())
             {
                 try
                 {
-                    try
+                    // Did we get an error
+                    if (error != null)
                     {
-                        if (result != null)
+                        logger.warn("Error fetching batch", error);
+                        if (error instanceof StaleSequenceException)
                         {
-                            // Process the messages
-                            try
-                            {
-                                for (T message : result)
-                                {
-                                    consumer.accept(message);
-                                }
-                            }
-                            finally
-                            {
-                                if (logger.isTraceEnabled())  logger.trace("Updating sequence to: " + result.getNextSequenceToReadFrom());
-                                this.sequence = result.getNextSequenceToReadFrom();
-                            }
+                            this.sequence = ((StaleSequenceException) error).getHeadSeq();
                         }
                     }
-                    finally
+                    // update the sequence
+                    if (result != null)
                     {
-                        if (error != null)
-                        {
-                            logger.warn("Error fetching batch", error);
-                            if (error instanceof StaleSequenceException)
-                            {
-                                this.sequence = ((StaleSequenceException) error).getHeadSeq();
-                            }
-                        }
-                        // Fetch the next batch
-                        this.consume(consumer);
+                        if (logger.isTraceEnabled())  logger.trace("Updating sequence to: " + result.getNextSequenceToReadFrom());
+                        this.sequence = result.getNextSequenceToReadFrom();
                     }
                 }
                 catch (Exception e)
                 {
-                    logger.warn("Unhandled error whilst consuming", e);
+                    logger.error("Error updating sequence", e);
+                }
+                // Fetch the next batch
+                executor.execute(() -> this.consume(executor, consumer));
+                // Dispatch results
+                if (result != null)
+                {
+                    try
+                    {
+                        for (T message : result)
+                        {
+                            executor.execute(() -> consumer.accept(message));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        logger.error("Unhandled error consuming message", e);
+                    }
                 }
             }
         });

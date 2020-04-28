@@ -32,7 +32,7 @@ public class WorkerProxyProcessor extends MessageProcessor
     public void start()
     {
         // start consuming messages
-        this.consumer.start((message) -> {
+        this.consumer.start(this.channel.eventLoop(), (message) -> {
             channel.writeAndFlush(message);
         });
     }

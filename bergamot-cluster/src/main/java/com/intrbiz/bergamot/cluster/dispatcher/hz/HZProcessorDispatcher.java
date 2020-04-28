@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.ringbuffer.Ringbuffer;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRouteTable;
@@ -30,27 +29,25 @@ public class HZProcessorDispatcher extends HZBaseDispatcher<ProcessorMessage> im
     
     /**
      * Place the given processor message onto the queue for the given processor
-     * @param processor the id of the processor
+     * @param processorId the id of the processor
      * @param message the message
      * @return whether the message was offered successfully ({@code PublishStatus.Success}) or not ({@code PublishStatus.Failed})
      */
-    public PublishStatus dispatch(UUID processor, ProcessorMessage message)
+    public PublishStatus dispatch(UUID processorId, ProcessorMessage message)
     {
         // Pick a processor at random if we have no processor id
         // TODO: it would be nice to validate the processor exists
-        if (processor == null)
+        if (processorId == null)
         {
-            processor = route(message);
+            processorId = route(message);
         }
         // Did we manage to route the message
-        if (processor == null)
+        if (processorId == null)
         {
             return PublishStatus.Unroutable;
         }
         // Offer onto the result queue
-        Ringbuffer<ProcessorMessage> queue = this.getRingbuffer(Objects.requireNonNull(processor));
-        queue.add(message);
-        return PublishStatus.Success;
+        return this.offer(processorId, message);
     }
     
     /**
