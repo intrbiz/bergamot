@@ -27,6 +27,10 @@
     	<artifactId>hamcrest-all</artifactId>
     	<scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>com.intrbiz.core</groupId>
+    	<artifactId>core</artifactId>
+    </dependency>
   </dependencies>
   	<build>
 		<finalName>bergamot-util</finalName>

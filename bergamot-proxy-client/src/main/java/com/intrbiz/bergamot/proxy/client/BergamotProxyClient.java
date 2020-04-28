@@ -80,7 +80,7 @@ public class BergamotProxyClient
     
     private int getPort()
     {
-        return (this.server.getPort() <= 0 ? (this.isSecure() ? 80 : 443) : this.server.getPort());
+        return this.server.getPort() <= 0 ? (this.isSecure() ? 443 : 80) : this.server.getPort();
     }
     
     private SSLEngine createSSLEngine(String host, int port)

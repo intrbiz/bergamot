@@ -1,7 +1,5 @@
 package com.intrbiz.bergamot.cluster.client.hz;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,6 +19,7 @@ import com.intrbiz.bergamot.cluster.discovery.HazelcastZooKeeperDiscovery;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager.ZooKeeperState;
 import com.intrbiz.bergamot.config.ClusterCfg;
+import com.intrbiz.bergamot.util.HostUtil;
 
 /**
  * A Bergamot client daemon which connects to the cluster and provides services
@@ -70,15 +69,7 @@ public abstract class HZBergamotClient implements BergamotClient
     
     protected String getHostName()
     {
-        try
-        {
-            return Util.coalesceEmpty(System.getenv("BERGAMOT_HOSTNAME"), System.getProperty("bergamot.host.name"), InetAddress.getLocalHost().getHostName());
-        }
-        catch (UnknownHostException e)
-        {
-            logger.warn("Failed to get node host name", e);
-        }
-        return null;
+        return HostUtil.getHostName();
     }
     
     protected HazelcastInstance connectHazelcast() throws Exception

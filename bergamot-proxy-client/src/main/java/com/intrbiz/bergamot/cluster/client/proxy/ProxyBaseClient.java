@@ -1,8 +1,6 @@
 package com.intrbiz.bergamot.cluster.client.proxy;
 
-import java.net.InetAddress;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,6 +15,7 @@ import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.proxy.client.BergamotProxyClient;
 import com.intrbiz.bergamot.proxy.model.AuthenticationKey;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
+import com.intrbiz.bergamot.util.HostUtil;
 
 import io.netty.channel.Channel;
 
@@ -74,15 +73,7 @@ public abstract class ProxyBaseClient implements BergamotClient
     
     protected String getHostName()
     {
-        try
-        {
-            return Util.coalesceEmpty(System.getenv("BERGAMOT_HOSTNAME"), System.getProperty("bergamot.host.name"), InetAddress.getLocalHost().getHostName());
-        }
-        catch (UnknownHostException e)
-        {
-            logger.warn("Failed to get node host name", e);
-        }
-        return null;
+        return HostUtil.getHostName();
     }
     
     protected void panic()
