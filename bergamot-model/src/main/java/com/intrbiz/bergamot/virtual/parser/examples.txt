@@ -43,6 +43,9 @@ two hosts in pool 'cluster'
 one of services in pool 'cluster'
 one of traps in pool 'cluster'
 
+majority of hosts in pool 'cluster'
+majority hosts in pool 'cluster'
+
 # One of the named service/trap on hosts in the given pool
 one of service 'test' on hosts in pool 'cluster'
 one of traps 'test' on hosts in pool 'cluster'

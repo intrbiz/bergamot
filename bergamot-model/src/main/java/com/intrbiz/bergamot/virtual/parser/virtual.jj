@@ -75,13 +75,15 @@ TOKEN :
   | <ELSE                : "else" >
   | <END                 : "end" >
   | <AS                  : "as" >
-  | <STATUS             : "PENDING" | "OK" | "WARNING" | "CRITICAL" | "UNKNOWN" | "TIMEOUT" | "DISCONNECTED" | "ACTION" >
-  | <BOOLEAN            : "true" | "TRUE" | "false" | "FALSE" >
-  | <INTEGER            : (["0"-"9"])+ >
+  | <MAJORITY            : "majority" >
+  | <QUORUM              : "quorum" >
+  | <STATUS              : "PENDING" | "OK" | "WARNING" | "CRITICAL" | "UNKNOWN" | "TIMEOUT" | "DISCONNECTED" | "ACTION" >
+  | <BOOLEAN             : "true" | "TRUE" | "false" | "FALSE" >
+  | <INTEGER             : (["0"-"9"])+ >
   | <#HEXCHAR            : ["a"-"f","A"-"F","0"-"9"]> 
   | <#ESCAPECHAR         : "\\" ["n","t","b","r","f","\\","'","\"", "/"] > 
   | <#UESCAPECHAR        : "\\u" <HEXCHAR><HEXCHAR><HEXCHAR><HEXCHAR> > 
-  | <STRING             : "\'" ( (~["\'","\\","\n","\r"]) | <ESCAPECHAR> | <UESCAPECHAR>)* "\'" >
+  | <STRING              : "\'" ( (~["\'","\\","\n","\r"]) | <ESCAPECHAR> | <UESCAPECHAR>)* "\'" >
   | <QUOTE               : "\"" > : STRINGSTATE 
 }
 
@@ -632,6 +634,30 @@ private VirtualCheckOperator readOneOfFunction() :
     }
 }
 
+private VirtualCheckOperator readMajorityOfFunction() :
+{
+    ValuesOperator values;
+    Status as = null;
+    Token type = null;
+}
+{
+    (
+    	(
+        	<MAJORITY> |
+        	<QUORUM>
+        )
+        (<OF>)?
+        values = readValues()
+        (
+        	<AS>
+        	as = readStatus()
+        )?
+    )
+    { 
+        return new MajorityOfFunction(values, as); 
+    }
+}
+
 private VirtualCheckOperator readCountFunction() :
 {
     Status status = null;
@@ -710,10 +736,11 @@ private VirtualCheckOperator readFunction() :
 }
 {
     (
-        operator = readAllFunction()   |
-        operator = readAnyFunction()   |
-        operator = readOneOfFunction() |
-        operator = readCountFunction() |
+        operator = readAllFunction()        |
+        operator = readAnyFunction()        |
+        operator = readOneOfFunction()      |
+        operator = readMajorityOfFunction() |
+        operator = readCountFunction()      |
         operator = readCaseFunction()
     )
     { return operator; }

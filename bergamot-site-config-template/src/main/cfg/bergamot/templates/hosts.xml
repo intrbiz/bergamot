@@ -7,7 +7,7 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </host>
     
-    <host name="bergamot-ui-server" extends="bergamot-server" template="yes">
+    <host name="bergamot-ui-server" extends="bergamot-server" template="yes" resource-pool="bergamot-ui-cluster">
         <summary>A Bergamot Monitoring UI server</summary>
         
         <service name="bergamot-ui-daemon" extends="bergamot-service">
@@ -30,7 +30,7 @@
         </service>
     </host>
     
-    <host name="bergamot-notifier-server" extends="bergamot-server" template="yes">
+    <host name="bergamot-notifier-server" extends="bergamot-server" template="yes" resource-pool="bergamot-notifier-cluster">
         <summary>A Bergamot Monitoring Notifier server</summary>
         
         <service name="bergamot-notifier" extends="bergamot-service">
@@ -39,7 +39,7 @@
         </service>
     </host>
     
-    <host name="bergamot-worker-server" extends="bergamot-server" template="yes">
+    <host name="bergamot-worker-server" extends="bergamot-server" template="yes" resource-pool="bergamot-worker-cluster">
         <summary>A Bergamot Monitoring Worker server</summary>
         
         <service name="bergamot-worker-nagios" extends="bergamot-service">
@@ -48,7 +48,7 @@
         </service>
     </host>
     
-    <host name="bergamot-worker-agent-server" extends="bergamot-server" template="yes">
+    <host name="bergamot-worker-agent-server" extends="bergamot-server" template="yes" resource-pool="bergamot-worker-agent-cluster">
         <summary>A Bergamot Monitoring Agent Worker server</summary>
 
         <service name="bergamot-agent-port" extends="bergamot-service">
@@ -59,7 +59,7 @@
         </service>
     </host>
     
-    <host name="bergamot-postgresql-server" extends="bergamot-server, postgresql-server-agent" template="yes">
+    <host name="bergamot-postgresql-server" extends="bergamot-server, postgresql-server-agent" template="yes" resource-pool="bergamot-postgresql-cluster">
         <summary>A Bergamot Monitoring PostgreSQL server</summary>
         
         <service name="bergamot-transitions-size" extends="bergamot-service">

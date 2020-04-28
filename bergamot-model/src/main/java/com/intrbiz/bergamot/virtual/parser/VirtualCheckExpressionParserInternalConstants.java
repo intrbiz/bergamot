@@ -115,31 +115,35 @@ public interface VirtualCheckExpressionParserInternalConstants {
   /** RegularExpression Id. */
   int AS = 57;
   /** RegularExpression Id. */
-  int STATUS = 58;
+  int MAJORITY = 58;
   /** RegularExpression Id. */
-  int BOOLEAN = 59;
+  int QUORUM = 59;
   /** RegularExpression Id. */
-  int INTEGER = 60;
+  int STATUS = 60;
   /** RegularExpression Id. */
-  int HEXCHAR = 61;
+  int BOOLEAN = 61;
   /** RegularExpression Id. */
-  int ESCAPECHAR = 62;
+  int INTEGER = 62;
   /** RegularExpression Id. */
-  int UESCAPECHAR = 63;
+  int HEXCHAR = 63;
   /** RegularExpression Id. */
-  int STRING = 64;
+  int ESCAPECHAR = 64;
   /** RegularExpression Id. */
-  int QUOTE = 65;
+  int UESCAPECHAR = 65;
   /** RegularExpression Id. */
-  int ENDQUOTE = 67;
+  int STRING = 66;
   /** RegularExpression Id. */
-  int CHAR = 68;
+  int QUOTE = 67;
   /** RegularExpression Id. */
-  int CNTRLESC = 69;
+  int ENDQUOTE = 69;
   /** RegularExpression Id. */
-  int HEX = 71;
+  int CHAR = 70;
   /** RegularExpression Id. */
-  int HEXESC = 72;
+  int CNTRLESC = 71;
+  /** RegularExpression Id. */
+  int HEX = 73;
+  /** RegularExpression Id. */
+  int HEXESC = 74;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -210,6 +214,8 @@ public interface VirtualCheckExpressionParserInternalConstants {
     "\"else\"",
     "\"end\"",
     "\"as\"",
+    "\"majority\"",
+    "\"quorum\"",
     "<STATUS>",
     "<BOOLEAN>",
     "<INTEGER>",

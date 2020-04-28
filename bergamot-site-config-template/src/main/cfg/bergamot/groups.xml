@@ -14,4 +14,8 @@
         <summary>Bergamot Monitoring Servers</summary>
     </group>
     
+    <group name="bergamot-cluster" groups="clusters" extends="cluster-group">
+        <summary>Bergamot Cluster</summary>
+    </group>
+    
 </bergamot>

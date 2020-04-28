@@ -26,6 +26,11 @@
         <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
+    <group name="cluster-group" security-domains="global" template="yes">
+        <summary>Cluster Group Template</summary>
+        <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
+    </group>
+    
 	<!-- Services -->
     
     <group name="services" extends="service-group">
@@ -114,6 +119,11 @@
     
     <group name="websites" extends="website-group">
         <summary>Websites</summary>
+    </group>
+    
+    <!-- Clusters -->
+    <group name="clusters" extends="cluster-group">
+        <summary>Clusters</summary>
     </group>
     
 </bergamot>

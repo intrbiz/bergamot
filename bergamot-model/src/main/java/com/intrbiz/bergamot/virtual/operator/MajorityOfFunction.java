@@ -3,48 +3,16 @@ package com.intrbiz.bergamot.virtual.operator;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.virtual.VirtualCheckExpressionContext;
 
-public class OneOfFunction extends ValuesFunction
+public class MajorityOfFunction extends ValuesFunction
 {    
     private static final long serialVersionUID = 1L;
     
-    public enum Count {
-            one(1),
-            two(2),
-            three(3),
-            four(4),
-            five(5),
-            six(6),
-            seven(7),
-            eight(8),
-            nine(9);
-        
-        private final int count;
-        
-        private Count(int count)
-        {
-            this.count = count;
-        }
-        
-        public int getCount()
-        {
-            return count;
-        }
-    }
-    
-    private final Count count;
-    
     private final Status as;
 
-    public OneOfFunction(ValuesOperator values, String count, Status as)
+    public MajorityOfFunction(ValuesOperator values, Status as)
     {
         super(values);
-        this.count = Count.valueOf(count);
         this.as = as == null ? Status.CRITICAL : as;
-    }
-    
-    public Count getCount()
-    {
-        return count;
     }
     
     public Status getAs()
@@ -55,13 +23,26 @@ public class OneOfFunction extends ValuesFunction
     @Override
     public boolean computeOk(VirtualCheckExpressionContext context)
     {
+        int totalCount = 0;
         int okCount = 0;
         for (ValueOperator check : this.values.getValues(context))
         {
+            totalCount++;
             if (check.computeOk(context))
                 okCount++;
         }
-        return okCount == this.count.getCount();
+        return isQuorum(okCount, totalCount);
+    }
+    
+    /**
+     * Check for strict quorum.
+     * @param okCount the number of nodes ok
+     * @param totalCount the number of nodes in total
+     * @return true if and only if quorum exists
+     */
+    public static boolean isQuorum(int okCount, int totalCount)
+    {
+        return totalCount > 2 && okCount > (totalCount / 2);
     }
 
     public Status computeStatus(VirtualCheckExpressionContext context)
@@ -72,6 +53,6 @@ public class OneOfFunction extends ValuesFunction
 
     public String toString()
     {
-        return this.count + " of " + this.values.toString() + " as " + this.as.toString();
+        return "majority of " + this.values.toString() + " as " + this.as.toString();
     }
 }
