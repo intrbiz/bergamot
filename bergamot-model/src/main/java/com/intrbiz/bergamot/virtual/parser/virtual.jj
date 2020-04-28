@@ -637,7 +637,8 @@ private VirtualCheckOperator readOneOfFunction() :
 private VirtualCheckOperator readMajorityOfFunction() :
 {
     ValuesOperator values;
-    Status as = null;
+    Status warningAs = null;
+    Status criticalAs = null;
     Token type = null;
 }
 {
@@ -650,11 +651,13 @@ private VirtualCheckOperator readMajorityOfFunction() :
         values = readValues()
         (
         	<AS>
-        	as = readStatus()
+        	warningAs = readStatus()
+        	<SEP>
+        	criticalAs = readStatus()
         )?
     )
     { 
-        return new MajorityOfFunction(values, as); 
+        return new MajorityOfFunction(values, warningAs, criticalAs); 
     }
 }
 

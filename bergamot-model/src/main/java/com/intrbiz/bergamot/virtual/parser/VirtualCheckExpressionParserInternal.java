@@ -746,7 +746,8 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
 
   final private VirtualCheckOperator readMajorityOfFunction() throws ParseException {
     ValuesOperator values;
-    Status as = null;
+    Status warningAs = null;
+    Status criticalAs = null;
     Token type = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case MAJORITY:
@@ -772,13 +773,15 @@ public final class VirtualCheckExpressionParserInternal implements VirtualCheckE
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AS:
       jj_consume_token(AS);
-      as = readStatus();
+      warningAs = readStatus();
+      jj_consume_token(SEP);
+      criticalAs = readStatus();
       break;
     default:
       jj_la1[41] = jj_gen;
       ;
     }
-        {if (true) return new MajorityOfFunction(values, as);}
+        {if (true) return new MajorityOfFunction(values, warningAs, criticalAs);}
     throw new Error("Missing return statement in function");
   }
 

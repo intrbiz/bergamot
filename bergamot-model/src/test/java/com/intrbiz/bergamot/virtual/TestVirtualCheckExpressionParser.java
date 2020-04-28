@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.intrbiz.bergamot.virtual.operator.MajorityOfFunction;
 import com.intrbiz.bergamot.virtual.operator.VirtualCheckOperator;
 import com.intrbiz.bergamot.virtual.reference.AnonymousService;
 import com.intrbiz.bergamot.virtual.reference.AnonymousTrap;
@@ -93,15 +92,15 @@ public class TestVirtualCheckExpressionParser
     @Test
     public void testParseMajorityOf1()
     {
-        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("majority of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as WARNING");
-        assertThat(op.toString(), is(equalTo("majority of [host 'vm1', host 'vm2', host 'vm3', host 'vm4'] as WARNING")));
+        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("majority of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as WARNING, CRITICAL");
+        assertThat(op.toString(), is(equalTo("majority of [host 'vm1', host 'vm2', host 'vm3', host 'vm4'] as WARNING, CRITICAL")));
     }
     
     @Test
     public void testParseQuorumOf1()
     {
-        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("quorum of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as WARNING");
-        assertThat(op.toString(), is(equalTo("majority of [host 'vm1', host 'vm2', host 'vm3', host 'vm4'] as WARNING")));
+        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("quorum of [ host 'vm1', host 'vm2', host 'vm3', host 'vm4' ] as WARNING, CRITICAL");
+        assertThat(op.toString(), is(equalTo("majority of [host 'vm1', host 'vm2', host 'vm3', host 'vm4'] as WARNING, CRITICAL")));
     }
     
     @Test
@@ -253,32 +252,32 @@ public class TestVirtualCheckExpressionParser
     @Test
     public void testParseMajorityOfHostPool()
     {
-        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("majority of hosts in pool 'test' as WARNING");
-        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING")));
+        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("majority of hosts in pool 'test' as WARNING, CRITICAL");
+        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING, CRITICAL")));
         assertThat(op.computePoolDependencies(null), is(equalTo(new HashSet<String>(Arrays.asList("test")))));
     }
     
     @Test
     public void testParseMajorityOfHostPoolAlt()
     {
-        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("majority of hosts in resource pool 'test' as WARNING");
-        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING")));
+        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("majority of hosts in resource pool 'test' as WARNING, CRITICAL");
+        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING, CRITICAL")));
         assertThat(op.computePoolDependencies(null), is(equalTo(new HashSet<String>(Arrays.asList("test")))));
     }
     
     @Test
     public void testParseQuorumOfHostPool()
     {
-        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("quorum of hosts in pool 'test' as WARNING");
-        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING")));
+        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("quorum of hosts in pool 'test' as WARNING, CRITICAL");
+        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING, CRITICAL")));
         assertThat(op.computePoolDependencies(null), is(equalTo(new HashSet<String>(Arrays.asList("test")))));
     }
     
     @Test
     public void testParseQuorumOfHostPoolAlt()
     {
-        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("quorum of hosts in resource pool 'test' as WARNING");
-        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING")));
+        VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("quorum of hosts in resource pool 'test' as WARNING, CRITICAL");
+        assertThat(op.toString(), is(equalTo("majority of hosts in pool 'test' as WARNING, CRITICAL")));
         assertThat(op.computePoolDependencies(null), is(equalTo(new HashSet<String>(Arrays.asList("test")))));
     }
     
@@ -344,55 +343,5 @@ public class TestVirtualCheckExpressionParser
         VirtualCheckOperator op = VirtualCheckExpressionParser.parseVirtualCheckExpression("one or less of hosts in pool 'test' as WARNING");
         assertThat(op.toString(), is(equalTo("one or less of hosts in pool 'test' as WARNING")));
         assertThat(op.computePoolDependencies(null), is(equalTo(new HashSet<String>(Arrays.asList("test")))));
-    }
-    
-    @Test
-    public void testComputeQuorum()
-    {
-        // 1 node
-        assertThat(MajorityOfFunction.isQuorum(1, 1), is(equalTo(false)));
-        // 2 node
-        assertThat(MajorityOfFunction.isQuorum(2, 2), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(1, 2), is(equalTo(false)));
-        // 3 node
-        assertThat(MajorityOfFunction.isQuorum(3, 3), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(2, 3), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(1, 3), is(equalTo(false)));
-        // 4 node
-        assertThat(MajorityOfFunction.isQuorum(4, 4), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(3, 4), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(2, 4), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(1, 4), is(equalTo(false)));
-        // 5 node
-        assertThat(MajorityOfFunction.isQuorum(5, 5), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(4, 5), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(3, 5), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(2, 5), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(1, 5), is(equalTo(false)));
-        // 6 node
-        assertThat(MajorityOfFunction.isQuorum(6, 6), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(5, 6), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(4, 6), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(3, 6), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(2, 6), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(1, 6), is(equalTo(false)));
-        // 7 node
-        assertThat(MajorityOfFunction.isQuorum(7, 7), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(6, 7), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(5, 7), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(4, 7), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(3, 7), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(2, 7), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(1, 7), is(equalTo(false)));
-        // 9 node
-        assertThat(MajorityOfFunction.isQuorum(9, 9), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(8, 9), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(7, 9), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(6, 9), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(5, 9), is(equalTo(true)));
-        assertThat(MajorityOfFunction.isQuorum(4, 9), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(3, 9), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(2, 9), is(equalTo(false)));
-        assertThat(MajorityOfFunction.isQuorum(1, 9), is(equalTo(false)));
     }
 }
