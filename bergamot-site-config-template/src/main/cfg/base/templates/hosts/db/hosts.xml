@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
 
+	<host name="mysql-server" extends="db-server" template="yes">
+	<summary>MySQL DB Server</summary>
+	</host>
+
     <host name="postgresql-server" extends="db-server" template="yes">
         <summary>PostgreSQL DB Server</summary>
         
