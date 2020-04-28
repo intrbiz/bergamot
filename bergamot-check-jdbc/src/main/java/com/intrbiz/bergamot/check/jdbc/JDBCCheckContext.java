@@ -39,6 +39,12 @@ public class JDBCCheckContext
         return this.checker;
     }
     
+    public JDBCCheckContext driver(String driverName) throws Exception
+    {
+        Class.forName(driverName);
+        return this;
+    }
+    
     public long connectTimeout(long connectTimeout)
     {
         this.connectTimeout = connectTimeout;

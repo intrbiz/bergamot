@@ -20,18 +20,16 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.postgresql</groupId>
-    	<artifactId>postgresql</artifactId>
-    </dependency>
-    <dependency>
     	<groupId>log4j</groupId>
     	<artifactId>log4j</artifactId>
     </dependency>
-    <!--
     <dependency>
-    	<groupId>mysql</groupId>
-    	<artifactId>mysql-connector-java</artifactId>
+    	<groupId>org.postgresql</groupId>
+    	<artifactId>postgresql</artifactId>
     </dependency>
-    -->
+	<dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	</dependency>
   </dependencies>
 </project>

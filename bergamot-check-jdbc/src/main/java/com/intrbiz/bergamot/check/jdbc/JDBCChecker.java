@@ -4,11 +4,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
+import org.apache.log4j.Logger;
+
 /**
  * A JDBC based check framework
  */
 public class JDBCChecker
-{    
+{   
+    private static final Logger logger = Logger.getLogger(JDBCChecker.class);
+    
+    private static String[] DEFAULT_DRIVERS = {
+            "org.postgresql.Driver",
+            "com.mysql.cj.jdbc.Driver"
+    };
+    
     private final Timer timer;
 
     public JDBCChecker()
@@ -25,6 +34,18 @@ public class JDBCChecker
                 JDBCChecker.this.timer.purge();
             }
         }, 300_000L, 300_000L);
+        // register some common drivers
+        try
+        {
+            for (String driver : DEFAULT_DRIVERS)
+            {
+                Class.forName(driver);
+            }
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to register default JDBC drivers", e);
+        }
     }
     
     Timer getTimer()
