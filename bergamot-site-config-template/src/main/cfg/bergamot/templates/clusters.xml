@@ -7,12 +7,16 @@
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </cluster>
     
+    <resource name="bergamot-resource" extends="generic-resource" template="yes">
+    	<summary>A generic Bergamot Monitoring cluster resource</summary>
+    </resource>
+    
     <cluster name="bergamot-ui-cluster" extends="bergamot-cluster" template="yes">
         <summary>Bergamot UI Cluster</summary>
         
         <condition>majority of hosts in pool 'bergamot-ui-cluster'</condition>
         
-        <resource name="bergamot-ui-daemon" extends="bergamot-service">
+        <resource name="bergamot-ui-daemon" extends="bergamot-resource">
             <summary>Bergamot UI Daemon</summary>
             <condition>majority of service 'bergamot-ui-daemon' on hosts in pool 'bergamot-ui-cluster'</condition>
         </resource>
