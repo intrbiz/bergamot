@@ -146,7 +146,7 @@ public abstract class TemplatedObjectCfg<P extends TemplatedObjectCfg<P>> extend
         parent = i.next().resolve(resolver);
         while (i.hasNext())
         {
-            parent = resolver.resolve(parent, i.next());
+            parent = resolver.resolve(parent, i.next().resolve(resolver));
         }
         // resolve ourselves with the resolved state of our parents
         return resolver.resolve((P) this, parent);
