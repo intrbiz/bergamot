@@ -84,8 +84,16 @@ public abstract class HZBergamotClient implements BergamotClient
     protected HazelcastInstance connectHazelcast() throws Exception
     {
         logger.info("Connecting Hazelcast");
-        ClientConfig cliCfg = HazelcastZooKeeperDiscovery.configureHazelcastClient(this.zooKeeper, new ClientConfig());
+        ClientConfig cliCfg = this.configureHazelcast(HazelcastZooKeeperDiscovery.configureHazelcastClient(this.zooKeeper, new ClientConfig()));
         return HazelcastClient.newHazelcastClient(cliCfg); 
+    }
+    
+    protected ClientConfig configureHazelcast(ClientConfig config)
+    {
+        ClassLoader loader = this.getClass().getClassLoader();
+        logger.info("Setting hazelcast class loader to: " + loader);
+        config.setClassLoader(loader);
+        return config;
     }
     
     protected ZooKeeperManager connectZooKeeper() throws Exception

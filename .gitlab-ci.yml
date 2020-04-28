@@ -23,7 +23,7 @@ build:
   script: 
     - "mkdir -p $HOME/.m2"
     - "./.settings.sh > $HOME/.m2/settings.xml"
-    - "mvn clean deploy -B"
+    - "mvn clean install deploy -B"
   artifacts:
     paths:
       - 'pom.xml'
@@ -44,7 +44,7 @@ release:
     - "mkdir -p $HOME/.m2"
     - "./.settings.sh > $HOME/.m2/settings.xml"
     - "mvn versions:set -DnewVersion=$CI_COMMIT_TAG -B"
-    - "mvn clean deploy -B"
+    - "mvn clean install deploy -B"
   artifacts:
     paths:
       - 'pom.xml'

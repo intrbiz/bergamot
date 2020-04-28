@@ -106,6 +106,10 @@ public abstract class BergamotMember
     
     protected Config configureHazelcast(Config config)
     {
+        // Set the class loader
+        ClassLoader loader = this.getClass().getClassLoader();
+        logger.info("Setting hazelcast class loader to: " + loader);
+        config.setClassLoader(loader);
         // Configure the processors queue
         config.getRingbufferConfig(HZNames.buildProcessorRingbufferName(null))
             .setBackupCount(1)
