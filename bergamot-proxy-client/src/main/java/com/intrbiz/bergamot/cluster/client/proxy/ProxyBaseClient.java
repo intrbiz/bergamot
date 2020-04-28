@@ -66,7 +66,7 @@ public abstract class ProxyBaseClient implements BergamotClient
     public static String getProxyKey(ClusterCfg config)
     {
         return Util.coalesceEmpty(
-            System.getenv("PROXY_Key"), 
+            System.getenv("PROXY_KEY"), 
             System.getProperty("proxy.key"), 
             config.getProxyKey()
         );
