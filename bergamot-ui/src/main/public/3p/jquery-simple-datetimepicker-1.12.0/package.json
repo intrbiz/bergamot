@@ -31,7 +31,7 @@
     "grunt-contrib-qunit": "^0.4.0",
     "grunt-jquerymanifest": "^0.1.4",
     "qunitjs": "^1.14.0",
-    "jquery": "^2.1.0",
+    "jquery": "^3.5.0",
     "grunt-contrib-jshint": "^0.10.0"
   }
 }
