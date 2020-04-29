@@ -18,4 +18,8 @@
         <summary>Bergamot Cluster</summary>
     </group>
     
+    <group name="bergamot-websites" groups="websites" extends="website-group">
+        <summary>Bergamot Monitoring</summary>
+    </group>
+    
 </bergamot>

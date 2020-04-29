@@ -121,6 +121,11 @@
         <summary>Websites</summary>
     </group>
     
+    <group name="public-websites" groups="websites" extends="website-group">
+        <summary>Public Websites</summary>
+        <parameter name="status-page">public</parameter>
+    </group>
+    
     <!-- Clusters -->
     <group name="clusters" extends="cluster-group">
         <summary>Clusters</summary>

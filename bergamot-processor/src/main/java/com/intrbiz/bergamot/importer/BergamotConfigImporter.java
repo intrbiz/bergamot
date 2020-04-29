@@ -261,7 +261,9 @@ public class BergamotConfigImporter
                                     // get the registration url
                                     String url = this.registrationURLSupplier.apply(contact);
                                     // send a notification, only via email
-                                    this.notificationDispatcher.dispatchNotification(new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url) );
+                                    RegisterContactNotification registerContactEmail = new RegisterContactNotification(contact.getSite().toMOUnsafe(), contact.toMOUnsafe().addEngine("email"), url);
+                                    registerContactEmail.setEngine("email");
+                                    this.notificationDispatcher.dispatchNotification(registerContactEmail);
                                 }
                                 catch (Exception e)
                                 {

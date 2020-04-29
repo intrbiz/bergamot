@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+      
+    <host name="bergamot-website" extends="generic-secure-website" template="yes" security-domains="web" groups="bergamot-websites, -websites">
+    	<summary>Bergamot Monitoring Endpoint</summary>
+    	<description>A Bergamot Monitoring website / api endpoint</description>
+    	<state failed-after="10" recovers-after="20"/>
+        <schedule every="30s" retry-every="15s" time-period="24x7"/>
+    	<check-command command="https-check">
+	    	<parameter name="path">/health/alive</parameter>
+    	</check-command>
+    </host>
+
+</bergamot>

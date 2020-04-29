@@ -31,8 +31,8 @@ public class StatusRouter extends Router<BergamotApp>
     public void showStatusPage(BergamotDB db)
     {   
         // resolve the site using the host
-        Site site = model("site", db.getSiteByName(Balsa().request().getServerName()));
-        model(
+        Site site = var("site", db.getSiteByName(Balsa().request().getServerName()));
+        var(
             "groups", 
             db.listGroups(site.getId()).stream()
              .filter((g) -> "public".equals(g.getParameter("status-page")))
@@ -48,9 +48,9 @@ public class StatusRouter extends Router<BergamotApp>
     public void showStatusPage(BergamotDB db, String name)
     {
         // resolve the site using the host
-        Site site = model("site", db.getSiteByName(Balsa().request().getServerName()));
+        Site site = var("site", db.getSiteByName(Balsa().request().getServerName()));
         // look up the group
-        Group group = model("group", notNull(db.getGroupByName(site.getId(), name)));
+        Group group = var("group", notNull(db.getGroupByName(site.getId(), name)));
         require("public".equals(group.getParameter("status-page")));
         var("now", new Date());
         // render the status page

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <host name="generic-website" template="yes" security-domains="web" groups="websites">
+        <summary>Generic Website</summary>
+        <notifications enabled="yes" time-period="24x7" all-engines="yes">
+            <!-- escalation policies -->
+            <escalate after="1h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+            <escalate after="6h" time-period="24x7" ignore="warning">
+                <notify teams="admins"/>
+            </escalate>
+        </notifications>
+        <notify teams="web-admins"/>
+        <state failed-after="4" recovers-after="10"/>
+        <schedule every="5" retry-every="1" time-period="24x7"/>
+        <description>A website template</description>
+        <check-command command="http-check"/>
+    </host>
+    
+    <host name="generic-secure-website" extends="generic-website" template="yes" security-domains="web">
+    	<summary>Generic Secure Website (HTTPS)</summary>
+    	<description>A secure (HTTPS) website template</description>
+    	<check-command command="https-check"/>
+    	
+    	<service name="certificate-status" extends="web-service">
+    		<summary>Certificate Status</summary>
+    		<check-command command="certificate-check"/>
+    	</service>
+    </host>
+    
+    <host name="generic-public-website" extends="generic-website" template="yes" security-domains="web" groups="public-websites, -websites">
+    	<summary>Generic Public Website</summary>
+    	<description>A public website template</description>
+    </host>
+    
+    <host name="generic-public-secure-website" extends="generic-secure-website" template="yes" security-domains="web" groups="public-websites, -websites">
+    	<summary>Generic Public Secure Website (HTTPS)</summary>
+    	<description>A public secure (HTTPS) website template</description>
+    </host>
+
+</bergamot>
