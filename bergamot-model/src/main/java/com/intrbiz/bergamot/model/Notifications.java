@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -75,11 +78,13 @@ public class Notifications extends BergamotObject<NotificationsMO>
         this.id = id;
     }
 
-    public List<NotificationEngine> getEngines()
+    public Map<String, NotificationEngine> getEngines()
     {
         try (BergamotDB db = BergamotDB.connect())
         {
-            return db.getNotificationEngines(this.getId());
+            return db.getNotificationEngines(this.getId())
+                    .stream()
+                    .collect(Collectors.toMap(NotificationEngine::getEngine, Function.identity()));
         }
     }
 
@@ -217,15 +222,16 @@ public class Notifications extends BergamotObject<NotificationsMO>
      * @param time the time
      * @return true if notifications are enabled
      */
-    public boolean isEnabledAt(NotificationType type, Status status, Calendar time)
+    public boolean isEnabledAt(NotificationType type, Status status, Calendar time, String engine)
     {
         TimePeriod timePeriod = this.getTimePeriod();
         TimePeriod updatesTimePeriod = this.getUpdatesTimePeriod();
+        Map<String, NotificationEngine> notificationEngines = this.getEngines();
         return this.enabled && 
                 this.isNotificationTypeEnabled(type) && 
-                (!this.isStatusIgnored(status)) && 
-                (timePeriod == null ? true : timePeriod.isInTimeRange(time)) && 
-                (this.allEnginesEnabled || this.getEngines().stream().anyMatch((e) -> e.isEnabledAt(type, status, time))) &&
+                (!this.isStatusIgnored(status)) &&
+                (timePeriod == null ? true : timePeriod.isInTimeRange(time)) &&
+                isEngineEnabledAt(type, status, time, engine, notificationEngines) &&
                 (NotificationType.UPDATE == type ? ( updatesTimePeriod == null ? true : updatesTimePeriod.isInTimeRange(time) ) : true);
     }
 
@@ -242,19 +248,27 @@ public class Notifications extends BergamotObject<NotificationsMO>
                 (type == NotificationType.UPDATE && this.updatesEnabled);
     }
 
-    public Set<String> getEnginesEnabledAt(NotificationType type, Status status, Calendar time)
+    public Set<String> getEnginesEnabledAt(NotificationType type, Status status, Calendar time, Set<String> engines)
     {
-        return this.getEngines().stream()
-                .filter((e) -> e.isEnabledAt(type, status, time))
-                .map(NotificationEngine::getEngine)
-                .collect(Collectors.toSet());
+        Set<String> enabled = new TreeSet<>();
+        Map<String, NotificationEngine> notificationEngines = this.getEngines();
+        for (String engine : engines)
+        {
+            if (this.isEngineEnabledAt(type, status, time, engine, notificationEngines))
+                enabled.add(engine);
+        }
+        return enabled;
     }
 
     public boolean isEngineEnabledAt(NotificationType type, Status status, Calendar time, String engine)
     {
-        return this.getEngines().stream()
-                .filter((e) -> engine.equals(e.getEngine()))
-                .anyMatch((e) -> e.isEnabledAt(type, status, time));
+        return this.isEngineEnabledAt(type, status, time, engine, this.getEngines());
+    }
+    
+    private boolean isEngineEnabledAt(NotificationType type, Status status, Calendar time, String engine, Map<String, NotificationEngine> notificationEngines)
+    {
+        NotificationEngine notificationEngine = notificationEngines.get(engine);
+        return notificationEngine == null ? this.isAllEnginesEnabled() : notificationEngine.isEnabledAt(type, status, time);
     }
     
     public List<Escalation> getEscalations()
@@ -299,7 +313,7 @@ public class Notifications extends BergamotObject<NotificationsMO>
         {
             mo.setTimePeriod(timePeriod.toStubMO(contact));
         }
-        mo.setEngines(this.getEngines().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
+        mo.setEngines(this.getEngines().values().stream().map((x) -> x.toStubMO(contact)).collect(Collectors.toList()));
         mo.setEscalations(this.getEscalations().stream().map((e) -> e.toStubMO(contact)).collect(Collectors.toList()));
         mo.setUpdatesEnabled(this.isUpdatesEnabled());
         mo.setUpdatesIgnore(this.getUpdatesIgnore().stream().map(Status::toString).collect(Collectors.toSet()));

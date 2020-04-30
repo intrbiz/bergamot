@@ -143,7 +143,7 @@ public class SMSEngine extends TemplatedNotificationEngine
         Map<String, ContactMO> to = new TreeMap<String, ContactMO>();
         for (ContactMO contact : notification.getTo())
         {
-            if ((!Util.isEmpty(Util.coalesceEmpty(contact.getPager(), contact.getMobile()))) && contact.hasEngine(this.getName()))
+            if ((!Util.isEmpty(Util.coalesceEmpty(contact.getPager(), contact.getMobile()))))
             {
                 to.put(Util.coalesceEmpty(contact.getPager(), contact.getMobile()), contact);
             }

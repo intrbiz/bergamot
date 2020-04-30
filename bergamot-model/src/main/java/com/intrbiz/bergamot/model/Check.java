@@ -14,10 +14,8 @@ import com.intrbiz.bergamot.config.model.CheckCfg;
 import com.intrbiz.bergamot.config.model.NoteCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CheckMO;
-import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.NoteMO;
 import com.intrbiz.bergamot.model.message.VirtualCheckMO;
-import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.model.report.SLAReport;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
@@ -539,33 +537,6 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
         }
     }
     
-    /**
-     * Compute the list of contacts who should be notified
-     * @return a list of contact message objects
-     */
-    public List<ContactMO> getContactsToNotify(NotificationType type, Status status, Calendar time, Set<String> engines)
-    {
-        final Notifications checkNotifications = this.getNotifications();
-        // compute the contacts to notify
-        return this.getAllContacts().stream()
-        .filter((c) -> c != null && c.getNotifications() != null)
-        .filter((contact) -> contact.getNotifications().isEnabledAt(type, status, time))
-        .map((contact) -> {
-            ContactMO cmo = contact.toMOUnsafe();
-            cmo.setEngines(
-                    contact.getNotifications().getEnginesEnabledAt(type, status, time).stream()
-                    .filter((engine) -> checkNotifications.isAllEnginesEnabled() || engines.contains(engine))
-                    .collect(Collectors.toSet())
-            );
-            return cmo;
-        }).collect(Collectors.toList());
-    }
-    
-    public List<ContactMO> getContactsToNotify(NotificationType type, Set<String> engines)
-    {
-        return this.getContactsToNotify(type, this.getState().getStatus(), Calendar.getInstance(), engines);
-    }
-    
     public List<SLA> getSLAs()
     {
         try (BergamotDB db = BergamotDB.connect())
@@ -629,21 +600,5 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
             this.noteUrl = noteCfg.getUrl();
             this.noteTitle = noteCfg.getTitle();
         }
-    }
-
-    public SendUpdate createUpdateNotification(Calendar now, List<ContactMO> to, String engine)
-    {
-        // state
-        CheckState state = this.getState();
-        // should we send and update
-        if (! this.getNotifications().isEnabledAt(NotificationType.UPDATE, state.getStatus(), now)) return null;
-        // build the notification
-        SendUpdate notification = new SendUpdate();
-        notification.setEngine(engine);
-        notification.setSite(this.getSite().toMOUnsafe());
-        notification.setRaised(now.getTimeInMillis());
-        notification.setCheck(this.toMOUnsafe());
-        notification.setTo(to);
-        return notification;
     }
 }

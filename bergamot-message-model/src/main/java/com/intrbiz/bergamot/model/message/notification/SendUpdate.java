@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  */
 @JsonTypeName("bergamot.send_update")
 public class SendUpdate extends CheckNotification
-{    
+{
+    private static final long serialVersionUID = 1L;
+
     public SendUpdate()
     {
         super();

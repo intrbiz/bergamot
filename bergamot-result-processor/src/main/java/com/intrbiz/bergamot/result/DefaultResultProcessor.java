@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.result;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,10 +15,8 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
-import com.intrbiz.bergamot.accounting.model.AccountingNotificationType;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent;
 import com.intrbiz.bergamot.accounting.model.ProcessResultAccountingEvent.ResultType;
-import com.intrbiz.bergamot.accounting.model.SendNotificationAccountingEvent;
 import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteNotificationTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteUpdateTopic;
@@ -33,21 +32,15 @@ import com.intrbiz.bergamot.model.Escalation;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Location;
-import com.intrbiz.bergamot.model.NotificationType;
-import com.intrbiz.bergamot.model.Notifications;
 import com.intrbiz.bergamot.model.RealCheck;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.VirtualCheck;
-import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.event.update.AlertUpdate;
 import com.intrbiz.bergamot.model.message.event.update.CheckUpdate;
 import com.intrbiz.bergamot.model.message.event.update.GroupUpdate;
 import com.intrbiz.bergamot.model.message.event.update.LocationUpdate;
-import com.intrbiz.bergamot.model.message.notification.SendAlert;
-import com.intrbiz.bergamot.model.message.notification.SendRecovery;
-import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
@@ -303,15 +296,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             }
         }
     }
-    
-    protected Set<String> getNotificationEngines(UUID siteId, Notifications notifications, NotificationType type, Status status, Calendar now)
-    {
-        Set<String> availableEngines = this.notificationDispatcher.getAvailableEngines(siteId);
-        availableEngines.add("web"); // add in the web notification engine which is internal
-        Set<String> enabledEngines = notifications.getEnginesEnabledAt(type, status, now);
-        Set<String> engines = availableEngines.stream().filter(enabledEngines::contains).collect(Collectors.toSet());
-        return engines;
-    }
 
     protected void sendRecovery(Check<?, ?> check, BergamotDB db)
     {
@@ -326,33 +310,10 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             db.setAlert(alertRecord);
             // don't send notifications for suppressed checks
             CheckState state = check.getState();
-            if (! state.isSuppressedOrInDowntime())
-            {
-                Calendar now = Calendar.getInstance();
-                // compute the notification engines
-                Set<String> engines = this.getNotificationEngines(check.getSiteId(), check.getNotifications(), NotificationType.RECOVERY, state.getStatus(), now);
-                // Who to notify
-                List<ContactMO> to = alertRecord.getContactsToNotify(check, state.getStatus(), now, engines);
-                // send
-                for (String engine : engines)
-                {
-                    try
-                    {
-                        SendRecovery recovery = alertRecord.createRecoveryNotification(now, to, engine);
-                        if (recovery != null && (! recovery.getTo().isEmpty()))
-                        {
-                            logger.debug("Sending recovery for " + check);
-                            this.publishNotification(check, recovery);
-                            // accounting
-                            this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AccountingNotificationType.RECOVERY, recovery.getTo().size(), 0, null));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        logger.warn("Failed to send recovery notification", e);
-                    }
-                }
-            }
+            Calendar now = Calendar.getInstance();
+            // send
+            // TODO: should this also include escalated contacts
+            this.publishRecoveryNotification(check, state, alertRecord, alertRecord.getNotified(), now);
             // publish alert update
             this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
         }
@@ -368,68 +329,23 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         {
             Calendar now = Calendar.getInstance();
             // should we send update notifications
-            if (check.getNotifications().isEnabledAt(NotificationType.UPDATE, state.getStatus(), now))
-            {
-                // compute the notification engines
-                Set<String> engines = this.getNotificationEngines(check.getSiteId(), check.getNotifications(), NotificationType.UPDATE, state.getStatus(), now);
-                // compute the contacts who should be notified
-                List<ContactMO> to = check.getContactsToNotify(NotificationType.UPDATE, state.getStatus(), now, engines);
-                // send the notifications
-                for (String engine : engines)
-                {
-                    try
-                    {
-                        SendUpdate update = check.createUpdateNotification(now, to, engine);
-                        if (update != null && (! update.getTo().isEmpty()))
-                        {
-                            logger.debug("Sending update for " + check);
-                            this.publishNotification(check, update);
-                            // accounting
-                            this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), update.getId(), check.getId(), AccountingNotificationType.UPDATE, update.getTo().size(), 0, null));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        logger.warn("Failed to send update notification", e);
-                    }
-                }
-            }
+            this.publishUpdateNotification(check, state, check.getAllContacts(), now);
         }
     }
 
     protected void sendAlert(Check<?, ?> check, BergamotDB db)
     {
-        logger.debug("Alert for " + check);
         CheckState state = check.getState();
         if (! (state.isSuppressedOrInDowntime() || state.isEncompassed()))
         {
             Calendar now = Calendar.getInstance();
-            // compute the notification engines
-            Set<String> engines = this.getNotificationEngines(check.getSiteId(), check.getNotifications(), NotificationType.ALERT, state.getStatus(), now);
-            // compute the contacts who should be notified
-            List<ContactMO> to = check.getContactsToNotify(NotificationType.ALERT, state.getStatus(), now, engines);
+            List<Contact> contacts = new ArrayList<>(check.getAllContacts());
             // record the alert
-            Alert alertRecord = new Alert(check, state, to);
+            Alert alertRecord = new Alert(check, state, contacts);
             db.setAlert(alertRecord);
+            if (logger.isDebugEnabled()) logger.debug("Alert for " + check);
             // send the notifications
-            for (String engine : engines)
-            {
-                try
-                {
-                    SendAlert alert = alertRecord.createAlertNotification(now, to, engine);
-                    if (alert != null && (! alert.getTo().isEmpty()))
-                    {
-                        logger.debug("Sending alert for " + check);
-                        this.publishNotification(check, alert);
-                        // accounting
-                        this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AccountingNotificationType.ALERT, alert.getTo().size(), 0, null));
-                    }
-                }
-                catch (Exception e)
-                {
-                    logger.warn("Failed to send alert notification", e);
-                }
-            }
+            this.publishAlertNotification(check, state, alertRecord, contacts, now);
             // publish alert update
             this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
         }
@@ -459,29 +375,8 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             if (! state.isSuppressedOrInDowntime())
             {
                 Calendar now = Calendar.getInstance();
-                // compute the notification engines
-                Set<String> engines = this.getNotificationEngines(check.getSiteId(), check.getNotifications(), NotificationType.ALERT, state.getStatus(), now);
-                // compute the contacts who should be notified
-                List<ContactMO> to = alertRecord.getContactsToNotify(now, engines);
                 // send the notifications
-                for (String engine : engines)
-                {
-                    try
-                    {
-                        SendAlert alert = alertRecord.createAlertNotification(now, to, engine);
-                        if (alert != null && (! alert.getTo().isEmpty()))
-                        {
-                            logger.debug("Sending alert for " + check);
-                            this.publishNotification(check, alert);
-                            // accounting
-                            this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), alertRecord.getId(), check.getId(), AccountingNotificationType.ALERT, alert.getTo().size(), 0, null));
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        logger.warn("Failed to resend alert notification", e);
-                    }
-                }
+                this.publishAlertNotification(check, state, alertRecord, alertRecord.getNotified(), now);
                 // publish alert update
                 this.publishAlertUpdate(alertRecord, new AlertUpdate(alertRecord.toMOUnsafe()));
             }
@@ -499,8 +394,6 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             // current check state
             CheckState state = check.getState();
             Calendar now = Calendar.getInstance();
-            // compute the notification engines
-            Set<String> engines = this.getNotificationEngines(check.getSiteId(), check.getNotifications(), NotificationType.ALERT, state.getStatus(), now);
             // evaluate the escalation policies for this check
             List<Escalation> escalations = new LinkedList<Escalation>();
             check.getNotifications().evalEscalations(alertDuration, state.getStatus(), now, escalations);
@@ -516,7 +409,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                 if (after > 0 && after > alert.getEscalationThreshold())
                 {
                     // produce the list of contacts to whom the escalated alert should be sent
-                    Set<ContactMO> escalateTo = new HashSet<ContactMO>();
+                    Set<Contact> escalateTo = new HashSet<Contact>();
                     for (Escalation escalation : escalations)
                     {
                         if (escalation.getAfter() == after)
@@ -531,16 +424,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                                  *       
                                  *       Currently we forcefully renotify all original contacts
                                  */
-                                alert.getNotified().stream().map(Contact::toMOUnsafe).forEach(escalateTo::add);
+                                escalateTo.addAll(alert.getNotified());
                             }
                             // compute any new contacts to notify
-                            escalateTo.addAll(escalation.getContactsToNotify(check, state.getStatus(), now, engines));
+                            escalateTo.addAll(escalation.getAllContacts());
                         }
                     }
                     // do we have anyone to escalate too
                     if (! escalateTo.isEmpty())
                     {
-                        logger.info("Raising escalation for alert " + alert.getId() + " after " + after + " to [" + escalateTo.stream().map(ContactMO::getName).collect(Collectors.joining(", ")) + "]");
+                        logger.info("Raising escalation for alert " + alert.getId() + " after " + after + " to [" + escalateTo.stream().map(Contact::getName).collect(Collectors.joining(", ")) + "]");
                         // record the escalation
                         if (! alert.isEscalated())
                         {
@@ -563,24 +456,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                         alertEscalation.setNotifiedIds(escalateTo.stream().map((c) -> c.getId()).collect(Collectors.toList()));
                         db.setAlertEscalation(alertEscalation);
                         // send the notification
-                        for (String engine : engines)
-                        {
-                            try
-                            {
-                                SendAlert sendAlert = alert.createEscalatedAlertNotification(now, new LinkedList<ContactMO>(escalateTo), engine);
-                                if (sendAlert != null && (! sendAlert.getTo().isEmpty()))
-                                {
-                                    logger.warn("Sending escalated alert for " + check);
-                                    this.publishNotification(check, sendAlert);
-                                    // accounting
-                                    this.accounting.account(new SendNotificationAccountingEvent(check.getSiteId(), sendAlert.getId(), check.getId(), AccountingNotificationType.ALERT, sendAlert.getTo().size(), alertEscalation.getAfter(), alertEscalation.getEscalationId()));
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                logger.warn("Failed to send alert escalation notification", e);
-                            }
-                        }
+                        this.publishEscalatedAlertNotification(check, state, alert, escalateTo, now);
                         // publish alert update
                         this.publishAlertUpdate(alert, new AlertUpdate(alert.toMOUnsafe()));
                     }

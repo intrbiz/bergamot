@@ -1,9 +1,7 @@
 package com.intrbiz.bergamot.model.message;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,9 +25,6 @@ public class ContactMO extends SecuredObjectMO
 
     @JsonProperty("phone")
     private String phone;
-
-    @JsonProperty("engines")
-    private Set<String> engines = new HashSet<String>();
     
     @JsonProperty("teams")
     private List<TeamMO> teams = new LinkedList<TeamMO>();
@@ -86,27 +81,6 @@ public class ContactMO extends SecuredObjectMO
     public void setPhone(String phone)
     {
         this.phone = phone;
-    }
-
-    public Set<String> getEngines()
-    {
-        return engines;
-    }
-
-    public void setEngines(Set<String> engines)
-    {
-        this.engines = engines;
-    }
-    
-    public boolean hasEngine(String engine)
-    {
-        return this.engines.contains(engine);
-    }
-    
-    public ContactMO addEngine(String engine)
-    {
-        this.engines.add(engine);
-        return this;
     }
 
     public List<TeamMO> getTeams()

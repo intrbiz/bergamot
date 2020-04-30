@@ -131,7 +131,7 @@ public class EmailEngine extends TemplatedNotificationEngine
                 // accounting
                 for (ContactMO contact : notification.getTo())
                 {
-                    if ((!Util.isEmpty(contact.getEmail())) && contact.hasEngine(this.getName()))
+                    if ((!Util.isEmpty(contact.getEmail())))
                     {
                         this.accounting.account(new SendNotificationToContactAccountingEvent(
                             notification.getSite().getId(),
@@ -163,7 +163,7 @@ public class EmailEngine extends TemplatedNotificationEngine
     {
         for (ContactMO contact : notification.getTo())
         {
-            if ((!Util.isEmpty(contact.getEmail())) && contact.hasEngine(this.getName()))
+            if ((!Util.isEmpty(contact.getEmail())))
             {
                 return true;
             }
@@ -192,7 +192,7 @@ public class EmailEngine extends TemplatedNotificationEngine
         // to address
         for (ContactMO contact : notification.getTo())
         {
-            if ((!Util.isEmpty(contact.getEmail())) && contact.hasEngine(this.getName()))
+            if ((!Util.isEmpty(contact.getEmail())))
             {
                 message.addRecipient(RecipientType.TO, new InternetAddress(contact.getEmail()));
             }
@@ -221,7 +221,7 @@ public class EmailEngine extends TemplatedNotificationEngine
         // to address
         for (ContactMO contact : notification.getTo())
         {
-            if ((!Util.isEmpty(contact.getEmail())) && contact.hasEngine(this.getName()))
+            if ((!Util.isEmpty(contact.getEmail())))
             {
                 message.addRecipient(RecipientType.TO, new InternetAddress(contact.getEmail()));
             }
