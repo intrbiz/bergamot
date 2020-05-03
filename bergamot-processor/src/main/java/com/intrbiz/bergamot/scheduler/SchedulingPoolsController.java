@@ -64,16 +64,30 @@ public class SchedulingPoolsController
     
     public void start() throws Exception
     {
-        // Start our scheduler
-        this.scheduler.start();
         // Join the election for each pool
-        logger.info("Starting processing pool election");
-        for (SchedulingPoolElector pool : this.shufflePools())
-        {
-            logger.info("Electing pool " + pool.getPool());
-            pool.elect((state) -> this.poolTrigger(pool.getPool(), state));
-        }
-        logger.info("Finished processing pool election");
+        Thread softStarter = new Thread(() -> {
+            try
+            {
+                logger.info("Starting processing pool election");
+                for (SchedulingPoolElector pool : this.shufflePools())
+                {
+                    logger.info("Electing pool " + pool.getPool());
+                    pool.elect((state) -> this.poolTrigger(pool.getPool(), state));
+                }
+                logger.info("Finished processing pool election");
+                // Start our scheduler
+                Thread.sleep(180_000L);
+                logger.info("Scheduler starting");
+                this.scheduler.start();
+                logger.info("Scheduler started");
+            }
+            catch (Exception e)
+            {
+                logger.error("Error starting scheduler");
+            }
+        });
+        softStarter.setDaemon(true);
+        softStarter.start();
         // Start listening to scheduler messages
         this.listenerId = this.schedulingTopic.listen(this::processSchedulingMessage);
         // All started

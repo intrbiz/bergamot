@@ -1,0 +1,59 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Create Site">
+
+	<div class="row">
+		<form id="create_site" name="create_site" method="post" action="#{path('/global/site/create')}">
+			<div>
+				<h4>Site Details</h4>
+			</div>
+			<div>
+				<label for="name">Name</label>
+				<input type="text" id="name" name="name" placeholder="Site full DNS name" title="Enter the fully qualify domain name for this site" value="#{install.siteName}"/>
+			</div>
+			<div>
+				<label for="summary">Summary</label>
+				<input type="text" id="summary" name="summary" placeholder="Site summary" title="Enter the pretty name for this site" value="#{install.siteSummary}"/>
+			</div>
+			<div>
+				<h4 style="padding-top: 30px">Administrator Details</h4>
+			</div>
+			<div>
+				<label for="first_name">First Name</label>
+				<input type="text" id="first_name" name="first_name" placeholder="Your first name" title="Enter your first name" value="#{install.userFirstName}"/>
+			</div>
+			<div>
+				<label for="last_name">Last Name</label>
+				<input type="text" id="last_name" name="last_name" placeholder="Your last name" title="Enter your last name" value="#{install.userLastName}"/>
+			</div>
+			<div>
+				<label for="email">Email</label>
+				<input type="text" id="email" name="email" placeholder="Your email address" title="Enter your email address" value="#{install.userEmail}"/>
+			</div>
+			<div>
+				<label for="mobile">Mobile</label>
+				<input type="text" id="mobile" name="mobile" placeholder="Your mobile numer" title="Enter your mobile phone number" value="#{install.userMobile}"/>
+			</div>
+			<div>
+				<label for="username">Username</label>
+				<input type="text" id="username" name="username" placeholder="Choose your username" title="Enter your username" value="#{install.username}"/>
+			</div>
+			<div>
+				<label for="password">Password</label>
+				<input type="password" id="password" name="password" placeholder="Choose your password" value="#{install.password}"/>
+			</div>
+			<div>
+				<label for="password_confirm">Confirm Password</label>
+				<input type="password" id="password_confirm" name="password_confirm" placeholder="Confirm your password" value="#{install.confirmPassword}"/>
+			</div>
+			<div>
+				<h4>&nbsp;</h4>
+			</div>
+			<div>
+				<input type="submit" value="Create Site"/>
+			</div>
+		</form>
+	</div>
+
+</fragment>

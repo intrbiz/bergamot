@@ -242,6 +242,13 @@
 					</td>
 				</tr>
 			</data-set>
+			<tr>
+				<td colspan="8">
+					<form path="/global/site/create" method="get">
+						<input type="submit" name="add" value="Create Site" class="danger"/>
+					</form>
+				</td>
+			</tr>
 		</table>
 	</div>
 	
