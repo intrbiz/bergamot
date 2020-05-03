@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 
 import org.apache.log4j.ConsoleAppender;
@@ -45,6 +46,8 @@ public class BergamotProxy implements Configurable<ProxyCfg>
     private ProxyClient client;
     
     private BergamotProxyServer server;
+    
+    private volatile CountDownLatch shutdownLatch;
     
     public BergamotProxy()
     {
@@ -167,6 +170,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
     protected void start() throws Exception
     {
         logger.info("Bergamot Proxy starting....");
+        this.shutdownLatch = new CountDownLatch(1);
         // connect to the scheduler
         logger.info("Connecting to cluster");
         this.client = new HZProxyClient(this.configuration.getCluster(), this::clusterPanic);
@@ -190,7 +194,34 @@ public class BergamotProxy implements Configurable<ProxyCfg>
     protected void clusterPanic(Void v)
     {
         logger.fatal("Connection to cluster lost, forcing shutdown now!");
+        this.triggerShutdown();
+    }
+    
+    public void awaitShutdown()
+    {
+        try
+        {
+            this.shutdownLatch.await();
+        }
+        catch (InterruptedException e)
+        {
+        }
+    }
+    
+    public void run() throws Exception
+    {
+        // Start
+        this.start();
+        // Wait for shutdown
+        this.awaitShutdown();
+        // Stop
         this.stop();
+    }
+    
+    public void triggerShutdown()
+    {
+        logger.info("Triggering shutdown of " + this.getClass().getSimpleName());
+        this.shutdownLatch.countDown();
     }
     
     /**
@@ -210,12 +241,12 @@ public class BergamotProxy implements Configurable<ProxyCfg>
             BergamotProxy proxy = new BergamotProxy();
             proxy.configure(config);
             // Register a shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                logger.info("Triggering shutdown of Bergamot Proxy");
-                proxy.stop();
-            }));
-            // Start our proxy
-            proxy.start();
+            Runtime.getRuntime().addShutdownHook(new Thread(proxy::triggerShutdown));
+            // Run our proxy
+            proxy.run();
+            // Terminate normally
+            Thread.sleep(15_000);
+            System.exit(0);
         }
         catch (Exception e)
         {

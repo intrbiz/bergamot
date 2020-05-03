@@ -6,9 +6,9 @@ public class NRPEExample
 {
     public static void main(String[] args)
     {
-        try (NRPEClient client = new NRPEClient("127.0.0.1"))
+        try (NRPEClient client = new NRPEClient("172.30.4.21"))
         {
-            System.out.println(client.command("check_disk_root"));
+            System.out.println(client.command("check_load"));
         }
         catch (IOException e)
         {

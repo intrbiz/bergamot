@@ -95,7 +95,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     private ExecutorService executor;
 
-    private CountDownLatch shutdownLatch;
+    private volatile CountDownLatch shutdownLatch;
 
     public BergamotWorker()
     {
@@ -264,7 +264,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     protected void clusterPanic(Void v)
     {
         logger.fatal("Connection to cluster lost, forcing shutdown now!");
-        this.stop();
+        // Trigger shutdown which will run from the main thread
+        this.triggerShutdown();
     }
 
     protected void createExecutor() throws Exception
@@ -368,25 +369,21 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     protected void stop()
     {
-        try
-        {
-            logger.info("Bergamot Worker stopping....");
-            // Stop consuming
-            this.stopConsuming();
-            // Shutdown all engines
-            this.shutdownEngines();
-            // Shutdown executors
-            this.shutdownExecutor();
-            // Disconnect from the scheduler
-            this.disconnectScheduler();
-            logger.info("Bergamot Worker stopped.");
-        }
-        finally
-        {
-            this.shutdownLatch.countDown();
-        }
+        logger.info("Bergamot Worker stopping....");
+        // Stop consuming
+        this.stopConsuming();
+        // Shutdown all engines
+        this.shutdownEngines();
+        // Shutdown executors
+        this.shutdownExecutor();
+        // Disconnect from the scheduler
+        this.disconnectScheduler();
+        logger.info("Bergamot Worker stopped.");
     }
 
+    /**
+     * Await for shutdown to be triggered
+     */
     public void awaitShutdown()
     {
         try
@@ -396,6 +393,22 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         catch (InterruptedException e)
         {
         }
+    }
+    
+    public void run() throws Exception
+    {
+        // Start
+        this.start();
+        // Wait for shutdown
+        this.awaitShutdown();
+        // Stop
+        this.stop();
+    }
+    
+    public void triggerShutdown()
+    {
+        logger.info("Triggering shutdown of " + this.getClass().getSimpleName());
+        this.shutdownLatch.countDown();
     }
 
     /**
@@ -415,13 +428,9 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             BergamotWorker worker = new BergamotWorker();
             worker.configure(config);
             // Register a shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                logger.info("Triggering shutdown of Bergamot Worker");
-                worker.stop();
-            }));
-            // Start our worker
-            worker.start();
-            worker.awaitShutdown();
+            Runtime.getRuntime().addShutdownHook(new Thread(worker::triggerShutdown));
+            // Run our worker
+            worker.run();
             // Terminate normally
             Thread.sleep(15_000);
             System.exit(0);

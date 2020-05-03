@@ -70,7 +70,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     private ExecutorService executor;
     
-    private CountDownLatch shutdownLatch;
+    private volatile CountDownLatch shutdownLatch;
     
     public BergamotNotifier()
     {
@@ -193,7 +193,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     {
         logger.fatal("Connection to cluster lost, forcing shutdown now!");
         // Trigger a shutdown
-        this.stop();
+        this.triggerShutdown();
     }
     
     protected void createExecutor() throws Exception
@@ -274,23 +274,16 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
 
     protected void stop()
     {
-        try
-        {
-            logger.info("Bergamot Notifier stopping....");
-            // Stop consuming
-            this.stopConsuming();
-            // Shutdown all engines
-            this.shutdownEngines();
-            // Shutdown executors
-            this.shutdownExecutor();
-            // Disconnect from the scheduler
-            this.disconnectScheduler();
-            logger.info("Bergamot Notifier stopped.");
-        }
-        finally
-        {
-            this.shutdownLatch.countDown();
-        }
+        logger.info("Bergamot Notifier stopping....");
+        // Stop consuming
+        this.stopConsuming();
+        // Shutdown all engines
+        this.shutdownEngines();
+        // Shutdown executors
+        this.shutdownExecutor();
+        // Disconnect from the scheduler
+        this.disconnectScheduler();
+        logger.info("Bergamot Notifier stopped.");
     }
 
     public void awaitShutdown()
@@ -302,6 +295,22 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         catch (InterruptedException e)
         {
         }
+    }
+    
+    public void run() throws Exception
+    {
+        // Start
+        this.start();
+        // Wait for shutdown
+        this.awaitShutdown();
+        // Stop
+        this.stop();
+    }
+    
+    public void triggerShutdown()
+    {
+        logger.info("Triggering shutdown of " + this.getClass().getSimpleName());
+        this.shutdownLatch.countDown();
     }
     
     /**
@@ -321,13 +330,9 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             BergamotNotifier notifier = new BergamotNotifier();
             notifier.configure(config);
             // Register a shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                logger.info("Triggering shutdown of Bergamot Notifier");
-                notifier.stop();
-            }));
-            // Start our notifier
-            notifier.start();
-            notifier.awaitShutdown();
+            Runtime.getRuntime().addShutdownHook(new Thread(notifier::triggerShutdown));
+            // Run our notifier
+            notifier.run();
             // Terminate normally
             Thread.sleep(15_000);
             System.exit(0);
