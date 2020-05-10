@@ -6,14 +6,18 @@ import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.AlertEncompassesMO;
-import com.intrbiz.data.db.compiler.meta.Action;
+import com.intrbiz.data.db.compiler.meta.PartitionMode;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
-import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLPartition;
+import com.intrbiz.data.db.compiler.meta.SQLPartitioning;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "alert_encompasses", since = @SQLVersion({ 3, 30, 0 }) )
+@SQLPartitioning(
+    @SQLPartition(mode = PartitionMode.RANGE, on = "raised", indexOn = true, indexOnUsing = "brin")
+)
 public class AlertEncompasses extends BergamotObject<AlertEncompassesMO>
 {
     private static final long serialVersionUID = 1L;
@@ -22,7 +26,6 @@ public class AlertEncompasses extends BergamotObject<AlertEncompassesMO>
      * The alert
      */
     @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({ 3, 30, 0 }) )
-    @SQLForeignKey(references = Alert.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.CASCADE, since = @SQLVersion({ 3, 30, 0 }) )
     @SQLPrimaryKey()
     private UUID alertId;
 

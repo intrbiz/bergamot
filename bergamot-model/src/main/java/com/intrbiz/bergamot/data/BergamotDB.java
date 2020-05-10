@@ -629,8 +629,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({
-        "get_group_by_name.#{site_id}.*", 
-        "get_root_groups.#{site_id}.*", 
+        "get_root_groups.#{site_id}",
+        "get_group_by_name.#{site_id}.*",
         "get_groups_in_group.#{id}"
     })
     @SQLSetter(table = Group.class, name = "set_group", since = @SQLVersion({1, 0, 0}))
@@ -661,8 +661,8 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({
+        "get_root_groups.#{this.getSiteId(id)}",
         "get_group_by_name.#{this.getSiteId(id)}.*", 
-        "get_root_groups.#{this.getSiteId(id)}.*", 
         "get_groups_in_group.#{id}"
     })
     @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({1, 0, 0}),
@@ -1618,7 +1618,6 @@ public abstract class BergamotDB extends DatabaseAdapter
                     "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
-                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
                     "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
@@ -1739,7 +1738,6 @@ public abstract class BergamotDB extends DatabaseAdapter
                     "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
-                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
                     "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
@@ -1827,7 +1825,6 @@ public abstract class BergamotDB extends DatabaseAdapter
                     "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
-                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
                     "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
@@ -1880,7 +1877,6 @@ public abstract class BergamotDB extends DatabaseAdapter
                     "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
-                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
                     "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
@@ -1978,7 +1974,6 @@ public abstract class BergamotDB extends DatabaseAdapter
                     "DELETE FROM bergamot.alert                          WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_state                    WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.check_stats                    WHERE check_id = p_id;\n" +
-                    "DELETE FROM bergamot.check_transition               WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.downtime                       WHERE check_id = p_id;\n" +
                     "DELETE FROM bergamot.notification_engine            WHERE notifications_id = p_id;\n" +
                     "DELETE FROM bergamot.notifications                  WHERE id = p_id;\n" +
@@ -2080,22 +2075,18 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // transition log
     
-    @SQLSetter(table = CheckTransition.class, name = "log_check_transition", since = @SQLVersion({1, 3, 0}))
+    @SQLSetter(table = CheckTransition.class, name = "log_check_transition", since = @SQLVersion({1, 3, 0}), upsert = false)
     public abstract void logCheckTransition(CheckTransition transition);
     
-    @SQLGetter(table = CheckTransition.class, name = "get_check_transition", since = @SQLVersion({1, 3, 0}))
-    public abstract CheckTransition getCheckTransition(@SQLParam("id") UUID id);
-    
-    @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({1, 3, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC))
-    public abstract List<CheckTransition> listCheckTransitionsForCheck(@SQLParam("check_id") UUID checkId, @SQLOffset long offset, @SQLLimit long limit);
+    @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({1, 3, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
+        query = @SQLQuery("SELECT * FROM bergamot.check_transition WHERE check_id = p_check_id AND applied_at < p_from ORDER BY applied_at DESC LIMIT p_limit")
+    )
+    public abstract List<CheckTransition> listCheckTransitionsForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "from", virtual = true) Timestamp from, @SQLParam(value = "limit", virtual = true) long limit);
     
     @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({1, 3, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.check_transition WHERE check_id = p_check_id AND applied_at BETWEEN p_from AND p_to")
     )
     public abstract List<CheckTransition> listCheckTransitionsForCheckByDate(@SQLParam("check_id") UUID checkId, @SQLParam(value = "from", virtual = true) Timestamp from, @SQLParam(value = "to", virtual = true) Timestamp to);
-    
-    @SQLRemove(table = CheckTransition.class, name = "remove_check_Transition", since = @SQLVersion({1, 3, 0}))
-    public abstract void removeCheckTransition(@SQLParam("id") UUID id);
     
     // agent
     
@@ -2755,43 +2746,6 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // patches
     
-    @SQLPatch(name = "move_stats_from_state", index = 1, type = ScriptType.UPGRADE, version = @SQLVersion({1, 2, 0}), skip = false)
-    public static SQLScript moveStatsFromState()
-    {
-        return new SQLScript(
-            "INSERT INTO bergamot.check_stats (check_id, last_runtime, average_runtime, last_check_execution_latency, average_check_execution_latency, last_check_processing_latency, average_check_processing_latency) (SELECT check_id, last_runtime, average_runtime, last_check_execution_latency, average_check_execution_latency, last_check_processing_latency, average_check_processing_latency FROM bergamot.check_state)"
-        );
-    }
-    
-    @SQLPatch(name = "drop_state_stats_columns", index = 2, type = ScriptType.UPGRADE, version = @SQLVersion({1, 2, 0}), skip = false)
-    public static SQLScript dropStateStatsColumns()
-    {
-        return new SQLScript(
-          // state table
-          "ALTER TABLE bergamot.check_state DROP COLUMN last_runtime",
-          "ALTER TABLE bergamot.check_state DROP COLUMN average_runtime",
-          "ALTER TABLE bergamot.check_state DROP COLUMN last_check_execution_latency",
-          "ALTER TABLE bergamot.check_state DROP COLUMN average_check_execution_latency",
-          "ALTER TABLE bergamot.check_state DROP COLUMN last_check_processing_latency",
-          "ALTER TABLE bergamot.check_state DROP COLUMN average_check_processing_latency",
-          // state type
-          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_runtime",
-          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_runtime",
-          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_check_execution_latency",
-          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_check_execution_latency",
-          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE last_check_processing_latency",
-          "ALTER TYPE bergamot.t_check_state DROP ATTRIBUTE average_check_processing_latency"
-        );
-    }
-    
-    @SQLPatch(name = "add_check_transition_indexes", index = 3, type = ScriptType.BOTH, version = @SQLVersion({1, 3, 3}), skip = false)
-    public static SQLScript upgradeCheckTransitionIndexes()
-    {
-        return new SQLScript(
-           "CREATE INDEX check_transition_check_id_applied_at_idx ON bergamot.check_transition (check_id, applied_at)"
-        );
-    }
-    
     @SQLPatch(name = "add_validate_group_ids", index = 1, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
     public static SQLScript addValidateGroupIds()
     {
@@ -2858,77 +2812,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_site_alias_index", index = 5, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
-    public static SQLScript addSiteAliasIndex()
-    {
-        return new SQLScript(
-                "CREATE INDEX \"site_aliases_idx\" ON bergamot.site USING gin (aliases)"
-        );
-    }
-    
-    @SQLPatch(name = "add_info_and_action_statuses", index = 6, type = ScriptType.UPGRADE, version = @SQLVersion({2, 4, 0}), skip = false)
-    public static SQLScript addInfoAndActionStatuses()
-    {
-        return new SQLScript(
-                // check state
-                "UPDATE bergamot.check_state " +
-                "SET " +
-                " status=(CASE WHEN status = 0 THEN 0 ELSE status + 1 END), " +
-                " last_hard_status=(CASE WHEN last_hard_status = 0 THEN 0 ELSE last_hard_status + 1 END) ",
-                // check transitions
-                "UPDATE bergamot.check_transition " +
-                "SET " +
-                " previous_status=(CASE WHEN previous_status = 0 THEN 0 ELSE previous_status + 1 END), " +
-                " previous_last_hard_status=(CASE WHEN previous_last_hard_status = 0 THEN 0 ELSE previous_last_hard_status + 1 END), " +
-                " next_status=(CASE WHEN next_status = 0 THEN 0 ELSE next_status + 1 END), " +
-                " next_last_hard_status=(CASE WHEN next_last_hard_status = 0 THEN 0 ELSE next_last_hard_status + 1 END)",
-                // alerts
-                "UPDATE bergamot.alert "+
-                "SET " +
-                " status=(CASE WHEN status = 0 THEN 0 ELSE status + 1 END), " +
-                " last_hard_status=(CASE WHEN last_hard_status = 0 THEN 0 ELSE last_hard_status + 1 END) "
-        );
-    }
-    
-    @SQLPatch(name = "add_downtime_indexes", index = 7, type = ScriptType.BOTH, version = @SQLVersion({2, 9, 0}), skip = false)
-    public static SQLScript addDowntimeIndexes()
-    {
-        return new SQLScript(
-                "CREATE INDEX \"downtime_check_id_idx\" ON bergamot.downtime USING btree (check_id)",
-                "CREATE INDEX \"downtime_starts_ends_idx\" ON bergamot.downtime USING btree (starts, ends)"
-        );
-    }
-    
-    @SQLPatch(name = "add_acknowledge_notifications", index = 8, type = ScriptType.UPGRADE, version = @SQLVersion({3, 2, 0}), skip = false)
-    public static SQLScript addAcknowledgeNotifications()
-    {
-        return new SQLScript(
-                "UPDATE bergamot.notifications SET acknowledge_enabled = TRUE",
-                "UPDATE bergamot.notification_engine SET acknowledge_enabled = TRUE"
-        );
-    }
-
-    @SQLPatch(name = "add_downtime_state", index = 9, type = ScriptType.UPGRADE, version = @SQLVersion({3, 3, 0}), skip = false)
-    public static SQLScript addDowntimeState()
-    {
-        return new SQLScript(
-                "UPDATE bergamot.check_state SET in_downtime = FALSE",
-                "UPDATE bergamot.check_transition SET previous_in_downtime = FALSE, next_in_downtime = FALSE"
-        );
-    }
-    
-    @SQLPatch(name = "add_suppressed_state", index = 9, type = ScriptType.UPGRADE, version = @SQLVersion({3, 4, 0}), skip = false)
-    public static SQLScript addSuppressedState()
-    {
-        return new SQLScript(
-                "UPDATE bergamot.check_state SET suppressed = FALSE",
-                "UPDATE bergamot.check_transition SET previous_suppressed = FALSE, next_suppressed = FALSE"
-        );
-    }
-    
-    // V2 ACLs
-    
-    @SQLPatch(name = "add_acl_processing", index = 10, type = ScriptType.BOTH, version = @SQLVersion({3, 11, 0}), skip = false)
+    @SQLPatch(name = "add_acl_processing", index = 4, type = ScriptType.BOTH, version = @SQLVersion({3, 11, 0}), skip = false)
     public static SQLScript addACLProcessing()
     {
         return new SQLScript(
@@ -3170,7 +3054,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_suppress_check", index = 12, type = ScriptType.BOTH, version = @SQLVersion({3, 20, 0}), skip = false)
+    @SQLPatch(name = "add_suppress_check", index = 5, type = ScriptType.BOTH, version = @SQLVersion({3, 20, 0}), skip = false)
     public static SQLScript addSuppressCheckFunction()
     {
         return new SQLScript(
@@ -3186,15 +3070,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_alert_indexes", index = 13, type = ScriptType.BOTH, version = @SQLVersion({3, 26, 0}), skip = false)
-    public static SQLScript addAlertIndexes()
-    {
-        return new SQLScript(
-           "CREATE INDEX alert_check_id_raised_idx ON bergamot.alert USING btree(check_id, raised)"
-        );
-    }
-    
-    @SQLPatch(name = "add_set_current_alert", index = 14, type = ScriptType.BOTH, version = @SQLVersion({3, 29, 0}), skip = false)
+    @SQLPatch(name = "add_set_current_alert", index = 6, type = ScriptType.BOTH, version = @SQLVersion({3, 29, 0}), skip = false)
     public static SQLScript addSetCurrentAlert()
     {
         return new SQLScript(
@@ -3210,7 +3086,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_acknowledge_check", index = 15, type = ScriptType.BOTH, version = @SQLVersion({3, 31, 0}), skip = false)
+    @SQLPatch(name = "add_acknowledge_check", index = 7, type = ScriptType.BOTH, version = @SQLVersion({3, 31, 0}), skip = false)
     public static SQLScript addAcknowledgeCheckFunction()
     {
         return new SQLScript(
@@ -3226,7 +3102,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_set_alert_escalation_threshold", index = 15, type = ScriptType.BOTH, version = @SQLVersion({3, 34, 0}), skip = false)
+    @SQLPatch(name = "add_set_alert_escalation_threshold", index = 8, type = ScriptType.BOTH, version = @SQLVersion({3, 34, 0}), skip = false)
     public static SQLScript addSetAlertEscalationThresholdFunction()
     {
         return new SQLScript(
@@ -3241,17 +3117,9 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "$$"
         );
     }
-
-    @SQLPatch(name = "add_config_name_idx", index = 16, type = ScriptType.BOTH, version = @SQLVersion({3, 37, 0}), skip = false)
-    public static SQLScript addConfigNameIndex()
-    {
-        return new SQLScript(
-                "CREATE INDEX config_name_idx ON bergamot.config (site_id ASC NULLS LAST, type ASC NULLS LAST, name ASC NULLS LAST)"
-        );
-    }
     
-    @SQLPatch(name = "update_permission_v404", index = 17, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 4}), skip = false)
-    public static SQLScript updatePermissionV404()
+    @SQLPatch(name = "update_permissions", index = 9, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 4}), skip = false)
+    public static SQLScript updatePermissions()
     {
         return new SQLScript(
                 
@@ -3293,11 +3161,54 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'sign.agent',\n" +
                 "        'sign.proxy',\n" +
                 "        'config.export',\n" +
-                "        'config.change.apply'\n" +
+                "        'config.change.apply',\n" +
+                "        'rota.admin',\n" +
+                "        'ui.rota.admin',\n" +
+                "        'api.rota.admin,'\n" +
+                "        'rota.change',\n" +
+                "        'ui.rota.change',\n" +
+                "        'api.rota.change'\n" +
                 "      ])::TEXT;\n" +
                 "$$",
                 
                 "SELECT bergamot.build_permissions(id) FROM bergamot.site"
+        );
+    }
+    
+    @SQLPatch(name = "create_partitioned_tables", index = 10, type = ScriptType.INSTALL_LAST, version = @SQLVersion({4, 0, 4}), skip = false)
+    public static SQLScript createPartitionedTables()
+    {
+        return new SQLScript(
+            // Check Transition partitioned weekly
+            "SELECT bergamot.create_check_transition_partition_0(to_char(qq.start, 'YYYY_MM_DD'), qq.start, qq.end, NULL)\n" + 
+            "FROM (\n" + 
+            "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
+            "  FROM generate_series(date_trunc('week', now() - '1 week'::interval)::date, date_trunc('week', now() + '5 years'::interval)::date, '1 week'::interval) q(start)\n" + 
+            ") qq\n" + 
+            "WHERE qq.end IS NOT NULL",
+            // Alerts partitioned yearly
+            "SELECT bergamot.create_alert_partition_0(to_char(qq.start, 'YYYY'), qq.start, qq.end, NULL),\n" +
+            "       bergamot.create_alert_escalation_partition_0(to_char(qq.start, 'YYYY'), qq.start, qq.end, NULL),\n" +
+            "       bergamot.create_alert_encompasses_partition_0(to_char(qq.start, 'YYYY'), qq.start, qq.end, NULL)\n" +
+            "FROM (\n" + 
+            "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
+            "  FROM generate_series(date_trunc('year', now() - '1 year'::interval)::date, date_trunc('year', now() + '5 year'::interval)::date, '1 year'::interval) q(start)\n" + 
+            ") qq\n" + 
+            "WHERE qq.end IS NOT NULL",
+            // Comments partitioned yearly
+            "SELECT bergamot.create_comment_partition_0(to_char(qq.start, 'YYYY'), qq.start, qq.end, NULL)\n" +
+            "FROM (\n" + 
+            "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
+            "  FROM generate_series(date_trunc('year', now() - '1 year'::interval)::date, date_trunc('year', now() + '5 years'::interval)::date, '1 year'::interval) q(start)\n" + 
+            ") qq\n" + 
+            "WHERE qq.end IS NOT NULL",
+            // Downtime partitioned monthly
+            "SELECT bergamot.create_downtime_partition_0(to_char(qq.start, 'YYYY_MM'), qq.start, qq.end, NULL)\n" + 
+            "FROM (\n" + 
+            "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
+            "  FROM generate_series(date_trunc('month', now() - '1 month'::interval)::date, date_trunc('month', now() + '5 years'::interval)::date, '1 month'::interval) q(start)\n" + 
+            ") qq\n" + 
+            "WHERE qq.end IS NOT NULL"
         );
     }
     

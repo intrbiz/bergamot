@@ -11,7 +11,7 @@ BEGIN
   v_start_time := lamplighter.round_time(p_start, p_rollup);
   v_end_time := lamplighter.round_time(p_end, p_rollup);
   SELECT poll_interval INTO v_poll_interval FROM lamplighter.check_reading WHERE id = p_reading_id;
-  v_table := quote_ident(lamplighter.get_schema(p_site_id)) || '.' || quote_ident(lamplighter.get_table_name('int_gauge_reading', p_reading_id));
+  v_table := 'lamplighter.int_gauge_reading';
   -- query
   v_query := $$ SELECT 
     $1 AS site_id, 

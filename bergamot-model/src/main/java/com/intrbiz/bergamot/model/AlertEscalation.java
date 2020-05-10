@@ -9,14 +9,18 @@ import java.util.stream.Collectors;
 
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.AlertEscalationMO;
-import com.intrbiz.data.db.compiler.meta.Action;
+import com.intrbiz.data.db.compiler.meta.PartitionMode;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
-import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLPartition;
+import com.intrbiz.data.db.compiler.meta.SQLPartitioning;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "alert_escalation", since = @SQLVersion({ 3, 26, 0 }))
+@SQLPartitioning(
+    @SQLPartition(mode = PartitionMode.RANGE, on = "escalated_at", indexOn = true, indexOnUsing = "brin")
+)
 public class AlertEscalation extends BergamotObject<AlertEscalationMO>
 {
     private static final long serialVersionUID = 1L;
@@ -25,7 +29,6 @@ public class AlertEscalation extends BergamotObject<AlertEscalationMO>
      * The alert
      */
     @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({ 3, 26, 0 }))
-    @SQLForeignKey(references = Alert.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.CASCADE, since = @SQLVersion({ 3, 26, 0 }))
     @SQLPrimaryKey()
     private UUID alertId;
     

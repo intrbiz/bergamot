@@ -16,6 +16,7 @@ import com.intrbiz.configuration.Configuration;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLIndex;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -24,6 +25,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * An alert which was raised against a check
  */
 @SQLTable(schema = BergamotDB.class, name = "config", since = @SQLVersion({ 1, 0, 0 }))
+@SQLIndex(name = "name", using = "btree", columns = { "site_id", "type", "name" }, since = @SQLVersion({3, 37, 0}))
 public class Config implements Serializable
 {
     private static final long serialVersionUID = 1L;

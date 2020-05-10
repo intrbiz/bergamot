@@ -45,12 +45,6 @@ public class CheckReading implements Serializable
     @SQLColumn(index = 8, name = "reading_type", since = @SQLVersion({ 1, 0, 0 }))
     protected String readingType;
     
-    @SQLColumn(index = 9, name = "schema", since = @SQLVersion({ 1, 0, 0 }))
-    protected String schema;
-    
-    @SQLColumn(index = 10, name = "table", since = @SQLVersion({ 1, 0, 0 }))
-    protected String table;
-    
     @SQLColumn(index = 11, name = "created", since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
 
@@ -63,6 +57,22 @@ public class CheckReading implements Serializable
     public CheckReading()
     {
         super();
+    }
+
+    public CheckReading(UUID id, UUID siteId, UUID checkId, String name, String summary, String description, String unit, String readingType, long pollInterval)
+    {
+        super();
+        this.id = id;
+        this.siteId = siteId;
+        this.checkId = checkId;
+        this.name = name;
+        this.summary = summary;
+        this.description = description;
+        this.unit = unit;
+        this.readingType = readingType;
+        this.created = new Timestamp(System.currentTimeMillis());
+        this.updated = this.created;
+        this.pollInterval = pollInterval;
     }
 
     public UUID getId()
@@ -133,26 +143,6 @@ public class CheckReading implements Serializable
     public void setReadingType(String readingType)
     {
         this.readingType = readingType;
-    }
-
-    public String getSchema()
-    {
-        return schema;
-    }
-
-    public void setSchema(String schema)
-    {
-        this.schema = schema;
-    }
-
-    public String getTable()
-    {
-        return table;
-    }
-
-    public void setTable(String table)
-    {
-        this.table = table;
     }
 
     public Timestamp getCreated()

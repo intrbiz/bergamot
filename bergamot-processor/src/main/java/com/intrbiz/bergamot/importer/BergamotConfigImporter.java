@@ -1547,6 +1547,8 @@ public class BergamotConfigImporter
         service.configure(configuration);
         // load the check details
         this.loadActiveCheck(service, resolvedConfiguration, db);
+        // override the generated pool to be the same as the host
+        service.setPool(host.getPool());
         // add
         db.setService(service);
         // schedule

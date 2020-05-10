@@ -8,8 +8,12 @@ import java.util.UUID;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.CommentMO;
 import com.intrbiz.data.db.compiler.meta.Action;
+import com.intrbiz.data.db.compiler.meta.PartitionMode;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLIndex;
+import com.intrbiz.data.db.compiler.meta.SQLPartition;
+import com.intrbiz.data.db.compiler.meta.SQLPartitioning;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -18,6 +22,10 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A comment against an alert, check, etc
  */
 @SQLTable(schema = BergamotDB.class, name = "comment", since = @SQLVersion({ 1, 0, 0 }))
+@SQLPartitioning(
+    @SQLPartition(mode = PartitionMode.RANGE, on = "updated", indexOn = true, indexOnUsing = "brin")
+)
+@SQLIndex(name = "object_id", using = "btree", columns = "object_id", since = @SQLVersion({4, 0, 0}))
 public class Comment extends BergamotObject<CommentMO> implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -78,13 +86,13 @@ public class Comment extends BergamotObject<CommentMO> implements Serializable
     /**
      * When was it created
      */
-    @SQLColumn(index = 8, name = "created", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "created", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
 
     /**
      * When was it updated
      */
-    @SQLColumn(index = 9, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "updated", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
 
     /**

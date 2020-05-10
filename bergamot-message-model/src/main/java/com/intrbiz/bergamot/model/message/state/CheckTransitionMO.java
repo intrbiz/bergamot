@@ -21,12 +21,6 @@ public class CheckTransitionMO extends MessageObject
     private static final long serialVersionUID = 1L;
     
     /**
-     * The transition id, this should match the id of the execution / result
-     */
-    @JsonProperty("id")
-    private UUID id;
-    
-    /**
      * The check to which this transition applies
      */
     @JsonProperty("check_id")
@@ -285,16 +279,6 @@ public class CheckTransitionMO extends MessageObject
     public CheckTransitionMO()
     {
         super();
-    }
-
-    public UUID getId()
-    {
-        return id;
-    }
-
-    public void setId(UUID id)
-    {
-        this.id = id;
     }
 
     public UUID getCheckId()

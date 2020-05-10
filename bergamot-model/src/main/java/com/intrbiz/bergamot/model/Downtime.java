@@ -14,8 +14,12 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.message.DowntimeMO;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.data.db.compiler.meta.Action;
+import com.intrbiz.data.db.compiler.meta.PartitionMode;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
+import com.intrbiz.data.db.compiler.meta.SQLIndex;
+import com.intrbiz.data.db.compiler.meta.SQLPartition;
+import com.intrbiz.data.db.compiler.meta.SQLPartitioning;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
@@ -29,6 +33,10 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * dependencies.
  */
 @SQLTable(schema = BergamotDB.class, name = "downtime", since = @SQLVersion({ 1, 0, 0 }))
+@SQLPartitioning(
+    @SQLPartition(mode = PartitionMode.RANGE, on = "starts", indexOn = true, indexOnUsing = "brin")
+)
+@SQLIndex(name = "check_starts", using = "btree", columns = "check_id", since = @SQLVersion({4, 0, 0}))
 public class Downtime extends BergamotObject<DowntimeMO> implements Serializable, TimeRange, Commented
 {
     private static final long serialVersionUID = 1L;

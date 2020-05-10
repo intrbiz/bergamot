@@ -30,7 +30,6 @@ public class ReadingsExample
        UUID readingIdI = Site.randomId(siteId);
        UUID readingIdF = Site.randomId(siteId);
        //
-       db.setupSiteReadings(siteId);
        db.getOrSetupDoubleGaugeReading(checkId, "testd", "", 300_000L);
        db.getOrSetupFloatGaugeReading(checkId, "testf", "", 300_000L);
        db.getOrSetupLongGaugeReading(checkId, "testl", "", 300_000L);

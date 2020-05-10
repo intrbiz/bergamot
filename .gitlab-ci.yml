@@ -31,6 +31,7 @@ build:
       - '*/target/*.jar'
       - '*/target/*.app'
       - '*/target/*.tar.gz'
+      - '*/target/*.sql'
 
 release:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
@@ -52,6 +53,7 @@ release:
       - '*/target/*.jar'
       - '*/target/*.app'
       - '*/target/*.tar.gz'
+      - '*/target/*.sql'
 
 containers:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'

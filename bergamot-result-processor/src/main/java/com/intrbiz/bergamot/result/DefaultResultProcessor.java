@@ -153,7 +153,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
                         Transition transition = this.computeResultTransition((RealCheck<?, ?>) check, check.getState(), resultMO);
                         logger.info("State change for " + check.getType() + "::" + check.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange + ", in downtime: " + transition.nextState.isInDowntime());
                         // log the transition
-                        db.logCheckTransition(transition.toCheckTransition(check.getSite().randomObjectId(), check.getId(), new Timestamp(resultMO.getProcessed())));
+                        db.logCheckTransition(transition.toCheckTransition(check.getId(), new Timestamp(resultMO.getProcessed())));
                         // update the check state
                         db.setCheckState(transition.nextState);
                         // make our state available as soon as possible
@@ -648,7 +648,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             Transition virtualTransition = this.applyVirtualResult(referencedBy, referencedBy.getState(), ok, status, allHard, resultMO);
             logger.info("Virtual state change for " + referencedBy.getType() + "::" + referencedBy.getId() + " => hard state change: " + transition.hardChange + ", state change: " + transition.stateChange + " triggered by " + check.getType() + "::" + check.getId());
             // update the state
-            db.logCheckTransition(virtualTransition.toCheckTransition(referencedBy.getSite().randomObjectId(), referencedBy.getId(), new Timestamp(resultMO.getProcessed())));
+            db.logCheckTransition(virtualTransition.toCheckTransition(referencedBy.getId(), new Timestamp(resultMO.getProcessed())));
             db.setCheckState(virtualTransition.nextState);
             db.commit();
             // send the general state update notifications
@@ -884,9 +884,9 @@ public class DefaultResultProcessor extends AbstractResultProcessor
             return this;
         }
         
-        public CheckTransition toCheckTransition(UUID id, UUID checkId, Timestamp appliedAt)
+        public CheckTransition toCheckTransition(UUID checkId, Timestamp appliedAt)
         {
-            return new CheckTransition(id, checkId, appliedAt, this.stateChange, this.hardChange, this.alert, this.recovery, this.previousState, this.nextState);
+            return new CheckTransition(checkId, appliedAt, this.stateChange, this.hardChange, this.alert, this.recovery, this.previousState, this.nextState);
         }
         
         public boolean hasChanged()

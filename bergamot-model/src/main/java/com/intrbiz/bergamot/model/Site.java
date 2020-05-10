@@ -13,6 +13,7 @@ import com.intrbiz.bergamot.model.message.SiteMO;
 import com.intrbiz.bergamot.model.util.Parameter;
 import com.intrbiz.bergamot.model.util.Parameterised;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLIndex;
 import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLUnique;
@@ -22,6 +23,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * A monitoring 'site'
  */
 @SQLTable(schema = BergamotDB.class, name = "site", since = @SQLVersion({ 1, 0, 0 }))
+@SQLIndex(name = "aliases", using = "gin", columns = "aliases", since = @SQLVersion({1, 6, 0}))
 public final class Site extends BergamotObject<SiteMO> implements Serializable, Parameterised
 {
     private static final long serialVersionUID = 1L;
