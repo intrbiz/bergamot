@@ -10,15 +10,15 @@ import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "sla_fixed_period", since = @SQLVersion({ 3, 54, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "sla_fixed_period", since = @SQLVersion({4, 0, 0}))
 public class SLAFixedPeriod extends SLAPeriod<SLAFixedPeriodMO>
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 5, name = "start", since = @SQLVersion({ 3, 54, 0 }))
+    @SQLColumn(index = 5, name = "start", since = @SQLVersion({4, 0, 0}))
     private Date start;
 
-    @SQLColumn(index = 6, name = "end", since = @SQLVersion({ 3, 54, 0 }))
+    @SQLColumn(index = 6, name = "end", since = @SQLVersion({4, 0, 0}))
     private Date end;
 
     public SLAFixedPeriod()

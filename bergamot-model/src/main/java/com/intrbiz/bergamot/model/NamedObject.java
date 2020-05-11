@@ -27,33 +27,33 @@ public abstract class NamedObject<T extends NamedObjectMO, C extends NamedObject
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     protected UUID id;
 
-    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID siteId;
 
-    @SQLColumn(index = 3, name = "name", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "name", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected String name;
 
-    @SQLColumn(index = 4, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "summary", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected String summary;
 
-    @SQLColumn(index = 5, name = "description", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "description", since = @SQLVersion({4, 0, 0}))
     protected String description;
 
-    @SQLColumn(index = 6, name = "created", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "created", since = @SQLVersion({4, 0, 0}))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
 
-    @SQLColumn(index = 7, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "updated", since = @SQLVersion({4, 0, 0}))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
     
     /**
      * Arbitrary parameters of an object
      */
-    @SQLColumn(index = 8, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({4, 0, 0}))
     private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
 
     public NamedObject()

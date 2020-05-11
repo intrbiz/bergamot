@@ -20,56 +20,56 @@ import com.intrbiz.util.HOTPRegistration;
 /**
  * A (counter) HOTP based system which can been configured for the contract
  */
-@SQLTable(schema = BergamotDB.class, name = "hotp_registration", since = @SQLVersion({ 3, 39, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "hotp_registration", since = @SQLVersion({4, 0, 0}))
 public class ContactHOTPRegistration implements Serializable, HOTPRegistration
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID id;
 
     /**
      * The contact whom this token represents
      */
-    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({ 3, 39, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID contactId;
 
-    @SQLColumn(index = 3, name = "secret", notNull = true, since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 3, name = "secret", notNull = true, since = @SQLVersion({4, 0, 0}))
     private byte[] secret;
 
-    @SQLColumn(index = 4, name = "counter", notNull = true, since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 4, name = "counter", notNull = true, since = @SQLVersion({4, 0, 0}))
     private long counter;
 
     /**
      * When did we register this device
      */
-    @SQLColumn(index = 5, name = "created", since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 5, name = "created", since = @SQLVersion({4, 0, 0}))
     private Timestamp created = new Timestamp(System.currentTimeMillis());
 
     /**
      * When was this last updated
      */
-    @SQLColumn(index = 6, name = "updated", since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 6, name = "updated", since = @SQLVersion({4, 0, 0}))
     private Timestamp updated = null;
 
     /**
      * Has this device been revoked
      */
-    @SQLColumn(index = 7, name = "revoked", since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 7, name = "revoked", since = @SQLVersion({4, 0, 0}))
     private boolean revoked = false;
 
     /**
      * When was it revoked
      */
-    @SQLColumn(index = 8, name = "revoked_at", since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 8, name = "revoked_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp revokedAt = null;
 
     /**
      * A name for this method
      */
-    @SQLColumn(index = 9, name = "summary", since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 9, name = "summary", since = @SQLVersion({4, 0, 0}))
     private String summary;
 
     public ContactHOTPRegistration()

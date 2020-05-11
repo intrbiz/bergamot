@@ -12,63 +12,63 @@ import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "sla_report", virtual = true, since = @SQLVersion({ 3, 53, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "sla_report", virtual = true, since = @SQLVersion({4, 0, 0}))
 public class SLAReport extends BergamotObject<SLAReportMO>
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({4, 0, 0}))
     private UUID checkId;
 
-    @SQLColumn(index = 2, name = "check_name", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 2, name = "check_name", since = @SQLVersion({4, 0, 0}))
     private String checkName;
 
-    @SQLColumn(index = 3, name = "check_summary", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 3, name = "check_summary", since = @SQLVersion({4, 0, 0}))
     private String checkSummary;
 
-    @SQLColumn(index = 4, name = "check_description", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 4, name = "check_description", since = @SQLVersion({4, 0, 0}))
     private String checkDescription;
 
-    @SQLColumn(index = 5, name = "sla_id", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 5, name = "sla_id", since = @SQLVersion({4, 0, 0}))
     private UUID slaId;
 
-    @SQLColumn(index = 6, name = "sla_name", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 6, name = "sla_name", since = @SQLVersion({4, 0, 0}))
     private String slaName;
 
-    @SQLColumn(index = 7, name = "sla_summary", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 7, name = "sla_summary", since = @SQLVersion({4, 0, 0}))
     private String slaSummary;
 
-    @SQLColumn(index = 8, name = "sla_description", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 8, name = "sla_description", since = @SQLVersion({4, 0, 0}))
     private String slaDescription;
 
-    @SQLColumn(index = 9, name = "sla_target", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 9, name = "sla_target", since = @SQLVersion({4, 0, 0}))
     private double slaTarget;
 
-    @SQLColumn(index = 10, name = "period_name", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 10, name = "period_name", since = @SQLVersion({4, 0, 0}))
     private String periodName;
 
-    @SQLColumn(index = 11, name = "period_summary", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 11, name = "period_summary", since = @SQLVersion({4, 0, 0}))
     private String periodSummary;
 
-    @SQLColumn(index = 12, name = "period_description", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 12, name = "period_description", since = @SQLVersion({4, 0, 0}))
     private String periodDescription;
 
-    @SQLColumn(index = 13, name = "period_start", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 13, name = "period_start", since = @SQLVersion({4, 0, 0}))
     private Timestamp periodStart;
 
-    @SQLColumn(index = 14, name = "period_end", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 14, name = "period_end", since = @SQLVersion({4, 0, 0}))
     private Timestamp periodEnd;
 
-    @SQLColumn(index = 15, name = "period_alerts", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 15, name = "period_alerts", since = @SQLVersion({4, 0, 0}))
     private int periodAlerts;
 
-    @SQLColumn(index = 16, name = "period_false_positives", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 16, name = "period_false_positives", since = @SQLVersion({4, 0, 0}))
     private int periodFalsePositives;
 
-    @SQLColumn(index = 17, name = "period_value", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 17, name = "period_value", since = @SQLVersion({4, 0, 0}))
     private double periodValue;
 
-    @SQLColumn(index = 18, name = "period_breached", since = @SQLVersion({ 3, 53, 0 }))
+    @SQLColumn(index = 18, name = "period_breached", since = @SQLVersion({4, 0, 0}))
     private boolean periodBreached;
 
     public SLAReport()

@@ -25,7 +25,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * of a check, returning a transition.
  * 
  */
-@SQLTable(schema = BergamotDB.class, name = "check_transition", since = @SQLVersion({ 1, 3, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "check_transition", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
     @SQLPartition(mode = PartitionMode.RANGE, on = "applied_at", indexOn = true, indexOnUsing = "brin")
 )
@@ -36,26 +36,26 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
     /**
      * The check to which this transition applies
      */
-    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({4, 0, 0}))
     private UUID checkId;
     
     /**
      * When the transition was applied
      */
-    @SQLColumn(index = 2, name = "applied_at", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 2, name = "applied_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp appliedAt = new Timestamp(System.currentTimeMillis());
     
     /**
      * Did this transition result in a change of state for the check
      */
-    @SQLColumn(index = 3, name = "state_change", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 3, name = "state_change", since = @SQLVersion({4, 0, 0}))
     private boolean stateChange;
     
     /**
      * Did this transition result in a hard change.  IE the check state reached 
      * the attempt threshold which caused a hard change in state.
      */
-    @SQLColumn(index = 4, name = "hard_change", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 4, name = "hard_change", since = @SQLVersion({4, 0, 0}))
     private boolean hardChange;
     
     // previous
@@ -63,85 +63,85 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
     /**
      * Previous State: Is the check ok?
      */
-    @SQLColumn(index = 5, name = "previous_ok", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 5, name = "previous_ok", since = @SQLVersion({4, 0, 0}))
     private boolean previousOk;
 
     /**
      * Previous State: Why is the check ok or not ok?
      */
-    @SQLColumn(index = 6, name = "previous_status", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 6, name = "previous_status", since = @SQLVersion({4, 0, 0}))
     private Status previousStatus;
 
     /**
      * Previous State: What was the output of the last check
      */
-    @SQLColumn(index = 7, name = "previous_output", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 7, name = "previous_output", since = @SQLVersion({4, 0, 0}))
     private String previousOutput;
 
     /**
      * Previous State: When did the last check happen
      */
-    @SQLColumn(index = 8, name = "previous_last_check_time", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 8, name = "previous_last_check_time", since = @SQLVersion({4, 0, 0}))
     private Timestamp previousLastCheckTime;
 
     /**
      * Previous State: What was the Id of the last check
      */
-    @SQLColumn(index = 9, name = "previous_last_check_id", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 9, name = "previous_last_check_id", since = @SQLVersion({4, 0, 0}))
     private UUID previousLastCheckId;
 
     /**
      * Previous State: The number of attempts since the last hard state change
      */
-    @SQLColumn(index = 10, name = "previous_attempt", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 10, name = "previous_attempt", since = @SQLVersion({4, 0, 0}))
     private int previousAttempt;
 
     /**
      * Previous State: Has a hard state transition happened
      */
-    @SQLColumn(index = 11, name = "previous_hard", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 11, name = "previous_hard", since = @SQLVersion({4, 0, 0}))
     private boolean previousHard;
 
     /**
      * Previous State: Is the state in transition
      */
-    @SQLColumn(index = 12, name = "previous_transitioning", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 12, name = "previous_transitioning", since = @SQLVersion({4, 0, 0}))
     private boolean previousTransitioning;
 
     /**
      * Previous State: Is the state flapping between ok and not ok, but never reaching a hard state
      */
-    @SQLColumn(index = 13, name = "previous_flapping", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 13, name = "previous_flapping", since = @SQLVersion({4, 0, 0}))
     private boolean previousFlapping;
 
     /**
      * Previous State: When was the last hard state change
      */
-    @SQLColumn(index = 14, name = "previous_last_state_change", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 14, name = "previous_last_state_change", since = @SQLVersion({4, 0, 0}))
     private Timestamp previousLastStateChange;
 
     /**
      * Previous State: A bitmap of the ok history
      */
-    @SQLColumn(index = 15, name = "previous_ok_history", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 15, name = "previous_ok_history", since = @SQLVersion({4, 0, 0}))
     private long previousOkHistory = 0x1L;
 
     /**
      * Previous State: Was the last hard state ok?
      */
-    @SQLColumn(index = 16, name = "previous_last_hard_ok", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 16, name = "previous_last_hard_ok", since = @SQLVersion({4, 0, 0}))
     private boolean previousLastHardOk = true;
 
     /**
      * Previous State: What was the last hard status?
      */
-    @SQLColumn(index = 17, name = "previous_last_hard_status", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 17, name = "previous_last_hard_status", since = @SQLVersion({4, 0, 0}))
     private Status previousLastHardStatus = Status.PENDING;
 
     /**
      * Previous State: What was the output of the last hard state
      */
-    @SQLColumn(index = 18, name = "previous_last_hard_output", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 18, name = "previous_last_hard_output", since = @SQLVersion({4, 0, 0}))
     private String previousLastHardOutput = "Pending";  
  
     // next
@@ -149,145 +149,145 @@ public class CheckTransition extends BergamotObject<CheckTransitionMO>
     /**
      * Next State: Is the check ok?
      */
-    @SQLColumn(index = 19, name = "next_ok", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 19, name = "next_ok", since = @SQLVersion({4, 0, 0}))
     private boolean nextOk;
 
     /**
      * Next State: Why is the check ok or not ok?
      */
-    @SQLColumn(index = 20, name = "next_status", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 20, name = "next_status", since = @SQLVersion({4, 0, 0}))
     private Status nextStatus;
 
     /**
      * Next State: What was the output of the last check
      */
-    @SQLColumn(index = 21, name = "next_output", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 21, name = "next_output", since = @SQLVersion({4, 0, 0}))
     private String nextOutput;
 
     /**
      * Next State: When did the last check happen
      */
-    @SQLColumn(index = 22, name = "next_last_check_time", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 22, name = "next_last_check_time", since = @SQLVersion({4, 0, 0}))
     private Timestamp nextLastCheckTime;
 
     /**
      * Next State: What was the Id of the last check
      */
-    @SQLColumn(index = 23, name = "next_last_check_id", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 23, name = "next_last_check_id", since = @SQLVersion({4, 0, 0}))
     private UUID nextLastCheckId;
 
     /**
      * Next State: The number of attempts since the last hard state change
      */
-    @SQLColumn(index = 24, name = "next_attempt", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 24, name = "next_attempt", since = @SQLVersion({4, 0, 0}))
     private int nextAttempt;
 
     /**
      * Next State: Has a hard state transition happened
      */
-    @SQLColumn(index = 25, name = "next_hard", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 25, name = "next_hard", since = @SQLVersion({4, 0, 0}))
     private boolean nextHard;
 
     /**
      * Next State: Is the state in transition
      */
-    @SQLColumn(index = 26, name = "next_transitioning", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 26, name = "next_transitioning", since = @SQLVersion({4, 0, 0}))
     private boolean nextTransitioning;
 
     /**
      * Next State: Is the state flapping between ok and not ok, but never reaching a hard state
      */
-    @SQLColumn(index = 27, name = "next_flapping", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 27, name = "next_flapping", since = @SQLVersion({4, 0, 0}))
     private boolean nextFlapping;
 
     /**
      * Next State: When was the last hard state change
      */
-    @SQLColumn(index = 28, name = "next_last_state_change", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 28, name = "next_last_state_change", since = @SQLVersion({4, 0, 0}))
     private Timestamp nextLastStateChange;
 
     /**
      * Next State: A bitmap of the ok history
      */
-    @SQLColumn(index = 29, name = "next_ok_history", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 29, name = "next_ok_history", since = @SQLVersion({4, 0, 0}))
     private long nextOkHistory = 0x1L;
 
     /**
      * Next State: Was the last hard state ok?
      */
-    @SQLColumn(index = 30, name = "next_last_hard_ok", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 30, name = "next_last_hard_ok", since = @SQLVersion({4, 0, 0}))
     private boolean nextLastHardOk = true;
 
     /**
      * Next State: What was the last hard status?
      */
-    @SQLColumn(index = 31, name = "next_last_hard_status", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 31, name = "next_last_hard_status", since = @SQLVersion({4, 0, 0}))
     private Status nextLastHardStatus = Status.PENDING;
 
     /**
      * Next State: What was the output of the last hard state
      */
-    @SQLColumn(index = 32, name = "next_last_hard_output", since = @SQLVersion({ 1, 3, 0 }))
+    @SQLColumn(index = 32, name = "next_last_hard_output", since = @SQLVersion({4, 0, 0}))
     private String nextLastHardOutput = "Pending";
     
     /**
      * Does this transition result in an alert, IE: A hard change from ok to not ok.
      */
-    @SQLColumn(index = 33, name = "alert", since = @SQLVersion({ 1, 7, 0 }))
+    @SQLColumn(index = 33, name = "alert", since = @SQLVersion({4, 0, 0}))
     private boolean alert;
     
     /**
      * Does this transition result in a recovery, IE: A hard change from not ok to ok.
      */
-    @SQLColumn(index = 34, name = "recovery", since = @SQLVersion({ 1, 7, 0 }))
+    @SQLColumn(index = 34, name = "recovery", since = @SQLVersion({4, 0, 0}))
     private boolean recovery;
 
     /**
      * Previous State: Was the check previously in downtime
      */
-    @SQLColumn(index = 35, name = "previous_in_downtime", since = @SQLVersion({ 3, 3, 0 }))
+    @SQLColumn(index = 35, name = "previous_in_downtime", since = @SQLVersion({4, 0, 0}))
     private boolean previousInDowntime;
 
     /**
      * Next State: Is the check now in downtime
      */
-    @SQLColumn(index = 36, name = "next_in_downtime", since = @SQLVersion({ 3, 3, 0 }))
+    @SQLColumn(index = 36, name = "next_in_downtime", since = @SQLVersion({4, 0, 0}))
     private boolean nextInDowntime;
     
     /**
      * Previous State: Was the check previously suppressed
      */
-    @SQLColumn(index = 37, name = "previous_suppressed", since = @SQLVersion({ 3, 4, 0 }))
+    @SQLColumn(index = 37, name = "previous_suppressed", since = @SQLVersion({4, 0, 0}))
     private boolean previousSuppressed;
 
     /**
      * Next State: Is the check now suppressed
      */
-    @SQLColumn(index = 38, name = "next_suppressed", since = @SQLVersion({ 3, 4, 0 }))
+    @SQLColumn(index = 38, name = "next_suppressed", since = @SQLVersion({4, 0, 0}))
     private boolean nextSuppressed;
 
     /**
      * Previous State: Was the check previously acknowledged
      */
-    @SQLColumn(index = 39, name = "previous_acknowledged", since = @SQLVersion({ 3, 32, 0 }))
+    @SQLColumn(index = 39, name = "previous_acknowledged", since = @SQLVersion({4, 0, 0}))
     private boolean previousAcknowledged;
 
     /**
      * Next State: Is the check now acknowledged
      */
-    @SQLColumn(index = 40, name = "next_acknowledged", since = @SQLVersion({ 3, 32, 0 }))
+    @SQLColumn(index = 40, name = "next_acknowledged", since = @SQLVersion({4, 0, 0}))
     private boolean nextAcknowledged;
     
     /**
      * Previous State: Was the check previously encompassed
      */
-    @SQLColumn(index = 41, name = "previous_encompassed", since = @SQLVersion({ 3, 32, 0 }))
+    @SQLColumn(index = 41, name = "previous_encompassed", since = @SQLVersion({4, 0, 0}))
     private boolean previousEncompassed;
 
     /**
      * Next State: Is the check now encompassed
      */
-    @SQLColumn(index = 42, name = "next_encompassed", since = @SQLVersion({ 3, 32, 0 }))
+    @SQLColumn(index = 42, name = "next_encompassed", since = @SQLVersion({4, 0, 0}))
     private boolean nextEncompassed;
     
     public CheckTransition()

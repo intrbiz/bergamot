@@ -35,29 +35,29 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
     /**
      * How often should checks be executed (in milliseconds)
      */
-    @SQLColumn(index = 1, name = "check_interval", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "check_interval", since = @SQLVersion({4, 0, 0}))
     protected long checkInterval = TimeUnit.MINUTES.toMillis(5);
 
     /**
      * How often should checks be executed when not in an ok state (in milliseconds)
      */
-    @SQLColumn(index = 2, name = "retry_interval", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "retry_interval", since = @SQLVersion({4, 0, 0}))
     protected long retryInterval = TimeUnit.MINUTES.toMillis(1);
 
     /**
      * When should we check, a calendar
      */
-    @SQLColumn(index = 3, name = "timeperiod_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "timeperiod_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID timePeriodId;
 
-    @SQLColumn(index = 4, name = "worker_pool", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "worker_pool", since = @SQLVersion({4, 0, 0}))
     protected String workerPool;
 
     /**
      * How often should checks be executed when transitioning between hard states (in milliseconds)
      */
-    @SQLColumn(index = 5, name = "changing_interval", since = @SQLVersion({ 1, 4, 0 }))
+    @SQLColumn(index = 5, name = "changing_interval", since = @SQLVersion({4, 0, 0}))
     protected long changingInterval = 0;
 
     public ActiveCheck()

@@ -8,54 +8,54 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 
-@SQLTable(schema = LamplighterDB.class, name = "timer_reading", since = @SQLVersion({ 1, 6, 0 }))
+@SQLTable(schema = LamplighterDB.class, name = "timer_reading", since = @SQLVersion({4, 0, 0}))
 public class StoredTimerReading extends StoredReading
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "count", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 1, name = "count", since = @SQLVersion({4, 0, 0}))
     private long count;
     
-    @SQLColumn(index = 2, name = "mean_rate", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 2, name = "mean_rate", since = @SQLVersion({4, 0, 0}))
     private double meanRate;
     
-    @SQLColumn(index = 3, name = "one_minute_rate", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 3, name = "one_minute_rate", since = @SQLVersion({4, 0, 0}))
     private double oneMinuteRate;
  
-    @SQLColumn(index = 4, name = "five_minute_rate", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 4, name = "five_minute_rate", since = @SQLVersion({4, 0, 0}))
     private double fiveMinuteRate;
    
-    @SQLColumn(index = 5, name = "fifteen_minute_rate", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 5, name = "fifteen_minute_rate", since = @SQLVersion({4, 0, 0}))
     private double fifteenMinuteRate;
     
-    @SQLColumn(index = 6, name = "median", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 6, name = "median", since = @SQLVersion({4, 0, 0}))
     private double median;
 
-    @SQLColumn(index = 7, name = "mean", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 7, name = "mean", since = @SQLVersion({4, 0, 0}))
     private double mean;
 
-    @SQLColumn(index = 8, name = "min", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 8, name = "min", since = @SQLVersion({4, 0, 0}))
     private double min;
 
-    @SQLColumn(index = 9, name = "max", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 9, name = "max", since = @SQLVersion({4, 0, 0}))
     private double max;
 
-    @SQLColumn(index = 10, name = "std_dev", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 10, name = "std_dev", since = @SQLVersion({4, 0, 0}))
     private double stdDev;
 
-    @SQLColumn(index = 11, name = "the_75th_percentile", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 11, name = "the_75th_percentile", since = @SQLVersion({4, 0, 0}))
     private double the75thPercentile;
 
-    @SQLColumn(index = 12, name = "the_95th_percentile", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 12, name = "the_95th_percentile", since = @SQLVersion({4, 0, 0}))
     private double the95thPercentile;
 
-    @SQLColumn(index = 13, name = "the_98th_percentile", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 13, name = "the_98th_percentile", since = @SQLVersion({4, 0, 0}))
     private double the98thPercentile;
 
-    @SQLColumn(index = 14, name = "the_99th_percentile", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 14, name = "the_99th_percentile", since = @SQLVersion({4, 0, 0}))
     private double the99thPercentile;
 
-    @SQLColumn(index = 15, name = "the_999th_percentile", since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 15, name = "the_999th_percentile", since = @SQLVersion({4, 0, 0}))
     private double the999thPercentile;
     
     public StoredTimerReading()

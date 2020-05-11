@@ -17,7 +17,7 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLUnique;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "group", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "group", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Group extends SecuredObject<GroupMO, GroupCfg> implements Commented
 {
@@ -26,7 +26,7 @@ public class Group extends SecuredObject<GroupMO, GroupCfg> implements Commented
     /**
      * The groups this group is a member of
      */
-    @SQLColumn(index = 1, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "group_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     protected List<UUID> groupIds = new LinkedList<UUID>();
 
     public Group()

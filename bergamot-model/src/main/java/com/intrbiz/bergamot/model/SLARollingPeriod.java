@@ -11,7 +11,7 @@ import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "sla_rolling_period", since = @SQLVersion({ 3, 52, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "sla_rolling_period", since = @SQLVersion({4, 0, 0}))
 public class SLARollingPeriod extends SLAPeriod<SLARollingPeriodMO>
 {
     public enum RollingPeriodGranularity {
@@ -20,7 +20,7 @@ public class SLARollingPeriod extends SLAPeriod<SLARollingPeriodMO>
 
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 5, name = "granularity", since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 5, name = "granularity", since = @SQLVersion({4, 0, 0}))
     private RollingPeriodGranularity granularity;
 
     public SLARollingPeriod()

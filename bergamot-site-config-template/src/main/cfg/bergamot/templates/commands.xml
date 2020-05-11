@@ -44,7 +44,7 @@
             var pass = check.getParameter('password');
             /* Execute */
             jdbc.connect(url, user, pass, function(con) {
-                var total = con.query('SELECT round(sum(pg_relation_size((quote_ident("schema") || \'.\' || quote_ident("table"))::regclass)) / 1024.0 / 1024.0, 3) FROM lamplighter.check_reading', function(rs) {
+                var total = con.query('SELECT round(sum(pg_total_relation_size((quote_ident(n.nspname) || \'.\' || quote_ident(c.relname))::regclass)) / 1024.0 / 1024.0, 3) FROM pg_class c JOIN pg_namespace n ON (c.relnamespace = n.oid) WHERE n.nspname = \'lamplighter\' AND c.relkind = \'r\'', function(rs) {
                     return rs.next() ? rs.getDouble(1) : 0.0;
                 });
                 bergamot.info('Total Readings Size: ' + total + ' MiB');
@@ -71,7 +71,7 @@
             var pass = check.getParameter('password');
             /* Execute */
             jdbc.connect(url, user, pass, function(con) {
-                var total = con.query('SELECT round(pg_relation_size(\'bergamot.check_transition\'::regclass) / 1024.0 / 1024.0, 3)', function(rs) {
+                var total = con.query('SELECT round(pg_total_relation_size(\'bergamot.check_transition\'::regclass) / 1024.0 / 1024.0, 3)', function(rs) {
                     return rs.next() ? rs.getDouble(1) : 0.0;
                 });
                 bergamot.info('Check Transitions Size: ' + total + ' MiB');

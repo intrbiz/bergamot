@@ -13,7 +13,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A security domain, grouping checks for access controls
  */
-@SQLTable(schema = BergamotDB.class, name = "security_domain", since = @SQLVersion({ 3, 8, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "security_domain", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class SecurityDomain extends NamedObject<SecurityDomainMO, SecurityDomainCfg>
 {

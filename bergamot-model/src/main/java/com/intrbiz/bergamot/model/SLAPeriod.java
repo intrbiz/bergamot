@@ -16,22 +16,22 @@ public abstract class SLAPeriod<T extends SLAPeriodMO> extends BergamotObject<T>
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "sla_id", since = @SQLVersion({ 3, 52, 0 }))
-    @SQLForeignKey(references = SLA.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 1, name = "sla_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = SLA.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     protected UUID slaId;
 
-    @SQLColumn(index = 2, name = "name", since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 2, name = "name", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     protected String name;
 
-    @SQLColumn(index = 3, name = "summary", since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 3, name = "summary", since = @SQLVersion({4, 0, 0}))
     protected String summary;
 
-    @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 4, name = "description", since = @SQLVersion({4, 0, 0}))
     protected String description;
     
-    @SQLColumn(index = 5, name = "status", since = @SQLVersion({ 3, 54, 0 }))
+    @SQLColumn(index = 5, name = "status", since = @SQLVersion({4, 0, 0}))
     protected boolean status;
 
     public SLAPeriod()

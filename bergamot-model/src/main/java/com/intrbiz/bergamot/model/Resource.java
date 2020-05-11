@@ -15,19 +15,19 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A resource of a cluster, which is provided by multiple services
  */
-@SQLTable(schema = BergamotDB.class, name = "resource", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "resource", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "host_name_unq", columns = {"cluster_id", "name"})
 public class Resource extends VirtualCheck<ResourceMO, ResourceCfg>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "cluster_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "cluster_id", since = @SQLVersion({4, 0, 0}))
     private UUID clusterId;
     
-    @SQLColumn(index = 2, name = "category", since = @SQLVersion({ 2, 5, 0 }))
+    @SQLColumn(index = 2, name = "category", since = @SQLVersion({4, 0, 0}))
     private String category;
 
-    @SQLColumn(index = 3, name = "application", since = @SQLVersion({ 2, 5, 0 }))
+    @SQLColumn(index = 3, name = "application", since = @SQLVersion({4, 0, 0}))
     private String application;
 
     public Resource()

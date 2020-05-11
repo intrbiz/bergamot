@@ -18,40 +18,40 @@ import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "notification_engine", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "notification_engine", since = @SQLVersion({4, 0, 0}))
 public class NotificationEngine extends BergamotObject<NotificationEngineMO>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "notifications_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "notifications_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID notificationsId;
 
-    @SQLColumn(index = 2, name = "engine", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "engine", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private String engine;
 
-    @SQLColumn(index = 3, name = "enabled", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "enabled", since = @SQLVersion({4, 0, 0}))
     private boolean enabled;
 
-    @SQLColumn(index = 4, name = "timeperiod_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "timeperiod_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID timePeriodId;
 
-    @SQLColumn(index = 5, name = "alerts_enabled", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "alerts_enabled", since = @SQLVersion({4, 0, 0}))
     private boolean alertsEnabled = true;
 
-    @SQLColumn(index = 6, name = "recovery_enabled", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "recovery_enabled", since = @SQLVersion({4, 0, 0}))
     private boolean recoveryEnabled = true;
 
-    @SQLColumn(index = 7, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({4, 0, 0}))
     private List<Status> ignore = new LinkedList<Status>();
     
-    @SQLColumn(index = 8, name = "acknowledge_enabled", since = @SQLVersion({ 3, 2, 0 }))
+    @SQLColumn(index = 8, name = "acknowledge_enabled", since = @SQLVersion({4, 0, 0}))
     private boolean acknowledgeEnabled = true;
     
-    @SQLColumn(index = 8, name = "updates_enabled", since = @SQLVersion({ 3, 60, 0 }))
+    @SQLColumn(index = 8, name = "updates_enabled", since = @SQLVersion({4, 0, 0}))
     private boolean updatesEnabled = true;
 
     public NotificationEngine()

@@ -473,7 +473,7 @@ public abstract class LamplighterDB extends DatabaseAdapter
             "FROM level0,\n" + 
             "( \n" + 
             "  SELECT q.start, lead(q.start) OVER () AS end  \n" + 
-            "  FROM generate_series(date_trunc('week', now() - '1 week'::interval)::date, date_trunc('week', now() + '5 years'::interval)::date, '1 week'::interval) q(start)  \n" + 
+            "  FROM generate_series(date_trunc('week', now())::date, date_trunc('week', now() + '5 years'::interval)::date, '1 week'::interval) q(start)  \n" + 
             ") qq \n" + 
             "WHERE qq.end IS NOT NULL"
             ).collect(Collectors.toList()).toArray(new String[] {})

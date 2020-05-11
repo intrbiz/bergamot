@@ -24,7 +24,7 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLUnique;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "contact", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "contact", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Principal, Serializable
 {
@@ -50,29 +50,29 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
         }
     }
 
-    @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     private List<UUID> teamIds = new LinkedList<UUID>();
 
-    @SQLColumn(index = 2, name = "password_hash", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "password_hash", since = @SQLVersion({4, 0, 0}))
     private String passwordHash;
 
-    @SQLColumn(index = 3, name = "email", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "email", since = @SQLVersion({4, 0, 0}))
     @SQLUnique(name = "email_unq", columns = { "site_id", "email" })
     private String email;
 
-    @SQLColumn(index = 4, name = "pager", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "pager", since = @SQLVersion({4, 0, 0}))
     private String pager;
 
-    @SQLColumn(index = 5, name = "mobile", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "mobile", since = @SQLVersion({4, 0, 0}))
     private String mobile;
 
-    @SQLColumn(index = 6, name = "phone", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "phone", since = @SQLVersion({4, 0, 0}))
     private String phone;
 
-    @SQLColumn(index = 7, name = "granted_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "granted_permissions", type = "TEXT[]", since = @SQLVersion({4, 0, 0}))
     private List<String> grantedPermissions = new LinkedList<String>();
 
-    @SQLColumn(index = 8, name = "revoked_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "revoked_permissions", type = "TEXT[]", since = @SQLVersion({4, 0, 0}))
     private List<String> revokedPermissions = new LinkedList<String>();
     
     // account security flags
@@ -80,37 +80,37 @@ public class Contact extends SecuredObject<ContactMO, ContactCfg> implements Pri
     /**
      * Should the password be changed on next login
      */
-    @SQLColumn(index = 9, name = "force_password_change", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "force_password_change", since = @SQLVersion({4, 0, 0}))
     private boolean forcePasswordChange = false;
     
     /**
      * Is this account locked in any way, IE: reject authentication even with valid credentials
      */
-    @SQLColumn(index = 10, name = "locked", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "locked", since = @SQLVersion({4, 0, 0}))
     private boolean locked = false;
     
     /**
      * Why the account was locked
      */
-    @SQLColumn(index = 11, name = "locked_reason", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 11, name = "locked_reason", since = @SQLVersion({4, 0, 0}))
     private LockOutReason lockedReason;
     
     /**
      * When this account was locked last
      */
-    @SQLColumn(index = 12, name = "locked_at", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 12, name = "locked_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp lockedAt = null;
 
     /**
      * How many failed authentication attempts there have been
      */
-    @SQLColumn(index = 13, name = "auth_fails", since = @SQLVersion({ 3, 47, 0 }))
+    @SQLColumn(index = 13, name = "auth_fails", since = @SQLVersion({4, 0, 0}))
     private int authFails = 0;
     
     /**
      * Last time this contact logged in
      */
-    @SQLColumn(index = 14, name = "last_login_at", since = @SQLVersion({ 3, 48, 0 }))
+    @SQLColumn(index = 14, name = "last_login_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp lastLoginAt = null;
 
     public Contact()

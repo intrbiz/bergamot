@@ -18,47 +18,47 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A single use backup code for as a two factor auth fall back
  */
-@SQLTable(schema = BergamotDB.class, name = "backup_code", since = @SQLVersion({ 3, 40, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "backup_code", since = @SQLVersion({4, 0, 0}))
 public class ContactBackupCode implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3,40, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID id;
     
     /**
      * The contact whom this backup code is for
      */
-    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({ 3, 40, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID contactId;
     
-    @SQLColumn(index = 3, name = "code", notNull = true, since = @SQLVersion({ 3, 40, 0 }))
+    @SQLColumn(index = 3, name = "code", notNull = true, since = @SQLVersion({4, 0, 0}))
     private String code;
     
     /**
      * When did we create this code
      */
-    @SQLColumn(index = 4, name = "created", since = @SQLVersion({ 3, 40, 0 }))
+    @SQLColumn(index = 4, name = "created", since = @SQLVersion({4, 0, 0}))
     private Timestamp created = new Timestamp(System.currentTimeMillis());
     
     /**
      * When was this last updated
      */
-    @SQLColumn(index = 5, name = "updated", since = @SQLVersion({ 3, 40, 0 }))
+    @SQLColumn(index = 5, name = "updated", since = @SQLVersion({4, 0, 0}))
     private Timestamp updated = null;
     
     /**
      * Was this code used
      */
-    @SQLColumn(index = 6, name = "used", since = @SQLVersion({ 3, 40, 0 }))
+    @SQLColumn(index = 6, name = "used", since = @SQLVersion({4, 0, 0}))
     private boolean used = false;
     
     /**
      * When was it used
      */
-    @SQLColumn(index = 7, name = "used_at", since = @SQLVersion({ 3, 40, 0 }))
+    @SQLColumn(index = 7, name = "used_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp usedAt = null;
     
     public ContactBackupCode()

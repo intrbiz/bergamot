@@ -26,25 +26,25 @@ public abstract class RealCheck<T extends RealCheckMO, C extends RealCheckCfg<C>
     /**
      * How many check attempts to trigger a hard alert
      */
-    @SQLColumn(index = 1, name = "alert_attempt_threshold", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "alert_attempt_threshold", since = @SQLVersion({4, 0, 0}))
     protected int alertAttemptThreshold = 3;
 
     /**
      * How many check attempts to trigger a hard recovery
      */
-    @SQLColumn(index = 2, name = "recovery_attempt_threshold", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "recovery_attempt_threshold", since = @SQLVersion({4, 0, 0}))
     protected int recoveryAttemptThreshold = 3;
     
     /**
      * Checks which this check depends upon for reachability
      */
-    @SQLColumn(index = 10, name = "depends", type = "UUID[]", since = @SQLVersion({ 3, 21, 0 }))
+    @SQLColumn(index = 10, name = "depends", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     protected List<UUID> dependsIds = new LinkedList<UUID>();
     
     /**
      * The resource pool this check is part of
      */
-    @SQLColumn(index = 13, name = "resource_pool", since = @SQLVersion({ 3, 59, 0 }))
+    @SQLColumn(index = 13, name = "resource_pool", since = @SQLVersion({4, 0, 0}))
     protected String resourcePool;
 
     public RealCheck()

@@ -18,43 +18,43 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A configuration change which has or might be made
  */
-@SQLTable(schema = BergamotDB.class, name = "config_change", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "config_change", since = @SQLVersion({4, 0, 0}))
 public class ConfigChange implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     protected UUID id;
     
-    @SQLColumn(index = 2, name = "site_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "site_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID siteId;
 
-    @SQLColumn(index = 3, name = "summary", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "summary", since = @SQLVersion({4, 0, 0}))
     protected String summary;
 
-    @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "description", since = @SQLVersion({4, 0, 0}))
     protected String description;
     
-    @SQLColumn(index = 5, name = "created", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "created", since = @SQLVersion({4, 0, 0}))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
     
-    @SQLColumn(index = 6, name = "applied", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "applied", since = @SQLVersion({4, 0, 0}))
     protected boolean applied = false;
 
-    @SQLColumn(index = 7, name = "applied_at", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "applied_at", since = @SQLVersion({4, 0, 0}))
     protected Timestamp appliedAt;
 
-    @SQLColumn(index = 8, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({4, 0, 0}))
     protected Configuration configuration;
     
-    @SQLColumn(index = 9, name = "created_by_id", since = @SQLVersion({ 3, 10, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 10, 0 }))
+    @SQLColumn(index = 9, name = "created_by_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID createdById;
     
-    @SQLColumn(index = 10, name = "applied_by_id", since = @SQLVersion({ 3, 10, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 10, 0 }))
+    @SQLColumn(index = 10, name = "applied_by_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID appliedById;
 
     public ConfigChange()

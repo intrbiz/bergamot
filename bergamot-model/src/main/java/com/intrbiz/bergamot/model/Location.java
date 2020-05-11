@@ -20,17 +20,17 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * The physical (probably) location of a host
  */
-@SQLTable(schema = BergamotDB.class, name = "location", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "location", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Location extends SecuredObject<LocationMO, LocationCfg> implements Commented
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Location.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "location_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Location.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID locationId;
 
-    @SQLColumn(index = 2, name = "worker_pool", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "worker_pool", since = @SQLVersion({4, 0, 0}))
     protected String workerPool;
 
     public Location()

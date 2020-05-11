@@ -23,23 +23,23 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * The definition of a command which is used to check something
  */
-@SQLTable(schema = BergamotDB.class, name = "check_command", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "check_command", since = @SQLVersion({4, 0, 0}))
 public class CheckCommand extends BergamotObject<CheckCommandMO> implements Parameterised
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID checkId;
 
-    @SQLColumn(index = 2, name = "command_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Command.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 6, 0 }))
+    @SQLColumn(index = 2, name = "command_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Command.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID commandId;
 
-    @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({4, 0, 0}))
     private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
     
-    @SQLColumn(index = 4, name = "script", since = @SQLVersion({ 3, 43, 0 }))
+    @SQLColumn(index = 4, name = "script", since = @SQLVersion({4, 0, 0}))
     private String script;
 
     public CheckCommand()

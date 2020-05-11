@@ -25,7 +25,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * An alert which was raised against a check
  */
-@SQLTable(schema = BergamotDB.class, name = "alert", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "alert", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
     @SQLPartition(mode = PartitionMode.RANGE, on = "raised", indexOn = true, indexOnUsing = "brin")
 )
@@ -37,84 +37,84 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     /**
      * The unique ID for this alert
      */
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     private UUID id;
 
-    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID siteId;
 
     /**
      * The check to which this alert was issued
      */
-    @SQLColumn(index = 3, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "check_id", since = @SQLVersion({4, 0, 0}))
     private UUID checkId;
 
     /**
      * When was this alert raised
      */
-    @SQLColumn(index = 4, name = "raised", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "raised", since = @SQLVersion({4, 0, 0}))
     private Timestamp raised;
 
     /**
      * Is the check ok?
      */
-    @SQLColumn(index = 5, name = "ok", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "ok", since = @SQLVersion({4, 0, 0}))
     private boolean ok = true;
 
     /**
      * Why is the check ok or not ok?
      */
-    @SQLColumn(index = 6, name = "status", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "status", since = @SQLVersion({4, 0, 0}))
     private Status status = Status.PENDING;
 
     /**
      * What was the output of the last check
      */
-    @SQLColumn(index = 7, name = "output", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "output", since = @SQLVersion({4, 0, 0}))
     private String output = "Pending";
 
     /**
      * When did the last check happen
      */
-    @SQLColumn(index = 8, name = "last_check_time", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "last_check_time", since = @SQLVersion({4, 0, 0}))
     private Timestamp lastCheckTime = new Timestamp(System.currentTimeMillis());
 
     /**
      * What was the Id of the last check
      */
-    @SQLColumn(index = 9, name = "last_check_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "last_check_id", since = @SQLVersion({4, 0, 0}))
     private UUID lastCheckId;
 
     /**
      * The number of attempts since the last hard state change
      */
-    @SQLColumn(index = 10, name = "attempt", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "attempt", since = @SQLVersion({4, 0, 0}))
     private int attempt = Integer.MAX_VALUE;
 
     /**
      * Has a hard state transition happened
      */
-    @SQLColumn(index = 11, name = "hard", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 11, name = "hard", since = @SQLVersion({4, 0, 0}))
     private boolean hard = true;
 
     /**
      * Is the state in transition
      */
-    @SQLColumn(index = 12, name = "transitioning", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 12, name = "transitioning", since = @SQLVersion({4, 0, 0}))
     private boolean transitioning = false;
 
     /**
      * Is the state flapping between ok and not ok, but never reaching a hard state
      */
-    @SQLColumn(index = 13, name = "flapping", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 13, name = "flapping", since = @SQLVersion({4, 0, 0}))
     private boolean flapping = false;
 
     /**
      * When was the last hard state change
      */
-    @SQLColumn(index = 14, name = "last_state_change", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 14, name = "last_state_change", since = @SQLVersion({4, 0, 0}))
     private Timestamp lastStateChange = new Timestamp(System.currentTimeMillis());
 
     // history
@@ -122,111 +122,111 @@ public class Alert extends BergamotObject<AlertMO> implements Serializable, Comm
     /**
      * A bitmap of the ok history
      */
-    @SQLColumn(index = 15, name = "ok_history", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 15, name = "ok_history", since = @SQLVersion({4, 0, 0}))
     private long okHistory = 0x1L;
 
     /**
      * Was the last hard state ok?
      */
-    @SQLColumn(index = 16, name = "last_hard_ok", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 16, name = "last_hard_ok", since = @SQLVersion({4, 0, 0}))
     private boolean lastHardOk = true;
 
     /**
      * What was the last hard status?
      */
-    @SQLColumn(index = 17, name = "last_hard_status", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 17, name = "last_hard_status", since = @SQLVersion({4, 0, 0}))
     private Status lastHardStatus = Status.PENDING;
 
     /**
      * What was the output of the last hard state
      */
-    @SQLColumn(index = 18, name = "last_hard_output", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 18, name = "last_hard_output", since = @SQLVersion({4, 0, 0}))
     private String lastHardOutput = "Pending";
 
     /**
      * Has this alert been acknowledged by somebody
      */
-    @SQLColumn(index = 19, name = "acknowledged", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 19, name = "acknowledged", since = @SQLVersion({4, 0, 0}))
     private boolean acknowledged = false;
 
     /**
      * When was this alert acknowledged
      */
-    @SQLColumn(index = 20, name = "acknowledged_at", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 20, name = "acknowledged_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp acknowledgedAt;
 
     /**
      * Whom acknowledged this alert
      */
-    @SQLColumn(index = 21, name = "acknowledged_by_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 21, name = "acknowledged_by_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({4, 0, 0}))
     private UUID acknowledgedById;
 
     /**
      * Has this alert recovered by itself
      */
-    @SQLColumn(index = 22, name = "recovered", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 22, name = "recovered", since = @SQLVersion({4, 0, 0}))
     private boolean recovered = false;
 
     /**
      * Which check execution caused this alert to recover
      */
-    @SQLColumn(index = 23, name = "recovered_by", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 23, name = "recovered_by", since = @SQLVersion({4, 0, 0}))
     private UUID recoveredBy;
 
     /**
      * When did this check recover
      */
-    @SQLColumn(index = 24, name = "recovered_at", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 24, name = "recovered_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp recoveredAt;
 
     /**
      * Was this alert escalated
      */
-    @SQLColumn(index = 25, name = "escalated", since = @SQLVersion({ 3, 23, 0 }))
+    @SQLColumn(index = 25, name = "escalated", since = @SQLVersion({4, 0, 0}))
     private boolean escalated;
 
     /**
      * When was this alert first escalated
      */
-    @SQLColumn(index = 26, name = "escalated_at", since = @SQLVersion({ 3, 23, 0 }))
+    @SQLColumn(index = 26, name = "escalated_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp escalatedAt;
 
     /**
      * Who was notified because of this alert
      */
-    @SQLColumn(index = 27, name = "notified_ids", type = "UUID[]", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 27, name = "notified_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     private List<UUID> notifiedIds = new LinkedList<UUID>();
 
     /**
      * The threshold for the next escalation
      */
-    @SQLColumn(index = 28, name = "escalation_threshold", since = @SQLVersion({ 3, 34, 0 }))
+    @SQLColumn(index = 28, name = "escalation_threshold", since = @SQLVersion({4, 0, 0}))
     private long escalationThreshold = 0L;
 
     /**
      * Has this alert been marked as a false positive
      */
-    @SQLColumn(index = 29, name = "false_positive", since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 29, name = "false_positive", since = @SQLVersion({4, 0, 0}))
     private boolean falsePositive = false;
 
     /**
      * When was this alert marked as a false positive
      */
-    @SQLColumn(index = 30, name = "false_positive_at", since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 30, name = "false_positive_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp falsePositiveAt;
 
     /**
      * Whom marked this alert as a false positive
      */
-    @SQLColumn(index = 31, name = "false_positive_by_id", since = @SQLVersion({ 3, 52, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 31, name = "false_positive_by_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({4, 0, 0}))
     private UUID falsePositiveById;
 
     /**
      * Why this alert was marked as a false positive
      */
-    @SQLColumn(index = 32, name = "false_positive_reason_id", since = @SQLVersion({ 3, 52, 0 }))
+    @SQLColumn(index = 32, name = "false_positive_reason_id", since = @SQLVersion({4, 0, 0}))
     private UUID falsePositiveReasonId;
     
     private transient List<Contact> notifiedCache;

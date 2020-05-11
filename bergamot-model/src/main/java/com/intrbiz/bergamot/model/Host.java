@@ -20,7 +20,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A host - some form of network connected device that is to be checked
  */
-@SQLTable(schema = BergamotDB.class, name = "host", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "host", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Host extends ActiveCheck<HostMO, HostCfg>
 {
@@ -29,19 +29,19 @@ public class Host extends ActiveCheck<HostMO, HostCfg>
     /**
      * The IP address of this host, this might be an IP address or a DNS name
      */
-    @SQLColumn(index = 1, name = "address", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "address", since = @SQLVersion({4, 0, 0}))
     private String address;
 
     /**
      * The ID of the location which this host is physically located in
      */
-    @SQLColumn(index = 2, name = "location_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "location_id", since = @SQLVersion({4, 0, 0}))
     private UUID locationId;
     
     /**
      * The UUID of the agent that might be used for this host
      */
-    @SQLColumn(index = 3, name = "agent_id", since = @SQLVersion({ 1, 9, 0 }))
+    @SQLColumn(index = 3, name = "agent_id", since = @SQLVersion({4, 0, 0}))
     private UUID agentId;
 
     public Host()

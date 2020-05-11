@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.ui.api;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ public class StatsAPIRouter extends Router<BergamotApp>
 {
     @Title("Check Transitions")
     @Desc({
-        "Get details of recent transitions for the check identified by the given UUID.  This will provide detail data on every execution of a check."
+        "Get details of recent transitions for the check identified by the given UUID.  This will provide detailed data on every execution of a check."
     })
     @Any("/transitions/check/id/:id")
     @JSON(notFoundIfNull = true)
@@ -40,11 +41,12 @@ public class StatsAPIRouter extends Router<BergamotApp>
     public List<CheckTransitionMO> getCheckTransitions(
             BergamotDB db, 
             @IsaObjectId() UUID id, 
-            @Param("offset") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L) Long offset,
+            @Param("from") @IsaLong(min = 0, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 0L) Long from,
             @Param("limit")  @IsaLong(min = 1L, max = 1001L, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = 100L) Long limit
     )
     {
         require(permission("read", id));
-        return db.listCheckTransitionsForCheck(id, offset, limit).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
+        if (from <= 0) from = System.currentTimeMillis();
+        return db.listOlderCheckTransitionsForCheck(id, new Timestamp(from), limit).stream().map((x) -> x.toMO(currentPrincipal())).collect(Collectors.toList());
     }
 }

@@ -28,61 +28,61 @@ public abstract class Check<T extends CheckMO, C extends CheckCfg<C>> extends Se
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "pool", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "pool", since = @SQLVersion({4, 0, 0}))
     protected int pool;
     
     /**
      * Is the result of this check suppressed
      */
-    @SQLColumn(index = 2, name = "suppressed", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "suppressed", since = @SQLVersion({4, 0, 0}))
     protected boolean suppressed = false;
 
     /**
      * Is this check currently scheduled
      */
-    @SQLColumn(index = 3, name = "enabled", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "enabled", since = @SQLVersion({4, 0, 0}))
     protected boolean enabled = true;
 
     /**
      * Teams to notify
      */
-    @SQLColumn(index = 4, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "team_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     protected List<UUID> teamIds = new LinkedList<UUID>();
 
     /**
      * Contacts to notify
      */
-    @SQLColumn(index = 5, name = "contact_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "contact_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     protected List<UUID> contactIds = new LinkedList<UUID>();
 
     /**
      * The groups this check is a member of
      */
-    @SQLColumn(index = 7, name = "group_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "group_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     protected List<UUID> groupIds = new LinkedList<UUID>();
     
     /**
      * External systems reference for this check
      */
-    @SQLColumn(index = 9, name = "external_ref", since = @SQLVersion({ 2, 1, 0 }))
+    @SQLColumn(index = 9, name = "external_ref", since = @SQLVersion({4, 0, 0}))
     protected String externalRef;
     
     /**
      * Optional note for this check
      */
-    @SQLColumn(index = 10, name = "note", since = @SQLVersion({ 3, 49, 0 }))
+    @SQLColumn(index = 10, name = "note", since = @SQLVersion({4, 0, 0}))
     protected String note;
     
     /**
      * Optional URL to external notes for this check
      */
-    @SQLColumn(index = 11, name = "note_url", since = @SQLVersion({ 3, 49, 0 }))
+    @SQLColumn(index = 11, name = "note_url", since = @SQLVersion({4, 0, 0}))
     protected String noteUrl;
    
     /**
      * Optional title for url to external notes for this check
      */
-    @SQLColumn(index = 12, name = "note_title", since = @SQLVersion({ 3, 49, 0 }))
+    @SQLColumn(index = 12, name = "note_title", since = @SQLVersion({4, 0, 0}))
     protected String noteTitle;
 
     public Check()

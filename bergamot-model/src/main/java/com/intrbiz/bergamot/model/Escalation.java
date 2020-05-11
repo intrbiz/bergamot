@@ -19,43 +19,43 @@ import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "escalation", since = @SQLVersion({ 3, 22, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "escalation", since = @SQLVersion({4, 0, 0}))
 public class Escalation extends BergamotObject<EscalationMO> implements Comparable<Escalation>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "notifications_id", since = @SQLVersion({ 3, 22, 0 }))
-    @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "notifications_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Notifications.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID notificationsId;
 
-    @SQLColumn(index = 2, name = "after", since = @SQLVersion({ 3, 22, 0 }))
+    @SQLColumn(index = 2, name = "after", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private long after;
     
-    @SQLColumn(index = 3, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({ 3, 22, 0 }))
+    @SQLColumn(index = 3, name = "ignore", type = "TEXT[]", adapter = StatusesAdapter.class, since = @SQLVersion({4, 0, 0}))
     private List<Status> ignore = new LinkedList<Status>();
     
-    @SQLColumn(index = 4, name = "timeperiod_id", since = @SQLVersion({ 3, 22, 0 }))
-    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "timeperiod_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = TimePeriod.class, on = "id", onDelete = Action.RESTRICT, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID timePeriodId;
     
     /**
      * Teams to notify
      */
-    @SQLColumn(index = 5, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 3, 22, 0 }))
+    @SQLColumn(index = 5, name = "team_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     protected List<UUID> teamIds = new LinkedList<UUID>();
 
     /**
      * Contacts to notify
      */
-    @SQLColumn(index = 6, name = "contact_ids", type = "UUID[]", since = @SQLVersion({ 3, 22, 0 }))
+    @SQLColumn(index = 6, name = "contact_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     protected List<UUID> contactIds = new LinkedList<UUID>();
     
     /**
      * Should we renotify the original contacts
      */
-    @SQLColumn(index = 7, name = "renotify", since = @SQLVersion({ 3, 36, 0 }))
+    @SQLColumn(index = 7, name = "renotify", since = @SQLVersion({4, 0, 0}))
     protected boolean renotify = false;
 
     public Escalation()

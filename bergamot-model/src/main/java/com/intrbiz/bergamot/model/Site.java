@@ -22,36 +22,36 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A monitoring 'site'
  */
-@SQLTable(schema = BergamotDB.class, name = "site", since = @SQLVersion({ 1, 0, 0 }))
-@SQLIndex(name = "aliases", using = "gin", columns = "aliases", since = @SQLVersion({1, 6, 0}))
+@SQLTable(schema = BergamotDB.class, name = "site", since = @SQLVersion({4, 0, 0}))
+@SQLIndex(name = "aliases", using = "gin", columns = "aliases", since = @SQLVersion({4, 0, 0}))
 public final class Site extends BergamotObject<SiteMO> implements Serializable, Parameterised
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     protected UUID id;
 
-    @SQLColumn(index = 2, name = "name", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "name", notNull = true, since = @SQLVersion({4, 0, 0}))
     @SQLUnique()
     protected String name;
 
-    @SQLColumn(index = 3, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "summary", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected String summary;
 
-    @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "description", since = @SQLVersion({4, 0, 0}))
     protected String description;
 
-    @SQLColumn(index = 5, name = "aliases", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "aliases", type = "TEXT[]", since = @SQLVersion({4, 0, 0}))
     protected List<String> aliases = new LinkedList<String>();
     
     /**
      * Arbitrary parameters of an object
      */
-    @SQLColumn(index = 7, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 2, 0, 0 }))
+    @SQLColumn(index = 7, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({4, 0, 0}))
     private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
     
-    @SQLColumn(index = 8, name = "disabled", since = @SQLVersion({ 3, 45, 0 }))
+    @SQLColumn(index = 8, name = "disabled", since = @SQLVersion({4, 0, 0}))
     private boolean disabled = false;
 
     public Site()

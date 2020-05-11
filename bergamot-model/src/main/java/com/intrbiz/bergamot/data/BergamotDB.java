@@ -97,7 +97,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  */
 @SQLSchema(
         name = "bergamot", 
-        version = @SQLVersion({4, 0, 4}),
+        version = @SQLVersion({4, 0, 0}),
         tables = {
             Site.class,
             Location.class,
@@ -222,68 +222,68 @@ public abstract class BergamotDB extends DatabaseAdapter
     // global settings
     
     @Cacheable
-    @SQLSetter(table = GlobalSetting.class, name = "set_global_setting", since = @SQLVersion({3, 44, 0}))
+    @SQLSetter(table = GlobalSetting.class, name = "set_global_setting", since = @SQLVersion({4, 0, 0}))
     public abstract void setGlobalSetting(GlobalSetting setting);
     
     @Cacheable
-    @SQLGetter(table = GlobalSetting.class, name = "get_global_setting", since = @SQLVersion({3, 44, 0}))
+    @SQLGetter(table = GlobalSetting.class, name = "get_global_setting", since = @SQLVersion({4, 0, 0}))
     public abstract GlobalSetting getGlobalSetting(@SQLParam("name") String name);
     
     @Cacheable
-    @SQLRemove(table = GlobalSetting.class, name = "remove_global_setting", since = @SQLVersion({3, 44, 0}))
+    @SQLRemove(table = GlobalSetting.class, name = "remove_global_setting", since = @SQLVersion({4, 0, 0}))
     public abstract void removeGlobalSetting(@SQLParam("name") String name);
     
-    @SQLGetter(table = GlobalSetting.class, name = "list_global_settings", since = @SQLVersion({3, 44, 0}))
+    @SQLGetter(table = GlobalSetting.class, name = "list_global_settings", since = @SQLVersion({4, 0, 0}))
     public abstract List<GlobalSetting> listGlobalSettings();
 
     // site
     
     @Cacheable
     @CacheInvalidate({"get_site_by_name.*"})
-    @SQLSetter(table = Site.class, name = "set_site", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Site.class, name = "set_site", since = @SQLVersion({4, 0, 0}))
     public abstract void setSite(Site site);
     
     @Cacheable
-    @SQLGetter(table = Site.class, name = "get_site", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Site.class, name = "get_site", since = @SQLVersion({4, 0, 0}))
     public abstract Site getSite(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Site.class, name ="get_site_by_name", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Site.class, name ="get_site_by_name", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.site WHERE name = p_name OR aliases @> ARRAY[p_name]")
     )
     public abstract Site getSiteByName(@SQLParam("name") String name);
     
     @Cacheable
     @CacheInvalidate({"get_site_by_name.*"})
-    @SQLRemove(table = Site.class, name = "remove_site", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Site.class, name = "remove_site", since = @SQLVersion({4, 0, 0}))
     public abstract void removeSite(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = Site.class, name = "list_sites", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Site.class, name = "list_sites", since = @SQLVersion({4, 0, 0}))
     public abstract List<Site> listSites();
     
     // config
     
-    @SQLSetter(table = Config.class, name = "set_config", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Config.class, name = "set_config", since = @SQLVersion({4, 0, 0}))
     public abstract void setConfig(Config template);
     
-    @SQLGetter(table = Config.class, name = "get_config", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Config.class, name = "get_config", since = @SQLVersion({4, 0, 0}))
     public abstract Config getConfig(@SQLParam("id") UUID id);
     
-    @SQLRemove(table = Config.class, name = "remove_config", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Config.class, name = "remove_config", since = @SQLVersion({4, 0, 0}))
     public abstract void removeConfig(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = Config.class, name = "list_config", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Config.class, name = "list_config", orderBy = @SQLOrder("name"), since = @SQLVersion({4, 0, 0}))
     public abstract List<Config> listConfig(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type", optional = true) String type);
     
-    @SQLGetter(table = Config.class, name = "list_config_templates", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Config.class, name = "list_config_templates", orderBy = @SQLOrder("name"), since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND type = p_type AND template = TRUE")
     )
     public abstract List<Config> listConfigTemplates(@SQLParam("site_id") UUID siteId, @SQLParam(value = "type") String type);
     
-    @SQLGetter(table = Config.class, name = "get_config_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Config.class, name = "get_config_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Config getConfigByName(@SQLParam("site_id") UUID siteId, @SQLParam("type") String type, @SQLParam("name") String name);
     
-    @SQLGetter(table = Config.class, name = "list_dependent_config", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Config.class, name = "list_dependent_config", orderBy = @SQLOrder("name"), since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.config WHERE site_id = p_site_id AND required_templates @> ARRAY[p_qualified_template_name] AND (NOT (type = 'service' OR type = 'trap' OR type = 'resource'))")
     )
     public abstract List<Config> listDependentConfig(@SQLParam("site_id") UUID siteId, @SQLParam(value = "qualified_template_name", virtual = true) String qualifiedTemplateName);
@@ -291,7 +291,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     /**
      * Recursively find all objects which utilise the given template
      */
-    @SQLGetter(table = Config.class, name = "list_all_dependent_config_objects", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Config.class, name = "list_all_dependent_config_objects", orderBy = @SQLOrder("name"), since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("WITH RECURSIVE config_graph AS ( " + 
                               "    SELECT c.* " +
                               "    FROM bergamot.config c " + 
@@ -340,31 +340,31 @@ public abstract class BergamotDB extends DatabaseAdapter
         return new BergamotConfigResolver(this.getObjectLocator(siteId));
     }
     
-    @SQLSetter(table = ConfigChange.class, name = "set_config_change", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = ConfigChange.class, name = "set_config_change", since = @SQLVersion({4, 0, 0}))
     public abstract void setConfigChange(ConfigChange change);
     
-    @SQLGetter(table = ConfigChange.class, name = "get_config_change", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = ConfigChange.class, name = "get_config_change", since = @SQLVersion({4, 0, 0}))
     public abstract ConfigChange getConfigChange(@SQLParam("id") UUID id);
     
-    @SQLRemove(table = ConfigChange.class, name = "remove_config_change", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = ConfigChange.class, name = "remove_config_change", since = @SQLVersion({4, 0, 0}))
     public abstract void removeConfigChange(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = ConfigChange.class, name = "list_config_changes", since = @SQLVersion({1, 0, 0}), 
+    @SQLGetter(table = ConfigChange.class, name = "list_config_changes", since = @SQLVersion({4, 0, 0}), 
             orderBy = { @SQLOrder(value = "applied", direction = Direction.ASC), @SQLOrder(value = "created", direction = Direction.DESC) }
     )
     public abstract List<ConfigChange> listConfigChanges(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = ConfigChange.class, name = "page_all_config_changes", since = @SQLVersion({3, 33, 0}), 
+    @SQLGetter(table = ConfigChange.class, name = "page_all_config_changes", since = @SQLVersion({4, 0, 0}), 
             orderBy = { @SQLOrder(value = "applied", direction = Direction.ASC), @SQLOrder(value = "created", direction = Direction.DESC) }
     )
     public abstract List<ConfigChange> pageAllConfigChanges(@SQLParam("site_id") UUID siteId, @SQLLimit long limit, @SQLOffset long offset);
     
-    @SQLGetter(table = ConfigChange.class, name = "page_config_changes", since = @SQLVersion({3, 33, 0}), 
+    @SQLGetter(table = ConfigChange.class, name = "page_config_changes", since = @SQLVersion({4, 0, 0}), 
             orderBy = { @SQLOrder(value = "applied", direction = Direction.ASC), @SQLOrder(value = "created", direction = Direction.DESC) }
     )
     public abstract List<ConfigChange> pageConfigChanges(@SQLParam("site_id") UUID siteId, @SQLParam("applied") boolean applied, @SQLLimit long limit, @SQLOffset long offset);
     
-    @SQLGetter(table = ConfigChange.class, name = "list_pending_config_changes", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = ConfigChange.class, name = "list_pending_config_changes", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.config_change WHERE site_id = p_site_id AND applied = FALSE"),
             orderBy = @SQLOrder(value = "created", direction = Direction.DESC)
     )
@@ -374,23 +374,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_timeperiod_by_name.#{site_id}.*"})
-    @SQLSetter(table = TimePeriod.class, name = "set_timeperiod", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = TimePeriod.class, name = "set_timeperiod", since = @SQLVersion({4, 0, 0}))
     public abstract void setTimePeriod(TimePeriod timePeriod);
     
     @Cacheable
-    @SQLGetter(table = TimePeriod.class, name = "get_timeperiod", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = TimePeriod.class, name = "get_timeperiod", since = @SQLVersion({4, 0, 0}))
     public abstract TimePeriod getTimePeriod(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = TimePeriod.class, name = "get_timeperiod_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = TimePeriod.class, name = "get_timeperiod_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract TimePeriod getTimePeriodByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
-    @SQLGetter(table = TimePeriod.class, name = "list_timeperiods", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = TimePeriod.class, name = "list_timeperiods", since = @SQLVersion({4, 0, 0}))
     public abstract List<TimePeriod> listTimePeriods(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_timeperiod_by_name.#{this.getSiteId(id)}.*"})
-    @SQLRemove(table = TimePeriod.class, name = "remove_timeperiod", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = TimePeriod.class, name = "remove_timeperiod", since = @SQLVersion({4, 0, 0}))
     public abstract void removeTimePeriod(@SQLParam("id") UUID id);
     
     public void addTimePeriodExclude(TimePeriod timePeriod, TimePeriod excluded)
@@ -412,100 +412,100 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_credential_by_name.#{site_id}.*"})
-    @SQLSetter(table = Credential.class, name = "set_credential", since = @SQLVersion({3, 46, 0}))
+    @SQLSetter(table = Credential.class, name = "set_credential", since = @SQLVersion({4, 0, 0}))
     public abstract void setCredential(Credential Credential);
     
     @Cacheable
-    @SQLGetter(table = Credential.class, name = "get_credential", since = @SQLVersion({3, 46, 0}))
+    @SQLGetter(table = Credential.class, name = "get_credential", since = @SQLVersion({4, 0, 0}))
     public abstract Credential getCredential(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Credential.class, name = "get_credential_by_name", since = @SQLVersion({3, 46, 0}))
+    @SQLGetter(table = Credential.class, name = "get_credential_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Credential getCredentialByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
-    @SQLGetter(table = Credential.class, name = "list_credentials", since = @SQLVersion({3, 46, 0}))
+    @SQLGetter(table = Credential.class, name = "list_credentials", since = @SQLVersion({4, 0, 0}))
     public abstract List<Credential> listCredentials(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_credential_by_name.#{this.getSiteId(id)}.*"})
-    @SQLRemove(table = Credential.class, name = "remove_credential", since = @SQLVersion({3, 46, 0}))
+    @SQLRemove(table = Credential.class, name = "remove_credential", since = @SQLVersion({4, 0, 0}))
     public abstract void removeCredential(@SQLParam("id") UUID id);
     
     // SLA
     
     @Cacheable
     @CacheInvalidate({"get_sla_by_name.#{check_id}.*", "get_slas_for_check.#{check_id}.*"})
-    @SQLSetter(table = SLA.class, name = "set_sla", since = @SQLVersion({3, 52, 0}))
+    @SQLSetter(table = SLA.class, name = "set_sla", since = @SQLVersion({4, 0, 0}))
     public abstract void setSLA(SLA SLA);
     
     @Cacheable
-    @SQLGetter(table = SLA.class, name = "get_sla", since = @SQLVersion({3, 52, 0}))
+    @SQLGetter(table = SLA.class, name = "get_sla", since = @SQLVersion({4, 0, 0}))
     public abstract SLA getSLA(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = SLA.class, name = "get_sla_by_name", since = @SQLVersion({3, 52, 0}))
+    @SQLGetter(table = SLA.class, name = "get_sla_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract SLA getSLAByName(@SQLParam("check_id") UUID checkId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = SLA.class, name = "get_slas_for_check", since = @SQLVersion({3, 52, 0}))
+    @SQLGetter(table = SLA.class, name = "get_slas_for_check", since = @SQLVersion({4, 0, 0}))
     public abstract List<SLA> getSLAsForCheck(@SQLParam("check_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_sla_by_name.*", "get_slas_for_check.*"})
-    @SQLRemove(table = SLA.class, name = "remove_sla", since = @SQLVersion({3, 52, 0}))
+    @SQLRemove(table = SLA.class, name = "remove_sla", since = @SQLVersion({4, 0, 0}))
     public abstract void removeSLA(@SQLParam("id") UUID id);
     
     // SLA Rolling Period
     
     @Cacheable
     @CacheInvalidate({"get_sla_rolling_period_by_name.#{sla_id}.*", "get_sla_rolling_periods_for_sla.#{sla_id}.*"})
-    @SQLSetter(table = SLARollingPeriod.class, name = "set_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
+    @SQLSetter(table = SLARollingPeriod.class, name = "set_sla_rolling_period", since = @SQLVersion({4, 0, 0}))
     public abstract void setSLARollingPeriod(SLARollingPeriod SLARollingPeriod);
     
     @Cacheable
-    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period", since = @SQLVersion({4, 0, 0}))
     public abstract SLARollingPeriod getSLARollingPeriod(@SQLParam("sla_id") UUID id, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period_by_name", since = @SQLVersion({3, 52, 0}))
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_period_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract SLARollingPeriod getSLARollingPeriodByName(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
     
-    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_periods_for_sla", since = @SQLVersion({3, 52, 0}))
+    @SQLGetter(table = SLARollingPeriod.class, name = "get_sla_rolling_periods_for_sla", since = @SQLVersion({4, 0, 0}))
     public abstract List<SLARollingPeriod> getSLARollingPeriodsForSLA(@SQLParam("sla_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_sla_rolling_period_by_name.#{sla_id}.*", "get_sla_rolling_periods_for_sla.#{sla_id}.*"})
-    @SQLRemove(table = SLARollingPeriod.class, name = "remove_sla_rolling_period", since = @SQLVersion({3, 52, 0}))
+    @SQLRemove(table = SLARollingPeriod.class, name = "remove_sla_rolling_period", since = @SQLVersion({4, 0, 0}))
     public abstract void removeSLARollingPeriod(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
     
     // SLA Fixed Period
     
     @Cacheable
     @CacheInvalidate({"get_sla_fixed_period_by_name.#{sla_id}.*", "get_sla_fixed_periods_for_sla.#{sla_id}.*"})
-    @SQLSetter(table = SLAFixedPeriod.class, name = "set_sla_fixed_period", since = @SQLVersion({3, 54, 0}))
+    @SQLSetter(table = SLAFixedPeriod.class, name = "set_sla_fixed_period", since = @SQLVersion({4, 0, 0}))
     public abstract void setSLAFixedPeriod(SLAFixedPeriod SLAFixedPeriod);
     
     @Cacheable
-    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_period", since = @SQLVersion({3, 54, 0}))
+    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_period", since = @SQLVersion({4, 0, 0}))
     public abstract SLAFixedPeriod getSLAFixedPeriod(@SQLParam("sla_id") UUID id, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_period_by_name", since = @SQLVersion({3, 54, 0}))
+    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_period_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract SLAFixedPeriod getSLAFixedPeriodByName(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
     
-    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_periods_for_sla", since = @SQLVersion({3, 54, 0}))
+    @SQLGetter(table = SLAFixedPeriod.class, name = "get_sla_fixed_periods_for_sla", since = @SQLVersion({4, 0, 0}))
     public abstract List<SLAFixedPeriod> getSLAFixedPeriodsForSLA(@SQLParam("sla_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_sla_fixed_period_by_name.#{sla_id}.*", "get_sla_fixed_periods_for_sla.#{sla_id}.*"})
-    @SQLRemove(table = SLAFixedPeriod.class, name = "remove_sla_fixed_period", since = @SQLVersion({3, 54, 0}))
+    @SQLRemove(table = SLAFixedPeriod.class, name = "remove_sla_fixed_period", since = @SQLVersion({4, 0, 0}))
     public abstract void removeSLAFixedPeriod(@SQLParam("sla_id") UUID slaId, @SQLParam("name") String name);
     
     // SLA Reports
     
     @SQLGetter(
             table = SLAReport.class, name ="build_sla_report_for_group", 
-            since = @SQLVersion({3, 53, 0}),
+            since = @SQLVersion({4, 0, 0}),
             userDefined = @SQLUserDefined(
                     resources = "build_sla_report_for_group.sql",
                     value = "ALTER FUNCTION bergamot.build_sla_report_for_group(UUID, BOOLEAN) OWNER TO bergamot"
@@ -515,7 +515,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @SQLGetter(
             table = SLAReport.class, name ="build_sla_report_for_check", 
-            since = @SQLVersion({3, 53, 0}),
+            since = @SQLVersion({4, 0, 0}),
             userDefined = @SQLUserDefined(
                     resources = "build_sla_report_for_check.sql",
                     value = "ALTER FUNCTION bergamot.build_sla_report_for_check(UUID, BOOLEAN) OWNER TO bergamot"
@@ -527,23 +527,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_command_by_name.#{site_id}.*"})
-    @SQLSetter(table = Command.class, name = "set_command", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Command.class, name = "set_command", since = @SQLVersion({4, 0, 0}))
     public abstract void setCommand(Command command);
     
     @Cacheable
-    @SQLGetter(table = Command.class, name = "get_command", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Command.class, name = "get_command", since = @SQLVersion({4, 0, 0}))
     public abstract Command getCommand(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Command.class, name = "get_command_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Command.class, name = "get_command_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Command getCommandByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
-    @SQLGetter(table = Command.class, name = "list_commands", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Command.class, name = "list_commands", since = @SQLVersion({4, 0, 0}))
     public abstract List<Command> listCommands(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({"get_command_by_name.#{this.getSiteId(id)}.*"})
-    @SQLRemove(table = Command.class, name = "remove_command", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Command.class, name = "remove_command", since = @SQLVersion({4, 0, 0}))
     public abstract void removeCommand(@SQLParam("id") UUID id);
     
     // location
@@ -554,26 +554,26 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_location_by_name.#{site_id}.*", 
         "get_locations_in_location.#{id}"
     })
-    @SQLSetter(table = Location.class, name = "set_location", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Location.class, name = "set_location", since = @SQLVersion({4, 0, 0}))
     public abstract void setLocation(Location location);
     
     @Cacheable
-    @SQLGetter(table = Location.class, name = "get_location", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Location.class, name = "get_location", since = @SQLVersion({4, 0, 0}))
     public abstract Location getLocation(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Location.class, name = "get_location_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Location.class, name = "get_location_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Location getLocationByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Location.class, name = "get_locations_in_location", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Location.class, name = "get_locations_in_location", since = @SQLVersion({4, 0, 0}))
     public abstract List<Location> getLocationsInLocation(@SQLParam("location_id") UUID locationId);
     
-    @SQLGetter(table = Location.class, name = "list_locations", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Location.class, name = "list_locations", since = @SQLVersion({4, 0, 0}))
     public abstract List<Location> listLocations(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
-    @SQLGetter(table = Location.class, name = "get_root_locations", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Location.class, name = "get_root_locations", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.location WHERE site_id = p_site_id AND location_id IS NULL")
     )
     public abstract List<Location> getRootLocations(@SQLParam("site_id") UUID siteId);
@@ -584,7 +584,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_location_by_name.#{this.getSiteId(id)}.*", 
         "get_locations_in_location.#{id}"
     })
-    @SQLRemove(table = Location.class, name = "remove_location", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Location.class, name = "remove_location", since = @SQLVersion({4, 0, 0}))
     public abstract void removeLocation(@SQLParam("id") UUID locationId);
     
     public void addLocationChild(Location parent, Location child)
@@ -633,28 +633,28 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_group_by_name.#{site_id}.*",
         "get_groups_in_group.#{id}"
     })
-    @SQLSetter(table = Group.class, name = "set_group", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Group.class, name = "set_group", since = @SQLVersion({4, 0, 0}))
     public abstract void setGroup(Group group);
     
     @Cacheable
-    @SQLGetter(table = Group.class, name = "get_group", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Group.class, name = "get_group", since = @SQLVersion({4, 0, 0}))
     public abstract Group getGroup(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Group.class, name = "get_group_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Group.class, name = "get_group_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Group getGroupByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
-    @SQLGetter(table = Group.class, name = "list_group", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Group.class, name = "list_group", since = @SQLVersion({4, 0, 0}))
     public abstract List<Group> listGroups(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
-    @SQLGetter(table = Group.class, name = "get_root_groups", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Group.class, name = "get_root_groups", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.group WHERE site_id = p_site_id AND (group_ids IS NULL OR group_ids = ARRAY[]::UUID[])")
     )
     public abstract List<Group> getRootGroups(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
-    @SQLGetter(table = Group.class, name = "get_groups_in_group", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Group.class, name = "get_groups_in_group", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.group WHERE group_ids @> ARRAY[p_group_id]")
     )
     public abstract List<Group> getGroupsInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
@@ -665,7 +665,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_group_by_name.#{this.getSiteId(id)}.*", 
         "get_groups_in_group.#{id}"
     })
-    @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Group.class, name = "remove_group", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                         "UPDATE bergamot.group    SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
                         "UPDATE bergamot.host     SET group_ids=array_remove(group_ids, p_id) WHERE group_ids @> ARRAY[p_id];\n" +
@@ -733,22 +733,22 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_teams_in_team.#{id}", 
         "get_contacts_in_team.#{id}"
     })
-    @SQLSetter(table = Team.class, name = "set_team", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Team.class, name = "set_team", since = @SQLVersion({4, 0, 0}))
     public abstract void setTeam(Team team);
     
     @Cacheable
-    @SQLGetter(table = Team.class, name = "get_team", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Team.class, name = "get_team", since = @SQLVersion({4, 0, 0}))
     public abstract Team getTeam(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = Team.class, name = "list_teams", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Team.class, name = "list_teams", since = @SQLVersion({4, 0, 0}))
     public abstract List<Team> listTeams(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
-    @SQLGetter(table = Team.class, name = "get_team_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Team.class, name = "get_team_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Team getTeamByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Team.class, name = "get_teams_in_team", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Team.class, name = "get_teams_in_team", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.team WHERE team_ids @> ARRAY[p_team_id]")
     )
     public abstract List<Team> getTeamsInTeam(@SQLParam(value = "team_id", virtual = true) UUID teamId);
@@ -759,7 +759,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_teams_in_team.#{id}", 
         "get_contacts_in_team.#{id}"
     })
-    @SQLRemove(table = Team.class, name = "remove_team", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Team.class, name = "remove_team", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                     "UPDATE bergamot.team     SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
                     "UPDATE bergamot.contact  SET team_ids=array_remove(team_ids, p_id) WHERE team_ids @> ARRAY[p_id];\n" +
@@ -825,37 +825,37 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_contact_by_email.#{site_id}.*", 
         "get_contact_by_name_or_email.#{site_id}.*"
     })
-    @SQLSetter(table = Contact.class, name = "set_contact", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Contact.class, name = "set_contact", since = @SQLVersion({4, 0, 0}))
     public abstract void setContact(Contact contact);
     
     @Cacheable
-    @SQLGetter(table = Contact.class, name = "get_contact", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Contact.class, name = "get_contact", since = @SQLVersion({4, 0, 0}))
     public abstract Contact getContact(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Contact.class, name = "get_contact_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Contact.class, name = "get_contact_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Contact getContactByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Contact.class, name = "get_contact_by_email", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Contact.class, name = "get_contact_by_email", since = @SQLVersion({4, 0, 0}))
     public abstract Contact getContactByEmail(@SQLParam("site_id") UUID siteId, @SQLParam("email") String email);
     
     @Cacheable
-    @SQLGetter(table = Contact.class, name = "get_contact_by_name_or_email", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Contact.class, name = "get_contact_by_name_or_email", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.contact WHERE site_id = p_site_id AND (name = p_name_or_email OR email = p_name_or_email)")
     )
     public abstract Contact getContactByNameOrEmail(@SQLParam("site_id") UUID siteId, @SQLParam(value = "name_or_email", virtual = true) String nameOrEmail);
     
-    @SQLGetter(table = Contact.class, name = "list_contacts", orderBy = @SQLOrder("name"), since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Contact.class, name = "list_contacts", orderBy = @SQLOrder("name"), since = @SQLVersion({4, 0, 0}))
     public abstract List<Contact> listContacts(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
-    @SQLGetter(table = Contact.class, name = "get_contacts_in_team", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Contact.class, name = "get_contacts_in_team", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.contact WHERE team_ids @> ARRAY[p_team_id]")
     )
     public abstract List<Contact> getContactsInTeam(@SQLParam(value = "team_id", virtual = true) UUID teamId);
     
-    @SQLGetter(table = Contact.class, name = "get_contacts_not_in_a_team", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Contact.class, name = "get_contacts_not_in_a_team", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM contact WHERE site_id = p_site_id AND (team_ids IS NULL OR team_ids = ARRAY[]::UUID[])")
     )
     public abstract List<Contact> getContactsNotInATeam(@SQLParam("site_id") UUID site_id);
@@ -866,7 +866,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_contact_by_email.#{this.getSiteId(id)}.*", 
         "get_contact_by_name_or_email.#{this.getSiteId(id)}.*"
     })
-    @SQLRemove(table = Contact.class, name = "remove_contact", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Contact.class, name = "remove_contact", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                     "UPDATE bergamot.host     SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
                     "UPDATE bergamot.service  SET contact_ids=array_remove(contact_ids, p_id) WHERE contact_ids @> ARRAY[p_id];\n" +
@@ -881,175 +881,175 @@ public abstract class BergamotDB extends DatabaseAdapter
     // API tokens
     
     @Cacheable
-    @SQLSetter(table = APIToken.class, name = "set_api_token", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = APIToken.class, name = "set_api_token", since = @SQLVersion({4, 0, 0}))
     public abstract void setAPIToken(APIToken token);
     
     @Cacheable
-    @SQLGetter(table = APIToken.class, name = "get_api_token", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = APIToken.class, name = "get_api_token", since = @SQLVersion({4, 0, 0}))
     public abstract APIToken getAPIToken(@SQLParam("token") String token);
     
     @Cacheable
-    @SQLRemove(table = APIToken.class, name = "remove_api_token", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = APIToken.class, name = "remove_api_token", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAPIToken(@SQLParam("token") String token);
     
-    @SQLGetter(table = APIToken.class, name = "get_api_tokens_for_contact", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = APIToken.class, name = "get_api_tokens_for_contact", since = @SQLVersion({4, 0, 0}))
     public abstract List<APIToken> getAPITokensForContact(@SQLParam("contact_id") UUID contactId);
     
     // U2F devices
     
     @Cacheable
     @CacheInvalidate({"get_u2f_device_registrations_for_contact.#{contact_id}"})
-    @SQLSetter(table = ContactU2FDeviceRegistration.class, name = "set_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    @SQLSetter(table = ContactU2FDeviceRegistration.class, name = "set_u2f_device_registration", since = @SQLVersion({4, 0, 0}))
     public abstract void setU2FDeviceRegistration(ContactU2FDeviceRegistration device);
     
     @Cacheable
-    @SQLGetter(table = ContactU2FDeviceRegistration.class, name = "get_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    @SQLGetter(table = ContactU2FDeviceRegistration.class, name = "get_u2f_device_registration", since = @SQLVersion({4, 0, 0}))
     public abstract ContactU2FDeviceRegistration getU2FDeviceRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_u2f_device_registrations_for_contact.*"})
-    @SQLRemove(table = ContactU2FDeviceRegistration.class, name = "remove_u2f_device_registration", since = @SQLVersion({3, 38, 0}))
+    @SQLRemove(table = ContactU2FDeviceRegistration.class, name = "remove_u2f_device_registration", since = @SQLVersion({4, 0, 0}))
     public abstract void removeU2FDeviceRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = ContactU2FDeviceRegistration.class, name = "get_u2f_device_registrations_for_contact", since = @SQLVersion({3, 38, 0}))
+    @SQLGetter(table = ContactU2FDeviceRegistration.class, name = "get_u2f_device_registrations_for_contact", since = @SQLVersion({4, 0, 0}))
     public abstract List<ContactU2FDeviceRegistration> getU2FDeviceRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
 
     // HOTP
     
     @Cacheable
     @CacheInvalidate({"get_hotp_registrations_for_contact.#{contact_id}"})
-    @SQLSetter(table = ContactHOTPRegistration.class, name = "set_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    @SQLSetter(table = ContactHOTPRegistration.class, name = "set_hotp_registration", since = @SQLVersion({4, 0, 0}))
     public abstract void setHOTPRegistration(ContactHOTPRegistration device);
     
     @Cacheable
-    @SQLGetter(table = ContactHOTPRegistration.class, name = "get_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    @SQLGetter(table = ContactHOTPRegistration.class, name = "get_hotp_registration", since = @SQLVersion({4, 0, 0}))
     public abstract ContactHOTPRegistration getHOTPRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_hotp_registrations_for_contact.*"})
-    @SQLRemove(table = ContactHOTPRegistration.class, name = "remove_hotp_registration", since = @SQLVersion({3, 39, 0}))
+    @SQLRemove(table = ContactHOTPRegistration.class, name = "remove_hotp_registration", since = @SQLVersion({4, 0, 0}))
     public abstract void removeHOTPRegistration(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = ContactHOTPRegistration.class, name = "get_hotp_registrations_for_contact", since = @SQLVersion({3, 39, 0}))
+    @SQLGetter(table = ContactHOTPRegistration.class, name = "get_hotp_registrations_for_contact", since = @SQLVersion({4, 0, 0}))
     public abstract List<ContactHOTPRegistration> getHOTPRegistrationsForContact(@SQLParam("contact_id") UUID contactId);
     
     // Backup Codes
     
     @Cacheable
     @CacheInvalidate({"get_backup_codes_for_contact.#{contact_id}"})
-    @SQLSetter(table = ContactBackupCode.class, name = "set_backup_code", since = @SQLVersion({3, 40, 0}))
+    @SQLSetter(table = ContactBackupCode.class, name = "set_backup_code", since = @SQLVersion({4, 0, 0}))
     public abstract void setBackupCode(ContactBackupCode device);
     
     @Cacheable
-    @SQLGetter(table = ContactBackupCode.class, name = "get_backup_code", since = @SQLVersion({3, 40, 0}))
+    @SQLGetter(table = ContactBackupCode.class, name = "get_backup_code", since = @SQLVersion({4, 0, 0}))
     public abstract ContactBackupCode getBackupCode(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_backup_codes_for_contact.*"})
-    @SQLRemove(table = ContactBackupCode.class, name = "remove_backup_code", since = @SQLVersion({3, 40, 0}))
+    @SQLRemove(table = ContactBackupCode.class, name = "remove_backup_code", since = @SQLVersion({4, 0, 0}))
     public abstract void removeBackupCode(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = ContactBackupCode.class, name = "get_backup_codes_for_contact", since = @SQLVersion({3, 40, 0}))
+    @SQLGetter(table = ContactBackupCode.class, name = "get_backup_codes_for_contact", since = @SQLVersion({4, 0, 0}))
     public abstract List<ContactBackupCode> getBackupCodesForContact(@SQLParam("contact_id") UUID contactId);
     
     // notifications
     
     @Cacheable
     @CacheInvalidate({"get_notification_engines.#{id}"})
-    @SQLSetter(table = Notifications.class, name = "set_notifications", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Notifications.class, name = "set_notifications", since = @SQLVersion({4, 0, 0}))
     public abstract void setNotifications(Notifications notifications);
     
     @Cacheable
-    @SQLGetter(table = Notifications.class, name = "get_notifications", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Notifications.class, name = "get_notifications", since = @SQLVersion({4, 0, 0}))
     public abstract Notifications getNotifications(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_notification_engines.#{id}"})
-    @SQLRemove(table = Notifications.class, name = "remove_notifications", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Notifications.class, name = "remove_notifications", since = @SQLVersion({4, 0, 0}))
     public abstract void removeNotifications(@SQLParam("id") UUID id);
     
     // notification engine
     
     @Cacheable
     @CacheInvalidate({"get_notification_engines.#{notifications_id}"})
-    @SQLSetter(table = NotificationEngine.class, name = "set_notification_engine", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = NotificationEngine.class, name = "set_notification_engine", since = @SQLVersion({4, 0, 0}))
     public abstract void setNotificationEngine(NotificationEngine notificationEngine);
     
     @Cacheable
-    @SQLGetter(table = NotificationEngine.class, name = "get_notification_engine", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = NotificationEngine.class, name = "get_notification_engine", since = @SQLVersion({4, 0, 0}))
     public abstract NotificationEngine getNotificationEngine(@SQLParam("notifications_id") UUID notificationId, @SQLParam("engine") String engine);
     
     @Cacheable
-    @SQLGetter(table = NotificationEngine.class, name = "get_notification_engines", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = NotificationEngine.class, name = "get_notification_engines", since = @SQLVersion({4, 0, 0}))
     public abstract List<NotificationEngine> getNotificationEngines(@SQLParam("notifications_id") UUID notificationId);
     
     @Cacheable
     @CacheInvalidate({"get_notification_engines.#{notifications_id}"})
-    @SQLRemove(table = NotificationEngine.class, name = "remove_notification_engine", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = NotificationEngine.class, name = "remove_notification_engine", since = @SQLVersion({4, 0, 0}))
     public abstract void removeNotificationEngine(@SQLParam("notifications_id") UUID notificationId, @SQLParam("engine") String engine);
     
     @Cacheable
     @CacheInvalidate({"get_notification_engines.#{notifications_id}"})
-    @SQLRemove(table = NotificationEngine.class, name = "remove_notification_engines", since = @SQLVersion({3, 22, 0}))
+    @SQLRemove(table = NotificationEngine.class, name = "remove_notification_engines", since = @SQLVersion({4, 0, 0}))
     public abstract void removeNotificationEngines(@SQLParam("notifications_id") UUID notificationId);
     
     // escalations
     
     @Cacheable
     @CacheInvalidate({"get_escalations.#{notifications_id}"})
-    @SQLSetter(table = Escalation.class, name = "set_escalation", since = @SQLVersion({3, 22, 0}))
+    @SQLSetter(table = Escalation.class, name = "set_escalation", since = @SQLVersion({4, 0, 0}))
     public abstract void setEscalation(Escalation escalation);
     
     @Cacheable
-    @SQLGetter(table = Escalation.class, name = "get_escalation", since = @SQLVersion({3, 22, 0}))
+    @SQLGetter(table = Escalation.class, name = "get_escalation", since = @SQLVersion({4, 0, 0}))
     public abstract Escalation getEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("after") long after);
     
     @Cacheable
-    @SQLGetter(table = Escalation.class, name = "get_escalations", since = @SQLVersion({3, 22, 0}), orderBy = @SQLOrder(value = "after", direction = Direction.DESC))
+    @SQLGetter(table = Escalation.class, name = "get_escalations", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "after", direction = Direction.DESC))
     public abstract List<Escalation> getEscalations(@SQLParam("notifications_id") UUID notificationId);
     
     @Cacheable
     @CacheInvalidate({"get_escalations.#{notifications_id}"})
-    @SQLRemove(table = Escalation.class, name = "remove_escalation", since = @SQLVersion({3, 22, 0}))
+    @SQLRemove(table = Escalation.class, name = "remove_escalation", since = @SQLVersion({4, 0, 0}))
     public abstract void removeEscalation(@SQLParam("notifications_id") UUID notificationId, @SQLParam("after") long after);
     
     @Cacheable
     @CacheInvalidate({"get_escalations.#{notifications_id}"})
-    @SQLRemove(table = Escalation.class, name = "remove_escalations", since = @SQLVersion({3, 22, 0}))
+    @SQLRemove(table = Escalation.class, name = "remove_escalations", since = @SQLVersion({4, 0, 0}))
     public abstract void removeEscalations(@SQLParam("notifications_id") UUID notificationId);
     
     // state
     
     @Cacheable
-    @SQLSetter(table = CheckState.class, name = "set_check_state", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = CheckState.class, name = "set_check_state", since = @SQLVersion({4, 0, 0}))
     public abstract void setCheckState(CheckState state);
     
     @Cacheable
-    @SQLGetter(table = CheckState.class, name = "get_check_state", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = CheckState.class, name = "get_check_state", since = @SQLVersion({4, 0, 0}))
     public abstract CheckState getCheckState(@SQLParam("check_id") UUID id);
     
     @Cacheable
-    @SQLRemove(table = CheckState.class, name = "remove_check_state", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = CheckState.class, name = "remove_check_state", since = @SQLVersion({4, 0, 0}))
     public abstract void removeCheckState(@SQLParam("check_id") UUID id);
     
     // saved state
     
     @Cacheable
-    @SQLSetter(table = CheckSavedState.class, name = "set_check_saved_state", since = @SQLVersion({3, 7, 0}))
+    @SQLSetter(table = CheckSavedState.class, name = "set_check_saved_state", since = @SQLVersion({4, 0, 0}))
     public abstract void setCheckSavedState(CheckSavedState savedState);
     
     @Cacheable
-    @SQLGetter(table = CheckSavedState.class, name = "get_check_saved_state", since = @SQLVersion({3, 7, 0}))
+    @SQLGetter(table = CheckSavedState.class, name = "get_check_saved_state", since = @SQLVersion({4, 0, 0}))
     public abstract CheckSavedState getCheckSavedState(@SQLParam("check_id") UUID id);
     
     @Cacheable
     @CacheInvalidate({
         "get_check_saved_state.#{check_id}",
     })
-    @SQLRemove(table = CheckSavedState.class, name = "remove_check_saved_state", since = @SQLVersion({3, 7, 0}))
+    @SQLRemove(table = CheckSavedState.class, name = "remove_check_saved_state", since = @SQLVersion({4, 0, 0}))
     public abstract void removeCheckSavedState(@SQLParam("check_id") UUID id);
     
     // alerts
@@ -1066,7 +1066,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_alerts_for_check.#{check_id}", 
         "get_current_alert_for_check.#{check_id}"
     })
-    @SQLSetter(table = Alert.class, name = "set_alert", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Alert.class, name = "set_alert", since = @SQLVersion({4, 0, 0}))
     public abstract void setAlert(Alert alert);
     
     /**
@@ -1075,7 +1075,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return the alert
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_alert", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Alert.class, name = "get_alert", since = @SQLVersion({4, 0, 0}))
     public abstract Alert getAlert(@SQLParam("id") UUID id);
     
     /**
@@ -1091,7 +1091,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_current_alert_for_check.*",
         "get_last_alert_for_check.*"
     })
-    @SQLRemove(table = Alert.class, name = "remove_alert", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Alert.class, name = "remove_alert", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAlert(@SQLParam("id") UUID id);
     
     /**
@@ -1100,7 +1100,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return a list of alerts
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
+    @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<Alert> getAllAlertsForCheck(@SQLParam("check_id") UUID checkId);
     
     /**
@@ -1111,7 +1111,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return a list of alerts
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check_paged", since = @SQLVersion({3, 5, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
+    @SQLGetter(table = Alert.class, name = "get_all_alerts_for_check_paged", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<Alert> getAllAlertsForCheck(@SQLParam("check_id") UUID checkId, @SQLLimit() long limit, @SQLOffset() long offset);
     
     /**
@@ -1122,7 +1122,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return a list of alerts
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_all_recent_alerts_for_check", since = @SQLVersion({3, 5, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
+    @SQLGetter(table = Alert.class, name = "get_all_recent_alerts_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
         query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND raised > (now() - p_interval) ORDER BY raised DESC LIMIT p_limit")
     )
     public abstract List<Alert> getAllRecentAlertsForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "interval", virtual = true) String interval, @SQLLimit() long limit);
@@ -1133,7 +1133,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return a list of alerts
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_recovered_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
+    @SQLGetter(table = Alert.class, name = "get_recovered_alerts_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = TRUE")
     )
     public abstract List<Alert> getRecoveredAlertsForCheck(@SQLParam("check_id") UUID checkId);
@@ -1144,7 +1144,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return a list of alerts
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_alerts_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
+    @SQLGetter(table = Alert.class, name = "get_alerts_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE")
     )
     public abstract List<Alert> getAlertsForCheck(@SQLParam("check_id") UUID checkId);
@@ -1155,7 +1155,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return the alert
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_current_alert_for_check", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Alert.class, name = "get_current_alert_for_check", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id AND recovered = FALSE ORDER BY raised DESC LIMIT 1")
     )
     public abstract Alert getCurrentAlertForCheck(@SQLParam("check_id") UUID checkId);
@@ -1166,7 +1166,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @return the alert
      */
     @Cacheable
-    @SQLGetter(table = Alert.class, name = "get_last_alert_for_check", since = @SQLVersion({3, 50, 0}),
+    @SQLGetter(table = Alert.class, name = "get_last_alert_for_check", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert WHERE check_id = p_check_id ORDER BY raised DESC LIMIT 1")
     )
     public abstract Alert getLastAlertForCheck(@SQLParam("check_id") UUID checkId);
@@ -1176,7 +1176,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param siteId the site id to get the alerts for
      * @return a list of all currently active alerts
      */
-    @SQLGetter(table = Alert.class, name = "list_alerts", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Alert.class, name = "list_alerts", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert "
                     + "WHERE site_id = p_site_id "
                     + "AND recovered = FALSE AND acknowledged = FALSE "
@@ -1190,7 +1190,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param contactId the contact id
      * @return a list of alerts
      */
-    @SQLGetter(table = Alert.class, name = "list_alerts_for_contact", since = @SQLVersion({3, 58, 0}),
+    @SQLGetter(table = Alert.class, name = "list_alerts_for_contact", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert "
                     + "WHERE site_id = p_site_id "
                     + "AND recovered = FALSE AND acknowledged = FALSE "
@@ -1206,7 +1206,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param limit the number of alerts to return
      * @return a list of alerts
      */
-    @SQLGetter(table = Alert.class, name = "list_alert_history", since = @SQLVersion({3, 55, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
+    @SQLGetter(table = Alert.class, name = "list_alert_history", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<Alert> listAlertHistory(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);
 
     /**
@@ -1217,7 +1217,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param limit the number of alerts to return
      * @return a list of alerts
      */
-    @SQLGetter(table = Alert.class, name = "list_alert_history_for_contact", since = @SQLVersion({3, 56, 0}),
+    @SQLGetter(table = Alert.class, name = "list_alert_history_for_contact", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.alert "
                     + "WHERE site_id = p_site_id "
                     + "AND bergamot.has_permission_for_object(p_contact_id, check_id, 'read') "
@@ -1232,46 +1232,46 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_alert_escalations.#{alert_id}"})
-    @SQLSetter(table = AlertEscalation.class, name = "set_alert_escalation", since = @SQLVersion({3, 26, 0}))
+    @SQLSetter(table = AlertEscalation.class, name = "set_alert_escalation", since = @SQLVersion({4, 0, 0}))
     public abstract void setAlertEscalation(AlertEscalation alertEscalation);
     
     @Cacheable
-    @SQLGetter(table = AlertEscalation.class, name = "get_alert_escalation", since = @SQLVersion({3, 26, 0}))
+    @SQLGetter(table = AlertEscalation.class, name = "get_alert_escalation", since = @SQLVersion({4, 0, 0}))
     public abstract AlertEscalation getAlertEscalation(@SQLParam("alert_id") UUID alertId, @SQLParam("after") long after);
     
     @Cacheable
-    @SQLGetter(table = AlertEscalation.class, name = "get_alert_escalations", since = @SQLVersion({3, 26, 0}), orderBy = @SQLOrder(value = "after", direction = Direction.ASC))
+    @SQLGetter(table = AlertEscalation.class, name = "get_alert_escalations", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "after", direction = Direction.ASC))
     public abstract List<AlertEscalation> getAlertEscalations(@SQLParam("alert_id") UUID alertId);
     
     @Cacheable
     @CacheInvalidate({"get_alert_escalations.#{alert_id}"})
-    @SQLRemove(table = AlertEscalation.class, name = "remove_alert_escalation", since = @SQLVersion({3, 26, 0}))
+    @SQLRemove(table = AlertEscalation.class, name = "remove_alert_escalation", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAlertEscalation(@SQLParam("alert_id") UUID alertId, @SQLParam("after") long after);
     
     @Cacheable
     @CacheInvalidate({"get_alert_escalations.#{alert_id}"})
-    @SQLRemove(table = AlertEscalation.class, name = "remove_alert_escalations", since = @SQLVersion({3, 26, 0}))
+    @SQLRemove(table = AlertEscalation.class, name = "remove_alert_escalations", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAlertEscalations(@SQLParam("alert_id") UUID alertId);
     
     // encompasses
     
     @Cacheable
     @CacheInvalidate({"get_alert_encompasses.#{alert_id}"})
-    @SQLSetter(table = AlertEncompasses.class, name = "set_alert_encompasses", since = @SQLVersion({3, 30, 0}))
+    @SQLSetter(table = AlertEncompasses.class, name = "set_alert_encompasses", since = @SQLVersion({4, 0, 0}))
     public abstract void setAlertEncompasses(AlertEncompasses alertEncompasses);
     
     @Cacheable
-    @SQLGetter(table = AlertEncompasses.class, name = "get_alert_encompasses", since = @SQLVersion({3, 30, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
+    @SQLGetter(table = AlertEncompasses.class, name = "get_alert_encompasses", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "raised", direction = Direction.DESC))
     public abstract List<AlertEncompasses> getAlertEncompasses(@SQLParam("alert_id") UUID alertId);
     
     @Cacheable
     @CacheInvalidate({"get_alert_encompasses.#{alert_id}"})
-    @SQLRemove(table = AlertEncompasses.class, name = "remove_an_alert_encompasses", since = @SQLVersion({3, 30, 0}))
+    @SQLRemove(table = AlertEncompasses.class, name = "remove_an_alert_encompasses", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAnAlertEncompasses(@SQLParam("alert_id") UUID alertId, @SQLParam("check_id") UUID checkId);
     
     @Cacheable
     @CacheInvalidate({"get_alert_encompasses.#{alert_id}"})
-    @SQLRemove(table = AlertEncompasses.class, name = "remove_alert_encompasses", since = @SQLVersion({3, 30, 0}))
+    @SQLRemove(table = AlertEncompasses.class, name = "remove_alert_encompasses", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAlertEncompasses(@SQLParam("alert_id") UUID alertId);
     
     // group state
@@ -1283,7 +1283,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param groupId
      * @return
      */
-    @SQLGetter(table = GroupState.class, name = "compute_group_state", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = GroupState.class, name = "compute_group_state", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery(
             "WITH RECURSIVE group_graph(id) AS ( \n" +
             "    SELECT g.id \n" +
@@ -1337,7 +1337,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param groupId
      * @param contactId
      */
-    @SQLGetter(table = GroupState.class, name = "compute_group_state_for_contact", since = @SQLVersion({3, 11, 0}),
+    @SQLGetter(table = GroupState.class, name = "compute_group_state_for_contact", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery(
             "WITH RECURSIVE group_graph(id) AS (  \n" +
             "    SELECT g.id  \n" +
@@ -1418,7 +1418,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param groupId
      * @return
      */
-    @SQLGetter(table = GroupState.class, name = "compute_location_state", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = GroupState.class, name = "compute_location_state", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery(
             "WITH RECURSIVE location_graph(id) AS ( \n"+
             "    SELECT l.id \n"+
@@ -1462,7 +1462,7 @@ public abstract class BergamotDB extends DatabaseAdapter
      * @param groupId
      * @return
      */
-    @SQLGetter(table = GroupState.class, name = "compute_location_state_for_contact", since = @SQLVersion({3, 13, 0}),
+    @SQLGetter(table = GroupState.class, name = "compute_location_state_for_contact", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery(
             "WITH RECURSIVE location_graph(id) AS (\n" +
             "    SELECT l1.id\n" +
@@ -1528,15 +1528,15 @@ public abstract class BergamotDB extends DatabaseAdapter
     // check command
     
     @Cacheable
-    @SQLSetter(table = CheckCommand.class, name = "set_check_command", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = CheckCommand.class, name = "set_check_command", since = @SQLVersion({4, 0, 0}))
     public abstract void setCheckCommand(CheckCommand command);
     
     @Cacheable
-    @SQLGetter(table = CheckCommand.class, name = "get_check_command", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = CheckCommand.class, name = "get_check_command", since = @SQLVersion({4, 0, 0}))
     public abstract CheckCommand getCheckCommand(@SQLParam("check_id") UUID id);
     
     @Cacheable
-    @SQLRemove(table = CheckCommand.class, name = "remove_check_command", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = CheckCommand.class, name = "remove_check_command", since = @SQLVersion({4, 0, 0}))
     public abstract void removeCheckCommand(@SQLParam("check_id") UUID id);
     
     // host
@@ -1553,46 +1553,46 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_hosts_in_group.*"
         
     })
-    @SQLSetter(table = Host.class, name = "set_host", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Host.class, name = "set_host", since = @SQLVersion({4, 0, 0}))
     public abstract void setHost(Host host);
     
     @Cacheable
-    @SQLGetter(table = Host.class, name = "get_host", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Host.class, name = "get_host", since = @SQLVersion({4, 0, 0}))
     public abstract Host getHost(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Host.class, name = "get_host_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Host.class, name = "get_host_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Host getHostByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Host.class, name = "get_host_by_address", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Host.class, name = "get_host_by_address", since = @SQLVersion({4, 0, 0}))
     public abstract Host getHostByAddress(@SQLParam("site_id") UUID siteId, @SQLParam("address") String address);
     
     @Cacheable
-    @SQLGetter(table = Host.class, name = "get_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    @SQLGetter(table = Host.class, name = "get_host_by_external_ref", since = @SQLVersion({4, 0, 0}))
     public abstract Host getHostByExternalRef(@SQLParam("site_id") UUID siteId, @SQLParam("external_ref") String externalRef);
     
-    @SQLGetter(table = Host.class, name = "get_hosts_in_resource_pool", since = @SQLVersion({3, 59, 0}))
+    @SQLGetter(table = Host.class, name = "get_hosts_in_resource_pool", since = @SQLVersion({4, 0, 0}))
     public abstract List<Host> getHostsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("resource_pool") String resourcePool);
     
     @Cacheable
-    @SQLGetter(table = Host.class, name = "get_host_by_agent_id", since = @SQLVersion({2, 3, 0}))
+    @SQLGetter(table = Host.class, name = "get_host_by_agent_id", since = @SQLVersion({4, 0, 0}))
     public abstract Host getHostByAgentId(@SQLParam("site_id") UUID siteId, @SQLParam("agent_id") UUID agentId);
     
     @Cacheable
-    @SQLGetter(table = Host.class, name = "get_hosts_in_location", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Host.class, name = "get_hosts_in_location", since = @SQLVersion({4, 0, 0}))
     public abstract List<Host> getHostsInLocation(@SQLParam("location_id") UUID locationId);
     
     @Cacheable
-    @SQLGetter(table = Host.class, name = "get_hosts_in_group", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Host.class, name = "get_hosts_in_group", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.host WHERE group_ids @> ARRAY[p_group_id]")
     )
     public abstract List<Host> getHostsInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
     
-    @SQLGetter(table = Host.class, name = "list_hosts", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Host.class, name = "list_hosts", since = @SQLVersion({4, 0, 0}))
     public abstract List<Host> listHosts(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Host.class, name = "list_hosts_that_are_not_ok", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Host.class, name = "list_hosts_that_are_not_ok", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery("SELECT c.* FROM bergamot.host c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")
     )
     public abstract List<Host> listHostsThatAreNotOk(@SQLParam("site_id") UUID siteId);
@@ -1611,7 +1611,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_hosts_in_location.*",
         "get_hosts_in_group.*"
     })
-    @SQLRemove(table = Host.class, name = "remove_host", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Host.class, name = "remove_host", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
                     "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
@@ -1672,24 +1672,24 @@ public abstract class BergamotDB extends DatabaseAdapter
         "check_state.#{id}",
         "get_services_on_host.#{host_id}"
     })
-    @SQLSetter(table = Service.class, name = "set_service", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Service.class, name = "set_service", since = @SQLVersion({4, 0, 0}))
     public abstract void setService(Service service);
     
     @Cacheable
-    @SQLGetter(table = Service.class, name = "get_service", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Service.class, name = "get_service", since = @SQLVersion({4, 0, 0}))
     public abstract Service getService(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Service.class, name = "get_services_on_host", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Service.class, name = "get_services_on_host", since = @SQLVersion({4, 0, 0}))
     public abstract List<Service> getServicesOnHost(@SQLParam("host_id") UUID hostId);
     
-    @SQLGetter(table = Service.class, name = "get_service_on_host", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Service.class, name = "get_service_on_host", since = @SQLVersion({4, 0, 0}))
     public abstract Service getServiceOnHost(@SQLParam("host_id") UUID hostId, @SQLParam("name") String name);
     
-    @SQLGetter(table = Service.class, name = "get_service_on_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    @SQLGetter(table = Service.class, name = "get_service_on_host_by_external_ref", since = @SQLVersion({4, 0, 0}))
     public abstract Service getServiceOnHostByExternalRef(@SQLParam("host_id") UUID hostId, @SQLParam("external_ref") String externalRef);
     
-    @SQLGetter(table = Service.class, name = "get_services_on_hosts_in_resource_pool", since = @SQLVersion({3, 59, 0}),
+    @SQLGetter(table = Service.class, name = "get_services_on_hosts_in_resource_pool", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT s.* "
                     + "FROM bergamot.service s "
                     + "JOIN bergamot.host h ON (s.host_id = h.id) "
@@ -1700,30 +1700,30 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Service> getServicesOnHostsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name, @SQLParam("resource_pool") String resourcePool);
     
-    @SQLGetter(table = Service.class, name = "get_services_in_resource_pool", since = @SQLVersion({3, 59, 0}))
+    @SQLGetter(table = Service.class, name = "get_services_in_resource_pool", since = @SQLVersion({4, 0, 0}))
     public abstract List<Service> getServicesInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("resource_pool") String resourcePool);
     
-    @SQLGetter(table = Service.class, name = "get_service_on_host_by_name", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Service.class, name = "get_service_on_host_by_name", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.service WHERE host_id = (SELECT h.id FROM bergamot.host h WHERE h.site_id = p_site_id AND h.name = p_host_name) AND name = p_name")
     )
     public abstract Service getServiceOnHostByName(@SQLParam(value = "site_id", virtual = true) UUID siteId, @SQLParam(value = "host_name", virtual = true) String hostName, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Service.class, name = "get_services_in_group", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Service.class, name = "get_services_in_group", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.service WHERE group_ids @> ARRAY[p_group_id]")
     )
     public abstract List<Service> getServicesInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
     
     @Cacheable
-    @SQLGetter(table = Service.class, name = "list_services", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Service.class, name = "list_services", since = @SQLVersion({4, 0, 0}))
     public abstract List<Service> listServices(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Service.class, name = "list_services_that_are_not_ok", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Service.class, name = "list_services_that_are_not_ok", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT c.* FROM bergamot.service c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")
     )
     public abstract List<Service> listServicesThatAreNotOk(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Service.class, name = "list_services_in_pool", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Service.class, name = "list_services_in_pool", since = @SQLVersion({4, 0, 0}))
     public abstract List<Service> listServicesInPool(@SQLParam(value = "pool") int pool);
     
     @Cacheable
@@ -1731,7 +1731,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "check_command.#{id}", 
         "check_state.#{id}"
     })
-    @SQLRemove(table = Service.class, name = "remove_service", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Service.class, name = "remove_service", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
                     "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
@@ -1754,24 +1754,24 @@ public abstract class BergamotDB extends DatabaseAdapter
         "check_state.#{id}",
         "get_traps_on_host.#{host_id}"
     })
-    @SQLSetter(table = Trap.class, name = "set_trap", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Trap.class, name = "set_trap", since = @SQLVersion({4, 0, 0}))
     public abstract void setTrap(Trap trap);
     
     @Cacheable
-    @SQLGetter(table = Trap.class, name = "get_trap", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Trap.class, name = "get_trap", since = @SQLVersion({4, 0, 0}))
     public abstract Trap getTrap(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Trap.class, name = "get_traps_on_host", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Trap.class, name = "get_traps_on_host", since = @SQLVersion({4, 0, 0}))
     public abstract List<Trap> getTrapsOnHost(@SQLParam("host_id") UUID hostId);
     
-    @SQLGetter(table = Trap.class, name = "get_trap_on_host", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Trap.class, name = "get_trap_on_host", since = @SQLVersion({4, 0, 0}))
     public abstract Trap getTrapOnHost(@SQLParam("host_id") UUID hostId, @SQLParam("name") String name);
     
-    @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_external_ref", since = @SQLVersion({4, 0, 0}))
     public abstract Trap getTrapOnHostByExternalRef(@SQLParam("host_id") UUID hostId, @SQLParam("external_ref") String externalRef);
     
-    @SQLGetter(table = Trap.class, name = "get_traps_on_hosts_in_resource_pool", since = @SQLVersion({3, 59, 0}),
+    @SQLGetter(table = Trap.class, name = "get_traps_on_hosts_in_resource_pool", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT t.* "
                     + "FROM bergamot.trap t "
                     + "JOIN bergamot.host h ON (t.host_id = h.id) "
@@ -1782,24 +1782,24 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Trap> getTrapsOnHostsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name, @SQLParam("resource_pool") String resourcePool);
     
-    @SQLGetter(table = Trap.class, name = "get_traps_in_resource_pool", since = @SQLVersion({3, 59, 0}))
+    @SQLGetter(table = Trap.class, name = "get_traps_in_resource_pool", since = @SQLVersion({4, 0, 0}))
     public abstract List<Trap> getTrapsInResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam("resource_pool") String resourcePool);
     
-    @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_name", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Trap.class, name = "get_trap_on_host_by_name", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.trap WHERE host_id = (SELECT h.id FROM bergamot.host h WHERE h.site_id = p_site_id AND h.name = p_host_name) AND name = p_name")
     )
     public abstract Trap getTrapOnHostByName(@SQLParam(value = "site_id", virtual = true) UUID siteId, @SQLParam(value = "host_name", virtual = true) String hostName, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Trap.class, name = "get_traps_in_group", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Trap.class, name = "get_traps_in_group", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.trap WHERE group_ids @> ARRAY[p_group_id]")
     )
     public abstract List<Trap> getTrapsInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
     
-    @SQLGetter(table = Trap.class, name = "list_traps", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Trap.class, name = "list_traps", since = @SQLVersion({4, 0, 0}))
     public abstract List<Trap> listTraps(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Trap.class, name = "list_traps_for_watcher", since = @SQLVersion({1, 8, 0}),
+    @SQLGetter(table = Trap.class, name = "list_traps_for_watcher", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT t.* FROM bergamot.trap t" +
                               " JOIN bergamot.check_command cc ON (t.id = cc.check_id)" +
                               " JOIN bergamot.command c ON (cc.command_id = c.id)" +
@@ -1808,7 +1808,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     )
     public abstract List<Trap> listTrapsForWatcher(@SQLParam("site_id") UUID siteId, @SQLParam(value = "location_id", virtual = true) UUID locationId, @SQLParam(value = "engine", virtual = true) String engine);
     
-    @SQLGetter(table = Trap.class, name = "list_traps_that_are_not_ok", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Trap.class, name = "list_traps_that_are_not_ok", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT c.* FROM bergamot.trap c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")
     )
     public abstract List<Trap> listTrapsThatAreNotOk(@SQLParam("site_id") UUID siteId);
@@ -1818,7 +1818,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "check_command.#{id}", 
         "check_state.#{id}"
     })
-    @SQLRemove(table = Trap.class, name = "remove_trap", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Trap.class, name = "remove_trap", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
                     "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
@@ -1842,23 +1842,23 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_cluster_by_name.#{site_id}.*",
         "get_clusters_referencing_check.*"
     })
-    @SQLSetter(table = Cluster.class, name = "set_cluster", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Cluster.class, name = "set_cluster", since = @SQLVersion({4, 0, 0}))
     public abstract void setCluster(Cluster cluster);
     
     @Cacheable
-    @SQLGetter(table = Cluster.class, name = "get_cluster", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Cluster.class, name = "get_cluster", since = @SQLVersion({4, 0, 0}))
     public abstract Cluster getCluster(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Cluster.class, name = "get_cluster_by_name", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Cluster.class, name = "get_cluster_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract Cluster getClusterByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Cluster.class, name = "get_cluster_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    @SQLGetter(table = Cluster.class, name = "get_cluster_by_external_ref", since = @SQLVersion({4, 0, 0}))
     public abstract Cluster getClusterByExternalRef(@SQLParam("site_id") UUID siteId, @SQLParam("external_ref") String externalRef);
     
     @Cacheable
-    @SQLGetter(table = Cluster.class, name = "get_clusters_in_group", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Cluster.class, name = "get_clusters_in_group", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.cluster WHERE group_ids @> ARRAY[p_group_id]")
     )
     public abstract List<Cluster> getClustersInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
@@ -1870,7 +1870,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_cluster_by_name.#{this.getSiteId(id)}.*", 
         "get_clusters_referencing_check.*"
     })
-    @SQLRemove(table = Cluster.class, name = "remove_cluster", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Cluster.class, name = "remove_cluster", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
                     "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
@@ -1886,22 +1886,22 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract void removeCluster(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Cluster.class, name = "get_clusters_referencing_check", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Cluster.class, name = "get_clusters_referencing_check", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.cluster WHERE reference_ids @> ARRAY[p_check_id]")
     )
     public abstract List<Cluster> getClustersReferencingCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId);
     
-    @SQLGetter(table = Cluster.class, name = "get_clusters_referencing_resource_pool", since = @SQLVersion({3, 59, 0}),
+    @SQLGetter(table = Cluster.class, name = "get_clusters_referencing_resource_pool", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.cluster "
                     + "WHERE site_id = p_site_id "
                     + "AND reference_resource_pools @> ARRAY[p_resource_pool]")
     )
     public abstract List<Cluster> getClusterReferencingResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "resource_pool", virtual = true) String resourcePool);
     
-    @SQLGetter(table = Cluster.class, name = "list_clusters", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Cluster.class, name = "list_clusters", since = @SQLVersion({4, 0, 0}))
     public abstract List<Cluster> listClusters(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Cluster.class, name = "list_clusters_that_are_not_ok", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Cluster.class, name = "list_clusters_that_are_not_ok", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT c.* FROM bergamot.cluster c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")
     )
     public abstract List<Cluster> listClustersThatAreNotOk(@SQLParam("site_id") UUID siteId);
@@ -1934,29 +1934,29 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_resources_referencing_check.*",
         "get_resources_on_cluster.#{cluster_id}"
     })
-    @SQLSetter(table = Resource.class, name = "set_resource", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Resource.class, name = "set_resource", since = @SQLVersion({4, 0, 0}))
     public abstract void setResource(Resource resource);
     
     @Cacheable
-    @SQLGetter(table = Resource.class, name = "get_resource", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Resource.class, name = "get_resource", since = @SQLVersion({4, 0, 0}))
     public abstract Resource getResource(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = Resource.class, name = "get_resources_on_cluster", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Resource.class, name = "get_resources_on_cluster", since = @SQLVersion({4, 0, 0}))
     public abstract List<Resource> getResourcesOnCluster(@SQLParam("cluster_id") UUID clusterId);
     
-    @SQLGetter(table = Resource.class, name = "get_resource_on_cluster", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Resource.class, name = "get_resource_on_cluster", since = @SQLVersion({4, 0, 0}))
     public abstract Resource getResourceOnCluster(@SQLParam("cluster_id") UUID clusterId, @SQLParam("name") String name);
     
-    @SQLGetter(table = Resource.class, name = "get_resource_on_cluster_by_external_ref", since = @SQLVersion({2, 1, 0}))
+    @SQLGetter(table = Resource.class, name = "get_resource_on_cluster_by_external_ref", since = @SQLVersion({4, 0, 0}))
     public abstract Resource getResourceOnClusterByExternalRef(@SQLParam("cluster_id") UUID clusterId, @SQLParam("external_ref") String externalRef);
     
-    @SQLGetter(table = Resource.class, name = "get_resource_on_cluster_by_name", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Resource.class, name = "get_resource_on_cluster_by_name", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.resource WHERE host_id = (SELECT c.id FROM bergamot.cluster c WHERE c.site_id = p_site_id AND c.name = p_cluster_name) AND name = p_name")
     )
     public abstract Resource getResourceOnClusterByName(@SQLParam(value = "site_id", virtual = true) UUID siteId, @SQLParam(value = "cluster_name", virtual = true) String clusterName, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = Resource.class, name = "get_resources_in_group", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Resource.class, name = "get_resources_in_group", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT * FROM bergamot.resource WHERE group_ids @> ARRAY[p_group_id]")
     )
     public abstract List<Resource> getResourcesInGroup(@SQLParam(value = "group_id", virtual = true) UUID groupId);
@@ -1967,7 +1967,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "check_state.#{id}", 
         "get_resources_referencing_check.*"
     })
-    @SQLRemove(table = Resource.class, name = "remove_resource", since = @SQLVersion({1, 0, 0}),
+    @SQLRemove(table = Resource.class, name = "remove_resource", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery(
                     "DELETE FROM bergamot.comment USING bergamot.alert a WHERE object_id = a.id AND a.check_id = p_id;\n" +
                     "DELETE FROM bergamot.comment                        WHERE object_id = p_id;\n" +
@@ -1983,22 +1983,22 @@ public abstract class BergamotDB extends DatabaseAdapter
     public abstract void removeResource(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Resource.class, name = "get_resources_referencing_check", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Resource.class, name = "get_resources_referencing_check", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery("SELECT * FROM bergamot.resource WHERE reference_ids @> ARRAY[p_check_id]")
     )
     public abstract List<Resource> getResourcesReferencingCheck(@SQLParam(value = "check_id", virtual = true) UUID checkId);
     
-    @SQLGetter(table = Resource.class, name = "get_resources_referencing_resource_pool", since = @SQLVersion({3, 59, 0}),
+    @SQLGetter(table = Resource.class, name = "get_resources_referencing_resource_pool", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery("SELECT * FROM bergamot.resource "
                 + "WHERE site_id = p_site_id "
                 + "AND reference_resource_pools @> ARRAY[p_resource_pool]")
     )
     public abstract List<Resource> getResourcesReferencingResourcePool(@SQLParam("site_id") UUID siteId, @SQLParam(value = "resource_pool", virtual = true) String resourcePool);
     
-    @SQLGetter(table = Resource.class, name = "list_resources", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Resource.class, name = "list_resources", since = @SQLVersion({4, 0, 0}))
     public abstract List<Resource> listResources(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = Resource.class, name = "list_resources_that_are_not_ok", since = @SQLVersion({1, 0, 0}),
+    @SQLGetter(table = Resource.class, name = "list_resources_that_are_not_ok", since = @SQLVersion({4, 0, 0}),
             query = @SQLQuery("SELECT c.* FROM bergamot.resource c JOIN bergamot.check_state s ON (c.id = s.check_id) WHERE c.site_id = p_site_id AND (NOT s.ok) AND s.hard AND (NOT c.suppressed)")
     )
     public abstract List<Resource> listResourceThatAreNotOk(@SQLParam("site_id") UUID siteId);
@@ -2007,42 +2007,42 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     @Cacheable
     @CacheInvalidate({"get_comments_for_object.*"})
-    @SQLSetter(table = Comment.class, name = "set_comment", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Comment.class, name = "set_comment", since = @SQLVersion({4, 0, 0}))
     public abstract void setComment(Comment comment);
     
     @Cacheable
-    @SQLGetter(table = Comment.class, name = "get_comment", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Comment.class, name = "get_comment", since = @SQLVersion({4, 0, 0}))
     public abstract Comment getComment(@SQLParam("id") UUID id);
     
     @Cacheable
     @CacheInvalidate({"get_comments_for_object.*"})
-    @SQLRemove(table = Comment.class, name = "remove_comment", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Comment.class, name = "remove_comment", since = @SQLVersion({4, 0, 0}))
     public abstract void removeComment(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Comment.class, name = "get_comments_for_object", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
+    @SQLGetter(table = Comment.class, name = "get_comments_for_object", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
     public abstract List<Comment> getCommentsForObject(@SQLParam("object_id") UUID checkId, @SQLOffset long offset, @SQLLimit long limit);
     
-    @SQLGetter(table = Comment.class, name = "list_comments", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Comment.class, name = "list_comments", since = @SQLVersion({4, 0, 0}))
     public abstract List<Comment> listComments(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);
     
     // downtime
     
     @Cacheable
     @CacheInvalidate({"get_downtimes_for_check.#{check_id}.*", "get_all_downtimes_for_check.#{check_id}"})
-    @SQLSetter(table = Downtime.class, name = "set_downtime", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = Downtime.class, name = "set_downtime", since = @SQLVersion({4, 0, 0}))
     public abstract void setDowntime(Downtime downtime);
     
     @Cacheable
-    @SQLGetter(table = Downtime.class, name = "get_downtime", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Downtime.class, name = "get_downtime", since = @SQLVersion({4, 0, 0}))
     public abstract Downtime getDowntime(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLRemove(table = Downtime.class, name = "remove_downtime", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = Downtime.class, name = "remove_downtime", since = @SQLVersion({4, 0, 0}))
     public abstract void removeDowntime(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = Downtime.class, name = "get_downtimes_for_check", since = @SQLVersion({1, 1, 1}), orderBy = @SQLOrder(value = "starts", direction = Direction.DESC),
+    @SQLGetter(table = Downtime.class, name = "get_downtimes_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "starts", direction = Direction.DESC),
         query = @SQLQuery("SELECT * FROM bergamot.downtime WHERE check_id = p_check_id AND starts >= (now() - p_past_interval::INTERVAL) AND ends <= (now() + p_future_interval::INTERVAL)")
     )
     public abstract List<Downtime> getDowntimesForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "past_interval", virtual = true) String pastInterval, @SQLParam(value = "future_interval", virtual = true) String futureInterval);
@@ -2053,70 +2053,75 @@ public abstract class BergamotDB extends DatabaseAdapter
     }
     
     @Cacheable
-    @SQLGetter(table = Downtime.class, name = "get_all_downtimes_for_check", since = @SQLVersion({1, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
+    @SQLGetter(table = Downtime.class, name = "get_all_downtimes_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "created", direction = Direction.DESC))
     public abstract List<Downtime> getAllDowntimesForCheck(@SQLParam("check_id") UUID checkId);
     
-    @SQLGetter(table = Downtime.class, name = "list_downtimes", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = Downtime.class, name = "list_downtimes", since = @SQLVersion({4, 0, 0}))
     public abstract List<Downtime> listDowntimes(@SQLParam("site_id") UUID siteId, @SQLOffset long offset, @SQLLimit long limit);
     
     // stats
     
     @Cacheable
-    @SQLSetter(table = CheckStats.class, name = "set_check_stats", since = @SQLVersion({1, 0, 0}))
+    @SQLSetter(table = CheckStats.class, name = "set_check_stats", since = @SQLVersion({4, 0, 0}))
     public abstract void setCheckStats(CheckStats state);
     
     @Cacheable
-    @SQLGetter(table = CheckStats.class, name = "get_check_stats", since = @SQLVersion({1, 0, 0}))
+    @SQLGetter(table = CheckStats.class, name = "get_check_stats", since = @SQLVersion({4, 0, 0}))
     public abstract CheckStats getCheckStats(@SQLParam("check_id") UUID id);
     
     @Cacheable
-    @SQLRemove(table = CheckStats.class, name = "remove_check_stats", since = @SQLVersion({1, 0, 0}))
+    @SQLRemove(table = CheckStats.class, name = "remove_check_stats", since = @SQLVersion({4, 0, 0}))
     public abstract void removeCheckStats(@SQLParam("check_id") UUID id);
     
     // transition log
     
-    @SQLSetter(table = CheckTransition.class, name = "log_check_transition", since = @SQLVersion({1, 3, 0}), upsert = false)
+    @SQLSetter(table = CheckTransition.class, name = "log_check_transition", since = @SQLVersion({4, 0, 0}), upsert = false)
     public abstract void logCheckTransition(CheckTransition transition);
     
-    @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({1, 3, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
+    @SQLGetter(table = CheckTransition.class, name = "list_older_check_transitions_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
         query = @SQLQuery("SELECT * FROM bergamot.check_transition WHERE check_id = p_check_id AND applied_at < p_from ORDER BY applied_at DESC LIMIT p_limit")
     )
-    public abstract List<CheckTransition> listCheckTransitionsForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "from", virtual = true) Timestamp from, @SQLParam(value = "limit", virtual = true) long limit);
+    public abstract List<CheckTransition> listOlderCheckTransitionsForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "from", virtual = true) Timestamp from, @SQLParam(value = "limit", virtual = true) long limit);
     
-    @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({1, 3, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
+    @SQLGetter(table = CheckTransition.class, name = "list_newer_check_transitions_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
+            query = @SQLQuery("SELECT * FROM bergamot.check_transition WHERE check_id = p_check_id AND applied_at > p_from ORDER BY applied_at ASC LIMIT p_limit")
+        )
+        public abstract List<CheckTransition> listNewerCheckTransitionsForCheck(@SQLParam("check_id") UUID checkId, @SQLParam(value = "from", virtual = true) Timestamp from, @SQLParam(value = "limit", virtual = true) long limit);
+    
+    @SQLGetter(table = CheckTransition.class, name = "list_check_transitions_for_check", since = @SQLVersion({4, 0, 0}), orderBy = @SQLOrder(value = "applied_at", direction = Direction.DESC),
             query = @SQLQuery("SELECT * FROM bergamot.check_transition WHERE check_id = p_check_id AND applied_at BETWEEN p_from AND p_to")
     )
     public abstract List<CheckTransition> listCheckTransitionsForCheckByDate(@SQLParam("check_id") UUID checkId, @SQLParam(value = "from", virtual = true) Timestamp from, @SQLParam(value = "to", virtual = true) Timestamp to);
     
     // agent
     
-    @SQLSetter(table = AgentKey.class, name = "set_agent_key", since = @SQLVersion({4, 0, 2}))
+    @SQLSetter(table = AgentKey.class, name = "set_agent_key", since = @SQLVersion({4, 0, 0}))
     public abstract void setAgentKey(AgentKey key);
     
-    @SQLGetter(table = AgentKey.class, name = "get_agent_key", since = @SQLVersion({4, 0, 2}))
+    @SQLGetter(table = AgentKey.class, name = "get_agent_key", since = @SQLVersion({4, 0, 0}))
     public abstract AgentKey getAgentKey(@SQLParam("id") UUID id);
     
-    @SQLRemove(table = AgentKey.class, name = "remove_agent_key", since = @SQLVersion({4, 0, 2}))
+    @SQLRemove(table = AgentKey.class, name = "remove_agent_key", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAgentKey(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = AgentKey.class, name = "list_agent_keys", since = @SQLVersion({4, 0, 2}))
+    @SQLGetter(table = AgentKey.class, name = "list_agent_keys", since = @SQLVersion({4, 0, 0}))
     public abstract List<AgentKey> listAgentKeys(@SQLParam("site_id") UUID siteId);
     
     // proxy
     
-    @SQLSetter(table = ProxyKey.class, name = "set_proxy_key", since = @SQLVersion({4, 0, 3}))
+    @SQLSetter(table = ProxyKey.class, name = "set_proxy_key", since = @SQLVersion({4, 0, 0}))
     public abstract void setProxyKey(ProxyKey key);
     
-    @SQLGetter(table = ProxyKey.class, name = "get_proxy_key", since = @SQLVersion({4, 0, 3}))
+    @SQLGetter(table = ProxyKey.class, name = "get_proxy_key", since = @SQLVersion({4, 0, 0}))
     public abstract ProxyKey getProxyKey(@SQLParam("id") UUID id);
     
-    @SQLRemove(table = ProxyKey.class, name = "remove_proxy_key", since = @SQLVersion({4, 0, 3}))
+    @SQLRemove(table = ProxyKey.class, name = "remove_proxy_key", since = @SQLVersion({4, 0, 0}))
     public abstract void removeProxyKey(@SQLParam("id") UUID id);
     
-    @SQLGetter(table = ProxyKey.class, name = "list_proxy_keys", since = @SQLVersion({4, 0, 3}))
+    @SQLGetter(table = ProxyKey.class, name = "list_proxy_keys", since = @SQLVersion({4, 0, 0}))
     public abstract List<ProxyKey> listProxyKeys(@SQLParam("site_id") UUID siteId);
     
-    @SQLGetter(table = ProxyKey.class, name = "list_proxy_keys", since = @SQLVersion({4, 0, 3}), 
+    @SQLGetter(table = ProxyKey.class, name = "list_proxy_keys", since = @SQLVersion({4, 0, 0}), 
             query = @SQLQuery("SELECT * FROM bergamot.proxy_key WHERE site_id IS NULL")
     )
     public abstract List<ProxyKey> listGlobalProxyKeys();
@@ -2378,26 +2383,26 @@ public abstract class BergamotDB extends DatabaseAdapter
     @CacheInvalidate({
         "get_security_domain_by_name.#{this.getSiteId(id)}.*",
     })
-    @SQLSetter(table = SecurityDomain.class, name = "set_security_domain", since = @SQLVersion({3, 8, 0}))
+    @SQLSetter(table = SecurityDomain.class, name = "set_security_domain", since = @SQLVersion({4, 0, 0}))
     public abstract void setSecurityDomain(SecurityDomain securityDomain);
     
     @Cacheable
-    @SQLGetter(table = SecurityDomain.class, name = "get_security_domain", since = @SQLVersion({3, 8, 0}))
+    @SQLGetter(table = SecurityDomain.class, name = "get_security_domain", since = @SQLVersion({4, 0, 0}))
     public abstract SecurityDomain getSecurityDomain(@SQLParam("id") UUID id);
     
     @Cacheable
-    @SQLGetter(table = SecurityDomain.class, name = "get_security_domain_by_name", since = @SQLVersion({3, 8, 0}))
+    @SQLGetter(table = SecurityDomain.class, name = "get_security_domain_by_name", since = @SQLVersion({4, 0, 0}))
     public abstract SecurityDomain getSecurityDomainByName(@SQLParam("site_id") UUID siteId, @SQLParam("name") String name);
     
     @Cacheable
-    @SQLGetter(table = SecurityDomain.class, name = "list_security_domains", since = @SQLVersion({3, 17, 0}))
+    @SQLGetter(table = SecurityDomain.class, name = "list_security_domains", since = @SQLVersion({4, 0, 0}))
     public abstract List<SecurityDomain> listSecurityDomains(@SQLParam("site_id") UUID siteId);
     
     @Cacheable
     @CacheInvalidate({
         "get_security_domain_by_name.#{this.getSiteId(id)}.*",
     })
-    @SQLRemove(table = SecurityDomain.class, name = "remove_security_domain", since = @SQLVersion({3, 8, 0}))
+    @SQLRemove(table = SecurityDomain.class, name = "remove_security_domain", since = @SQLVersion({4, 0, 0}))
     public abstract void removeSecurityDomain(@SQLParam("id") UUID id);
     
     
@@ -2406,11 +2411,11 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_security_domain_members.#{security_domain_id}",
         "get_security_domains_for_check.#{check_id}"
     })
-    @SQLSetter(table = SecurityDomainMembership.class, name = "set_security_domain_membership", since = @SQLVersion({3, 8, 0}), upsert = false)
+    @SQLSetter(table = SecurityDomainMembership.class, name = "set_security_domain_membership", since = @SQLVersion({4, 0, 0}), upsert = false)
     public abstract void setSecurityDomainMembership(SecurityDomainMembership membership);
     
     @Cacheable
-    @SQLGetter(table = SecurityDomainMembership.class, name = "get_security_domain_members", since = @SQLVersion({3, 8, 0}))
+    @SQLGetter(table = SecurityDomainMembership.class, name = "get_security_domain_members", since = @SQLVersion({4, 0, 0}))
     public abstract List<SecurityDomainMembership> getSecurityDomainMembers(@SQLParam("security_domain_id") UUID securityDomainId);
     
     @Cacheable
@@ -2418,7 +2423,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_security_domain_members.#{security_domain_id}",
         "get_security_domains_for_check.#{check_id}"
     })
-    @SQLRemove(table = SecurityDomainMembership.class, name = "remove_security_domain_membership", since = @SQLVersion({3, 8, 0}))
+    @SQLRemove(table = SecurityDomainMembership.class, name = "remove_security_domain_membership", since = @SQLVersion({4, 0, 0}))
     public abstract void removeSecurityDomainMembership(@SQLParam("security_domain_id") UUID securityDomainId, @SQLParam("check_id") UUID checkId);
     
     @Cacheable
@@ -2426,12 +2431,12 @@ public abstract class BergamotDB extends DatabaseAdapter
         "get_security_domain_members.*",
         "get_security_domains_for_check.#{check_id}"
     })
-    @SQLRemove(table = SecurityDomainMembership.class, name = "remove_security_domain_membership_for_check", since = @SQLVersion({3, 8, 0}))
+    @SQLRemove(table = SecurityDomainMembership.class, name = "remove_security_domain_membership_for_check", since = @SQLVersion({4, 0, 0}))
     public abstract void removeSecurityDomainMembershipForCheck(@SQLParam("check_id") UUID checkId);
     
     
     @Cacheable
-    @SQLGetter(table = SecurityDomain.class, name = "get_security_domains_for_object", since = @SQLVersion({3, 8, 0}),
+    @SQLGetter(table = SecurityDomain.class, name = "get_security_domains_for_object", since = @SQLVersion({4, 0, 0}),
         query = @SQLQuery(
                 "SELECT sd.* "
                 + "FROM bergamot.security_domain sd "
@@ -2459,23 +2464,23 @@ public abstract class BergamotDB extends DatabaseAdapter
     // access controls
     
     @Cacheable
-    @SQLSetter(table = AccessControl.class, name = "set_access_control", since = @SQLVersion({3, 8, 0}))
+    @SQLSetter(table = AccessControl.class, name = "set_access_control", since = @SQLVersion({4, 0, 0}))
     public abstract void setAccessControl(AccessControl accessControl);
     
     @Cacheable
-    @SQLGetter(table = AccessControl.class, name = "get_access_control", since = @SQLVersion({3, 8, 0}))
+    @SQLGetter(table = AccessControl.class, name = "get_access_control", since = @SQLVersion({4, 0, 0}))
     public abstract AccessControl getAccessControl(@SQLParam("security_domain_id") UUID securityDomainId, @SQLParam("role_id") UUID roleId);
     
     @Cacheable
-    @SQLGetter(table = AccessControl.class, name = "get_access_controls_for_security_domain", since = @SQLVersion({3, 8, 0}))
+    @SQLGetter(table = AccessControl.class, name = "get_access_controls_for_security_domain", since = @SQLVersion({4, 0, 0}))
     public abstract List<AccessControl> getAccessControlsForSecurityDomain(@SQLParam("security_domain_id") UUID securityDomainId);
     
     @Cacheable
-    @SQLGetter(table = AccessControl.class, name = "get_access_controls_for_role", since = @SQLVersion({3, 8, 0}))
+    @SQLGetter(table = AccessControl.class, name = "get_access_controls_for_role", since = @SQLVersion({4, 0, 0}))
     public abstract List<AccessControl> getAccessControlsForRole(@SQLParam("role_id") UUID roleId);
     
     @Cacheable
-    @SQLRemove(table = AccessControl.class, name = "remove_access_control", since = @SQLVersion({3, 8, 0}))
+    @SQLRemove(table = AccessControl.class, name = "remove_access_control", since = @SQLVersion({4, 0, 0}))
     public abstract void removeAccessControl(@SQLParam("security_domain_id") UUID securityDomainId, @SQLParam("role_id") UUID roleId);
     
     // compute permissions from ACL information
@@ -2746,7 +2751,7 @@ public abstract class BergamotDB extends DatabaseAdapter
     
     // patches
     
-    @SQLPatch(name = "add_validate_group_ids", index = 1, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    @SQLPatch(name = "add_validate_group_ids", index = 1, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addValidateGroupIds()
     {
         return new SQLScript(
@@ -2768,7 +2773,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_validate_team_ids", index = 2, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    @SQLPatch(name = "add_validate_team_ids", index = 2, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addValidateTeamIds()
     {
         return new SQLScript(
@@ -2790,7 +2795,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_validate_contact_ids", index = 3, type = ScriptType.BOTH, version = @SQLVersion({1, 6, 0}), skip = false)
+    @SQLPatch(name = "add_validate_contact_ids", index = 3, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addValidateContactIds()
     {
         return new SQLScript(
@@ -2812,7 +2817,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_acl_processing", index = 4, type = ScriptType.BOTH, version = @SQLVersion({3, 11, 0}), skip = false)
+    @SQLPatch(name = "add_acl_processing", index = 4, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addACLProcessing()
     {
         return new SQLScript(
@@ -3054,7 +3059,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_suppress_check", index = 5, type = ScriptType.BOTH, version = @SQLVersion({3, 20, 0}), skip = false)
+    @SQLPatch(name = "add_suppress_check", index = 5, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addSuppressCheckFunction()
     {
         return new SQLScript(
@@ -3070,7 +3075,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_set_current_alert", index = 6, type = ScriptType.BOTH, version = @SQLVersion({3, 29, 0}), skip = false)
+    @SQLPatch(name = "add_set_current_alert", index = 6, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addSetCurrentAlert()
     {
         return new SQLScript(
@@ -3086,7 +3091,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_acknowledge_check", index = 7, type = ScriptType.BOTH, version = @SQLVersion({3, 31, 0}), skip = false)
+    @SQLPatch(name = "add_acknowledge_check", index = 7, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addAcknowledgeCheckFunction()
     {
         return new SQLScript(
@@ -3102,7 +3107,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "add_set_alert_escalation_threshold", index = 8, type = ScriptType.BOTH, version = @SQLVersion({3, 34, 0}), skip = false)
+    @SQLPatch(name = "add_set_alert_escalation_threshold", index = 8, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript addSetAlertEscalationThresholdFunction()
     {
         return new SQLScript(
@@ -3118,7 +3123,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "update_permissions", index = 9, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 4}), skip = false)
+    @SQLPatch(name = "update_permissions", index = 9, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript updatePermissions()
     {
         return new SQLScript(
@@ -3175,7 +3180,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "create_partitioned_tables", index = 10, type = ScriptType.INSTALL_LAST, version = @SQLVersion({4, 0, 4}), skip = false)
+    @SQLPatch(name = "create_partitioned_tables", index = 10, type = ScriptType.INSTALL_LAST, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript createPartitionedTables()
     {
         return new SQLScript(
@@ -3183,7 +3188,7 @@ public abstract class BergamotDB extends DatabaseAdapter
             "SELECT bergamot.create_check_transition_partition_0(to_char(qq.start, 'YYYY_MM_DD'), qq.start, qq.end, NULL)\n" + 
             "FROM (\n" + 
             "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
-            "  FROM generate_series(date_trunc('week', now() - '1 week'::interval)::date, date_trunc('week', now() + '5 years'::interval)::date, '1 week'::interval) q(start)\n" + 
+            "  FROM generate_series(date_trunc('week', now())::date, date_trunc('week', now() + '5 years'::interval)::date, '1 week'::interval) q(start)\n" + 
             ") qq\n" + 
             "WHERE qq.end IS NOT NULL",
             // Alerts partitioned yearly
@@ -3192,21 +3197,21 @@ public abstract class BergamotDB extends DatabaseAdapter
             "       bergamot.create_alert_encompasses_partition_0(to_char(qq.start, 'YYYY'), qq.start, qq.end, NULL)\n" +
             "FROM (\n" + 
             "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
-            "  FROM generate_series(date_trunc('year', now() - '1 year'::interval)::date, date_trunc('year', now() + '5 year'::interval)::date, '1 year'::interval) q(start)\n" + 
+            "  FROM generate_series(date_trunc('year', now())::date, date_trunc('year', now() + '5 year'::interval)::date, '1 year'::interval) q(start)\n" + 
             ") qq\n" + 
             "WHERE qq.end IS NOT NULL",
             // Comments partitioned yearly
             "SELECT bergamot.create_comment_partition_0(to_char(qq.start, 'YYYY'), qq.start, qq.end, NULL)\n" +
             "FROM (\n" + 
             "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
-            "  FROM generate_series(date_trunc('year', now() - '1 year'::interval)::date, date_trunc('year', now() + '5 years'::interval)::date, '1 year'::interval) q(start)\n" + 
+            "  FROM generate_series(date_trunc('year', now())::date, date_trunc('year', now() + '5 years'::interval)::date, '1 year'::interval) q(start)\n" + 
             ") qq\n" + 
             "WHERE qq.end IS NOT NULL",
             // Downtime partitioned monthly
             "SELECT bergamot.create_downtime_partition_0(to_char(qq.start, 'YYYY_MM'), qq.start, qq.end, NULL)\n" + 
             "FROM (\n" + 
             "  SELECT q.start, lead(q.start) OVER () AS end\n" + 
-            "  FROM generate_series(date_trunc('month', now() - '1 month'::interval)::date, date_trunc('month', now() + '5 years'::interval)::date, '1 month'::interval) q(start)\n" + 
+            "  FROM generate_series(date_trunc('month', now())::date, date_trunc('month', now() + '5 years'::interval)::date, '1 month'::interval) q(start)\n" + 
             ") qq\n" + 
             "WHERE qq.end IS NOT NULL"
         );

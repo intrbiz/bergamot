@@ -26,7 +26,6 @@ import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.bergamot.ui.router.global.InstallBean;
-import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.metadata.Action;
 
 public class SiteActions implements BalsaAction<BergamotApp>
@@ -105,11 +104,6 @@ public class SiteActions implements BalsaAction<BergamotApp>
         try (BergamotDB db = BergamotDB.connect())
         {
             db.setSite(site);
-        }
-        // setup the readings
-        try (LamplighterDB db = LamplighterDB.connect())
-        {
-            db.setupSiteReadings(siteId);
         }
         // now import the site config
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)

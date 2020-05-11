@@ -11,17 +11,17 @@ import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "security_domain_membership", since = @SQLVersion({ 3, 8, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "security_domain_membership", since = @SQLVersion({4, 0, 0}))
 public class SecurityDomainMembership implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "security_domain_id", since = @SQLVersion({ 3, 8, 0 }))
-    @SQLForeignKey(references = SecurityDomain.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 3, 8, 0 }))
+    @SQLColumn(index = 1, name = "security_domain_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = SecurityDomain.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID securityDomainId;
     
-    @SQLColumn(index = 2, name = "check_id", since = @SQLVersion({ 3, 8, 0 }))
+    @SQLColumn(index = 2, name = "check_id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID checkId;
     

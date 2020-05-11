@@ -24,42 +24,42 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * An alert which was raised against a check
  */
-@SQLTable(schema = BergamotDB.class, name = "config", since = @SQLVersion({ 1, 0, 0 }))
-@SQLIndex(name = "name", using = "btree", columns = { "site_id", "type", "name" }, since = @SQLVersion({3, 37, 0}))
+@SQLTable(schema = BergamotDB.class, name = "config", since = @SQLVersion({4, 0, 0}))
+@SQLIndex(name = "name", using = "btree", columns = { "site_id", "type", "name" }, since = @SQLVersion({4, 0, 0}))
 public class Config implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     protected UUID id;
 
-    @SQLColumn(index = 2, name = "site_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "site_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID siteId;
 
-    @SQLColumn(index = 3, name = "type", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "type", since = @SQLVersion({4, 0, 0}))
     protected String type;
 
-    @SQLColumn(index = 4, name = "name", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "name", since = @SQLVersion({4, 0, 0}))
     protected String name;
 
-    @SQLColumn(index = 5, name = "template", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "template", since = @SQLVersion({4, 0, 0}))
     protected boolean template;
 
-    @SQLColumn(index = 6, name = "inherits", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "inherits", type = "TEXT[]", since = @SQLVersion({4, 0, 0}))
     protected List<String> inherits = new LinkedList<String>();
 
-    @SQLColumn(index = 7, name = "summary", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "summary", since = @SQLVersion({4, 0, 0}))
     protected String summary;
 
-    @SQLColumn(index = 8, name = "description", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "description", since = @SQLVersion({4, 0, 0}))
     protected String description;
 
-    @SQLColumn(index = 9, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "configuration", type = "TEXT", adapter = BergamotCfgAdapter.class, since = @SQLVersion({4, 0, 0}))
     protected Configuration configuration;
 
-    @SQLColumn(index = 10, name = "required_templates", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "required_templates", type = "TEXT[]", since = @SQLVersion({4, 0, 0}))
     protected List<String> requiredTemplates = new LinkedList<String>();
 
     public Config()

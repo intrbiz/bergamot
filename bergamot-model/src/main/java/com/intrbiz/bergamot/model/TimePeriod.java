@@ -26,7 +26,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A calendar of when checks should be executed
  */
-@SQLTable(schema = BergamotDB.class, name = "timeperiod", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "timeperiod", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class TimePeriod extends SecuredObject<TimePeriodMO, TimePeriodCfg> implements TimeRange
 {
@@ -34,10 +34,10 @@ public class TimePeriod extends SecuredObject<TimePeriodMO, TimePeriodCfg> imple
     
     private transient Logger logger = Logger.getLogger(TimePeriod.class);
 
-    @SQLColumn(index = 1, name = "excludes_id", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "excludes_id", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     private List<UUID> excludesId = new LinkedList<UUID>();
 
-    @SQLColumn(index = 2, name = "ranges", type = "TEXT[]", adapter = TimeRangesAdapter.class, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "ranges", type = "TEXT[]", adapter = TimeRangesAdapter.class, since = @SQLVersion({4, 0, 0}))
     private List<TimeRange> ranges = new LinkedList<TimeRange>();
 
     public TimePeriod()

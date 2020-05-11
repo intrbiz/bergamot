@@ -32,7 +32,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * however notifications will not be sent and the state will not affect any 
  * dependencies.
  */
-@SQLTable(schema = BergamotDB.class, name = "downtime", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "downtime", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
     @SQLPartition(mode = PartitionMode.RANGE, on = "starts", indexOn = true, indexOnUsing = "brin")
 )
@@ -44,64 +44,64 @@ public class Downtime extends BergamotObject<DowntimeMO> implements Serializable
     /**
      * The unique ID for this downtime
      */
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     private UUID id;
 
     /**
      * The site id
      */
-    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID siteId;
 
     /**
      * The check to which this downtime applies
      */
-    @SQLColumn(index = 3, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "check_id", since = @SQLVersion({4, 0, 0}))
     private UUID checkId;
     
     /**
      * The summary of this downtime
      */
-    @SQLColumn(index = 4, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "summary", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected String summary;
 
     /**
      * The description of this downtime
      */
-    @SQLColumn(index = 5, name = "description", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "description", since = @SQLVersion({4, 0, 0}))
     protected String description;
 
     /**
      * When this downtime was added
      */
-    @SQLColumn(index = 6, name = "created", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "created", since = @SQLVersion({4, 0, 0}))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
 
     /**
      * When this downtime was last modified
      */
-    @SQLColumn(index = 7, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "updated", since = @SQLVersion({4, 0, 0}))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
     
     /**
      * Whom created this downtime
      */
-    @SQLColumn(index = 8, name = "created_by_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "created_by_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.SET_NULL, onUpdate = Action.SET_NULL, since = @SQLVersion({4, 0, 0}))
     protected UUID createdById;
     
     /**
      * When does this downtime start (in UTC)
      */
-    @SQLColumn(index = 9, name = "starts", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "starts", since = @SQLVersion({4, 0, 0}))
     protected Timestamp starts;
     
     /**
      * When does this downtime end (in UTC)
      */
-    @SQLColumn(index = 10, name = "ends", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "ends", since = @SQLVersion({4, 0, 0}))
     protected Timestamp ends;
 
     public Downtime()

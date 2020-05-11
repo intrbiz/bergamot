@@ -92,7 +92,8 @@ public class FirstInstallRouter extends Router<BergamotApp>
     public void goCreateSite(BergamotDB db) throws Exception
     {
         // create the site
-        action("site-install", sessionModel("install"));
+        InstallBean install = sessionModel("install");
+        action("site-install", install);
         // done!
         encode("global/install/complete");
     }

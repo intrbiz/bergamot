@@ -18,7 +18,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A cluster of resources spanning many hosts
  */
-@SQLTable(schema = BergamotDB.class, name = "cluster", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "cluster", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Cluster extends VirtualCheck<ClusterMO, ClusterCfg>
 {   

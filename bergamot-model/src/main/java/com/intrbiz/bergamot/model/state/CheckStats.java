@@ -15,33 +15,33 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * The stats of a check
  */
-@SQLTable(schema = BergamotDB.class, name = "check_stats", since = @SQLVersion({ 1, 2, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "check_stats", since = @SQLVersion({4, 0, 0}))
 public class CheckStats extends BergamotObject<CheckStatsMO> implements Cloneable
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID checkId;
     
     // stats
     
-    @SQLColumn(index = 16, name = "last_runtime", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 16, name = "last_runtime", since = @SQLVersion({4, 0, 0}))
     private double lastRuntime;
 
-    @SQLColumn(index = 17, name = "average_runtime", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 17, name = "average_runtime", since = @SQLVersion({4, 0, 0}))
     private double averageRuntime;
 
-    @SQLColumn(index = 18, name = "last_check_execution_latency", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 18, name = "last_check_execution_latency", since = @SQLVersion({4, 0, 0}))
     private double lastCheckExecutionLatency;
 
-    @SQLColumn(index = 19, name = "average_check_execution_latency", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 19, name = "average_check_execution_latency", since = @SQLVersion({4, 0, 0}))
     private double averageCheckExecutionLatency;
 
-    @SQLColumn(index = 20, name = "last_check_processing_latency", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 20, name = "last_check_processing_latency", since = @SQLVersion({4, 0, 0}))
     private double lastCheckProcessingLatency;
 
-    @SQLColumn(index = 21, name = "average_check_processing_latency", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 21, name = "average_check_processing_latency", since = @SQLVersion({4, 0, 0}))
     private double averageCheckProcessingLatency;
 
     public CheckStats()

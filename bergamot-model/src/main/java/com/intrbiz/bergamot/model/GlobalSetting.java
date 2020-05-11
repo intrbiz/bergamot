@@ -15,7 +15,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * Global system settings
  */
-@SQLTable(schema = BergamotDB.class, name = "global_setting", since = @SQLVersion({ 3, 44, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "global_setting", since = @SQLVersion({4, 0, 0}))
 public final class GlobalSetting implements Serializable, Parameterised
 {
     public static final class NAME
@@ -26,17 +26,17 @@ public final class GlobalSetting implements Serializable, Parameterised
     
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "name", notNull = true, since = @SQLVersion({ 3, 44, 0 }))
+    @SQLColumn(index = 1, name = "name", notNull = true, since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     protected String name;
 
-    @SQLColumn(index = 2, name = "value", since = @SQLVersion({ 3, 44, 0 }))
+    @SQLColumn(index = 2, name = "value", since = @SQLVersion({4, 0, 0}))
     protected String value;
 
     /**
      * Arbitrary parameters of an object
      */
-    @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({ 3, 44, 0 }))
+    @SQLColumn(index = 3, name = "parameters", type = "JSON", adapter = ParametersAdapter.class, since = @SQLVersion({4, 0, 0}))
     private LinkedHashMap<String, Parameter> parameters = new LinkedHashMap<String, Parameter>();
 
     public GlobalSetting()

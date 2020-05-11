@@ -17,47 +17,47 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A key used to authenticate Agents against this site
  */
-@SQLTable(schema = BergamotDB.class, name = "agent_key", since = @SQLVersion({ 4, 0, 2 }))
+@SQLTable(schema = BergamotDB.class, name = "agent_key", since = @SQLVersion({4, 0, 0}))
 public class AgentKey implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
     public static final int DEFAULT_KEY_SIZE = 32;
     
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 4, 0, 2 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     protected UUID id;
 
-    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 4, 0, 2 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 4, 0, 2 }))
+    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     protected UUID siteId;
     
-    @SQLColumn(index = 3, name = "purpose", notNull = true, since = @SQLVersion({ 4, 0, 2 }))
+    @SQLColumn(index = 3, name = "purpose", notNull = true, since = @SQLVersion({4, 0, 0}))
     private String purpose;
     
     /**
      * The secret key used for authentication
      */
-    @SQLColumn(index = 4, name = "secret", since = @SQLVersion({ 4, 0, 2 }))
+    @SQLColumn(index = 4, name = "secret", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private byte[] secret;
     
     /**
      * When this key was created
      */
-    @SQLColumn(index = 5, name = "created", since = @SQLVersion({ 4, 0, 2 }))
+    @SQLColumn(index = 5, name = "created", since = @SQLVersion({4, 0, 0}))
     private Timestamp created = new Timestamp(System.currentTimeMillis());
     
     /**
      * Has this token been revoked
      */
-    @SQLColumn(index = 6, name = "revoked", since = @SQLVersion({ 4, 0, 2 }))
+    @SQLColumn(index = 6, name = "revoked", since = @SQLVersion({4, 0, 0}))
     private boolean revoked = false;
     
     /**
      * When was it revoked
      */
-    @SQLColumn(index = 7, name = "revoked_at", since = @SQLVersion({ 4, 0, 2 }))
+    @SQLColumn(index = 7, name = "revoked_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp revokedAt = null;
     
     public AgentKey()

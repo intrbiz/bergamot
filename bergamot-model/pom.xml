@@ -94,7 +94,7 @@
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>data-database-adapter-compiler-plugin</artifactId>
-				<version>1.3.1</version>
+				<version>${intrbiz.util.version}</version>
 				<configuration>
 					<adapterClass>com.intrbiz.bergamot.data.BergamotDB</adapterClass>
 					<defaultOwner>bergamot</defaultOwner>

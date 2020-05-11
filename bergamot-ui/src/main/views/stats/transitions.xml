@@ -19,8 +19,8 @@
 	<div class="row">
 		<div class="col12">
 			<p>
-				<a href="/stats/transitions/check/id/#{check.id}?offset=#{offset - limit}&amp;limit=#{limit}" rendered="#{offset > 0}">Newer</a>
-				<a href="/stats/transitions/check/id/#{check.id}?offset=#{offset + limit}&amp;limit=#{limit}" rendered="#{transitions.size() > 0}" style="float: right;">Older</a>
+				<a href="/stats/transitions/check/id/#{check.id}/newer?from=#{from}&amp;limit=#{limit}" rendered="#{from != null}">Newer</a>
+				<a href="/stats/transitions/check/id/#{check.id}/older?from=#{transitions.get(transitions.size() - 1).appliedAt.getTime()}&amp;limit=#{limit}" rendered="#{transitions.size() > 0}" style="float: right;">Older</a>
 			</p>
 			<table style="width: 100%;">
 				<tr>

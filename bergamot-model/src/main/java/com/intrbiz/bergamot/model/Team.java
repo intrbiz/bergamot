@@ -18,19 +18,19 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A team of people, who can be notified
  */
-@SQLTable(schema = BergamotDB.class, name = "team", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "team", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Team extends SecuredObject<TeamMO, TeamCfg>
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "team_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     private List<UUID> teamIds = new LinkedList<UUID>();
 
-    @SQLColumn(index = 2, name = "granted_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "granted_permissions", type = "TEXT[]", since = @SQLVersion({4, 0, 0}))
     private List<String> grantedPermissions = new LinkedList<String>();
 
-    @SQLColumn(index = 3, name = "revoked_permissions", type = "TEXT[]", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "revoked_permissions", type = "TEXT[]", since = @SQLVersion({4, 0, 0}))
     private List<String> revokedPermissions = new LinkedList<String>();
 
     public Team()

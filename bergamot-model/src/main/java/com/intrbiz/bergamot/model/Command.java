@@ -14,25 +14,25 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * The definition of a command which is used to check something
  */
-@SQLTable(schema = BergamotDB.class, name = "command", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "command", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "name_unq", columns = { "site_id", "name" })
 public class Command extends SecuredObject<CommandMO, CommandCfg>
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "engine", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "engine", since = @SQLVersion({4, 0, 0}))
     private String engine;
 
-    @SQLColumn(index = 2, name = "executor", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "executor", since = @SQLVersion({4, 0, 0}))
     private String executor;
     
-    @SQLColumn(index = 3, name = "category", since = @SQLVersion({ 2, 5, 0 }))
+    @SQLColumn(index = 3, name = "category", since = @SQLVersion({4, 0, 0}))
     private String category;
 
-    @SQLColumn(index = 4, name = "application", since = @SQLVersion({ 2, 5, 0 }))
+    @SQLColumn(index = 4, name = "application", since = @SQLVersion({4, 0, 0}))
     private String application;
     
-    @SQLColumn(index = 5, name = "script", since = @SQLVersion({ 3, 6, 0 }))
+    @SQLColumn(index = 5, name = "script", since = @SQLVersion({4, 0, 0}))
     private String script;
 
     public Command()

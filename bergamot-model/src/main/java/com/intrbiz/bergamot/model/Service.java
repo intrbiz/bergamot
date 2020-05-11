@@ -16,19 +16,19 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * Some software service running on a host which needs to be checked
  */
-@SQLTable(schema = BergamotDB.class, name = "service", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "service", since = @SQLVersion({4, 0, 0}))
 @SQLUnique(name = "host_name_unq", columns = {"host_id", "name"})
 public class Service extends ActiveCheck<ServiceMO, ServiceCfg>
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "host_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "host_id", since = @SQLVersion({4, 0, 0}))
     private UUID hostId;
     
-    @SQLColumn(index = 2, name = "category", since = @SQLVersion({ 2, 5, 0 }))
+    @SQLColumn(index = 2, name = "category", since = @SQLVersion({4, 0, 0}))
     private String category;
 
-    @SQLColumn(index = 3, name = "application", since = @SQLVersion({ 2, 5, 0 }))
+    @SQLColumn(index = 3, name = "application", since = @SQLVersion({4, 0, 0}))
     private String application;
 
     public Service()

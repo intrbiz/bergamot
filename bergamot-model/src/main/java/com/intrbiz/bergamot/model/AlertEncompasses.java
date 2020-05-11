@@ -14,7 +14,7 @@ import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "alert_encompasses", since = @SQLVersion({ 3, 30, 0 }) )
+@SQLTable(schema = BergamotDB.class, name = "alert_encompasses", since = @SQLVersion({4, 0, 0}) )
 @SQLPartitioning(
     @SQLPartition(mode = PartitionMode.RANGE, on = "raised", indexOn = true, indexOnUsing = "brin")
 )
@@ -25,21 +25,21 @@ public class AlertEncompasses extends BergamotObject<AlertEncompassesMO>
     /**
      * The alert
      */
-    @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({ 3, 30, 0 }) )
+    @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({4, 0, 0}) )
     @SQLPrimaryKey()
     private UUID alertId;
 
     /**
      * The unique id of this escalation
      */
-    @SQLColumn(index = 2, name = "check_id", since = @SQLVersion({ 3, 30, 0 }) )
+    @SQLColumn(index = 2, name = "check_id", since = @SQLVersion({4, 0, 0}) )
     @SQLPrimaryKey()
     private UUID checkId;
 
     /**
      * When did this check get encompassed under this alert
      */
-    @SQLColumn(index = 3, name = "raised", since = @SQLVersion({ 3, 30, 0 }) )
+    @SQLColumn(index = 3, name = "raised", since = @SQLVersion({4, 0, 0}) )
     private Timestamp raised;
 
     public AlertEncompasses()

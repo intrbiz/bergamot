@@ -13,66 +13,66 @@ import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "group_state", virtual = true, since = @SQLVersion({ 1, 0, 0 }) )
+@SQLTable(schema = BergamotDB.class, name = "group_state", virtual = true, since = @SQLVersion({4, 0, 0}) )
 public class GroupState extends BergamotObject<GroupStateMO>
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "group_id", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 1, name = "group_id", since = @SQLVersion({4, 0, 0}) )
     @SQLPrimaryKey
     private UUID groupId;
 
-    @SQLColumn(index = 2, name = "ok", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 2, name = "ok", since = @SQLVersion({4, 0, 0}) )
     private boolean ok = true;
 
-    @SQLColumn(index = 3, name = "status", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 3, name = "status", since = @SQLVersion({4, 0, 0}) )
     private Status status = Status.PENDING;
 
     // counts;
 
-    @SQLColumn(index = 4, name = "pending_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 4, name = "pending_count", since = @SQLVersion({4, 0, 0}) )
     private int pendingCount = 0;
 
-    @SQLColumn(index = 5, name = "ok_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 5, name = "ok_count", since = @SQLVersion({4, 0, 0}) )
     private int okCount = 0;
 
-    @SQLColumn(index = 6, name = "warning_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 6, name = "warning_count", since = @SQLVersion({4, 0, 0}) )
     private int warningCount = 0;
 
-    @SQLColumn(index = 7, name = "critical_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 7, name = "critical_count", since = @SQLVersion({4, 0, 0}) )
     private int criticalCount = 0;
 
-    @SQLColumn(index = 8, name = "unknown_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 8, name = "unknown_count", since = @SQLVersion({4, 0, 0}) )
     private int unknownCount = 0;
 
-    @SQLColumn(index = 9, name = "timeout_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 9, name = "timeout_count", since = @SQLVersion({4, 0, 0}) )
     private int timeoutCount = 0;
 
-    @SQLColumn(index = 10, name = "error_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 10, name = "error_count", since = @SQLVersion({4, 0, 0}) )
     private int errorCount = 0;
 
-    @SQLColumn(index = 11, name = "suppressed_count", since = @SQLVersion({ 1, 0, 0 }) )
+    @SQLColumn(index = 11, name = "suppressed_count", since = @SQLVersion({4, 0, 0}) )
     private int suppressedCount = 0;
 
-    @SQLColumn(index = 12, name = "info_count", since = @SQLVersion({ 2, 4, 0 }) )
+    @SQLColumn(index = 12, name = "info_count", since = @SQLVersion({4, 0, 0}) )
     private int infoCount = 0;
 
-    @SQLColumn(index = 13, name = "action_count", since = @SQLVersion({ 2, 4, 0 }) )
+    @SQLColumn(index = 13, name = "action_count", since = @SQLVersion({4, 0, 0}) )
     private int actionCount = 0;
 
-    @SQLColumn(index = 14, name = "in_downtime_count", since = @SQLVersion({ 2, 6, 0 }) )
+    @SQLColumn(index = 14, name = "in_downtime_count", since = @SQLVersion({4, 0, 0}) )
     private int inDowntimeCount = 0;
 
-    @SQLColumn(index = 15, name = "total_checks", since = @SQLVersion({ 2, 7, 0 }) )
+    @SQLColumn(index = 15, name = "total_checks", since = @SQLVersion({4, 0, 0}) )
     private int totalChecks = 0;
 
-    @SQLColumn(index = 16, name = "disconnected_count", since = @SQLVersion({ 3, 19, 0 }) )
+    @SQLColumn(index = 16, name = "disconnected_count", since = @SQLVersion({4, 0, 0}) )
     private int disconnectedCount = 0;
 
-    @SQLColumn(index = 17, name = "acknowledged_count", since = @SQLVersion({ 3, 35, 0 }) )
+    @SQLColumn(index = 17, name = "acknowledged_count", since = @SQLVersion({4, 0, 0}) )
     private int acknowledgedCount;
 
-    @SQLColumn(index = 18, name = "encompassed_count", since = @SQLVersion({ 3, 35, 0 }) )
+    @SQLColumn(index = 18, name = "encompassed_count", since = @SQLVersion({4, 0, 0}) )
     private int encompassedCount;
 
     public GroupState()

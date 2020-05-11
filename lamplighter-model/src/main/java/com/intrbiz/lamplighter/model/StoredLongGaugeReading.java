@@ -8,24 +8,24 @@ import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 
-@SQLTable(schema = LamplighterDB.class, name = "long_gauge_reading", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = LamplighterDB.class, name = "long_gauge_reading", since = @SQLVersion({4, 0, 0}))
 public class StoredLongGaugeReading extends StoredReading
 {
     private static final long serialVersionUID = 1L;
 
-    @SQLColumn(index = 1, name = "value", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "value", since = @SQLVersion({4, 0, 0}))
     private long value;
     
-    @SQLColumn(index = 2, name = "warning", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "warning", since = @SQLVersion({4, 0, 0}))
     private long warning;
     
-    @SQLColumn(index = 3, name = "critical", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "critical", since = @SQLVersion({4, 0, 0}))
     private long critical;
     
-    @SQLColumn(index = 4, name = "min", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "min", since = @SQLVersion({4, 0, 0}))
     private long min;
     
-    @SQLColumn(index = 5, name = "max", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "max", since = @SQLVersion({4, 0, 0}))
     private long max;
     
     public StoredLongGaugeReading()

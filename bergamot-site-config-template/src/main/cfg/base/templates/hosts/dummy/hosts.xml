@@ -2,7 +2,7 @@
 <bergamot site="bergamot.template">
     
     <host name="dummy-random-linux-server" extends="generic-agent-host" template="yes" groups="linux-servers" security-domains="linux">
-        <summary>Dummy Linux Server</summary>
+        <summary>Dummy Linux Server (Random)</summary>
         <description>A dummy Linux server where all checks are random.</description>
         <check-command command="dummy-random-check"/>
         <notify teams="linux-admins"/>
@@ -79,7 +79,7 @@
     </host>
     
         <host name="dummy-static-linux-server" extends="generic-agent-host" template="yes" groups="linux-servers" security-domains="linux">
-        <summary>Dummy Linux Server</summary>
+        <summary>Dummy Linux Server (Static)</summary>
         <description>A dummy Linux server where all checks are static.</description>
         <check-command command="dummy-static-check"/>
         <notify teams="linux-admins"/>

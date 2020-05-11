@@ -21,7 +21,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A comment against an alert, check, etc
  */
-@SQLTable(schema = BergamotDB.class, name = "comment", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "comment", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
     @SQLPartition(mode = PartitionMode.RANGE, on = "updated", indexOn = true, indexOnUsing = "brin")
 )
@@ -45,60 +45,60 @@ public class Comment extends BergamotObject<CommentMO> implements Serializable
     /**
      * The unique ID for this comment
      */
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     private UUID id;
 
-    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "site_id", notNull = true, since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Site.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID siteId;
 
     /**
      * The object against which this comment relates, this could be: 1. a check 2. an alert 3. a downtime
      */
-    @SQLColumn(index = 3, name = "object_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "object_id", since = @SQLVersion({4, 0, 0}))
     private UUID objectId;
 
     /**
      * The content type of the comment: "plain", "markdown", "html"
      */
-    @SQLColumn(index = 4, name = "format", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "format", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected String format = "plain";
 
     /**
      * The type of the comment: "general", "acknowledgement", ...
      */
-    @SQLColumn(index = 5, name = "comment_type", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "comment_type", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected String commentType = CommentType.GENERAL;
 
     /**
      * The summary (title) of the comment
      */
-    @SQLColumn(index = 6, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "summary", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected String summary;
 
     /**
      * The comment
      */
-    @SQLColumn(index = 7, name = "comment", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "comment", since = @SQLVersion({4, 0, 0}))
     protected String comment;
 
     /**
      * When was it created
      */
-    @SQLColumn(index = 8, name = "created", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "created", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected Timestamp created = new Timestamp(System.currentTimeMillis());
 
     /**
      * When was it updated
      */
-    @SQLColumn(index = 9, name = "updated", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "updated", notNull = true, since = @SQLVersion({4, 0, 0}))
     protected Timestamp updated = new Timestamp(System.currentTimeMillis());
 
     /**
      * Who created this alert
      */
-    @SQLColumn(index = 10, name = "author_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "author_id", since = @SQLVersion({4, 0, 0}))
     private UUID authorId;
 
     public Comment()

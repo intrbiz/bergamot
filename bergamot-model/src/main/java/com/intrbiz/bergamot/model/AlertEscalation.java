@@ -17,7 +17,7 @@ import com.intrbiz.data.db.compiler.meta.SQLPrimaryKey;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
 import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
-@SQLTable(schema = BergamotDB.class, name = "alert_escalation", since = @SQLVersion({ 3, 26, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "alert_escalation", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
     @SQLPartition(mode = PartitionMode.RANGE, on = "escalated_at", indexOn = true, indexOnUsing = "brin")
 )
@@ -28,33 +28,33 @@ public class AlertEscalation extends BergamotObject<AlertEscalationMO>
     /**
      * The alert
      */
-    @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 1, name = "alert_id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     private UUID alertId;
     
     /**
      * How long after the alert was this escalation raised
      */
-    @SQLColumn(index = 2, name = "after", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 2, name = "after", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey()
     private long after;
     
     /**
      * The unique id of this escalation
      */
-    @SQLColumn(index = 3, name = "escalation_id", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 3, name = "escalation_id", since = @SQLVersion({4, 0, 0}))
     private UUID escalationId;
     
     /**
      * When did this escalation happen
      */
-    @SQLColumn(index = 4, name = "escalated_at", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 4, name = "escalated_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp escalatedAt;
     
     /**
      * Who was notified because of this alert escalation
      */
-    @SQLColumn(index = 5, name = "notified_ids", type = "UUID[]", since = @SQLVersion({ 3, 26, 0 }))
+    @SQLColumn(index = 5, name = "notified_ids", type = "UUID[]", since = @SQLVersion({4, 0, 0}))
     private List<UUID> notifiedIds = new LinkedList<UUID>();
     
     public AlertEscalation()

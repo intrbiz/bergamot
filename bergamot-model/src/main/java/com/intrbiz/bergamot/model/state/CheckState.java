@@ -24,73 +24,73 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  * This is always the most current state of a check
  * 
  */
-@SQLTable(schema = BergamotDB.class, name = "check_state", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "check_state", since = @SQLVersion({4, 0, 0}))
 public class CheckState extends BergamotObject<CheckStateMO> implements Cloneable
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "check_id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID checkId;
 
     /**
      * Is the check ok?
      */
-    @SQLColumn(index = 2, name = "ok", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "ok", since = @SQLVersion({4, 0, 0}))
     private boolean ok = true;
 
     /**
      * Why is the check ok or not ok?
      */
-    @SQLColumn(index = 3, name = "status", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "status", since = @SQLVersion({4, 0, 0}))
     private Status status = Status.PENDING;
 
     /**
      * What was the output of the last check
      */
-    @SQLColumn(index = 4, name = "output", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "output", since = @SQLVersion({4, 0, 0}))
     private String output = "Pending";
 
     /**
      * When did the last check happen
      */
-    @SQLColumn(index = 5, name = "last_check_time", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "last_check_time", since = @SQLVersion({4, 0, 0}))
     private Timestamp lastCheckTime = new Timestamp(System.currentTimeMillis());
 
     /**
      * What was the Id of the last check
      */
-    @SQLColumn(index = 6, name = "last_check_id", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "last_check_id", since = @SQLVersion({4, 0, 0}))
     private UUID lastCheckId;
 
     /**
      * The number of attempts since the last hard state change
      */
-    @SQLColumn(index = 7, name = "attempt", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "attempt", since = @SQLVersion({4, 0, 0}))
     private int attempt = 1;
 
     /**
      * Has a hard state transition happened
      */
-    @SQLColumn(index = 8, name = "hard", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "hard", since = @SQLVersion({4, 0, 0}))
     private boolean hard = true;
 
     /**
      * Is the state in transition
      */
-    @SQLColumn(index = 9, name = "transitioning", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 9, name = "transitioning", since = @SQLVersion({4, 0, 0}))
     private boolean transitioning = false;
 
     /**
      * Is the state flapping between ok and not ok, but never reaching a hard state
      */
-    @SQLColumn(index = 10, name = "flapping", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 10, name = "flapping", since = @SQLVersion({4, 0, 0}))
     private boolean flapping = false;
 
     /**
      * When was the last hard state change
      */
-    @SQLColumn(index = 11, name = "last_state_change", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 11, name = "last_state_change", since = @SQLVersion({4, 0, 0}))
     private Timestamp lastStateChange = new Timestamp(System.currentTimeMillis());
 
     // history
@@ -98,55 +98,55 @@ public class CheckState extends BergamotObject<CheckStateMO> implements Cloneabl
     /**
      * A bitmap of the ok history
      */
-    @SQLColumn(index = 12, name = "ok_history", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 12, name = "ok_history", since = @SQLVersion({4, 0, 0}))
     private long okHistory = 0x1L;
 
     /**
      * Was the last hard state ok?
      */
-    @SQLColumn(index = 13, name = "last_hard_ok", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 13, name = "last_hard_ok", since = @SQLVersion({4, 0, 0}))
     private boolean lastHardOk = true;
 
     /**
      * What was the last hard status?
      */
-    @SQLColumn(index = 14, name = "last_hard_status", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 14, name = "last_hard_status", since = @SQLVersion({4, 0, 0}))
     private Status lastHardStatus = Status.PENDING;
 
     /**
      * What was the output of the last hard state
      */
-    @SQLColumn(index = 15, name = "last_hard_output", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 15, name = "last_hard_output", since = @SQLVersion({4, 0, 0}))
     private String lastHardOutput = "Pending";
 
     /**
      * Is this check currently in downtime
      */
-    @SQLColumn(index = 16, name = "in_downtime", since = @SQLVersion({ 3, 3, 0 }))
+    @SQLColumn(index = 16, name = "in_downtime", since = @SQLVersion({4, 0, 0}))
     private boolean inDowntime;
     
     /**
      * Is this check currently suppressed
      */
-    @SQLColumn(index = 17, name = "suppressed", since = @SQLVersion({ 3, 4, 0 }))
+    @SQLColumn(index = 17, name = "suppressed", since = @SQLVersion({4, 0, 0}))
     private boolean suppressed;
     
     /**
      * Is this check currently acknowledged
      */
-    @SQLColumn(index = 18, name = "acknowledged", since = @SQLVersion({ 3, 28, 0 }))
+    @SQLColumn(index = 18, name = "acknowledged", since = @SQLVersion({4, 0, 0}))
     private boolean acknowledged;
     
     /**
      * Is this check currently encompassed by an alert on a dependent check
      */
-    @SQLColumn(index = 19, name = "encompassed", since = @SQLVersion({ 3, 28, 0 }))
+    @SQLColumn(index = 19, name = "encompassed", since = @SQLVersion({4, 0, 0}))
     private boolean encompassed;
     
     /**
      * The current alert id for this check
      */
-    @SQLColumn(index = 20, name = "current_alert_id", since = @SQLVersion({ 3, 28, 0 }))
+    @SQLColumn(index = 20, name = "current_alert_id", since = @SQLVersion({4, 0, 0}))
     private UUID currentAlertId;
 
     public CheckState()

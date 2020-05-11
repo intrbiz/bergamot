@@ -15,7 +15,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 /**
  * A perpetual API token which has been created for a Contact
  */
-@SQLTable(schema = BergamotDB.class, name = "api_token", since = @SQLVersion({ 1, 0, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "api_token", since = @SQLVersion({4, 0, 0}))
 public class APIToken implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -23,39 +23,39 @@ public class APIToken implements Serializable
     /**
      * The API Token which will be used for perpetual authentication of external things
      */
-    @SQLColumn(index = 1, name = "token", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 1, name = "token", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private String token;
     
     /**
      * The contact whom this token represents
      */
-    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({ 1, 0, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID contactId;
     
-    @SQLColumn(index = 3, name = "summary", notNull = true, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 3, name = "summary", notNull = true, since = @SQLVersion({4, 0, 0}))
     private String summary;
 
-    @SQLColumn(index = 4, name = "description", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 4, name = "description", since = @SQLVersion({4, 0, 0}))
     private String description;
     
-    @SQLColumn(index = 5, name = "created", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 5, name = "created", since = @SQLVersion({4, 0, 0}))
     private Timestamp created = new Timestamp(System.currentTimeMillis());
     
-    @SQLColumn(index = 6, name = "updated", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 6, name = "updated", since = @SQLVersion({4, 0, 0}))
     private Timestamp updated = new Timestamp(System.currentTimeMillis());
     
     /**
      * Has this token been revoked
      */
-    @SQLColumn(index = 7, name = "revoked", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 7, name = "revoked", since = @SQLVersion({4, 0, 0}))
     private boolean revoked = false;
     
     /**
      * When was it revoked
      */
-    @SQLColumn(index = 8, name = "revoked_at", since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 8, name = "revoked_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp revokedAt = null;
     
     public APIToken()

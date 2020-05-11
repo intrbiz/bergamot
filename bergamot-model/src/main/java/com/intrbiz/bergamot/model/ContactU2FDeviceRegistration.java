@@ -24,71 +24,71 @@ import com.yubico.u2f.exceptions.U2fBadInputException;
 /**
  * A U2F device which has been registered to a user
  */
-@SQLTable(schema = BergamotDB.class, name = "u2f_device_registration", since = @SQLVersion({ 3, 38, 0 }))
+@SQLTable(schema = BergamotDB.class, name = "u2f_device_registration", since = @SQLVersion({4, 0, 0}))
 public class ContactU2FDeviceRegistration implements Serializable
 {
     private static final long serialVersionUID = 1L;
     
-    @SQLColumn(index = 1, name = "id", since = @SQLVersion({ 3,38, 0 }))
+    @SQLColumn(index = 1, name = "id", since = @SQLVersion({4, 0, 0}))
     @SQLPrimaryKey
     private UUID id;
     
     /**
      * The contact whom this token represents
      */
-    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({ 3, 38, 0 }))
-    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({ 1, 0, 0 }))
+    @SQLColumn(index = 2, name = "contact_id", since = @SQLVersion({4, 0, 0}))
+    @SQLForeignKey(references = Contact.class, on = "id", onDelete = Action.CASCADE, onUpdate = Action.RESTRICT, since = @SQLVersion({4, 0, 0}))
     private UUID contactId;
     
-    @SQLColumn(index = 3, name = "key_handle", notNull = true, since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 3, name = "key_handle", notNull = true, since = @SQLVersion({4, 0, 0}))
     private String keyHandle;
 
-    @SQLColumn(index = 4, name = "public_key", notNull = true, since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 4, name = "public_key", notNull = true, since = @SQLVersion({4, 0, 0}))
     private String publicKey;
     
-    @SQLColumn(index = 5, name = "attestation_cert", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 5, name = "attestation_cert", since = @SQLVersion({4, 0, 0}))
     private String attestationCert;
     
-    @SQLColumn(index = 6, name = "counter", notNull = true, since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 6, name = "counter", notNull = true, since = @SQLVersion({4, 0, 0}))
     private long counter;
     
     /**
      * When did we register this device
      */
-    @SQLColumn(index = 7, name = "created", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 7, name = "created", since = @SQLVersion({4, 0, 0}))
     private Timestamp created = new Timestamp(System.currentTimeMillis());
     
     /**
      * When was this last updated
      */
-    @SQLColumn(index = 8, name = "updated", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 8, name = "updated", since = @SQLVersion({4, 0, 0}))
     private Timestamp updated = null;
     
     /**
      * Has this device been revoked
      */
-    @SQLColumn(index = 9, name = "revoked", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 9, name = "revoked", since = @SQLVersion({4, 0, 0}))
     private boolean revoked = false;
     
     /**
      * When was it revoked
      */
-    @SQLColumn(index = 10, name = "revoked_at", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 10, name = "revoked_at", since = @SQLVersion({4, 0, 0}))
     private Timestamp revokedAt = null;
     
-    @SQLColumn(index = 11, name = "vendor", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 11, name = "vendor", since = @SQLVersion({4, 0, 0}))
     private String vendor;
     
-    @SQLColumn(index = 12, name = "device", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 12, name = "device", since = @SQLVersion({4, 0, 0}))
     private String device;
     
-    @SQLColumn(index = 13, name = "device_image", since = @SQLVersion({ 3, 38, 0 }))
+    @SQLColumn(index = 13, name = "device_image", since = @SQLVersion({4, 0, 0}))
     private String deviceImage;
     
     /**
      * A name for this method
      */
-    @SQLColumn(index = 14, name = "summary", since = @SQLVersion({ 3, 39, 0 }))
+    @SQLColumn(index = 14, name = "summary", since = @SQLVersion({4, 0, 0}))
     private String summary;
     
     public ContactU2FDeviceRegistration()
