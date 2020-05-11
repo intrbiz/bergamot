@@ -32,7 +32,8 @@ BEGIN
  	 $$ || quote_ident(p_agg) || $$("min")::REAL PRECISION AS "min",
  	 $$ || quote_ident(p_agg) || $$("max")::REAL PRECISION AS "max"
     FROM $$ || v_table || $$ 
-    WHERE collected_at BETWEEN ($3 - (($5 / 1000) ||' seconds')::interval) AND ($4 + (($5 / 1000) ||' seconds')::interval) 
+    WHERE reading_id = $2
+      AND collected_at BETWEEN ($3 - (($5 / 1000) ||' seconds')::interval) AND ($4 + (($5 / 1000) ||' seconds')::interval) 
     GROUP BY 1 
    ) q 
    ON (q.collected_at = i.v) 

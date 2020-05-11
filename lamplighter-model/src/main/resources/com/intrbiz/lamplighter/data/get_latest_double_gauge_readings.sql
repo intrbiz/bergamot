@@ -5,7 +5,7 @@ DECLARE
   v_table TEXT;
 BEGIN
   v_table := 'lamplighter.double_gauge_reading';
-  RETURN QUERY EXECUTE $$SELECT q.* FROM (SELECT * FROM $$ || v_table || $$ WHERE site_id = $1 AND reading_id = $2 ORDER BY collected_at DESC LIMIT $3) q ORDER BY q.collected_at ASC$$ USING p_site_id, p_reading_id, p_limit;
+  RETURN QUERY EXECUTE $$SELECT q.* FROM (SELECT * FROM $$ || v_table || $$ WHERE reading_id = $1 ORDER BY collected_at DESC LIMIT $2) q ORDER BY q.collected_at ASC$$ USING p_reading_id, p_limit;
 END;
 $BODY$
 LANGUAGE plpgsql;

@@ -32,7 +32,8 @@ BEGIN
      $$ || quote_ident(p_agg) || $$("five_minute_rate")::DOUBLE PRECISION AS "five_minute_rate",
      $$ || quote_ident(p_agg) || $$("fifteen_minute_rate")::DOUBLE PRECISION AS "fifteen_minute_rate"
     FROM $$ || v_table || $$ 
-    WHERE collected_at BETWEEN ($3 - (($5 / 1000) ||' seconds')::interval) AND ($4 + (($5 / 1000) ||' seconds')::interval) 
+    WHERE reading_id = $2
+      AND collected_at BETWEEN ($3 - (($5 / 1000) ||' seconds')::interval) AND ($4 + (($5 / 1000) ||' seconds')::interval) 
     GROUP BY 1 
    ) q 
    ON (q.collected_at = i.v) 
