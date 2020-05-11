@@ -14,10 +14,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 
@@ -41,7 +41,7 @@ public class TestHTTPEngine
             }
 
             @Override
-            public void publishAgentAction(AgentMessage event)
+            public void publishAgentAction(ProcessorAgentMessage event)
             {
             }
 
@@ -61,7 +61,7 @@ public class TestHTTPEngine
             }
 
             @Override
-            public void publishReading(ReadingParcelMO readingParcelMO)
+            public void publishReading(ReadingParcelMessage readingParcelMO)
             {
             }
         });
@@ -76,7 +76,7 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessor(new UUID(0, 0));
+        check.setProcessorId(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -96,7 +96,7 @@ public class TestHTTPEngine
         check.setName("check_http");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessor(new UUID(0, 0));
+        check.setProcessorId(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -117,7 +117,7 @@ public class TestHTTPEngine
         check.setName("check_certificate");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessor(new UUID(0, 0));
+        check.setProcessorId(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setParameter("host", "intrbiz.com");
@@ -171,7 +171,7 @@ public class TestHTTPEngine
         check.setName("check_http_script");
         check.setCheckType("service");
         check.setCheckId(UUID.randomUUID());
-        check.setProcessor(new UUID(0, 0));
+        check.setProcessorId(new UUID(0, 0));
         check.setScheduled(System.currentTimeMillis());
         // parameters
         check.setScript(
@@ -231,16 +231,16 @@ public class TestHTTPEngine
     {
         private Consumer<ResultMessage> onResult;
         
-        private Consumer<ReadingParcelMO> onReading;
+        private Consumer<ReadingParcelMessage> onReading;
         
-        public TestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
+        public TestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMessage> onReading)
         {
             this.onResult = onResult;
             this.onReading = onReading;
         }
 
         @Override
-        public void publishReading(ReadingParcelMO readingParcelMO)
+        public void publishReading(ReadingParcelMessage readingParcelMO)
         {
             if (this.onReading != null)
                 this.onReading.accept(readingParcelMO);

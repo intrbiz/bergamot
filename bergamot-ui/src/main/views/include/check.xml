@@ -40,10 +40,7 @@
 				    <span class="label">Last checked: </span>
 				    <span class="value">#{dateformat('HH:mm:ss', checkstate.lastCheckTime)} on #{dateformat('EEEE dd/MM/yyyy', checkstate.lastCheckTime)}</span>
 			    </p>
-			    <p class="output field-output">
-				    <span class="label">Output: </span>
-				    <span class="value">#{coalesce(checkstate.output, '')}</span>
-			    </p>
+			    <p class="output field-output">#{coalesce(checkstate.output, '')}</p>
 			    <!-- TODO: Spacer -->
 			   	<p rendered="#{check.type == 'cluster'}">
 			    	<span class="label">&nbsp;</span>

@@ -4,27 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.config.ClusterCfg;
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.Message;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.processor.ProcessorMessage;
-import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.proxy.AgentState;
-import com.intrbiz.bergamot.model.message.proxy.FoundAgentKey;
-import com.intrbiz.bergamot.model.message.proxy.LookupAgentKey;
+import com.intrbiz.bergamot.model.message.worker.WorkerMessage;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
 
 /**
@@ -36,26 +30,19 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
     
     private final ProxyProcessorDispatcher dispatcher;
     
-    private final ProxyAgentKeyLookup lookup;
-    
-    public ProxyWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String info, String workerPool, Set<String> availableEngines) throws Exception
+    public ProxyWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String workerPool, Set<String> availableEngines) throws Exception
     {
-        super(config, onPanic, new ClientHeader().userAgent(info).proxyForWorker().workerPool(workerPool).engines(availableEngines));
+        super(config, onPanic, new ClientHeader().userAgent(application).info(info).proxyForWorker().workerPool(workerPool).engines(availableEngines));
         this.consumer = new ProxyWorkerConsumer();
         this.dispatcher = new ProxyProcessorDispatcher();
-        this.lookup = new ProxyAgentKeyLookup();
     }
 
     @Override
     protected void handleMessage(Message message)
     {
-        if (message instanceof ExecuteCheck)
+        if (message instanceof WorkerMessage)
         {
-            this.consumer.processMessage((ExecuteCheck) message);
-        }
-        else if (message instanceof FoundAgentKey)
-        {
-            this.lookup.processMessage((FoundAgentKey) message);
+            this.consumer.processMessage((WorkerMessage) message);
         }
     }
 
@@ -67,11 +54,6 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
     public ProcessorDispatcher getProcessorDispatcher()
     {
         return this.dispatcher;
-    }
-    
-    public AgentKeyLookup getAgentKeyLookup()
-    {
-        return this.lookup;
     }
 
     public void registerAgent(UUID agentId) throws Exception
@@ -86,13 +68,13 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
     
     private class ProxyWorkerConsumer implements WorkerConsumer
     {
-        private volatile List<ExecuteCheck> buffer;
+        private volatile List<WorkerMessage> buffer;
         
         private volatile Executor executor;
         
-        private volatile Consumer<ExecuteCheck> consumer;
+        private volatile Consumer<WorkerMessage> consumer;
         
-        void processMessage(ExecuteCheck check)
+        void processMessage(WorkerMessage check)
         {
             synchronized (this)
             {
@@ -135,7 +117,7 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
         }
 
         @Override
-        public boolean start(Executor executor, Consumer<ExecuteCheck> consumer)
+        public boolean start(Executor executor, Consumer<WorkerMessage> consumer)
         {
             synchronized (this)
             {
@@ -143,10 +125,10 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
                 this.consumer = consumer;
                 if (this.buffer != null)
                 {
-                    for (ExecuteCheck check : this.buffer)
+                    for (WorkerMessage message : this.buffer)
                     {
                         this.executor.execute(() -> {
-                            consumer.accept(check);
+                            consumer.accept(message);
                         });
                     }
                     this.buffer = null;
@@ -161,7 +143,7 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
         }
 
         @Override
-        public void drainTo(Consumer<ExecuteCheck> consumer)
+        public void drainTo(Consumer<WorkerMessage> consumer)
         {
         }
 
@@ -181,61 +163,21 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
         }
 
         @Override
-        public PublishStatus dispatch(UUID processor, ProcessorMessage message)
-        {
-            return this.dispatch(message);
-        }
-
-        @Override
         public PublishStatus dispatchResult(ResultMessage result)
         {
             return this.dispatch(result);
         }
 
         @Override
-        public PublishStatus dispatchResult(UUID processor, ResultMessage result)
-        {
-            return this.dispatch(result);
-        }
-
-        @Override
-        public PublishStatus dispatchReading(ReadingParcelMO reading)
+        public PublishStatus dispatchReading(ReadingParcelMessage reading)
         {
             return this.dispatch(reading);
         }
 
         @Override
-        public PublishStatus dispatchReading(UUID processor, ReadingParcelMO reading)
-        {
-            return this.dispatch(reading);
-        }
-
-        @Override
-        public PublishStatus dispatchAgentMessage(AgentMessage action)
+        public PublishStatus dispatchAgentMessage(ProcessorAgentMessage action)
         {
             return this.dispatch(action);
-        }
-    }
-    
-    private class ProxyAgentKeyLookup implements AgentKeyLookup
-    {
-        private final ConcurrentMap<UUID, Consumer<AgentAuthenticationKey>> callbacks = new ConcurrentHashMap<>();
-        
-        private void processMessage(FoundAgentKey response)
-        {
-            Consumer<AgentAuthenticationKey> callback = this.callbacks.remove(response.getReplyTo());
-            if (callback != null)
-            {
-                callback.accept(new AgentAuthenticationKey(response.getKey()));
-            }
-        }
-        
-        @Override
-        public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
-        {
-            LookupAgentKey lookup = new LookupAgentKey(keyId);
-            this.callbacks.put(lookup.getId(), callback);
-            channel.writeAndFlush(lookup);
         }
     }
 }

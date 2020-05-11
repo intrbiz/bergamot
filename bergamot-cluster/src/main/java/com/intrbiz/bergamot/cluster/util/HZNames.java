@@ -63,4 +63,14 @@ public final class HZNames
     {
         return "bergamot.cluster.map.lookup.proxy.key";
     }
+    
+    public static final String buildProxiesSequenceMapName()
+    {
+        return "bergamot.map.proxies.sequence";
+    }
+    
+    public static final String buildProxyRingbufferName(UUID workerId)
+    {
+        return "bergamot.ringbuffer.proxy." + (workerId == null ? "*" : workerId.toString());
+    }
 }

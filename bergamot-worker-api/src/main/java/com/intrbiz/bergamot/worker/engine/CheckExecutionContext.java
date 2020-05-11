@@ -1,10 +1,10 @@
 package com.intrbiz.bergamot.worker.engine;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.gerald.polyakov.Reading;
 
 /**
@@ -39,7 +39,7 @@ public interface CheckExecutionContext
      * Publish a readings
      * @param readingParcelMO the readings all parcelled up and addressed
      */
-    void publishReading(ReadingParcelMO reading);
+    void publishReading(ReadingParcelMessage reading);
     
     /**
      * Publish the given readings for the given check execution
@@ -48,7 +48,7 @@ public interface CheckExecutionContext
      */
     default void publishReading(ExecuteCheck check, Reading... readings)
     {
-        ReadingParcelMO readingParcel = new ReadingParcelMO().fromCheck(check.getCheckId()).captured(System.currentTimeMillis());
+        ReadingParcelMessage readingParcel = new ReadingParcelMessage().fromCheck(check.getCheckId()).captured(System.currentTimeMillis());
         for (Reading reading : readings)
         {
             readingParcel.reading(reading);
@@ -63,7 +63,7 @@ public interface CheckExecutionContext
      */
     default void publishReading(ExecuteCheck check, Iterable<Reading> readings)
     {
-        ReadingParcelMO readingParcel = new ReadingParcelMO().fromCheck(check.getCheckId()).captured(System.currentTimeMillis());
+        ReadingParcelMessage readingParcel = new ReadingParcelMessage().fromCheck(check.getCheckId()).captured(System.currentTimeMillis());
         for (Reading reading : readings)
         {
             readingParcel.reading(reading);

@@ -1,6 +1,5 @@
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.util.function.BiConsumer;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -24,9 +23,9 @@ public class TestProxyServer
         BergamotProxyServer server = new BergamotProxyServer(14080, new KeyResolver()
         {
             @Override
-            public CompletionStage<AuthenticationKey> resolveKey(UUID keyId)
+            public void resolveKey(UUID keyId, BiConsumer<AuthenticationKey, UUID> callback)
             {
-                return CompletableFuture.completedFuture(new AuthenticationKey("G7Fq13geaxtCXqoRMgvt_3g1tML6wVOxWOdncRaWnjEyIsUSUaor11KFpw09HC27CFY"));
+                callback.accept(new AuthenticationKey("G7Fq13geaxtCXqoRMgvt_3g1tML6wVOxWOdncRaWnjEyIsUSUaor11KFpw09HC27CFY"), null);
             }
             
         }, new MessageProcessor.Factory()

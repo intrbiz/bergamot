@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.result.matcher.Matcher;
 import com.intrbiz.bergamot.result.matcher.Matchers;
 import com.intrbiz.data.DataException;
@@ -43,7 +43,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
     }
 
     @Override
-    public void process(ReadingParcelMO readings)
+    public void process(ReadingParcelMessage readings)
     {
         if (logger.isTraceEnabled()) logger.trace("Processing readings: " + readings);
         // store the readings
@@ -179,7 +179,7 @@ public class DefaultReadingProcessor extends AbstractReadingProcessor
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected Check<?, ?> matchCheck(ReadingParcelMO readings)
+    protected Check<?, ?> matchCheck(ReadingParcelMessage readings)
     {
         // use the match engine to find the result
         Matcher<?> matcher = this.matchers.buildMatcher(readings.getMatchOn());

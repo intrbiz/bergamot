@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.api.APIRequest;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 
 @JsonTypeName("bergamot.api.execute_adhoc_check")
 public class ExecuteAdhocCheck extends APIRequest

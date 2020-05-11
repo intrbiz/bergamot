@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.proxy.server;
 
 import java.util.Objects;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -63,6 +64,11 @@ public abstract class BaseBergamotServer
     protected abstract String getServerName();
     
     protected abstract String getWebSocketPath();
+    
+    public Executor getServerExecutor()
+    {
+        return this.workerGroup;
+    }
     
     public void start()
     {

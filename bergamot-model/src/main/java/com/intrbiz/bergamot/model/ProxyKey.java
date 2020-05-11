@@ -144,7 +144,7 @@ public class ProxyKey implements Serializable
     
     public AuthenticationKey toAuthenticationKey()
     {
-        return new AuthenticationKey(this.id, this.siteId, this.secret);
+        return new AuthenticationKey(this.id, this.secret);
     }
     
     public String toString()

@@ -13,10 +13,24 @@ public abstract class Message extends MessageObject
     
     @JsonProperty("id")
     private UUID id = UUID.randomUUID();
+    
+    @JsonProperty("reply_to")
+    private UUID replyTo;
 
     public Message()
     {
         super();
+    }
+    
+    public Message(UUID replyTo)
+    {
+        super();
+        this.replyTo = replyTo;
+    }
+    
+    public Message(Message replyTo)
+    {
+        this(replyTo.getId());
     }
 
     public final UUID getId()
@@ -27,5 +41,15 @@ public abstract class Message extends MessageObject
     public final void setId(UUID id)
     {
         this.id = id;
+    }
+
+    public UUID getReplyTo()
+    {
+        return this.replyTo;
+    }
+
+    public void setReplyTo(UUID replyTo)
+    {
+        this.replyTo = replyTo;
     }
 }

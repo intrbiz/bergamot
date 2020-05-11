@@ -13,7 +13,7 @@ import com.intrbiz.bergamot.model.message.processor.result.match.MatchableMO;
 /**
  * The result of a passive check
  */
-@JsonTypeName("bergamot.result.passive")
+@JsonTypeName("bergamot.processor.result.passive")
 public class PassiveResult extends ResultMessage implements MatchableMO, ProcessorHashable
 {
     private static final long serialVersionUID = 1L;

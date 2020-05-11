@@ -26,8 +26,6 @@ public class AuthenticationKey
     
     private UUID id;
     
-    private UUID siteId;
-    
     private byte[] secret;
     
     public AuthenticationKey()
@@ -35,11 +33,10 @@ public class AuthenticationKey
         super();
     }
     
-    public AuthenticationKey(UUID id, UUID siteId, byte[] secret)
+    public AuthenticationKey(UUID id, byte[] secret)
     {
         super();
         this.id = Objects.requireNonNull(id);
-        this.siteId = siteId;
         this.secret = Objects.requireNonNull(secret);
     }
     
@@ -52,11 +49,6 @@ public class AuthenticationKey
     public UUID getId()
     {
         return this.id;
-    }
-    
-    public UUID getSiteId()
-    {
-        return this.siteId;
     }
 
     public byte[] getSecret()

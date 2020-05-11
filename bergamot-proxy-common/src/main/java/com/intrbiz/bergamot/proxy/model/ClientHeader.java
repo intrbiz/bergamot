@@ -12,8 +12,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -50,6 +49,8 @@ public class ClientHeader
         public static final String WORKER_POOL = HEADER_PREFIX + "-worker-pool";
         
         public static final String HOST_NAME = HEADER_PREFIX + "-host-name";
+        
+        public static final String INFO = HEADER_PREFIX + "-info";
     }
     
     public static final class BergamotHeaderValues
@@ -78,7 +79,9 @@ public class ClientHeader
     
     private String signature;
     
-    private AuthenticationKey key;
+    private transient AuthenticationKey key;
+    
+    private transient UUID allowedSiteId;
 
     public ClientHeader(UUID id, String address, String userAgent, Map<String, String> attributes, long authenticationTimestamp, UUID keyId, String signature)
     {
@@ -191,6 +194,16 @@ public class ClientHeader
         return this.attribute(BergamotHeaderNames.HOST_NAME, hostName);
     }
     
+    public String getInfo()
+    {
+        return this.getAttribute(BergamotHeaderNames.INFO);
+    }
+    
+    public ClientHeader info(String info)
+    {
+        return this.attribute(BergamotHeaderNames.INFO, info);
+    }
+    
     public long getAuthenticationTimestamp()
     {
         return this.authenticationTimestamp;
@@ -213,40 +226,43 @@ public class ClientHeader
     
     public Set<UUID> getSiteIds()
     {
-        return this.key == null || this.key.getSiteId() == null ? 
+        return this.key == null || this.allowedSiteId == null ? 
                 Collections.emptySet() : 
-                Collections.singleton(this.key.getSiteId());
+                Collections.singleton(this.allowedSiteId);
     }
 
-    public CompletionStage<Boolean> authenticate(KeyResolver keyResolver)
+    public void authenticate(KeyResolver keyResolver, Consumer<Boolean> callback)
     {
         if (Math.abs((System.currentTimeMillis() / 1000) - this.authenticationTimestamp) < AUTHENTICATION_GRACE_SECONDS)
         {
-            return keyResolver.resolveKey(this.keyId).thenApply((resolvedKey) -> {
+            keyResolver.resolveKey(this.keyId, (resolvedKey, allowedSiteId) -> {
                 if (resolvedKey != null)
                 {
                     this.key = resolvedKey;
+                    this.allowedSiteId = allowedSiteId;
                     try
                     {
-                        return resolvedKey.checkBase64(this.authenticationTimestamp, this.id, this.attributes, this.signature);
+                        callback.accept(resolvedKey.checkBase64(this.authenticationTimestamp, this.id, this.attributes, this.signature));
+                        return;
                     }
                     catch (InvalidKeyException | NoSuchAlgorithmException e)
                     {
                         logger.warn("Error checking signature", e);
+                        
                     }
                 }
                 else
                 {
                     logger.warn("Failed to resolve authentication key: " + this.keyId);
                 }
-                return false;
+                callback.accept(false);
             });
         }
         else
         {
             logger.warn("Authentication timestamp is not within the grace period");
+            callback.accept(false);
         }
-        return CompletableFuture.completedFuture(false);
     }
     
     public ClientHeader sign(AuthenticationKey key) throws InvalidKeyException, NoSuchAlgorithmException

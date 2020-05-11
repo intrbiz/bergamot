@@ -51,6 +51,7 @@
 			    <span class="label wide">Last status: </span>
 			    <span class="value">#{cluster.state.lastHardStatus.toString().substring(0,1) + cluster.state.lastHardStatus.toString().substring(1).toLowerCase()}</span>
 		    </p>
+		    <p class="output field-output">#{coalesce(cluster.state.output, '')}</p>
 		</div>
 		<div class="col4 description" style="padding-top: 100px;">
 			<p rendered="#{! isempty(cluster.description)}">#{cluster.description}</p>

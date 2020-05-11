@@ -6,17 +6,17 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.accounting.model.ExecuteCheckAccountingEvent;
-import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.WorkerDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.scheduler.SchedulerMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 
 
 public abstract class AbstractScheduler implements Scheduler
@@ -25,14 +25,14 @@ public abstract class AbstractScheduler implements Scheduler
     
     protected final UUID processorId;
     
-    protected final CheckDispatcher checkDispatcher;
+    protected final WorkerDispatcher checkDispatcher;
     
     protected final ProcessorDispatcher processorDispatcher;
     
     // accounting
     protected final Accounting accounting = Accounting.create(this.getClass());
     
-    public AbstractScheduler(UUID processorId, CheckDispatcher checkDispatcher, ProcessorDispatcher processorDispatcher)
+    public AbstractScheduler(UUID processorId, WorkerDispatcher checkDispatcher, ProcessorDispatcher processorDispatcher)
     {
         super();
         this.processorId = processorId;
@@ -46,7 +46,7 @@ public abstract class AbstractScheduler implements Scheduler
         if (executeCheck != null)
         {
             // publish the check
-            executeCheck.setProcessor(this.processorId);
+            executeCheck.setProcessorId(this.processorId);
             PublishStatus result = this.publishExecuteCheck(executeCheck);
             if (result == PublishStatus.Success)
             {
@@ -94,7 +94,8 @@ public abstract class AbstractScheduler implements Scheduler
                 break;
         }
         // Publish the result
-        PublishStatus resultStatus = this.processorDispatcher.dispatchResult(this.processorId, result);
+        result.setProcessorId(this.processorId);
+        PublishStatus resultStatus = this.processorDispatcher.dispatchResult(result);
         if (resultStatus != PublishStatus.Success)
         {
             logger.error("Failed to publish failure result, got: " + resultStatus + "!\n" + result);

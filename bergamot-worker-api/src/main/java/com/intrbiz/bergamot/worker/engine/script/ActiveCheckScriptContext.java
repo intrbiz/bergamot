@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.function.BiPredicate;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
@@ -433,7 +433,7 @@ public class ActiveCheckScriptContext
             this.context.publishReading(this.check, readings);
     }
     
-    public void publishReadings(ReadingParcelMO readings)
+    public void publishReadings(ReadingParcelMessage readings)
     {
         if (readings != null)
             this.context.publishReading(readings);

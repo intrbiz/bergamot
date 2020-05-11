@@ -6,12 +6,12 @@ import java.util.function.BiPredicate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.check.CheckMessage;
+import com.intrbiz.bergamot.model.message.worker.check.CheckMessage;
 
 /**
  * The result of a active check
  */
-@JsonTypeName("bergamot.result.active")
+@JsonTypeName("bergamot.processor.result.active")
 public class ActiveResult extends ResultMessage
 {
     private static final long serialVersionUID = 1L;

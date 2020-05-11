@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.model.message.check;
+package com.intrbiz.bergamot.model.message.worker.check;
 
 import java.util.UUID;
 
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 /**
  * Execute this check please
  */
-@JsonTypeName("bergamot.execute_check")
+@JsonTypeName("bergamot.worker.check.execute")
 public class ExecuteCheck extends CheckMessage
 {
     private static final long serialVersionUID = 1L;

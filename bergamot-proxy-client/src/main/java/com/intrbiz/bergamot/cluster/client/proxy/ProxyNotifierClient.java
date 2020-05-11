@@ -21,9 +21,9 @@ public class ProxyNotifierClient extends ProxyBaseClient implements NotifierClie
 {
     private final ProxyNotificationConsumer consumer;
     
-    public ProxyNotifierClient(ClusterCfg config, Consumer<Void> onPanic, String info, Set<String> availableEngines) throws Exception
+    public ProxyNotifierClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<String> availableEngines) throws Exception
     {
-        super(config, onPanic, new ClientHeader().userAgent(info).proxyForNotifier().engines(availableEngines));
+        super(config, onPanic, new ClientHeader().userAgent(application).info(info).proxyForNotifier().engines(availableEngines));
         this.consumer = new ProxyNotificationConsumer();
     }
 

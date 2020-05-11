@@ -180,7 +180,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         if (! Util.isEmpty(ProxyBaseClient.getProxyUrl(this.configuration.getCluster())))
         {
             logger.info("Connecting to proxy");
-            this.client = new ProxyNotifierClient(this.configuration.getCluster(), this::clusterPanic, BergamotVersion.fullVersionString(), this.engines.keySet());
+            this.client = new ProxyNotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString(), this.engines.keySet());
         }
         else
         {

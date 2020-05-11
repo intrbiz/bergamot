@@ -45,7 +45,11 @@ public class NotifierCleanup
         logger.info("Cleaning up notifier queue " + notifier);
         NotificationConsumer consumer = this.notificationConsumerFactory.apply(notifier);
         // Drain down the worker queue
-        consumer.drainTo(this.notificationDispatcher::dispatchNotification);
+        consumer.drainTo((message) -> {
+            // reset the notifier id and dispatch
+            message.setNotifierId(null);
+            this.notificationDispatcher.dispatchNotification(message);   
+        });
         // Destroy the worker queue
         consumer.destroy();
     }

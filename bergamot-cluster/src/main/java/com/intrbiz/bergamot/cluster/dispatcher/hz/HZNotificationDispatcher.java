@@ -31,10 +31,13 @@ public class HZNotificationDispatcher extends HZBaseDispatcher<Notification> imp
     public PublishStatus dispatchNotification(Notification notification)
     {
         // Pick a notifier for this check
-        UUID notifierId = this.routeNotification(notification);
-        if (notifierId == null) return PublishStatus.Unroutable;
+        if (notification.getNotifierId() == null)
+        {
+            notification.setNotifierId(this.routeNotification(notification));
+        }
+        if (notification.getNotifierId() == null) return PublishStatus.Unroutable;
         // Offer to the notifier
-        return this.offer(notifierId, notification);
+        return this.offer(notification.getNotifierId(), notification);
     }
     
     protected UUID routeNotification(Notification check)

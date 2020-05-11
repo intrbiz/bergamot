@@ -5,8 +5,8 @@ import java.util.function.Consumer;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 
 /**
@@ -60,7 +60,7 @@ public interface EngineContext
     /**
      * The agent event queue for sending register events
      */
-    void publishAgentAction(AgentMessage action);
+    void publishAgentAction(ProcessorAgentMessage action);
     
     /**
      * Register this worker as being the route for the given agent id
@@ -80,5 +80,5 @@ public interface EngineContext
     /**
      * Publish a set of readings
      */
-    void publishReading(ReadingParcelMO reading);
+    void publishReading(ReadingParcelMessage reading);
 }

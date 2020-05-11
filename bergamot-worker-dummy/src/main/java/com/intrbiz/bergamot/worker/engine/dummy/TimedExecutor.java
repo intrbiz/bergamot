@@ -2,8 +2,8 @@ package com.intrbiz.bergamot.worker.engine.dummy;
 
 import java.util.Calendar;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.timeperiod.TimeRange;
 import com.intrbiz.bergamot.timerange.TimeRangeParser;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;

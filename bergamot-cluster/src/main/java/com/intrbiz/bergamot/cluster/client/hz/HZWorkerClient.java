@@ -11,8 +11,6 @@ import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.cluster.consumer.hz.HZWorkerConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.hz.HZProcessorDispatcher;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
-import com.intrbiz.bergamot.cluster.lookup.hz.HZAgentKeyClientLookup;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistar;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistar;
 import com.intrbiz.bergamot.config.ClusterCfg;
@@ -34,8 +32,6 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
     
     private final ProcessorDispatcher processorDispatcher;
     
-    private final AgentKeyLookup agentKeyLookup;
-    
     private final AgentRegistar agentRegistar;
 
     public HZWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws Exception
@@ -47,7 +43,6 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
         this.agentRegistar = new AgentRegistar(this.zooKeeper.getZooKeeper());
         this.workerConsumer = new HZWorkerConsumer(this.hazelcast, this.id);
         this.processorDispatcher = new HZProcessorDispatcher(this.hazelcast, this.workerRegistar.getRouteTable());
-        this.agentKeyLookup = new HZAgentKeyClientLookup(this.hazelcast);
         // Register this worker
         this.registerWorker(restrictedSiteIds, workerPool, availableEngines);
     }
@@ -60,11 +55,6 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
     public ProcessorDispatcher getProcessorDispatcher()
     {
         return this.processorDispatcher;
-    }
-    
-    public AgentKeyLookup getAgentKeyLookup()
-    {
-        return this.agentKeyLookup;
     }
     
     private void registerWorker(Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws KeeperException, InterruptedException

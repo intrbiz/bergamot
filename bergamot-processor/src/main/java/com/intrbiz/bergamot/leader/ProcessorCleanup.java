@@ -45,7 +45,11 @@ public class ProcessorCleanup
         logger.info("Cleaning up worker queue " + worker);
         ProcessorConsumer consumer = this.processorConsumerFactory.apply(worker);
         // Drain down the worker queue
-        consumer.drainTo(this.processorDispatcher::dispatch);
+        consumer.drainTo((message) -> {
+            // reset the processor id and dispatch
+            message.setProcessorId(null);
+            this.processorDispatcher.dispatch(message); 
+        });
         // Destroy the worker queue
         consumer.destroy();
     }

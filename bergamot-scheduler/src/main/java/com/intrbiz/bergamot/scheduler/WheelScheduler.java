@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.WorkerDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.ActiveCheck;
@@ -83,7 +83,7 @@ public class WheelScheduler extends AbstractScheduler
     // task executor
     protected final ExecutorService taskExecutor;
 
-    public WheelScheduler(UUID processorId, CheckDispatcher checkDispatcher, ProcessorDispatcher processorDispatcher)
+    public WheelScheduler(UUID processorId, WorkerDispatcher checkDispatcher, ProcessorDispatcher processorDispatcher)
     {
         super(processorId, checkDispatcher, processorDispatcher);
         // setup the wheel structure

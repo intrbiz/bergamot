@@ -112,7 +112,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object>
             // decode the client header
             this.clientHeader = ClientHeader.fromHeaders(req.headers(), ctx.channel().remoteAddress());
             // authenticate the client
-            this.clientHeader.authenticate(this.keyResolver).thenAccept((authResult) -> {
+            this.clientHeader.authenticate(this.keyResolver, (authResult) -> {
                 if (authResult)
                 {
                     this.authenticated = true;

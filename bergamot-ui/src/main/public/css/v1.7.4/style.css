@@ -440,7 +440,12 @@ a:hover .dash_icon {
     height: 25px;
 }
 
+.dash_icon > p.stacked {
+	height: 50px;
+}
+
 .dash_icon > p.output {
+    padding: 10px 0 0 10px;
     height: 80px;
     line-height: 20px;
     overflow: hidden;
@@ -451,6 +456,7 @@ a:hover .dash_icon {
     display: block;
     float: left;
     margin: 5px 0 0 10px;
+    height: 25px;
 }
 
 .dash_icon p span.label {
@@ -462,16 +468,25 @@ a:hover .dash_icon {
     width: 240px;
 }
 
+.dash_icon p.stacked span.value,
+.dash_icon p span.label.single {
+    width: 560px;
+}
+
 .dash_icon p span.value {
     width: 270px;
+    overflow-x: hidden;
 }
 
 .dash_icon p a span.value {
 	text-decoration: underline;
 }
 
+.dash_icon p.stacked span.value,
 .dash_icon p span.value.single {
     width: 560px;
+    padding-left: 10px;
+    margin-top: 0;
 }
 
 span.info {

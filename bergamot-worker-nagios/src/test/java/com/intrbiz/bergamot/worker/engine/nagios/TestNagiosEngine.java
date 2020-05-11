@@ -9,10 +9,10 @@ import java.util.function.Consumer;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 public class TestNagiosEngine
@@ -225,7 +225,7 @@ public class TestNagiosEngine
         this.run(check, onResult, null);
     }
     
-    private void run(ExecuteCheck check, Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
+    private void run(ExecuteCheck check, Consumer<ResultMessage> onResult, Consumer<ReadingParcelMessage> onReading)
     {
         NagiosTestContext context = new NagiosTestContext(onResult, onReading);
         this.engine.execute(check, context);
@@ -235,16 +235,16 @@ public class TestNagiosEngine
     {
         private Consumer<ResultMessage> onResult;
         
-        private Consumer<ReadingParcelMO> onReading;
+        private Consumer<ReadingParcelMessage> onReading;
         
-        public NagiosTestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
+        public NagiosTestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMessage> onReading)
         {
             this.onResult = onResult;
             this.onReading = onReading;
         }
 
         @Override
-        public void publishReading(ReadingParcelMO readingParcelMO)
+        public void publishReading(ReadingParcelMessage readingParcelMO)
         {
             if (this.onReading != null)
                 this.onReading.accept(readingParcelMO);

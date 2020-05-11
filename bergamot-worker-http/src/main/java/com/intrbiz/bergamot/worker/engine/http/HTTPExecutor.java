@@ -11,10 +11,10 @@ import com.intrbiz.Util;
 import com.intrbiz.bergamot.check.http.HTTPCheckBuilder;
 import com.intrbiz.bergamot.check.http.HTTPCheckResponse;
 import com.intrbiz.bergamot.model.message.ParameterMO;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -98,7 +98,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 tctx.stop();
                 context.publishActiveResult(resultMO);
                 // publish some metrics
-                ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
+                ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId());
                 readings.longGaugeReading("response-time", "ms", response.getRuntime(), (long) executeCheck.getIntParameter("warning_response_time", 0), (long) executeCheck.getIntParameter("critical_response_time", 0), null, null);
                 readings.longGaugeReading("content-length", "B", (long) response.getResponse().content().capacity());
                 readings.integerGaugeReading("status", null, response.getResponse().getStatus().code());

@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
@@ -80,7 +80,7 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
                     tctx.stop();
                     context.publishActiveResult(resultMO);
                     // readings
-                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
+                    ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId());
                     for (NagiosPerfData perfData : response.getPerfData())
                     {
                         Reading reading = perfData.toReading();

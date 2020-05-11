@@ -16,9 +16,11 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
 import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
+import com.intrbiz.bergamot.cluster.consumer.ProxyConsumer;
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.cluster.consumer.hz.HZNotificationConsumer;
 import com.intrbiz.bergamot.cluster.consumer.hz.HZProcessorConsumer;
+import com.intrbiz.bergamot.cluster.consumer.hz.HZProxyConsumer;
 import com.intrbiz.bergamot.cluster.consumer.hz.HZWorkerConsumer;
 import com.intrbiz.bergamot.cluster.election.SchedulingPoolElector;
 import com.intrbiz.bergamot.data.BergamotDB;
@@ -30,6 +32,7 @@ import com.intrbiz.bergamot.model.ProxyKey;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
+import com.intrbiz.bergamot.model.message.cluster.ProxyRegistration;
 import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
 import com.intrbiz.bergamot.ui.BergamotApp;
 import com.intrbiz.metadata.Any;
@@ -99,6 +102,20 @@ public class GlobalAdminRouter extends Router<BergamotApp>
         }
         var("notifier_tail", notifierTails);
         var("notifier_commited", notifierCommited);
+        // proxies
+        Set<ProxyRegistration> proxies = app().getProcessor().getProxyRegistry().getProxies();
+        var("proxies", proxies);
+        Map<UUID, Long> proxyTails = new HashMap<UUID, Long>();
+        Map<UUID, Long> proxyCommited = new HashMap<UUID, Long>();
+        for (ProxyRegistration proxy : proxies)
+        {
+            // TODO: we should have a task computing real stats somewhere
+            ProxyConsumer consumer = new HZProxyConsumer(app().getProcessor().getHazelcast(), proxy.getId());
+            proxyTails.put(proxy.getId(), consumer.getTailSequence());
+            proxyCommited.put(proxy.getId(), consumer.getSequence());
+        }
+        var("proxy_tail", proxyTails);
+        var("proxy_commited", proxyCommited);
         // processors
         Map<UUID, ProcessorRegistration> processors = app().getProcessor().getProcessorRegistry().getProcessors().stream().collect(Collectors.toMap(p -> p.getId(), p -> p));
         Map<UUID, String> colours = new HashMap<>();

@@ -3,8 +3,10 @@ package com.intrbiz.bergamot.proxy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.UUID;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import org.apache.log4j.ConsoleAppender;
@@ -13,10 +15,14 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.ProxyClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZProxyClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.ProxyCfg;
+import com.intrbiz.bergamot.model.message.processor.proxy.LookupProxyKey;
+import com.intrbiz.bergamot.model.message.proxy.FoundProxyKey;
+import com.intrbiz.bergamot.model.message.proxy.ProxyMessage;
 import com.intrbiz.bergamot.proxy.model.AuthenticationKey;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
 import com.intrbiz.bergamot.proxy.processor.NotifierProxyProcessor;
@@ -48,6 +54,8 @@ public class BergamotProxy implements Configurable<ProxyCfg>
     private BergamotProxyServer server;
     
     private volatile CountDownLatch shutdownLatch;
+    
+    private final ConcurrentMap<UUID, BiConsumer<AuthenticationKey, UUID>> proxyKeyLookups = new ConcurrentHashMap<>();
     
     public BergamotProxy()
     {
@@ -85,10 +93,13 @@ public class BergamotProxy implements Configurable<ProxyCfg>
         this.port = Integer.parseInt(this.getConfigurationParameter("proxy.port", () -> String.valueOf(this.configuration.getPort()), "14080"));
     }
     
-    protected CompletionStage<AuthenticationKey> resolveKey(UUID keyId)
+    protected void resolveKey(UUID keyId, BiConsumer<AuthenticationKey, UUID> callback)
     {
-        return this.client.getProxyKeyLookup().lookupProxyKey(keyId)
-                .thenApply((key) -> key == null || key.isRevoked()? null : key.toAuthenticationKey());
+        // TODO: cache keys
+        // fire off the lookup
+        LookupProxyKey lookup = new LookupProxyKey(keyId, this.client.getId());
+        this.proxyKeyLookups.put(lookup.getId(), callback);
+        this.client.getProcessorDispatcher().dispatch(lookup);
     }
     
     protected MessageProcessor.Factory createMessageProcessorFactory()
@@ -108,7 +119,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
                         return new WorkerProxyProcessor(
                             clientHeaders, 
                             channel,
-                            client.registerWorker(DAEMON_NAME, clientHeaders.getUserAgent(), clientHeaders.getSiteIds(), clientHeaders.getWorkerPool(), clientHeaders.getEngines()),
+                            client.registerWorker(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getSiteIds(), clientHeaders.getWorkerPool(), clientHeaders.getEngines()),
                             client
                         );
                     }
@@ -125,7 +136,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
                         return new NotifierProxyProcessor(
                             clientHeaders, 
                             channel, 
-                            client.registerNotifier(DAEMON_NAME, clientHeaders.getUserAgent(), clientHeaders.getSiteIds(), clientHeaders.getEngines())
+                            client.registerNotifier(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getSiteIds(), clientHeaders.getEngines())
                         );
                     }
                     catch (Exception e)
@@ -173,16 +184,45 @@ public class BergamotProxy implements Configurable<ProxyCfg>
         this.shutdownLatch = new CountDownLatch(1);
         // connect to the scheduler
         logger.info("Connecting to cluster");
-        this.client = new HZProxyClient(this.configuration.getCluster(), this::clusterPanic);
+        this.client = new HZProxyClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
         // start our server
         this.server = new BergamotProxyServer(this.port, this::resolveKey, this.createMessageProcessorFactory());
         this.server.start();
+        // start consuming our messages
+        this.startConsuming();
         logger.info("Bergamot Proxy started.");
+    }
+    
+    protected void startConsuming() throws Exception
+    {
+        logger.info("Starting consuming proxy messages");
+        this.client.getProxyConsumer().start(this.server.getServerExecutor(), this::processProxyMessage);
+    }
+    
+    protected void processProxyMessage(ProxyMessage message)
+    {
+        if (message instanceof FoundProxyKey)
+        {
+            BiConsumer<AuthenticationKey, UUID> callback = this.proxyKeyLookups.remove(message.getReplyTo());
+            if (callback != null)
+            {
+                FoundProxyKey found = (FoundProxyKey) message;
+                callback.accept(found.getKey() == null ? null : new AuthenticationKey(found.getKey()), found.getSiteId());
+            }
+        }
+    }
+    
+    protected void stopConsuming()
+    {
+        logger.info("Stopping consuming proxy messages");
+        this.client.getProxyConsumer().stop();
     }
     
     protected void stop()
     {
         logger.info("Bergamot Proxy stopping....");
+        // Stop consuming
+        this.stopConsuming();
         // stop our server
         this.server.stop();
         // disconnect from the scheduler

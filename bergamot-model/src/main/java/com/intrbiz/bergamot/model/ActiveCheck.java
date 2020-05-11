@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.express.BergamotEntityResolver;
 import com.intrbiz.bergamot.express.BergamotExpressExtensionRegistry;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.util.Parameter;

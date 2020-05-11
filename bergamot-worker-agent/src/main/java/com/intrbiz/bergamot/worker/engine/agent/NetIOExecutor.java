@@ -10,9 +10,9 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckNetIO;
 import com.intrbiz.bergamot.model.message.agent.stat.NetIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.netio.NetIOInfo;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
@@ -85,7 +85,7 @@ public class NetIOExecutor extends AbstractExecutor<AgentEngine>
                             ).collect(Collectors.joining("; "))
                     ).runtime(runtime));
                     // readings
-                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
+                    ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     for (NetIOInfo iface : stat.getIfaces())
                     {
                         // rate

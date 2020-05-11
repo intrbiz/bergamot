@@ -1,13 +1,14 @@
-package com.intrbiz.bergamot.model.message.proxy;
+package com.intrbiz.bergamot.model.message.worker.agent;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.intrbiz.bergamot.model.message.processor.agent.LookupAgentKey;
 
 /**
  * Found an agent key
  */
-@JsonTypeName("bergamot.proxy.found.agent.key")
-public class FoundAgentKey extends ProxyMessage
+@JsonTypeName("bergamot.worker.agent.key")
+public class FoundAgentKey extends WorkerAgentMessage
 {
     private static final long serialVersionUID = 1L;
     
@@ -18,10 +19,16 @@ public class FoundAgentKey extends ProxyMessage
     {
         super();
     }
+    
+    public FoundAgentKey(LookupAgentKey replyTo)
+    {
+        super(replyTo);
+        this.setWorkerId(replyTo.getWorkerId());
+    }
 
     public FoundAgentKey(LookupAgentKey replyTo, String key)
     {
-        super(replyTo);
+        this(replyTo);
         this.key = key;
     }
 

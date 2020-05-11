@@ -10,9 +10,9 @@ import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIOInfo;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
@@ -86,7 +86,7 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
                             ).collect(Collectors.joining("; "))
                     ).runtime(runtime));
                     // readings
-                    ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
+                    ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     for (DiskIOInfo disk : stat.getDisks())
                     {
                         // rate

@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 import org.junit.Before;
 
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
@@ -38,7 +38,7 @@ public abstract class BaseSSHTest
             }
 
             @Override
-            public void publishAgentAction(AgentMessage event)
+            public void publishAgentAction(ProcessorAgentMessage event)
             {
             }
 
@@ -58,7 +58,7 @@ public abstract class BaseSSHTest
             }
 
             @Override
-            public void publishReading(ReadingParcelMO readingParcelMO)
+            public void publishReading(ReadingParcelMessage readingParcelMO)
             {
             }            
         });
@@ -72,7 +72,7 @@ public abstract class BaseSSHTest
         this.run(check, onResult, null);
     }
     
-    protected void run(ExecuteCheck check, Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
+    protected void run(ExecuteCheck check, Consumer<ResultMessage> onResult, Consumer<ReadingParcelMessage> onReading)
     {
         TestContext context = new TestContext(onResult, onReading);
         this.engine.execute(check, context);
@@ -82,16 +82,16 @@ public abstract class BaseSSHTest
     {
         private Consumer<ResultMessage> onResult;
         
-        private Consumer<ReadingParcelMO> onReading;
+        private Consumer<ReadingParcelMessage> onReading;
         
-        public TestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMO> onReading)
+        public TestContext(Consumer<ResultMessage> onResult, Consumer<ReadingParcelMessage> onReading)
         {
             this.onResult = onResult;
             this.onReading = onReading;
         }
 
         @Override
-        public void publishReading(ReadingParcelMO readingParcelMO)
+        public void publishReading(ReadingParcelMessage readingParcelMO)
         {
             if (this.onReading != null)
                 this.onReading.accept(readingParcelMO);

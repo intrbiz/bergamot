@@ -18,6 +18,8 @@ public class ZKPaths
     
     public static final String PROCESSORS = "processors";
     
+    public static final String PROXIES = "proxies";
+    
     public static final String AGENTS = "agents";
     
     public static final String POOLS = "pools";

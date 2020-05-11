@@ -9,43 +9,75 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.WorkerDispatcher;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.HostCfg;
 import com.intrbiz.bergamot.config.validator.ValidatedBergamotConfiguration;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
+import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
 import com.intrbiz.bergamot.model.message.processor.agent.AgentRegister;
+import com.intrbiz.bergamot.model.message.processor.agent.LookupAgentKey;
+import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
+import com.intrbiz.bergamot.model.message.worker.agent.FoundAgentKey;
 
-public class AgentRegistrationService
+public class AgentProcessorService
 {
-    private static final Logger logger = Logger.getLogger(AgentRegistrationService.class);
+    private static final Logger logger = Logger.getLogger(AgentProcessorService.class);
     
     private final SchedulingTopic schedulingTopic;
     
     private final NotificationDispatcher notificationDispatcher;
     
+    private final WorkerDispatcher workerDispatcher;
+    
     private final int schedulingPoolCount;
     
-    public AgentRegistrationService(SchedulingTopic schedulingTopic, NotificationDispatcher notificationDispatcher, int schedulingPoolCount)
+    public AgentProcessorService(SchedulingTopic schedulingTopic, NotificationDispatcher notificationDispatcher, WorkerDispatcher workerDispatcher, int schedulingPoolCount)
     {
         super();
         this.schedulingTopic = schedulingTopic;
         this.notificationDispatcher = notificationDispatcher;
+        this.workerDispatcher = workerDispatcher;
         this.schedulingPoolCount = schedulingPoolCount;
     }
     
-    public void process(AgentMessage event)
+    public void process(ProcessorAgentMessage message)
     {
-        if (event instanceof AgentRegister)
+        if (message instanceof LookupAgentKey)
         {
-            this.processAgentRegister((AgentRegister) event);
+            this.lookupAgentKey((LookupAgentKey) message);
         }
+        else if (message instanceof AgentRegister)
+        {
+            this.processAgentRegister((AgentRegister) message);
+        }
+    }
+    
+    protected void lookupAgentKey(LookupAgentKey lookup)
+    {
+        FoundAgentKey reply = new FoundAgentKey(lookup);
+        try
+        {
+            try (BergamotDB db = BergamotDB.connect())
+            {
+                AgentKey key = db.getAgentKey(lookup.getKeyId());
+                if (key != null && (! key.isRevoked()))
+                {
+                    reply.setKey(key.toAgentAuthenticationKey().toString());
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            logger.warn("Failed to lookup agent key", e);
+        }
+        this.workerDispatcher.dispatch(reply);
     }
     
     protected void processAgentRegister(AgentRegister agent)

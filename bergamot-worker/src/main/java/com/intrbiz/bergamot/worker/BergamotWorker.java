@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,11 +33,15 @@ import com.intrbiz.bergamot.cluster.client.proxy.ProxyWorkerClient;
 import com.intrbiz.bergamot.config.LoggingCfg;
 import com.intrbiz.bergamot.config.WorkerCfg;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.agent.LookupAgentKey;
+import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
+import com.intrbiz.bergamot.model.message.worker.WorkerMessage;
+import com.intrbiz.bergamot.model.message.worker.agent.FoundAgentKey;
+import com.intrbiz.bergamot.model.message.worker.agent.WorkerAgentMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.Engine;
 import com.intrbiz.bergamot.worker.engine.EngineContext;
@@ -96,6 +102,8 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     private ExecutorService executor;
 
     private volatile CountDownLatch shutdownLatch;
+    
+    private final ConcurrentMap<UUID, Consumer<AgentAuthenticationKey>> agentKeyLookups = new ConcurrentHashMap<>();
 
     public BergamotWorker()
     {
@@ -198,11 +206,15 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             @Override
             public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
             {
-                client.getAgentKeyLookup().lookupAgentKey(keyId, callback);
+                // TODO: caching
+                // fire off lookup
+                LookupAgentKey lookup = new LookupAgentKey(keyId, client.getId());
+                agentKeyLookups.put(lookup.getId(), callback);
+                client.getProcessorDispatcher().dispatch(lookup);
             }
 
             @Override
-            public void publishAgentAction(AgentMessage event)
+            public void publishAgentAction(ProcessorAgentMessage event)
             {
                 client.getProcessorDispatcher().dispatchAgentMessage(event);
             }
@@ -240,7 +252,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             }
 
             @Override
-            public void publishReading(ReadingParcelMO reading)
+            public void publishReading(ReadingParcelMessage reading)
             {
                 client.getProcessorDispatcher().dispatchReading(reading);
             }
@@ -252,7 +264,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         if (! Util.isEmpty(ProxyBaseClient.getProxyUrl(this.configuration.getCluster())))
         {
             logger.info("Connecting to proxy");
-            this.client = new ProxyWorkerClient(this.configuration.getCluster(), this::clusterPanic, BergamotVersion.fullVersionString(), this.workerPool, this.engines.keySet());
+            this.client = new ProxyWorkerClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString(), this.workerPool, this.engines.keySet());
         }
         else
         {
@@ -286,7 +298,32 @@ public class BergamotWorker implements Configurable<WorkerCfg>
     protected void startConsuming() throws Exception
     {
         logger.info("Starting consuming checks");
-        this.client.getWorkerConsumer().start(this.executor, this::executeCheck);
+        this.client.getWorkerConsumer().start(this.executor, this::processMessage);
+    }
+    
+    protected void processMessage(WorkerMessage message)
+    {
+        if (message instanceof ExecuteCheck)
+        {
+            this.executeCheck((ExecuteCheck) message);
+        }
+        else if (message instanceof WorkerAgentMessage)
+        {
+            this.processAgentMessage((WorkerAgentMessage) message);
+        }
+    }
+    
+    protected void processAgentMessage(WorkerAgentMessage message)
+    {
+        if (message instanceof FoundAgentKey)
+        {
+            Consumer<AgentAuthenticationKey> callback = this.agentKeyLookups.remove(message.getReplyTo());
+            if (callback != null)
+            {
+                FoundAgentKey found = (FoundAgentKey) message;
+                callback.accept(found.getKey() == null ? null : new AgentAuthenticationKey(found.getKey()));
+            }
+        }
     }
 
     protected void executeCheck(ExecuteCheck check)
@@ -321,15 +358,15 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             @Override
             public void publishResult(ResultMessage result)
             {
-                result.setProcessor(check.getProcessor());
-                client.getProcessorDispatcher().dispatchResult(check.getProcessor(), result);
+                result.setProcessorId(check.getProcessorId());
+                client.getProcessorDispatcher().dispatchResult(result);
             }
 
             @Override
-            public void publishReading(ReadingParcelMO reading)
+            public void publishReading(ReadingParcelMessage reading)
             {
-                reading.setProcessor(check.getProcessor());
-                client.getProcessorDispatcher().dispatchReading(check.getProcessor(), reading);
+                reading.setProcessorId(check.getProcessorId());
+                client.getProcessorDispatcher().dispatchReading(reading);
             }
         };
     }

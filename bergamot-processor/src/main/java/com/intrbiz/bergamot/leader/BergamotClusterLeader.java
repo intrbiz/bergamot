@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
 import com.intrbiz.bergamot.cluster.consumer.ProcessorConsumer;
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
-import com.intrbiz.bergamot.cluster.dispatcher.CheckDispatcher;
+import com.intrbiz.bergamot.cluster.dispatcher.WorkerDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.NotificationDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.election.LeaderElector;
@@ -51,7 +51,7 @@ public class BergamotClusterLeader
             ProcessorDispatcher processorDispatcher,
             WorkerRegistry workerRegistry, 
             Function<UUID, WorkerConsumer> workerConsumerFactory, 
-            CheckDispatcher checkDispatcher,
+            WorkerDispatcher checkDispatcher,
             NotifierRegistry notifierRegistry, 
             Function<UUID, NotificationConsumer> notificationConsumerFactory, 
             NotificationDispatcher notificationDispatcher

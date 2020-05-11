@@ -5,48 +5,41 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.Message;
 
-
 /**
  * A message which is directed to a processing pool
  */
 public abstract class ProcessorMessage extends Message
 {
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * The processor to which this message is destined
      */
-    @JsonProperty("processor")
-    private UUID processor;
-    
-    /**
-     * The worker which generated this message
-     */
-    @JsonProperty("worker")
-    private UUID worker;
+    @JsonProperty("processor_id")
+    private UUID processorId;
 
     public ProcessorMessage()
     {
         super();
     }
 
-    public UUID getProcessor()
+    public ProcessorMessage(Message replyTo)
     {
-        return this.processor;
+        super(replyTo);
     }
 
-    public void setProcessor(UUID processor)
+    public ProcessorMessage(UUID replyTo)
     {
-        this.processor = processor;
+        super(replyTo);
     }
 
-    public UUID getWorker()
+    public UUID getProcessorId()
     {
-        return this.worker;
+        return this.processorId;
     }
 
-    public void setWorker(UUID worker)
+    public void setProcessorId(UUID processorId)
     {
-        this.worker = worker;
+        this.processorId = processorId;
     }
 }

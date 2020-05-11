@@ -1,4 +1,4 @@
-package com.intrbiz.bergamot.model.message.check;
+package com.intrbiz.bergamot.model.message.worker.check;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -8,8 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.ParameterisedMO;
+import com.intrbiz.bergamot.model.message.worker.WorkerMessage;
 
-public class CheckMessage extends Message implements ParameterisedMO
+public class CheckMessage extends WorkerMessage implements ParameterisedMO
 {
     private static final long serialVersionUID = 1L;
 
@@ -30,37 +31,39 @@ public class CheckMessage extends Message implements ParameterisedMO
 
     @JsonProperty("site_id")
     private UUID siteId;
-    
+
     @JsonProperty("worker_pool")
     private String workerPool;
 
     @JsonProperty("parameters")
-    private List<ParameterMO> parameters = new LinkedList<ParameterMO>(); 
-    
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
+
     /**
-     * An id added to adhoc checks to correlate 
-     * them with with the originator.  This must 
-     * be null for normal check executions
+     * An id added to adhoc checks to correlate them with with the originator. This must be null for normal check executions
      */
     @JsonProperty("adhoc_id")
     private UUID adhocId;
-    
+
     /**
      * The processor responsible for this check
      */
-    @JsonProperty("processor")
-    private UUID processor;
-    
-    /**
-     * The worker that is going to execute this check
-     */
-    @JsonProperty("worker")
-    private UUID worker;
-    
+    @JsonProperty("processor_id")
+    private UUID processorId;
+
     public CheckMessage()
     {
         super();
-    }    
+    }
+
+    public CheckMessage(Message replyTo)
+    {
+        super(replyTo);
+    }
+
+    public CheckMessage(UUID replyTo)
+    {
+        super(replyTo);
+    }
 
     public String getEngine()
     {
@@ -134,14 +137,14 @@ public class CheckMessage extends Message implements ParameterisedMO
         this.parameters = parameters;
     }
 
-    public UUID getProcessor()
+    public UUID getProcessorId()
     {
-        return this.processor;
+        return this.processorId;
     }
 
-    public void setProcessor(UUID processor)
+    public void setProcessorId(UUID processorId)
     {
-        this.processor = processor;
+        this.processorId = processorId;
     }
 
     public String getWorkerPool()
@@ -162,15 +165,5 @@ public class CheckMessage extends Message implements ParameterisedMO
     public void setAdhocId(UUID adhocId)
     {
         this.adhocId = adhocId;
-    }
-
-    public UUID getWorker()
-    {
-        return this.worker;
-    }
-
-    public void setWorker(UUID worker)
-    {
-        this.worker = worker;
     }
 }

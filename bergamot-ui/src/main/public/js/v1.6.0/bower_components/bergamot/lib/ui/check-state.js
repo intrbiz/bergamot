@@ -23,7 +23,7 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	    this.$node.find("h3 span.dash_img").attr("class", "dash_img status_" + check.state.status.toLowerCase());
 	    this.$node.find("h3 span.dash_img").attr("title", "The check is " + check.state.status.toLowerCase());
 	    this.$node.find("p.field-status span.value").text(check.state.status.toUpperCase().substring(0,1) + check.state.status.toLowerCase().substring(1));
-	    this.$node.find("p.field-output span.value").text(check.state.output);
+	    this.$node.find("p.field-output").text(check.state.output);
 	    // last check time
 	    this.$node.find("p.field-last-checked span.value").text(this.formatDate(check.state.last_check_time));
 	    // attempt
@@ -92,10 +92,10 @@ define(['flight/lib/component', 'bergamot/lib/api', 'bergamot/lib/util/logger'],
 	{
 	    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	    var theDate = new Date(date);
-	    return this.formatDigit(theDate.getHours()) + ":" + this.formatDigit(theDate.getMinutes()) + ":" + this.formatDigit(theDate.getSeconds()) + 
+	    return this.formatDigit(theDate.getUTCHours()) + ":" + this.formatDigit(theDate.getUTCMinutes()) + ":" + this.formatDigit(theDate.getUTCSeconds()) + 
 	           " on " + 
-	           days[theDate.getDay()] + " " + 
-		   this.formatDigit(theDate.getDate() + 1) + "/" + this.formatDigit(theDate.getMonth() + 1) + "/" + theDate.getFullYear();
+	           days[theDate.getUTCDay()] + " " + 
+		   this.formatDigit(theDate.getUTCDate() + 1) + "/" + this.formatDigit(theDate.getUTCMonth() + 1) + "/" + theDate.getUTCFullYear();
 	    
 	};
 	

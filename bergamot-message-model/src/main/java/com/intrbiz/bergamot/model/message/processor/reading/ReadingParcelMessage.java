@@ -26,8 +26,8 @@ import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
  * A collection of readings which related to a specific 
  * check
  */
-@JsonTypeName("bergamot.reading.parcel")
-public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, ParameterisedMO, ProcessorHashable
+@JsonTypeName("bergamot.processor.reading.parcel")
+public class ReadingParcelMessage extends ProcessorMessage implements MatchableMO, ParameterisedMO, ProcessorHashable
 {
     private static final long serialVersionUID = 1L;
 
@@ -55,7 +55,7 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     @JsonProperty("parameters")
     private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
     
-    public ReadingParcelMO()
+    public ReadingParcelMessage()
     {
         super();
     }
@@ -119,7 +119,7 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     //
     
     @JsonIgnore
-    public ReadingParcelMO fromCheck(UUID checkId)
+    public ReadingParcelMessage fromCheck(UUID checkId)
     {
         this.setSiteId(SiteMO.getSiteId(checkId));
         this.setMatchOn(new MatchOnCheckId(checkId));
@@ -129,7 +129,7 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     }
     
     @JsonIgnore
-    public ReadingParcelMO matchOn(UUID siteId, MatchOn match)
+    public ReadingParcelMessage matchOn(UUID siteId, MatchOn match)
     {
         this.setSiteId(siteId);
         this.setMatchOn(match);
@@ -139,21 +139,21 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     }
     
     @JsonIgnore
-    public ReadingParcelMO captured(long captured)
+    public ReadingParcelMessage captured(long captured)
     {
         this.setCaptured(captured);
         return this;
     }
     
     @JsonIgnore
-    public ReadingParcelMO captured(Date captured)
+    public ReadingParcelMessage captured(Date captured)
     {
         this.setCaptured(captured.getTime());
         return this;
     }
     
     @JsonIgnore
-    public ReadingParcelMO reading(Reading reading)
+    public ReadingParcelMessage reading(Reading reading)
     {
         if (reading != null)
             this.getReadings().add(reading);
@@ -165,14 +165,14 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     // double
     
     @JsonIgnore
-    public ReadingParcelMO doubleGaugeReading(String name, String unit, Double value, Double warning, Double critical, Double min, Double max)
+    public ReadingParcelMessage doubleGaugeReading(String name, String unit, Double value, Double warning, Double critical, Double min, Double max)
     {
         this.getReadings().add(new DoubleGaugeReading(name, unit, value, warning, critical, min, max));
         return this;
     }
     
     @JsonIgnore
-    public ReadingParcelMO doubleGaugeReading(String name, String unit, Double value)
+    public ReadingParcelMessage doubleGaugeReading(String name, String unit, Double value)
     {
         this.getReadings().add(new DoubleGaugeReading(name, unit, value));
         return this;
@@ -181,14 +181,14 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     // float
     
     @JsonIgnore
-    public ReadingParcelMO floatGaugeReading(String name, String unit, Float value, Float warning, Float critical, Float min, Float max)
+    public ReadingParcelMessage floatGaugeReading(String name, String unit, Float value, Float warning, Float critical, Float min, Float max)
     {
         this.getReadings().add(new FloatGaugeReading(name, unit, value, warning, critical, min, max));
         return this;
     }
     
     @JsonIgnore
-    public ReadingParcelMO floatGaugeReading(String name, String unit, Float value)
+    public ReadingParcelMessage floatGaugeReading(String name, String unit, Float value)
     {
         this.getReadings().add(new FloatGaugeReading(name, unit, value));
         return this;
@@ -197,14 +197,14 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     // long
     
     @JsonIgnore
-    public ReadingParcelMO longGaugeReading(String name, String unit, Long value, Long warning, Long critical, Long min, Long max)
+    public ReadingParcelMessage longGaugeReading(String name, String unit, Long value, Long warning, Long critical, Long min, Long max)
     {
         this.getReadings().add(new LongGaugeReading(name, unit, value, warning, critical, min, max));
         return this;
     }
     
     @JsonIgnore
-    public ReadingParcelMO longGaugeReading(String name, String unit, Long value)
+    public ReadingParcelMessage longGaugeReading(String name, String unit, Long value)
     {
         this.getReadings().add(new LongGaugeReading(name, unit, value));
         return this;
@@ -213,14 +213,14 @@ public class ReadingParcelMO extends ProcessorMessage implements MatchableMO, Pa
     // int
     
     @JsonIgnore
-    public ReadingParcelMO integerGaugeReading(String name, String unit, Integer value, Integer warning, Integer critical, Integer min, Integer max)
+    public ReadingParcelMessage integerGaugeReading(String name, String unit, Integer value, Integer warning, Integer critical, Integer min, Integer max)
     {
         this.getReadings().add(new IntegerGaugeReading(name, unit, value, warning, critical, min, max));
         return this;
     }
     
     @JsonIgnore
-    public ReadingParcelMO integerGaugeReading(String name, String unit, Integer value)
+    public ReadingParcelMessage integerGaugeReading(String name, String unit, Integer value)
     {
         this.getReadings().add(new IntegerGaugeReading(name, unit, value));
         return this;

@@ -1,6 +1,6 @@
 package com.intrbiz.lamplighter.reading;
 
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 
 
 /**
@@ -16,5 +16,5 @@ public interface ReadingProcessor
      * Process the readings of a check which executed
      * @param readings - the readings to process
      */
-    void process(ReadingParcelMO readings);
+    void process(ReadingParcelMessage readings);
 }

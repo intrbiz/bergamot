@@ -17,30 +17,27 @@
 					<span class="name">#{ucFirst(coalesce(processor.application, 'Processor'))}</span>
 					<span class="name" style="font-size: 12px">(#{processor.id})</span>
 			    </h3>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">State: </span>
 				    <span class="value">#{ucFirst(lc(processor_leaders.get(processor.id).state))}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Dispatcher: </span>
 				    <span class="value">#{processor_tail.get(processor.id)}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Consumer: </span>
 				    <span class="value">#{processor_commited.get(processor.id)}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Host: </span>
 				    <span class="value">#{processor.hostName}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Pools: </span>
 				    <span class="value">#{processor_pools.get(processor.id)}</span>
 			    </p>
-			    <p>
-				    <span class="label">&nbsp;</span>
-				    <span class="value">#{processor.info}</span>
-			    </p>
+			    <p class="output">#{processor.info}</p>
 			</div>
 		</data-set>
     </div>
@@ -70,26 +67,27 @@
 					<span class="name">#{ucFirst(coalesce(worker.application, 'Worker'))}</span>
 					<span class="name" style="font-size: 12px">(#{worker.id})</span>
 			    </h3>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Worker Pool: </span>
 				    <span class="value">#{coalesce(worker.workerPool, 'any')}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Dispatcher: </span>
 				    <span class="value">#{worker_tail.get(worker.id)}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Consumer: </span>
 				    <span class="value">#{worker_commited.get(worker.id)}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Host: </span>
 				    <span class="value">#{worker.hostName}</span>
 			    </p>
-			    <p>
-				    <span class="label">&nbsp;</span>
-				    <span class="value">#{worker.info}</span>
+			    <p rendered="#{worker.proxy}" class="stacked">
+				    <span class="label">Via: </span>
+				    <span class="value">#{worker.proxyId}</span>
 			    </p>
+			    <p class="output">#{worker.info}</p>
 			</div>
 		</data-set>
     </div>
@@ -105,46 +103,54 @@
 					<span class="name">#{ucFirst(coalesce(notifier.application, 'Notifier'))}</span>
 					<span class="name" style="font-size: 12px">(#{notifier.id})</span>
 			    </h3>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Dispatcher: </span>
 				    <span class="value">#{notifier_tail.get(notifier.id)}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Consumer: </span>
 				    <span class="value">#{notifier_commited.get(notifier.id)}</span>
 			    </p>
-			    <p>
+			    <p class="stacked">
 				    <span class="label">Host: </span>
 				    <span class="value">#{notifier.hostName}</span>
 			    </p>
-			    <p>
-				    <span class="label">&nbsp;</span>
-				    <span class="value">#{notifier.info}</span>
+			    <p rendered="#{notifier.proxy}" class="stacked">
+				    <span class="label single">Via: </span>
+				    <span class="value single">#{notifier.proxyId}</span>
 			    </p>
+			    <p class="output">#{notifier.info}</p>
 			</div>
 		</data-set>
     </div>
     
-    <!--
     <div class="row">
-		<h3 title="The processing pools in this Bergamot cluster which can schedule checks and process results">Processing Pools</h3>
-		<data-set var="processor" value="#{cluster_info.processors}">
+		<h3>Proxies</h3>
+		<data-set var="proxy" value="#{proxies}">
 			<div class="col3 dash_icon check">
 				<h3>
-					<span class="dash_img status_ok" title="Member #{processor.address}">
+					<span class="dash_img status_ok" title="Proxy #{proxy.id}">
 						<img src="#{public('/images/icons/64/bergamot.png')}" />
 					</span>
-					<span class="name" title="The member this processor resides on">Member #{processor.address}</span>
-					<span class="name" style="font-size: 12px">(#{processor.uuid})</span>
+					<span class="name">#{ucFirst(coalesce(proxy.application, 'Proxy'))}</span>
+					<span class="name" style="font-size: 12px">(#{proxy.id})</span>
 			    </h3>
-			    <p>
-				    <span class="label" title="The number of site pools being processed">Site Pools: </span>
-				    <span class="value">#{processor.pools.size}</span>
+			    <p class="stacked">
+				    <span class="label">Dispatcher: </span>
+				    <span class="value">#{proxy_tail.get(proxy.id)}</span>
 			    </p>
+			    <p class="stacked">
+				    <span class="label">Consumer: </span>
+				    <span class="value">#{proxy_commited.get(proxy.id)}</span>
+			    </p>
+			    <p class="stacked">
+				    <span class="label">Host: </span>
+				    <span class="value">#{proxy.hostName}</span>
+			    </p>
+			    <p class="output">#{proxy.info}</p>
 			</div>
 		</data-set>
-	</div>
-	-->
+    </div>
 	
     <div class="row">
 		<h3>Worker Routes</h3>

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
- * Lookup agent key
+ * State update for an agent via the proxy protocol
  */
 @JsonTypeName("bergamot.proxy.agent.state")
 public class AgentState extends ProxyMessage

@@ -4,20 +4,17 @@ import java.util.UUID;
 
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
-import com.intrbiz.bergamot.cluster.lookup.AgentKeyLookup;
 
 /**
  * A Bergamot Worker node client
  */
 public interface WorkerClient extends BergamotClient
 {   
-    public WorkerConsumer getWorkerConsumer();
+    WorkerConsumer getWorkerConsumer();
 
-    public ProcessorDispatcher getProcessorDispatcher();
-    
-    public AgentKeyLookup getAgentKeyLookup();
+    ProcessorDispatcher getProcessorDispatcher();
 
-    public void registerAgent(UUID agentId) throws Exception;
+    void registerAgent(UUID agentId) throws Exception;
     
-    public void unregisterAgent(UUID agentId) throws Exception;
+    void unregisterAgent(UUID agentId) throws Exception;
 }

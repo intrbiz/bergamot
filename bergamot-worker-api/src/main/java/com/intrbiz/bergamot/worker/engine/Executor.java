@@ -1,6 +1,6 @@
 package com.intrbiz.bergamot.worker.engine;
 
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 
 /**
  * Executors execute a particular check.

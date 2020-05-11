@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.model.message.notification;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,6 +16,9 @@ import com.intrbiz.bergamot.model.message.SiteMO;
 public abstract class Notification extends Message
 {
     private static final long serialVersionUID = 1L;
+    
+    @JsonProperty("notifier_id")
+    private UUID notifierId;
     
     @JsonProperty("raised")
     private long raised;
@@ -81,5 +85,15 @@ public abstract class Notification extends Message
     public void setSite(SiteMO site)
     {
         this.site = site;
+    }
+
+    public UUID getNotifierId()
+    {
+        return this.notifierId;
+    }
+
+    public void setNotifierId(UUID notifierId)
+    {
+        this.notifierId = notifierId;
     }
 }

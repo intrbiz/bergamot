@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Timer;
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
@@ -70,7 +70,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
     {
         logger.debug("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
-        ReadingParcelMO readings = new ReadingParcelMO().fromCheck(executeCheck.getCheckId());
+        ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId());
         try
         {
             // validate the command line

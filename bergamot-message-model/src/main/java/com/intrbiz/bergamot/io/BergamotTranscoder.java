@@ -65,14 +65,12 @@ import com.intrbiz.bergamot.model.message.api.update.RegisteredForUpdates;
 import com.intrbiz.bergamot.model.message.api.update.UpdateEvent;
 import com.intrbiz.bergamot.model.message.api.util.APIPing;
 import com.intrbiz.bergamot.model.message.api.util.APIPong;
-import com.intrbiz.bergamot.model.message.check.ExecuteCheck;
-import com.intrbiz.bergamot.model.message.check.RegisterCheck;
-import com.intrbiz.bergamot.model.message.check.UnregisterCheck;
 import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
 import com.intrbiz.bergamot.model.message.cluster.NodeRegistration;
 import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
 import com.intrbiz.bergamot.model.message.cluster.PoolRegistration;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
+import com.intrbiz.bergamot.model.message.cluster.ProxyRegistration;
 import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
 import com.intrbiz.bergamot.model.message.event.global.FlushGlobalCaches;
@@ -92,7 +90,9 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 import com.intrbiz.bergamot.model.message.notification.U2FADeviceRegistered;
 import com.intrbiz.bergamot.model.message.processor.agent.AgentRegister;
-import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMO;
+import com.intrbiz.bergamot.model.message.processor.agent.LookupAgentKey;
+import com.intrbiz.bergamot.model.message.processor.proxy.LookupProxyKey;
+import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnAgentId;
@@ -105,14 +105,16 @@ import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnServiceN
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnTrapExternalRef;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnTrapName;
 import com.intrbiz.bergamot.model.message.proxy.AgentState;
-import com.intrbiz.bergamot.model.message.proxy.FoundAgentKey;
-import com.intrbiz.bergamot.model.message.proxy.LookupAgentKey;
 import com.intrbiz.bergamot.model.message.report.SLAReportMO;
 import com.intrbiz.bergamot.model.message.scheduler.ScheduleCheck;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
 import com.intrbiz.bergamot.model.message.state.CheckStatsMO;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.bergamot.model.message.state.GroupStateMO;
+import com.intrbiz.bergamot.model.message.worker.agent.FoundAgentKey;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
+import com.intrbiz.bergamot.model.message.worker.check.RegisterCheck;
+import com.intrbiz.bergamot.model.message.worker.check.UnregisterCheck;
 import com.intrbiz.gerald.polyakov.io.PolyakovTranscoder;
 
 /**
@@ -149,40 +151,7 @@ public class BergamotTranscoder
         SLAMO.class,
         SLARollingPeriodMO.class,
         SLAFixedPeriodMO.class,
-        // model
-        ParameterMO.class,
-        // messages
-        // check
-        ExecuteCheck.class,
-        ActiveResult.class,
-        PassiveResult.class,
-        MatchOnAgentId.class,
-        MatchOnCheckId.class,
-        MatchOnHostAddress.class,
-        MatchOnHostName.class,
-        MatchOnServiceName.class,
-        MatchOnTrapName.class,
-        MatchOnHostExternalRef.class,
-        MatchOnServiceExternalRef.class,
-        MatchOnTrapExternalRef.class,
-        ReadingParcelMO.class,
         CheckReadingMO.class,
-        // notifications
-        SendAlert.class,
-        SendRecovery.class,
-        PasswordResetNotification.class,
-        RegisterContactNotification.class,
-        SendAcknowledge.class,
-        U2FADeviceRegistered.class,
-        BackupCodeUsed.class,
-        SendUpdate.class,
-        // updates
-        CheckUpdate.class,
-        GroupUpdate.class,
-        LocationUpdate.class,
-        AlertUpdate.class,
-        // scheduler
-        ScheduleCheck.class,
         // API
         APIError.class,
         APIPing.class,
@@ -198,38 +167,67 @@ public class BergamotTranscoder
         AdhocResultEvent.class,
         ExecuteAdhocCheck.class,
         ExecutedAdhocCheck.class,
-        // watcher
-        RegisterCheck.class,
-        UnregisterCheck.class,
-        // auth
+        // model
+        ParameterMO.class,
         AuthTokenMO.class,
-        // stats
         CheckStatsMO.class,
         CheckTransitionMO.class,
-        // cluster manager
-        InitSite.class,
-        FlushGlobalCaches.class,
-        DeinitSite.class,
-        // util models
+        SLAReportMO.class,
         BergamotImportReportMO.class,
         AppliedConfigChange.class,
         BergamotValidationReportMO.class,
         VerifiedCommand.class,
-        // agent events
-        AgentRegister.class,
-        // reports
-        SLAReportMO.class,
-        // cluster registry
+        // cluster
         WorkerRegistration.class,
         NotifierRegistration.class,
         ProcessorRegistration.class,
         AgentRegistration.class,
         NodeRegistration.class,
         PoolRegistration.class,
-        // proxy
-        LookupAgentKey.class,
+        ProxyRegistration.class,
+        // events
+        InitSite.class,
+        FlushGlobalCaches.class,
+        DeinitSite.class,
+        // scheduler
+        ScheduleCheck.class,
+        // worker
+        ExecuteCheck.class,
+        RegisterCheck.class,
+        UnregisterCheck.class,
         FoundAgentKey.class,
-        AgentState.class
+        // processor
+        ActiveResult.class,
+        PassiveResult.class,
+        MatchOnAgentId.class,
+        MatchOnCheckId.class,
+        MatchOnHostAddress.class,
+        MatchOnHostName.class,
+        MatchOnServiceName.class,
+        MatchOnTrapName.class,
+        MatchOnHostExternalRef.class,
+        MatchOnServiceExternalRef.class,
+        MatchOnTrapExternalRef.class,
+        ReadingParcelMessage.class,
+        AgentRegister.class,
+        LookupAgentKey.class,
+        LookupProxyKey.class,
+        // proxy
+        AgentState.class,
+        // notifications
+        SendAlert.class,
+        SendRecovery.class,
+        PasswordResetNotification.class,
+        RegisterContactNotification.class,
+        SendAcknowledge.class,
+        U2FADeviceRegistered.class,
+        BackupCodeUsed.class,
+        SendUpdate.class,
+        // updates
+        CheckUpdate.class,
+        GroupUpdate.class,
+        LocationUpdate.class,
+        AlertUpdate.class
     };
     
     private static final BergamotTranscoder DEFAULT = new BergamotTranscoder();
