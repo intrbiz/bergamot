@@ -6,6 +6,8 @@ import com.intrbiz.bergamot.cluster.client.ProxyClient;
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.processor.ProcessorMessage;
+import com.intrbiz.bergamot.model.message.processor.agent.LookupAgentKey;
+import com.intrbiz.bergamot.model.message.processor.proxy.LookupProxyKey;
 import com.intrbiz.bergamot.model.message.proxy.AgentState;
 import com.intrbiz.bergamot.model.message.proxy.ProxyMessage;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
@@ -52,6 +54,18 @@ public class WorkerProxyProcessor extends MessageProcessor
     
     protected void processProcessorMessage(ProcessorMessage message)
     {
+        // Filter and modify certain messages
+        if (message instanceof LookupProxyKey)
+        {
+            // A proxy client cannot access proxy keys
+            return;
+        }
+        else if (message instanceof LookupAgentKey)
+        {
+            // This is because the proxy server owns the worker id and not the client
+            ((LookupAgentKey) message).setWorkerId(this.getId());
+        }
+        // Forward the message
         this.proxyClient.getProcessorDispatcher().dispatch(message);
     }
     

@@ -153,7 +153,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         {
             this.sites.add(UUID.fromString(site));
         }
-        this.workerPool = this.getConfigurationParameter("worker-pool", this.configuration::getWorkerPool, null);
+        this.workerPool = this.getConfigurationParameter("worker.pool", this.configuration::getWorkerPool, null);
         this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", String.valueOf(this.configuration.getThreads())));
         // register engines
         for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
