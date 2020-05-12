@@ -9,12 +9,12 @@ import java.util.List;
 
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.nrpe.model.NRPEPacket;
 import com.intrbiz.bergamot.nrpe.model.NRPEResponse;
+import com.intrbiz.bergamot.nrpe.util.NRPETLSContext;
 
 /**
  * <p>
@@ -42,11 +42,7 @@ import com.intrbiz.bergamot.nrpe.model.NRPEResponse;
  */
 public class NRPEClient implements AutoCloseable
 {
-    public static final String[] CIPHERS = new String[] { "TLS_DH_anon_WITH_AES_128_CBC_SHA" };
-
-    public static final String[] PROTOCOLS = new String[] { "TLSv1" };
-
-    private static final SSLSocketFactory FACTORY = (SSLSocketFactory) SSLSocketFactory.getDefault();
+    private static final NRPETLSContext FACTORY = new NRPETLSContext();
 
     private Logger logger = Logger.getLogger(NRPEClient.class);
 
@@ -58,9 +54,7 @@ public class NRPEClient implements AutoCloseable
     {
         super();
         this.address = new InetSocketAddress(host, port);
-        this.socket = (SSLSocket) FACTORY.createSocket();
-        this.socket.setEnabledProtocols(PROTOCOLS);
-        this.socket.setEnabledCipherSuites(CIPHERS);
+        this.socket = FACTORY.createSSLSocket();
         this.socket.connect(this.address, connectTimeout);
     }
 

@@ -1,21 +1,23 @@
 package com.intrbiz.bergamot.nrpe.netty;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-
+import java.io.EOFException;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.nrpe.model.NRPEPacket;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.ssl.SslHandshakeCompletionEvent;
+
 public class NRPEHandler extends ChannelInboundHandlerAdapter
 {
     private Logger logger = Logger.getLogger(NRPEHandler.class);
     
-    private long start;
+    private long start = -1;
     
-    private long end;
+    private long end = -1;
     
     private NRPEPacket request;
     
@@ -45,11 +47,14 @@ public class NRPEHandler extends ChannelInboundHandlerAdapter
     }
     
     @Override
-    public void channelActive(ChannelHandlerContext ctx)
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception
     {
-        logger.debug("Sending NRPE request");
-        this.start = System.currentTimeMillis();
-        ctx.writeAndFlush(this.request);
+        if (evt instanceof SslHandshakeCompletionEvent)
+        {
+            logger.debug("SSL Handshake complete, sending NRPE request");
+            this.start = System.currentTimeMillis();
+            ctx.writeAndFlush(this.request);
+        }
     }
 
     @Override
@@ -58,5 +63,14 @@ public class NRPEHandler extends ChannelInboundHandlerAdapter
         logger.debug("Error processing NRPE request: " + cause);
         // invoke the callback
         this.errorHandler.accept(cause);
-    }    
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception
+    {
+        if (this.end == -1)
+        {
+            this.errorHandler.accept(new EOFException("Connection closed by NRPE before response received."));
+        }
+    }
 }

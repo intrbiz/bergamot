@@ -1,8 +1,20 @@
 package com.intrbiz.bergamot.nrpe;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+import com.intrbiz.bergamot.nrpe.model.NRPEPacket;
+import com.intrbiz.bergamot.nrpe.model.NRPEResponse;
+import com.intrbiz.bergamot.nrpe.netty.NRPEDecoder;
+import com.intrbiz.bergamot.nrpe.netty.NRPEEncoder;
+import com.intrbiz.bergamot.nrpe.netty.NRPEHandler;
+import com.intrbiz.bergamot.nrpe.util.NRPETLSContext;
+import com.intrbiz.util.IBThreadFactory;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -12,39 +24,26 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import io.netty.util.concurrent.GenericFutureListener;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
-
-import com.intrbiz.bergamot.nrpe.model.NRPEPacket;
-import com.intrbiz.bergamot.nrpe.model.NRPEResponse;
-import com.intrbiz.bergamot.nrpe.netty.NRPEDecoder;
-import com.intrbiz.bergamot.nrpe.netty.NRPEEncoder;
-import com.intrbiz.bergamot.nrpe.netty.NRPEHandler;
-import com.intrbiz.util.IBThreadFactory;
 
 /**
  * A non-blocking, asynchronous NRPE client
  */
 public class NRPEPoller
 {
-    private EventLoopGroup eventLoop;
+    private final EventLoopGroup eventLoop;
 
-    private int defaultRequestTimeoutSeconds;
+    private final int defaultRequestTimeoutSeconds;
 
-    private int defaultConnectTimeoutSeconds;
+    private final int defaultConnectTimeoutSeconds;
+    
+    private final NRPETLSContext sslContext;
 
     public NRPEPoller(int threads, int defaultConnectTimeoutSeconds, int defaultRequestTimeoutSeconds)
     {
         this.defaultRequestTimeoutSeconds = defaultRequestTimeoutSeconds;
         this.defaultConnectTimeoutSeconds = defaultConnectTimeoutSeconds;
+        // create our NRPE SSL context
+        this.sslContext = new NRPETLSContext();
         // setup the Netty event loop
         this.eventLoop = new NioEventLoopGroup(threads, new IBThreadFactory("NRPEPoller", false));
     }
@@ -62,22 +61,6 @@ public class NRPEPoller
     public int getDefaultConnectTimeoutSeconds()
     {
         return defaultConnectTimeoutSeconds;
-    }
-    
-    private SSLEngine createSSLEngine()
-    {
-        try
-        {
-            SSLEngine sslEngine = SSLContext.getDefault().createSSLEngine();
-            sslEngine.setEnabledCipherSuites(NRPEClient.CIPHERS);
-            sslEngine.setEnabledProtocols(NRPEClient.PROTOCOLS);
-            sslEngine.setUseClientMode(true);
-            return sslEngine;
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new RuntimeException("Failed to init SSLEngine", e);
-        }
     }
 
     /**
@@ -109,7 +92,7 @@ public class NRPEPoller
                 ch.pipeline().addLast(
                         new ReadTimeoutHandler(requestTimeout /* seconds */), 
                         new WriteTimeoutHandler(requestTimeout /* seconds */), 
-                        new SslHandler(createSSLEngine()), 
+                        new SslHandler(sslContext.createSSLEngine()), 
                         new NRPEDecoder(), 
                         new NRPEEncoder(),
                         new NRPEHandler(request, responseHandler, errorHandler)
@@ -117,15 +100,11 @@ public class NRPEPoller
             }
         });
         // connect the client
-        b.connect(host, port).addListener(new GenericFutureListener<ChannelFuture>()
+        b.connect(host, port).addListener((future) ->
         {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception
+            if (future.isDone() && (!future.isSuccess()))
             {
-                if (future.isDone() && (!future.isSuccess()))
-                {
-                    errorHandler.accept(future.cause());
-                }
+                errorHandler.accept(future.cause());
             }
         });
     }
