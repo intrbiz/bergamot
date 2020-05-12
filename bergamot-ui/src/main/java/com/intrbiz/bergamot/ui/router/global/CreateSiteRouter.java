@@ -47,7 +47,8 @@ public class CreateSiteRouter extends Router<BergamotApp>
         // decode the form
         decodeOnly("global/site/create");
         // create the site
-        action("site-create", sessionModel("install"));
+        InstallBean bean = sessionModel("install");
+        action("site-create", bean);
         // done!
         redirect(path("/global/admin/"));
     }
