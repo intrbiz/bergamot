@@ -8,7 +8,14 @@
 		<a rendered="#{(!cluster.suppressed) and Balsa().permission('suppress', cluster)}" href="/cluster/suppress/#{host.id}">Suppress</a>
 		<a rendered="#{cluster.enabled and Balsa().permission('disable', cluster)}"        href="/cluster/disable/#{host.id}">Disable</a>
 		<a rendered="#{(!cluster.enabled) and Balsa().permission('enable', cluster)}"      href="/cluster/enable/#{host.id}">Enable</a>
-		<a href="/sla/check/id/#{cluster.id}">SLA Reports</a>
+		<a                                                                                 href="/sla/check/id/#{cluster.id}">SLA Reports</a>
+		<a rendered="#{Balsa().permission('ui.view.stats', cluster)}"                      href="/stats/check/id/#{cluster.id}">Stats</a>
+		<a rendered="#{Balsa().permission('read.config', cluster)}"                        href="/config/check/id/#{cluster.id}">Configuration</a>
+	</div>
+	<div class="row submenu pull-right">
+		<data-set var="group" value="#{cluster.groups}">
+			<a rendered="#{Balsa().permission('read', group)}" href="/group/id/#{group.id}">Back to group #{group.summary}</a>
+		</data-set>
 	</div>
 
 	<div class="row">
@@ -98,23 +105,17 @@
 		</data-set>
 	</div>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{cluster}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
-	
-	<!-- Comments -->
-	<include view="include/comments" data-check="#{cluster}"/>
 	
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{cluster}"/>
 	
-	<!-- Readings -->
-	<include view="include/readings" data-check="#{cluster}"/>
-	
-	<!-- Stats -->
-	<include view="include/check_stats" data-check="#{cluster}"/>
-	
-	<!-- Configuration -->
-	<include view="include/check_configuration" data-check="#{cluster}"/>
+	<!-- Comments -->
+	<include view="include/comments" data-check="#{cluster}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

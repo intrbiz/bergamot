@@ -22,7 +22,7 @@ import com.intrbiz.metadata.Template;
 @RequireValidPrincipal()
 public class StatsRouter extends Router<BergamotApp>
 {   
-    @Any("/transitions/check/id/:id")
+    @Any("/check/id/:id")
     @WithDataAdapter(BergamotDB.class)
     public void index(
             BergamotDB db, 
@@ -32,12 +32,13 @@ public class StatsRouter extends Router<BergamotApp>
     {
         Check<?,?> check = model("check", notNull(db.getCheck(id)));
         require(permission("read", check));
+        require(permission("ui.view.stats", check));
         var("transitions", db.listOlderCheckTransitionsForCheck(id, new Timestamp(System.currentTimeMillis()), limit));
         var("limit", limit);
-        encode("stats/transitions");
+        encode("stats/index");
     }
     
-    @Any("/transitions/check/id/:id/older")
+    @Any("/check/id/:id/older")
     @WithDataAdapter(BergamotDB.class)
     public void older(
             BergamotDB db, 
@@ -48,14 +49,15 @@ public class StatsRouter extends Router<BergamotApp>
     {
         Check<?,?> check = model("check", notNull(db.getCheck(id)));
         require(permission("read", check));
+        require(permission("ui.view.stats", check));
         if (from <= 0) from = System.currentTimeMillis();
         var("transitions", db.listOlderCheckTransitionsForCheck(id, new Timestamp(from), limit));
         var("from", from);
         var("limit", limit);
-        encode("stats/transitions");
+        encode("stats/index");
     }
     
-    @Any("/transitions/check/id/:id/newer")
+    @Any("/check/id/:id/newer")
     @WithDataAdapter(BergamotDB.class)
     public void newer(
             BergamotDB db, 
@@ -67,10 +69,11 @@ public class StatsRouter extends Router<BergamotApp>
     {
         Check<?,?> check = model("check", notNull(db.getCheck(id)));
         require(permission("read", check));
+        require(permission("ui.view.stats", check));
         if (from <= 0) from = System.currentTimeMillis();
         var("transitions", db.listNewerCheckTransitionsForCheck(id, new Timestamp(from), limit));
         var("from", from);
         var("limit", limit);
-        encode("stats/transitions");
+        encode("stats/index");
     }
 }

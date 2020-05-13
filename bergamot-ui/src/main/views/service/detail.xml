@@ -9,11 +9,19 @@
 		<a rendered="#{service.enabled and Balsa().permission('disable', service)}"         href="/service/disable/#{service.id}">Disable</a>
 		<a rendered="#{(!service.enabled) and Balsa().permission('enable', service)}"       href="/service/enable/#{service.id}">Enable</a>
 		<a rendered="#{Balsa().permission('execute', service)}"                             href="/service/execute/#{service.id}" id="check-now" data-check-id="#{service.id}">Check now</a>
-		<a href="/sla/check/id/#{service.id}">SLA Reports</a>
+		<a                                                                                  href="/sla/check/id/#{service.id}">SLA Reports</a>
+		<a rendered="#{Balsa().permission('ui.view.stats', service)}"                       href="/stats/check/id/#{service.id}">Stats</a>
+		<a rendered="#{Balsa().permission('read.config', service)}"                         href="/config/check/id/#{service.id}">Configuration</a>
+	</div>
+	<div class="row submenu pull-right">
+	    <a rendered="#{service.host != null and Balsa().permission('read', service.host)}" href="/host/id/#{service.host.id}">Back to host #{service.host.summary}</a>
+		<data-set var="group" value="#{service.groups}">
+			<a rendered="#{Balsa().permission('read', group)}" href="/group/id/#{group.id}">Back to group #{group.summary}</a>
+		</data-set>
 	</div>
 
 	<div class="row">
-		<div class="col4 dash_icon check" data-check-id="#{service.id}">
+		<div class="col6 dash_icon check" data-check-id="#{service.id}">
 			<include view="include/iconset" data-check="#{service}" data-checkstate="#{service.state}" data-alert="#{null}"/>
 			<h3>
 				<span class="dash_img status_#{service.state.status.toString().toLowerCase()}" title="The service is #{service.state.status.toString().toLowerCase()}">
@@ -61,6 +69,7 @@
 		    </p>
 		    <p class="output field-output">#{coalesce(service.state.output, '')}</p>
 		</div>
+		<div class="col2"></div>
 		<div class="col4 description" style="padding-top: 100px;">
 			<p rendered="#{! isempty(service.description)}">#{service.description}</p>
 			<p rendered="#{! isempty(service.note)}">#{service.note}</p>
@@ -71,23 +80,17 @@
 	<!-- Referenced By -->
 	<include view="include/referenced_by" data-referenced="#{service.getReferencedBy()}"/>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{service}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
-	
-	<!-- Comments -->
-	<include view="include/comments" data-check="#{service}"/>
 	
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{service}"/>
 	
-	<!-- Readings -->
-	<include view="include/readings" data-check="#{service}"/>
-	
-	<!-- Stats -->
-	<include view="include/check_stats" data-check="#{service}"/>
-	
-	<!-- Configuration -->
-	<include view="include/check_configuration" data-check="#{service}"/>
+	<!-- Comments -->
+	<include view="include/comments" data-check="#{service}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

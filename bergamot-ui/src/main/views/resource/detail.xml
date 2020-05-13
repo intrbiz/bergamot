@@ -8,7 +8,15 @@
 		<a rendered="#{(!resource.suppressed) and Balsa().permission('suppress', resource)}" href="/resource/suppress/#{resource.id}">Suppress</a>
 		<a rendered="#{resource.enabled and Balsa().permission('disable', resource)}"        href="/resource/disable/#{resource.id}">Disable</a>
 		<a rendered="#{(!resource.enabled) and Balsa().permission('enable', resource)}"      href="/resource/enable/#{resource.id}">Enable</a>
-		<a href="/sla/check/id/#{resource.id}">SLA Reports</a>
+		<a                                                                                   href="/sla/check/id/#{resource.id}">SLA Reports</a>
+		<a rendered="#{Balsa().permission('ui.view.stats', resource)}"                       href="/stats/check/id/#{resource.id}">Stats</a>
+		<a rendered="#{Balsa().permission('read.config', resource)}"                         href="/config/check/id/#{resource.id}">Configuration</a>
+	</div>
+	<div class="row submenu pull-right">
+	    <a rendered="#{resource.cluster != null and Balsa().permission('read', resource.cluster)}" href="/cluster/id/#{resource.cluster.id}">Back to cluster #{resource.cluster.summary}</a>
+		<data-set var="group" value="#{resource.groups}">
+			<a rendered="#{Balsa().permission('read', group)}" href="/group/id/#{group.id}">Back to group #{group.summary}</a>
+		</data-set>
 	</div>
 
 	<div class="row">
@@ -76,23 +84,17 @@
 		</data-set>
 	</div>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{resource}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
-	
-	<!-- Comments -->
-	<include view="include/comments" data-check="#{resource}"/>
 	
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{resource}"/>
 	
-	<!-- Readings -->
-	<include view="include/readings" data-check="#{resource}"/>
-	
-	<!-- Stats -->
-	<include view="include/check_stats" data-check="#{resource}"/>
-	
-	<!-- Configuration -->
-	<include view="include/check_configuration" data-check="#{resource}"/>
+	<!-- Comments -->
+	<include view="include/comments" data-check="#{resource}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

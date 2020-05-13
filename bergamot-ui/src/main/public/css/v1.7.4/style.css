@@ -1003,6 +1003,15 @@ div.status_group > a:hover {
 	color: #2c2c2c;
 }
 
+.section_header {
+    border-bottom: 2px solid #00BF00;
+}
+
+.bg-grad {
+    border-radius: 10px;
+    background-image: linear-gradient(to bottom, rgba(240,240,240,1), rgba(240,240,240,0));
+}
+
 /* Resizing */
 
 @media (min-width: 571px) and (max-width: 869px) {
@@ -1071,16 +1080,84 @@ div.status_group > a:hover {
     }
 }
 
-@media (min-width: 1740px) and (max-width: 19200px) {
+@media (min-width: 1730px) and (max-width: 2124px) {
     .row {
-        width: 1730px;
+        width: 1720px;
     }
     .container {
-        width: 1740px;
+        width: 1730px;
         margin: 0 auto;
     }
     .full-width {
-        width: 1730px;
+        width: 1720px;
+        overflow: auto;
+    }
+    #header {
+        width: 100%;
+    }
+}
+
+@media (min-width: 2135px) and (max-width: 3779px) {
+    .row {
+        width: 2135px;
+    }
+    .container {
+        width: 2145px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 2135px;
+        overflow: auto;
+    }
+    #header {
+        width: 100%;
+    }
+}
+
+@media (min-width: 2570px) and (max-width: 2994px) {
+    .row {
+        width: 2570px;
+    }
+    .container {
+        width: 2580px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 2570px;
+        overflow: auto;
+    }
+    #header {
+        width: 100%;
+    }
+}
+
+@media (min-width: 2995px) and (max-width: 3419px) {
+    .row {
+        width: 2995px;
+    }
+    .container {
+        width: 3005px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 2995px;
+        overflow: auto;
+    }
+    #header {
+        width: 100%;
+    }
+}
+
+@media (min-width: 3420px) and (max-width: 37790px) {
+    .row {
+        width: 3420px;
+    }
+    .container {
+        width: 3430px;
+        margin: 0 auto;
+    }
+    .full-width {
+        width: 3420px;
         overflow: auto;
     }
     #header {

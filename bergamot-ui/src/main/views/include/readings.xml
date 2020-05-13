@@ -2,7 +2,7 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
 	<div rendered="#{Balsa().permission('read.readings', check)}" id="readings" class="row" data-check-id="#{check.id}" style="display: none">
-		<H2>Readings</H2>
+		<H2 class="section_header">Readings</H2>
 		<script type="text/javascript">
 			<![CDATA[
 			require(["lamplighter/lib/ui/check-readings"], function(check_readings) {

@@ -3,7 +3,7 @@
 <fragment xmlns="com.intrbiz.balsa">
 	<container rendered="#{! alerts.isEmpty()}">
 	
-		<h2>Alert History</h2>
+		<h2 class="section_header">Alert History</h2>
 				
 		<data-set var="alert" value="#{alerts}">
 			<include view="include/alert"/>

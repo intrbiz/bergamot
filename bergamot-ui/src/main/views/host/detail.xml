@@ -9,7 +9,15 @@
 		<a rendered="#{host.enabled and Balsa().permission('disable', host)}"         href="/host/disable/#{host.id}">Disable</a>
 		<a rendered="#{(!host.enabled) and Balsa().permission('enable', host)}"       href="/host/enable/#{host.id}">Enable</a>
 		<a rendered="#{Balsa().permission('execute', host)}"                          href="/host/execute/#{host.id}" id="check-now" data-check-id="#{host.id}">Check now</a>
-		<a href="/sla/check/id/#{host.id}">SLA Reports</a>
+		<a                                                                            href="/sla/check/id/#{host.id}">SLA Reports</a>
+		<a rendered="#{Balsa().permission('ui.view.stats', host)}"                    href="/stats/check/id/#{host.id}">Stats</a>
+		<a rendered="#{Balsa().permission('read.config', host)}"                      href="/config/check/id/#{host.id}">Configuration</a>
+	</div>
+	<div class="row submenu pull-right">
+		<a rendered="#{host.location != null and Balsa().permission('read', host.location)}" href="/location/id/#{host.location.id}">Back to location #{host.location.summary}</a>
+		<data-set var="group" value="#{host.groups}">
+			<a rendered="#{Balsa().permission('read', group)}" href="/group/id/#{group.id}">Back to group #{group.summary}</a>
+		</data-set>
 	</div>
 
 	<div class="row">
@@ -125,23 +133,17 @@
 	<!-- Referenced By -->
 	<include view="include/referenced_by" data-referenced="#{host.getReferencedBy()}"/>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{host}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
-	
-	<!-- Comments -->
-	<include view="include/comments" data-check="#{host}"/>
 	
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{host}"/>
 	
-	<!-- Readings -->
-	<include view="include/readings" data-check="#{host}"/>
-
-	<!-- Stats -->
-	<include view="include/check_stats" data-check="#{host}"/>
-	
-	<!-- Configuration -->
-	<include view="include/check_configuration" data-check="#{host}"/>
+	<!-- Comments -->
+	<include view="include/comments" data-check="#{host}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

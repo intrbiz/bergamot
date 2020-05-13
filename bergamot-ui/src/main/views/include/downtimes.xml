@@ -2,10 +2,10 @@
 <?RenderLibrary com.intrbiz.balsa?>
 <fragment xmlns="com.intrbiz.balsa">
 	<container rendered="#{Balsa().permission('read.downtime', check)}">
-		<h2>Downtime</h2>
+		<h2 class="section_header">Downtime</h2>
 		<div class="row" id="downtime_header_row">
 			<div class="submenu pull-right" rendered="#{Balsa().permission('write.downtime', check)}">
-				<a data-check-id="#{check.id}" id="add_downtime" href="#add-downtime">Add downtime</a>
+				<a data-check-id="#{check.id}" id="add_downtime" href="#add-downtime">Add Downtime</a>
 			</div>
 		</div>
 		<data-set var="downtime" value="#{check.getDowntime()}">
@@ -14,7 +14,7 @@
 	    	</div>
 		</data-set>
 		<div id="downtime_modal" class="reveal-modal" rendered="#{Balsa().permission('write.downtime', check)}">
-	     	<h1>Add Dowtime</h1>
+	     	<h1>Add Downtime</h1>
 	     	<form id="downtime_form" method="post" action="#downtime">
 	     		<p>Please explain why downtime is being added to this check.</p>
 	     		<p>
@@ -33,7 +33,7 @@
 	     			<input type="text" data-datetime="yes" id="downtime_ends" name="ends" placeholder="YYYY-MM-DD 00:00" style="width: 402px;"/>
 	     		</p>
 	     		<p id="downtime_error" style="display: none;" class="error">
-	     			Failed to add downtime for this check, please try again.
+	     			Failed to add downtime for this check, please make sure you provide a summary and comment.
 	     		</p>
 	     		<p>
 	     			<input type="submit" id="do_add_downtime" name="add_downtime" value="Add Downtime"/>
@@ -55,7 +55,6 @@
 						ev.preventDefault();
 						var check_id = $(this).attr('data-check-id');
 						$('#downtime_form').attr('action', #{'"' + path('/api') + '"'} + '/downtime/add-downtime-to-check/id/' + check_id);
-						$('#acknowledge_form').attr('data-check-id', check_id);
 						$('#downtime_error').hide();
 						$('#downtime_modal').reveal();
 					});

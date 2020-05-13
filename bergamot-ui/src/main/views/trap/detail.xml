@@ -8,7 +8,15 @@
 		<a rendered="#{(!trap.suppressed) and Balsa().permission('suppress', trap)}"  href="/trap/suppress/#{trap.id}">Supress</a>
 		<a rendered="#{trap.enabled and Balsa().permission('disable', trap)}"         href="/trap/disable/#{trap.id}">Disable</a>
 		<a rendered="#{(!trap.enabled) and Balsa().permission('enable', trap)}"       href="/trap/enable/#{trap.id}">Enable</a>
-		<a href="/sla/check/id/#{trap.id}">SLA Reports</a>
+		<a                                                                            href="/sla/check/id/#{trap.id}">SLA Reports</a>
+		<a rendered="#{Balsa().permission('ui.view.stats', trap)}"                    href="/stats/check/id/#{trap.id}">Stats</a>
+		<a rendered="#{Balsa().permission('read.config', trap)}"                      href="/config/check/id/#{trap.id}">Configuration</a>
+	</div>
+	<div class="row submenu pull-right">
+	    <a rendered="#{trap.host != null and Balsa().permission('read', trap.host)}" href="/host/id/#{trap.host.id}">Back to host #{trap.host.summary}</a>
+		<data-set var="group" value="#{trap.groups}">
+			<a rendered="#{Balsa().permission('read', group)}" href="/group/id/#{group.id}">Back to group #{group.summary}</a>
+		</data-set>
 	</div>
 
 	<div class="row">
@@ -73,20 +81,17 @@
 	<!-- Referenced By -->
 	<include view="include/referenced_by" data-referenced="#{trap.getReferencedBy()}"/>
 	
+	<!-- Readings -->
+	<include view="include/readings" data-check="#{host}"/>
+	
 	<!-- Alerts -->
 	<include view="include/alerts"/>
-	
-	<!-- Comments -->
-	<include view="include/comments" data-check="#{trap}"/>
 	
 	<!-- Downtime -->
 	<include view="include/downtimes" data-check="#{trap}"/>
 	
-	<!-- Readings -->
-	<include view="include/readings" data-check="#{host}"/>
-	
-	<!-- Configuration -->
-	<include view="include/check_configuration" data-check="#{trap}"/>
+	<!-- Comments -->
+	<include view="include/comments" data-check="#{trap}"/>
 	
 	<script type="text/javascript">
 		<![CDATA[

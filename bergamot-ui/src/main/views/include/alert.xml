@@ -17,10 +17,7 @@
 			    <span class="label">Status: </span>
 			    <span class="value">#{alert.status.toString().substring(0,1) + alert.status.toString().substring(1).toLowerCase()}</span>
 		    </p>
-		    <p class="output">
-			    <span class="label">Output: </span>
-			    <span class="value">#{coalesce(alert.output, '')}</span>
-		    </p>
+		    <p class="output">#{coalesce(alert.output, '')}</p>
 	    </div>
 	    <div class="col4 dash_icon alert">
 		    <p>

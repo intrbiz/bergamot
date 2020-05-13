@@ -1,0 +1,207 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<fragment xmlns="com.intrbiz.balsa" title="Configuration for #{check.type} #{check.summary}#{if(check.host != null, ' on host ' + check.host.summary, '')}">
+
+	<div class="row submenu pull-right">
+		<a href="/#{check.type}/id/#{check.id}">Back to #{check.type} #{check.summary}#{if(check.host != null, ' on host ' + check.host.summary, '')}</a>
+		<a href="/admin/config/id/#{if(check.type == 'service' || check.type == 'trap', check.host.id, if(check.type == 'resource', check.cluster.id, check.id))}">Manage configuration</a>
+	</div>
+	
+	<div class="row">
+		<div class="col4 dash_icon" rendered="#{check.type == 'host' or check.type == 'service'}">
+			<h3>Scheduling</h3>
+			<p>
+				<span class="label wide">Check period</span>
+				<span class="value"><a href="/timeperiod/id/#{check.timePeriod.id}">#{check.timePeriod.summary}</a></span>
+			</p>
+			<p>
+				<span class="label wide">Check interval</span>
+				<span class="value">#{check.checkInterval / 1000}s</span>
+			</p>
+			<p>
+				<span class="label wide">Retry interval</span>
+				<span class="value">#{check.retryInterval / 1000}s</span>
+			</p>
+			<p>
+				<span class="label wide">Changing interval</span>
+				<span class="value">#{check.changingInterval / 1000}s</span>
+			</p>
+		</div>
+		<div class="col4 dash_icon" rendered="#{check.type == 'host' or check.type == 'service' or check.type == 'trap'}">
+			<h3>State transitions</h3>
+			<p>
+				<span class="label wide">Fails after</span>
+				<span class="value">#{check.alertAttemptThreshold} attempts</span>
+			</p>
+			<p>
+				<span class="label wide">Recovers after</span>
+				<span class="value">#{check.recoveryAttemptThreshold} attempts</span>
+			</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col4 dash_icon">
+			<h3>Notifications</h3>
+			<p>
+				<span class="label wide">Notifications enabled</span>
+				<span class="value">#{if(check.notifications.enabled, 'yes', 'no')}</span>
+			</p>
+			<p>
+				<span class="label wide">Notification period</span>
+				<span class="value"><a href="/timeperiod/id/#{check.notifications.timePeriodId}">#{check.notifications.timePeriod.summary}</a></span>
+			</p>
+			<p>
+				<span class="label wide">Update notifications enabled</span>
+				<span class="value">#{if(check.notifications.updatesEnabled, 'yes', 'no')}</span>
+			</p>
+			<p rendered="#{check.notifications.updatesTimePeriodId != null}">
+				<span class="label wide">Update notifications period</span>
+				<span class="value"><a href="/timeperiod/id/#{check.notifications.updatesTimePeriodId}">#{check.notifications.updatesTimePeriod.summary}</a></span>
+			</p>
+		</div>
+		<div class="col4 dash_icon">
+			<h3>Notify</h3>
+			<data-set var="contact" value="#{check.contacts}">
+				<p>
+					<span class="label wide">Contact</span>
+					<span class="value"><a href="/contact/id/#{contact.id}">#{contact.summary}</a></span>
+				</p>
+			</data-set>
+			<data-set var="team" value="#{check.teams}">
+				<p>
+					<span class="label wide">Team</span>
+					<span class="value"><a href="/team/id/#{team.id}">#{team.summary}</a></span>
+				</p>
+			</data-set>
+		</div>
+	</div>
+	<div class="row" rendered="#{! isempty(check.notifications.engines)}">
+		<h3>Notification Engines</h3>
+		<div class="col8">
+			<table>
+				<tr>
+					<th>Engine</th>
+					<th>Enabled</th>
+					<th>Notification Period</th>
+					<th>Ignores</th>
+					<th>Alerts</th>
+					<th>Recoveries</th>
+					<th>Acknowledgements</th>
+					<th>Updates</th>
+				</tr>
+				<data-set var="engine" value="#{check.notifications.engines}">
+					<tr>
+						<td>#{engine.engine}</td>
+						<td>#{if(engine.enabled, 'yes', 'no')}</td>
+						<td><a rendered="#{engine.timePeriodId != null}" href="/timeperiod/id/#{engine.timePeriod.id}">#{engine.timePeriod.summary}</a></td>
+						<td><data-set var="ignore" value="#{engine.ignore}"><span class="info">#{ucfirst(lc(ignore))}</span></data-set></td>
+						<td>#{if(engine.alertsEnabled, 'yes', 'no')}</td>
+						<td>#{if(engine.recoveryEnabled, 'yes', 'no')}</td>
+						<td>#{if(engine.acknowledgeEnabled, 'yes', 'no')}</td>
+						<td>#{if(engine.updatesEnabled, 'yes', 'no')}</td>
+					</tr>
+				</data-set>
+			</table>
+		</div>
+	</div>
+	<div class="row" rendered="#{! isempty(check.notifications.escalations)}">
+		<h3>Escalations</h3>
+		<div class="col8">
+			<table>
+				<tr>
+					<th>After</th>
+					<th>Notification Period</th>
+					<th>Ignores</th>
+					<th>Renotify</th>
+					<th>Teams</th>
+					<th>Contacts</th>
+				</tr>
+				<data-set var="escalation" value="#{check.notifications.escalations}">
+					<tr>
+						<td>#{if(escalation.after >= 3600000, (escalation.after/ 3600000) + 'h', (escalation.after / 60000) + 'm')}</td>
+						<td><a rendered="#{escalation.timePeriodId != null}" href="/timeperiod/id/#{escalation.timePeriod.id}">#{escalation.timePeriod.summary}</a></td>
+						<td><data-set var="ignore" value="#{escalation.ignore}"><span class="info">#{ucfirst(lc(ignore))}</span></data-set></td>
+						<td>#{if(escalation.renotify, 'yes', 'no')}</td>
+						<td>
+							<data-set var="to_team" value="#{escalation.getTeams()}">
+								<a href="/team/id/#{to_team.id}">#{to_team.summary}</a>
+							</data-set>
+						</td>
+						<td>
+							<data-set var="to_contact" value="#{escalation.getContacts()}">
+								<a href="/contact/id/#{to_contact.id}">#{to_contact.summary}</a>
+							</data-set>
+						</td>
+					</tr>
+				</data-set>
+			</table>
+		</div>
+	</div>
+	<div class="row" rendered="#{(! isempty(check.groups)) or (check.type == 'host' and check.location != null)}">
+		<div class="col4 dash_icon" rendered="#{! isempty(check.groups)}">
+			<h3>Groups</h3>
+			<data-set var="group" value="#{check.groups}">
+				<p>
+					<span class="label wide">Group</span>
+					<span class="value"><a href="/group/id/#{group.id}">#{group.summary}</a></span>
+				</p>
+			</data-set>
+		</div>
+		<div class="col4 dash_icon" rendered="#{check.type == 'host' and check.location != null}">
+			<h3>Location</h3>
+			<p>
+				<span class="label wide">Location</span>
+				<span class="value"><a href="/location/id/#{check.location.id}">#{check.location.summary}</a></span>
+			</p>
+		</div>
+	</div>
+
+	<container rendered="#{Balsa().permission('read.config', check) and Balsa().permission('read', check.checkCommand.command) and (check.type == 'host' or check.type == 'service' or check.type == 'trap')}">
+		<div class="row">
+			<div class="col4 dash_icon">
+				<h3>Command</h3>
+				<p>
+					<span class="label wide">Command: </span>
+					<span class="value"><a href="/command/id/#{check.checkCommand.command.id}">#{check.checkCommand.command.summary}</a></span>
+				</p>
+				<p>
+					<span class="label wide">Command Engine: </span>
+					<span class="value">#{check.checkCommand.command.engine}</span>
+				</p>
+				<p rendered="#{check.type == 'host' or check.type == 'service'}">
+					<span class="label wide">Worker Pool: </span>
+					<span class="value">#{coalesce(check.resolveWorkerPool(), 'any')}</span>
+				</p>
+				<p rendered="#{check.type == 'host' or check.type == 'service' or check.type == 'trap'}">
+					<span class="label wide">Resource Pool: </span>
+					<span class="value">#{coalesce(check.resourcePool, '')}</span>
+				</p>
+			</div>
+			<div class="col8 dash_icon">
+				<h3>Command Parameters</h3>
+				<table style="width: 1150px;">
+					<tr>
+						<th>Parameter Name</th>
+						<th>Parameter Value</th>
+					</tr>
+					<data-set var="parameter" value="#{check.checkCommand.resolveCheckParameters().values()}">
+						<tr>
+							<td>#{parameter.name}</td>
+							<td>#{parameter.value}</td>
+						</tr>
+					</data-set>
+				</table>
+			</div>
+		</div>
+	</container>
+	
+	<container rendered="#{Balsa().permission('read.config', check) and (check.type == 'cluster' or check.type == 'resource')}">
+		<div class="row">
+			<div class="col12 dash_icon">
+				<h3>Condition</h3>
+				<p>#{check.condition.toString()}</p>
+			</div>
+		</div>
+	</container>
+	
+</fragment>

@@ -49,11 +49,13 @@
 				<a href="/global/admin/?level=#{level}" style="margin-right: 10px; padding: 3px 5px;">#{if(level == 0, 'Leaders', 'Level ' + level)}</a>
 			</data-set>
 		</div>
-		<data-set var="pool" value="#{pools}">
-			<div class="col1" style="width: 60px; height: 60px; margin: 5px; background-color: #{processor_colours.get(pool.value.id)}; box-shadow: 0px 3px 6px #747474;" title="Pool #{pool.key} is on processor #{pool.value.hostName} (#{pool.value.id})">
-			    <h4 style="font-size: 24px; text-align: center; padding-top: 15px;">#{pool.key}</h4>
-			</div>
-		</data-set>
+		<div class="col12">
+			<data-set var="pool" value="#{pools}">
+				<div class="col1" style="width: 60px; height: 60px; margin: 5px; background-color: #{processor_colours.get(pool.value.id)}; box-shadow: 0px 3px 6px #747474;" title="Pool #{pool.key} is on processor #{pool.value.hostName} (#{pool.value.id})">
+				    <h4 style="font-size: 24px; text-align: center; padding-top: 15px;">#{pool.key}</h4>
+				</div>
+			</data-set>
+		</div>
     </div>
 	
     <div class="row">
@@ -163,35 +165,33 @@
 	</div>
 	
 	<div clas="row">
-    	<div class="col12">
-    		<h3>Bergamot Proxy Keys</h3>
-    		<p class="text-body">
-    			These are the authentication keys that remote Bergamot Workers and Notifiers can use to authenticate with Bergamot Monitoring.  Remote workers and notifiers which use these keys will be able to process checks for all sites.
-    		</p>
-    		<table>
-	    		<tr>
-		    		<th>Id</th>
-		    		<th>Secret Key</th>
-		    		<th>Revoked</th>
-	    			<th>Created</th>
-	    			<th>Purpose</th>
-	    			<th></th>
-	    		</tr>
-	    		<data-set var="proxyKey" value="#{proxyKeys}">
-	    			<tr>
-	    				<td>#{proxyKey.id}</td>
-	    				<td><pre>#{proxyKey.toAuthenticationKey()}</pre></td>
-	    				<td>
-	    					<span rendered="#{! proxyKey.revoked}">no</span>
-	    					<span rendered="#{proxyKey.revoked}">#{dateformat('HH:mm:ss', proxyKey.created)} on #{dateformat('EEEE dd/MM/yyyy', proxyKey.created)}</span>
-    					</td>
-	    				<td>#{proxyKey.purpose}</td>
-	    				<td>#{dateformat('HH:mm:ss', proxyKey.created)} on #{dateformat('EEEE dd/MM/yyyy', proxyKey.created)}</td>
-	    				<td><a href="/global/admin/proxy/revoke/#{agentKey.id}">Revoke</a></td>
-	    			</tr>
-	    		</data-set>
-	    	</table>
-    	</div>
+   		<h3>Bergamot Proxy Keys</h3>
+   		<p class="text-body">
+   			These are the authentication keys that remote Bergamot Workers and Notifiers can use to authenticate with Bergamot Monitoring.  Remote workers and notifiers which use these keys will be able to process checks for all sites.
+   		</p>
+   		<table style="width: 100%">
+    		<tr>
+	    		<th>Id</th>
+	    		<th>Secret Key</th>
+	    		<th>Revoked</th>
+    			<th>Created</th>
+    			<th>Purpose</th>
+    			<th></th>
+    		</tr>
+    		<data-set var="proxyKey" value="#{proxyKeys}">
+    			<tr>
+    				<td>#{proxyKey.id}</td>
+    				<td><pre>#{proxyKey.toAuthenticationKey()}</pre></td>
+    				<td>
+    					<span rendered="#{! proxyKey.revoked}">no</span>
+    					<span rendered="#{proxyKey.revoked}">#{dateformat('HH:mm:ss', proxyKey.created)} on #{dateformat('EEEE dd/MM/yyyy', proxyKey.created)}</span>
+   					</td>
+    				<td>#{proxyKey.purpose}</td>
+    				<td>#{dateformat('HH:mm:ss', proxyKey.created)} on #{dateformat('EEEE dd/MM/yyyy', proxyKey.created)}</td>
+    				<td><a href="/global/admin/proxy/revoke/#{agentKey.id}">Revoke</a></td>
+    			</tr>
+    		</data-set>
+    	</table>
     </div>
     
    	<div class="row">
