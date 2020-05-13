@@ -37,7 +37,7 @@ public class AboutRouter extends Router<BergamotApp>
     @Any("/")
     public void about()
     {
-        var("bergamot_version",  BergamotVersion.NUMBER);
+        var("bergamot_version",  BergamotVersion.numberString());
         var("bergamot_codename", BergamotVersion.CODE_NAME);
         encode("about/index");
     }

@@ -62,20 +62,17 @@ public class LoginRouter extends Router<BergamotApp>
     
     @Get("/login")
     @WithDataAdapter(BergamotDB.class)
-    public void login(BergamotDB db, @Param("redirect") String redirect, @Cookie("bergamot.auto.login") String autoAuthToken) throws Exception
+    public void login(BergamotDB db, @Param("redirect") String redirect, @Cookie("bergamot.auto.login") String autoAuthCookie, @Param("token") String autoAuthParam) throws Exception
     {
-        if (! Util.isEmpty(autoAuthToken))
+        // try auto login cookie
+        if (this.autologin(redirect, autoAuthCookie, true))
         {
-            // try the given auth token and assert the contact has ui.access permission
-            AuthenticationResponse authResp = tryAuthenticate(new GenericAuthenticationToken(autoAuthToken));
-            if (authResp != null)
-            {
-                // record the token in the session for removal on logout
-                sessionVar("bergamot.auto.login", autoAuthToken);
-                // complete the login
-                this.completeLogin(authResp, redirect);
-                return;
-            }
+            return;
+        }
+        // try auto login param
+        if (this.autologin(redirect, autoAuthParam, false))
+        {
+            return;
         }
         // is this first install?
         GlobalSetting firstInstall = db.getGlobalSetting(GlobalSetting.NAME.FIRST_INSTALL);
@@ -89,6 +86,27 @@ public class LoginRouter extends Router<BergamotApp>
         var("redirect", redirect);
         var("username", cookie("bergamot.username"));
         encode("login/login");
+    }
+    
+    protected boolean autologin(String redirect, String token, boolean removeOnLogout) throws Exception
+    {
+        if (! Util.isEmpty(token))
+        {
+            // try the given auth token and assert the contact has ui.access permission
+            AuthenticationResponse authResp = tryAuthenticate(new GenericAuthenticationToken(token));
+            if (authResp != null)
+            {
+                if (removeOnLogout)
+                {
+                    // record the token in the session for removal on logout
+                    sessionVar("bergamot.auto.login", token);
+                }
+                // complete the login
+                this.completeLogin(authResp, redirect);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Post("/login")

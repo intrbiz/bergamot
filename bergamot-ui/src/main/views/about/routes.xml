@@ -6,7 +6,7 @@
     <div clas="row">
     	<div class="col12">
 			<table>
-				<tr>content
+				<tr>
 					<th>Method</th>
 					<th>Path</th>
 					<th>As</th>

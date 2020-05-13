@@ -16,19 +16,20 @@
    		<h4>Licensing</h4>
    	    <p class="text-body">
    	    	Bergamot Monitoring is released under the GNU Lesser General Public License (GNU LGPL) and 
-   	    	is copyright <a href="https://intrbiz.com/">Chris Ellis</a> 2014 - 2015.
+   	    	is copyright <a href="https://intrbiz.com/">Chris Ellis</a> 2014 - 2020.
    		</p>
    	</div>
    	<div clas="row" style="margin-top: 30px;">
    		<h4>Standing On The Shoulder Of Giants</h4>
    	    <p class="text-body">
-   	    	Bergamot Monitoring makes use the following projects:
+   	    	Bergamot Monitoring makes use the following projects, and many more:
    		</p>
    		<ul>
    			<li><a href="https://github.com/intrbiz/balsa">Intrbiz Balsa - Web Framework</a></li>
    			<li><a href="https://github.com/intrbiz/SNMP-IB">Intrbiz SNMP-IB - SNMP Client</a></li>
-   			<li><a href="http://hazelcast.org/">Hazelcast - Clustering</a></li>
-   			<li><a href="http://www.rabbitmq.com/">RabbitMQ - Message Queueing</a></li>
+   			<li><a href="https://netty.io/">Netty - IO Library</a></li>
+   			<li><a href="https://zookeeper.apache.org/">ZooKeeper - Cluster Coordination</a></li>
+   			<li><a href="http://hazelcast.org/">Hazelcast - Distributed Data</a></li>
    			<li><a href="http://www.postgresql.org/">PostgreSQL - Database</a></li>
    			<li><a href="https://github.com/google/material-design-icons">Google Material Design Icons - Icon Set</a></li>
    		</ul>
