@@ -16,7 +16,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLTable(schema = BergamotDB.class, name = "alert_encompasses", since = @SQLVersion({4, 0, 0}) )
 @SQLPartitioning(
-    @SQLPartition(mode = PartitionMode.RANGE, on = "raised", indexOn = true, indexOnUsing = "brin")
+    @SQLPartition(mode = PartitionMode.RANGE, on = "raised")
 )
 public class AlertEncompasses extends BergamotObject<AlertEncompassesMO>
 {

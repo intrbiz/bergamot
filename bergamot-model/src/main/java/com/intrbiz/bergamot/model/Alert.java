@@ -27,9 +27,9 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "alert", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
-    @SQLPartition(mode = PartitionMode.RANGE, on = "raised", indexOn = true, indexOnUsing = "brin")
+    @SQLPartition(mode = PartitionMode.RANGE, on = "raised")
 )
-@SQLIndex(name = "check_id", using = "btree", columns = "check_id", since = @SQLVersion({4, 0, 0}))
+@SQLIndex(name = "check_id", using = "btree", columns = { "check_id", "raised" }, since = @SQLVersion({4, 0, 0}))
 public class Alert extends BergamotObject<AlertMO> implements Serializable, Commented
 {
     private static final long serialVersionUID = 1L;

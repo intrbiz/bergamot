@@ -13,7 +13,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
 
 @SQLPartitioning({
     @SQLPartition(mode = PartitionMode.HASH,  on = "reading_id"),
-    @SQLPartition(mode = PartitionMode.RANGE, on = "collected_at", indexOn = true, indexOnUsing = "brin")
+    @SQLPartition(mode = PartitionMode.RANGE, on = "collected_at")
 })
 @SQLIndex(name = "reading_collected_at", columns = { "reading_id", "collected_at" }, using = "btree", since = @SQLVersion({4, 0, 0}))
 public abstract class StoredReading implements Serializable

@@ -23,7 +23,7 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "comment", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
-    @SQLPartition(mode = PartitionMode.RANGE, on = "updated", indexOn = true, indexOnUsing = "brin")
+    @SQLPartition(mode = PartitionMode.RANGE, on = "updated")
 )
 @SQLIndex(name = "object_id", using = "btree", columns = "object_id", since = @SQLVersion({4, 0, 0}))
 public class Comment extends BergamotObject<CommentMO> implements Serializable

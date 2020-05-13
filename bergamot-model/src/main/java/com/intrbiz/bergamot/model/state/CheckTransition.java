@@ -11,6 +11,7 @@ import com.intrbiz.bergamot.model.Status;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
 import com.intrbiz.data.db.compiler.meta.PartitionMode;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
+import com.intrbiz.data.db.compiler.meta.SQLIndex;
 import com.intrbiz.data.db.compiler.meta.SQLPartition;
 import com.intrbiz.data.db.compiler.meta.SQLPartitioning;
 import com.intrbiz.data.db.compiler.meta.SQLTable;
@@ -27,8 +28,9 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "check_transition", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
-    @SQLPartition(mode = PartitionMode.RANGE, on = "applied_at", indexOn = true, indexOnUsing = "brin")
+    @SQLPartition(mode = PartitionMode.RANGE, on = "applied_at")
 )
+@SQLIndex(name = "check_applied_at", using = "btree", columns = { "check_id", "applied_at" }, since = @SQLVersion({4, 0, 0}))
 public class CheckTransition extends BergamotObject<CheckTransitionMO>
 {
     private static final long serialVersionUID = 1L;

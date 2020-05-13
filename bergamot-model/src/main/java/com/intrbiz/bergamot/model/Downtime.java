@@ -34,9 +34,9 @@ import com.intrbiz.data.db.compiler.meta.SQLVersion;
  */
 @SQLTable(schema = BergamotDB.class, name = "downtime", since = @SQLVersion({4, 0, 0}))
 @SQLPartitioning(
-    @SQLPartition(mode = PartitionMode.RANGE, on = "starts", indexOn = true, indexOnUsing = "brin")
+    @SQLPartition(mode = PartitionMode.RANGE, on = "starts")
 )
-@SQLIndex(name = "check_starts", using = "btree", columns = "check_id", since = @SQLVersion({4, 0, 0}))
+@SQLIndex(name = "check_starts", using = "btree", columns = { "check_id", "starts" }, since = @SQLVersion({4, 0, 0}))
 public class Downtime extends BergamotObject<DowntimeMO> implements Serializable, TimeRange, Commented
 {
     private static final long serialVersionUID = 1L;
