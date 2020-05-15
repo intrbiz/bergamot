@@ -2931,6 +2931,7 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'ui.sign.agent',\n" +
                 "        'ui.sign.proxy',\n" +
                 "        'ui.admin',\n" +
+                "        'ui.create',\n" +
                 "        'api.access',\n" +
                 "        'api.sign.agent',\n" +
                 "        'api.sign.proxy',\n" +
@@ -2956,7 +2957,14 @@ public abstract class BergamotDB extends DatabaseAdapter
                 "        'sign.agent',\n" +
                 "        'sign.proxy',\n" +
                 "        'config.export',\n" +
-                "        'config.change.apply'\n" +
+                "        'config.change.apply',\n" +
+                "        'rota.admin',\n" +
+                "        'ui.rota.admin',\n" +
+                "        'api.rota.admin,'\n" +
+                "        'rota.change',\n" +
+                "        'ui.rota.change',\n" +
+                "        'api.rota.change',\n" +
+                "        'ui.password.change'\n" +
                 "      ])::TEXT;\n" +
                 "$$",
 
@@ -3123,64 +3131,7 @@ public abstract class BergamotDB extends DatabaseAdapter
         );
     }
     
-    @SQLPatch(name = "update_permissions", index = 9, type = ScriptType.BOTH, version = @SQLVersion({4, 0, 0}), skip = false)
-    public static SQLScript updatePermissions()
-    {
-        return new SQLScript(
-                
-                "CREATE OR REPLACE FUNCTION bergamot.list_permissions()\n" +
-                "RETURNS SETOF TEXT\n" +
-                "LANGUAGE SQL AS $$\n" +
-                "  SELECT unnest(\n" +
-                "      ARRAY[\n" +
-                "        'ui.access',\n" +
-                "        'ui.view.stats',\n" +
-                "        'ui.view.stats.transitions',\n" +
-                "        'ui.view.readings',\n" +
-                "        'ui.sign.agent',\n" +
-                "        'ui.sign.proxy',\n" +
-                "        'ui.admin',\n" +
-                "        'ui.create',\n" +
-                "        'api.access',\n" +
-                "        'api.sign.agent',\n" +
-                "        'api.sign.proxy',\n" +
-                "        'read',\n" +
-                "        'read.config',\n" +
-                "        'read.comment',\n" +
-                "        'read.downtime',\n" +
-                "        'read.readings',\n" +
-                "        'enable',\n" +
-                "        'disable',\n" +
-                "        'execute',\n" +
-                "        'suppress',\n" +
-                "        'unsuppress',\n" +
-                "        'submit',\n" +
-                "        'acknowledge',\n" +
-                "        'write',\n" +
-                "        'write.comment',\n" +
-                "        'write.downtime',\n" +
-                "        'create',\n" +
-                "        'remove',\n" +
-                "        'remove.comment',\n" +
-                "        'remove.downtime',\n" +
-                "        'sign.agent',\n" +
-                "        'sign.proxy',\n" +
-                "        'config.export',\n" +
-                "        'config.change.apply',\n" +
-                "        'rota.admin',\n" +
-                "        'ui.rota.admin',\n" +
-                "        'api.rota.admin,'\n" +
-                "        'rota.change',\n" +
-                "        'ui.rota.change',\n" +
-                "        'api.rota.change'\n" +
-                "      ])::TEXT;\n" +
-                "$$",
-                
-                "SELECT bergamot.build_permissions(id) FROM bergamot.site"
-        );
-    }
-    
-    @SQLPatch(name = "create_partitioned_tables", index = 10, type = ScriptType.INSTALL_LAST, version = @SQLVersion({4, 0, 0}), skip = false)
+    @SQLPatch(name = "create_partitioned_tables", index = 9, type = ScriptType.INSTALL_LAST, version = @SQLVersion({4, 0, 0}), skip = false)
     public static SQLScript createPartitionedTables()
     {
         return new SQLScript(

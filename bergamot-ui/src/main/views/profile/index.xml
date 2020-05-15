@@ -6,7 +6,7 @@
     <script src="#{public('/js/' + bergamot_js_version() + '/u2f-api.js')}"></script>
 
 	<div class="row submenu pull-right">
-		<a href="/change-password?redirect=#{path('/profile/')}">Change password</a>
+		<a href="/change-password?redirect=#{path('/profile/')}" rendered="#{Balsa().permission('ui.password.change')}">Change password</a>
 	</div>
 
 	<div class="row">

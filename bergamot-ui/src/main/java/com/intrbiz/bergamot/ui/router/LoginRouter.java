@@ -47,6 +47,7 @@ import com.intrbiz.metadata.Param;
 import com.intrbiz.metadata.Post;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireAuthenticating;
+import com.intrbiz.metadata.RequirePermission;
 import com.intrbiz.metadata.RequirePrincipal;
 import com.intrbiz.metadata.RequireValidAccessTokenForURL;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -327,6 +328,7 @@ public class LoginRouter extends Router<BergamotApp>
     
     @Get("/change-password")
     @RequirePrincipal()
+    @RequirePermission("ui.password.change")
     public void changePassword(@Param("redirect") String redirect, @CurrentPrincipal Contact contact)
     {
         // setup recaptcha
@@ -394,6 +396,7 @@ public class LoginRouter extends Router<BergamotApp>
     @Order()
     @Post("/force-change-password")
     @RequirePrincipal()
+    @RequirePermission("ui.password.change")
     @RequireValidAccessTokenForURL()
     public void changePasswordError(@Param("redirect") String redirect) throws IOException
     {
