@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.snmp.SNMPContext;
 import com.intrbiz.snmp.SNMPVersion;
@@ -17,22 +17,20 @@ import com.intrbiz.snmp.security.SNMPPrivMode;
 /**
  * Generic SNMP check handling
  */
-public abstract class AbstractSNMPExecutor extends AbstractExecutor<SNMPEngine>
+public abstract class AbstractSNMPExecutor extends AbstractCheckExecutor<SNMPEngine>
 {
     private Logger logger = Logger.getLogger(AbstractSNMPExecutor.class);
 
-    public AbstractSNMPExecutor()
+
+
+    public AbstractSNMPExecutor(String name, boolean defaultExecutor)
     {
-        super();
+        super(name, defaultExecutor);
     }
 
-    /**
-     * Only execute Checks where the engine == "snmp"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
+    public AbstractSNMPExecutor(String name)
     {
-        return "snmp".equals(task.getEngine());
+        super(name);
     }
     
     protected abstract void executeSNMP(ExecuteCheck executeCheck, CheckExecutionContext context, SNMPContext<?> agent) throws Exception;

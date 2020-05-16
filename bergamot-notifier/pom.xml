@@ -27,23 +27,19 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-notification-engine-email</artifactId>
-			<version>${project.version}</version>
+			<artifactId>bergamot-notifier-email</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-notification-engine-sms</artifactId>
-			<version>${project.version}</version>
+			<artifactId>bergamot-notifier-sms</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-notifier-slack</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-notifier-webhook</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
@@ -56,7 +52,7 @@
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>packaging</artifactId>
-				<version>1.1.1</version>
+				<version>${intrbiz.util.version}</version>
 				<configuration>
 					<appClass>com.intrbiz.bergamot.notifier.BergamotNotifier</appClass>
 				</configuration>

@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckProcess;
 import com.intrbiz.bergamot.model.message.agent.stat.ProcessStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
@@ -17,7 +17,7 @@ import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 /**
  * Check process stats via Bergamot Agent
  */
-public class ProcessStatsExecutor extends AbstractExecutor<AgentEngine>
+public class ProcessStatsExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "process-stats";
     
@@ -25,16 +25,7 @@ public class ProcessStatsExecutor extends AbstractExecutor<AgentEngine>
 
     public ProcessStatsExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

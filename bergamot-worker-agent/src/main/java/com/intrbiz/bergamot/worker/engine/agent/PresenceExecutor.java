@@ -9,15 +9,15 @@ import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnAgentId;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
-import com.intrbiz.bergamot.worker.engine.EngineContext;
+import com.intrbiz.bergamot.worker.engine.CheckEngineContext;
 import com.intrbiz.gerald.polyakov.gauge.LongGaugeReading;
 
 /**
  * Check the presence of a Bergamot Agent
  */
-public class PresenceExecutor extends AbstractExecutor<AgentEngine>
+public class PresenceExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "presence";
     
@@ -25,16 +25,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
 
     public PresenceExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override
@@ -67,7 +58,7 @@ public class PresenceExecutor extends AbstractExecutor<AgentEngine>
     }
     
     @Override
-    public void start(AgentEngine engine, EngineContext context)
+    public void start(AgentEngine engine, CheckEngineContext context)
     {
         // setup event handlers
         // on connection

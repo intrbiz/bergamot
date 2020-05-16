@@ -3,15 +3,16 @@ package com.intrbiz.bergamot.worker.engine.agent;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServer;
 import com.intrbiz.bergamot.model.message.processor.agent.AgentRegister;
-import com.intrbiz.bergamot.worker.engine.AbstractEngine;
-import com.intrbiz.bergamot.worker.engine.EngineContext;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckEngine;
+import com.intrbiz.bergamot.worker.engine.CheckEngineContext;
 
 /**
  * Execute Bergamot Agent checks via the Bergamot Agent Server
  */
-public class AgentEngine extends AbstractEngine
+public class AgentEngine extends AbstractCheckEngine
 {
     private static final Logger logger = Logger.getLogger(AgentEngine.class);
     
@@ -21,7 +22,7 @@ public class AgentEngine extends AbstractEngine
 
     public AgentEngine()
     {
-        super(NAME,
+        super(BergamotVersion.NAME, NAME, false,
                 new PresenceExecutor(), 
                 new CPUExecutor(), 
                 new MemoryExecutor(), 
@@ -46,7 +47,7 @@ public class AgentEngine extends AbstractEngine
     }
     
     @Override
-    public void doPrepare(EngineContext engineContext) throws Exception
+    public void doPrepare(CheckEngineContext engineContext) throws Exception
     {
         // setup the server
         int port = engineContext.getIntParameter("agent-port", 15080);
@@ -55,7 +56,7 @@ public class AgentEngine extends AbstractEngine
     }
     
     @Override
-    public void doStart(EngineContext engineContext) throws Exception
+    public void doStart(CheckEngineContext engineContext) throws Exception
     {
         // Setup event handlers
         this.server.setOnAgentConnectHandler((agent) -> {

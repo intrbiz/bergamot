@@ -1,0 +1,5 @@
+Recovery for host #{slack_encode(host.summary)} is #{host.state.status}
+<# slack_message.attachment().color(status_colour(host.state.status)).authorName('Check Output').text(host.state.output);
+   slack_message.attachment().color(status_colour(host.state.status)).authorName('Last checked').text().text(dateformat('HH:mm:ss', host.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime));
+   slack_message.attachment().color(status_colour(host.state.status)).authorName('View Check').text().link('https://' + site.name + '/host/id/' + host.id, 'View host ' + host.summary);
+#>

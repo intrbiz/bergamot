@@ -13,7 +13,7 @@ import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIOInfo;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
@@ -21,7 +21,7 @@ import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 /**
  * Check disk IO for an interface via Bergamot Agent
  */
-public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
+public class DiskIOExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "disk-io";
     
@@ -31,16 +31,7 @@ public class DiskIOExecutor extends AbstractExecutor<AgentEngine>
 
     public DiskIOExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     /**

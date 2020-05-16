@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.agent.script.BergamotAgentScriptWrapper;
 import com.intrbiz.bergamot.worker.engine.script.ScriptedCheckManager;
@@ -15,7 +15,7 @@ import com.intrbiz.bergamot.worker.engine.script.ScriptedCheckManager;
 /**
  * Execute a scripted Bergamot check against an agent
  */
-public class ScriptExecutor extends AbstractExecutor<AgentEngine>
+public class ScriptExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "script";
     
@@ -25,16 +25,7 @@ public class ScriptExecutor extends AbstractExecutor<AgentEngine>
 
     public ScriptExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

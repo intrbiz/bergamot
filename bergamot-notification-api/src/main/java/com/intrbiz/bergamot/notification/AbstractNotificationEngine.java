@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.notification;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -24,15 +25,21 @@ import com.intrbiz.bergamot.model.message.notification.SendRecovery;
 import com.intrbiz.bergamot.model.message.notification.SendUpdate;
 
 public abstract class AbstractNotificationEngine implements NotificationEngine
-{    
+{   
+    private final String vendor;
+    
     private final String name;
+    
+    private final boolean enabledByDefault;
 
     protected NotificationEngineContext engineContext;
 
-    public AbstractNotificationEngine(String name)
+    public AbstractNotificationEngine(final String vendor, final String name, final boolean enabledByDefault)
     {
         super();
-        this.name = name;
+        this.vendor = Objects.requireNonNull(vendor);
+        this.name = Objects.requireNonNull(name);
+        this.enabledByDefault = enabledByDefault;
     }
 
     @Override
@@ -41,6 +48,18 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
         return this.name;
     }
     
+    @Override
+    public String getVendor()
+    {
+        return this.vendor;
+    }
+
+    @Override
+    public boolean isEnabledByDefault()
+    {
+        return this.enabledByDefault;
+    }
+
     protected final NotificationEngineContext getEngineContext()
     {
         return this.engineContext;
@@ -136,5 +155,10 @@ public abstract class AbstractNotificationEngine implements NotificationEngine
         else if (notification instanceof PasswordResetNotification) return ((PasswordResetNotification) notification).getContact().getId();
         else if (notification instanceof RegisterContactNotification) return ((RegisterContactNotification) notification).getContact().getId();
         return null;
+    }
+    
+    public String toString()
+    {
+        return this.vendor + "::" + this.name;
     }
 }

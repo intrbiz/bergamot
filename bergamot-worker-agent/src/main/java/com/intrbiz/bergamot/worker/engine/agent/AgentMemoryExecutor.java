@@ -10,13 +10,13 @@ import com.intrbiz.bergamot.model.message.agent.stat.AgentStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.util.UnitUtil;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 /**
  * Check internal memory usage of a Bergamot Agent
  */
-public class AgentMemoryExecutor extends AbstractExecutor<AgentEngine>
+public class AgentMemoryExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "agent-memory";
     
@@ -24,16 +24,7 @@ public class AgentMemoryExecutor extends AbstractExecutor<AgentEngine>
 
     public AgentMemoryExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

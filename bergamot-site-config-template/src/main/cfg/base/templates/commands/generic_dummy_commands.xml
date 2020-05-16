@@ -30,4 +30,9 @@
         <parameter description="Check output" name="output">Different hour, different mood</parameter>
     </command>
     
+    <command name="dummy-script-check" extends="dummy-check" executor="script">
+        <summary>A scripted dummy check</summary>
+        <description>A scripted dummy check which will publish a result based on the actions of a script</description>
+    </command>
+    
 </bergamot>

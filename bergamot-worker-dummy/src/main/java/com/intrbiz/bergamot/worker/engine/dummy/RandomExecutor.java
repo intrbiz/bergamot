@@ -4,13 +4,13 @@ import java.security.SecureRandom;
 
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 /**
  * Execute randomised dummy checks, which changes state randomly
  */
-public class RandomExecutor extends AbstractExecutor<DummyEngine>
+public class RandomExecutor extends AbstractCheckExecutor<DummyEngine>
 {
     public static final String NAME = "random";
     
@@ -18,12 +18,7 @@ public class RandomExecutor extends AbstractExecutor<DummyEngine>
 
     public RandomExecutor()
     {
-        super();
-    }
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return DummyEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

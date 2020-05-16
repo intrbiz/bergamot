@@ -16,10 +16,12 @@ import org.junit.Test;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
-import com.intrbiz.bergamot.worker.engine.EngineContext;
+import com.intrbiz.bergamot.worker.engine.CheckEngineContext;
 
 @Ignore
 public class TestHTTPEngine
@@ -33,7 +35,7 @@ public class TestHTTPEngine
         Logger.getRootLogger().setLevel(Level.TRACE);
         //
         this.engine = new HTTPEngine();
-        this.engine.prepare(new EngineContext() {
+        this.engine.prepare(new CheckEngineContext() {
 
             @Override
             public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
@@ -244,6 +246,18 @@ public class TestHTTPEngine
         {
             if (this.onReading != null)
                 this.onReading.accept(readingParcelMO);
+        }
+
+        @Override
+        public void publishActiveResult(ActiveResult result)
+        {
+            this.publishResult(result);
+        }
+
+        @Override
+        public void publishPassiveResult(PassiveResult result)
+        {
+            this.publishResult(result);
         }
 
         @Override

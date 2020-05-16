@@ -1,0 +1,2 @@
+ com.intrbiz.bergamot.worker.engine.nagios.NagiosEngine
+ com.intrbiz.bergamot.worker.engine.nrpe.NRPEEngine

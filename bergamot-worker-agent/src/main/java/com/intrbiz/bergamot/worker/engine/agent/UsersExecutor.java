@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.stat.WhoStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 
@@ -17,7 +17,7 @@ import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 /**
  * Check active users of a Bergamot Agent
  */
-public class UsersExecutor extends AbstractExecutor<AgentEngine>
+public class UsersExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "users";
     
@@ -25,16 +25,7 @@ public class UsersExecutor extends AbstractExecutor<AgentEngine>
 
     public UsersExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

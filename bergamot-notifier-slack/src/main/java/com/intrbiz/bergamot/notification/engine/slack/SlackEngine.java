@@ -10,14 +10,13 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
-import javax.net.ssl.TrustManager;
 
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
 import com.intrbiz.accounting.Accounting;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
-import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
@@ -66,7 +65,7 @@ public class SlackEngine extends TemplatedNotificationEngine
 
     public SlackEngine()
     {
-        super(NAME);
+        super(BergamotVersion.NAME, NAME, true);
         // timer used for timeouts
         this.timer = new Timer();
         // every 5 minutes forcefully purge the timer queue
@@ -88,9 +87,8 @@ public class SlackEngine extends TemplatedNotificationEngine
         // setup our custom functions for templating
         this.expressExtensions.addFunction("slack_encode", SlackEncode.class);
         // setup our HTTP engine
-        // Setup a custom SSLContext which will not validate certs
         this.sslContext = SSLContext.getInstance("TLS");
-        this.sslContext.init(null, new TrustManager[] { new BergamotTrustManager(false) }, new SecureRandom());
+        this.sslContext.init(null, null, new SecureRandom());
         // setup the Netty event loop
         this.eventLoop = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 2, new IBThreadFactory("bergamot-slack-notifier", false));
         // log

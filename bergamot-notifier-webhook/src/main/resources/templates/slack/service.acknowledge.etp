@@ -1,0 +1,4 @@
+The alert for service #{slack_encode(service.summary)} on the host #{slack_encode(host.summary)} has been acknowledged by #{slack_encode(notification.acknowledgedBy.summary)} #{dateformat('HH:mm:ss', notification.raised)} on #{dateformat('EEEE dd/MM/yyyy', notification.raised)}
+<# slack_message.attachment().color('#55aaff').authorName(notification.acknowledgeSummary).text(notification.acknowledgeComment);
+   slack_message.attachment().color('#2c2c2c').authorName('View Check').text().link('https://' + site.name + '/service/id/' + service.id, 'View service ' + service.summary + ' on host ' + host.summary);
+#>

@@ -2,24 +2,19 @@ package com.intrbiz.bergamot.worker.engine.dummy;
 
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 /**
  * Execute static dummy checks
  */
-public class StaticExecutor extends AbstractExecutor<DummyEngine>
+public class StaticExecutor extends AbstractCheckExecutor<DummyEngine>
 {
     public static final String NAME = "static";
 
     public StaticExecutor()
     {
-        super();
-    }
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return DummyEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

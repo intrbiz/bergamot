@@ -21,19 +21,13 @@ public interface CheckExecutionContext
      * Publish an active result for the given check
      * @param resultMO the active result
      */
-    default void publishActiveResult(ActiveResult result)
-    {
-        this.publishResult(result);
-    }
+    void publishActiveResult(ActiveResult result);
     
     /**
      * Publish a passive result for a check of the given site
      * @param resultMO the passive result
      */
-    default void publishPassiveResult(PassiveResult result)
-    {
-        this.publishResult(result);
-    }
+    void publishPassiveResult(PassiveResult result);
     
     /**
      * Publish a readings
@@ -46,9 +40,24 @@ public interface CheckExecutionContext
      * @param check the check which was executed
      * @param readings the readings
      */
+    default void publishReading(Reading... readings)
+    {
+        ReadingParcelMessage readingParcel = new ReadingParcelMessage().captured(System.currentTimeMillis());
+        for (Reading reading : readings)
+        {
+            readingParcel.reading(reading);
+        }
+        this.publishReading(readingParcel);
+    }
+    
+    /**
+     * Publish the given readings for the given check execution
+     * @param check the check which was executed
+     * @param readings the readings
+     */
     default void publishReading(ExecuteCheck check, Reading... readings)
     {
-        ReadingParcelMessage readingParcel = new ReadingParcelMessage().fromCheck(check.getCheckId()).captured(System.currentTimeMillis());
+        ReadingParcelMessage readingParcel = new ReadingParcelMessage().captured(System.currentTimeMillis());
         for (Reading reading : readings)
         {
             readingParcel.reading(reading);
@@ -63,7 +72,7 @@ public interface CheckExecutionContext
      */
     default void publishReading(ExecuteCheck check, Iterable<Reading> readings)
     {
-        ReadingParcelMessage readingParcel = new ReadingParcelMessage().fromCheck(check.getCheckId()).captured(System.currentTimeMillis());
+        ReadingParcelMessage readingParcel = new ReadingParcelMessage().captured(System.currentTimeMillis());
         for (Reading reading : readings)
         {
             readingParcel.reading(reading);

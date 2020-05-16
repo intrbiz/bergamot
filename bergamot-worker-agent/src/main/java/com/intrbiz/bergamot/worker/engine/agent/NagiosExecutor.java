@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 
@@ -20,7 +20,7 @@ import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 /**
  * Execute a Nagios plugin via the Bergamot Agent
  */
-public class NagiosExecutor extends AbstractExecutor<AgentEngine>
+public class NagiosExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "nagios";
     
@@ -28,16 +28,7 @@ public class NagiosExecutor extends AbstractExecutor<AgentEngine>
 
     public NagiosExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

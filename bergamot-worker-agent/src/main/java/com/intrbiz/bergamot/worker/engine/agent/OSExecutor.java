@@ -9,13 +9,13 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.stat.OSStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 /**
  * Display the OS an Agent is running
  */
-public class OSExecutor extends AbstractExecutor<AgentEngine>
+public class OSExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "os";
     
@@ -23,16 +23,7 @@ public class OSExecutor extends AbstractExecutor<AgentEngine>
 
     public OSExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

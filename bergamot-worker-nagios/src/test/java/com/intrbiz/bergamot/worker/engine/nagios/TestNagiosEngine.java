@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
@@ -255,6 +256,18 @@ public class TestNagiosEngine
         {
             if (this.onResult != null)
                 this.onResult.accept(resultMO);
+        }
+
+        @Override
+        public void publishActiveResult(ActiveResult result)
+        {
+            this.publishResult(result);
+        }
+
+        @Override
+        public void publishPassiveResult(PassiveResult result)
+        {
+            this.publishResult(result);
         }
     }
 }

@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -21,7 +21,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 /**
  * Execute NRPE checks from pure Java
  */
-public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
+public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
 {
     private static final Logger logger = Logger.getLogger(NRPEExecutor.class);
     
@@ -31,20 +31,11 @@ public class NRPEExecutor extends AbstractExecutor<NRPEEngine>
     
     public NRPEExecutor()
     {
-        super();
+        super("nrpe", true);
         // setup metrics
         IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.nrpe");
         this.nrpeRequestTimer = source.getRegistry().timer("all-nrpe-requests");
         this.failedRequests = source.getRegistry().counter("failed-nrpe-requests");
-    }
-    
-    /**
-     * Only execute Checks where the engine == "nrpe"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return NRPEEngine.NAME.equalsIgnoreCase(task.getEngine());
     }
     
     @Override

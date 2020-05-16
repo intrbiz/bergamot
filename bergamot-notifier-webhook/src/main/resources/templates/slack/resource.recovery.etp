@@ -1,0 +1,4 @@
+Recovery for resource #{slack_encode(resource.summary)} on the cluster #{slack_encode(cluster.summary)} is #{resource.state.status}
+<# slack_message.attachment().color(status_colour(resource.state.status)).authorName('Last checked').text().text(dateformat('HH:mm:ss', resource.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', resource.state.lastCheckTime));
+   slack_message.attachment().color(status_colour(resource.state.status)).authorName('View Check').text().link('https://' + site.name + '/resource/id/' + resource.id, 'View resource ' + resource.summary + ' on cluster ' + cluster.summary);
+#>

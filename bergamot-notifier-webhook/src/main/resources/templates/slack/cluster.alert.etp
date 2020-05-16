@@ -1,0 +1,13 @@
+Alert for cluster #{slack_encode(cluster.summary)} is #{cluster.state.status}
+<# slack_message.attachment().color(status_colour(cluster.state.status)).authorName('Last checked').text().text(dateformat('HH:mm:ss', cluster.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', cluster.state.lastCheckTime));
+   slack_message.attachment().color(status_colour(cluster.state.status)).authorName('View Check').text().link('https://' + site.name + '/cluster/id/' + cluster.id, 'View cluster ' + cluster.summary);
+   if (cluster.note != null) {
+     noteText = slack_message.attachment().color(status_colour(cluster.state.status)).authorName('Note').text();
+     if (! isempty(cluster.note.content)) {
+       noteText.text(cluster.note.content).text('\n');
+     }
+     if (! isempty(cluster.note.url)) {
+   	   noteText.link(cluster.note.url, coalesce(cluster.note.title, 'More information'));
+   	 }
+   }
+#>

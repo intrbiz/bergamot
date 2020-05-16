@@ -16,7 +16,7 @@ import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.util.UnitUtil;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
@@ -25,7 +25,7 @@ import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 /**
  * Check the disk usage of a Bergamot Agent
  */
-public class DisksExecutor extends AbstractExecutor<AgentEngine>
+public class DisksExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "disks";
     
@@ -35,16 +35,7 @@ public class DisksExecutor extends AbstractExecutor<AgentEngine>
 
     public DisksExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckNetCon;
 import com.intrbiz.bergamot.model.message.agent.stat.NetConStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 
@@ -18,7 +18,7 @@ import com.intrbiz.gerald.polyakov.gauge.IntegerGaugeReading;
 /**
  * Check network connections on a Bergamot Agent
  */
-public class NetConExecutor extends AbstractExecutor<AgentEngine>
+public class NetConExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "network-connection";
     
@@ -26,16 +26,7 @@ public class NetConExecutor extends AbstractExecutor<AgentEngine>
 
     public NetConExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

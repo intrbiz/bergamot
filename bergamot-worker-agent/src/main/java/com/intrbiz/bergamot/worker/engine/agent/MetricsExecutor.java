@@ -11,14 +11,14 @@ import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.MetricsStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.script.ScriptedCheckManager;
 
 /**
  * Check some metrics retrieved from an Agent
  */
-public class MetricsExecutor extends AbstractExecutor<AgentEngine>
+public class MetricsExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "metrics";
     
@@ -28,16 +28,7 @@ public class MetricsExecutor extends AbstractExecutor<AgentEngine>
 
     public MetricsExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

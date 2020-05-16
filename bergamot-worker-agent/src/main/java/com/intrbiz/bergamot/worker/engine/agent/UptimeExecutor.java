@@ -11,14 +11,14 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
  * Check the uptime of a Bergamot Agent
  */
-public class UptimeExecutor extends AbstractExecutor<AgentEngine>
+public class UptimeExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "uptime";
     
@@ -28,16 +28,7 @@ public class UptimeExecutor extends AbstractExecutor<AgentEngine>
 
     public UptimeExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

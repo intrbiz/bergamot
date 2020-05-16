@@ -15,7 +15,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<intrbiz.util.version>1.6.4</intrbiz.util.version>
+		<intrbiz.util.version>1.7.0</intrbiz.util.version>
 		<intrbiz.snmpib.version>1.1.0</intrbiz.snmpib.version>
 		<intrbiz.gerald.version>1.2.2</intrbiz.gerald.version>
 		<intrbiz.balsa.version>5.1.3</intrbiz.balsa.version>
@@ -39,7 +39,7 @@
 		<java.mail.version>[1.5,)</java.mail.version>
 		<jna.version>4.0.0</jna.version>
 		<sigar.version>1.6.4</sigar.version>
-		<commons.codec.version>1.8</commons.codec.version>
+		<commons.codec.version>1.13</commons.codec.version>
 		<fluent.hc.version>[4.5,)</fluent.hc.version>
 		<jbcrypt.version>0.4</jbcrypt.version>
 		<jaxb.core.version>2.3.0.1</jaxb.core.version>
@@ -101,59 +101,68 @@
 	</build>
 
 	<modules>
-		<module>bergamot-ui</module>
-		<module>bergamot-nrpe</module>
-		<module>bergamot-config</module>
-		<module>bergamot-timerange</module>
-		<module>bergamot-compat-nagios</module>
-		<module>bergamot-config-converter</module>
-		<module>bergamot-util</module>
+	    <!-- Core Model -->
 		<module>bergamot-message-model</module>
 		<module>bergamot-model</module>
-		<module>bergamot-notification-api</module>
-		<module>bergamot-worker-api</module>
-		<module>bergamot-result-processor</module>
-		<module>bergamot-scheduler</module>
-		<module>bergamot-notification-engine-email</module>
-		<module>bergamot-notification-engine-sms</module>
-		<module>bergamot-worker-nagios</module>
-		<module>bergamot-worker-snmp</module>
-		<module>bergamot-cli</module>
-		<module>bergamot-daemon-config</module>
-		<module>bergamot-api-client</module>
-		<module>bergamot-jnetraw</module>
-		<module>bergamot-pinger</module>
-		<module>bergamot-worker-http</module>
-		<module>bergamot-check-http</module>
-		<module>bergamot-check-tcp</module>
-		<module>bergamot-agent</module>
-		<module>bergamot-agent-server</module>
-		<module>bergamot-agent-message-model</module>
-		<module>bergamot-crypto-util</module>
-		<module>bergamot-nagios</module>
-		<module>bergamot-worker-agent</module>
-		<module>bergamot-worker-dummy</module>
-		<module>bergamot-notifier-webhook</module>
 		<module>lamplighter-model</module>
-		<module>lamplighter-reading-processor</module>
-		<module>bergamot-worker-jdbc</module>
-		<module>bergamot-check-jdbc</module>
+		<module>bergamot-config</module>
+		<module>bergamot-compat-nagios</module>
+		<module>bergamot-timerange</module>
+		<module>bergamot-config-converter</module>
+		<!-- Util -->
+		<module>bergamot-util</module>
+		<module>bergamot-crypto-util</module>
 		<module>bergamot-accounting-model</module>
-		<module>bergamot-check-jmx</module>
-		<module>bergamot-worker-jmx</module>
-		<module>bergamot-worker-ssh</module>
-		<module>bergamot-check-ssh</module>
-		<module>bergamot-notifier-slack</module>
-		<module>bergamot-worker</module>
+		<module>bergamot-daemon-config</module>
+		<!-- Processing -->
+		<module>bergamot-cluster-api</module>
 		<module>bergamot-cluster</module>
+		<module>bergamot-result-processor</module>
+		<module>lamplighter-reading-processor</module>
+		<module>bergamot-scheduler</module>
 		<module>bergamot-processor</module>
-		<module>bergamot-notifier</module>
-		<module>bergamot-site-config-template</module>
+		<!-- UI -->
+		<module>bergamot-ui</module>
+		<!-- Proxy -->
 		<module>bergamot-proxy-common</module>
 		<module>bergamot-proxy-server</module>
 		<module>bergamot-proxy-client</module>
 		<module>bergamot-proxy</module>
-		<module>bergamot-cluster-api</module>
+		<!-- Workers -->
+		<module>bergamot-agent</module>
+		<module>bergamot-agent-server</module>
+		<module>bergamot-agent-message-model</module>
+		<module>bergamot-jnetraw</module>
+		<module>bergamot-pinger</module>
+		<module>bergamot-check-http</module>
+		<module>bergamot-check-jdbc</module>
+		<module>bergamot-check-jmx</module>
+		<module>bergamot-check-ssh</module>
+		<module>bergamot-check-tcp</module>
+		<module>bergamot-nrpe</module>
+		<module>bergamot-nagios</module>
+		<module>bergamot-worker-api</module>
+		<module>bergamot-worker-agent</module>
+		<module>bergamot-worker-dummy</module>
+		<module>bergamot-worker-http</module>
+		<module>bergamot-worker-jdbc</module>
+		<module>bergamot-worker-jmx</module>
+		<module>bergamot-worker-nagios</module>
+		<module>bergamot-worker-snmp</module>
+		<module>bergamot-worker-ssh</module>
+		<module>bergamot-worker</module>
+		<!-- Notifiers -->
+		<module>bergamot-notification-api</module>
+		<module>bergamot-notifier-email</module>
+		<module>bergamot-notifier-slack</module>
+		<module>bergamot-notifier-sms</module>
+		<module>bergamot-notifier-webhook</module>
+		<module>bergamot-notifier</module>
+		<!-- Client -->
+		<module>bergamot-api-client</module>
+		<module>bergamot-cli</module>
+		<!-- Configuration Templates -->
+		<module>bergamot-site-config-template</module>
 	</modules>
 
 	<dependencyManagement>
@@ -309,6 +318,86 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-notifier-email</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-notifier-sms</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-notifier-slack</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-notifier-webhook</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-nagios</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-http</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-dummy</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-jdbc</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-jmx</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-snmp</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-ssh</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-worker-agent</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-check-ssh</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-accounting-model</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-check-jdbc</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-check-jmx</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.intrbiz.core</groupId>
 				<artifactId>core</artifactId>
 				<version>${intrbiz.core.version}</version>
@@ -461,11 +550,6 @@
 				<version>${postgresql.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.intrbiz.bergamot</groupId>
-				<artifactId>bergamot-check-jdbc</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.jsoup</groupId>
 				<artifactId>jsoup</artifactId>
 				<version>${jsoup.version}</version>
@@ -481,24 +565,9 @@
 				<version>[1.0,)</version>
 			</dependency>
 			<dependency>
-				<groupId>com.intrbiz.bergamot</groupId>
-				<artifactId>bergamot-accounting-model</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.intrbiz.bergamot</groupId>
-				<artifactId>bergamot-check-jmx</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>com.jcraft</groupId>
 				<artifactId>jsch</artifactId>
 				<version>${jsch.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.intrbiz.bergamot</groupId>
-				<artifactId>bergamot-check-ssh</artifactId>
-				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.intrbiz.gerald</groupId>

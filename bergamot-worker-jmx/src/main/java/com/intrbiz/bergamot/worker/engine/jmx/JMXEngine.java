@@ -1,12 +1,13 @@
 package com.intrbiz.bergamot.worker.engine.jmx;
 
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.check.jmx.JMXChecker;
-import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckEngine;
 
 /**
  * A dedicated JMX check engine
  */
-public class JMXEngine extends AbstractEngine
+public class JMXEngine extends AbstractCheckEngine
 {
     public static final String NAME = "jmx";
     
@@ -14,7 +15,7 @@ public class JMXEngine extends AbstractEngine
 
     public JMXEngine()
     {
-        super(NAME, new ScriptedJMXExecutor());
+        super(BergamotVersion.NAME, NAME, true, new ScriptedJMXExecutor());
         // setup the checker
         this.checker = new JMXChecker();
     }

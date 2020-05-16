@@ -9,10 +9,12 @@ import org.junit.Before;
 import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
+import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
-import com.intrbiz.bergamot.worker.engine.EngineContext;
+import com.intrbiz.bergamot.worker.engine.CheckEngineContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
 
 public abstract class BaseSSHTest
@@ -30,7 +32,7 @@ public abstract class BaseSSHTest
     public void setup() throws Exception
     {
         this.engine = new SSHEngine();
-        this.engine.prepare(new EngineContext() {
+        this.engine.prepare(new CheckEngineContext() {
             
             @Override
             public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
@@ -102,6 +104,18 @@ public abstract class BaseSSHTest
         {
             if (this.onResult != null)
                 this.onResult.accept(resultMO);
+        }
+
+        @Override
+        public void publishActiveResult(ActiveResult result)
+        {
+            this.publishResult(result);
+        }
+
+        @Override
+        public void publishPassiveResult(PassiveResult result)
+        {
+            this.publishResult(result);
         }
     }
     

@@ -28,42 +28,34 @@
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-nagios</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-http</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-dummy</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-jdbc</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-jmx</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-snmp</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-ssh</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
 			<artifactId>bergamot-worker-agent</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
@@ -76,7 +68,7 @@
 			<plugin>
 				<groupId>com.intrbiz.util</groupId>
 				<artifactId>packaging</artifactId>
-				<version>1.1.1</version>
+				<version>${intrbiz.util.version}</version>
 				<configuration>
 					<appClass>com.intrbiz.bergamot.worker.BergamotWorker</appClass>
 				</configuration>

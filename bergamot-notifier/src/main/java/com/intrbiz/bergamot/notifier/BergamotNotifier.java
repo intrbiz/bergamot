@@ -2,11 +2,12 @@ package com.intrbiz.bergamot.notifier;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -32,13 +34,10 @@ import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.NotificationEngine;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
-import com.intrbiz.bergamot.notification.engine.email.EmailEngine;
-import com.intrbiz.bergamot.notification.engine.slack.SlackEngine;
-import com.intrbiz.bergamot.notification.engine.sms.SMSEngine;
-import com.intrbiz.bergamot.notification.engine.webhook.WebHookEngine;
 import com.intrbiz.configuration.Configurable;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.util.IBThreadFactory;
+import com.intrbiz.util.IntrbizBootstrap;
 
 public class BergamotNotifier implements Configurable<NotifierCfg>
 {   
@@ -48,17 +47,11 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     
     private static final Logger logger = Logger.getLogger(BergamotNotifier.class);
     
-    private static final List<AvailableEngine> AVAILABLE_ENGINES = new ArrayList<>();
-    
-    static
-    {
-        AVAILABLE_ENGINES.add(new AvailableEngine(EmailEngine.NAME,   EmailEngine::new,   true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(SMSEngine.NAME,     SMSEngine::new,     false));
-        AVAILABLE_ENGINES.add(new AvailableEngine(SlackEngine.NAME,   SlackEngine::new,   true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(WebHookEngine.NAME, WebHookEngine::new, true));
-    }
-    
     private NotifierCfg configuration;
+ 
+    private Set<String> enabledEngines = new HashSet<>();
+    
+    private Set<String> disabledEngines = new HashSet<>();
     
     private Map<String, NotificationEngine> engines = new TreeMap<String, NotificationEngine>();
 
@@ -102,18 +95,29 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
          *  - Specific configuration method
          *  - Default value
          */
-        return Util.coalesceEmpty(
-            System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')),
-            System.getProperty(name),
-            configuration.getStringParameterValue(name, null),
-            cfgValue == null ? null : cfgValue.get(),
-            defaultValue
+        return Util.coalesce(
+                Util.coalesceEmpty(
+                    System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')),
+                    System.getProperty(name),
+                    configuration.getStringParameterValue(name, null),
+                    cfgValue == null ? null : cfgValue.get()
+                ),
+                defaultValue
         );
     }
     
     protected String getConfigurationParameter(String name, String defaultValue)
     {
         return this.getConfigurationParameter(name, null, defaultValue);
+    }
+    
+    protected boolean isEngineEnabled(String engineName, boolean enabledByDefault)
+    {
+        if (this.enabledEngines.contains(engineName))
+            return true;
+        if (this.disabledEngines.contains(engineName))
+            return false;
+        return enabledByDefault;
     }
     
     @Override
@@ -126,17 +130,39 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         {
             this.sites.add(UUID.fromString(site));
         }
-        this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", String.valueOf(this.configuration.getThreads())));
-        // register engines 
-        for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
+        this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", this.configuration::getThreads, String.valueOf(Runtime.getRuntime().availableProcessors())));
+        this.enabledEngines = Arrays.stream(this.getConfigurationParameter("enabled.engines", "").split(",")).map(String::trim).collect(Collectors.toSet());
+        this.disabledEngines = Arrays.stream(this.getConfigurationParameter("disabled.engines", "").split(",")).map(String::trim).collect(Collectors.toSet());
+         // register engines
+        Set<Class<?>> processed = new HashSet<>();
+        for (NotificationEngine availableEngine : ServiceLoader.load(NotificationEngine.class))
         {
-            if (this.configuration.isEngineEnabled(availableEngine.name, availableEngine.enabledByDefault))
+            this.registerEngine(availableEngine, processed);
+        }
+        for (URLClassLoader pluginLoader : IntrbizBootstrap.getPluginClassLoaders())
+        {
+            for (NotificationEngine availableEngine : ServiceLoader.load(NotificationEngine.class, pluginLoader))
             {
-                NotificationEngine engine = availableEngine.constructor.get();
-                this.engines.put(engine.getName(), engine);
-                logger.info("Registering notification engine: " + engine.getName());
+                this.registerEngine(availableEngine,processed);
+            }    
+        }
+    }
+    
+    protected void registerEngine(NotificationEngine availableEngine, Set<Class<?>> processed)
+    {
+        if (! processed.contains(availableEngine.getClass()))
+        {
+            if (this.isEngineEnabled(availableEngine.getName(), availableEngine.isEnabledByDefault()))
+            {
+                logger.info("Registering check engine: " + availableEngine);
+                this.engines.put(availableEngine.getName(), availableEngine);
+            }
+            else
+            {
+                logger.info("Skipping check engine: " + availableEngine);   
             }
         }
+        processed.add(availableEngine.getClass());
     }
 
     public void start() throws Exception
@@ -379,22 +405,5 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         Logger root = Logger.getRootLogger();
         root.addAppender(new ConsoleAppender(new PatternLayout("%d [%t] %p %c %x - %m%n")));
         root.setLevel(Level.toLevel(config.getLevel().toUpperCase()));
-    }
-    
-    private static class AvailableEngine
-    {
-        public final String name;
-        
-        public final Supplier<NotificationEngine> constructor;
-        
-        public final boolean enabledByDefault;
-
-        public AvailableEngine(String name, Supplier<NotificationEngine> constructor, boolean enabledByDefault)
-        {
-            super();
-            this.name = name;
-            this.constructor = constructor;
-            this.enabledByDefault = enabledByDefault;
-        }
     }
 }

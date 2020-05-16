@@ -1,16 +1,17 @@
 package com.intrbiz.bergamot.worker.engine.nagios;
 
-import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.BergamotVersion;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckEngine;
 
 /**
  * Nagios check engine
  */
-public class NagiosEngine extends AbstractEngine
+public class NagiosEngine extends AbstractCheckEngine
 {
     public static final String NAME = "nagios";
 
     public NagiosEngine()
     {
-        super(NAME, new NagiosExecutor());
+        super(BergamotVersion.NAME, NAME, true, new NagiosExecutor());
     }
 }

@@ -16,6 +16,7 @@ import com.intrbiz.bergamot.model.message.processor.ProcessorMessage;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOn;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnCheckId;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchableMO;
+import com.intrbiz.bergamot.model.message.worker.check.CheckMessage;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 import com.intrbiz.gerald.polyakov.gauge.FloatGaugeReading;
@@ -117,6 +118,13 @@ public class ReadingParcelMessage extends ProcessorMessage implements MatchableM
     }
     
     //
+    
+    @JsonIgnore
+    public ReadingParcelMessage fromCheck(CheckMessage check)
+    {
+        this.fromCheck(check.getCheckId());
+        return this;
+    }
     
     @JsonIgnore
     public ReadingParcelMessage fromCheck(UUID checkId)

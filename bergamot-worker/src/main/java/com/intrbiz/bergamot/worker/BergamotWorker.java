@@ -2,11 +2,12 @@ package com.intrbiz.bergamot.worker;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -37,31 +39,20 @@ import com.intrbiz.bergamot.model.message.processor.agent.LookupAgentKey;
 import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
+import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.worker.WorkerMessage;
 import com.intrbiz.bergamot.model.message.worker.agent.FoundAgentKey;
 import com.intrbiz.bergamot.model.message.worker.agent.WorkerAgentMessage;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
+import com.intrbiz.bergamot.worker.engine.CheckEngine;
+import com.intrbiz.bergamot.worker.engine.CheckEngineContext;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
-import com.intrbiz.bergamot.worker.engine.Engine;
-import com.intrbiz.bergamot.worker.engine.EngineContext;
-import com.intrbiz.bergamot.worker.engine.agent.AgentEngine;
-import com.intrbiz.bergamot.worker.engine.dummy.DummyEngine;
-import com.intrbiz.bergamot.worker.engine.http.HTTPEngine;
-import com.intrbiz.bergamot.worker.engine.jdbc.JDBCEngine;
-import com.intrbiz.bergamot.worker.engine.jmx.JMXEngine;
-import com.intrbiz.bergamot.worker.engine.nagios.NagiosEngine;
-import com.intrbiz.bergamot.worker.engine.nrpe.NRPEEngine;
-import com.intrbiz.bergamot.worker.engine.sftp.SFTPEngine;
-import com.intrbiz.bergamot.worker.engine.snmp.SNMPEngine;
-import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
 import com.intrbiz.configuration.Configurable;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.util.IBThreadFactory;
+import com.intrbiz.util.IntrbizBootstrap;
 
-/**
- * A worker to execute nagios check engines
- */
 public class BergamotWorker implements Configurable<WorkerCfg>
 {
     public static final String DEFAULT_CONFIGURATION_FILE = "/etc/bergamot/worker/default.xml";
@@ -70,26 +61,13 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     private static final Logger logger = Logger.getLogger(BergamotWorker.class);
 
-    private static final List<AvailableEngine> AVAILABLE_ENGINES = new ArrayList<>();
-
-    static
-    {
-        // register all engines which are available
-        AVAILABLE_ENGINES.add(new AvailableEngine(DummyEngine.NAME, DummyEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(NagiosEngine.NAME, NagiosEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(NRPEEngine.NAME, NRPEEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(HTTPEngine.NAME, HTTPEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(JDBCEngine.NAME, JDBCEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(JMXEngine.NAME, JMXEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(SSHEngine.NAME, SSHEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(SFTPEngine.NAME, SFTPEngine::new, true));
-        AVAILABLE_ENGINES.add(new AvailableEngine(SNMPEngine.NAME, SNMPEngine::new, false));
-        AVAILABLE_ENGINES.add(new AvailableEngine(AgentEngine.NAME, AgentEngine::new, false));
-    }
-
     private WorkerCfg configuration;
+    
+    private Set<String> enabledEngines = new HashSet<>();
+    
+    private Set<String> disabledEngines = new HashSet<>();
 
-    private Map<String, Engine> engines = new TreeMap<String, Engine>();
+    private Map<String, CheckEngine> engines = new TreeMap<String, CheckEngine>();
 
     private Set<UUID> sites = new HashSet<>();
 
@@ -125,7 +103,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         return this.workerPool;
     }
 
-    public final Collection<Engine> getEngines()
+    public final Collection<CheckEngine> getEngines()
     {
         return this.engines.values();
     }
@@ -135,12 +113,21 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         /*
          * Fetch configuration in order of: - Env var - System property - Configuration parameter - Specific configuration method - Default value
          */
-        return Util.coalesceEmpty(System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')), System.getProperty(name), configuration.getStringParameterValue(name, null), cfgValue == null ? null : cfgValue.get(), defaultValue);
+        return Util.coalesce(Util.coalesceEmpty(System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')), System.getProperty(name), configuration.getStringParameterValue(name, null), cfgValue == null ? null : cfgValue.get()), defaultValue);
     }
 
     protected String getConfigurationParameter(String name, String defaultValue)
     {
         return this.getConfigurationParameter(name, null, defaultValue);
+    }
+    
+    protected boolean isEngineEnabled(String engineName, boolean enabledByDefault)
+    {
+        if (this.enabledEngines.contains(engineName))
+            return true;
+        if (this.disabledEngines.contains(engineName))
+            return false;
+        return enabledByDefault;
     }
 
     @Override
@@ -153,18 +140,40 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         {
             this.sites.add(UUID.fromString(site));
         }
+        this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", this.configuration::getThreads, String.valueOf(Runtime.getRuntime().availableProcessors())));
+        this.enabledEngines = Arrays.stream(this.getConfigurationParameter("enabled.engines", "").split(",")).map(String::trim).collect(Collectors.toSet());
+        this.disabledEngines = Arrays.stream(this.getConfigurationParameter("disabled.engines", "").split(",")).map(String::trim).collect(Collectors.toSet());
         this.workerPool = this.getConfigurationParameter("worker.pool", this.configuration::getWorkerPool, null);
-        this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", String.valueOf(this.configuration.getThreads())));
         // register engines
-        for (AvailableEngine availableEngine : AVAILABLE_ENGINES)
+        Set<Class<?>> processed = new HashSet<>();
+        for (CheckEngine availableEngine : ServiceLoader.load(CheckEngine.class))
         {
-            if (this.configuration.isEngineEnabled(availableEngine.name, availableEngine.enabledByDefault))
+            this.registerEngine(availableEngine, processed);
+        }
+        for (URLClassLoader pluginLoader : IntrbizBootstrap.getPluginClassLoaders())
+        {
+            for (CheckEngine availableEngine : ServiceLoader.load(CheckEngine.class, pluginLoader))
             {
-                Engine engine = availableEngine.constructor.get();
-                this.engines.put(engine.getName(), engine);
-                logger.info("Registering check engine: " + engine.getName());
+                this.registerEngine(availableEngine,processed);
+            }    
+        }
+    }
+    
+    protected void registerEngine(CheckEngine availableEngine, Set<Class<?>> processed)
+    {
+        if (! processed.contains(availableEngine.getClass()))
+        {
+            if (this.isEngineEnabled(availableEngine.getName(), availableEngine.isEnabledByDefault()))
+            {
+                logger.info("Registering check engine: " + availableEngine);
+                this.engines.put(availableEngine.getName(), availableEngine);
+            }
+            else
+            {
+                logger.info("Skipping check engine: " + availableEngine);   
             }
         }
+        processed.add(availableEngine.getClass());
     }
 
     protected void start() throws Exception
@@ -186,16 +195,16 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     protected void prepareEngines() throws Exception
     {
-        for (Engine engine : this.getEngines())
+        for (CheckEngine engine : this.getEngines())
         {
             logger.info("Preparing check engine: " + engine.getName());
             engine.prepare(this.createEngineContext(engine));
         }
     }
 
-    protected EngineContext createEngineContext(final Engine e)
+    protected CheckEngineContext createEngineContext(final CheckEngine e)
     {
-        return new EngineContext()
+        return new CheckEngineContext()
         {
             @Override
             public String getParameter(String name, String defaultValue)
@@ -288,7 +297,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     protected void startEngines() throws Exception
     {
-        for (Engine engine : this.getEngines())
+        for (CheckEngine engine : this.getEngines())
         {
             logger.info("Starting check engine: " + engine.getName());
             engine.start(this.createEngineContext(engine));
@@ -334,7 +343,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             CheckExecutionContext context = createExecutionContext(check);
             try
             {
-                Engine engine = this.engines.get(check.getEngine());
+                CheckEngine engine = this.engines.get(check.getEngine());
                 if (engine != null && engine.accept(check))
                 {
                     engine.execute(check, context);
@@ -363,8 +372,22 @@ public class BergamotWorker implements Configurable<WorkerCfg>
             }
 
             @Override
+            public void publishActiveResult(ActiveResult result)
+            {
+                result.fromCheck(check);
+                this.publishResult(result);
+            }
+
+            @Override
+            public void publishPassiveResult(PassiveResult result)
+            {
+                this.publishResult(result);
+            }
+
+            @Override
             public void publishReading(ReadingParcelMessage reading)
             {
+                reading.fromCheck(check);
                 reading.setProcessorId(check.getProcessorId());
                 client.getProcessorDispatcher().dispatchReading(reading);
             }
@@ -379,7 +402,7 @@ public class BergamotWorker implements Configurable<WorkerCfg>
 
     protected void shutdownEngines()
     {
-        for (Engine engine : this.getEngines())
+        for (CheckEngine engine : this.getEngines())
         {
             logger.info("Shutting down check engine: " + engine.getName());
             engine.shutdown(this.createEngineContext(engine));
@@ -514,22 +537,5 @@ public class BergamotWorker implements Configurable<WorkerCfg>
         Logger root = Logger.getRootLogger();
         root.addAppender(new ConsoleAppender(new PatternLayout("%d [%t] %p %c %x - %m%n")));
         root.setLevel(Level.toLevel(config.getLevel().toUpperCase()));
-    }
-
-    private static class AvailableEngine
-    {
-        public final String name;
-
-        public final Supplier<Engine> constructor;
-
-        public final boolean enabledByDefault;
-
-        public AvailableEngine(String name, Supplier<Engine> constructor, boolean enabledByDefault)
-        {
-            super();
-            this.name = name;
-            this.constructor = constructor;
-            this.enabledByDefault = enabledByDefault;
-        }
     }
 }

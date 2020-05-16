@@ -10,14 +10,14 @@ import com.intrbiz.bergamot.model.message.agent.check.CheckCPU;
 import com.intrbiz.bergamot.model.message.agent.stat.CPUStat;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.gauge.DoubleGaugeReading;
 
 /**
  * Check the load average of a Bergamot Agent
  */
-public class LoadExecutor extends AbstractExecutor<AgentEngine>
+public class LoadExecutor extends AbstractCheckExecutor<AgentEngine>
 {
     public static final String NAME = "load";
     
@@ -27,16 +27,7 @@ public class LoadExecutor extends AbstractExecutor<AgentEngine>
 
     public LoadExecutor()
     {
-        super();
-    }
-
-    /**
-     * Only execute Checks where the engine == "agent"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return AgentEngine.NAME.equals(task.getEngine()) && NAME.equals(task.getExecutor());
+        super(NAME);
     }
 
     @Override

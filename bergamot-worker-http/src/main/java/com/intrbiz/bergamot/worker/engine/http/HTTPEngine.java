@@ -1,12 +1,13 @@
 package com.intrbiz.bergamot.worker.engine.http;
 
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.check.http.HTTPChecker;
-import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckEngine;
 
 /**
  * A dedicated HTTP check engine
  */
-public class HTTPEngine extends AbstractEngine
+public class HTTPEngine extends AbstractCheckEngine
 {
     public static final String NAME = "http";
     
@@ -14,7 +15,7 @@ public class HTTPEngine extends AbstractEngine
 
     public HTTPEngine()
     {
-        super(NAME, 
+        super(BergamotVersion.NAME, NAME, true, 
                 new HTTPExecutor(),
                 new CertificateExecutor(),
                 new ScriptedHTTPExecutor());

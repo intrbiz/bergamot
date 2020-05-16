@@ -24,12 +24,12 @@ public abstract class TemplatedNotificationEngine extends AbstractNotificationEn
     protected final ExpressExtensionRegistry expressExtensions = new ExpressExtensionRegistry("bergamot").addSubRegistry(ExpressExtensionRegistry.getDefaultRegistry());
 
     protected TemplateLoader templateLoader;
-
-    protected TemplatedNotificationEngine(String name)
-    {
-        super(name);
-    }
     
+    public TemplatedNotificationEngine(String vendor, String name, boolean enabledByDefault)
+    {
+        super(vendor, name, enabledByDefault);
+    }
+
     @Override
     protected void doPrepare(NotificationEngineContext engineContext) throws Exception
     {

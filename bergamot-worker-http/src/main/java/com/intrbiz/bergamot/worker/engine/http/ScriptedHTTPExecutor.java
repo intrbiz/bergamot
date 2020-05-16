@@ -1,19 +1,12 @@
 package com.intrbiz.bergamot.worker.engine.http;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleBindings;
-
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
-import com.intrbiz.bergamot.worker.engine.script.ActiveCheckScriptContext;
-import com.intrbiz.scripting.RestrictedScriptEngineManager;
+import com.intrbiz.bergamot.worker.engine.script.ScriptedCheckManager;
 
 /**
  * Execute HTTP check scripts, a Javascript script can be provided to 
@@ -21,46 +14,28 @@ import com.intrbiz.scripting.RestrictedScriptEngineManager;
  * fetching an API value.
  * 
  */
-public class ScriptedHTTPExecutor extends AbstractExecutor<HTTPEngine>
+public class ScriptedHTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
 {
     public static final String NAME = "script";
     
     private Logger logger = Logger.getLogger(ScriptedHTTPExecutor.class);
     
-    private ScriptEngineManager factory = new RestrictedScriptEngineManager();
+    private final ScriptedCheckManager scriptManager = new ScriptedCheckManager();
     
     public ScriptedHTTPExecutor()
     {
-        super();
-    }
-    
-    /**
-     * Only execute Checks where the engine == "http" and executor == "script"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
-               ScriptedHTTPExecutor.NAME.equalsIgnoreCase(task.getExecutor());
+        super(NAME);
     }
     
     @Override
     public void execute(final ExecuteCheck executeCheck, final CheckExecutionContext context)
     {
-        // TODO: use ScriptedCheckManager
         try
         {
-            // we need a script!
-            if (Util.isEmpty(executeCheck.getScript())) throw new RuntimeException("The script must be defined!");
-            // setup the script engine
-            ScriptEngine script = factory.getEngineByName("nashorn");
-            SimpleBindings bindings = new SimpleBindings();
-            bindings.put("check", executeCheck);
-            bindings.put("http", this.getEngine().getChecker());
-            bindings.put("bergamot", new ActiveCheckScriptContext(executeCheck, context));
-            script.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
-            // execute
-            script.eval(executeCheck.getScript());
+            // execute the script
+            this.scriptManager.createExecutor(executeCheck, context)
+                .bind("http", this.getEngine().getChecker())
+                .execute();
         }
         catch (Exception e)
         {

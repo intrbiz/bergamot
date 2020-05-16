@@ -1,16 +1,18 @@
 package com.intrbiz.bergamot.worker.engine.dummy;
 
-import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.BergamotVersion;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckEngine;
 
-public class DummyEngine extends AbstractEngine
+public class DummyEngine extends AbstractCheckEngine
 {
     public static final String NAME = "dummy";
     
     public DummyEngine()
     {
-        super(NAME, 
+        super(BergamotVersion.NAME, NAME, true,
                 new StaticExecutor(),
                 new RandomExecutor(),
-                new TimedExecutor());
+                new TimedExecutor(),
+                new ScriptExecutor());
     }
 }

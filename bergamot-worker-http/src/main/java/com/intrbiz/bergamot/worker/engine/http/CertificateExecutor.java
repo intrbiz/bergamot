@@ -14,7 +14,7 @@ import com.intrbiz.bergamot.crypto.util.TLSInfo;
 import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -22,7 +22,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
 /**
  * Execute TLS Certificate checks
  */
-public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
+public class CertificateExecutor extends AbstractCheckExecutor<HTTPEngine>
 {
     public static final String NAME = "certificate";
     
@@ -34,21 +34,11 @@ public class CertificateExecutor extends AbstractExecutor<HTTPEngine>
     
     public CertificateExecutor()
     {
-        super();
+        super(NAME);
         // setup metrics
         IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.http");
         this.requestTimer = source.getRegistry().timer("all-http-requests");
         this.failedRequests = source.getRegistry().counter("failed-http-requests");
-    }
-    
-    /**
-     * Only execute Checks where the engine == "http" and executor = "certificate"
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
-               CertificateExecutor.NAME.equalsIgnoreCase(task.getExecutor());
     }
     
     @Override

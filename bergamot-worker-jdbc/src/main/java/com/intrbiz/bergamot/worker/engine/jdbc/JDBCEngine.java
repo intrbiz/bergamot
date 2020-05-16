@@ -1,12 +1,13 @@
 package com.intrbiz.bergamot.worker.engine.jdbc;
 
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.check.jdbc.JDBCChecker;
-import com.intrbiz.bergamot.worker.engine.AbstractEngine;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckEngine;
 
 /**
  * A dedicated JDBC check engine
  */
-public class JDBCEngine extends AbstractEngine
+public class JDBCEngine extends AbstractCheckEngine
 {
     public static final String NAME = "jdbc";
     
@@ -14,7 +15,7 @@ public class JDBCEngine extends AbstractEngine
 
     public JDBCEngine()
     {
-        super(NAME, new ScriptedJDBCExecutor());
+        super(BergamotVersion.NAME, NAME, true, new ScriptedJDBCExecutor());
         // setup the checker
         this.checker = new JDBCChecker();
     }

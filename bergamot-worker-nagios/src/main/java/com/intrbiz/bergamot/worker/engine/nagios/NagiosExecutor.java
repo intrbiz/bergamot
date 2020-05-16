@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.polyakov.Reading;
 import com.intrbiz.gerald.source.IntelligenceSource;
@@ -38,7 +38,7 @@ import com.intrbiz.gerald.witchcraft.Witchcraft;
  * macros is this Nagios specific CheckExecutor implementation.
  * 
  */
-public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
+public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
 {
     private Logger logger = Logger.getLogger(NagiosExecutor.class);
     
@@ -48,7 +48,7 @@ public class NagiosExecutor extends AbstractExecutor<NagiosEngine>
 
     public NagiosExecutor()
     {
-        super();
+        super("nagios", true);
         // setup the executor
         this.executor = new NagiosPluginExecutor();
         // setup metrics

@@ -1,8 +1,5 @@
 package com.intrbiz.bergamot.worker.engine.http;
 
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
-
 import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Counter;
@@ -15,16 +12,19 @@ import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.AbstractExecutor;
+import com.intrbiz.bergamot.worker.engine.AbstractCheckExecutor;
 import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
+
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
 
 
 /**
  * Execute HTTP checks
  */
-public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
+public class HTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
 {
     public static final String NAME = "http";
     
@@ -36,21 +36,11 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
     
     public HTTPExecutor()
     {
-        super();
+        super(NAME, true);
         // setup metrics
         IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.http");
         this.requestTimer = source.getRegistry().timer("all-http-requests");
         this.failedRequests = source.getRegistry().counter("failed-http-requests");
-    }
-    
-    /**
-     * Only execute Checks where the engine == "http" and (executor == "http" or executor == null)
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return HTTPEngine.NAME.equalsIgnoreCase(task.getEngine()) &&
-               (HTTPExecutor.NAME.equalsIgnoreCase(task.getExecutor()) || Util.isEmpty(task.getExecutor()));
     }
     
     @Override
@@ -101,7 +91,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId());
                 readings.longGaugeReading("response-time", "ms", response.getRuntime(), (long) executeCheck.getIntParameter("warning_response_time", 0), (long) executeCheck.getIntParameter("critical_response_time", 0), null, null);
                 readings.longGaugeReading("content-length", "B", (long) response.getResponse().content().capacity());
-                readings.integerGaugeReading("status", null, response.getResponse().getStatus().code());
+                readings.integerGaugeReading("status", null, response.getResponse().status().code());
                 context.publishReading(readings);
             }, 
             (error) -> {
@@ -122,12 +112,12 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
     
     protected boolean checkStatus(ExecuteCheck check, HTTPCheckResponse response, ResultMessage resultMO)
     {
-        if (check.getIntParameterCSV("status", "200, 301, 302, 304").stream().anyMatch((stat) -> { return response.getResponse().getStatus().code() == stat; }))
+        if (check.getIntParameterCSV("status", "200, 301, 302, 304").stream().anyMatch((stat) -> { return response.getResponse().status().code() == stat; }))
         {
-            resultMO.ok("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
+            resultMO.ok("Got " + response.getResponse().status() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
             return true;
         }
-        resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
+        resultMO.critical("Got " + response.getResponse().status() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms");
         return false;
     }
     
@@ -140,7 +130,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             {
                 if (response.getRuntime() > criticalResponseTime)
                 {
-                    resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + criticalResponseTime + "ms)");
+                    resultMO.critical("Got " + response.getResponse().status() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + criticalResponseTime + "ms)");
                     return false;
                 }
             }
@@ -152,7 +142,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             {
                 if (response.getRuntime() > warningResponseTime)
                 {
-                    resultMO.warning("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + warningResponseTime + "ms)");
+                    resultMO.warning("Got " + response.getResponse().status() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (slower than " + warningResponseTime + "ms)");
                     return false;
                 }
             }
@@ -170,7 +160,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
                 int contentLength = response.getResponse().content().capacity();
                 if (contentLength < length)
                 {
-                    resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content length " + contentLength + " < " + length + "')");
+                    resultMO.critical("Got " + response.getResponse().status() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content length " + contentLength + " < " + length + "')");
                     return false;
                 }
             }
@@ -189,7 +179,7 @@ public class HTTPExecutor extends AbstractExecutor<HTTPEngine>
             // check we contain the given string
             if (! content.contains(contains))
             {
-                resultMO.critical("Got " + response.getResponse().getStatus() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content does not contain: '" + contains + "')");
+                resultMO.critical("Got " + response.getResponse().status() + ", " + response.getResponse().content().capacity() + " bytes, in " + response.getRuntime() + "ms (content does not contain: '" + contains + "')");
                 return false;
             }
         }

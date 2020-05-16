@@ -14,16 +14,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
 {
     public GetSNMPExecutor()
     {
-        super();
-    }
-
-    /**
-     * Where executor == 'get'
-     */
-    @Override
-    public boolean accept(ExecuteCheck task)
-    {
-        return super.accept(task) && "get".equalsIgnoreCase(task.getExecutor()); 
+        super("get");
     }
 
     @Override

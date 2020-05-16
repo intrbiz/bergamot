@@ -1,0 +1,14 @@
+Update for host #{slack_encode(host.summary)} is #{host.state.status}
+<# slack_message.attachment().color(status_colour(host.state.status)).authorName('Check Output').text(host.state.output);
+   slack_message.attachment().color(status_colour(host.state.status)).authorName('Last checked').text().text(dateformat('HH:mm:ss', host.state.lastCheckTime)).text(' on ').text(dateformat('EEEE dd/MM/yyyy', host.state.lastCheckTime));
+   slack_message.attachment().color(status_colour(host.state.status)).authorName('View Check').text().link('https://' + site.name + '/host/id/' + host.id, 'View host ' + host.summary);
+   if (host.note != null) {
+     noteText = slack_message.attachment().color(status_colour(host.state.status)).authorName('Note').text();
+     if (! isempty(host.note.content)) {
+       noteText.text(host.note.content).text('\n');
+     }
+     if (! isempty(host.note.url)) {
+   	   noteText.link(host.note.url, coalesce(host.note.title, 'More information'));
+   	 }
+   }
+#>

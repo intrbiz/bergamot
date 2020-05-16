@@ -3,8 +3,6 @@ package com.intrbiz.bergamot.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,11 +20,9 @@ public class NotifierCfg extends Configuration
     
     private ClusterCfg cluster;
     
-    private int threads = -1;
+    private String threads;
     
     private String site;
-
-    private List<EngineCfg> engines = new LinkedList<EngineCfg>();
     
     private LoggingCfg logging;
 
@@ -46,43 +42,13 @@ public class NotifierCfg extends Configuration
         this.site = site;
     }
 
-    public NotifierCfg(EngineCfg... engines)
-    {
-        super();
-        for (EngineCfg engine : engines)
-        {
-            this.engines.add(engine);
-        }
-    }
-
-    @XmlElementRef(type=EngineCfg.class)
-    public List<EngineCfg> getEngines()
-    {
-        return engines;
-    }
-
-    public void setEngines(List<EngineCfg> engines)
-    {
-        this.engines = engines;
-    }
-    
-    public boolean isEngineEnabled(String engineName, boolean defaultValue)
-    {
-        for (EngineCfg engine : this.engines)
-        {
-            if (engineName.equalsIgnoreCase(engine.getName()))
-                return engine.isEnabled();
-        }
-        return defaultValue;
-    }
-
     @XmlAttribute(name = "threads")
-    public int getThreads()
+    public String getThreads()
     {
         return threads;
     }
 
-    public void setThreads(int threads)
+    public void setThreads(String threads)
     {
         this.threads = threads;
     }
@@ -117,12 +83,6 @@ public class NotifierCfg extends Configuration
         if (this.cluster == null)
         {
             this.cluster = new ClusterCfg(new String[] { "127.0.0.1:2181" });
-        }
-        // default number of threads
-        if (this.threads <= 0)
-        {
-            // default of 5 checks per processor
-            this.threads = Runtime.getRuntime().availableProcessors() * 5;
         }
         // logging defaults
         if (this.logging == null)
