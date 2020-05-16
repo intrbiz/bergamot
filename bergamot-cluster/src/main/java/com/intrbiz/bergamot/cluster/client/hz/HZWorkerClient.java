@@ -12,6 +12,7 @@ import com.intrbiz.bergamot.cluster.consumer.hz.HZWorkerConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.hz.HZProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistar;
+import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistar;
 import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
@@ -28,11 +29,13 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
     
     private final WorkerRegistar workerRegistar;
     
-    private final WorkerConsumer workerConsumer;
+    private final AgentRegistar agentRegistar;
+    
+    private final ProcessorRegistry processorRegistry;
     
     private final ProcessorDispatcher processorDispatcher;
     
-    private final AgentRegistar agentRegistar;
+    private final WorkerConsumer workerConsumer;
 
     public HZWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws Exception
     {
@@ -41,8 +44,9 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
         this.info = info;
         this.workerRegistar = new WorkerRegistar(this.zooKeeper.getZooKeeper());
         this.agentRegistar = new AgentRegistar(this.zooKeeper.getZooKeeper());
+        this.processorRegistry = new ProcessorRegistry(this.zooKeeper.getZooKeeper());
+        this.processorDispatcher = new HZProcessorDispatcher(this.hazelcast, this.processorRegistry.getRouteTable());
         this.workerConsumer = new HZWorkerConsumer(this.hazelcast, this.id);
-        this.processorDispatcher = new HZProcessorDispatcher(this.hazelcast, this.workerRegistar.getRouteTable());
         // Register this worker
         this.registerWorker(restrictedSiteIds, workerPool, availableEngines);
     }

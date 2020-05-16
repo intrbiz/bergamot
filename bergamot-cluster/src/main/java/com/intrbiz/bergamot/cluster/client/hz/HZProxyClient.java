@@ -17,6 +17,7 @@ import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.dispatcher.hz.HZProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistar;
 import com.intrbiz.bergamot.cluster.registry.NotifierRegistar;
+import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 import com.intrbiz.bergamot.cluster.registry.ProxyRegistar;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistar;
 import com.intrbiz.bergamot.config.ClusterCfg;
@@ -36,15 +37,17 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
     
     private final ProxyRegistar proxyRegistar;
     
-    private final ProxyConsumer proxyConsumer;
-    
     private final WorkerRegistar workerRegistar;
-    
-    private final ProcessorDispatcher processorDispatcher;
     
     private final AgentRegistar agentRegistar;
     
     private final NotifierRegistar notifierRegistar;
+    
+    private final ProcessorRegistry processorRegistry;
+    
+    private final ProcessorDispatcher processorDispatcher;
+    
+    private final ProxyConsumer proxyConsumer;
 
     public HZProxyClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
     {
@@ -52,11 +55,12 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
         this.application = application;
         this.info = info;
         this.proxyRegistar = new ProxyRegistar(this.zooKeeper.getZooKeeper());
-        this.proxyConsumer = new HZProxyConsumer(this.hazelcast, this.id);
         this.notifierRegistar = new NotifierRegistar(this.zooKeeper.getZooKeeper());
         this.workerRegistar = new WorkerRegistar(this.zooKeeper.getZooKeeper());
         this.agentRegistar = new AgentRegistar(this.zooKeeper.getZooKeeper());
-        this.processorDispatcher = new HZProcessorDispatcher(this.hazelcast, this.workerRegistar.getRouteTable());
+        this.processorRegistry = new ProcessorRegistry(this.zooKeeper.getZooKeeper());
+        this.processorDispatcher = new HZProcessorDispatcher(this.hazelcast, this.processorRegistry.getRouteTable());
+        this.proxyConsumer = new HZProxyConsumer(this.hazelcast, this.id);
         // register this proxy
         this.registerProxy();
     }
