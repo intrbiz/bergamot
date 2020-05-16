@@ -6,7 +6,7 @@ import com.intrbiz.bergamot.config.model.TimePeriodCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
@@ -18,7 +18,7 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-public class TimePeriodAdminRouter extends Router<BergamotApp>
+public class TimePeriodAdminRouter extends Router<BergamotUI>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)

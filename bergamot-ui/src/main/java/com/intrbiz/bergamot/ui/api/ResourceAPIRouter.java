@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -23,7 +23,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/resource")
 @RequireValidPrincipal()
-public class ResourceAPIRouter extends Router<BergamotApp>
+public class ResourceAPIRouter extends Router<BergamotUI>
 {    
     @Get("/name/:cluster/:name")
     @JSON(notFoundIfNull = true)

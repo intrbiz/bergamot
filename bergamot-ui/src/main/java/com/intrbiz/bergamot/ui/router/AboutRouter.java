@@ -19,7 +19,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.util.BalsaWriter;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.ListOf;
 import com.intrbiz.metadata.Prefix;
@@ -32,7 +32,7 @@ import com.intrbiz.metadata.doc.Title;
 @Prefix("/about")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class AboutRouter extends Router<BergamotApp>
+public class AboutRouter extends Router<BergamotUI>
 {    
     @Any("/")
     public void about()

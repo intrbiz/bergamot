@@ -13,7 +13,7 @@ import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Command;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CommandMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
@@ -25,7 +25,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/command")
 @RequireValidPrincipal()
-public class CommandAPIRouter extends Router<BergamotApp>
+public class CommandAPIRouter extends Router<BergamotUI>
 {
     @Get("/")
     @JSON

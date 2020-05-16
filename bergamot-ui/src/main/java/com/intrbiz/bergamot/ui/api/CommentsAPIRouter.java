@@ -15,7 +15,7 @@ import com.intrbiz.bergamot.model.Comment;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CommentMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
@@ -31,7 +31,7 @@ import com.intrbiz.metadata.Var;
 
 @Prefix("/api/comment")
 @RequireValidPrincipal()
-public class CommentsAPIRouter extends Router<BergamotApp>
+public class CommentsAPIRouter extends Router<BergamotUI>
 {
 
     @Get("/id/:id")

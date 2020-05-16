@@ -1,12 +1,9 @@
 package com.intrbiz.bergamot.cluster.member;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
@@ -18,11 +15,12 @@ import com.hazelcast.core.LifecycleEvent;
 import com.hazelcast.core.LifecycleEvent.LifecycleState;
 import com.hazelcast.topic.TopicOverloadPolicy;
 import com.intrbiz.Util;
+import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.cluster.discovery.HazelcastZooKeeperDiscovery;
 import com.intrbiz.bergamot.cluster.util.HZNames;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager.ZooKeeperState;
-import com.intrbiz.bergamot.config.ClusterCfg;
+import com.intrbiz.bergamot.util.HostUtil;
 
 /**
  * A Bergamot member daemon which forms part of the core cluster
@@ -30,8 +28,6 @@ import com.intrbiz.bergamot.config.ClusterCfg;
 public abstract class BergamotMember
 {
     private static final Logger logger = Logger.getLogger(BergamotMember.class);
-    
-    protected final ClusterCfg config;
     
     protected final UUID id;
     
@@ -49,15 +45,14 @@ public abstract class BergamotMember
     
     protected final AtomicBoolean paniced = new AtomicBoolean(false);
     
-    public BergamotMember(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
+    public BergamotMember(Consumer<Void> onPanic, String application, String info) throws Exception
     {
         super();
-        this.config = Objects.requireNonNull(config);
         this.onPanic = Objects.requireNonNull(onPanic);
         this.id = UUID.randomUUID();
         this.application = application;
         this.info = info;
-        this.hostName = this.getHostName();
+        this.hostName = HostUtil.getHostName();
         // Connect
         logger.info("Connecting to Bergamot Cluster");
         this.zooKeeper = this.connectZooKeeper();
@@ -67,39 +62,19 @@ public abstract class BergamotMember
         logger.info("Connected to Bergamot Cluster");
     }
     
-    protected String getZooKeeperNodes()
-    {
-        return Util.coalesceEmpty(
-            System.getenv("ZOOKEEPER_NODES"), 
-            System.getProperty("zookeeper.nodes"), 
-            this.config.getZooKeeper().stream().collect(Collectors.joining(","))
-       );
-    }
-    
-    protected String getHostName()
-    {
-        try
-        {
-            return Util.coalesceEmpty(System.getenv("BERGAMOT_HOSTNAME"), System.getProperty("bergamot.host.name"), InetAddress.getLocalHost().getHostName());
-        }
-        catch (UnknownHostException e)
-        {
-            logger.warn("Failed to get node host name", e);
-        }
-        return null;
-    }
-    
     protected HazelcastInstance connectHazelcast() throws Exception
     {
         logger.info("Connecting Hazelcast");
         Config config = this.configureHazelcast(HazelcastZooKeeperDiscovery.configureHazelcast(this.zooKeeper, new Config()));
-        if (! Util.isEmpty(this.config.getPublicAddress()))
+        String publicAddress = BergamotConfig.getHazelcastPublicAddress();
+        if (! Util.isEmpty(publicAddress))
         {
-            config.getNetworkConfig().setPublicAddress(this.config.getPublicAddress());
+            config.getNetworkConfig().setPublicAddress(publicAddress);
         }
-        if (this.config.getPort() > 0)
+        int port = BergamotConfig.getHazelcastPort();
+        if (port > 0)
         {
-            config.getNetworkConfig().setPort(this.config.getPort());
+            config.getNetworkConfig().setPort(port);
         }
         return Hazelcast.newHazelcastInstance(config);
     }
@@ -161,7 +136,7 @@ public abstract class BergamotMember
     protected ZooKeeperManager connectZooKeeper() throws Exception
     {
         logger.info("Connecting ZooKeeper");
-        return new ZooKeeperManager(this.getZooKeeperNodes());
+        return new ZooKeeperManager();
     }
     
     protected void zooKeeperListener(ZooKeeperState state)

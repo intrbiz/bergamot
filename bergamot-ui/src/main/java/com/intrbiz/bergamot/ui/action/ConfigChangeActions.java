@@ -16,13 +16,13 @@ import com.intrbiz.bergamot.importer.BergamotConfigImporter;
 import com.intrbiz.bergamot.importer.BergamotImportReport;
 import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Action;
 
 
-public class ConfigChangeActions implements BalsaAction<BergamotApp>
+public class ConfigChangeActions implements BalsaAction<BergamotUI>
 {
     private Logger logger = Logger.getLogger(ConfigChangeActions.class);
 

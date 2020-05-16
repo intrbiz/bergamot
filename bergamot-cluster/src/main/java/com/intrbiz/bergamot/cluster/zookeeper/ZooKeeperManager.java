@@ -12,6 +12,8 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 
+import com.intrbiz.bergamot.BergamotConfig;
+
 import org.apache.zookeeper.ZooKeeper;
 
 public final class ZooKeeperManager
@@ -32,9 +34,9 @@ public final class ZooKeeperManager
     
     private final ConcurrentMap<UUID, Consumer<ZooKeeperState>> listeners = new ConcurrentHashMap<>();
     
-    public ZooKeeperManager(String connectString) throws IOException
+    public ZooKeeperManager() throws IOException
     {
-        this.connectString = Objects.requireNonNull(connectString);
+        this.connectString = Objects.requireNonNull(BergamotConfig.getZooKeeperNodes(), "The ZooKeeper nodes must be given");
         // Connect to ZooKeeper
         this.zooKeeper = new ZooKeeper(this.connectString, SESSION_TIMEOUT, this::processWatchedEvent);
         this.waitForInitialConnect();

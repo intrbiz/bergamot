@@ -117,7 +117,7 @@
                 <artifactId>balsa-executor-compiler-plugin</artifactId>
                 <version>${intrbiz.balsa.plugin.version}</version>
                 <configuration>
-                	<appClass>com.intrbiz.bergamot.ui.BergamotApp</appClass>
+                	<appClass>com.intrbiz.bergamot.ui.BergamotUI</appClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -133,7 +133,7 @@
 				<artifactId>packaging</artifactId>
 				<version>${intrbiz.util.version}</version>
 				<configuration>
-					<appClass>com.intrbiz.bergamot.ui.BergamotApp</appClass>
+					<appClass>com.intrbiz.bergamot.ui.BergamotUI</appClass>
 				</configuration>
 				<executions>
 					<execution>

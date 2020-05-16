@@ -25,7 +25,7 @@ import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
@@ -41,7 +41,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/group")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class GroupsRouter extends Router<BergamotApp>
+public class GroupsRouter extends Router<BergamotUI>
 {
     private Logger logger = Logger.getLogger(GroupsRouter.class);
     

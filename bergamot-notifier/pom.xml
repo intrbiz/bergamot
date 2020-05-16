@@ -23,7 +23,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-notification-api</artifactId>
+			<artifactId>bergamot-notifier-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.intrbiz.bergamot</groupId>

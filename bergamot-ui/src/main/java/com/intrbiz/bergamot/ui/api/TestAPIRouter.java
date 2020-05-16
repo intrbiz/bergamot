@@ -4,7 +4,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -15,7 +15,7 @@ import com.intrbiz.metadata.RequireValidPrincipal;
  * Simple test API calls to prove conectivity, etc.
  */
 @Prefix("/api/test")
-public class TestAPIRouter extends Router<BergamotApp>
+public class TestAPIRouter extends Router<BergamotUI>
 {    
     @Get("/hello/world")
     @JSON()

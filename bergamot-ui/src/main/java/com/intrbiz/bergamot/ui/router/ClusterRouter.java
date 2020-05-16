@@ -11,7 +11,7 @@ import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Cluster;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -20,7 +20,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/cluster")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class ClusterRouter extends Router<BergamotApp>
+public class ClusterRouter extends Router<BergamotUI>
 {    
     @Any("/name/:name")
     @WithDataAdapter(BergamotDB.class)

@@ -23,7 +23,7 @@ import com.intrbiz.bergamot.model.message.AlertMO;
 import com.intrbiz.bergamot.model.message.event.update.AlertUpdate;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.result.AbstractResultProcessor;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.Get;
@@ -44,7 +44,7 @@ import com.intrbiz.metadata.doc.Title;
 })
 @Prefix("/api/alert")
 @RequireValidPrincipal()
-public class AlertsAPIRouter extends Router<BergamotApp>
+public class AlertsAPIRouter extends Router<BergamotUI>
 {
     private Logger logger = Logger.getLogger(AlertsAPIRouter.class);
     

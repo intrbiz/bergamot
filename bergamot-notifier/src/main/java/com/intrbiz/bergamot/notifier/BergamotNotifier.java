@@ -1,9 +1,6 @@
 package com.intrbiz.bergamot.notifier;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,49 +12,34 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.BergamotVersion;
+import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.cluster.client.NotifierClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZNotifierClient;
-import com.intrbiz.bergamot.cluster.client.proxy.ProxyBaseClient;
 import com.intrbiz.bergamot.cluster.client.proxy.ProxyNotifierClient;
-import com.intrbiz.bergamot.config.LoggingCfg;
-import com.intrbiz.bergamot.config.NotifierCfg;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.NotificationEngine;
 import com.intrbiz.bergamot.notification.NotificationEngineContext;
-import com.intrbiz.configuration.Configurable;
-import com.intrbiz.configuration.Configuration;
 import com.intrbiz.util.IBThreadFactory;
 import com.intrbiz.util.IntrbizBootstrap;
 
-public class BergamotNotifier implements Configurable<NotifierCfg>
-{   
-    public static final String DEFAULT_CONFIGURATION_FILE = "/etc/bergamot/notifier/default.xml";
-    
-    public static final String DAEMON_NAME = "bergamot-notifier";
-    
+public class BergamotNotifier
+{
     private static final Logger logger = Logger.getLogger(BergamotNotifier.class);
+
+    private Set<UUID> sites = new HashSet<>();
     
-    private NotifierCfg configuration;
- 
+    private int threadCount;
+    
     private Set<String> enabledEngines = new HashSet<>();
     
     private Set<String> disabledEngines = new HashSet<>();
     
     private Map<String, NotificationEngine> engines = new TreeMap<String, NotificationEngine>();
-
-    private Set<UUID> sites = new HashSet<>();
-    
-    private int threadCount;
     
     private NotifierClient client;
     
@@ -70,11 +52,6 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         super();
     }
 
-    public final NotifierCfg getConfiguration()
-    {
-        return this.configuration;
-    }
-
     public final Set<UUID> getSites()
     {
         return this.sites;
@@ -85,54 +62,12 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
         return this.engines.values();
     }
     
-    protected String getConfigurationParameter(String name, Supplier<String> cfgValue, String defaultValue)
+    public final void configure()
     {
-        /*
-         * Fetch configuration in order of:
-         *  - Env var
-         *  - System property
-         *  - Configuration parameter
-         *  - Specific configuration method
-         *  - Default value
-         */
-        return Util.coalesce(
-                Util.coalesceEmpty(
-                    System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')),
-                    System.getProperty(name),
-                    configuration.getStringParameterValue(name, null),
-                    cfgValue == null ? null : cfgValue.get()
-                ),
-                defaultValue
-        );
-    }
-    
-    protected String getConfigurationParameter(String name, String defaultValue)
-    {
-        return this.getConfigurationParameter(name, null, defaultValue);
-    }
-    
-    protected boolean isEngineEnabled(String engineName, boolean enabledByDefault)
-    {
-        if (this.enabledEngines.contains(engineName))
-            return true;
-        if (this.disabledEngines.contains(engineName))
-            return false;
-        return enabledByDefault;
-    }
-    
-    @Override
-    public final void configure(NotifierCfg cfg) throws Exception
-    {
-        this.configuration = cfg;
-        // TODO: support multiple sites
-        String site = this.getConfigurationParameter("site", this.configuration::getSite, null);
-        if (! Util.isEmpty(site))
-        {
-            this.sites.add(UUID.fromString(site));
-        }
-        this.threadCount = Integer.parseInt(this.getConfigurationParameter("threads", this.configuration::getThreads, String.valueOf(Runtime.getRuntime().availableProcessors())));
-        this.enabledEngines = Arrays.stream(this.getConfigurationParameter("enabled.engines", "").split(",")).map(String::trim).collect(Collectors.toSet());
-        this.disabledEngines = Arrays.stream(this.getConfigurationParameter("disabled.engines", "").split(",")).map(String::trim).collect(Collectors.toSet());
+        this.sites = BergamotConfig.getSites();
+        this.threadCount = BergamotConfig.getThreads();
+        this.enabledEngines = BergamotConfig.getEnabledEngines();
+        this.disabledEngines = BergamotConfig.getDisabledEngines();
          // register engines
         Set<Class<?>> processed = new HashSet<>();
         for (NotificationEngine availableEngine : ServiceLoader.load(NotificationEngine.class))
@@ -146,6 +81,15 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
                 this.registerEngine(availableEngine,processed);
             }    
         }
+    }
+    
+    protected boolean isEngineEnabled(String engineName, boolean enabledByDefault)
+    {
+        if (this.enabledEngines.contains(engineName))
+            return true;
+        if (this.disabledEngines.contains(engineName))
+            return false;
+        return enabledByDefault;
     }
     
     protected void registerEngine(NotificationEngine availableEngine, Set<Class<?>> processed)
@@ -196,22 +140,22 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             @Override
             public String getParameter(String name, String defaultValue)
             {
-                return getConfigurationParameter(name, defaultValue);
+                return BergamotConfig.getConfigurationParameter(name, defaultValue);
             }
         };
     }
     
     protected void connectCluster() throws Exception
     {
-        if (! Util.isEmpty(ProxyBaseClient.getProxyUrl(this.configuration.getCluster())))
+        if (! Util.isEmpty(BergamotConfig.getProxyUrl()))
         {
             logger.info("Connecting to proxy");
-            this.client = new ProxyNotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString(), this.engines.keySet());
+            this.client = new ProxyNotifierClient(this::clusterPanic, this.getClass().getSimpleName(), BergamotVersion.fullVersionString(), this.engines.keySet());
         }
         else
         {
             logger.info("Connecting to cluster");
-            this.client = new HZNotifierClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString(), this.sites, this.engines.keySet());
+            this.client = new HZNotifierClient(this::clusterPanic, this.getClass().getSimpleName(), BergamotVersion.fullVersionString(), this.sites, this.engines.keySet());
         }
     }
     
@@ -250,7 +194,7 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             if (logger.isTraceEnabled()) logger.trace("Sending notification: " + notification);
             try
             {
-             // send the notification for the requested engine
+                // send the notification for the requested engine
                 NotificationEngine engine = this.engines.get(notification.getEngine());
                 if (engine != null && engine.accept(notification))
                 {
@@ -346,15 +290,11 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
     {
         try
         {
-            // Load configuration
-            NotifierCfg config = loadConfiguration();
             // Configure logging
-            configureLogging(config.getLogging());
-            Logger logger = Logger.getLogger(BergamotNotifier.class);
-            logger.info("Bergamot Notifier, using configuration:\r\n" + config.toString());
+            BergamotConfig.configureLogging();
             // Create the worker
             BergamotNotifier notifier = new BergamotNotifier();
-            notifier.configure(config);
+            notifier.configure();
             // Register a shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(notifier::triggerShutdown));
             // Run our notifier
@@ -370,40 +310,5 @@ public class BergamotNotifier implements Configurable<NotifierCfg>
             Thread.sleep(15_000);
             System.exit(1);
         }
-    }
-    
-    /**
-     * Search for the configuration file
-     */
-    private static File getConfigurationFile()
-    {
-        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("BERGAMOT_CONFIG"), DEFAULT_CONFIGURATION_FILE));
-    }
-    
-    private static NotifierCfg loadConfiguration() throws Exception
-    {
-        NotifierCfg config = null;
-        // try the config file?
-        File configFile = getConfigurationFile();
-        if (configFile.exists())
-        {
-            System.out.println("Using configuration file " + configFile.getAbsolutePath());
-            config = Configuration.read(NotifierCfg.class, new FileInputStream(configFile));
-        }
-        else
-        {
-            config = new NotifierCfg();
-        }
-        config.applyDefaults();
-        return config;
-    }
-    
-    private static void configureLogging(LoggingCfg config) throws Exception
-    {
-        if (config == null) config = new LoggingCfg();
-        // configure logging to terminal
-        Logger root = Logger.getRootLogger();
-        root.addAppender(new ConsoleAppender(new PatternLayout("%d [%t] %p %c %x - %m%n")));
-        root.setLevel(Level.toLevel(config.getLevel().toUpperCase()));
     }
 }

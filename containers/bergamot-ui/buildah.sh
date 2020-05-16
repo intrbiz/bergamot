@@ -4,13 +4,11 @@ ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
 buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 5701 --port 8090 --port 8081 --workingdir '/opt/bergamot/ui' --cmd '/usr/bin/java "-Dbootstrap.extract=false" "-Dbalsa.env=prod" "-jar" "bergamot-ui.app"' $ID
 
 # Setup our directories
-buildah run $ID mkdir -p /etc/bergamot/ui
 buildah run $ID mkdir -p /etc/bergamot/config
 buildah run $ID mkdir -p /opt/bergamot/ui
 
 # Add our application
 buildah copy $ID ./bergamot-ui.app /opt/bergamot/ui/bergamot-ui.app
-buildah copy $ID ./default.xml /etc/bergamot/ui/default.xml
 buildah copy $ID ./bergamot-site-config-template.tar.gz /etc/bergamot/config/bergamot-site-config-template.tar.gz
 
 # Extract the application

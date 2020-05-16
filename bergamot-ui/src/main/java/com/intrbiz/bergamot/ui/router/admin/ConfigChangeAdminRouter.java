@@ -32,7 +32,7 @@ import com.intrbiz.bergamot.model.ConfigChange;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.util.Parameter;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
@@ -51,7 +51,7 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-public class ConfigChangeAdminRouter extends Router<BergamotApp>
+public class ConfigChangeAdminRouter extends Router<BergamotUI>
 {
     private Logger logger = Logger.getLogger(ConfigChangeAdminRouter.class);
     

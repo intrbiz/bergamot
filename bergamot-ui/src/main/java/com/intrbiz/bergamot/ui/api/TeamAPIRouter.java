@@ -14,7 +14,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Team;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.TeamMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
@@ -26,7 +26,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/team")
 @RequireValidPrincipal()
-public class TeamAPIRouter extends Router<BergamotApp>
+public class TeamAPIRouter extends Router<BergamotUI>
 {    
     @Get("/")
     @JSON

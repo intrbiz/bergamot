@@ -4,10 +4,10 @@ import java.util.UUID;
 
 import com.intrbiz.balsa.action.BalsaAction;
 import com.intrbiz.bergamot.model.message.event.update.Update;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Action;
 
-public class UpdateActions implements BalsaAction<BergamotApp>
+public class UpdateActions implements BalsaAction<BergamotUI>
 {
 
     public UpdateActions()

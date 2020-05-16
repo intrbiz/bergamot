@@ -1,21 +1,20 @@
 package com.intrbiz.bergamot.ui;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
 import com.intrbiz.Util;
 import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
 import com.intrbiz.bergamot.BergamotVersion;
+import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
-import com.intrbiz.bergamot.config.UICfg;
 import com.intrbiz.bergamot.data.BergamotDB;
+import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.processor.BergamotProcessor;
 import com.intrbiz.bergamot.ui.action.CheckActions;
 import com.intrbiz.bergamot.ui.action.ConfigChangeActions;
@@ -102,7 +101,6 @@ import com.intrbiz.bergamot.ui.router.global.GlobalUtilsAdminRouter;
 import com.intrbiz.bergamot.ui.router.proxy.ProxyRouter;
 import com.intrbiz.bergamot.ui.security.BergamotSecurityEngine;
 import com.intrbiz.bergamot.updater.UpdateServer;
-import com.intrbiz.configuration.Configurable;
 import com.intrbiz.crypto.SecretKey;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.HazelcastCacheProvider;
@@ -112,11 +110,9 @@ import com.intrbiz.util.pool.database.DatabasePool;
 /**
  * The Bergamot web interface
  */
-public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
+public class BergamotUI extends BalsaApplication
 {   
-    private static final Logger logger = Logger.getLogger(BergamotApp.class);
-    
-    public static final String DAEMON_NAME = "bergamot-ui";
+    private static final Logger logger = Logger.getLogger(BergamotUI.class);
     
     public static final class COMPONENTS
     {
@@ -124,8 +120,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         
         public static final String CSS = "v1.7.4";
     }
-    
-    private UICfg config;
     
     private BergamotProcessor processor;
     
@@ -135,7 +129,7 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     private CountDownLatch shutdownLatch;
     
-    public BergamotApp()
+    public BergamotUI()
     {
         super();
     }
@@ -155,39 +149,22 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         return updateServer;
     }
     
-    @Override
-    public void configure(UICfg cfg) throws Exception
-    {
-        this.config = cfg;
-    }
-
-    @Override
-    public UICfg getConfiguration()
-    {
-        return this.config;
-    }
-    
     /**
      * Override the default configuration method
      */
     protected void configureLogging()
     {
-        // configure logging to terminal
-        Logger root = Logger.getRootLogger();
-        root.addAppender(new ConsoleAppender(new PatternLayout("%d [%t] %p %c %x - %m%n")));
-        root.setLevel(Level.toLevel(this.config.getLogging().getLevel().toUpperCase()));
+        BergamotConfig.configureLogging();
     }
     
     protected int getListenerPort(String listenerType, int defaultPort)
     {
-        if ("scgi".equalsIgnoreCase(listenerType)) return this.config.getListen().getScgiPort();
-        return Integer.getInteger("balsa." + listenerType + ".port", defaultPort);
+        return BergamotConfig.getIntConfigurationParameter("balsa." + listenerType + ".port", defaultPort);
     }
     
     protected int getListenerThreadCount(String listenerType, int defaultThreadCount)
     {
-        if ("scgi".equalsIgnoreCase(listenerType)) return this.config.getListen().getScgiWorkers();
-        return Integer.getInteger("balsa." + listenerType + ".workers", Integer.getInteger("balsa.workers", defaultThreadCount));
+        return BergamotConfig.getIntConfigurationParameter("balsa." + listenerType + ".workers", BergamotConfig.getIntConfigurationParameter("balsa.workers", defaultThreadCount));
     }
 
     @Override
@@ -197,9 +174,9 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         DataManager.getInstance().registerDefaultServer(
             DatabasePool.Default.with()
                 .postgresql()
-                .url(this.config.getDatabase().getUrl())
-                .username(this.config.getDatabase().getUsername())
-                .password(this.config.getDatabase().getPassword())
+                .url(Objects.requireNonNull(BergamotConfig.getDbUrl(), "The database URL must be given"))
+                .username(Objects.requireNonNull(BergamotConfig.getDbUsername(), "The database username must be given"))
+                .password(Objects.requireNonNull(BergamotConfig.getDbPassword(), "The database password must be given"))
                 .build()
         );
         // setup accounting
@@ -212,20 +189,12 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         sessionEngine(new HazelcastSessionEngine((instanceName) -> this.processor.getHazelcast()));
         // task engine
         /*
-         * TODO: disable the shared task engine as we are getting issues with 
-         * serialising Apache Log4J Loggers
          * taskEngine(new HazelcastTaskEngine());
          */
         // security engine
         securityEngine(new BergamotSecurityEngine());
-        // setup the application security key
-        if (! Util.isEmpty(this.getConfiguration().getSecurityKey()))
-        {
-            // set the key
-            this.getSecurityEngine().applicationKey(SecretKey.fromString(this.getConfiguration().getSecurityKey()));
-        }
         // websocket update server
-        this.updateServer = new UpdateServer(this.config.getListen().getWebsocketPort());
+        this.updateServer = new UpdateServer(BergamotConfig.getWebSocketPort());
     }
 
     @Override
@@ -356,8 +325,19 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
         {
             logger.info("Database module: " + db.getName() + " " + db.getVersion());
         }
+        // setup the application security key
+        try (BergamotDB db = BergamotDB.connect())
+        {
+            GlobalSetting setting = db.getGlobalSetting(GlobalSetting.NAME.SECURITY_KEY);
+            if (setting == null || Util.isEmpty(setting.getValue()))
+            {
+                setting = new GlobalSetting(GlobalSetting.NAME.SECURITY_KEY, SecretKey.generate().toString());
+                db.setGlobalSetting(setting);
+            }
+            this.getSecurityEngine().applicationKey(SecretKey.fromString(setting.getValue()));
+        }
         // Connect to ZooKeeper and start Hazelcast
-        this.processor = new BergamotProcessor(this.config.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
+        this.processor = new BergamotProcessor(this::clusterPanic, this.getClass().getSimpleName(), BergamotVersion.fullVersionString());
         // Setup the database cache
         logger.info("Setting up Hazelcast cache");
         DataManager.get().registerCacheProvider("hazelcast", new HazelcastCacheProvider(this.processor.getHazelcast()));
@@ -406,23 +386,18 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     {
         try
         {
-            // read config
-            UICfg config = UICfg.loadConfiguration();
-            System.out.println("Using configuration: ");
-            System.out.println(config.toString());
             // create the application
-            BergamotApp bergamotApp = new BergamotApp();
-            bergamotApp.configure(config);
+            BergamotUI bergamotUi = new BergamotUI();
             // setup shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                 logger.info("Triggering shutdown of Bergamot UI");
-                bergamotApp.stop();
+                bergamotUi.stop();
             }));
             // start the app
             System.out.println("Starting Bergamot");
-            bergamotApp.start();
+            bergamotUi.start();
             // Await shutdown
-            bergamotApp.awaitShutdown();
+            bergamotUi.awaitShutdown();
             // Terminate normally
             System.out.println("Exiting Bergamot");
             Thread.sleep(15_000);
@@ -439,6 +414,6 @@ public class BergamotApp extends BalsaApplication implements Configurable<UICfg>
     
     public static String getApplicationInstanceName()
     {
-        return BalsaApplication.getApplicationInstanceName(BergamotApp.class);
+        return BalsaApplication.getApplicationInstanceName(BergamotUI.class);
     }
 }

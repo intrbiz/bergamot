@@ -20,7 +20,6 @@ import com.intrbiz.bergamot.cluster.registry.NotifierRegistar;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 import com.intrbiz.bergamot.cluster.registry.ProxyRegistar;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistar;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
 import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
 import com.intrbiz.bergamot.model.message.cluster.ProxyRegistration;
@@ -49,9 +48,9 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
     
     private final ProxyConsumer proxyConsumer;
 
-    public HZProxyClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
+    public HZProxyClient(Consumer<Void> onPanic, String application, String info) throws Exception
     {
-        super(config, onPanic);
+        super(onPanic);
         this.application = application;
         this.info = info;
         this.proxyRegistar = new ProxyRegistar(this.zooKeeper.getZooKeeper());

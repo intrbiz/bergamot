@@ -1,6 +1,6 @@
 package com.intrbiz.bergamot.ui.express;
 
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.express.ExpressContext;
 import com.intrbiz.express.ExpressException;
 import com.intrbiz.express.operator.Function;
@@ -15,6 +15,6 @@ public class BergamotCSSVersion extends Function
     @Override
     public Object get(ExpressContext context, Object source) throws ExpressException
     {
-        return BergamotApp.COMPONENTS.CSS;
+        return BergamotUI.COMPONENTS.CSS;
     }
 }

@@ -4,7 +4,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.bergamot.ui.model.health.DatabaseHealth;
 import com.intrbiz.bergamot.ui.model.health.DatabaseModuleHealth;
 import com.intrbiz.bergamot.ui.model.health.HealthCheck;
@@ -20,7 +20,7 @@ import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Text;
 
 @Prefix("/health")
-public class HealthRouter extends Router<BergamotApp>
+public class HealthRouter extends Router<BergamotUI>
 {   
     @SuppressWarnings("rawtypes")
     private static final Class[] DATABASE_MODULES =  { BergamotDB.class, LamplighterDB.class };

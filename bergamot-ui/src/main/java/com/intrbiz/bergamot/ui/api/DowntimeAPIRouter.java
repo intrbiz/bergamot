@@ -14,7 +14,7 @@ import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Downtime;
 import com.intrbiz.bergamot.model.message.DowntimeMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsDate;
 import com.intrbiz.metadata.CheckStringLength;
@@ -29,7 +29,7 @@ import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/api/downtime")
 @RequireValidPrincipal()
-public class DowntimeAPIRouter extends Router<BergamotApp>
+public class DowntimeAPIRouter extends Router<BergamotUI>
 {
 
     @Get("/id/:id")

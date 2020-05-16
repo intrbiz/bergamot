@@ -26,7 +26,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.api.APIResponse;
 import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 import com.intrbiz.bergamot.model.util.Parameter;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckRegEx;
@@ -47,7 +47,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/config")
 @RequireValidPrincipal()
-public class ConfigAPIRouter extends Router<BergamotApp>
+public class ConfigAPIRouter extends Router<BergamotUI>
 {
     /**
      * Build the site-wide configuration

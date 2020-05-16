@@ -8,7 +8,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.Get;
@@ -18,7 +18,7 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/global/install")
 @Template("layout/install")
-public class FirstInstallRouter extends Router<BergamotApp>
+public class FirstInstallRouter extends Router<BergamotUI>
 {
     @Before()
     @Any("**")

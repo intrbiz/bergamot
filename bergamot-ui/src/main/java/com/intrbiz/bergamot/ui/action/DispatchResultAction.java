@@ -4,10 +4,10 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.balsa.action.BalsaAction;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Action;
 
-public class DispatchResultAction implements BalsaAction<BergamotApp>
+public class DispatchResultAction implements BalsaAction<BergamotUI>
 {
     private Logger logger = Logger.getLogger(DispatchResultAction.class);
     

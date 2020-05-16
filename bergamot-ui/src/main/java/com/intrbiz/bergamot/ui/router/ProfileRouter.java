@@ -15,7 +15,7 @@ import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.ContactHOTPRegistration;
 import com.intrbiz.bergamot.model.ContactU2FDeviceRegistration;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.AsString;
 import com.intrbiz.metadata.CheckStringLength;
@@ -42,7 +42,7 @@ import net.glxn.qrgen.javase.QRCode;
 @Prefix("/profile")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class ProfileRouter extends Router<BergamotApp>
+public class ProfileRouter extends Router<BergamotUI>
 {   
     private final U2F u2f = new U2F();
     

@@ -11,7 +11,6 @@ import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.cluster.consumer.WorkerConsumer;
 import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.model.PublishStatus;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.processor.ProcessorMessage;
 import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
@@ -30,9 +29,9 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
     
     private final ProxyProcessorDispatcher dispatcher;
     
-    public ProxyWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, String workerPool, Set<String> availableEngines) throws Exception
+    public ProxyWorkerClient(Consumer<Void> onPanic, String application, String info, String workerPool, Set<String> availableEngines) throws Exception
     {
-        super(config, onPanic, new ClientHeader().userAgent(application).info(info).proxyForWorker().workerPool(workerPool).engines(availableEngines));
+        super(onPanic, new ClientHeader().userAgent(application).info(info).proxyForWorker().workerPool(workerPool).engines(availableEngines));
         this.consumer = new ProxyWorkerConsumer();
         this.dispatcher = new ProxyProcessorDispatcher();
     }

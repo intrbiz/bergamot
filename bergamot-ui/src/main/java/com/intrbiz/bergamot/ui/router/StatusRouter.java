@@ -10,14 +10,14 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/status")
-public class StatusRouter extends Router<BergamotApp>
+public class StatusRouter extends Router<BergamotUI>
 {
     @Any("/status/")
     @WithDataAdapter(BergamotDB.class)

@@ -8,7 +8,7 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Check;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.IsaLong;
@@ -20,7 +20,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/stats")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class StatsRouter extends Router<BergamotApp>
+public class StatsRouter extends Router<BergamotUI>
 {   
     @Any("/check/id/:id")
     @WithDataAdapter(BergamotDB.class)

@@ -1,25 +1,17 @@
 package com.intrbiz.bergamot.proxy;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.BergamotVersion;
+import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.cluster.client.ProxyClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZProxyClient;
-import com.intrbiz.bergamot.config.LoggingCfg;
-import com.intrbiz.bergamot.config.ProxyCfg;
 import com.intrbiz.bergamot.model.message.processor.proxy.LookupProxyKey;
 import com.intrbiz.bergamot.model.message.proxy.FoundProxyKey;
 import com.intrbiz.bergamot.model.message.proxy.ProxyMessage;
@@ -29,23 +21,12 @@ import com.intrbiz.bergamot.proxy.processor.NotifierProxyProcessor;
 import com.intrbiz.bergamot.proxy.processor.WorkerProxyProcessor;
 import com.intrbiz.bergamot.proxy.server.BergamotProxyServer;
 import com.intrbiz.bergamot.proxy.server.MessageProcessor;
-import com.intrbiz.configuration.Configurable;
-import com.intrbiz.configuration.Configuration;
 
 import io.netty.channel.Channel;
 
-/**
- * A worker to execute nagios check engines
- */
-public class BergamotProxy implements Configurable<ProxyCfg>
-{   
-    public static final String DEFAULT_CONFIGURATION_FILE = "/etc/bergamot/proxy/default.xml";
-    
-    public static final String DAEMON_NAME = "bergamot-proxy";
-    
+public class BergamotProxy
+{
     private static final Logger logger = Logger.getLogger(BergamotProxy.class);
-    
-    private ProxyCfg configuration;
     
     private int port;
     
@@ -61,36 +42,10 @@ public class BergamotProxy implements Configurable<ProxyCfg>
     {
         super();
     }
-
-    public final ProxyCfg getConfiguration()
-    {
-        return this.configuration;
-    }
     
-    protected String getConfigurationParameter(String name, Supplier<String> cfgValue, String defaultValue)
+    public final void configure() throws Exception
     {
-        /*
-         * Fetch configuration in order of:
-         *  - Env var
-         *  - System property
-         *  - Configuration parameter
-         *  - Specific configuration method
-         *  - Default value
-         */
-        return Util.coalesceEmpty(
-            System.getenv(name.toUpperCase().replace('.', '_').replace('-', '_')),
-            System.getProperty(name),
-            configuration.getStringParameterValue(name, null),
-            cfgValue == null ? null : cfgValue.get(),
-            defaultValue
-        );
-    }
-    
-    @Override
-    public final void configure(ProxyCfg cfg) throws Exception
-    {
-        this.configuration = cfg;
-        this.port = Integer.parseInt(this.getConfigurationParameter("proxy.port", () -> String.valueOf(this.configuration.getPort()), "14080"));
+        this.port = BergamotConfig.getProxyPort();
     }
     
     protected void resolveKey(UUID keyId, BiConsumer<AuthenticationKey, UUID> callback)
@@ -184,7 +139,7 @@ public class BergamotProxy implements Configurable<ProxyCfg>
         this.shutdownLatch = new CountDownLatch(1);
         // connect to the scheduler
         logger.info("Connecting to cluster");
-        this.client = new HZProxyClient(this.configuration.getCluster(), this::clusterPanic, DAEMON_NAME, BergamotVersion.fullVersionString());
+        this.client = new HZProxyClient(this::clusterPanic, this.getClass().getSimpleName(), BergamotVersion.fullVersionString());
         // start our server
         this.server = new BergamotProxyServer(this.port, this::resolveKey, this.createMessageProcessorFactory());
         this.server.start();
@@ -271,15 +226,11 @@ public class BergamotProxy implements Configurable<ProxyCfg>
     {
         try
         {
-            // Load configuration
-            ProxyCfg config = loadConfiguration();
             // Configure logging
-            configureLogging(config.getLogging());
-            Logger logger = Logger.getLogger(BergamotProxy.class);
-            logger.info("Bergamot Proxy, using configuration:\r\n" + config.toString());
+            BergamotConfig.configureLogging();
             // Create the worker
             BergamotProxy proxy = new BergamotProxy();
-            proxy.configure(config);
+            proxy.configure();
             // Register a shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(proxy::triggerShutdown));
             // Run our proxy
@@ -295,40 +246,5 @@ public class BergamotProxy implements Configurable<ProxyCfg>
             Thread.sleep(15_000);
             System.exit(1);
         }
-    }
-    
-    /**
-     * Search for the configuration file
-     */
-    private static File getConfigurationFile()
-    {
-        return new File(Util.coalesceEmpty(System.getProperty("bergamot.config"), System.getenv("BERGAMOT_CONFIG"), DEFAULT_CONFIGURATION_FILE));
-    }
-    
-    private static ProxyCfg loadConfiguration() throws Exception
-    {
-        ProxyCfg config = null;
-        // try the config file?
-        File configFile = getConfigurationFile();
-        if (configFile.exists())
-        {
-            System.out.println("Using configuration file " + configFile.getAbsolutePath());
-            config = Configuration.read(ProxyCfg.class, new FileInputStream(configFile));
-        }
-        else
-        {
-            config = new ProxyCfg();
-        }
-        config.applyDefaults();
-        return config;
-    }
-    
-    private static void configureLogging(LoggingCfg config) throws Exception
-    {
-        if (config == null) config = new LoggingCfg();
-        // configure logging to terminal
-        Logger root = Logger.getRootLogger();
-        root.addAppender(new ConsoleAppender(new PatternLayout("%d [%t] %p %c %x - %m%n")));
-        root.setLevel(Level.toLevel(config.getLevel().toUpperCase()));
     }
 }

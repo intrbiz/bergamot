@@ -8,9 +8,8 @@ import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.Util;
+import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.cluster.client.BergamotClient;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.proxy.client.BergamotProxyClient;
 import com.intrbiz.bergamot.proxy.model.AuthenticationKey;
@@ -22,8 +21,6 @@ import io.netty.channel.Channel;
 public abstract class ProxyBaseClient implements BergamotClient
 {
     private static Logger logger = Logger.getLogger(ProxyBaseClient.class);
-    
-    protected final ClusterCfg config;
     
     protected final UUID id;
     
@@ -37,38 +34,19 @@ public abstract class ProxyBaseClient implements BergamotClient
     
     protected final AtomicBoolean paniced = new AtomicBoolean(false);
     
-    public ProxyBaseClient(ClusterCfg config, Consumer<Void> onPanic, ClientHeader headers) throws Exception
+    public ProxyBaseClient(Consumer<Void> onPanic, ClientHeader headers) throws Exception
     {
         super();
-        this.config = Objects.requireNonNull(config);
         this.onPanic = Objects.requireNonNull(onPanic);
         this.id = UUID.randomUUID();
         this.hostName = this.getHostName();
-        this.client = new BergamotProxyClient(new URI(getProxyUrl(this.config)));
+        this.client = new BergamotProxyClient(new URI(Objects.requireNonNull(BergamotConfig.getProxyUrl(), "The proxy URL must be given")));
         // Connect
-        this.channel = this.client.connect(headers.hostName(this.hostName), new AuthenticationKey(getProxyKey(this.config)), this::handleMessage).sync().get();
+        this.channel = this.client.connect(headers.hostName(this.hostName), new AuthenticationKey(Objects.requireNonNull(BergamotConfig.getProxyKey(), "The proxy key must be given")), this::handleMessage).sync().get();
         this.channel.closeFuture().addListener((future) -> {
             logger.info("Proxy connection closed");
             this.panic();
         });
-    }
-    
-    public static String getProxyUrl(ClusterCfg config)
-    {
-        return Util.coalesceEmpty(
-            System.getenv("PROXY_URL"), 
-            System.getProperty("proxy.url"), 
-            config.getProxyUrl()
-        );
-    }
-    
-    public static String getProxyKey(ClusterCfg config)
-    {
-        return Util.coalesceEmpty(
-            System.getenv("PROXY_KEY"), 
-            System.getProperty("proxy.key"), 
-            config.getProxyKey()
-        );
     }
     
     protected String getHostName()

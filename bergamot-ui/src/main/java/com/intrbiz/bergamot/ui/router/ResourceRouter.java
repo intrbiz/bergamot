@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Resource;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -19,7 +19,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/resource")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class ResourceRouter extends Router<BergamotApp>
+public class ResourceRouter extends Router<BergamotUI>
 {   
     @Any("/name/:host/:resource")
     @WithDataAdapter(BergamotDB.class)

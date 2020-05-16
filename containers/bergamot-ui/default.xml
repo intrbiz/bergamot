@@ -1,9 +1,0 @@
-<ui>
-    <cluster expected-members="1" public-address="127.0.0.1:5701" port="5701">
-        <zookeeper>127.0.0.1:2181</zookeeper>
-    </cluster>
-    <database url="jdbc:postgresql://localhost:5432/bergamot" username="bergamot" password="bergamot"/>
-    <security-key>xjGAg5NbIZ8N1yCOCk9PZXj/2AmsiRz2joLwt0FMkozGBRPTp/yjAVigGMydHcIlhvV1+ziwqJx9DAzfQiEN0p0V0+OKa6XllgoO0c9mEuPEwepfIwPmn9YH9Jvlg7q38F1yn5z0zcVRbbILPK8lwHvHd6CQ9JTOU1xbcR0Ib2c=</security-key>
-    <listen scgi-port="8090" scgi-workers="50" websocket-port="8081"/>
-    <logging level="info"/>
-</ui>

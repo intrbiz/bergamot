@@ -28,7 +28,7 @@ import com.intrbiz.bergamot.model.APIToken;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.GlobalSetting;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.bergamot.ui.security.password.check.BadPassword;
 import com.intrbiz.bergamot.ui.security.password.check.PasswordCheckEngine;
 import com.intrbiz.bergamot.ui.util.RecaptchaUtil;
@@ -55,7 +55,7 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/single")
-public class LoginRouter extends Router<BergamotApp>
+public class LoginRouter extends Router<BergamotUI>
 {   
     private Logger logger = Logger.getLogger(LoginRouter.class);
     

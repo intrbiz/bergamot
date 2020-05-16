@@ -14,7 +14,7 @@ import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnCheckId;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
@@ -27,7 +27,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/trap")
 @RequireValidPrincipal()
-public class TrapAPIRouter extends Router<BergamotApp>
+public class TrapAPIRouter extends Router<BergamotUI>
 {    
     @Get("/name/:host/:name")
     @JSON(notFoundIfNull = true)

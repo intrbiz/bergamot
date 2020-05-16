@@ -24,11 +24,11 @@ import com.intrbiz.bergamot.model.ProxyKey;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.bergamot.ui.router.global.InstallBean;
 import com.intrbiz.metadata.Action;
 
-public class SiteActions implements BalsaAction<BergamotApp>
+public class SiteActions implements BalsaAction<BergamotUI>
 {
     public static final Logger logger = Logger.getLogger(SiteActions.class);
 

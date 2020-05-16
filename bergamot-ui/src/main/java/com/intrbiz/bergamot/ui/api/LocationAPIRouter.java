@@ -15,7 +15,7 @@ import com.intrbiz.bergamot.model.Location;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.LocationMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
@@ -26,7 +26,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/location")
 @RequireValidPrincipal()
-public class LocationAPIRouter extends Router<BergamotApp>
+public class LocationAPIRouter extends Router<BergamotUI>
 {
     @Get("/")
     @JSON

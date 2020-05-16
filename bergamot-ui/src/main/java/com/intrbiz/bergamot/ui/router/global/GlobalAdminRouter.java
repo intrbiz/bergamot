@@ -34,7 +34,7 @@ import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
 import com.intrbiz.bergamot.model.message.cluster.ProxyRegistration;
 import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.CheckStringLength;
@@ -53,7 +53,7 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-public class GlobalAdminRouter extends Router<BergamotApp>
+public class GlobalAdminRouter extends Router<BergamotUI>
 {    
     private static final Logger logger = Logger.getLogger(GlobalAdminRouter.class);
     

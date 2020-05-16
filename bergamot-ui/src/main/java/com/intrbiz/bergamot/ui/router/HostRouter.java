@@ -25,7 +25,7 @@ import com.intrbiz.bergamot.model.Host;
 import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.Trap;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
@@ -41,7 +41,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/host")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class HostRouter extends Router<BergamotApp>
+public class HostRouter extends Router<BergamotUI>
 {   
     private Logger logger = Logger.getLogger(HostRouter.class);
     

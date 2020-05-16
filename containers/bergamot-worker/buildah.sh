@@ -4,7 +4,6 @@ ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
 buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 15080 --port 8161 --workingdir '/opt/bergamot/worker' --cmd '/usr/bin/java "-Dbootstrap.extract=false" "-jar" "bergamot-worker.app"' $ID
 
 # Setup our directories
-buildah run $ID mkdir -p /etc/bergamot/worker
 buildah run $ID mkdir -p /opt/bergamot/worker
 buildah run $ID mkdir -p /opt/bergamot/plugins/nagios
 
@@ -14,7 +13,6 @@ buildah run $ID zypper -q -n in monitoring-plugins-dummy monitoring-plugins-dbi 
 
 # Add our application
 buildah copy $ID ./bergamot-worker.app /opt/bergamot/worker/bergamot-worker.app
-buildah copy $ID ./default.xml /etc/bergamot/worker/default.xml
 
 # Extract the application
 buildah run $ID sh -c 'cd /opt/bergamot/worker && java -Dbootstrap.extract.only=true -jar bergamot-worker.app'

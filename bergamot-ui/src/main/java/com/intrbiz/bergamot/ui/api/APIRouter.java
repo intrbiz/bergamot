@@ -17,7 +17,7 @@ import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.converter.ConversionException;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Any;
@@ -39,7 +39,7 @@ import com.intrbiz.validator.ValidationException;
 
 @Title("Authentication API Methods")
 @Prefix("/api/")
-public class APIRouter extends Router<BergamotApp>
+public class APIRouter extends Router<BergamotUI>
 {   
     private Logger logger = Logger.getLogger(APIRouter.class);
     

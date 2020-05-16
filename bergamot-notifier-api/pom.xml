@@ -9,8 +9,8 @@
 		<artifactId>bergamot</artifactId>
 		<version>4.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>bergamot-notification-api</artifactId>
-	<name>bergamot-notification-api</name>
+	<artifactId>bergamot-notifier-api</artifactId>
+	<name>bergamot-notifier-api</name>
 	<url>https://bergamot-monitoring.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -14,17 +14,12 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
     	<groupId>com.intrbiz.core</groupId>
     	<artifactId>core</artifactId>
     </dependency>
     <dependency>
-    	<groupId>com.intrbiz.util</groupId>
-    	<artifactId>crypto</artifactId>
+    	<groupId>log4j</groupId>
+    	<artifactId>log4j</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -12,7 +12,7 @@ import com.intrbiz.bergamot.model.Service;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Prefix;
@@ -28,7 +28,7 @@ import com.intrbiz.metadata.doc.Title;
 })
 @Prefix("/api/service")
 @RequireValidPrincipal()
-public class ServiceAPIRouter extends Router<BergamotApp>
+public class ServiceAPIRouter extends Router<BergamotUI>
 {    
     @Title("Get service")
     @Desc({

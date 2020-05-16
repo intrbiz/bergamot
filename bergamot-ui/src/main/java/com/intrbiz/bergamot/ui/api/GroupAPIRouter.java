@@ -16,7 +16,7 @@ import com.intrbiz.bergamot.model.Group;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.GroupMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
@@ -28,7 +28,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/group")
 @RequireValidPrincipal()
-public class GroupAPIRouter extends Router<BergamotApp>
+public class GroupAPIRouter extends Router<BergamotUI>
 {
     @Get("/")
     @JSON

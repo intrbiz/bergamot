@@ -13,7 +13,7 @@ import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.ContactMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
@@ -25,7 +25,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/contact")
 @RequireValidPrincipal()
-public class ContactAPIRouter extends Router<BergamotApp>
+public class ContactAPIRouter extends Router<BergamotUI>
 {
     @Get("/")
     @JSON

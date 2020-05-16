@@ -10,7 +10,7 @@ import com.intrbiz.balsa.error.BalsaConversionError;
 import com.intrbiz.balsa.error.BalsaValidationError;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.balsa.http.HTTP.HTTPStatus;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Catch;
 import com.intrbiz.metadata.Order;
@@ -20,7 +20,7 @@ import com.intrbiz.metadata.Template;
 
 @Prefix("/")
 @Template("layout/single")
-public class ErrorRouter extends Router<BergamotApp>
+public class ErrorRouter extends Router<BergamotUI>
 {   
     private Logger logger = Logger.getLogger(ErrorRouter.class);
     

@@ -10,7 +10,7 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.message.state.CheckTransitionMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.IsaLong;
@@ -28,7 +28,7 @@ import com.intrbiz.metadata.doc.Title;
 })
 @Prefix("/api/stats")
 @RequireValidPrincipal()
-public class StatsAPIRouter extends Router<BergamotApp>
+public class StatsAPIRouter extends Router<BergamotUI>
 {
     @Title("Check Transitions")
     @Desc({

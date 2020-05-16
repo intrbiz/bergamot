@@ -152,7 +152,7 @@
 		<module>bergamot-worker-ssh</module>
 		<module>bergamot-worker</module>
 		<!-- Notifiers -->
-		<module>bergamot-notification-api</module>
+		<module>bergamot-notifier-api</module>
 		<module>bergamot-notifier-email</module>
 		<module>bergamot-notifier-slack</module>
 		<module>bergamot-notifier-sms</module>
@@ -249,7 +249,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.intrbiz.bergamot</groupId>
-				<artifactId>bergamot-notification-api</artifactId>
+				<artifactId>bergamot-notifier-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

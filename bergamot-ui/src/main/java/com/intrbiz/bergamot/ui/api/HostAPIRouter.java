@@ -18,7 +18,7 @@ import com.intrbiz.bergamot.model.message.HostMO;
 import com.intrbiz.bergamot.model.message.ServiceMO;
 import com.intrbiz.bergamot.model.message.TrapMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
@@ -37,7 +37,7 @@ import com.intrbiz.metadata.doc.Title;
 })
 @Prefix("/api/host")
 @RequireValidPrincipal()
-public class HostAPIRouter extends Router<BergamotApp>
+public class HostAPIRouter extends Router<BergamotUI>
 {
     @Title("List hosts")
     @Desc({

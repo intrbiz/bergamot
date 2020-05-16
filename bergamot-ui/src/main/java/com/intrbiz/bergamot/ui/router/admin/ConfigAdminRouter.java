@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Config;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -19,7 +19,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/admin/config")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class ConfigAdminRouter extends Router<BergamotApp>
+public class ConfigAdminRouter extends Router<BergamotUI>
 {        
     @Get("/id/:id")
     @WithDataAdapter(BergamotDB.class)

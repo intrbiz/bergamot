@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 
 import com.intrbiz.bergamot.cluster.client.NotifierClient;
 import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
@@ -21,9 +20,9 @@ public class ProxyNotifierClient extends ProxyBaseClient implements NotifierClie
 {
     private final ProxyNotificationConsumer consumer;
     
-    public ProxyNotifierClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<String> availableEngines) throws Exception
+    public ProxyNotifierClient(Consumer<Void> onPanic, String application, String info, Set<String> availableEngines) throws Exception
     {
-        super(config, onPanic, new ClientHeader().userAgent(application).info(info).proxyForNotifier().engines(availableEngines));
+        super(onPanic, new ClientHeader().userAgent(application).info(info).proxyForNotifier().engines(availableEngines));
         this.consumer = new ProxyNotificationConsumer();
     }
 

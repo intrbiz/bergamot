@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.agent.AgentProcessorService;
 import com.intrbiz.bergamot.cluster.broker.SchedulingTopic;
 import com.intrbiz.bergamot.cluster.broker.SiteEventTopic;
@@ -31,7 +32,6 @@ import com.intrbiz.bergamot.cluster.registry.ProcessorRegistar;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 import com.intrbiz.bergamot.cluster.registry.ProxyRegistry;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistry;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.executor.ProcessorExecutor;
 import com.intrbiz.bergamot.leader.BergamotClusterLeader;
 import com.intrbiz.bergamot.model.message.cluster.ProcessorRegistration;
@@ -123,9 +123,9 @@ public class BergamotProcessor extends BergamotMember
     
     private final AtomicBoolean started = new AtomicBoolean(false);
 
-    public BergamotProcessor(ClusterCfg config, Consumer<Void> onPanic, String application, String info) throws Exception
+    public BergamotProcessor(Consumer<Void> onPanic, String application, String info) throws Exception
     {
-        super(config, onPanic, application, info);
+        super(onPanic, application, info);
         // topics
         this.siteEventTopic = new SiteEventTopic(this.hazelcast);
         this.notificationTopic = new SiteNotificationTopic(this.hazelcast);
@@ -214,9 +214,9 @@ public class BergamotProcessor extends BergamotMember
     
     protected void waitForProcessors() throws Exception
     {
-        if (this.config.getExpectedMembers() > 1)
+        if (BergamotConfig.getExpectedProcessors() > 1)
         {
-            int waitFor = (int) Math.ceil(((double) this.config.getExpectedMembers()) / 2d);
+            int waitFor = (int) Math.ceil(((double) BergamotConfig.getExpectedProcessors()) / 2d);
             logger.info("Waiting for " + waitFor + " processors to join");
             for (int i = 0; i < 300; i++)
             {

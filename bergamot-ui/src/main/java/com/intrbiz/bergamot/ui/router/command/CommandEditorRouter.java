@@ -18,7 +18,7 @@ import com.intrbiz.bergamot.model.message.api.call.VerifiedCommand;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 import com.intrbiz.bergamot.model.message.config.BergamotValidationReportMO;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.configuration.Configuration;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.JSON;
@@ -32,7 +32,7 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-public class CommandEditorRouter extends Router<BergamotApp>
+public class CommandEditorRouter extends Router<BergamotUI>
 {    
     private Logger logger = Logger.getLogger(CommandEditorRouter.class);
     

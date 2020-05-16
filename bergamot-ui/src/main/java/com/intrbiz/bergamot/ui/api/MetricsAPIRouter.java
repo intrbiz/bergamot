@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.error.http.BalsaNotFound;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.bergamot.ui.util.MetricWriter;
 import com.intrbiz.gerald.source.IntelligenceSource;
 import com.intrbiz.gerald.witchcraft.Witchcraft;
@@ -19,7 +19,7 @@ import com.intrbiz.metadata.RequireValidPrincipal;
 
 @Prefix("/api/metrics")
 @RequireValidPrincipal()
-public class MetricsAPIRouter extends Router<BergamotApp>
+public class MetricsAPIRouter extends Router<BergamotUI>
 {   
     @Get("/sources")
     @RequirePermission("api.read.system.metrics")

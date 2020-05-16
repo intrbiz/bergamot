@@ -14,12 +14,12 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Contact.LockOutReason;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.crypto.cookie.CookieBaker.Expires;
 import com.intrbiz.crypto.cookie.CryptoCookie;
 import com.intrbiz.metadata.Action;
 
-public class ContactActions implements BalsaAction<BergamotApp>
+public class ContactActions implements BalsaAction<BergamotUI>
 {
     private Logger logger = Logger.getLogger(ContactActions.class);
     

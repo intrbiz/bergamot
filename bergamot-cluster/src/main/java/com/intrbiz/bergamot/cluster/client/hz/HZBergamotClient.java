@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 
@@ -13,12 +12,10 @@ import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.LifecycleEvent;
 import com.hazelcast.core.LifecycleEvent.LifecycleState;
-import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.client.BergamotClient;
 import com.intrbiz.bergamot.cluster.discovery.HazelcastZooKeeperDiscovery;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager.ZooKeeperState;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.util.HostUtil;
 
 /**
@@ -27,8 +24,6 @@ import com.intrbiz.bergamot.util.HostUtil;
 public abstract class HZBergamotClient implements BergamotClient
 {
     private static final Logger logger = Logger.getLogger(HZBergamotClient.class);
-    
-    protected final ClusterCfg config;
     
     protected final UUID id;
     
@@ -42,10 +37,9 @@ public abstract class HZBergamotClient implements BergamotClient
     
     protected final AtomicBoolean paniced = new AtomicBoolean(false);
     
-    public HZBergamotClient(ClusterCfg config, Consumer<Void> onPanic) throws Exception
+    public HZBergamotClient(Consumer<Void> onPanic) throws Exception
     {
         super();
-        this.config = Objects.requireNonNull(config);
         this.onPanic = Objects.requireNonNull(onPanic);
         this.id = UUID.randomUUID();
         this.hostName = this.getHostName();
@@ -56,15 +50,6 @@ public abstract class HZBergamotClient implements BergamotClient
         this.hazelcast = this.connectHazelcast();
         this.hazelcast.getLifecycleService().addLifecycleListener(this::hazelcastListener);
         logger.info("Connected to Bergamot Cluster");
-    }
-    
-    protected String getZooKeeperNodes()
-    {
-        return Util.coalesceEmpty(
-            System.getenv("ZOOKEEPER_NODES"), 
-            System.getProperty("zookeeper.nodes"), 
-            this.config.getZooKeeper().stream().collect(Collectors.joining(","))
-        );
     }
     
     protected String getHostName()
@@ -90,7 +75,7 @@ public abstract class HZBergamotClient implements BergamotClient
     protected ZooKeeperManager connectZooKeeper() throws Exception
     {
         logger.info("Connecting ZooKeeper");
-        return new ZooKeeperManager(this.getZooKeeperNodes());
+        return new ZooKeeperManager();
     }
     
     protected void zooKeeperListener(ZooKeeperState state)

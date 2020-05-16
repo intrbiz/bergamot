@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.data.DataManager;
 import com.intrbiz.data.cache.Cache;
 import com.intrbiz.metadata.Any;
@@ -18,7 +18,7 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-public class GlobalUtilsAdminRouter extends Router<BergamotApp>
+public class GlobalUtilsAdminRouter extends Router<BergamotUI>
 {   
     private static final Logger logger = Logger.getLogger(GlobalUtilsAdminRouter.class);
     

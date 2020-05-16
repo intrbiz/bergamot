@@ -8,7 +8,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Check;
 import com.intrbiz.bergamot.model.Group;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Prefix;
 import com.intrbiz.metadata.RequireValidPrincipal;
@@ -17,7 +17,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/sla")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class SLARouter extends Router<BergamotApp>
+public class SLARouter extends Router<BergamotUI>
 {    
     @Any("/group/id/:id")
     @WithDataAdapter(BergamotDB.class)

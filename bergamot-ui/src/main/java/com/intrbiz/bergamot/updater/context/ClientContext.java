@@ -10,7 +10,7 @@ import com.intrbiz.balsa.engine.session.BalsaSession;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.api.APIObject;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 
 public abstract class ClientContext
 {    
@@ -27,9 +27,9 @@ public abstract class ClientContext
         super();
     }
     
-    public BergamotApp app()
+    public BergamotUI app()
     {
-        return (BergamotApp) BalsaApplication.getInstance();
+        return (BergamotUI) BalsaApplication.getInstance();
     }
 
     public Site getSite()

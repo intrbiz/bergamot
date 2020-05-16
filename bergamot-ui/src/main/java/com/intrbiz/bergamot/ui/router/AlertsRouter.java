@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.model.Alert;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CoalesceMode;
 import com.intrbiz.metadata.CurrentPrincipal;
@@ -22,7 +22,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/alerts")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class AlertsRouter extends Router<BergamotApp>
+public class AlertsRouter extends Router<BergamotUI>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)

@@ -9,7 +9,7 @@ import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.IsaInt;
 import com.intrbiz.metadata.JSON;
@@ -20,7 +20,7 @@ import com.intrbiz.metadata.Var;
 
 @Prefix("/api/util")
 @RequireValidPrincipal()
-public class UtilAPIRouter extends Router<BergamotApp>
+public class UtilAPIRouter extends Router<BergamotUI>
 {   
     @Get("/version")
     @JSON()

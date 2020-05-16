@@ -22,6 +22,7 @@ public final class GlobalSetting implements Serializable, Parameterised
     {
         public static final String FIRST_INSTALL = "first.install";
         public static final String GLOBAL_ADMINS = "global.admins";
+        public static final String SECURITY_KEY  = "security.key";
     }
     
     private static final long serialVersionUID = 1L;

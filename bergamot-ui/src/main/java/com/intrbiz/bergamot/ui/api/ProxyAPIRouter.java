@@ -9,7 +9,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.IgnoreBinding;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.Param;
@@ -29,7 +29,7 @@ import com.intrbiz.metadata.doc.Title;
 @RequireValidPrincipal()
 @RequirePermission("api.sign.proxy")
 @RequirePermission("sign.proxy")
-public class ProxyAPIRouter extends Router<BergamotApp>
+public class ProxyAPIRouter extends Router<BergamotUI>
 {
     
     /**

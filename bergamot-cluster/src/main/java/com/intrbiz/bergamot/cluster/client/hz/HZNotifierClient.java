@@ -10,7 +10,6 @@ import com.intrbiz.bergamot.cluster.client.NotifierClient;
 import com.intrbiz.bergamot.cluster.consumer.NotificationConsumer;
 import com.intrbiz.bergamot.cluster.consumer.hz.HZNotificationConsumer;
 import com.intrbiz.bergamot.cluster.registry.NotifierRegistar;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.model.message.cluster.NotifierRegistration;
 
 /**
@@ -26,9 +25,9 @@ public class HZNotifierClient extends HZBergamotClient implements NotifierClient
     
     private final NotificationConsumer consumer;
 
-    public HZNotifierClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, Set<String> availableEngines) throws Exception
+    public HZNotifierClient(Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, Set<String> availableEngines) throws Exception
     {
-        super(config, onPanic);
+        super(onPanic);
         this.application = application;
         this.info = info;
         this.registar = new NotifierRegistar(this.zooKeeper.getZooKeeper());

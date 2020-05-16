@@ -4,7 +4,7 @@ import com.intrbiz.balsa.engine.route.Router;
 import com.intrbiz.balsa.metadata.WithDataAdapter;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.Contact;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.Before;
 import com.intrbiz.metadata.CurrentPrincipal;
@@ -19,7 +19,7 @@ import com.intrbiz.metadata.Template;
 @Template("layout/main")
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
-public class CreateSiteRouter extends Router<BergamotApp>
+public class CreateSiteRouter extends Router<BergamotUI>
 {   
     @Before()
     @Any("**")

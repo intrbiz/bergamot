@@ -17,7 +17,7 @@ import com.intrbiz.bergamot.model.message.CheckMO;
 import com.intrbiz.bergamot.model.message.ClusterMO;
 import com.intrbiz.bergamot.model.message.ResourceMO;
 import com.intrbiz.bergamot.model.message.state.CheckStateMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Get;
 import com.intrbiz.metadata.JSON;
 import com.intrbiz.metadata.ListOf;
@@ -29,7 +29,7 @@ import com.intrbiz.metadata.XML;
 
 @Prefix("/api/cluster")
 @RequireValidPrincipal()
-public class ClusterAPIRouter extends Router<BergamotApp>
+public class ClusterAPIRouter extends Router<BergamotUI>
 {
     @Get("/")
     @JSON

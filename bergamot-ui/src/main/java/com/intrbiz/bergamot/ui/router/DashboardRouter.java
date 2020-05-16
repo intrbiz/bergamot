@@ -8,7 +8,7 @@ import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CurrentPrincipal;
 import com.intrbiz.metadata.Prefix;
@@ -18,7 +18,7 @@ import com.intrbiz.metadata.Template;
 @Prefix("/")
 @Template("layout/main")
 @RequireValidPrincipal()
-public class DashboardRouter extends Router<BergamotApp>
+public class DashboardRouter extends Router<BergamotUI>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)

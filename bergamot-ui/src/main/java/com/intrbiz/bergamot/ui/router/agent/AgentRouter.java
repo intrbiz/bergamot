@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.metadata.GetBergamotSite;
 import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.AgentKey;
 import com.intrbiz.bergamot.model.Site;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.metadata.Any;
 import com.intrbiz.metadata.CheckStringLength;
 import com.intrbiz.metadata.CoalesceMode;
@@ -25,7 +25,7 @@ import com.intrbiz.metadata.Template;
 @RequireValidPrincipal()
 @RequirePermission("ui.sign.agent")
 @RequirePermission("sign.agent")
-public class AgentRouter extends Router<BergamotApp>
+public class AgentRouter extends Router<BergamotUI>
 {    
     @Any("/")
     @WithDataAdapter(BergamotDB.class)

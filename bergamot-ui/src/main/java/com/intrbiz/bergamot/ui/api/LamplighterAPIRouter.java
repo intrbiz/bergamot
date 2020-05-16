@@ -17,7 +17,7 @@ import com.intrbiz.bergamot.metadata.IsaObjectId;
 import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.VirtualCheck;
 import com.intrbiz.bergamot.model.message.CheckReadingMO;
-import com.intrbiz.bergamot.ui.BergamotApp;
+import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.lamplighter.data.LamplighterDB;
 import com.intrbiz.lamplighter.model.CheckReading;
 import com.intrbiz.lamplighter.model.StoredDoubleGaugeReading;
@@ -54,7 +54,7 @@ import com.intrbiz.metadata.doc.Title;
 })
 @Prefix("/api/lamplighter")
 @RequireValidPrincipal()
-public class LamplighterAPIRouter extends Router<BergamotApp>
+public class LamplighterAPIRouter extends Router<BergamotUI>
 {        
     @Title("Get readings for check")
     @Desc({

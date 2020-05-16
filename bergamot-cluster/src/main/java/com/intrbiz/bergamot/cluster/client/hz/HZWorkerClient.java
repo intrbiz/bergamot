@@ -14,7 +14,6 @@ import com.intrbiz.bergamot.cluster.dispatcher.hz.HZProcessorDispatcher;
 import com.intrbiz.bergamot.cluster.registry.AgentRegistar;
 import com.intrbiz.bergamot.cluster.registry.ProcessorRegistry;
 import com.intrbiz.bergamot.cluster.registry.WorkerRegistar;
-import com.intrbiz.bergamot.config.ClusterCfg;
 import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
 import com.intrbiz.bergamot.model.message.cluster.WorkerRegistration;
 
@@ -37,9 +36,9 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
     
     private final WorkerConsumer workerConsumer;
 
-    public HZWorkerClient(ClusterCfg config, Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws Exception
+    public HZWorkerClient(Consumer<Void> onPanic, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws Exception
     {
-        super(config, onPanic);
+        super(onPanic);
         this.application = application;
         this.info = info;
         this.workerRegistar = new WorkerRegistar(this.zooKeeper.getZooKeeper());
