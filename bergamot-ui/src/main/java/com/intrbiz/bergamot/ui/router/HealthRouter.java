@@ -32,6 +32,20 @@ public class HealthRouter extends Router<BergamotApp>
         return "OK";
     }
     
+    @Any("/alive")
+    @Text
+    public String alive()
+    {
+        return "OK";
+    }
+    
+    @Any("/ready")
+    @Text
+    public String ready()
+    {
+        return "OK";
+    }
+    
     @Any("/check")
     @JSON()
     public HealthCheck check()
