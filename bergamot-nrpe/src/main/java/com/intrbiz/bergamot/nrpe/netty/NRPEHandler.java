@@ -15,6 +15,8 @@ public class NRPEHandler extends ChannelInboundHandlerAdapter
 {
     private Logger logger = Logger.getLogger(NRPEHandler.class);
     
+    private boolean complete = false;
+    
     private long start = -1;
     
     private long end = -1;
@@ -41,6 +43,7 @@ public class NRPEHandler extends ChannelInboundHandlerAdapter
         p.setRuntime(this.end - this.start);
         logger.debug("Got NRPE response in: status: " + p.getResponseCode() + ", message: " + p.getMessage() + ", runtime: " + p.getRuntime() + "ms");
         // invoke the callback
+        complete = true;
         this.responseHandler.accept(p);
         // close
         if (ctx.channel().isActive()) ctx.close();
@@ -51,9 +54,20 @@ public class NRPEHandler extends ChannelInboundHandlerAdapter
     {
         if (evt instanceof SslHandshakeCompletionEvent)
         {
-            logger.debug("SSL Handshake complete, sending NRPE request");
-            this.start = System.currentTimeMillis();
-            ctx.writeAndFlush(this.request);
+            SslHandshakeCompletionEvent sslEvt = (SslHandshakeCompletionEvent) evt;
+            if (sslEvt.isSuccess())
+            {
+                logger.debug("SSL Handshake complete, sending NRPE request");
+                this.start = System.currentTimeMillis();
+                ctx.writeAndFlush(this.request);
+            }
+            else
+            {
+                logger.warn("SSL Handshake failed");
+                complete = true;
+                this.errorHandler.accept(sslEvt.cause());
+                ctx.channel().close();
+            }
         }
     }
 
@@ -62,13 +76,14 @@ public class NRPEHandler extends ChannelInboundHandlerAdapter
     {
         logger.debug("Error processing NRPE request: " + cause);
         // invoke the callback
+        complete = true;
         this.errorHandler.accept(cause);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception
     {
-        if (this.end == -1)
+        if (! this.complete)
         {
             this.errorHandler.accept(new EOFException("Connection closed by NRPE before response received."));
         }

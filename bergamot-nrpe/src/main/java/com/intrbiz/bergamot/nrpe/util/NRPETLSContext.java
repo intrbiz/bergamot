@@ -19,17 +19,21 @@ public class NRPETLSContext
     private static final String TLS = "TLS";
     
     private static final String TLS_DISABLED_ALGORITHMS = "jdk.tls.disabledAlgorithms";
+    
+    private static final String TLS_LEGACY_ALGORITHMS = "jdk.tls.legacyAlgorithms";
 
     private final SSLContext context;
     
     public NRPETLSContext()
     {
         String disabledTlsAlg = Security.getProperty(TLS_DISABLED_ALGORITHMS);
+        String legacyTlsAlg = Security.getProperty(TLS_LEGACY_ALGORITHMS);
         try
         {
             // NRPE uses TLS DH ANON which is terribly insecure and disabled by default
             // enable it temporarily whilst we create a context
             Security.setProperty(TLS_DISABLED_ALGORITHMS, "");
+            Security.setProperty(TLS_LEGACY_ALGORITHMS, "");
             this.context = SSLContext.getInstance(TLS);
             context.init(null, null, new SecureRandom());
         }
@@ -41,7 +45,11 @@ public class NRPETLSContext
         {
             if (disabledTlsAlg != null)
             {
-                Security.setProperty("jdk.tls.disabledAlgorithms", disabledTlsAlg);
+                Security.setProperty(TLS_DISABLED_ALGORITHMS, disabledTlsAlg);
+            }
+            if (legacyTlsAlg != null)
+            {
+                Security.setProperty(TLS_LEGACY_ALGORITHMS, legacyTlsAlg);
             }
         }
     }
