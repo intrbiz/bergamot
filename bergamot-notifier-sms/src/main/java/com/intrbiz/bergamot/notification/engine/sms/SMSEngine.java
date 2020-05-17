@@ -45,7 +45,7 @@ public class SMSEngine extends TemplatedNotificationEngine
 
     public SMSEngine()
     {
-        super(BergamotVersion.NAME, NAME, true);
+        super(BergamotVersion.NAME, NAME, false);
         // setup metrics
         IntelligenceSource source = Witchcraft.get().source("com.intrbiz.bergamot.sms");
         this.smsSendTimer = source.getRegistry().timer("sms-sent");
