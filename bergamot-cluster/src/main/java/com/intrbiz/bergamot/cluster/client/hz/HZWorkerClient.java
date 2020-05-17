@@ -50,11 +50,13 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
         this.registerWorker(restrictedSiteIds, workerPool, availableEngines);
     }
 
+    @Override
     public WorkerConsumer getWorkerConsumer()
     {
         return this.workerConsumer;
     }
 
+    @Override
     public ProcessorDispatcher getProcessorDispatcher()
     {
         return this.processorDispatcher;
@@ -70,14 +72,16 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
         this.workerRegistar.unregisterWorker(this.id);
     }
 
+    @Override
     public void registerAgent(UUID agentId) throws KeeperException, InterruptedException
     {
         this.agentRegistar.registerAgent(new AgentRegistration(agentId, System.currentTimeMillis(), this.id));
     }
     
+    @Override
     public void unregisterAgent(UUID agentId) throws KeeperException, InterruptedException
     {
-        this.agentRegistar.unregisterAgent(agentId);
+        this.agentRegistar.unregisterAgent(agentId, this.id);
     }
 
     @Override

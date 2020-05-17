@@ -30,6 +30,7 @@ public class WorkerProxyProcessor extends MessageProcessor
         this.proxyClient = proxyClient;
     }
     
+    @Override
     public void start()
     {
         // start consuming messages
@@ -82,7 +83,7 @@ public class WorkerProxyProcessor extends MessageProcessor
                 }
                 else
                 {
-                    this.proxyClient.unregisterAgent(state.getAgentId());
+                    this.proxyClient.unregisterAgent(state.getAgentId(), this.getId());
                 }
             }
             catch (Exception e)
@@ -92,6 +93,7 @@ public class WorkerProxyProcessor extends MessageProcessor
         }
     }
     
+    @Override
     public void stop()
     {
         this.consumer.stop();

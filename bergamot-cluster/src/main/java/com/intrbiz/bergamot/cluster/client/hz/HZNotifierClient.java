@@ -36,6 +36,7 @@ public class HZNotifierClient extends HZBergamotClient implements NotifierClient
         this.registerNotifier(restrictedSiteIds, availableEngines);
     }
 
+    @Override
     public NotificationConsumer getNotifierConsumer()
     {
         return this.consumer;

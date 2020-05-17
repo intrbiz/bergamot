@@ -70,6 +70,7 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
         return this.proxyConsumer;
     }
 
+    @Override
     public ProcessorDispatcher getProcessorDispatcher()
     {
         return this.processorDispatcher;
@@ -85,6 +86,7 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
         this.workerRegistar.unregisterWorker(this.id);
     }
     
+    @Override
     public WorkerConsumer registerWorker(String host, String application, String info, Set<UUID> restrictedSiteIds, String workerPool, Set<String> availableEngines) throws KeeperException, InterruptedException
     {
         UUID workerId = UUID.randomUUID();
@@ -92,21 +94,25 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
         return new HZWorkerConsumer(this.hazelcast, workerId);
     }
     
+    @Override
     public void unregisterWorker(UUID workerId) throws KeeperException, InterruptedException
     {
         this.workerRegistar.unregisterWorker(workerId);
     }
 
+    @Override
     public void registerAgent(UUID agentId, UUID workerId) throws KeeperException, InterruptedException
     {
         this.agentRegistar.registerAgent(new AgentRegistration(agentId, System.currentTimeMillis(), workerId));
     }
     
-    public void unregisterAgent(UUID agentId) throws KeeperException, InterruptedException
+    @Override
+    public void unregisterAgent(UUID agentId, UUID workerId) throws KeeperException, InterruptedException
     {
-        this.agentRegistar.unregisterAgent(agentId);
+        this.agentRegistar.unregisterAgent(agentId, workerId);
     }
-    
+
+    @Override
     public NotificationConsumer registerNotifier(String host, String application, String info, Set<UUID> restrictedSiteIds, Set<String> availableEngines) throws KeeperException, InterruptedException
     {
         UUID notifierId = UUID.randomUUID();
@@ -114,6 +120,7 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
         return new HZNotificationConsumer(this.hazelcast, notifierId);
     }
     
+    @Override
     public void unregisterNotifier(UUID notifierId) throws KeeperException, InterruptedException
     {
         this.notifierRegistar.unregisterNotifier(notifierId);

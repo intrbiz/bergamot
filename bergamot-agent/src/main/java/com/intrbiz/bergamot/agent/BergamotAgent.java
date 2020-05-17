@@ -426,6 +426,7 @@ public class BergamotAgent
                 final Channel channel = future.channel();
                 if (future.isDone() && future.isSuccess())
                 {
+                    logger.info("Connected to server: " + server);
                     // stash the channel
                     BergamotAgent.this.channel = channel;
                     // reset fail counter

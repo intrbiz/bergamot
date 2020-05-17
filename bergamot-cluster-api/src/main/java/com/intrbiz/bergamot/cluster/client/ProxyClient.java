@@ -23,7 +23,7 @@ public interface ProxyClient extends BergamotClient
 
     void registerAgent(UUID agentId, UUID workerId) throws Exception;
     
-    void unregisterAgent(UUID agentId) throws Exception;
+    void unregisterAgent(UUID agentId, UUID workerId) throws Exception;
     
     NotificationConsumer registerNotifier(String host, String application, String info, Set<UUID> restrictedSiteIds, Set<String> availableEngines) throws Exception;
     
