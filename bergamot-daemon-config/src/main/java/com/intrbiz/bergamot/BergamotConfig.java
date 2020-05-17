@@ -205,30 +205,30 @@ public class BergamotConfig
     public static boolean getBooleanConfigurationParameter(String name, boolean defaultValue)
     {
         String value = getConfigurationParameter(name);
-        return value == null ? defaultValue : Boolean.parseBoolean(name);
+        return value == null ? defaultValue : Boolean.parseBoolean(value);
     }
 
     public static int getIntConfigurationParameter(String name, int defaultValue)
     {
         String value = getConfigurationParameter(name);
-        return value == null ? defaultValue : Integer.parseInt(name);
+        return value == null ? defaultValue : Integer.parseInt(value);
     }
     
     public static long getLongConfigurationParameter(String name, long defaultValue)
     {
         String value = getConfigurationParameter(name);
-        return value == null ? defaultValue : Long.parseLong(name);
+        return value == null ? defaultValue : Long.parseLong(value);
     }
     
     public static float getFloatConfigurationParameter(String name, float defaultValue)
     {
         String value = getConfigurationParameter(name);
-        return value == null ? defaultValue : Float.parseFloat(name);
+        return value == null ? defaultValue : Float.parseFloat(value);
     }
     
     public static double getDoubleConfigurationParameter(String name, double defaultValue)
     {
         String value = getConfigurationParameter(name);
-        return value == null ? defaultValue : Double.parseDouble(name);
+        return value == null ? defaultValue : Double.parseDouble(value);
     }
 }
