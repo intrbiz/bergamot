@@ -1,0 +1,2 @@
+jdk.tls.disabledAlgorithms=SSLv3, RC4, DES, MD5withRSA, \
+    EC keySize < 224, 3DES_EDE_CBC, NULL
