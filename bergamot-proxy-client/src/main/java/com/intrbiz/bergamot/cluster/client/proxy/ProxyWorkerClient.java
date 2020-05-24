@@ -55,14 +55,14 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
         return this.dispatcher;
     }
 
-    public void registerAgent(UUID agentId) throws Exception
+    public void registerAgent(UUID agentId, UUID nonce) throws Exception
     {
-        this.channel.writeAndFlush(new AgentState(agentId, true));
+        this.channel.writeAndFlush(new AgentState(agentId, nonce, true));
     }
     
-    public void unregisterAgent(UUID agentId) throws Exception
+    public void unregisterAgent(UUID agentId, UUID nonce) throws Exception
     {
-        this.channel.writeAndFlush(new AgentState(agentId, false));
+        this.channel.writeAndFlush(new AgentState(agentId, nonce, false));
     }
     
     private class ProxyWorkerConsumer implements WorkerConsumer

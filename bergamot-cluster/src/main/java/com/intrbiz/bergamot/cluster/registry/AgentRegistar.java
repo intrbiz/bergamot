@@ -23,20 +23,20 @@ public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
         super(zooKeeper, ZKPaths.AGENTS);
     }
     
-    public void registerAgent(AgentRegistration agent) throws KeeperException, InterruptedException
+    public int registerAgent(AgentRegistration agent) throws KeeperException, InterruptedException
     {
         try
         {
-            this.registerItem(agent.getId(), agent);
+            return this.registerItem(agent.getId(), agent);
         }
         catch (NodeExistsException e)
         {
             // update the registration instead
-            this.reregisterItem(agent.getId(), agent);
+            return this.reregisterItem(agent.getId(), agent);
         }
     }
     
-    public void unregisterAgent(UUID agentId, UUID workerId) throws KeeperException, InterruptedException
+    public void unregisterAgent(UUID agentId, UUID nonce, UUID workerId) throws KeeperException, InterruptedException
     {
         // Ensure we only delete the node if it is for this worker
         try
@@ -49,7 +49,7 @@ public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
             {
                 AgentRegistration reg = this.transcoder.decodeFromBytes(agentData, AgentRegistration.class);
                 // Do we own this registration
-                if (workerId.equals(reg.getWorkerId()))
+                if (nonce.equals(reg.getNonce()) && workerId.equals(reg.getWorkerId()))
                 {
                     // Delete the node
                     this.zooKeeper.delete(path, stat.getVersion());
@@ -60,5 +60,6 @@ public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
         {
             // ignore
         }
+
     }
 }

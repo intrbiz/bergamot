@@ -23,6 +23,12 @@ public class AgentRegistration extends MessageObject implements Comparable<Agent
     private UUID id;
     
     /**
+     * A unique number used once used to validate the deletion of an agent registration
+     */
+    @JsonProperty("nonce")
+    private UUID nonce;
+    
+    /**
      * When this worker registered
      */
     @JsonProperty("registered")
@@ -39,10 +45,11 @@ public class AgentRegistration extends MessageObject implements Comparable<Agent
         super();
     }
     
-    public AgentRegistration(UUID id, long registered, UUID workerId)
+    public AgentRegistration(UUID id, UUID nonce, long registered, UUID workerId)
     {
         super();
         this.id = Objects.requireNonNull(id);
+        this.nonce = Objects.requireNonNull(nonce);
         this.registered = registered;
         this.workerId = workerId;
     }
@@ -50,6 +57,21 @@ public class AgentRegistration extends MessageObject implements Comparable<Agent
     public UUID getId()
     {
         return id;
+    }
+    
+    public void setId(UUID id)
+    {
+        this.id = id;
+    }
+
+    public UUID getNonce()
+    {
+        return this.nonce;
+    }
+
+    public void setNonce(UUID nonce)
+    {
+        this.nonce = nonce;
     }
 
     public long getRegistered()
@@ -70,11 +92,6 @@ public class AgentRegistration extends MessageObject implements Comparable<Agent
     public void setWorkerId(UUID workerId)
     {
         this.workerId = workerId;
-    }
-
-    public void setId(UUID id)
-    {
-        this.id = id;
     }
 
     @Override

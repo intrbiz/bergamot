@@ -79,11 +79,11 @@ public class WorkerProxyProcessor extends MessageProcessor
                 AgentState state = (AgentState) message;
                 if (state.isConnected())
                 {
-                    this.proxyClient.registerAgent(state.getAgentId(), this.getId());
+                    this.proxyClient.registerAgent(state.getAgentId(), state.getNonce(), this.getId());
                 }
                 else
                 {
-                    this.proxyClient.unregisterAgent(state.getAgentId(), this.getId());
+                    this.proxyClient.unregisterAgent(state.getAgentId(), state.getNonce(), this.getId());
                 }
             }
             catch (Exception e)

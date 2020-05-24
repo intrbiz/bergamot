@@ -9,12 +9,12 @@ import com.intrbiz.bergamot.cluster.dispatcher.ProcessorDispatcher;
  * A Bergamot Worker node client
  */
 public interface WorkerClient extends BergamotClient
-{   
+{
     WorkerConsumer getWorkerConsumer();
 
     ProcessorDispatcher getProcessorDispatcher();
 
-    void registerAgent(UUID agentId) throws Exception;
+    void registerAgent(UUID agentId, UUID nonce) throws Exception;
     
-    void unregisterAgent(UUID agentId) throws Exception;
+    void unregisterAgent(UUID agentId, UUID nonce) throws Exception;
 }

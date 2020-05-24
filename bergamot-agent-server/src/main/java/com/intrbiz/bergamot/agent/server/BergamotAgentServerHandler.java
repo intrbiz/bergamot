@@ -89,6 +89,8 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     
     private static final AsciiString SERVER_NAME = AsciiString.cached("Bergamot Agent Server");
     
+    private final UUID nonce = UUID.randomUUID();
+    
     private final BergamotAgentServer server;
 
     private WebSocketServerHandshaker handshaker;
@@ -125,6 +127,11 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
     {
         super();
         this.server = server;
+    }
+    
+    public UUID getNonce()
+    {
+        return this.nonce;
     }
     
     /**

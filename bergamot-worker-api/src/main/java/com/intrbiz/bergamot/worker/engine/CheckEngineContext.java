@@ -63,14 +63,23 @@ public interface CheckEngineContext
     void publishAgentAction(ProcessorAgentMessage action);
     
     /**
-     * Register this worker as being the route for the given agent id
+     * Register this worker as being the route for the given agent id.
+     * 
+     * The nonce should be random (UUID.randomUUID()) and needs to be tracked 
+     * by the caller so that it can be provided to unregisterAgent.
+     * 
+     * @param agentId the agent id to register to this worker
+     * @param nonce a random number used once (NONCE) which is used to validate unregistration
      */
-    void registerAgent(UUID agentId);
+    void registerAgent(UUID agentId, UUID nonce);
     
     /**
      * Unregister this worker as being the route for the given agent id
+     * 
+     * @param agentId the agent id to unregister from this worker
+     * @param nonce the random NONCE which was used when the agent was registered
      */
-    void unregisterAgent(UUID agentId);
+    void unregisterAgent(UUID agentId, UUID nonce);
     
     /**
      * Publish a (probably passive) result

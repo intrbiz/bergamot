@@ -48,12 +48,12 @@ public class TestHTTPEngine
             }
 
             @Override
-            public void registerAgent(UUID agentId)
+            public void registerAgent(UUID agentId, UUID nonce)
             {
             }
 
             @Override
-            public void unregisterAgent(UUID agentId)
+            public void unregisterAgent(UUID agentId, UUID nonce)
             {
             }
 

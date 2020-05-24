@@ -16,6 +16,9 @@ public class AgentState extends ProxyMessage
     @JsonProperty("agent_id")
     private UUID agentId;
     
+    @JsonProperty("nonce")
+    private UUID nonce;
+    
     @JsonProperty("connected")
     private boolean connected;
     
@@ -24,10 +27,11 @@ public class AgentState extends ProxyMessage
         super();
     }
 
-    public AgentState(UUID agentId, boolean connected)
+    public AgentState(UUID agentId, UUID nonce, boolean connected)
     {
         super();
         this.agentId = agentId;
+        this.nonce = nonce;
         this.connected = connected;
     }
 
@@ -39,6 +43,16 @@ public class AgentState extends ProxyMessage
     public void setAgentId(UUID agentId)
     {
         this.agentId = agentId;
+    }
+
+    public UUID getNonce()
+    {
+        return this.nonce;
+    }
+
+    public void setNonce(UUID nonce)
+    {
+        this.nonce = nonce;
     }
 
     public boolean isConnected()

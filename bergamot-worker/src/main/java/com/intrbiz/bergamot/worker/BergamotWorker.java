@@ -186,11 +186,11 @@ public class BergamotWorker
             }
 
             @Override
-            public void registerAgent(UUID agentId)
+            public void registerAgent(UUID agentId, UUID nonce)
             {
                 try
                 {
-                    client.registerAgent(agentId);
+                    client.registerAgent(agentId, nonce);
                 }
                 catch (Exception e)
                 {
@@ -199,11 +199,11 @@ public class BergamotWorker
             }
 
             @Override
-            public void unregisterAgent(UUID agentId)
+            public void unregisterAgent(UUID agentId, UUID nonce)
             {
                 try
                 {
-                    client.unregisterAgent(agentId);
+                    client.unregisterAgent(agentId, nonce);
                 }
                 catch (Exception e)
                 {

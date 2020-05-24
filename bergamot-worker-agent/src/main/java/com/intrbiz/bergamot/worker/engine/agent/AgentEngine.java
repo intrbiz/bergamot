@@ -61,7 +61,7 @@ public class AgentEngine extends AbstractCheckEngine
         // Setup event handlers
         this.server.setOnAgentConnectHandler((agent) -> {
             logger.info("Registering agent: " + agent.getAgentId());
-            engineContext.registerAgent(agent.getAgentId());
+            engineContext.registerAgent(agent.getAgentId(), agent.getNonce());
             // Offer a register message
             if (! Util.isEmpty(agent.getAgentTemplateName()))
             {
@@ -79,7 +79,7 @@ public class AgentEngine extends AbstractCheckEngine
         });
         this.server.setOnAgentDisconnectHandler((agent) -> {
             logger.debug("Unregistering agent: " + agent.getAgentId());
-            engineContext.unregisterAgent(agent.getAgentId());
+            engineContext.unregisterAgent(agent.getAgentId(), agent.getNonce());
         });
         // start the server
         this.server.start();

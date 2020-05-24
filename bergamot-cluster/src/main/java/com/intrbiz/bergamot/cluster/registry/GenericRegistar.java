@@ -53,20 +53,35 @@ public abstract class GenericRegistar<K, V>
         }
     }
     
-    protected final void registerItem(K id, V data) throws KeeperException, InterruptedException
+    protected final int registerItem(K id, V data) throws KeeperException, InterruptedException
     {
-        String path = this.zooKeeper.create(this.buildItemPath(id), this.transcoder.encodeAsBytes(data), Arrays.asList(new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.ANYONE_ID_UNSAFE)), CreateMode.EPHEMERAL);
+        Stat stat = new Stat();
+        String path = this.zooKeeper.create(this.buildItemPath(id), this.transcoder.encodeAsBytes(data), Arrays.asList(new ACL(ZooDefs.Perms.ALL, ZooDefs.Ids.ANYONE_ID_UNSAFE)), CreateMode.EPHEMERAL, stat);
         logger.info("Registered into ZooKeeper: " + path);
+        return stat.getVersion();
     }
     
-    protected final void reregisterItem(K id, V data) throws KeeperException, InterruptedException
+    protected final int reregisterItem(K id, V data, int version) throws KeeperException, InterruptedException
     {
-        this.zooKeeper.setData(this.buildItemPath(id), this.transcoder.encodeAsBytes(data), -1);
+        String path = this.buildItemPath(id);
+        Stat stat = this.zooKeeper.setData(path, this.transcoder.encodeAsBytes(data), version);
+        logger.info("Reregistered into ZooKeeper: " + path);
+        return stat.getVersion();
+    }
+    
+    protected final int reregisterItem(K id, V data) throws KeeperException, InterruptedException
+    {
+        return this.reregisterItem(id, data, -1);
+    }
+    
+    protected final void unregisterItem(K id, int version) throws KeeperException, InterruptedException
+    {
+        this.zooKeeper.delete(this.buildItemPath(id), version);
     }
     
     protected final void unregisterItem(K id) throws KeeperException, InterruptedException
     {
-        this.zooKeeper.delete(this.buildItemPath(id), -1);
+        this.unregisterItem(id, -1);
     }
     
     protected final String buildItemPath(K itemId)
