@@ -13,9 +13,9 @@
             </escalate>
         </notifications>
         <notify teams="admins"/>
-        <state failed-after="4" recovers-after="10"/>
+        <state failed-after="5" recovers-after="10"/>
         <check-command command="check-host-alive"/>
-        <schedule every="5" retry-every="1" time-period="24x7"/>
+        <schedule every="5" changing-every="1" retry-every="150s" time-period="24x7"/>
         <description>A generic host template</description>
     </host>
     
