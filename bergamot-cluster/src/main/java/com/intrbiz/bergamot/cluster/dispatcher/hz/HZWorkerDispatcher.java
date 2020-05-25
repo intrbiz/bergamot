@@ -2,6 +2,9 @@ package com.intrbiz.bergamot.cluster.dispatcher.hz;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.intrbiz.bergamot.cluster.dispatcher.WorkerDispatcher;
@@ -20,11 +23,15 @@ public class HZWorkerDispatcher extends HZBaseDispatcher<WorkerMessage> implemen
 {
     private static final String ENGINE_AGENT = "agent";
     
+    private static final String ENGINE_INTERNAL = "internal";
+    
     private final WorkerRegistry workers;
     
     private final WorkerRouteTable workerRouteTable;
     
     private final AgentRegistry agents;
+    
+    private final ConcurrentMap<String, Consumer<WorkerMessage>> internalWorkers = new ConcurrentHashMap<>();
     
     public HZWorkerDispatcher(WorkerRegistry workers, AgentRegistry agents, HazelcastInstance hazelcast)
     {
@@ -43,39 +50,61 @@ public class HZWorkerDispatcher extends HZBaseDispatcher<WorkerMessage> implemen
     @Override
     public PublishStatus dispatch(WorkerMessage message)
     {
-        // Route the check
-        UUID workerId = message.getWorkerId();
-        if (workerId == null)
+        if (this.isInternal(message))
         {
-            if (message instanceof ExecuteCheck)
+            Consumer<WorkerMessage> internal = this.internalWorkers.get(message.getEngine());
+            if (internal != null)
             {
-                ExecuteCheck check = (ExecuteCheck) message;
-                if (this.isAgentRouted(check))
-                {
-                    if (check.getAgentId() == null)
+                internal.accept(message);
+                return PublishStatus.Success;
+            }
+            return PublishStatus.Unroutable;
+        }
+        else
+        {
+            // Route the check
+            UUID workerId = message.getWorkerId();
+            if (workerId == null)
+            {
+                    if (this.isAgentRouted(message))
                     {
-                        return PublishStatus.NoAgentId;
+                        if (message.getAgentId() == null)
+                        {
+                            return PublishStatus.NoAgentId;
+                        }
+                        else
+                        {
+                            workerId = this.agents.routeAgent(message.getAgentId());
+                            if (workerId == null) return PublishStatus.AgentUnroutable;
+                        }
                     }
                     else
                     {
-                        workerId = this.agents.routeAgent(check.getAgentId());
-                        if (workerId == null) return PublishStatus.AgentUnroutable;
+                        workerId = this.workerRouteTable.route(message.getSiteId(), message.getWorkerPool(), message.getEngine());
                     }
-                }
-                else
-                {
-                    workerId = this.workerRouteTable.route(check.getSiteId(), check.getWorkerPool(), check.getEngine());
-                }
+                if (workerId == null) return PublishStatus.Unroutable;
+                message.setWorkerId(workerId);
             }
-            if (workerId == null) return PublishStatus.Unroutable;
-            message.setWorkerId(workerId);
+            // Offer to the worker
+            return this.offer(workerId, message);
         }
-        // Offer to the worker
-        return this.offer(workerId, message);
     }
     
-    protected boolean isAgentRouted(ExecuteCheck check)
+    protected final boolean isAgentRouted(WorkerMessage check)
     {
         return check.getEngine() != null && check.getEngine().toLowerCase().startsWith(ENGINE_AGENT);
+    }
+    
+    protected final boolean isInternal(WorkerMessage check)
+    {
+        return check.getEngine() != null && check.getEngine().toLowerCase().startsWith(ENGINE_INTERNAL);
+    }
+    
+    public void registerInternalWorker(String engineName, Consumer<WorkerMessage> consumer)
+    {
+        if (Objects.requireNonNull(engineName).startsWith(ENGINE_INTERNAL))
+        {
+            this.internalWorkers.put(engineName, consumer);
+        }
     }
 }

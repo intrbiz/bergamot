@@ -91,6 +91,13 @@ public class ActiveResult extends ResultMessage
         return this;
     }
     
+    @JsonIgnore
+    public ActiveResult withProcessorId(UUID processorId)
+    {
+        this.setProcessorId(processorId);
+        return this;
+    }
+    
     public ActiveResult state(String savedState)
     {
         this.savedState = savedState;

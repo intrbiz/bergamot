@@ -88,7 +88,7 @@ public class BergamotWorker
     public final void configure()
     {
         this.sites = BergamotConfig.getSites();
-        this.threadCount = BergamotConfig.getThreads();
+        this.threadCount = BergamotConfig.getThreads(8, 4);
         this.enabledEngines = BergamotConfig.getEnabledEngines();
         this.disabledEngines = BergamotConfig.getDisabledEngines();
         this.workerPool = BergamotConfig.getWorkerPool();

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <command name="bergamot-internal-workers" engine="internal" executor="workers" security-domains="global">
+        <summary>Bergamot Internal Workers</summary>
+        <parameter name="warning" description="The minimum number of workers expected for a Warning state">#{if(site.deployment_mode == 'cluster', 3, 1)}</parameter>
+        <parameter name="critical" description="The minimum number of workers expected for a Critical state">#{if(site.deployment_mode == 'cluster', 2, 1)}</parameter>
+        <parameter name="engines" description="The check execution engines which must be available"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
+        <description>Check the number of workers available for this check</description>
+    </command>
+    
+    <command name="bergamot-internal-notifiers" engine="internal" executor="notifiers" security-domains="global">
+        <summary>Bergamot Internal Notifiers</summary>
+        <parameter name="warning" description="The minimum number of workers expected for a Warning state">#{if(site.deployment_mode == 'cluster', 3, 1)}</parameter>
+        <parameter name="critical" description="The minimum number of workers expected for a Critical state">#{if(site.deployment_mode == 'cluster', 2, 1)}</parameter>
+        <parameter name="engines" description="The notification engines which must be available"></parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
+        <description>Check the number of notifiers available</description>
+    </command>
+    
+    <command name="bergamot-internal-proxies" engine="internal" executor="proxies" security-domains="global">
+        <summary>Bergamot Internal Proxies</summary>
+        <parameter name="warning" description="The minimum number of proxies expected for a Warning state">#{if(site.deployment_mode == 'cluster', 3, 1)}</parameter>
+        <parameter name="critical" description="The minimum number of proxies expected for a Critical state">#{if(site.deployment_mode == 'cluster', 2, 1)}</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
+        <description>Check the number of proxies available</description>
+    </command>
+    
+</bergamot>

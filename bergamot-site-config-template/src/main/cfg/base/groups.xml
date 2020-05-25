@@ -9,7 +9,7 @@
     
     <group name="host-group" security-domains="global" template="yes">
         <summary>Host Group Template</summary>
-        <parameter description="ui-icon" name="ui-icon">/images/icons/64/host.png</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/host.png</parameter>
     </group>
     
     <group name="service-group" security-domains="global" template="yes">
@@ -18,17 +18,17 @@
     
     <group name="website-group" security-domains="global" template="yes">
         <summary>Website Group Template</summary>
-        <parameter description="ui-icon" name="ui-icon">/images/icons/64/world.png</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/world.png</parameter>
     </group>
     
     <group name="network-group" security-domains="global" template="yes">
         <summary>Network Group Template</summary>
-        <parameter description="ui-icon" name="ui-icon">/images/icons/64/network.png</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/network.png</parameter>
     </group>
     
     <group name="cluster-group" security-domains="global" template="yes">
         <summary>Cluster Group Template</summary>
-        <parameter description="ui-icon" name="ui-icon">/images/icons/64/cluster.png</parameter>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/cluster.png</parameter>
     </group>
     
 	<!-- Services -->
@@ -129,6 +129,12 @@
     <!-- Clusters -->
     <group name="clusters" extends="cluster-group">
         <summary>Clusters</summary>
+    </group>
+    
+    <!-- Internal -->
+    <group name="internal" extends="generic-group">
+        <summary>Bergamot Internal</summary>
+        <parameter description="UI Icon" name="ui-icon">/images/icons/64/bergamot.png</parameter>
     </group>
     
 </bergamot>

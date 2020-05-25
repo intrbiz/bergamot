@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bergamot site="bergamot.template">
+    
+    <!-- Default internal checks -->
+    
+    <host groups="internal" extends="generic-host" name="bergamot-workers-any">
+        <description>The number of Bergamot Workers available globally.</description>
+        <summary>Bergamot Workers</summary>
+        <check-command command="bergamot-internal-workers"/>
+    </host>
+    
+    <host groups="internal" extends="generic-host" name="bergamot-workers-office">
+        <description>The number of Bergamot Workers available for the office location.</description>
+        <summary>Bergamot Office Workers</summary>
+        <check-command command="bergamot-internal-workers"/>
+    </host>
+    
+    <host groups="internal" extends="generic-host" name="bergamot-proxies-any">
+        <description>The number of Bergamot Proxies available.</description>
+        <summary>Bergamot Proxies</summary>
+        <check-command command="bergamot-internal-proxies"/>
+    </host>
+    
+    <host groups="internal" extends="generic-host" name="bergamot-notifiers-any">
+        <description>The number of Bergamot Notifiers available.</description>
+        <summary>Bergamot Notifiers</summary>
+        <check-command command="bergamot-internal-notifiers"/>
+    </host>
+    
+    
+</bergamot>

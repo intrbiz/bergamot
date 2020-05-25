@@ -13,6 +13,9 @@ import com.intrbiz.bergamot.model.message.worker.WorkerMessage;
 public class CheckMessage extends WorkerMessage implements ParameterisedMO
 {
     private static final long serialVersionUID = 1L;
+    
+    @JsonProperty("agent-id")
+    private UUID agentId;
 
     @JsonProperty("engine")
     private String engine;
@@ -64,7 +67,19 @@ public class CheckMessage extends WorkerMessage implements ParameterisedMO
     {
         super(replyTo);
     }
+    
+    @Override
+    public UUID getAgentId()
+    {
+        return agentId;
+    }
 
+    public void setAgentId(UUID agentId)
+    {
+        this.agentId = agentId;
+    }
+
+    @Override
     public String getEngine()
     {
         return engine;
@@ -115,6 +130,7 @@ public class CheckMessage extends WorkerMessage implements ParameterisedMO
         this.checkId = checkId;
     }
 
+    @Override
     public UUID getSiteId()
     {
         return siteId;
@@ -147,6 +163,7 @@ public class CheckMessage extends WorkerMessage implements ParameterisedMO
         this.processorId = processorId;
     }
 
+    @Override
     public String getWorkerPool()
     {
         return workerPool;

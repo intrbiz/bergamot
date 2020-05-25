@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.Util;
 import com.intrbiz.balsa.BalsaException;
 import com.intrbiz.balsa.action.BalsaAction;
+import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.config.BergamotConfigReader;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
 import com.intrbiz.bergamot.config.model.ContactCfg;
@@ -26,6 +27,7 @@ import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
 import com.intrbiz.bergamot.ui.BergamotUI;
 import com.intrbiz.bergamot.ui.router.global.InstallBean;
+import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.Action;
 
 public class SiteActions implements BalsaAction<BergamotUI>
@@ -56,8 +58,8 @@ public class SiteActions implements BalsaAction<BergamotUI>
         UUID   siteId      = Site.randomSiteId();
         String siteName    = install.getSiteName();
         String siteSummary = install.getSiteSummary();
-        // TODO
-        File templateConfigDir = new File(Util.coalesceEmpty(System.getenv("BERGAMOT_SITE_CONFIG_TEMPLATE"), System.getProperty("bergamot.site.config.template"), "cfg/template"));
+        // Get the template directory
+        File templateConfigDir = BergamotConfig.getBergamotSiteConfigurationTemplatePath();
         // now check that we can create the site and it's aliases
         try (BergamotDB db = BergamotDB.connect())
         {
@@ -67,6 +69,9 @@ public class SiteActions implements BalsaAction<BergamotUI>
                 throw new BalsaException("A site with the name '" + siteName + "' already exists!");
             }
         }
+        // generated configuration to inject
+        BergamotCfg generatedConfig = new BergamotCfg(siteName);
+        generatedConfig.addParameter(new CfgParameter("deployment_mode", "Deployment Mode", null, BergamotConfig.getExpectedProcessors() > 1 ? "cluster" : "standalone"));
         // create the admin user configuration
         ContactCfg admin = new ContactCfg();
         admin.setName(install.getUsername());
@@ -80,12 +85,13 @@ public class SiteActions implements BalsaAction<BergamotUI>
         admin.setObjectState(ObjectState.PRESENT);
         admin.getInheritedTemplates().add("generic-contact");
         admin.getTeams().add("bergamot-admins");
+        generatedConfig.addObject(admin);
         // load the site configuration template and inject our admin user
         Collection<ValidatedBergamotConfiguration> vbcfgs = new BergamotConfigReader()
                 .overrideSiteName(siteName)
                 .includeDir(new File(templateConfigDir, "base"))
                 .includeDir(new File(templateConfigDir, "bergamot"))
-                .inject(new BergamotCfg(siteName, admin))
+                .inject(generatedConfig)
                 .build();
         // assert the configuration is valid
         for (ValidatedBergamotConfiguration vbcfg : vbcfgs)

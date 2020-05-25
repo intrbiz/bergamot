@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.processor;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -41,15 +43,21 @@ import com.intrbiz.bergamot.result.ResultProcessor;
 import com.intrbiz.bergamot.scheduler.Scheduler;
 import com.intrbiz.bergamot.scheduler.SchedulingPoolsController;
 import com.intrbiz.bergamot.scheduler.WheelScheduler;
+import com.intrbiz.bergamot.worker.internal.InternalWorker;
 import com.intrbiz.lamplighter.reading.DefaultReadingProcessor;
 import com.intrbiz.lamplighter.reading.ReadingProcessor;
+import com.intrbiz.util.IBThreadFactory;
 
 /**
  * A Bergamot Processing node
  */
-public class BergamotProcessor extends BergamotMember
+public class BergamotProcessor extends BergamotMember implements Locator
 {
     private static final Logger logger = Logger.getLogger(BergamotProcessor.class);
+    
+    // executor
+    
+    private final ExecutorService executor;
     
     // topics
     
@@ -122,10 +130,18 @@ public class BergamotProcessor extends BergamotMember
     private final BergamotClusterLeader leader;
     
     private final AtomicBoolean started = new AtomicBoolean(false);
+    
+    // internal worker
+    
+    private final InternalWorker internalWorker;
 
     public BergamotProcessor(Consumer<Void> onPanic, String application, String info) throws Exception
     {
         super(onPanic, application, info);
+        // Thread pool to execute processing task in
+        int threads = BergamotConfig.getThreads(4, 4);
+        logger.info("Using " + threads + " execution threads");
+        this.executor = Executors.newFixedThreadPool(threads, new IBThreadFactory("bergamot-processor-executor", true));
         // topics
         this.siteEventTopic = new SiteEventTopic(this.hazelcast);
         this.notificationTopic = new SiteNotificationTopic(this.hazelcast);
@@ -158,12 +174,15 @@ public class BergamotProcessor extends BergamotMember
         this.readingProcessor = new DefaultReadingProcessor();
         this.agentProcessorService = new AgentProcessorService(this.schedulingTopic, this.notificationDispatcher, this.workerDispatcher, this.poolElectors.length);
         this.proxyProcessorService = new ProxyProcessorService(this.proxyDispatcher);
+        // internal worker
+        this.internalWorker = new InternalWorker(this.executor, this.processorDispatcher, this);
+        this.workerDispatcher.registerInternalWorker(InternalWorker.NAME, this.internalWorker::processMessage);
         // consumer
         this.processorConsumer = new HZProcessorConsumer(this.hazelcast, this.id);
         // scheduling controller
         this.schedulingController = new SchedulingPoolsController(this.poolElectors, this.scheduler, this.schedulingTopic);
         // processor executor
-        this.processorExecutor = new ProcessorExecutor(this.resultProcessor, this.readingProcessor, this.agentProcessorService, this.proxyProcessorService, this.processorConsumer);
+        this.processorExecutor = new ProcessorExecutor(this.executor, this.resultProcessor, this.readingProcessor, this.agentProcessorService, this.proxyProcessorService, this.processorConsumer);
         // leader
         this.leader = new BergamotClusterLeader(
                 this.poolElectors, 
@@ -387,5 +406,15 @@ public class BergamotProcessor extends BergamotMember
     public int getSchedulingPoolCount()
     {
         return this.poolElectors.length;
+    }
+
+    public ExecutorService getExecutor()
+    {
+        return this.executor;
+    }
+
+    public InternalWorker getInternalWorker()
+    {
+        return this.internalWorker;
     }
 }

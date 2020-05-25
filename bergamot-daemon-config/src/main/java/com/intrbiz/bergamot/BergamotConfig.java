@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot;
 
+import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.UUID;
 
@@ -49,6 +50,8 @@ public class BergamotConfig
         public static final String HAZELCAST_PORT = "hazelcast.port";
         
         public static final String HAZELCAST_PUBLIC_ADDRESS = "hazelcast.public.address";
+        
+        public static final String BERGAMOT_SITE_CONFIG_TEMPLATE = "bergamot.site.config.template";
     }
     
     // Common configuration parameters
@@ -61,9 +64,9 @@ public class BergamotConfig
         return sites;
     }
     
-    public static int getThreads()
+    public static int getThreads(int defaultThreadsPerCore, int defaultOverheadThreads)
     {
-        return getIntConfigurationParameter(Name.THREADS, Runtime.getRuntime().availableProcessors());
+        return getIntConfigurationParameter(Name.THREADS, defaultOverheadThreads + (Runtime.getRuntime().availableProcessors() * Math.max(defaultThreadsPerCore, 1)));
     }
     
     public static LinkedHashSet<String> getEnabledEngines()
@@ -134,6 +137,11 @@ public class BergamotConfig
     public static String getHazelcastPublicAddress()
     {
         return getConfigurationParameter(Name.HAZELCAST_PUBLIC_ADDRESS);
+    }
+    
+    public static File getBergamotSiteConfigurationTemplatePath()
+    {
+        return new File(getConfigurationParameter(Name.BERGAMOT_SITE_CONFIG_TEMPLATE, "/etc/bergamot/config"));
     }
     
     // Config helpers

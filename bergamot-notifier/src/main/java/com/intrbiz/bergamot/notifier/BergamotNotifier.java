@@ -65,7 +65,7 @@ public class BergamotNotifier
     public final void configure()
     {
         this.sites = BergamotConfig.getSites();
-        this.threadCount = BergamotConfig.getThreads();
+        this.threadCount = BergamotConfig.getThreads(4, 4);
         this.enabledEngines = BergamotConfig.getEnabledEngines();
         this.disabledEngines = BergamotConfig.getDisabledEngines();
          // register engines

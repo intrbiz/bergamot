@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrbiz.bergamot.model.message.Message;
 
-public class WorkerMessage extends Message
+public abstract class WorkerMessage extends Message
 {
     private static final long serialVersionUID = 1L;
 
@@ -39,4 +39,12 @@ public class WorkerMessage extends Message
     {
         this.workerId = workerId;
     }
+    
+    public abstract String getWorkerPool();
+    
+    public abstract String getEngine();
+    
+    public abstract UUID getAgentId();
+    
+    public abstract UUID getSiteId();
 }

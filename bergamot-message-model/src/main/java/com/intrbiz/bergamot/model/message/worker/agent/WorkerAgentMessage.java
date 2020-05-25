@@ -23,4 +23,28 @@ public abstract class WorkerAgentMessage extends WorkerMessage
     {
         super(replyTo);
     }
+    
+    @Override
+    public String getEngine()
+    {
+        return null;
+    }
+
+    @Override
+    public String getWorkerPool()
+    {
+        return null;
+    }
+
+    @Override
+    public UUID getAgentId()
+    {
+        return null;
+    }
+
+    @Override
+    public UUID getSiteId()
+    {
+        return null;
+    }
 }
