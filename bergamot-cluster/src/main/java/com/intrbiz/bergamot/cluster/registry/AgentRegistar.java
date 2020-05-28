@@ -2,6 +2,7 @@ package com.intrbiz.bergamot.cluster.registry;
 
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.BadVersionException;
 import org.apache.zookeeper.KeeperException.NoNodeException;
@@ -17,7 +18,9 @@ import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
  * Register Agents in and out of the registry.
  */
 public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
-{    
+{   
+    private static final Logger logger = Logger.getLogger(AgentRegistar.class);
+    
     public AgentRegistar(ZooKeeper zooKeeper) throws KeeperException, InterruptedException
     {
         super(zooKeeper, ZKPaths.AGENTS);
@@ -42,6 +45,7 @@ public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
         try
         {
             String path = this.buildItemPath(agentId);
+            logger.info("Attempted to unregister from ZooKeeper: " + path + " nonce=" + nonce);
             // Get the current registration data
             Stat stat = new Stat();
             byte[] agentData = this.zooKeeper.getData(path, false, stat);
@@ -52,6 +56,7 @@ public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
                 if (nonce.equals(reg.getNonce()) && workerId.equals(reg.getWorkerId()))
                 {
                     // Delete the node
+                    logger.info("Unregistering agent from ZooKeeper: " + path + " version=" + stat.getVersion());
                     this.zooKeeper.delete(path, stat.getVersion());
                 }
             }
@@ -60,6 +65,5 @@ public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
         {
             // ignore
         }
-
     }
 }

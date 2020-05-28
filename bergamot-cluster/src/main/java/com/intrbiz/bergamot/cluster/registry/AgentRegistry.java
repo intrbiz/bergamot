@@ -50,8 +50,7 @@ public class AgentRegistry  extends GenericRegistry<UUID, AgentRegistration>
     protected void onItemUpdated(UUID id, AgentRegistration item)
     {
         logger.info("Updating agent: " + id);
-        // if we already have the agent cached, update it as it is likely hot on this node
-        this.agentsCache.computeIfPresent(id, (k, v) -> item.getWorkerId());
+        this.agentsCache.remove(id);
     }
 
     /**

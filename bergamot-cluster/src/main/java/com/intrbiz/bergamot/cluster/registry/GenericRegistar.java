@@ -76,7 +76,9 @@ public abstract class GenericRegistar<K, V>
     
     protected final void unregisterItem(K id, int version) throws KeeperException, InterruptedException
     {
-        this.zooKeeper.delete(this.buildItemPath(id), version);
+        String path = this.buildItemPath(id);
+        logger.info("Unregistered from ZooKeeper: " + path + ", version=" + version);
+        this.zooKeeper.delete(path, version);
     }
     
     protected final void unregisterItem(K id) throws KeeperException, InterruptedException
