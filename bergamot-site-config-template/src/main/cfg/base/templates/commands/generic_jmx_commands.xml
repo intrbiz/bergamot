@@ -3,8 +3,10 @@
     
     <command name="jmx-script-check" engine="jmx" executor="script" security-domains="global">
         <summary>JMX Script Check</summary>
-        <parameter name="host">#{host.address}</parameter>
-        <parameter name="port">#{coalesce(host.getParameter('jmx_port'), host.location.getParameter('jmx_port'), site.jmx_port)}</parameter>
+        <parameter description="The JMX host name or address" name="host">#{host.address}</parameter>
+        <parameter description="The JMX port number" name="port">#{coalesce(host.getParameter('jmx_port'), host.location.getParameter('jmx_port'), site.jmx_port)}</parameter>
+        <parameter description="The JMX username" name="jmx_username">#{resolve_credentials('jmx').username}</parameter>
+        <parameter description="The JMX password" name="jmx_password">#{resolve_credentials('jmx').password}</parameter>
         <parameter description="UI Icon" name="ui-icon">/images/icons/64/service.png</parameter>
         <description>Check Java application via the JMX protocol</description>
     </command>

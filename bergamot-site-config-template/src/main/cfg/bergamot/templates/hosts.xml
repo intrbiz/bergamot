@@ -10,22 +10,36 @@
     <host name="bergamot-ui-server" extends="bergamot-server" template="yes" resource-pool="bergamot-ui-cluster">
         <summary>A Bergamot Monitoring UI server</summary>
         
-        <service name="bergamot-ui-daemon" extends="bergamot-service">
+        <service name="bergamot-ui-daemon" extends="bergamot-service" application="Bergamot UI">
             <summary>Bergamot UI Daemon</summary>
             <check-command command="check-bergamot-ui-process" />
         </service>
         
-        <service name="bergamot-ui-port" extends="bergamot-service">
+        <service name="bergamot-ui-port" extends="bergamot-service" application="Bergamot UI">
             <summary>Port: Bergamot UI</summary>
             <check-command command="check-agent-port-listener">
             	<parameter name="local_port">8080</parameter>
             </check-command>
         </service>
         
-        <service name="bergamot-cluster-port" extends="bergamot-service">
+        <service name="bergamot-cluster-port" extends="bergamot-service" application="Bergamot UI">
             <summary>Port: Bergamot UI</summary>
             <check-command command="check-agent-port-listener">
             	<parameter name="local_port">5701</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-ui-java-heap-usage" application="Bergamot UI">
+            <summary>Java Heap: Bergamot UI</summary>
+            <check-command command="java-heap-usage">
+                <parameter name="port">9001</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-ui-java-cpu-usage" application="Bergamot UI">
+            <summary>Java CPU: Bergamot UI</summary>
+            <check-command command="java-cpu-usage">
+                <parameter name="port">9001</parameter>
             </check-command>
         </service>
     </host>
@@ -33,25 +47,53 @@
     <host name="bergamot-notifier-server" extends="bergamot-server" template="yes" resource-pool="bergamot-notifier-cluster">
         <summary>A Bergamot Monitoring Notifier server</summary>
         
-        <service name="bergamot-notifier-daemon" extends="bergamot-service">
+        <service name="bergamot-notifier-daemon" extends="bergamot-service" application="Bergamot Notifier">
             <summary>Bergamot Notifier Daemon</summary>
             <check-command command="check-bergamot-notifier-process"/>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-notifier-java-heap-usage" application="Bergamot Notifier">
+            <summary>Java Heap: Bergamot Notifier</summary>
+            <check-command command="java-heap-usage">
+                <parameter name="port">9004</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-notifier-java-cpu-usage" application="Bergamot Notifier">
+            <summary>Java CPU: Bergamot Notifier</summary>
+            <check-command command="java-cpu-usage">
+                <parameter name="port">9004</parameter>
+            </check-command>
         </service>
     </host>
     
     <host name="bergamot-worker-server" extends="bergamot-server" template="yes" resource-pool="bergamot-worker-cluster">
         <summary>A Bergamot Monitoring Worker server</summary>
         
-        <service name="bergamot-worker-daemon" extends="bergamot-service">
+        <service name="bergamot-worker-daemon" extends="bergamot-service" application="Bergamot Worker">
             <summary>Bergamot Worker Daemon</summary>
             <check-command command="check-bergamot-worker-process"/>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-worker-java-heap-usage" application="Bergamot Worker">
+            <summary>Java Heap: Bergamot Worker</summary>
+            <check-command command="java-heap-usage">
+                <parameter name="port">9002</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-worker-java-cpu-usage" application="Bergamot Worker">
+            <summary>Java CPU: Bergamot Worker</summary>
+            <check-command command="java-cpu-usage">
+                <parameter name="port">9002</parameter>
+            </check-command>
         </service>
     </host>
     
     <host name="bergamot-worker-agent-server" extends="bergamot-server" template="yes">
         <summary>A Bergamot Monitoring Agent Worker server</summary>
 
-        <service name="bergamot-agent-port" extends="bergamot-service">
+        <service name="bergamot-agent-port" extends="bergamot-service" application="Bergamot Worker">
             <summary>Port: Bergamot Agent</summary>
             <check-command command="check-agent-port-listener">
             	<parameter name="local_port">15080</parameter>
@@ -62,12 +104,12 @@
     <host name="bergamot-postgresql-server" extends="bergamot-server, postgresql-server-agent" template="yes" resource-pool="bergamot-postgresql-cluster">
         <summary>A Bergamot Monitoring PostgreSQL server</summary>
         
-        <service name="bergamot-transitions-size" extends="bergamot-service">
+        <service name="bergamot-transitions-size" extends="bergamot-service" application="Bergamot DB">
             <summary>Transitions Size</summary>
             <check-command command="bergamot-transitions-size" />
         </service>
         
-        <service name="bergamot-readings-size" extends="bergamot-service">
+        <service name="bergamot-readings-size" extends="bergamot-service" application="Bergamot DB">
             <summary>Readings Size</summary>
             <check-command command="bergamot-readings-total-size" />
         </service>

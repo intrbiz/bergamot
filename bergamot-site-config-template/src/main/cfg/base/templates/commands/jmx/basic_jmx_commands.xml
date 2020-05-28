@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <bergamot site="bergamot.template">
     
-    <command name="java-process-cpu-usage" extends="jmx-script-check">
+    <command name="java-cpu-usage" extends="jmx-script-check">
         <summary>Java CPU Usage</summary>
         <parameter name="warning">80</parameter>
         <parameter name="critical">90</parameter>
@@ -16,7 +16,7 @@
             var warning = check.getDoubleParameter('warning');
             var critical = check.getDoubleParameter('critical');
             /* Execute */
-            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), function(con) {
+            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), check.getParameter('jmx_username'), check.getParameter('jmx_password'), function(con) {
                 /* Fetch the CPU mbean */
                 var sysBean = con.getMBean('java.lang:type=OperatingSystem');
                 var processCPU = Math.round(sysBean.getAttribute('ProcessCpuLoad').getValue() * 10000) / 100.0;
@@ -35,7 +35,7 @@
             }); 
         ]]>
         </script>
-        <description>Check the CPU usage of a Java process</description>
+        <description>Check the CPU usage of a Java process.</description>
     </command>
     
     <command name="java-heap-usage" extends="jmx-script-check">
@@ -53,7 +53,7 @@
             var warning = check.getDoubleParameter('warning');
             var critical = check.getDoubleParameter('critical');
             /* Execute */
-            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), function(con) {
+            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), check.getParameter('jmx_username'), check.getParameter('jmx_password'), function(con) {
                 /* Fetch the Memory mbean */
                 var sysBean = con.getMBean('java.lang:type=Memory');
                 var heapMemUsage = sysBean.getAttribute('HeapMemoryUsage').getValue();
@@ -72,13 +72,13 @@
                 /* Readings */
                 bergamot.publishReadings(
                     bergamot.createDoubleGaugeReading('Heap committed memory', 'MiB', committedMem, null, null, 0, maxMem),
-                    bergamot.createDoubleGaugeReading('Heap used memory', 'MiB', usedMem, null, null, null, null),
+                    bergamot.createDoubleGaugeReading('Heap used memory', 'MiB', usedMem, null, null, 0, maxMem),
                     bergamot.createDoubleGaugeReading('Heap used', '%', usedPC, warning, critical, 0, 100)
                 );
             });
         ]]>
         </script>
-        <description>Check the CPU usage of a Java process</description>
+        <description>Monitor the JVM heap memory usage.</description>
     </command>
     
     <command name="java-version-info" extends="jmx-script-check">
@@ -89,7 +89,7 @@
             bergamot.require('host');
             bergamot.require('port');
             /* Execute */
-            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), function(con) {
+            jmx.connect(check.getParameter('host'), check.getIntParameter('port'), check.getParameter('jmx_username'), check.getParameter('jmx_password'), function(con) {
                 /* Fetch the Runtime mbean */
                 var runBean = con.getMBean('java.lang:type=Runtime');
                 var specVersion = runBean.getAttribute('SpecVersion').getValue();
@@ -101,7 +101,7 @@
             });
         ]]>
         </script>
-        <description>Check the CPU usage of a Java process</description>
+        <description>Get information about the JVM running the application.</description>
     </command>
     
 </bergamot>
