@@ -9,7 +9,7 @@
         <check-command command="bergamot-internal-workers"/>
     </host>
     
-    <host groups="internal" extends="generic-host" name="bergamot-workers-office">
+    <host groups="internal" extends="generic-host" name="bergamot-workers-office" location="office">
         <description>The number of Bergamot Workers available for the office location.</description>
         <summary>Bergamot Office Workers</summary>
         <check-command command="bergamot-internal-workers"/>
