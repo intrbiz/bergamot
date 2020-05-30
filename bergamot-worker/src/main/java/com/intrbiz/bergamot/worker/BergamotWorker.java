@@ -19,8 +19,8 @@ import java.util.function.Consumer;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.BergamotConfig;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZWorkerClient;
 import com.intrbiz.bergamot.cluster.client.proxy.ProxyWorkerClient;
@@ -186,11 +186,11 @@ public class BergamotWorker
             }
 
             @Override
-            public void registerAgent(UUID agentId, UUID nonce)
+            public void registerAgent(UUID siteId, UUID agentId, UUID nonce)
             {
                 try
                 {
-                    client.registerAgent(agentId, nonce);
+                    client.registerAgent(siteId, agentId, nonce);
                 }
                 catch (Exception e)
                 {
@@ -199,11 +199,11 @@ public class BergamotWorker
             }
 
             @Override
-            public void unregisterAgent(UUID agentId, UUID nonce)
+            public void unregisterAgent(UUID siteId, UUID agentId, UUID nonce)
             {
                 try
                 {
-                    client.unregisterAgent(agentId, nonce);
+                    client.unregisterAgent(siteId, agentId, nonce);
                 }
                 catch (Exception e)
                 {

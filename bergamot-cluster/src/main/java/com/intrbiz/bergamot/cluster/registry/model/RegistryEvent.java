@@ -1,6 +1,6 @@
 package com.intrbiz.bergamot.cluster.registry.model;
 
-public final class RegistryEvent<K, V>
+public class RegistryEvent<K, V>
 {
     public enum Type { ADDED, REMOVED, UPDATED, DISCONNECTED, CONNECTED };
     
@@ -18,17 +18,17 @@ public final class RegistryEvent<K, V>
         this.data = data;
     }
 
-    public Type getType()
+    public final Type getType()
     {
         return this.type;
     }
 
-    public K getId()
+    public final K getId()
     {
         return this.id;
     }
 
-    public V getData()
+    public final V getData()
     {
         return this.data;
     }

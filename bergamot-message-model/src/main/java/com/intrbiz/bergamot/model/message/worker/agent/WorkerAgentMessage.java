@@ -41,10 +41,4 @@ public abstract class WorkerAgentMessage extends WorkerMessage
     {
         return null;
     }
-
-    @Override
-    public UUID getSiteId()
-    {
-        return null;
-    }
 }

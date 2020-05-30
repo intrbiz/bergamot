@@ -32,9 +32,6 @@ public class ReadingParcelMessage extends ProcessorMessage implements MatchableM
 {
     private static final long serialVersionUID = 1L;
 
-    @JsonProperty("site_id")
-    private UUID siteId;
-
     @JsonProperty("match_on")
     private MatchOn matchOn;
     
@@ -59,16 +56,6 @@ public class ReadingParcelMessage extends ProcessorMessage implements MatchableM
     public ReadingParcelMessage()
     {
         super();
-    }
-
-    public UUID getSiteId()
-    {
-        return siteId;
-    }
-
-    public void setSiteId(UUID siteId)
-    {
-        this.siteId = siteId;
     }
 
     public MatchOn getMatchOn()

@@ -47,7 +47,7 @@ public class NagiosSSHExecutor extends AbstractCheckExecutor<SSHEngine>
             context.connect(SSHCheckUtil.getSSHUsername(executeCheck), SSHCheckUtil.getSSHHost(executeCheck), SSHCheckUtil.getSSHPort(executeCheck), (session) -> {
                 // the command to execute
                 String command = executeCheck.getParameter("command_line");
-                logger.debug("Executing Nagios plugin via SSH, command: " + command);
+                if (logger.isTraceEnabled()) logger.trace("Executing Nagios plugin via SSH, command: " + command);
                 // execute the command
                 long start = System.currentTimeMillis();
                 ExecStat stat = session.exec(command);
@@ -77,7 +77,7 @@ public class NagiosSSHExecutor extends AbstractCheckExecutor<SSHEngine>
         }
         catch (Exception e)
         {
-            logger.error("Failed to execute Nagios over SSH check", e);
+            if (logger.isTraceEnabled()) logger.trace("Failed to execute Nagios over SSH check", e);
             checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }

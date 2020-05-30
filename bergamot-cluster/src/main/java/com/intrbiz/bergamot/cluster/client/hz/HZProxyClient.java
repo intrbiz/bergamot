@@ -101,15 +101,15 @@ public class HZProxyClient extends HZBergamotClient implements ProxyClient
     }
 
     @Override
-    public void registerAgent(UUID agentId, UUID nonce, UUID workerId) throws KeeperException, InterruptedException
+    public void registerAgent(UUID siteId, UUID agentId, UUID nonce, UUID workerId) throws KeeperException, InterruptedException
     {
-        this.agentRegistar.registerAgent(new AgentRegistration(agentId, nonce, System.currentTimeMillis(), workerId));
+        this.agentRegistar.registerAgent(siteId, new AgentRegistration(agentId, nonce, System.currentTimeMillis(), workerId));
     }
     
     @Override
-    public void unregisterAgent(UUID agentId, UUID nonce, UUID workerId) throws KeeperException, InterruptedException
+    public void unregisterAgent(UUID siteId, UUID agentId, UUID nonce, UUID workerId) throws KeeperException, InterruptedException
     {
-        this.agentRegistar.unregisterAgent(agentId, nonce, workerId);
+        this.agentRegistar.unregisterAgent(siteId, agentId, nonce, workerId);
     }
 
     @Override

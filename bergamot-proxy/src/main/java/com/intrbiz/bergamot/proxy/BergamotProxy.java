@@ -74,7 +74,7 @@ public class BergamotProxy
                         return new WorkerProxyProcessor(
                             clientHeaders, 
                             channel,
-                            client.registerWorker(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getSiteIds(), clientHeaders.getWorkerPool(), clientHeaders.getEngines()),
+                            client.registerWorker(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getAllowedSiteIds(), clientHeaders.getWorkerPool(), clientHeaders.getEngines()),
                             client
                         );
                     }
@@ -91,7 +91,7 @@ public class BergamotProxy
                         return new NotifierProxyProcessor(
                             clientHeaders, 
                             channel, 
-                            client.registerNotifier(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getSiteIds(), clientHeaders.getEngines())
+                            client.registerNotifier(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getAllowedSiteIds(), clientHeaders.getEngines())
                         );
                     }
                     catch (Exception e)

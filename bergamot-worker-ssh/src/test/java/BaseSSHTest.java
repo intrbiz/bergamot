@@ -45,12 +45,12 @@ public abstract class BaseSSHTest
             }
 
             @Override
-            public void registerAgent(UUID agentId, UUID nonce)
+            public void registerAgent(UUID siteId, UUID agentId, UUID nonce)
             {
             }
 
             @Override
-            public void unregisterAgent(UUID agentId, UUID nonce)
+            public void unregisterAgent(UUID siteId, UUID agentId, UUID nonce)
             {
             }
 

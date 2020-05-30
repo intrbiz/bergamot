@@ -67,18 +67,23 @@ public class BergamotProxyClient
         }
     }
     
-    private boolean isSecure()
+    public URI getServer()
+    {
+        return this.server;
+    }
+    
+    public boolean isSecure()
     {
         return "wss".equalsIgnoreCase(this.server.getScheme()) ||
                "https".equalsIgnoreCase(this.server.getScheme());
     }
     
-    private String getHost()
+    public String getHost()
     {
         return this.server.getHost();
     }
     
-    private int getPort()
+    public int getPort()
     {
         return this.server.getPort() <= 0 ? (this.isSecure() ? 443 : 80) : this.server.getPort();
     }
@@ -93,7 +98,7 @@ public class BergamotProxyClient
     
     public Future<Channel> connect(final ClientHeader client, final AuthenticationKey key, final Consumer<Message> messageHandler)
     {
-        logger.info("Connecting to: " + this.server);
+        if (logger.isTraceEnabled()) logger.trace("Connecting to: " + this.server);
         Promise<Channel> connectPromise = this.eventLoop.next().newPromise();
         new Bootstrap().group(this.eventLoop)
         .channel(NioSocketChannel.class)

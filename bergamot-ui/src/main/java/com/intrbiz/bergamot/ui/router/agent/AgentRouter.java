@@ -23,11 +23,11 @@ import com.intrbiz.metadata.Template;
 @Prefix("/agent")
 @Template("layout/main")
 @RequireValidPrincipal()
-@RequirePermission("ui.sign.agent")
-@RequirePermission("sign.agent")
 public class AgentRouter extends Router<BergamotUI>
 {    
     @Any("/")
+    @RequirePermission("ui.sign.agent")
+    @RequirePermission("sign.agent")
     @WithDataAdapter(BergamotDB.class)
     public void listAgents(BergamotDB db, @GetBergamotSite() Site site)
     {
@@ -36,6 +36,8 @@ public class AgentRouter extends Router<BergamotUI>
     }
     
     @Any("/create")
+    @RequirePermission("ui.sign.agent")
+    @RequirePermission("sign.agent")
     @WithDataAdapter(BergamotDB.class)
     public void createAgentKey(BergamotDB db, @GetBergamotSite() Site site, @Param("purpose") @CheckStringLength(min = 1, max = 100, mandatory = true, coalesce = CoalesceMode.ALWAYS, defaultValue = "General Agent Key") String purpose) throws IOException
     {
@@ -45,11 +47,21 @@ public class AgentRouter extends Router<BergamotUI>
     }
     
     @Any("/revoke/:id")
+    @RequirePermission("ui.sign.agent")
+    @RequirePermission("sign.agent")
     @WithDataAdapter(BergamotDB.class)
     public void revokeAgent(BergamotDB db, @GetBergamotSite() Site site, @Param("id") @IsaObjectId() UUID agentKeyId) throws Exception
     {
         db.setAgentKey(notNull(db.getAgentKey(agentKeyId)).revoke());
         // encode the index
         redirect(path("/agent/"));
+    }
+    
+    @Any("/connected")
+    @WithDataAdapter(BergamotDB.class)
+    public void connectedAgents(BergamotDB db, @GetBergamotSite() Site site) throws Exception
+    {
+        var("agents", app().getProcessor().getAgentRegistry().getAgentsForSite(site.getId()));
+        encode("agent/connected");
     }
 }

@@ -38,7 +38,7 @@ public abstract class AbstractSNMPExecutor extends AbstractCheckExecutor<SNMPEng
     @Override
     public void execute(ExecuteCheck executeCheck, final CheckExecutionContext context)
     {
-        if (logger.isDebugEnabled()) logger.debug("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
+        if (logger.isTraceEnabled())  logger.trace("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         try
         {
             // validate parameters
@@ -50,7 +50,7 @@ public abstract class AbstractSNMPExecutor extends AbstractCheckExecutor<SNMPEng
         }
         catch (Exception e)
         {
-            logger.error("Error executing check", e);
+            if (logger.isTraceEnabled()) logger.trace("Error executing check", e);
             context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }

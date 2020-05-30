@@ -74,7 +74,7 @@ public class HZWorkerDispatcher extends HZBaseDispatcher<WorkerMessage> implemen
                         }
                         else
                         {
-                            workerId = this.agents.routeAgent(message.getAgentId());
+                            workerId = this.agents.routeAgent(message.getSiteId(), message.getAgentId());
                             if (workerId == null) return PublishStatus.AgentUnroutable;
                         }
                     }

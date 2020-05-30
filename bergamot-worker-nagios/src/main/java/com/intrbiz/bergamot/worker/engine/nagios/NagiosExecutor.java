@@ -68,7 +68,7 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
-        logger.debug("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
+        if (logger.isTraceEnabled()) logger.trace("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
         ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId());
         try
@@ -99,7 +99,7 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
         }
         catch (IOException | InterruptedException e)
         {
-            logger.error("Failed to execute nagios check command", e);
+            if (logger.isTraceEnabled()) logger.trace("Failed to execute nagios check command", e);
             resultMO.error(e);
         }
         context.publishActiveResult(resultMO);

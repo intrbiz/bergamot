@@ -38,7 +38,7 @@ public class ScriptedJMXExecutor extends AbstractCheckExecutor<JMXEngine>
         }
         catch (Exception e)
         {
-            logger.error("Error executing check", e);
+            if (logger.isTraceEnabled()) logger.trace("Error executing check", e);
             context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }

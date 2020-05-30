@@ -14,7 +14,7 @@ public interface WorkerClient extends BergamotClient
 
     ProcessorDispatcher getProcessorDispatcher();
 
-    void registerAgent(UUID agentId, UUID nonce) throws Exception;
+    void registerAgent(UUID siteId, UUID agentId, UUID nonce) throws Exception;
     
-    void unregisterAgent(UUID agentId, UUID nonce) throws Exception;
+    void unregisterAgent(UUID siteId, UUID agentId, UUID nonce) throws Exception;
 }

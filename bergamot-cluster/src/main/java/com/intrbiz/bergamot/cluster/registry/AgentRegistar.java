@@ -2,14 +2,8 @@ package com.intrbiz.bergamot.cluster.registry;
 
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.KeeperException.BadVersionException;
-import org.apache.zookeeper.KeeperException.NoNodeException;
-import org.apache.zookeeper.KeeperException.NodeExistsException;
-import org.apache.zookeeper.KeeperException.NotEmptyException;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
 
 import com.intrbiz.bergamot.cluster.util.ZKPaths;
 import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
@@ -17,53 +11,20 @@ import com.intrbiz.bergamot.model.message.cluster.AgentRegistration;
 /**
  * Register Agents in and out of the registry.
  */
-public class AgentRegistar extends GenericRegistar<UUID, AgentRegistration>
-{   
-    private static final Logger logger = Logger.getLogger(AgentRegistar.class);
-    
+public class AgentRegistar extends GenericNamespacedRegistar<UUID, UUID, AgentRegistration>
+{
     public AgentRegistar(ZooKeeper zooKeeper) throws KeeperException, InterruptedException
     {
-        super(zooKeeper, ZKPaths.AGENTS);
+        super(zooKeeper, AgentRegistration.class, ZKPaths.AGENTS);
     }
     
-    public int registerAgent(AgentRegistration agent) throws KeeperException, InterruptedException
+    public int registerAgent(UUID siteId, AgentRegistration agent) throws KeeperException, InterruptedException
     {
-        try
-        {
-            return this.registerItem(agent.getId(), agent);
-        }
-        catch (NodeExistsException e)
-        {
-            // update the registration instead
-            return this.reregisterItem(agent.getId(), agent);
-        }
+        return this.registerItem(siteId, agent.getId(), agent, true);
     }
     
-    public void unregisterAgent(UUID agentId, UUID nonce, UUID workerId) throws KeeperException, InterruptedException
+    public void unregisterAgent(UUID siteId, UUID agentId, UUID nonce, UUID workerId) throws KeeperException, InterruptedException
     {
-        // Ensure we only delete the node if it is for this worker
-        try
-        {
-            String path = this.buildItemPath(agentId);
-            logger.info("Attempted to unregister from ZooKeeper: " + path + " nonce=" + nonce);
-            // Get the current registration data
-            Stat stat = new Stat();
-            byte[] agentData = this.zooKeeper.getData(path, false, stat);
-            if (agentData != null)
-            {
-                AgentRegistration reg = this.transcoder.decodeFromBytes(agentData, AgentRegistration.class);
-                // Do we own this registration
-                if (nonce.equals(reg.getNonce()) && workerId.equals(reg.getWorkerId()))
-                {
-                    // Delete the node
-                    logger.info("Unregistering agent from ZooKeeper: " + path + " version=" + stat.getVersion());
-                    this.zooKeeper.delete(path, stat.getVersion());
-                }
-            }
-        }
-        catch (NoNodeException | BadVersionException | NotEmptyException e)
-        {
-            // ignore
-        }
+        this.unregisterItem(siteId, agentId, reg -> nonce.equals(reg.getNonce()) && workerId.equals(reg.getWorkerId()));
     }
 }

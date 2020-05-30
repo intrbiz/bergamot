@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apache.log4j.Logger;
@@ -257,7 +258,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             return;
         }
         // authenticate the client
-        this.authenticateAgent(req, (result) -> {
+        this.authenticateAgent(req, (result, message) -> {
             this.authenticated = result;
             if (this.authenticated)
             {
@@ -283,7 +284,7 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
             else
             {
                 // bad client certificate, terminate the connection
-                logger.warn("Failed to authenticate agent connection from " + this.remoteAddress + " possible agent id " + this.agentId);
+                logger.warn("Failed to authenticate agent connection from " + this.remoteAddress + " possible agent id " + this.agentId + (message != null ? " due to: " + message : ""));
                 sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
             }
         });
@@ -321,9 +322,10 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
         return response;
     }
     
-    private void authenticateAgent(FullHttpRequest req, Consumer<Boolean> authenticated) throws Exception
+    private void authenticateAgent(FullHttpRequest req, BiConsumer<Boolean, String> authenticated) throws Exception
     {
-        
+        try
+        {
             // Extract metadata
             this.agentUserAgent = Util.coalesce(req.headers().get(HttpHeaderNames.USER_AGENT), "Unknown");
             this.agentId = UUID.fromString(requireNonEmpty(req.headers().get(AgentHTTPHeaderNames.AGENT_ID), "agent id"));
@@ -344,14 +346,18 @@ public class BergamotAgentServerHandler extends SimpleChannelInboundHandler<Obje
                     if (Math.abs((System.currentTimeMillis() / 1000) - this.authenticationTimestamp) > AUTHENTICATION_GRACE_SECONDS)
                         throw new SecurityException("Authentication timestamp is not within the grace period.");
                     // Validate the signature
-                    authenticated.accept(key.checkBase64(this.authenticationTimestamp, this.agentId, this.agentHostName, this.agentTemplateName, authSig));
+                    authenticated.accept(key.checkBase64(this.authenticationTimestamp, this.agentId, this.agentHostName, this.agentTemplateName, authSig), null);
                 }
                 catch (Exception e)
                 {
-                    logger.error("Failed to authenticate agent: " + this.agentId);
-                    authenticated.accept(false);
+                    authenticated.accept(false, e.getMessage());
                 }
             });
+        }
+        catch (Exception e)
+        {
+            authenticated.accept(false, e.getMessage());
+        }
     }
     
     private String requireNonEmpty(String value, String name)

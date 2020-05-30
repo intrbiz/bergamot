@@ -3,10 +3,14 @@ package com.intrbiz.bergamot.cluster.registry;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.KeeperException.BadVersionException;
+import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.apache.zookeeper.KeeperException.NotEmptyException;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
@@ -27,12 +31,15 @@ public abstract class GenericRegistar<K, V>
     
     protected final BergamotTranscoder transcoder = BergamotTranscoder.getDefaultInstance();
     
+    protected final Class<V> dataType;
+    
     protected final String containerPath;
     
-    public GenericRegistar(ZooKeeper zooKeeper, String containerName) throws KeeperException, InterruptedException
+    public GenericRegistar(ZooKeeper zooKeeper, Class<V> dataType, String containerName) throws KeeperException, InterruptedException
     {
         super();
         this.zooKeeper = Objects.requireNonNull(zooKeeper);
+        this.dataType = Objects.requireNonNull(dataType);
         this.containerPath = ZKPaths.BERGAMOT + "/" + Objects.requireNonNull(containerName);
         this.waitForContainer();
     }
@@ -61,19 +68,6 @@ public abstract class GenericRegistar<K, V>
         return stat.getVersion();
     }
     
-    protected final int reregisterItem(K id, V data, int version) throws KeeperException, InterruptedException
-    {
-        String path = this.buildItemPath(id);
-        Stat stat = this.zooKeeper.setData(path, this.transcoder.encodeAsBytes(data), version);
-        logger.info("Reregistered into ZooKeeper: " + path);
-        return stat.getVersion();
-    }
-    
-    protected final int reregisterItem(K id, V data) throws KeeperException, InterruptedException
-    {
-        return this.reregisterItem(id, data, -1);
-    }
-    
     protected final void unregisterItem(K id, int version) throws KeeperException, InterruptedException
     {
         String path = this.buildItemPath(id);
@@ -84,6 +78,34 @@ public abstract class GenericRegistar<K, V>
     protected final void unregisterItem(K id) throws KeeperException, InterruptedException
     {
         this.unregisterItem(id, -1);
+    }
+    
+    public void unregisterItem(K id, Predicate<V> check) throws KeeperException, InterruptedException
+    {
+        // Ensure we only delete the node if the check passes
+        try
+        {
+            String path = this.buildItemPath(id);
+            logger.info("Attempting to unregister from ZooKeeper: " + path);
+            // Get the current registration data
+            Stat stat = new Stat();
+            byte[] data = this.zooKeeper.getData(path, false, stat);
+            if (data != null)
+            {
+                V reg = this.transcoder.decodeFromBytes(data, this.dataType);
+                // Do we own this registration
+                if (check.test(reg))
+                {
+                    // Delete the node
+                    logger.info("Unregistering from ZooKeeper: " + path + " version=" + stat.getVersion());
+                    this.zooKeeper.delete(path, stat.getVersion());
+                }
+            }
+        }
+        catch (NoNodeException | BadVersionException | NotEmptyException e)
+        {
+            // ignore
+        }
     }
     
     protected final String buildItemPath(K itemId)

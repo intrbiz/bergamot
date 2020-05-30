@@ -224,11 +224,16 @@ public class ClientHeader
         return this.key;
     }
     
-    public Set<UUID> getSiteIds()
+    public Set<UUID> getAllowedSiteIds()
     {
         return this.key == null || this.allowedSiteId == null ? 
                 Collections.emptySet() : 
                 Collections.singleton(this.allowedSiteId);
+    }
+    
+    public UUID getAllowedSiteId()
+    {
+        return this.key == null || this.allowedSiteId == null ? null : this.allowedSiteId;
     }
 
     public void authenticate(KeyResolver keyResolver, Consumer<Boolean> callback)
@@ -324,5 +329,11 @@ public class ClientHeader
         if (Util.isEmpty(value))
             throw new IllegalArgumentException("The header '" + name + "' must be provided");
         return value;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ClientHeader [id=" + id + ", address=" + address + ", userAgent=" + userAgent + ", attributes=" + attributes + ", authenticationTimestamp=" + authenticationTimestamp + ", keyId=" + keyId + ", signature=" + signature + ", key=" + key + ", allowedSiteId=" + allowedSiteId + "]";
     }
 }

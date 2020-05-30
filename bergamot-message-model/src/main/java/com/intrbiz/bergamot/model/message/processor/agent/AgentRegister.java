@@ -15,9 +15,6 @@ public class AgentRegister extends ProcessorAgentMessage implements ProcessorHas
 {
     private static final long serialVersionUID = 1L;
     
-    @JsonProperty("site_id")
-    private UUID siteId;
-    
     @JsonProperty("agent_id")
     private UUID agentId;
     
@@ -44,23 +41,13 @@ public class AgentRegister extends ProcessorAgentMessage implements ProcessorHas
     public AgentRegister(UUID siteId, UUID agentId, UUID keyId, String agentName, String agentSummary, String agentAddress, String templateName)
     {
         super();
-        this.siteId = Objects.requireNonNull(siteId);
+        this.setSiteId(Objects.requireNonNull(siteId));
         this.agentId = Objects.requireNonNull(agentId);
         this.keyId = Objects.requireNonNull(keyId);
         this.agentName = Objects.requireNonNull(agentName);
         this.agentSummary = agentSummary;
         this.agentAddress = agentAddress;
         this.templateName = Objects.requireNonNull(templateName);
-    }
-    
-    public UUID getSiteId()
-    {
-        return this.siteId;
-    }
-
-    public void setSiteId(UUID siteId)
-    {
-        this.siteId = siteId;
     }
 
     public UUID getAgentId()

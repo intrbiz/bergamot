@@ -61,7 +61,7 @@ public class ScriptedSFTPExecutor extends AbstractCheckExecutor<SFTPEngine>
         }
         catch (Exception e)
         {
-            logger.error("Error executing check", e);
+            if (logger.isTraceEnabled()) logger.trace("Error executing check", e);
             checkContext.publishActiveResult(new ActiveResult().error(e));
         }
     }

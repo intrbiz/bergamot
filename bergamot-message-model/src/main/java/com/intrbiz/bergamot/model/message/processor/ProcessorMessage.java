@@ -17,6 +17,9 @@ public abstract class ProcessorMessage extends Message
      */
     @JsonProperty("processor_id")
     private UUID processorId;
+    
+    @JsonProperty("site_id")
+    private UUID siteId;
 
     public ProcessorMessage()
     {
@@ -33,13 +36,23 @@ public abstract class ProcessorMessage extends Message
         super(replyTo);
     }
 
-    public UUID getProcessorId()
+    public final UUID getProcessorId()
     {
         return this.processorId;
     }
 
-    public void setProcessorId(UUID processorId)
+    public final void setProcessorId(UUID processorId)
     {
         this.processorId = processorId;
+    }
+
+    public final UUID getSiteId()
+    {
+        return this.siteId;
+    }
+
+    public final void setSiteId(UUID siteId)
+    {
+        this.siteId = siteId;
     }
 }

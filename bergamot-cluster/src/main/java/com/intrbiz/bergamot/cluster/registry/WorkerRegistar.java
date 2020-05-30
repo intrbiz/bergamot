@@ -16,17 +16,12 @@ public class WorkerRegistar extends GenericRegistar<UUID, WorkerRegistration>
 {
     public WorkerRegistar(ZooKeeper zooKeeper) throws KeeperException, InterruptedException
     {
-        super(zooKeeper, WORKERS);
+        super(zooKeeper, WorkerRegistration.class, WORKERS);
     }
     
     public void registerWorker(WorkerRegistration worker) throws KeeperException, InterruptedException
     {
         this.registerItem(worker.getId(), worker);
-    }
-    
-    public void reregisterWorker(WorkerRegistration worker) throws KeeperException, InterruptedException
-    {
-        this.reregisterItem(worker.getId(), worker);
     }
     
     public void unregisterWorker(UUID workerId) throws KeeperException, InterruptedException

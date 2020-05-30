@@ -21,15 +21,15 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.ACL;
 
-import com.intrbiz.bergamot.cluster.registry.model.RegistryEvent;
+import com.intrbiz.bergamot.cluster.registry.model.NamespacedRegistryEvent;
 import com.intrbiz.bergamot.cluster.registry.model.RegistryEvent.Type;
 import com.intrbiz.bergamot.cluster.util.ZKPaths;
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 
 /**
- * A generic registry of things
+ * A generic namespaced registry of things
  */
-public abstract class GenericRegistry<K, V>
+public class GenericNamespacedRegistry<N, K, V>
 {
     public static final Logger logger = Logger.getLogger(GenericRegistry.class);
     
@@ -39,19 +39,22 @@ public abstract class GenericRegistry<K, V>
     
     protected final Class<V> dataType;
     
+    protected final Function<String, N> namespaceFromString;
+    
     protected final Function<String, K> idFromString;
     
     protected final String containerPath;
     
     protected final int itemPrefixLength;
     
-    protected final ConcurrentMap<UUID, Consumer<RegistryEvent<K, V>>> listeners = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<UUID, Consumer<NamespacedRegistryEvent<N, K, V>>> listeners = new ConcurrentHashMap<>();
     
-    public GenericRegistry(ZooKeeper zooKeeper, Class<V> dataType, Function<String, K> idFromString, String containerName) throws KeeperException, InterruptedException
+    public GenericNamespacedRegistry(ZooKeeper zooKeeper, Class<V> dataType, Function<String, N> namespaceFromString, Function<String, K> idFromString, String containerName) throws KeeperException, InterruptedException
     {
         super();
         this.zooKeeper = Objects.requireNonNull(zooKeeper);
         this.dataType = Objects.requireNonNull(dataType);
+        this.namespaceFromString = Objects.requireNonNull(namespaceFromString);
         this.idFromString = Objects.requireNonNull(idFromString);
         this.containerPath = ZKPaths.BERGAMOT + "/" + Objects.requireNonNull(containerName);
         this.itemPrefixLength = this.containerPath.length() + 1;
@@ -95,32 +98,35 @@ public abstract class GenericRegistry<K, V>
     private void setupWatcher() throws KeeperException, InterruptedException
     {
         this.zooKeeper.addWatch(this.containerPath,  (watchedEvent) -> {
-            if (logger.isDebugEnabled()) logger.debug("Processing registry event for " + this.containerPath + ": " + watchedEvent);
+            if (logger.isDebugEnabled()) logger.debug("Processing namespaced registry event for " + this.containerPath + ": " + watchedEvent);
             try
             {
                 switch (watchedEvent.getType())
                 {
                     case NodeCreated:
                         {
+                            N namespace = this.getNamespaceFromPath(watchedEvent.getPath());
                             K itemId = this.getItemIdFromPath(watchedEvent.getPath());
                             V item = this.getItem(watchedEvent.getPath());
-                            this.onItemAdded(itemId, item);
-                            this.fireEvent(new RegistryEvent<>(Type.ADDED, itemId, item));
+                            this.onItemAdded(namespace, itemId, item);
+                            this.fireEvent(new NamespacedRegistryEvent<>(Type.ADDED, namespace, itemId, item));
                         }
                         break;
                     case NodeDeleted:
                         {
+                            N namespace = this.getNamespaceFromPath(watchedEvent.getPath());
                             K itemId = this.getItemIdFromPath(watchedEvent.getPath());
-                            this.onItemRemoved(itemId);
-                            this.fireEvent(new RegistryEvent<>(Type.REMOVED, itemId, null));
+                            this.onItemRemoved(namespace, itemId);
+                            this.fireEvent(new NamespacedRegistryEvent<>(Type.REMOVED, namespace, itemId, null));
                         }
                         break;
                     case NodeDataChanged:
                         {
+                            N namespace = this.getNamespaceFromPath(watchedEvent.getPath());
                             K itemId = this.getItemIdFromPath(watchedEvent.getPath());
                             V item = this.getItem(watchedEvent.getPath());
-                            this.onItemUpdated(itemId, item);
-                            this.fireEvent(new RegistryEvent<>(Type.UPDATED, itemId, item));
+                            this.onItemUpdated(namespace, itemId, item);
+                            this.fireEvent(new NamespacedRegistryEvent<>(Type.UPDATED, namespace, itemId, item));
                         }
                     case None:
                         {
@@ -129,13 +135,13 @@ public abstract class GenericRegistry<K, V>
                                 logger.info("Reconnected to ZooKeeper, recreating watch");
                                 this.setupWatcher();
                                 this.onConnect();
-                                this.fireEvent(new RegistryEvent<>(Type.CONNECTED, null, null));
+                                this.fireEvent(new NamespacedRegistryEvent<>(Type.CONNECTED, null, null, null));
                             }
                             else if (watchedEvent.getState() == KeeperState.Disconnected)
                             {
                                 logger.warn("Lost connection to ZooKeeper, waiting for reconnect");
                                 this.onDisconnect();
-                                this.fireEvent(new RegistryEvent<>(Type.DISCONNECTED, null, null));
+                                this.fireEvent(new NamespacedRegistryEvent<>(Type.DISCONNECTED, null, null, null));
                             }
                         }
                         break;
@@ -150,9 +156,9 @@ public abstract class GenericRegistry<K, V>
         }, AddWatchMode.PERSISTENT_RECURSIVE);
     }
     
-    protected void fireEvent(RegistryEvent<K, V> event)
+    protected void fireEvent(NamespacedRegistryEvent<N, K, V> event)
     {
-        for (Consumer<RegistryEvent<K, V>> listener : this.listeners.values())
+        for (Consumer<NamespacedRegistryEvent<N, K, V>> listener : this.listeners.values())
         {
             try
             {
@@ -170,7 +176,7 @@ public abstract class GenericRegistry<K, V>
      * @param listener the listener to be invoked when an event happens
      * @return the listener id
      */
-    public final UUID listen(Consumer<RegistryEvent<K, V>> listener)
+    public final UUID listen(Consumer<NamespacedRegistryEvent<N, K, V>> listener)
     {
         Objects.requireNonNull(listener);
         UUID id = UUID.randomUUID();
@@ -192,38 +198,68 @@ public abstract class GenericRegistry<K, V>
         return this.containerPath;
     }
     
-    public int count() throws KeeperException, InterruptedException
+    public int countNamespaces() throws KeeperException, InterruptedException
     {
         return this.zooKeeper.getChildren(this.containerPath, false).size();
     }
     
+    public int count(N namespace) throws KeeperException, InterruptedException
+    {
+        return this.zooKeeper.getChildren(this.buildNamespacePath(namespace), false).size();
+    }
+    
     /**
      * Get the registration data for a specific item from ZooKeeper
+     * @param namespace the namespace
      * @param itemId the item id
      * @return the item registration data or null
      * @throws KeeperException
      * @throws InterruptedException
      */
-    protected final V getItem(K itemId) throws KeeperException, InterruptedException
+    protected final V getItem(N namespace, K itemId) throws KeeperException, InterruptedException
     {
-        return this.getItem(this.buildItemPath(itemId));
+        return this.getItem(this.buildItemPath(namespace, itemId));
     }
     
     /**
-     * Get the current list of items from ZooKeeper 
+     * Get the current list of items from ZooKeeper for the given namespace
      * @return The list of currently registered items
      * @throws KeeperException
      * @throws InterruptedException
      */
-    protected final Set<V> getItems() throws KeeperException, InterruptedException
+    protected final Set<N> getNamespaces() throws KeeperException, InterruptedException
     {
-        Set<V> workers = new TreeSet<>();
+        Set<N> namespaces = new TreeSet<>();
         for (String path : this.zooKeeper.getChildren(this.containerPath, false))
         {
-            V item = this.getItem(this.buildItemPath(path));
-            if (item != null) workers.add(item);
+            namespaces.add(this.namespaceFromString.apply(path));
         }
-        return workers;
+        return namespaces;
+    }
+    
+    /**
+     * Get the current list of items from ZooKeeper for the given namespace
+     * @param namespace the id of the namespace to list
+     * @return The list of currently registered items
+     * @throws KeeperException
+     * @throws InterruptedException
+     */
+    protected final Set<V> getItems(N namespace) throws KeeperException, InterruptedException
+    {
+        Set<V> items = new TreeSet<>();
+        try
+        {
+            for (String path : this.zooKeeper.getChildren(this.buildNamespacePath(namespace), false))
+            {
+                V item = this.getItem(this.buildItemPath(namespace, path));
+                if (item != null) items.add(item);
+            }
+        }
+        catch (NoNodeException e)
+        {
+            // ignore no node errors
+        }
+        return items;
     }
     
     protected final V getItem(String path) throws KeeperException, InterruptedException
@@ -243,32 +279,52 @@ public abstract class GenericRegistry<K, V>
         return null;
     }
     
-    protected final String buildItemPath(String itemId)
+    protected final String buildNamespacePath(String namespaceId)
     {
-        return this.containerPath + "/" + itemId;
+        return this.containerPath + "/" + namespaceId;
     }
     
-    protected final String buildItemPath(K item)
+    protected final String buildNamespacePath(N namespace)
     {
-        return buildItemPath(item.toString());
+        return this.buildNamespacePath(namespace.toString());
+    }
+    
+    protected final String buildItemPath(String namespaceId, String itemId)
+    {
+        return this.buildNamespacePath(namespaceId) + "/" + itemId;
+    }
+    
+    protected final String buildItemPath(N namespace, K item)
+    {
+        return buildItemPath(namespace.toString(), item.toString());
+    }
+    
+    protected final String buildItemPath(N namespace, String itemId)
+    {
+        return buildItemPath(namespace.toString(), itemId);
     }
     
     protected final K getItemIdFromPath(String itemFullPath)
     {
-        return this.idFromString.apply(itemFullPath.substring(this.itemPrefixLength));
+        return this.idFromString.apply(itemFullPath.substring(itemFullPath.lastIndexOf('/') + 1));
+    }
+    
+    protected final N getNamespaceFromPath(String itemFullPath)
+    {
+        return this.namespaceFromString.apply(itemFullPath.substring(this.itemPrefixLength, itemFullPath.lastIndexOf('/')));
     }
     
     // Hooks
     
-    protected void onItemAdded(K id, V item)
+    protected void onItemAdded(N namespace, K id, V item)
     {
     }
     
-    protected void onItemRemoved(K id)
+    protected void onItemRemoved(N namespace, K id)
     {
     }
     
-    protected void onItemUpdated(K id, V item)
+    protected void onItemUpdated(N namespace, K id, V item)
     {
     }
     

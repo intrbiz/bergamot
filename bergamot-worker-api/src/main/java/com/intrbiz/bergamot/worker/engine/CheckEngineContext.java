@@ -71,7 +71,7 @@ public interface CheckEngineContext
      * @param agentId the agent id to register to this worker
      * @param nonce a random number used once (NONCE) which is used to validate unregistration
      */
-    void registerAgent(UUID agentId, UUID nonce);
+    void registerAgent(UUID siteId, UUID agentId, UUID nonce);
     
     /**
      * Unregister this worker as being the route for the given agent id
@@ -79,7 +79,7 @@ public interface CheckEngineContext
      * @param agentId the agent id to unregister from this worker
      * @param nonce the random NONCE which was used when the agent was registered
      */
-    void unregisterAgent(UUID agentId, UUID nonce);
+    void unregisterAgent(UUID siteId, UUID agentId, UUID nonce);
     
     /**
      * Publish a (probably passive) result

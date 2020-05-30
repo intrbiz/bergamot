@@ -73,15 +73,15 @@ public class HZWorkerClient extends HZBergamotClient implements WorkerClient
     }
 
     @Override
-    public void registerAgent(UUID agentId, UUID nonce) throws KeeperException, InterruptedException
+    public void registerAgent(UUID siteId, UUID agentId, UUID nonce) throws KeeperException, InterruptedException
     {
-        this.agentRegistar.registerAgent(new AgentRegistration(agentId, nonce, System.currentTimeMillis(), this.id));
+        this.agentRegistar.registerAgent(siteId, new AgentRegistration(agentId, nonce, System.currentTimeMillis(), this.id));
     }
     
     @Override
-    public void unregisterAgent(UUID agentId, UUID nonce) throws KeeperException, InterruptedException
+    public void unregisterAgent(UUID siteId, UUID agentId, UUID nonce) throws KeeperException, InterruptedException
     {
-        this.agentRegistar.unregisterAgent(agentId, nonce, this.id);
+        this.agentRegistar.unregisterAgent(siteId, agentId, nonce, this.id);
     }
 
     @Override

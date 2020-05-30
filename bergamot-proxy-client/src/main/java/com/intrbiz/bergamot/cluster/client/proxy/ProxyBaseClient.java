@@ -42,11 +42,13 @@ public abstract class ProxyBaseClient implements BergamotClient
         this.hostName = this.getHostName();
         this.client = new BergamotProxyClient(new URI(Objects.requireNonNull(BergamotConfig.getProxyUrl(), "The proxy URL must be given")));
         // Connect
+        logger.info("Connecting to Bergamot Proxy (" + this.client.getServer() + ") ...");
         this.channel = this.client.connect(headers.hostName(this.hostName), new AuthenticationKey(Objects.requireNonNull(BergamotConfig.getProxyKey(), "The proxy key must be given")), this::handleMessage).sync().get();
         this.channel.closeFuture().addListener((future) -> {
             logger.info("Proxy connection closed");
             this.panic();
         });
+        logger.info("Connected to Bergamot Proxy");
     }
     
     protected String getHostName()

@@ -53,15 +53,28 @@
 		    </div>
 	    </container>
 	            
-	    <!-- Admin Menu -->
-	    <container rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
-	        <div class="menu-group">
-	            <h4><a href="/agent/">Bergamot Agent</a></h4>
-	        </div>
-	    </container>
+	    <!-- Bergamot Agent Menu -->
+        <div class="menu-group">
+        	<h4>Bergamot Agent</h4>
+        	<ul>
+	         	<li rendered="#{Balsa().permission('ui.sign.agent') and Balsa().permission('sign.agent')}">
+	                <a href="/agent/">Bergamot Agent Keys</a>
+	            </li>
+	            <li>
+	                <a href="/agent/connected">Connected Bergamot Agents</a>
+	            </li>
+	        </ul>
+        </div>
+        
+        <!-- Bergamot Proxy Menu -->
 	    <container rendered="#{Balsa().permission('ui.sign.proxy') and Balsa().permission('sign.proxy')}">
 	        <div class="menu-group">
-	            <h4><a href="/proxy/">Bergamot Proxy</a></h4>
+               	<h4>Bergamot Proxy</h4>
+        		<ul>
+	         		<li>
+	                	<a href="/proxy/">Bergamot Proxy Keys</a>
+	            	</li>
+				</ul>
 	        </div>
 	    </container>
     

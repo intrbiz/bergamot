@@ -138,7 +138,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object>
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable e)
     {
-        logger.error("Unhandled error communicating with Bergamot proxy server", e);
+        if (logger.isTraceEnabled()) logger.trace("Unhandled error communicating with Bergamot proxy server", e);
         if (! this.connectPromise.isDone())
         {
             this.connectPromise.setFailure(e);

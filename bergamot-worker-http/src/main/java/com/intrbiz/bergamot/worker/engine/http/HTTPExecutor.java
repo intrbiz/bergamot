@@ -46,7 +46,7 @@ public class HTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
     @Override
     public void execute(final ExecuteCheck executeCheck, final CheckExecutionContext context)
     {
-        logger.info("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getExecutor() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
+        if (logger.isTraceEnabled()) logger.trace("Executing check : " + executeCheck.getEngine() + "::" + executeCheck.getExecutor() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         // time it
         final Timer.Context tctx = this.requestTimer.time();
         try
@@ -75,7 +75,7 @@ public class HTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
             }
             // execute
             check.execute((response) -> {
-                logger.info("Got response for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
+                if (logger.isTraceEnabled()) logger.trace("Got response for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
                 ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);           
                 // check the response
@@ -97,13 +97,13 @@ public class HTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
             (error) -> {
                 tctx.stop();
                 failedRequests.inc();
-                logger.error("Error for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
+                if (logger.isTraceEnabled()) logger.trace("Error for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
                 context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(error));
             });
         }
         catch (Exception e)
         {
-            logger.error("Failed to execute HTTP check", e);
+            if (logger.isTraceEnabled()) logger.trace("Failed to execute HTTP check", e);
             tctx.stop();
             this.failedRequests.inc();
             context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));

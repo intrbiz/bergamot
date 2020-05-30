@@ -15,17 +15,12 @@ public class NotifierRegistar extends GenericRegistar<UUID, NotifierRegistration
 {    
     public NotifierRegistar(ZooKeeper zooKeeper) throws KeeperException, InterruptedException
     {
-        super(zooKeeper, ZKPaths.NOTIFIERS);
+        super(zooKeeper, NotifierRegistration.class, ZKPaths.NOTIFIERS);
     }
     
     public void registerNotifier(NotifierRegistration notifier) throws KeeperException, InterruptedException
     {
         this.registerItem(notifier.getId(), notifier);
-    }
-    
-    public void reregisterNotifier(NotifierRegistration notifier) throws KeeperException, InterruptedException
-    {
-        this.reregisterItem(notifier.getId(), notifier);
     }
     
     public void unregisterNotifier(UUID notifierId) throws KeeperException, InterruptedException

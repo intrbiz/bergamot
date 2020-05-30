@@ -47,23 +47,10 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
      */
     @JsonProperty("adhoc_id")
     private UUID adhocId;
-    
-    @JsonProperty("site_id")
-    private UUID siteId;
 
     public ResultMessage()
     {
         super();
-    }
-    
-    public UUID getSiteId()
-    {
-        return siteId;
-    }
-
-    public void setSiteId(UUID siteId)
-    {
-        this.siteId = siteId;
     }
 
     public boolean isOk()

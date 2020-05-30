@@ -41,7 +41,7 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
-        logger.info("Executing NRPE check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
+        if (logger.isTraceEnabled()) logger.trace("Executing NRPE check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
         Timer.Context tctx = this.nrpeRequestTimer.time();
         try
         {
@@ -90,7 +90,7 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
         }
         catch (Exception e)
         {
-            logger.error("Failed to execute NRPE check", e);
+            if (logger.isTraceEnabled()) logger.trace("Failed to execute NRPE check", e);
             tctx.stop();
             this.failedRequests.inc();
             context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));

@@ -16,17 +16,12 @@ public class ProxyRegistar extends GenericRegistar<UUID, ProxyRegistration>
 {
     public ProxyRegistar(ZooKeeper zooKeeper) throws KeeperException, InterruptedException
     {
-        super(zooKeeper, PROXIES);
+        super(zooKeeper, ProxyRegistration.class, PROXIES);
     }
     
     public void registerProxy(ProxyRegistration proxy) throws KeeperException, InterruptedException
     {
         this.registerItem(proxy.getId(), proxy);
-    }
-    
-    public void reregisterProxy(ProxyRegistration proxy) throws KeeperException, InterruptedException
-    {
-        this.reregisterItem(proxy.getId(), proxy);
     }
     
     public void unregisterProxy(UUID proxyId) throws KeeperException, InterruptedException

@@ -1,0 +1,29 @@
+<!DOCTYPE balsa SYSTEM "http://balsa.intrbiz.net/balsa.dtd">
+<?RenderLibrary com.intrbiz.balsa?>
+<!-- The index view -->
+<fragment xmlns="com.intrbiz.balsa" title="Bergamot Agent - Connected Agents">
+    
+	<div clas="row">
+    	<div class="col12">
+    		<h3>Connected Bergamot Agents</h3>
+    		<p class="text-body">
+    			These are Bergamot Agents which are currently connected.
+    		</p>
+    		<table>
+	    		<tr>
+		    		<th>Agent Id</th>
+	    			<th>Connected</th>
+	    			<th>Worker</th>
+	    		</tr>
+	    		<data-set var="agent" value="#{agents}">
+	    			<tr>
+	    				<td>#{agent.id}</td>
+	    				<td>#{dateformat('HH:mm:ss', agentKey.created)} on #{dateformat('EEEE dd/MM/yyyy', agent.registered)}</td>
+	    				<td>#{agent.workerId}</td>
+	    			</tr>
+	    		</data-set>
+	    	</table>
+    	</div>
+    </div>
+    
+</fragment>

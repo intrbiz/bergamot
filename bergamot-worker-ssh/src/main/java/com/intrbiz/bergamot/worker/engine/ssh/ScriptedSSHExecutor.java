@@ -35,7 +35,7 @@ public class ScriptedSSHExecutor extends AbstractCheckExecutor<SSHEngine>
         }
         catch (Exception e)
         {
-            logger.error("Error executing check", e);
+            if (logger.isTraceEnabled()) logger.trace("Error executing check", e);
             checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
         }
     }

@@ -15,7 +15,7 @@ public class ProcessorRegistar extends GenericRegistar<UUID, ProcessorRegistrati
 {    
     public ProcessorRegistar(ZooKeeper zooKeeper) throws KeeperException, InterruptedException
     {
-        super(zooKeeper, ZKPaths.PROCESSORS);
+        super(zooKeeper, ProcessorRegistration.class, ZKPaths.PROCESSORS);
     }
     
     public void registerProcessor(ProcessorRegistration processor) throws KeeperException, InterruptedException

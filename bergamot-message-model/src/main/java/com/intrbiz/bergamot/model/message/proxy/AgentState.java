@@ -13,6 +13,9 @@ public class AgentState extends ProxyMessage
 {
     private static final long serialVersionUID = 1L;
     
+    @JsonProperty("site_id")
+    private UUID siteId;
+    
     @JsonProperty("agent_id")
     private UUID agentId;
     
@@ -27,12 +30,23 @@ public class AgentState extends ProxyMessage
         super();
     }
 
-    public AgentState(UUID agentId, UUID nonce, boolean connected)
+    public AgentState(UUID siteId, UUID agentId, UUID nonce, boolean connected)
     {
         super();
+        this.siteId = siteId;
         this.agentId = agentId;
         this.nonce = nonce;
         this.connected = connected;
+    }
+
+    public UUID getSiteId()
+    {
+        return this.siteId;
+    }
+
+    public void setSiteId(UUID siteId)
+    {
+        this.siteId = siteId;
     }
 
     public UUID getAgentId()
