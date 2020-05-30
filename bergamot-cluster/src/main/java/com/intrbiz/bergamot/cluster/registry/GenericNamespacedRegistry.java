@@ -107,26 +107,35 @@ public class GenericNamespacedRegistry<N, K, V>
                         {
                             N namespace = this.getNamespaceFromPath(watchedEvent.getPath());
                             K itemId = this.getItemIdFromPath(watchedEvent.getPath());
-                            V item = this.getItem(watchedEvent.getPath());
-                            this.onItemAdded(namespace, itemId, item);
-                            this.fireEvent(new NamespacedRegistryEvent<>(Type.ADDED, namespace, itemId, item));
+                            if (namespace != null && itemId != null)
+                            {
+                                V item = this.getItem(watchedEvent.getPath());
+                                this.onItemAdded(namespace, itemId, item);
+                                this.fireEvent(new NamespacedRegistryEvent<>(Type.ADDED, namespace, itemId, item));
+                            }
                         }
                         break;
                     case NodeDeleted:
                         {
                             N namespace = this.getNamespaceFromPath(watchedEvent.getPath());
                             K itemId = this.getItemIdFromPath(watchedEvent.getPath());
-                            this.onItemRemoved(namespace, itemId);
-                            this.fireEvent(new NamespacedRegistryEvent<>(Type.REMOVED, namespace, itemId, null));
+                            if (namespace != null && itemId != null)
+                            {
+                                this.onItemRemoved(namespace, itemId);
+                                this.fireEvent(new NamespacedRegistryEvent<>(Type.REMOVED, namespace, itemId, null));
+                            }
                         }
                         break;
                     case NodeDataChanged:
                         {
                             N namespace = this.getNamespaceFromPath(watchedEvent.getPath());
                             K itemId = this.getItemIdFromPath(watchedEvent.getPath());
-                            V item = this.getItem(watchedEvent.getPath());
-                            this.onItemUpdated(namespace, itemId, item);
-                            this.fireEvent(new NamespacedRegistryEvent<>(Type.UPDATED, namespace, itemId, item));
+                            if (namespace != null && itemId != null)
+                            {
+                                V item = this.getItem(watchedEvent.getPath());
+                                this.onItemUpdated(namespace, itemId, item);
+                                this.fireEvent(new NamespacedRegistryEvent<>(Type.UPDATED, namespace, itemId, item));
+                            }
                         }
                     case None:
                         {
@@ -306,12 +315,14 @@ public class GenericNamespacedRegistry<N, K, V>
     
     protected final K getItemIdFromPath(String itemFullPath)
     {
-        return this.idFromString.apply(itemFullPath.substring(itemFullPath.lastIndexOf('/') + 1));
+        int start = itemFullPath.lastIndexOf('/');
+        return start > this.itemPrefixLength ? this.idFromString.apply(itemFullPath.substring(start + 1)) : null;
     }
     
     protected final N getNamespaceFromPath(String itemFullPath)
     {
-        return this.namespaceFromString.apply(itemFullPath.substring(this.itemPrefixLength, itemFullPath.lastIndexOf('/')));
+        int end = itemFullPath.lastIndexOf('/');
+        return end > this.itemPrefixLength ? this.namespaceFromString.apply(itemFullPath.substring(this.itemPrefixLength, end)) : null;
     }
     
     // Hooks

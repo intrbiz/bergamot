@@ -18,7 +18,7 @@
 	    		<data-set var="agent" value="#{agents}">
 	    			<tr>
 	    				<td>#{agent.id}</td>
-	    				<td>#{dateformat('HH:mm:ss', agentKey.created)} on #{dateformat('EEEE dd/MM/yyyy', agent.registered)}</td>
+	    				<td>#{dateformat('HH:mm:ss', agent.registered)} on #{dateformat('EEEE dd/MM/yyyy', agent.registered)}</td>
 	    				<td>#{agent.workerId}</td>
 	    			</tr>
 	    		</data-set>
