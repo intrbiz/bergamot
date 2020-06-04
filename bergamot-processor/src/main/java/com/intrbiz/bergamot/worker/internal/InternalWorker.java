@@ -92,7 +92,7 @@ public class InternalWorker
             @Override
             public void publishReading(ReadingParcelMessage reading)
             {
-                reading.fromCheck(check);
+                reading._fromCheck(check);
                 reading.setProcessorId(check.getProcessorId());
                 dispatcher.dispatch(reading);
             }
