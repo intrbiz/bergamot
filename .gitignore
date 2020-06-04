@@ -12,3 +12,4 @@ bergamot-agent-manager/agent-manager.xml
 bergamot-agent-manager/certs
 containers/*/*.app
 containers/*/*.tar.gz
+*.pyc

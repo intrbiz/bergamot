@@ -25,16 +25,14 @@ public class RandomExecutor extends AbstractCheckExecutor<DummyEngine>
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         // apply a threshold to a random double from 0 - 1
-        long start = System.nanoTime();
         context.publishActiveResult(
-            new ActiveResult().fromCheck(executeCheck)
+            new ActiveResult()
             .applyGreaterThanThreshold(
                     this.random.nextDouble(), 
                     executeCheck.getDoubleParameter("warning", 0.7D), 
                     executeCheck.getDoubleParameter("critical", 0.9D), 
                     executeCheck.getParameter("output", "")
             )
-            .runtime(((double)(System.nanoTime() - start)) / 1_000_000D)
         );
     }
 }

@@ -84,8 +84,7 @@ public class TrapAPIRouter extends Router<BergamotUI>
         resultMO.setStatus(status);
         resultMO.setOk("OK".equalsIgnoreCase(status) || "PENDING".equalsIgnoreCase(status));
         resultMO.setOutput(output);
-        resultMO.setExecuted(System.currentTimeMillis());
-        resultMO.setRuntime(0);
+        resultMO.setSent(System.currentTimeMillis());
         resultMO.setParameter("bergamot.ui.instance", this.app().getInstanceName());
         // dispatch the result for processing
         action("dispatch-result", resultMO);

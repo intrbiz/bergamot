@@ -24,8 +24,7 @@ public class TimedExecutor extends AbstractCheckExecutor<DummyEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
-        long start = System.nanoTime();
-        ActiveResult result = new ActiveResult().fromCheck(executeCheck);
+        ActiveResult result = new ActiveResult();
         String output = executeCheck.getParameter("output", "");
         // parse time ranges
         TimeRange warning = TimeRangeParser.parseTimeRange(executeCheck.getParameter("warning", "01:00-02:00, 05:00-06:00, 08:00-09:00, 11:00-12:00, 14:00-15:00, 17:00-18:00, 20:00-21:00, 23:00-24:00"));
@@ -44,6 +43,6 @@ public class TimedExecutor extends AbstractCheckExecutor<DummyEngine>
         {
             result.ok(output);
         }
-        context.publishActiveResult(result.runtime(((double)(System.nanoTime() - start)) / 1_000_000D));
+        context.publishActiveResult(result);
     }
 }

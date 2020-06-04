@@ -71,12 +71,9 @@ public class TestNagiosEngine
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(true)));
                 assertThat(result.getStatus(), is(equalTo("OK")));
                 assertThat(result.getOutput(), is(equalTo("OK: Test")));
-                assertThat(result.getRuntime(), is(greaterThan(0D)));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
@@ -94,12 +91,9 @@ public class TestNagiosEngine
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("WARNING")));
                 assertThat(result.getOutput(), is(equalTo("WARNING: Test")));
-                assertThat(result.getRuntime(), is(greaterThan(0D)));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
@@ -117,12 +111,9 @@ public class TestNagiosEngine
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("CRITICAL")));
                 assertThat(result.getOutput(), is(equalTo("CRITICAL: Test")));
-                assertThat(result.getRuntime(), is(greaterThan(0D)));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
@@ -140,12 +131,9 @@ public class TestNagiosEngine
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("UNKNOWN")));
                 assertThat(result.getOutput(), is(equalTo("UNKNOWN: Test")));
-                assertThat(result.getRuntime(), is(greaterThan(0D)));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
@@ -163,12 +151,9 @@ public class TestNagiosEngine
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("ERROR")));
                 assertThat(result.getOutput(), is(not(nullValue())));
-                assertThat(result.getRuntime(), is(equalTo(0D)));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );

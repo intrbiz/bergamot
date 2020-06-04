@@ -14,7 +14,7 @@ public class CheckMessage extends WorkerMessage implements ParameterisedMO
 {
     private static final long serialVersionUID = 1L;
     
-    @JsonProperty("agent-id")
+    @JsonProperty("agent_id")
     private UUID agentId;
 
     @JsonProperty("engine")
@@ -37,21 +37,15 @@ public class CheckMessage extends WorkerMessage implements ParameterisedMO
 
     @JsonProperty("worker_pool")
     private String workerPool;
-
-    @JsonProperty("parameters")
-    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
-
-    /**
-     * An id added to adhoc checks to correlate them with with the originator. This must be null for normal check executions
-     */
-    @JsonProperty("adhoc_id")
-    private UUID adhocId;
-
+    
     /**
      * The processor responsible for this check
      */
     @JsonProperty("processor_id")
     private UUID processorId;
+
+    @JsonProperty("parameters")
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
 
     public CheckMessage()
     {
@@ -172,15 +166,5 @@ public class CheckMessage extends WorkerMessage implements ParameterisedMO
     public void setWorkerPool(String workerPool)
     {
         this.workerPool = workerPool;
-    }
-
-    public UUID getAdhocId()
-    {
-        return adhocId;
-    }
-
-    public void setAdhocId(UUID adhocId)
-    {
-        this.adhocId = adhocId;
     }
 }

@@ -23,28 +23,21 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
         // we need an OID to get
         if (Util.isEmpty(executeCheck.getParameter("oid"))) throw new RuntimeException("The OID to get must be defined!");
         // get the OID
-        final long start = System.currentTimeMillis();
         agent.getValue(
                 executeCheck.getParameter("oid"), 
                 (vb) -> {
-                    long runtime = System.currentTimeMillis() - start;
                     context.publishActiveResult( 
                             new ActiveResult()
-                            .fromCheck(executeCheck)
                             .info(Util.coalesce(executeCheck.getParameter("prefix"), "") + vb.valueToString() + Util.coalesce(executeCheck.getParameter("suffix"), ""))
-                            .runtime(runtime)
                     );
                 }, 
                 (ex) -> {
-                    long runtime = System.currentTimeMillis() - start;
                     if (ex instanceof SNMPTimeout)
                     {
                         // timeout
                         context.publishActiveResult( 
                                 new ActiveResult()
-                                .fromCheck(executeCheck)
                                 .timeout(ex.getMessage())
-                                .runtime(runtime)
                         );
                     }
                     else
@@ -52,9 +45,7 @@ public class GetSNMPExecutor extends AbstractSNMPExecutor
                         // generic error
                         context.publishActiveResult( 
                                 new ActiveResult()
-                                .fromCheck(executeCheck)
                                 .error(ex)
-                                .runtime(runtime)
                         );
                     }
                 }

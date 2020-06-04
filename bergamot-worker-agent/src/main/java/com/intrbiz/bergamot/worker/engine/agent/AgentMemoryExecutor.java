@@ -41,29 +41,27 @@ public class AgentMemoryExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the Agent stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckAgent(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     AgentStat stat = (AgentStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got agent info in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got agent info: " + stat);
                     // check
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyLessThanThreshold(
+                    context.publishActiveResult(new ActiveResult().applyLessThanThreshold(
                             stat.getFreeMemory(),
                             UnitUtil.parse(executeCheck.getParameter("warning", "10MiB"), 5 * UnitUtil.Mi), 
                             UnitUtil.parse(executeCheck.getParameter("critical", "5MiB"), 10 * UnitUtil.Mi),
                             "Agent Memory: " + (stat.getFreeMemory() / UnitUtil.Mi) + " MiB of " + (stat.getMaxMemory() / UnitUtil.Mi) + " MiB free"
-                    ).runtime(runtime));
+                    ));
                 });
             }
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

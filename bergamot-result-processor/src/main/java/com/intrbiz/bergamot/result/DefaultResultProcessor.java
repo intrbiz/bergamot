@@ -43,7 +43,6 @@ import com.intrbiz.bergamot.model.message.event.update.LocationUpdate;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
-import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
 import com.intrbiz.bergamot.model.state.CheckState;
 import com.intrbiz.bergamot.model.state.CheckStats;
@@ -500,7 +499,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         nextState.pushOkHistory(resultMO.isOk());
         nextState.setStatus(resultStatus);
         nextState.setOutput(resultMO.getOutput());
-        nextState.setLastCheckTime(new Timestamp(resultMO.getExecuted()));
+        nextState.setLastCheckTime(new Timestamp(resultMO.getProcessed()));
         // is this check entering downtime?
         nextState.setInDowntime(check.isInDowntime());
         nextState.setSuppressed(check.isSuppressed());
@@ -694,7 +693,7 @@ public class DefaultResultProcessor extends AbstractResultProcessor
         nextState.pushOkHistory(ok);
         nextState.setStatus(status);
         nextState.setOutput(null);
-        nextState.setLastCheckTime(new Timestamp(cause.getExecuted()));
+        nextState.setLastCheckTime(new Timestamp(cause.getProcessed()));
         // is this check entering downtime?
         nextState.setInDowntime(check.isInDowntime());
         nextState.setSuppressed(check.isSuppressed());
@@ -813,19 +812,16 @@ public class DefaultResultProcessor extends AbstractResultProcessor
     {
         CheckStats nextStats = stats.clone();
         // compute the stats
-        nextStats.setLastRuntime(resultMO.getRuntime());
+        nextStats.setLastRuntime(resultMO.getSent() - resultMO.getReceived());
         nextStats.setAverageRuntime(stats.getAverageRuntime() == 0 ? stats.getLastRuntime() : ((stats.getLastRuntime() + stats.getAverageRuntime()) / 2D));
         // check latencies
-        if (resultMO.getCheck() != null && resultMO.getCheck() instanceof ExecuteCheck)
-        {
-            nextStats.setLastCheckProcessingLatency(resultMO.getProcessed() - ((ExecuteCheck) resultMO.getCheck()).getScheduled());
-            nextStats.setLastCheckExecutionLatency( resultMO.getExecuted()  - ((ExecuteCheck) resultMO.getCheck()).getScheduled());
-            // moving average
-            nextStats.setAverageCheckExecutionLatency( stats.getAverageCheckExecutionLatency()  == 0 ? stats.getLastCheckExecutionLatency()  : ((stats.getAverageCheckExecutionLatency()  + stats.getLastCheckExecutionLatency())  / 2D));
-            nextStats.setAverageCheckProcessingLatency(stats.getAverageCheckProcessingLatency() == 0 ? stats.getLastCheckProcessingLatency() : ((stats.getAverageCheckProcessingLatency() + stats.getLastCheckProcessingLatency()) / 2D));
-            // log
-            logger.debug("Last check latency: processing => " + nextStats.getLastCheckProcessingLatency() + "ms, execution => " + nextStats.getLastCheckExecutionLatency() + "ms processes");
-        }
+        nextStats.setLastCheckProcessingLatency(resultMO.getProcessed() - resultMO.getSent());
+        nextStats.setLastCheckExecutionLatency(resultMO.getReceived()  - resultMO.getScheduled());
+        // moving average
+        nextStats.setAverageCheckExecutionLatency( stats.getAverageCheckExecutionLatency()  == 0 ? stats.getLastCheckExecutionLatency()  : ((stats.getAverageCheckExecutionLatency()  + stats.getLastCheckExecutionLatency())  / 2D));
+        nextStats.setAverageCheckProcessingLatency(stats.getAverageCheckProcessingLatency() == 0 ? stats.getLastCheckProcessingLatency() : ((stats.getAverageCheckProcessingLatency() + stats.getLastCheckProcessingLatency()) / 2D));
+        // log
+        logger.debug("Last check latency: processing => " + nextStats.getLastCheckProcessingLatency() + "ms, execution => " + nextStats.getLastCheckExecutionLatency() + "ms processes");
         return nextStats;
     }
  

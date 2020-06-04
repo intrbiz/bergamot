@@ -40,25 +40,23 @@ public class AgentExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the Agent stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckAgent(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     AgentStat stat = (AgentStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got agent info in " + runtime + "ms: " + stat);
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).info(
+                    if (logger.isTraceEnabled()) logger.trace("Got agent info: " + stat);
+                    context.publishActiveResult(new ActiveResult().info(
                             stat.getAgentProduct() + " " + stat.getAgentVersion() + " (" + stat.getRuntime() + " [" + stat.getRuntimeVendor() + "] " + " " + stat.getRuntimeVersion() + ") on " + stat.getOsName() + " (" + stat.getOsArch() + ")"
-                    ).runtime(runtime));
+                    ));
                 });
             }
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

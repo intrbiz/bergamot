@@ -29,14 +29,14 @@ public class ScriptedSSHExecutor extends AbstractCheckExecutor<SSHEngine>
             // execute the script
             this.scriptManager.createExecutor(executeCheck, checkContext)
                 .bind("ssh", this.getEngine().getChecker().createContext((t) -> {
-                    checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(t));
+                    checkContext.publishActiveResult(new ActiveResult().error(t));
                 }))
                 .execute();
         }
         catch (Exception e)
         {
             if (logger.isTraceEnabled()) logger.trace("Error executing check", e);
-            checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            checkContext.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

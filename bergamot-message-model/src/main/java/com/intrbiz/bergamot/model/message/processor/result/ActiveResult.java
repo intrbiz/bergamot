@@ -6,7 +6,7 @@ import java.util.function.BiPredicate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.worker.check.CheckMessage;
+import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 
 /**
  * The result of a active check
@@ -21,12 +21,15 @@ public class ActiveResult extends ResultMessage
 
     @JsonProperty("check_id")
     private UUID checkId;
-
-    @JsonProperty("check")
-    private CheckMessage check;
     
     @JsonProperty("saved_state")
     private String savedState;
+    
+    @JsonProperty("scheduled")
+    private long scheduled;
+    
+    @JsonProperty("received")
+    private long received;
 
     public ActiveResult()
     {
@@ -53,16 +56,6 @@ public class ActiveResult extends ResultMessage
         this.checkId = checkId;
     }
 
-    public CheckMessage getCheck()
-    {
-        return check;
-    }
-
-    public void setCheck(CheckMessage check)
-    {
-        this.check = check;
-    }    
-
     public String getSavedState()
     {
         return savedState;
@@ -73,20 +66,40 @@ public class ActiveResult extends ResultMessage
         this.savedState = savedState;
     }
 
+    public long getReceived()
+    {
+        return this.received;
+    }
+
+    public void setReceived(long received)
+    {
+        this.received = received;
+    }
+
+    public long getScheduled()
+    {
+        return this.scheduled;
+    }
+
+    public void setScheduled(long scheduled)
+    {
+        this.scheduled = scheduled;
+    }
+
     /**
      * Create a Result with the details of this check
      * 
      * @return
      */
     @JsonIgnore
-    public ActiveResult fromCheck(CheckMessage check)
+    public ActiveResult _fromCheck(ExecuteCheck check)
     {
         this.setId(check.getId());
         this.setCheckType(check.getCheckType());
         this.setCheckId(check.getCheckId());
         this.setSiteId(check.getSiteId());
-        this.setCheck(check);
-        this.setExecuted(System.currentTimeMillis());
+        this.setScheduled(check.getScheduled());
+        this.setReceived(check.getReceived());
         this.setAdhocId(check.getAdhocId());
         return this;
     }
@@ -101,13 +114,6 @@ public class ActiveResult extends ResultMessage
     public ActiveResult state(String savedState)
     {
         this.savedState = savedState;
-        return this;
-    }
-    
-    @Override
-    public ActiveResult runtime(double runtime)
-    {
-        super.runtime(runtime);
         return this;
     }
 

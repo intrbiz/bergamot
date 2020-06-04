@@ -55,18 +55,16 @@ public class ProcessesExecutor extends AbstractCheckExecutor<AgentEngine>
                 check.setState(executeCheck.getParameterCSV("state").stream().collect(Collectors.toList()));
                 check.setArguments(executeCheck.getParametersStartingWithValues("argument"));
                 // get the process stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(check, (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     ProcessStat stat = (ProcessStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got processes in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got processes: " + stat);
                     // apply the check
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyRange(
+                    context.publishActiveResult(new ActiveResult().applyRange(
                             stat.getProcesses().size(),
                             executeCheck.getIntRangeParameter("warning",  new Integer[] {1, 1}), 
                             executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
                             "found " + stat.getProcesses().size() + " processes"
-                    ).runtime(runtime));
+                    ));
                     // readings
                     context.publishReading(executeCheck, new IntegerGaugeReading("processes", null, stat.getProcesses().size()));
                 });
@@ -74,12 +72,12 @@ public class ProcessesExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

@@ -51,7 +51,7 @@ public abstract class AbstractSNMPExecutor extends AbstractCheckExecutor<SNMPEng
         catch (Exception e)
         {
             if (logger.isTraceEnabled()) logger.trace("Error executing check", e);
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
     

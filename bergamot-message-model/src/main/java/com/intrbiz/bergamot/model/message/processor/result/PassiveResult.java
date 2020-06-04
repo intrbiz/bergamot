@@ -50,15 +50,6 @@ public class PassiveResult extends ResultMessage implements MatchableMO, Process
         this.setSiteId(siteId);
         this.setMatchOn(matchCriteria);
         this.setId(UUID.randomUUID());
-        this.setExecuted(System.currentTimeMillis());
-        this.setRuntime(0);
-        return this;
-    }
-    
-    @Override
-    public PassiveResult runtime(double runtime)
-    {
-        super.runtime(runtime);
         return this;
     }
 

@@ -52,22 +52,20 @@ public class DisksExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the CPU stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckDisk(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     DiskStat stat = (DiskStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got Disk usage in + " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got Disk usage: " + stat);
                     // apply the check
                     double warning = executeCheck.getPercentParameter("warning", 0.8D);
                     double critical = executeCheck.getPercentParameter("critical", 0.9D);
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThresholds(
+                    context.publishActiveResult(new ActiveResult().applyGreaterThanThresholds(
                             stat.getDisks().stream().map(DiskInfo::getUsedPercent).map(UnitUtil::fromPercent).collect(Collectors.toList()),
                             warning,
                             critical,
                             "Disks: " + stat.getDisks().stream().map((disk)-> {
                                 return "" + disk.getMount() + " " + DFMT.format(toG(disk.getUsed())) + " GB of " + DFMT.format(toG(disk.getSize())) + " GB (" + DFMT.format(disk.getUsedPercent()) + " %) used";
                             }).collect(Collectors.joining("; "))
-                    ).runtime(runtime));
+                    ));
                     // readings
                     ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     for (DiskInfo disk : stat.getDisks())
@@ -82,12 +80,12 @@ public class DisksExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

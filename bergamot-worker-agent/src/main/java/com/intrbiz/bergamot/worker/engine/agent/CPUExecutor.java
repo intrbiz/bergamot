@@ -45,18 +45,16 @@ public class CPUExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the CPU stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckCPU(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     CPUStat stat = (CPUStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got CPU usage in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got CPU usage: " + stat);
                     // apply the check
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    context.publishActiveResult(new ActiveResult().applyGreaterThanThreshold(
                             stat.getTotalUsage().getTotal(), 
                             executeCheck.getPercentParameter("cpu_warning", 0.8D), 
                             executeCheck.getPercentParameter("cpu_critical", 0.9D), 
                             "Load: " + DFMT.format(stat.getLoad1()) + " " + DFMT.format(stat.getLoad5()) + " " + DFMT.format(stat.getLoad15()) + ", Usage: " + DFMT.format(UnitUtil.toPercent(stat.getTotalUsage().getTotal())) + "% of " + stat.getCpuCount() + " @ " + stat.getInfo().get(0).getSpeed() + " MHz " + stat.getInfo().get(0).getVendor() + " " + stat.getInfo().get(0).getModel()
-                    ).runtime(runtime));
+                    ));
                     // readings
                     context.publishReading(executeCheck, 
                         new DoubleGaugeReading("cpu-usage-total", "%", UnitUtil.toPercent(stat.getTotalUsage().getTotal()), UnitUtil.toPercent(executeCheck.getPercentParameter("cpu_warning", 0.8D)), UnitUtil.toPercent(executeCheck.getPercentParameter("cpu_critical", 0.9D)), 1D, 100D),
@@ -69,12 +67,12 @@ public class CPUExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

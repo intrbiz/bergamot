@@ -32,14 +32,14 @@ public class ScriptedJDBCExecutor extends AbstractCheckExecutor<JDBCEngine>
             // execute the script
             this.scriptManager.createExecutor(executeCheck, context)
                 .bind("jdbc", this.getEngine().getChecker().createContext((t) -> {
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(t));
+                    context.publishActiveResult(new ActiveResult().error(t));
                 }, executeCheck.getTimeout()))
                 .execute();
         }
         catch (Exception e)
         {
             if (logger.isTraceEnabled()) logger.trace("Error executing check", e);
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

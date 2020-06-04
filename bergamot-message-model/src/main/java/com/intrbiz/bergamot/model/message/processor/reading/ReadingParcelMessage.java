@@ -107,7 +107,7 @@ public class ReadingParcelMessage extends ProcessorMessage implements MatchableM
     //
     
     @JsonIgnore
-    public ReadingParcelMessage fromCheck(CheckMessage check)
+    public ReadingParcelMessage _fromCheck(CheckMessage check)
     {
         this.fromCheck(check.getCheckId());
         return this;

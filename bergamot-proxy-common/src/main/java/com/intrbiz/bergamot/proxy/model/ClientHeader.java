@@ -46,11 +46,11 @@ public class ClientHeader
         
         public static final String ENGINES = HEADER_PREFIX + "engines";
         
-        public static final String WORKER_POOL = HEADER_PREFIX + "-worker-pool";
+        public static final String WORKER_POOL = HEADER_PREFIX + "worker-pool";
         
-        public static final String HOST_NAME = HEADER_PREFIX + "-host-name";
+        public static final String HOST_NAME = HEADER_PREFIX + "host-name";
         
-        public static final String INFO = HEADER_PREFIX + "-info";
+        public static final String INFO = HEADER_PREFIX + "info";
     }
     
     public static final class BergamotHeaderValues

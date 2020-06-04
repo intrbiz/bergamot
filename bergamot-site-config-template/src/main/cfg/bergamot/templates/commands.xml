@@ -22,6 +22,13 @@
         <parameter name="argument">bergamot-worker</parameter>
     </command>
     
+    <command name="check-bergamot-proxy-process" extends="check-agent-processes">
+        <parameter name="warning">1:2</parameter>
+        <parameter name="critical">1:2</parameter>
+        <parameter name="command">java</parameter>
+        <parameter name="argument">bergamot-proxy</parameter>
+    </command>
+    
     <command application="PostgreSQL" name="bergamot-postgresql-jdbc-check" extends="postgresql-jdbc-check" security-domains="global">
         <summary>Check Bergamot Monitoring PostgreSQL Database</summary>
         <parameter name="database">bergamot</parameter>

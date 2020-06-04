@@ -77,7 +77,7 @@ public class ScriptedCheckManager
                 }
                 catch (Exception e)
                 {
-                    context.publishActiveResult(new ActiveResult().fromCheck(check).error(e));
+                    context.publishActiveResult(new ActiveResult().error(e));
                 }
             }
         };

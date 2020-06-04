@@ -77,14 +77,13 @@ public class HTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
             check.execute((response) -> {
                 if (logger.isTraceEnabled()) logger.trace("Got response for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);           
+                ActiveResult resultMO = new ActiveResult();           
                 // check the response
                 boolean   cont = checkStatus(executeCheck, response, resultMO);
                 if (cont) cont = checkRuntime(executeCheck, response, resultMO);
                 if (cont) cont = checkLength(executeCheck, response, resultMO);
                 if (cont) cont = checkContent(executeCheck, response, resultMO);
                 // submit the result
-                resultMO.setRuntime(response.getRuntime());
                 tctx.stop();
                 context.publishActiveResult(resultMO);
                 // publish some metrics
@@ -98,7 +97,7 @@ public class HTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
                 tctx.stop();
                 failedRequests.inc();
                 if (logger.isTraceEnabled()) logger.trace("Error for HTTP check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(error));
+                context.publishActiveResult(new ActiveResult().error(error));
             });
         }
         catch (Exception e)
@@ -106,7 +105,7 @@ public class HTTPExecutor extends AbstractCheckExecutor<HTTPEngine>
             if (logger.isTraceEnabled()) logger.trace("Failed to execute HTTP check", e);
             tctx.stop();
             this.failedRequests.inc();
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }        
     }
     

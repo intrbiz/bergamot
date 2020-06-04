@@ -55,17 +55,15 @@ public class DiskIOExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the user stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckDiskIO(executeCheck.getParameterCSV("device")), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     DiskIOStat stat = (DiskIOStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got DiskIOStat in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got DiskIOStat in: " + stat);
                     // thresholds
                     double warning = executeCheck.getDoubleParameter("warning",  200);
                     double critical = executeCheck.getDoubleParameter("critical", 250);
                     // apply the check
                     boolean peak = executeCheck.getBooleanParameter("peak", false);
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyThresholds(
+                    context.publishActiveResult(new ActiveResult().applyThresholds(
                             stat.getDisks(),
                             (v, t) -> (peak ? v.getFiveMinuteRate().getReadPeakRateMBps(): v.getFiveMinuteRate().getReadRateMBps()) > t || (peak ? v.getFiveMinuteRate().getWritePeakRateMBps(): v.getFiveMinuteRate().getWriteRateMBps()) > t,
                             warning, 
@@ -75,7 +73,7 @@ public class DiskIOExecutor extends AbstractCheckExecutor<AgentEngine>
                                 " Read: " + DFMT.format(n.getFiveMinuteRate().getReadRateMBps()) + "MB/s (" + DFMT.format(n.getFiveMinuteRate().getReadPeakRateMBps()) + "MB/s Peak) - " + DFMT.format(n.getFiveMinuteRate().getReads()) + "/s (" + DFMT.format(n.getFiveMinuteRate().getPeakReads()) + "/s Peak)" + 
                                 " Write: " + DFMT.format(n.getFiveMinuteRate().getWriteRateMBps()) + "MB/s (" + DFMT.format(n.getFiveMinuteRate().getWritePeakRateMBps()) + "MB/s Peak) - " + DFMT.format(n.getFiveMinuteRate().getWrites()) + "/s (" + DFMT.format(n.getFiveMinuteRate().getPeakWrites()) + "/s Peak)"
                             ).collect(Collectors.joining("; "))
-                    ).runtime(runtime));
+                    ));
                     // readings
                     ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     for (DiskIOInfo disk : stat.getDisks())
@@ -95,12 +93,12 @@ public class DiskIOExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

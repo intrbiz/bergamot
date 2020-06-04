@@ -56,18 +56,16 @@ public class PortListenerExecutor extends AbstractCheckExecutor<AgentEngine>
                 // addresses
                 check.setLocalAddress(executeCheck.getParameter("local_address"));
                 // get the process stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(check, (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     NetConStat stat = (NetConStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got net cons in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got net cons: " + stat);
                     // apply the check
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyRange(
+                    context.publishActiveResult(new ActiveResult().applyRange(
                             stat.getConnections().size(),
                             executeCheck.getIntRangeParameter("warning",  new Integer[] {1, 1}), 
                             executeCheck.getIntRangeParameter("critical", new Integer[] {1, 1}), 
                             "found " + stat.getConnections().size() + " listeners: " + stat.getConnections().stream().map((nc) -> nc.getProtocol() + " " + nc.getLocalAddress() + ":" + nc.getLocalPort()).collect(Collectors.joining(", "))
-                    ).runtime(runtime));
+                    ));
                     // readings
                     context.publishReading(executeCheck, new IntegerGaugeReading("connections", null, stat.getConnections().size()));
                 });
@@ -75,12 +73,12 @@ public class PortListenerExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

@@ -31,7 +31,7 @@ public class ScriptExecutor extends AbstractCheckExecutor<DummyEngine>
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

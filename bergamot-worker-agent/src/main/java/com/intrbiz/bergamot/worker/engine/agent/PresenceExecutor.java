@@ -42,18 +42,18 @@ public class PresenceExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 agent.sendOnePingAndOnePingOnly((rtt) -> {
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).ok("Bergamot Agent " + agent.getAgentUserAgent() + " connected. Latency: " + rtt + "ms").runtime(rtt));
+                    context.publishActiveResult(new ActiveResult().ok("Bergamot Agent " + agent.getAgentUserAgent() + " connected. Latency: " + rtt + "ms"));
                     context.publishReading(executeCheck, new LongGaugeReading("latency", "ms", rtt));
                 });
             }
             else
             {
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
     

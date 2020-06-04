@@ -52,31 +52,26 @@ public class MetricsExecutor extends AbstractCheckExecutor<AgentEngine>
                 // strip host from metric name
                 checkMetrics.setStripSourceFromMetricName(executeCheck.getBooleanParameter("strip_source_from_metric_name", true));
                 // send to agent
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(checkMetrics, (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     // error from agent?
                     if (response instanceof GeneralError)
                     {
-                        context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(((GeneralError) response).getMessage()));
+                        context.publishActiveResult(new ActiveResult().error(((GeneralError) response).getMessage()));
                         return;
                     }
                     // process the stat
                     MetricsStat stat = (MetricsStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got metrics from agent in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got metrics from agent: " + stat);
                     // if we have a script execute it otherwise just publish an informational result
                     if (Util.isEmpty(executeCheck.getScript()))
                     {
                         context.publishActiveResult( 
-                                new ActiveResult().fromCheck(executeCheck)
-                                 .runtime(runtime)
-                                 .info("Got " + stat.getReadings().size() + " metric readings")
+                                new ActiveResult().info("Got " + stat.getReadings().size() + " metric readings")
                         );
                     }
                     else
                     {
                         this.scriptManager.createExecutor(executeCheck, context)
-                            .bind("runtime", runtime)
                             .bind("metrics", stat.getReadings())
                             .bind("readings", stat.getReadings())
                             .execute();
@@ -88,12 +83,12 @@ public class MetricsExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
     

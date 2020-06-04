@@ -25,14 +25,11 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
     @JsonProperty("status")
     private String status;
 
-    @JsonProperty("executed")
-    private long executed;
+    @JsonProperty("sent")
+    private long sent;
 
     @JsonProperty("processed")
     private long processed;
-
-    @JsonProperty("runtime")
-    private double runtime;
 
     @JsonProperty("output")
     private String output;
@@ -73,14 +70,14 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.status = status;
     }
 
-    public long getExecuted()
+    public long getSent()
     {
-        return executed;
+        return this.sent;
     }
 
-    public void setExecuted(long executed)
+    public void setSent(long sent)
     {
-        this.executed = executed;
+        this.sent = sent;
     }
 
     public long getProcessed()
@@ -91,16 +88,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
     public void setProcessed(long processed)
     {
         this.processed = processed;
-    }
-
-    public double getRuntime()
-    {
-        return runtime;
-    }
-
-    public void setRuntime(double runtime)
-    {
-        this.runtime = runtime;
     }
 
     public String getOutput()
@@ -176,13 +163,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
     }
     
     // constructor helpers
-    
-    @JsonIgnore
-    public ResultMessage runtime(double runtime)
-    {
-        this.runtime = runtime;
-        return this;
-    }
 
     @JsonIgnore
     public ResultMessage pending(String output)
@@ -190,7 +170,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(true);
         this.setStatus("PENDING");
         this.setOutput(output);
-        this.setRuntime(0);
         return this;
     }
     
@@ -201,7 +180,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(true);
         this.setStatus("INFO");
         this.setOutput(message);
-        this.setRuntime(0);
         return this;
     }
     
@@ -211,7 +189,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(true);
         this.setStatus("OK");
         this.setOutput(output);
-        this.setRuntime(0);
         return this;
     }
     
@@ -221,7 +198,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("WARNING");
         this.setOutput(output);
-        this.setRuntime(0);
         return this;
     }
     
@@ -231,7 +207,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("CRITICAL");
         this.setOutput(output);
-        this.setRuntime(0);
         return this;
     }
     
@@ -241,7 +216,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("UNKNOWN");
         this.setOutput(output);
-        this.setRuntime(0);
         return this;
     }
     
@@ -256,7 +230,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("ERROR");
         this.setOutput(t.getMessage());
-        this.setRuntime(0);
         return this;
     }
     
@@ -266,7 +239,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("ERROR");
         this.setOutput(message);
-        this.setRuntime(0);
         return this;
     }
     
@@ -276,7 +248,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("TIMEOUT");
         this.setOutput(message);
-        this.setRuntime(0);
         return this;
     }
     
@@ -286,7 +257,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("DISCONNECTED");
         this.setOutput(message);
-        this.setRuntime(0);
         return this;
     }
     
@@ -296,7 +266,6 @@ public abstract class ResultMessage extends ProcessorMessage implements Paramete
         this.setOk(false);
         this.setStatus("ACTION");
         this.setOutput(message);
-        this.setRuntime(0);
         return this;
     }
     

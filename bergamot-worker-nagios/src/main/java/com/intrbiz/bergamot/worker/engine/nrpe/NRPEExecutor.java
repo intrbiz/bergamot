@@ -63,11 +63,10 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
             this.getEngine().getPoller().command(
                 host, 5666, 5,  60, 
                 (response) -> {
-                    ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
+                    ActiveResult resultMO = new ActiveResult();
                     resultMO.setOk(response.toOk());
                     resultMO.setStatus(response.toStatus());
                     resultMO.setOutput(response.getOutput());
-                    resultMO.setRuntime(response.getRuntime());
                     tctx.stop();
                     context.publishActiveResult(resultMO);
                     // readings
@@ -82,7 +81,7 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
                 (exception) -> {
                     tctx.stop();
                     failedRequests.inc();
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(exception));
+                    context.publishActiveResult(new ActiveResult().error(exception));
                 },
                 command,
                 args
@@ -93,7 +92,7 @@ public class NRPEExecutor extends AbstractCheckExecutor<NRPEEngine>
             if (logger.isTraceEnabled()) logger.trace("Failed to execute NRPE check", e);
             tctx.stop();
             this.failedRequests.inc();
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }        
     }
 }

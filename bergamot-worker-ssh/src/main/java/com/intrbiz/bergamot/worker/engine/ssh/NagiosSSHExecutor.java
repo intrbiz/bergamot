@@ -39,7 +39,7 @@ public class NagiosSSHExecutor extends AbstractCheckExecutor<SSHEngine>
             if (Util.isEmpty(executeCheck.getParameter("command_line"))) throw new RuntimeException("The 'command_line' parameter must be given");
             // create our context
             SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { 
-                checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e)); 
+                checkContext.publishActiveResult(new ActiveResult().error(e)); 
              });
             // setup the context - this will add SSH keys etc
             SSHCheckUtil.setupSSHCheckContext(executeCheck, context);
@@ -55,11 +55,10 @@ public class NagiosSSHExecutor extends AbstractCheckExecutor<SSHEngine>
                 // parse the nagios result
                 NagiosResult response = new NagiosResult(stat.getStdOut(), stat.getExit(), runtime);
                 // publish the result
-                ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
+                ActiveResult resultMO = new ActiveResult();
                 resultMO.setOk(response.toOk());
                 resultMO.setStatus(response.toStatus());
                 resultMO.setOutput(response.getOutput());
-                resultMO.setRuntime(response.getRuntime());
                 checkContext.publishActiveResult(resultMO);
                 // readings
                 if (! response.getPerfData().isEmpty())
@@ -78,7 +77,7 @@ public class NagiosSSHExecutor extends AbstractCheckExecutor<SSHEngine>
         catch (Exception e)
         {
             if (logger.isTraceEnabled()) logger.trace("Failed to execute Nagios over SSH check", e);
-            checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            checkContext.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

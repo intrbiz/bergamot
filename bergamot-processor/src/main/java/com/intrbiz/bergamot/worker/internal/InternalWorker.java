@@ -64,12 +64,12 @@ public class InternalWorker
             }
             catch (Exception e)
             {
-                this.dispatcher.dispatch(new ActiveResult().fromCheck(check).error(e.getMessage()).withProcessorId(check.getProcessorId()));
+                this.dispatcher.dispatch(new ActiveResult()._fromCheck(check).error(e.getMessage()).withProcessorId(check.getProcessorId()));
             }
         }
         else
         {
-            this.dispatcher.dispatch(new ActiveResult().fromCheck(check).error("No such executor: " + check.getExecutor()).withProcessorId(check.getProcessorId()));
+            this.dispatcher.dispatch(new ActiveResult()._fromCheck(check).error("No such executor: " + check.getExecutor()).withProcessorId(check.getProcessorId()));
         }
     }
     
@@ -86,7 +86,7 @@ public class InternalWorker
             @Override
             public void publishResult(ActiveResult result)
             {
-                dispatcher.dispatch(result.fromCheck(check).withProcessorId(check.getProcessorId()));
+                dispatcher.dispatch(result._fromCheck(check).withProcessorId(check.getProcessorId()));
             }
 
             @Override

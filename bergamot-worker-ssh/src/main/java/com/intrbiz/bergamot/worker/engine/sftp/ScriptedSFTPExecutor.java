@@ -35,7 +35,7 @@ public class ScriptedSFTPExecutor extends AbstractCheckExecutor<SFTPEngine>
             if (Util.isEmpty(executeCheck.getScript())) throw new RuntimeException("The script must be defined!");
             // create our context
             SSHCheckContext context = this.getEngine().getChecker().createContext((e) -> { 
-                checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e)); 
+                checkContext.publishActiveResult(new ActiveResult().error(e)); 
             });
             // setup the context - this will add SSH keys etc
             SSHCheckUtil.setupSSHCheckContext(executeCheck, context);
@@ -47,7 +47,7 @@ public class ScriptedSFTPExecutor extends AbstractCheckExecutor<SFTPEngine>
                         // execute the script
                         this.scriptManager.createExecutor(executeCheck, checkContext)
                             .bind("ssh", this.getEngine().getChecker().createContext((t) -> {
-                                checkContext.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(t));
+                                checkContext.publishActiveResult(new ActiveResult().error(t));
                             }))
                             .bind("sftp", sftp)
                             .execute();

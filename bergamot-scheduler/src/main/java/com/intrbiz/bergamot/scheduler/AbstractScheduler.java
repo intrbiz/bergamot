@@ -74,7 +74,7 @@ public abstract class AbstractScheduler implements Scheduler
     protected void publishFailedCheck(ExecuteCheck check, PublishStatus status)
     {
         logger.warn("Failed to execute check (" + status + "): " + check.getId() + "\r\n" + check);
-        ActiveResult result = new ActiveResult().fromCheck(check);
+        ActiveResult result = new ActiveResult()._fromCheck(check);
         switch (status)
         {
             case AgentUnroutable:

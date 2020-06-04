@@ -44,11 +44,9 @@ public class ProcessStatsExecutor extends AbstractCheckExecutor<AgentEngine>
                 // get the process stats
                 CheckProcess check = new CheckProcess();
                 check.setListProcesses(false);
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(check, (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     ProcessStat stat = (ProcessStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got who in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got stat: " + stat);
                     // thresholds
                     long warning = executeCheck.getLongParameter("warning",  150);
                     long critical = executeCheck.getLongParameter("critical", 200);
@@ -93,12 +91,12 @@ public class ProcessStatsExecutor extends AbstractCheckExecutor<AgentEngine>
                         message = count + " total processes, " + stat.getThreads() + " total threads";
                     }
                     // apply the check
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    context.publishActiveResult(new ActiveResult().applyGreaterThanThreshold(
                             count, 
                             warning, 
                             critical, 
                             message
-                    ).runtime(runtime));
+                    ));
                     // publish readings
                     context.publishReading(executeCheck, new LongGaugeReading(state + "-processes", null, count, warning, critical, 0L, null));
                 });
@@ -106,12 +104,12 @@ public class ProcessStatsExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

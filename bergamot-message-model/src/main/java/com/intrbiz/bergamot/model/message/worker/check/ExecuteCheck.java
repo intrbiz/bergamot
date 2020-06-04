@@ -1,5 +1,7 @@
 package com.intrbiz.bergamot.model.message.worker.check;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -17,11 +19,20 @@ public class ExecuteCheck extends CheckMessage
     @JsonProperty("scheduled")
     private long scheduled;
     
+    @JsonProperty("received")
+    private long received;
+    
     @JsonProperty("script")
     private String script;
     
     @JsonProperty("saved_state")
     private String savedState;
+    
+    /**
+     * An id added to adhoc checks to correlate them with with the originator. This must be null for normal check executions
+     */
+    @JsonProperty("adhoc_id")
+    private UUID adhocId;
 
     public ExecuteCheck()
     {
@@ -66,5 +77,25 @@ public class ExecuteCheck extends CheckMessage
     public void setSavedState(String savedState)
     {
         this.savedState = savedState;
+    }
+
+    public long getReceived()
+    {
+        return this.received;
+    }
+
+    public void setReceived(long received)
+    {
+        this.received = received;
+    }
+    
+    public UUID getAdhocId()
+    {
+        return adhocId;
+    }
+
+    public void setAdhocId(UUID adhocId)
+    {
+        this.adhocId = adhocId;
     }
 }

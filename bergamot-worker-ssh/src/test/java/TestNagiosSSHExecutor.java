@@ -46,12 +46,9 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(true)));
                 assertThat(result.getStatus(), is(equalTo("OK")));
                 assertThat(result.getOutput(), is(equalTo("OK: Test")));
-                assertThat(result.getRuntime(), is(greaterThan(0D)));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
@@ -73,11 +70,9 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("ERROR")));
                 assertThat(result.getOutput(), is(notNullValue()));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
@@ -97,11 +92,9 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("ERROR")));
                 assertThat(result.getOutput(), is(equalTo("The 'command_line' parameter must be given")));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
@@ -123,10 +116,8 @@ public class TestNagiosSSHExecutor extends BaseSSHTest
                 assertThat(result.getId(), is(equalTo(executeCheck.getId())));
                 assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
                 assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
-                assertThat(result.getCheck(), is(equalTo(executeCheck)));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("ERROR")));
-                assertThat(result.getExecuted(), is(not(nullValue())));
                 assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );

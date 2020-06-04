@@ -44,11 +44,9 @@ public class LoadExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the CPU stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckCPU(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     CPUStat stat = (CPUStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got CPU usage in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got CPU usage: " + stat);
                     // thresholds
                     double load1Warning = executeCheck.getDoubleParameter("load_1_warning");
                     double load1critical = executeCheck.getDoubleParameter("load_1_critical");
@@ -58,7 +56,7 @@ public class LoadExecutor extends AbstractCheckExecutor<AgentEngine>
                     double load15critical = executeCheck.getDoubleParameter("load_15_critical");
                     // apply the check
                     String message = "Load: " + DFMT.format(stat.getLoad1()) + ", " + DFMT.format(stat.getLoad5()) + ", " + DFMT.format(stat.getLoad15());
-                    ActiveResult result = new ActiveResult().fromCheck(executeCheck).ok(message);
+                    ActiveResult result = new ActiveResult().ok(message);
                     // check load 1
                     if (load1Warning > 0 && load1critical > 0)
                         result.applyGreaterThanThreshold(stat.getLoad1(), load1Warning, load1critical, message);
@@ -69,7 +67,7 @@ public class LoadExecutor extends AbstractCheckExecutor<AgentEngine>
                     if (load15Warning > 0 && load15critical > 0)
                         result.applyGreaterThanThreshold(stat.getLoad15(), load15Warning, load15critical, message);
                     // publish
-                    context.publishActiveResult(result.runtime(runtime));
+                    context.publishActiveResult(result);
                     // readings
                     context.publishReading(executeCheck, 
                         new DoubleGaugeReading("load-1",  null, stat.getLoad1(),  load1Warning  < 0 ? null : load1Warning,  load1critical  < 0 ? null : load1critical,  null, null),
@@ -81,12 +79,12 @@ public class LoadExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

@@ -30,7 +30,7 @@ public class ScriptedSNMPExecutor extends AbstractSNMPExecutor
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

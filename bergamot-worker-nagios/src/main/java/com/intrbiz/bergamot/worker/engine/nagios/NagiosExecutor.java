@@ -69,7 +69,7 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
         if (logger.isTraceEnabled()) logger.trace("Executing Nagios check : " + executeCheck.getEngine() + "::" + executeCheck.getName() + " for " + executeCheck.getCheckType() + " " + executeCheck.getCheckId());
-        ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
+        ActiveResult resultMO = new ActiveResult();
         ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId());
         try
         {
@@ -84,7 +84,6 @@ public class NagiosExecutor extends AbstractCheckExecutor<NagiosEngine>
                 resultMO.setOk(response.toOk());
                 resultMO.setStatus(response.toStatus());
                 resultMO.setOutput(response.getOutput());
-                resultMO.setRuntime(response.getRuntime());
                 // readings
                 for (NagiosPerfData perfData : response.getPerfData())
                 {

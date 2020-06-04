@@ -214,6 +214,7 @@ public class BergamotWorker
             @Override
             public void publishResult(ResultMessage result)
             {
+                result.setSent(System.currentTimeMillis());
                 client.getProcessorDispatcher().dispatchResult(result);
             }
 
@@ -296,6 +297,7 @@ public class BergamotWorker
     {
         if (check != null)
         {
+            check.setReceived(System.currentTimeMillis());
             if (logger.isTraceEnabled()) logger.trace("Executing check: " + check);
             CheckExecutionContext context = createExecutionContext(check);
             try
@@ -307,12 +309,12 @@ public class BergamotWorker
                 }
                 else
                 {
-                    context.publishResult(new ActiveResult().fromCheck(check).error("No engine found to execute check"));
+                    context.publishResult(new ActiveResult().error("No engine found to execute check"));
                 }
             }
             catch (Exception e)
             {
-                context.publishResult(new ActiveResult().fromCheck(check).error("Error executing check: " + e.getMessage()));
+                context.publishResult(new ActiveResult().error("Error executing check: " + e.getMessage()));
             }
         }
     }
@@ -325,13 +327,14 @@ public class BergamotWorker
             public void publishResult(ResultMessage result)
             {
                 result.setProcessorId(check.getProcessorId());
+                result.setSent(System.currentTimeMillis());
                 client.getProcessorDispatcher().dispatchResult(result);
             }
 
             @Override
             public void publishActiveResult(ActiveResult result)
             {
-                result.fromCheck(check);
+                result._fromCheck(check);
                 this.publishResult(result);
             }
 
@@ -344,7 +347,7 @@ public class BergamotWorker
             @Override
             public void publishReading(ReadingParcelMessage reading)
             {
-                reading.fromCheck(check);
+                reading._fromCheck(check);
                 reading.setProcessorId(check.getProcessorId());
                 client.getProcessorDispatcher().dispatchReading(reading);
             }

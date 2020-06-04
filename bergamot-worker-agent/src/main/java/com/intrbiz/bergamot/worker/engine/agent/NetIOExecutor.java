@@ -54,17 +54,15 @@ public class NetIOExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the user stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckNetIO(executeCheck.getParameterCSV("interface")), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     NetIOStat stat = (NetIOStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got NetIOStat in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got NetIOStat: " + stat);
                     // thresholds
                     double warning = executeCheck.getDoubleParameter("warning",  50);
                     double critical = executeCheck.getDoubleParameter("critical", 75);
                     // apply the check
                     boolean peak = executeCheck.getBooleanParameter("peak", false);
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyThresholds(
+                    context.publishActiveResult(new ActiveResult().applyThresholds(
                             stat.getIfaces(),
                             (v, t) -> (peak ? v.getFiveMinuteRate().getTxPeakRateMbps(): v.getFiveMinuteRate().getTxRateMbps()) > t || (peak ? v.getFiveMinuteRate().getRxPeakRateMbps(): v.getFiveMinuteRate().getRxRateMbps()) > t,
                             warning, 
@@ -74,7 +72,7 @@ public class NetIOExecutor extends AbstractCheckExecutor<AgentEngine>
                                 " Tx: " + DFMT.format(n.getFiveMinuteRate().getTxRateMbps()) + "Mb/s (" + DFMT.format(n.getFiveMinuteRate().getTxPeakRateMbps()) + "Mb/s Peak)" + 
                                 " Rx: " + DFMT.format(n.getFiveMinuteRate().getRxRateMbps()) + "Mb/s (" + DFMT.format(n.getFiveMinuteRate().getRxPeakRateMbps()) + "Mb/s Peak)"
                             ).collect(Collectors.joining("; "))
-                    ).runtime(runtime));
+                    ));
                     // readings
                     ReadingParcelMessage readings = new ReadingParcelMessage().fromCheck(executeCheck.getCheckId()).captured(System.currentTimeMillis());
                     for (NetIOInfo iface : stat.getIfaces())
@@ -91,12 +89,12 @@ public class NetIOExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

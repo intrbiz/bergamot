@@ -87,7 +87,7 @@ public abstract class AbstractCheckEngine implements CheckEngine
         }
         else
         {
-            context.publishResult(new ActiveResult().fromCheck(check).error("No executor found to execute check"));
+            context.publishResult(new ActiveResult().error("No executor found to execute check"));
         }
     }
     

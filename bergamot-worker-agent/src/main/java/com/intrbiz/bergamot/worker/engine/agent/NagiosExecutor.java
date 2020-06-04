@@ -52,17 +52,14 @@ public class NagiosExecutor extends AbstractCheckExecutor<AgentEngine>
                 check.setEngine("nagios");
                 check.getParameters().add(new Parameter("command_line", commandLine));
                 // exec the check
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(check, (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     ExecStat stat = (ExecStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Executed check " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Executed check: " + stat);
                     // submit the result
-                    ActiveResult result = new ActiveResult().fromCheck(executeCheck);
+                    ActiveResult result = new ActiveResult();
                     result.setOk(stat.isOk());
                     result.setStatus(stat.getStatus());
                     result.setOutput(stat.getOutput());
-                    result.runtime(runtime);
                     context.publishActiveResult(result);
                     // readings
                     if (stat.getReadings().size() > 0)
@@ -77,12 +74,12 @@ public class NagiosExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

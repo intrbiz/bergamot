@@ -51,11 +51,9 @@ public class DiskExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the CPU stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckDisk(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     DiskStat stat = (DiskStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got Disk usage in + " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got Disk usage: " + stat);
                     // find the mount
                     DiskInfo disk = stat.getDisks().stream().filter((di) -> { return mount.equals(di.getMount()); }).findFirst().orElse(null);
                     if (disk != null)
@@ -63,12 +61,12 @@ public class DiskExecutor extends AbstractCheckExecutor<AgentEngine>
                         // apply the check
                         double warning = executeCheck.getPercentParameter("warning", 0.8D);
                         double critical = executeCheck.getPercentParameter("critical", 0.9D);
-                        context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThreshold(
+                        context.publishActiveResult(new ActiveResult().applyGreaterThanThreshold(
                                 fromPercent(disk.getUsedPercent()), 
                                 warning,
                                 critical,
                                 "Disk: " + disk.getMount() + " " + disk.getType() + " on " + disk.getDevice() +" " + DFMT.format(toG(disk.getUsed())) + " GB of " + DFMT.format(toG(disk.getSize())) + " GB (" + DFMT.format(disk.getUsedPercent()) + " %) used" 
-                        ).runtime(runtime));
+                        ));
                         // readings
                         context.publishReading(executeCheck, 
                             new DoubleGaugeReading("disk-space-used-[" + disk.getMount() + "]", "MB", UnitUtil.toM(disk.getUsed()), UnitUtil.toM(disk.getSize()) * warning, UnitUtil.toM(disk.getSize()) * critical, 0D, UnitUtil.toM(disk.getSize())),
@@ -78,19 +76,19 @@ public class DiskExecutor extends AbstractCheckExecutor<AgentEngine>
                     }
                     else
                     {
-                        context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error("No such mount point: " + mount).runtime(runtime));
+                        context.publishActiveResult(new ActiveResult().error("No such mount point: " + mount));
                     }
                 });
             }
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

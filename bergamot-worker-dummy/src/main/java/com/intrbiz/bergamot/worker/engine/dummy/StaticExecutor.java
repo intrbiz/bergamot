@@ -20,8 +20,7 @@ public class StaticExecutor extends AbstractCheckExecutor<DummyEngine>
     @Override
     public void execute(ExecuteCheck executeCheck, CheckExecutionContext context)
     {
-        long start = System.nanoTime();
-        ActiveResult result = new ActiveResult().fromCheck(executeCheck);
+        ActiveResult result = new ActiveResult();
         if (Boolean.getBoolean("dummy.static.critical"))
         {
             result.setOk(false);
@@ -34,7 +33,6 @@ public class StaticExecutor extends AbstractCheckExecutor<DummyEngine>
             result.setStatus(executeCheck.getParameter("status", "OK"));
             result.setOutput(executeCheck.getParameter("output", ""));
         }
-        result.setRuntime(((double)(System.nanoTime() - start)) / 1_000_000D);
         context.publishActiveResult(result);
     }
 }

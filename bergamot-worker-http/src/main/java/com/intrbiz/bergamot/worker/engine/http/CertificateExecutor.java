@@ -76,7 +76,7 @@ public class CertificateExecutor extends AbstractCheckExecutor<HTTPEngine>
             check.execute((response) -> {
                 if (logger.isTraceEnabled()) logger.trace("Got response for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")\n" + response);
                 // compute the result
-                ActiveResult resultMO = new ActiveResult().fromCheck(executeCheck);
+                ActiveResult resultMO = new ActiveResult();
                 // check the response
                 TLSInfo tls = response.getTlsInfo();
                 CertInfo serverCert = tls.getServerCertInfo();
@@ -101,7 +101,6 @@ public class CertificateExecutor extends AbstractCheckExecutor<HTTPEngine>
                     resultMO.critical("TLS certificate is not valid: " + Util.coalesceEmpty(Util.nullable(tls.getCertificateValidationError(), Throwable::getMessage), " for some reason") + ".");
                 }
                 // submit the result
-                resultMO.setRuntime(response.getRuntime());
                 tctx.stop();
                 context.publishActiveResult(resultMO); 
             }, 
@@ -109,7 +108,7 @@ public class CertificateExecutor extends AbstractCheckExecutor<HTTPEngine>
                 tctx.stop();
                 failedRequests.inc();
                 if (logger.isTraceEnabled()) logger.trace("Error for TLS Certificate check (" + executeCheck.getCheckId() + "/" + executeCheck.getId() + ")", error);
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(error));
+                context.publishActiveResult(new ActiveResult().error(error));
             });
         }
         catch (Exception e)
@@ -117,7 +116,7 @@ public class CertificateExecutor extends AbstractCheckExecutor<HTTPEngine>
             if (logger.isTraceEnabled()) logger.trace("Failed to execute TLS Certificate check", e);
             tctx.stop();
             this.failedRequests.inc();
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }        
     }
 

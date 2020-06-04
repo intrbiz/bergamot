@@ -42,18 +42,16 @@ public class UsersExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the user stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckWho(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     WhoStat stat = (WhoStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got who in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got who: " + stat);
                     // apply the check
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).applyGreaterThanThreshold(
+                    context.publishActiveResult(new ActiveResult().applyGreaterThanThreshold(
                             stat.getUsers().size(), 
                             executeCheck.getIntParameter("warning",  2), 
                             executeCheck.getIntParameter("critical", 5), 
                             stat.getUsers().size() + " active users"
-                    ).runtime(runtime));
+                    ));
                     // readings
                     context.publishReading(executeCheck, new IntegerGaugeReading("active-users", null, stat.getUsers().size(), executeCheck.getIntParameter("warning",  2), executeCheck.getIntParameter("critical", 5), 0, Integer.MAX_VALUE));
                 });
@@ -61,12 +59,12 @@ public class UsersExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

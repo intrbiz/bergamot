@@ -46,7 +46,7 @@ public class OSExecutor extends AbstractCheckExecutor<AgentEngine>
                     OSStat stat = (OSStat) response;
                     if (logger.isTraceEnabled()) logger.trace("Got OS info in " + runtime + "ms: " + stat);
                     // display the info
-                    context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).info(
+                    context.publishActiveResult(new ActiveResult().info(
                             "OS: " + stat.getVendor() + " " + stat.getVendorVersion() + ", " + stat.getName() + " " + stat.getVersion() + " (" + stat.getMachine() + ")"
                     ));
                 });
@@ -54,12 +54,12 @@ public class OSExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
 }

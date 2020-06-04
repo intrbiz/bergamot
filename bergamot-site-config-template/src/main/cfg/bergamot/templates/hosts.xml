@@ -67,6 +67,36 @@
         </service>
     </host>
     
+    <host name="bergamot-proxy-server" extends="bergamot-server" template="yes" resource-pool="bergamot-proxy-cluster">
+        <summary>A Bergamot Monitoring Worker server</summary>
+        
+        <service name="bergamot-proxy-daemon" extends="bergamot-service" application="Bergamot Proxy">
+            <summary>Bergamot Proxy Daemon</summary>
+            <check-command command="check-bergamot-proxy-process"/>
+        </service>
+        
+        <service name="bergamot-agent-port" extends="bergamot-service" application="Bergamot Proxy">
+            <summary>Port: Bergamot Proxy</summary>
+            <check-command command="check-agent-port-listener">
+            	<parameter name="local_port">14080</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-proxy-java-heap-usage" application="Bergamot Proxy">
+            <summary>Java Heap: Bergamot Proxy</summary>
+            <check-command command="java-heap-usage">
+                <parameter name="port">9003</parameter>
+            </check-command>
+        </service>
+        
+        <service extends="bergamot-service" name="bergamot-proxy-java-cpu-usage" application="Bergamot Proxy">
+            <summary>Java CPU: Bergamot Proxy</summary>
+            <check-command command="java-cpu-usage">
+                <parameter name="port">9003</parameter>
+            </check-command>
+        </service>
+    </host>
+    
     <host name="bergamot-worker-server" extends="bergamot-server" template="yes" resource-pool="bergamot-worker-cluster">
         <summary>A Bergamot Monitoring Worker server</summary>
         

@@ -45,16 +45,14 @@ public class UptimeExecutor extends AbstractCheckExecutor<AgentEngine>
             if (agent != null)
             {
                 // get the Uptime stats
-                long sent = System.nanoTime();
                 agent.sendMessageToAgent(new CheckUptime(), (response) -> {
-                    double runtime = ((double)(System.nanoTime() - sent)) / 1000_000D;
                     UptimeStat stat = (UptimeStat) response;
-                    if (logger.isTraceEnabled()) logger.trace("Got Uptime in " + runtime + "ms: " + stat);
+                    if (logger.isTraceEnabled()) logger.trace("Got Uptime: " + stat);
                     // thresholds
                     long critical = executeCheck.getLongParameter("critical", TimeUnit.MINUTES.toSeconds(5));
                     long warning  = executeCheck.getLongParameter("warning",  TimeUnit.MINUTES.toSeconds(10));
                     // the result
-                    ActiveResult result = new ActiveResult().fromCheck(executeCheck);
+                    ActiveResult result = new ActiveResult();
                     // apply the check
                     if (stat.getUptime() <= warning)
                     {
@@ -69,7 +67,6 @@ public class UptimeExecutor extends AbstractCheckExecutor<AgentEngine>
                         result.ok("Up " + formatUptime(stat.getUptime()));
                     }
                     // submit
-                    result.runtime(runtime);
                     context.publishActiveResult(result);
                     // readings
                     context.publishReading(executeCheck, new DoubleGaugeReading("uptime", "s", stat.getUptime()));
@@ -78,12 +75,12 @@ public class UptimeExecutor extends AbstractCheckExecutor<AgentEngine>
             else
             {
                 // raise an error
-                context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).disconnected("Bergamot Agent disconnected"));
+                context.publishActiveResult(new ActiveResult().disconnected("Bergamot Agent disconnected"));
             }
         }
         catch (Exception e)
         {
-            context.publishActiveResult(new ActiveResult().fromCheck(executeCheck).error(e));
+            context.publishActiveResult(new ActiveResult().error(e));
         }
     }
     
