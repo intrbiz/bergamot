@@ -46,13 +46,9 @@ public class TestScriptedSSHExecutor extends BaseSSHTest
                 ActiveResult result = (ActiveResult) res;
                 System.out.println("testGetHostId:\n" + result);
                 assertThat(result, is(not(nullValue())));
-                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
-                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
                 assertThat(result.isOk(), is(equalTo(true)));
                 assertThat(result.getStatus(), is(equalTo("INFO")));
                 assertThat(result.getOutput(), is(notNullValue()));
-                assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
     }

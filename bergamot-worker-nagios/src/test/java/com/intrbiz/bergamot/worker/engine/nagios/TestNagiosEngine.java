@@ -1,7 +1,7 @@
 package com.intrbiz.bergamot.worker.engine.nagios;
 
 import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.CoreMatchers.*;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -68,13 +68,9 @@ public class TestNagiosEngine
             (res) -> {
                 ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
-                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
-                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
                 assertThat(result.isOk(), is(equalTo(true)));
                 assertThat(result.getStatus(), is(equalTo("OK")));
                 assertThat(result.getOutput(), is(equalTo("OK: Test")));
-                assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
     }
@@ -88,13 +84,9 @@ public class TestNagiosEngine
             (res) -> {
                 ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
-                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
-                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("WARNING")));
                 assertThat(result.getOutput(), is(equalTo("WARNING: Test")));
-                assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
     }
@@ -108,13 +100,9 @@ public class TestNagiosEngine
             (res) -> {
                 ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
-                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
-                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("CRITICAL")));
                 assertThat(result.getOutput(), is(equalTo("CRITICAL: Test")));
-                assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
     }
@@ -128,13 +116,9 @@ public class TestNagiosEngine
             (res) -> {
                 ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
-                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
-                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("UNKNOWN")));
                 assertThat(result.getOutput(), is(equalTo("UNKNOWN: Test")));
-                assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
     }
@@ -148,13 +132,9 @@ public class TestNagiosEngine
             (res) -> {
                 ActiveResult result = (ActiveResult) res;
                 assertThat(result, is(not(nullValue())));
-                assertThat(result.getId(), is(equalTo(executeCheck.getId())));
-                assertThat(result.getCheckType(), is(equalTo(executeCheck.getCheckType())));
-                assertThat(result.getCheckId(), is(equalTo(executeCheck.getCheckId())));
                 assertThat(result.isOk(), is(equalTo(false)));
                 assertThat(result.getStatus(), is(equalTo("ERROR")));
                 assertThat(result.getOutput(), is(not(nullValue())));
-                assertThat(result.getProcessed(), is(equalTo(0L)));
             }
         );
     }
