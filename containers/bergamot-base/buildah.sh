@@ -5,7 +5,7 @@ buildah config --author='Chris Ellis <chris@intrbiz.com>' $ID
 
 # Install the base JDK
 buildah run $ID zypper -q -n ref
-buildah run $ID zypper -q -n in java-11-openjdk-devel tar
+buildah run $ID zypper -q -n in java-11-openjdk-devel tar gzip
 
 # Setup some common directories
 buildah run $ID mkdir -p /etc/bergamot
