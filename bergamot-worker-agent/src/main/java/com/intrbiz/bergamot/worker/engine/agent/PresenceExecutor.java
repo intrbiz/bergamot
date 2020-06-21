@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.agent.server.BergamotAgentServerHandler;
+import com.intrbiz.bergamot.agent.server.BergamotAgent;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.match.MatchOnAgentId;
@@ -38,7 +38,7 @@ public class PresenceExecutor extends AbstractCheckExecutor<AgentEngine>
             UUID agentId = executeCheck.getAgentId();
             if (agentId == null) throw new RuntimeException("No agent id was given");
             // lookup the agent
-            BergamotAgentServerHandler agent = this.getEngine().getAgentServer().getAgent(agentId);
+            BergamotAgent agent = this.getEngine().getAgentServer().getAgent(agentId);
             if (agent != null)
             {
                 agent.sendOnePingAndOnePingOnly((rtt) -> {

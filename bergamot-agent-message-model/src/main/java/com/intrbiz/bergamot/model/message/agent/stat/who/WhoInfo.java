@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat.who;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.who-info")
-public class WhoInfo extends AgentType
+public class WhoInfo extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("user")
     private String user;
     

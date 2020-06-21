@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.stat.agent")
-public class AgentStat extends AgentMessage
+public class AgentStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("processors")
     private int processors = 0;
     
@@ -54,7 +56,7 @@ public class AgentStat extends AgentMessage
         super();
     }
 
-    public AgentStat(AgentMessage message)
+    public AgentStat(Message message)
     {
         super(message);
     }

@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.agent.handler;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 
 public class DefaultHandler extends AbstractAgentHandler
@@ -21,7 +21,7 @@ public class DefaultHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         // unhandled
         logger.warn("Unhandled message: " + request);

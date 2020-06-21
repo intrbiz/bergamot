@@ -5,15 +5,17 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.agent.util.Parameter;
+import com.intrbiz.bergamot.model.message.Message;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 
 /**
  * Execute a server defined check
  */
 @JsonTypeName("bergamot.agent.check.exec")
-public class ExecCheck extends AgentMessage
+public class ExecCheck extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("engine")
     private String engine;
 
@@ -24,32 +26,20 @@ public class ExecCheck extends AgentMessage
     private String name;
 
     @JsonProperty("parameters")
-    private List<Parameter> parameters = new LinkedList<Parameter>();
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
     
     public ExecCheck()
     {
         super();
     }
 
-    public ExecCheck(String engine, String executor, String name, List<Parameter> parameters)
+    public ExecCheck(String engine, String executor, String name, List<ParameterMO> parameters)
     {
         super();
         this.engine = engine;
         this.executor = executor;
         this.name = name;
         this.parameters = parameters;
-    }
-
-
-
-    public ExecCheck(AgentMessage message)
-    {
-        super(message);
-    }
-
-    public ExecCheck(String id)
-    {
-        super(id);
     }
 
     public String getEngine()
@@ -82,12 +72,12 @@ public class ExecCheck extends AgentMessage
         this.name = name;
     }
 
-    public List<Parameter> getParameters()
+    public List<ParameterMO> getParameters()
     {
         return parameters;
     }
 
-    public void setParameters(List<Parameter> parameters)
+    public void setParameters(List<ParameterMO> parameters)
     {
         this.parameters = parameters;
     }

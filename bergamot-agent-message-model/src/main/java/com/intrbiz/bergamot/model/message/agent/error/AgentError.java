@@ -1,10 +1,12 @@
 package com.intrbiz.bergamot.model.message.agent.error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
-public abstract class AgentError extends AgentMessage
+public abstract class AgentError extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("message")
     protected String message;
     
@@ -13,20 +15,15 @@ public abstract class AgentError extends AgentMessage
         super();
     }
     
-    public AgentError(String id)
-    {
-        super(id);
-    }
-    
-    public AgentError(AgentMessage inResponseTo, String message)
+    public AgentError(Message inResponseTo, String message)
     {
         super(inResponseTo);
         this.message = message;
     }
     
-    public AgentError(String id, String message)
+    public AgentError(String message)
     {
-        super(id);
+        super();
         this.message = message;
     }
 
@@ -39,6 +36,4 @@ public abstract class AgentError extends AgentMessage
     {
         this.message = message;
     }
-    
-    
 }

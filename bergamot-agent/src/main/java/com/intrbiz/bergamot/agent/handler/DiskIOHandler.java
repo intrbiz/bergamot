@@ -21,7 +21,7 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 
 import com.intrbiz.bergamot.agent.util.SampleRingBuffer;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.check.CheckDiskIO;
 import com.intrbiz.bergamot.model.message.agent.stat.DiskIOStat;
 import com.intrbiz.bergamot.model.message.agent.stat.diskio.DiskIOInfo;
@@ -63,7 +63,7 @@ public class DiskIOHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         CheckDiskIO check = (CheckDiskIO) request;
         DiskIOStat stat = new DiskIOStat(request);

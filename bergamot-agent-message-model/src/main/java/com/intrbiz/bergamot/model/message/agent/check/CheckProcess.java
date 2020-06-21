@@ -5,11 +5,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.check.process")
-public class CheckProcess extends AgentMessage
-{   
+public class CheckProcess extends Message
+{
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Send back a process list (default: yes)
      */
@@ -68,8 +70,6 @@ public class CheckProcess extends AgentMessage
         super();
     }
     
-    
-
     public CheckProcess(boolean listProcesses, String command, boolean flattenCommand, List<String> arguments, boolean regex, List<String> state, String user, String group, String title)
     {
         super();
@@ -84,16 +84,9 @@ public class CheckProcess extends AgentMessage
         this.title = title;
     }
 
-
-
-    public CheckProcess(AgentMessage message)
+    public CheckProcess(Message message)
     {
         super(message);
-    }
-
-    public CheckProcess(String id)
-    {
-        super(id);
     }
 
     public boolean isListProcesses()

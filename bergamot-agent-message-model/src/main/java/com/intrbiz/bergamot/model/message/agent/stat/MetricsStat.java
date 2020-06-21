@@ -5,15 +5,17 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.gerald.polyakov.Reading;
 
 /**
  * A set of metrics which were fetched
  */
 @JsonTypeName("bergamot.agent.stat.metrics")
-public class MetricsStat extends AgentMessage
-{    
+public class MetricsStat extends Message
+{
+    private static final long serialVersionUID = 1L;
+    
     /**
      * A collection of metric readings
      */
@@ -25,14 +27,9 @@ public class MetricsStat extends AgentMessage
         super();
     }
 
-    public MetricsStat(AgentMessage message)
+    public MetricsStat(Message message)
     {
         super(message);
-    }
-
-    public MetricsStat(String id)
-    {
-        super(id);
     }
 
     public List<Reading> getReadings()

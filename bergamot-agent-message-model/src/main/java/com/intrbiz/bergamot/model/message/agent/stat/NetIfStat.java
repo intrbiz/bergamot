@@ -5,13 +5,15 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.stat.netif.NetIfInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.netif.NetRouteInfo;
 
 @JsonTypeName("bergamot.agent.stat.netif")
-public class NetIfStat extends AgentMessage
+public class NetIfStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("hostname")
     private String hostname;
     
@@ -26,14 +28,9 @@ public class NetIfStat extends AgentMessage
         super();
     }
 
-    public NetIfStat(AgentMessage message)
+    public NetIfStat(Message message)
     {
         super(message);
-    }
-
-    public NetIfStat(String id)
-    {
-        super(id);
     }
 
     public String getHostname()

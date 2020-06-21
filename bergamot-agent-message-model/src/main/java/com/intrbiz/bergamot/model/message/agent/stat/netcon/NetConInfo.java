@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat.netcon;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.netcon-info")
-public class NetConInfo extends AgentType
+public class NetConInfo extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("protocol")
     private String protocol;
     

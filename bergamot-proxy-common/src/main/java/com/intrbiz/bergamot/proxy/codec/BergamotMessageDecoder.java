@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.proxy.codec;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 
@@ -18,11 +19,12 @@ public class BergamotMessageDecoder extends MessageToMessageDecoder<WebSocketFra
 {
     private static final Logger logger = Logger.getLogger(BergamotMessageDecoder.class);
     
-    private final BergamotTranscoder transcoder = BergamotTranscoder.getDefaultInstance();
+    private final BergamotTranscoder transcoder;
     
-    public BergamotMessageDecoder()
+    public BergamotMessageDecoder(BergamotTranscoder transcoder)
     {
         super();
+        this.transcoder = Objects.requireNonNull(transcoder);
     }
 
     @Override

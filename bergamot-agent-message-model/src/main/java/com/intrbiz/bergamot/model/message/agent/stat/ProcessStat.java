@@ -5,12 +5,14 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.stat.process.ProcessInfo;
 
 @JsonTypeName("bergamot.agent.stat.process")
-public class ProcessStat extends AgentMessage
+public class ProcessStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("total")
     private long total;
     
@@ -40,14 +42,9 @@ public class ProcessStat extends AgentMessage
         super();
     }
 
-    public ProcessStat(AgentMessage message)
+    public ProcessStat(Message message)
     {
         super(message);
-    }
-
-    public ProcessStat(String id)
-    {
-        super(id);
     }
 
     public List<ProcessInfo> getProcesses()

@@ -6,16 +6,18 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
-import com.intrbiz.bergamot.model.message.agent.util.Parameter;
+import com.intrbiz.bergamot.model.message.Message;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.gerald.polyakov.Reading;
 
 /**
  * Result of executing a server defined check
  */
 @JsonTypeName("bergamot.agent.stat.exec")
-public class ExecStat extends AgentMessage
+public class ExecStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("ok")
     private boolean ok;
 
@@ -41,21 +43,16 @@ public class ExecStat extends AgentMessage
     private List<Reading> readings = new LinkedList<Reading>();
 
     @JsonProperty("parameters")
-    private List<Parameter> parameters = new LinkedList<Parameter>();
+    private List<ParameterMO> parameters = new LinkedList<ParameterMO>();
 
     public ExecStat()
     {
         super();
     }
 
-    public ExecStat(AgentMessage message)
+    public ExecStat(Message message)
     {
         super(message);
-    }
-
-    public ExecStat(String id)
-    {
-        super(id);
     }
 
     public boolean isOk()
@@ -98,12 +95,12 @@ public class ExecStat extends AgentMessage
         this.runtime = runtime;
     }
 
-    public List<Parameter> getParameters()
+    public List<ParameterMO> getParameters()
     {
         return parameters;
     }
 
-    public void setParameters(List<Parameter> parameters)
+    public void setParameters(List<ParameterMO> parameters)
     {
         this.parameters = parameters;
     }

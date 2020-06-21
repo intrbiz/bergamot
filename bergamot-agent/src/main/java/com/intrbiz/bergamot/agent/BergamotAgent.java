@@ -4,18 +4,13 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -24,6 +19,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.hyperic.sigar.Humidor;
 import org.hyperic.sigar.SigarException;
 
+import com.intrbiz.bergamot.agent.client.BergamotAgentClient;
 import com.intrbiz.bergamot.agent.handler.AgentInfoHandler;
 import com.intrbiz.bergamot.agent.handler.CPUInfoHandler;
 import com.intrbiz.bergamot.agent.handler.DefaultHandler;
@@ -43,30 +39,15 @@ import com.intrbiz.bergamot.agent.handler.WhoInfoHandler;
 import com.intrbiz.bergamot.agent.statsd.StatsDProcessor;
 import com.intrbiz.bergamot.agent.statsd.StatsDReceiver;
 import com.intrbiz.bergamot.agent.util.AgentUtil;
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.AuthenticationKey;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.error.AgentError;
+import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPing;
 import com.intrbiz.bergamot.model.message.agent.ping.AgentPong;
+import com.intrbiz.bergamot.proxy.model.ClientHeader;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-import io.netty.util.concurrent.GenericFutureListener;
 
 /**
  */
@@ -77,6 +58,8 @@ public class BergamotAgent
     public static final String AGENT_PRODUCT = "Bergamot Agent";
     
     public static final String AGENT_VERSION = "4.0.0";
+    
+    public static final String USER_AGENT = AGENT_PRODUCT + " (" + AGENT_VENDOR + ") " + AGENT_VERSION;
     
     private static final double BACKOFF_FACTOR = 0.16D;
     
@@ -96,21 +79,21 @@ public class BergamotAgent
     
     private String templateName;
     
-    private AgentAuthenticationKey key;
-
-    private EventLoopGroup eventLoop;
+    private AuthenticationKey key;
     
-    private Timer timer;
+    private BergamotAgentClient client;
     
-    private ConcurrentMap<Class<?>, AgentHandler> handlers = new ConcurrentHashMap<Class<?>, AgentHandler>();
-    
-    private SSLContext sslContext;
-    
-    private AgentHandler defaultHandler;
+    private ClientHeader headers;
     
     private volatile Channel channel;
     
+    private Timer timer;
+    
     private AtomicInteger connectionAttempt = new AtomicInteger(0);
+    
+    private ConcurrentMap<Class<?>, AgentHandler> handlers = new ConcurrentHashMap<Class<?>, AgentHandler>();
+    
+    private AgentHandler defaultHandler;
     
     private int statsDPort = 0;
     
@@ -123,15 +106,6 @@ public class BergamotAgent
     public BergamotAgent()
     {
         super();
-        // Create our SSL context
-        try
-        {
-            this.sslContext = SSLContext.getDefault();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new RuntimeException("Failed to create default SSLContext", e);
-        }
         // background GC task, we want to deliberately keep memory to a minimum
         this.timer = new Timer();
         this.timer.scheduleAtFixedRate(new TimerTask() {
@@ -166,18 +140,6 @@ public class BergamotAgent
         this.registerHandler(new DiskIOHandler());
         this.registerHandler(new MetricsHandler());
         this.registerHandler(new ShellHandler());
-        // shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run()
-            {
-                BergamotAgent.logger.info("Bergamot Agent shutting down");
-                if (BergamotAgent.this.channel != null && BergamotAgent.this.channel.isActive())
-                {
-                    BergamotAgent.this.channel.close();
-                }
-            }
-        });
     }
     
     public StatsDProcessor getStatsDProcessor()
@@ -198,9 +160,11 @@ public class BergamotAgent
         this.configureAgentKey();
         // Configure statsD
         this.configureStatsD();
-        // Finish configuration
+        // create the headers
+        this.headers = new ClientHeader().userAgent(USER_AGENT).id(this.agentId).hostName(this.hostName).info(this.hostSummary).templateName(this.templateName);
+        // create the client
         logger.info("Bergamot Agent, connecting to " + this.server);
-        this.eventLoop = new NioEventLoopGroup(1);
+        this.client = new BergamotAgentClient(this.server);
     }
     
     private static String getProperty(String propertyName, boolean required)
@@ -294,21 +258,7 @@ public class BergamotAgent
     
     private void configureAgentKey() throws Exception
     {
-        this.key = new AgentAuthenticationKey(getProperty("bergamot.agent.key", true));
-    }
-    
-    private boolean isSecure()
-    {
-        return "wss".equalsIgnoreCase(this.server.getScheme()) ||
-               "https".equalsIgnoreCase(this.server.getScheme());
-    }
-    
-    private SSLEngine createSSLEngine(String host, int port)
-    {        
-        SSLEngine sslEngine = this.sslContext.createSSLEngine(host, port);
-        sslEngine.setUseClientMode(true);
-        sslEngine.setNeedClientAuth(false);
-        return sslEngine;
+        this.key = new AuthenticationKey(getProperty("bergamot.agent.key", true));
     }
     
     public void registerHandler(AgentHandler handler)
@@ -362,94 +312,65 @@ public class BergamotAgent
         // start the connection process
         this.connect();
     }
+    
+    protected void handleMessage(Message request, Channel channel)
+    {
+        if (request instanceof AgentPing)
+        {
+            logger.debug("Got ping from server");
+            channel.writeAndFlush(new AgentPong((AgentPing) request));
+        }
+        else if (request instanceof AgentPong)
+        {
+            logger.debug("Got pong from server");
+        }
+        else if (request instanceof AgentError)
+        {
+            logger.warn("Got error from server: " + ((AgentError) request).getMessage());
+        }
+        else if (request != null)
+        {
+            AgentHandler handler = getHandler(request.getClass());
+            if (handler != null)
+            {
+                Message response = handler.handle(request);
+                if (response != null)
+                {
+                    response.setReplyTo(request.getId());
+                    channel.writeAndFlush(response);
+                }
+            }
+            else
+            {
+                channel.writeAndFlush(new GeneralError(request, "No handler found for request."));
+            }
+        }
+    }
 
     private void connect()
     {
-        final SSLEngine engine = isSecure() ? createSSLEngine(this.server.getHost(), (this.server.getPort() <= 0 ? 443 : this.server.getPort())) : null;
-        // configure the client
-        Bootstrap b = new Bootstrap();
-        b.group(this.eventLoop);
-        b.channel(NioSocketChannel.class);
-        b.option(ChannelOption.ALLOCATOR, new UnpooledByteBufAllocator(false));
-        b.handler(new ChannelInitializer<SocketChannel>()
-        {
-            @Override
-            public void initChannel(SocketChannel ch) throws Exception
-            {
-                // HTTP handling
-                ChannelPipeline pipeline = ch.pipeline();
-                pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  90 /* seconds */ )); 
-                pipeline.addLast("write-timeout", new WriteTimeoutHandler( 90 /* seconds */ ));
-                if (engine != null) pipeline.addLast("ssl", new SslHandler(engine));
-                pipeline.addLast("codec",         new HttpClientCodec()); 
-                pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
-                pipeline.addLast("handler",       new AgentClientHandler(BergamotAgent.this.timer, BergamotAgent.this.server, BergamotAgent.this.agentId, BergamotAgent.this.hostName, BergamotAgent.this.hostSummary, BergamotAgent.this.templateName, BergamotAgent.this.key)
-                {
-                    @Override
-                    protected AgentMessage processAgentMessage(final ChannelHandlerContext ctx, final AgentMessage request)
-                    {
-                        if (request instanceof AgentPing)
-                        {
-                            logger.debug("Got ping from server");
-                            return new AgentPong((AgentPing) request);
-                        }
-                        else if (request instanceof AgentPong)
-                        {
-                            logger.debug("Got pong from server");
-                            return null;
-                        }
-                        else if (request instanceof AgentError)
-                        {
-                            logger.warn("Got error from server: " + ((AgentError) request).getMessage());
-                            return null;
-                        }
-                        else if (request != null)
-                        {
-                            AgentHandler handler = getHandler(request.getClass());
-                            if (handler != null)
-                            {
-                                return handler.handle(request);
-                            }
-                        }
-                        return null;
-                    }
-                });
-            }
-        });
         // connect the client
-        logger.info("Connecting to: " + this.server);
+        logger.info("Connecting to " + this.server);
         connectionAttempt.incrementAndGet();
-        b.connect(this.server.getHost(), (this.server.getPort() <= 0 ? 443 : this.server.getPort())).addListener(new GenericFutureListener<ChannelFuture>() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception
+        // start the connection attempt
+        this.client.connect(this.headers, this.key, this::handleMessage).addListener(connectFuture -> {
+            if (connectFuture.isSuccess())
             {
-                final Channel channel = future.channel();
-                if (future.isDone() && future.isSuccess())
-                {
-                    logger.info("Connected to server: " + server);
-                    // stash the channel
-                    BergamotAgent.this.channel = channel;
-                    // reset fail counter
-                    connectionAttempt.set(0);
-                    // setup close listener
-                    channel.closeFuture().addListener(new GenericFutureListener<ChannelFuture>() {
-                        @Override
-                        public void operationComplete(ChannelFuture future) throws Exception
-                        {
-                            BergamotAgent.this.channel = null;
-                            logger.info("Connection closed.");
-                            BergamotAgent.this.scheduleReconnect();
-                        }
-                    });
-                }
-                else
-                {
-                    logger.info("Failed to connect to: " + server + "");
-                    // schedule reconnect
-                    BergamotAgent.this.scheduleReconnect();
-                }
+                this.channel = (Channel) connectFuture.get();
+                this.channel.closeFuture().addListener(closeFuture -> {
+                    logger.info("Lost connection to server");
+                    this.scheduleReconnect();
+                    this.channel = null;
+                });
+                logger.info("Sucessfully connected to " + this.server);
+            }
+            else
+            {
+                logger.warn("Failed to connect to " + this.server + ": " + connectFuture.cause());
+                this.scheduleReconnect();
             }
         });
+        
     }
     
     protected void scheduleReconnect()
@@ -460,41 +381,20 @@ public class BergamotAgent
             @Override
             public void run()
             {
-                try
-                {
-                    BergamotAgent.this.connect();
-                }
-                catch (Exception e)
-                {
-                    BergamotAgent.logger.error("Error connecting to server", e);
-                    BergamotAgent.this.scheduleReconnect();
-                }
+                BergamotAgent.this.connect();
             }
         }, wait);
     }
-
-    public void shutdown()
-    {
-        try
-        {
-            this.eventLoop.shutdownGracefully().await();
-            this.statsDReceiver.shutdown();
-        }
-        catch (InterruptedException e)
-        {
-        }
-    }
     
-    public void terminate()
+
+    public void stop()
     {
-        try
+        if (this.channel != null)
         {
-            this.eventLoop.shutdownGracefully(1, 2, TimeUnit.SECONDS).await();
-            this.statsDReceiver.shutdown();
+            this.channel.close();
         }
-        catch (InterruptedException e)
-        {
-        }
+        this.client.stop();
+        this.statsDReceiver.shutdown();
     }
     
     private static void configureLogging() throws Exception
@@ -523,6 +423,15 @@ public class BergamotAgent
             BergamotAgent agent = new BergamotAgent();
             agent.configure();
             agent.start();
+            // shutdown hook
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run()
+                {
+                    BergamotAgent.logger.info("Bergamot Agent shutting down");
+                    agent.stop();
+                }
+            });
         }
         catch (Throwable e)
         {

@@ -1,11 +1,13 @@
 package com.intrbiz.bergamot.model.message.agent.check;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.check.netcon")
-public class CheckNetCon extends AgentMessage
+public class CheckNetCon extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     private boolean client = false;
     
     private boolean server = true;
@@ -58,16 +60,9 @@ public class CheckNetCon extends AgentMessage
         this.remoteAddress = remoteAddress;
     }
 
-
-
-    public CheckNetCon(AgentMessage message)
+    public CheckNetCon(Message message)
     {
         super(message);
-    }
-
-    public CheckNetCon(String id)
-    {
-        super(id);
     }
 
     public boolean isClient()

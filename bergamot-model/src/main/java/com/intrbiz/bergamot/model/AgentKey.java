@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 import com.intrbiz.bergamot.data.BergamotDB;
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
 import com.intrbiz.data.db.compiler.meta.Action;
 import com.intrbiz.data.db.compiler.meta.SQLColumn;
 import com.intrbiz.data.db.compiler.meta.SQLForeignKey;
@@ -142,9 +141,9 @@ public class AgentKey implements Serializable
         return this;
     }
     
-    public AgentAuthenticationKey toAgentAuthenticationKey()
+    public AuthenticationKey toAgentAuthenticationKey()
     {
-        return new AgentAuthenticationKey(this.id, this.secret);
+        return new AuthenticationKey(AuthenticationKey.Type.AGENT, this.id, this.secret);
     }
     
     public String toString()

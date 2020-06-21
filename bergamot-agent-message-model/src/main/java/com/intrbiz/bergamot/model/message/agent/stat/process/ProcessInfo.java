@@ -5,11 +5,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.process-info")
-public class ProcessInfo extends AgentType
+public class ProcessInfo extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("pid")
     private long pid;
     

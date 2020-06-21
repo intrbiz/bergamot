@@ -5,14 +5,16 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 /**
  * Execute a shell command on the server
  */
 @JsonTypeName("bergamot.agent.check.shell")
-public class ShellCheck extends AgentMessage
+public class ShellCheck extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("command-line")
     private String commandLine;
     
@@ -29,16 +31,6 @@ public class ShellCheck extends AgentMessage
         super();
         this.commandLine = commandLine;
         this.environment = environment;
-    }
-
-    public ShellCheck(AgentMessage message)
-    {
-        super(message);
-    }
-
-    public ShellCheck(String id)
-    {
-        super(id);
     }
 
     public String getCommandLine()

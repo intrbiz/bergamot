@@ -13,6 +13,8 @@ import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
 
+import io.netty.channel.Channel;
+
 /**
  * A Bergamot Notifier proxy client
  */
@@ -27,7 +29,7 @@ public class ProxyNotifierClient extends ProxyBaseClient implements NotifierClie
     }
 
     @Override
-    protected void handleMessage(Message message)
+    protected void handleMessage(Message message, Channel channel)
     {
         if (message instanceof Notification)
         {

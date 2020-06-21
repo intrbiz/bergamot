@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.stat.uptime")
-public class UptimeStat extends AgentMessage
+public class UptimeStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("uptime")
     private double uptime;
 
@@ -15,14 +17,9 @@ public class UptimeStat extends AgentMessage
         super();
     }
 
-    public UptimeStat(AgentMessage message)
+    public UptimeStat(Message message)
     {
         super(message);
-    }
-
-    public UptimeStat(String id)
-    {
-        super(id);
     }
 
     public double getUptime()

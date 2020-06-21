@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.check.ShellCheck;
 import com.intrbiz.bergamot.model.message.agent.stat.ShellStat;
 import com.intrbiz.bergamot.util.CommandTokeniser;
@@ -36,7 +36,7 @@ public class ShellHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         ShellCheck check = (ShellCheck) request;
         ShellStat stat = new ShellStat(request);

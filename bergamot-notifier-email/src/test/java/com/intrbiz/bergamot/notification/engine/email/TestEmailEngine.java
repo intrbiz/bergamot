@@ -8,7 +8,7 @@ import javax.mail.Message;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.notification.PasswordResetNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
 import com.intrbiz.bergamot.model.message.notification.SendRecovery;
@@ -29,7 +29,7 @@ public class TestEmailEngine extends EmailEngine
     
     private <T> T loadMessage(Class<T> type, String name)
     {
-        BergamotTranscoder transcoder = new BergamotTranscoder();
+        BergamotCoreTranscoder transcoder = new BergamotCoreTranscoder();
         return transcoder.decode(Thread.currentThread().getContextClassLoader().getResourceAsStream(name), type);
     }
     

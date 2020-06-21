@@ -6,8 +6,8 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.intrbiz.bergamot.model.AuthenticationKey;
 import com.intrbiz.bergamot.proxy.client.BergamotProxyClient;
-import com.intrbiz.bergamot.proxy.model.AuthenticationKey;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
 
 import io.netty.channel.Channel;
@@ -27,7 +27,7 @@ public class TestProxyClient
                 .proxyForWorker()
                 .engines(new HashSet<>(Arrays.asList("dummy"))),
             new AuthenticationKey("G7Fq13geaxtCXqoRMgvt_3g1tML6wVOxWOdncRaWnjEyIsUSUaor11KFpw09HC27CFY"), 
-            (msg) -> System.out.println("Got: " + msg)
+            (msg, chn) -> System.out.println("Got: " + msg)
         );
         // Wait to connect
         Channel channel = connectFuture.sync().get();

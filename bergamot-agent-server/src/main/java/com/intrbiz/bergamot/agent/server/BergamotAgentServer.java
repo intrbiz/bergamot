@@ -1,89 +1,70 @@
 package com.intrbiz.bergamot.agent.server;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
-import javax.net.ssl.SSLEngine;
+import com.intrbiz.bergamot.io.BergamotAgentTranscoder;
+import com.intrbiz.bergamot.proxy.BaseBergamotServer;
+import com.intrbiz.bergamot.proxy.auth.KeyResolver;
+import com.intrbiz.bergamot.proxy.model.ClientHeader;
+import com.intrbiz.bergamot.proxy.processor.MessageProcessor;
 
-import org.apache.log4j.Logger;
-
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.ssl.SslHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
 
-public class BergamotAgentServer implements Runnable
-{
-    private static final Logger logger = Logger.getLogger(BergamotAgentServer.class);
+public class BergamotAgentServer extends BaseBergamotServer
+{   
+    private final ConcurrentMap<UUID, BergamotAgentHandler> agents = new ConcurrentHashMap<>();
+    
+    private volatile Consumer<BergamotAgentHandler> onAgentPing;
+    
+    private volatile Consumer<BergamotAgentHandler> onAgentConnect;
+    
+    private volatile Consumer<BergamotAgentHandler> onAgentDisconnect;
 
-    private final int port;
-    
-    private final AgentKeyResolver agentKeyResolver;
-    
-    private final ConcurrentMap<UUID, BergamotAgentServerHandler> agents = new ConcurrentHashMap<UUID, BergamotAgentServerHandler>();
-    
-    private EventLoopGroup bossGroup;
-
-    private EventLoopGroup workerGroup;
-
-    private Thread runner = null;
-    
-    private volatile Consumer<BergamotAgentServerHandler> onAgentPing;
-    
-    private volatile Consumer<BergamotAgentServerHandler> onAgentConnect;
-    
-    private volatile Consumer<BergamotAgentServerHandler> onAgentDisconnect;
-
-    public BergamotAgentServer(int port, AgentKeyResolver agentKeyResolver)
+    public BergamotAgentServer(int port, KeyResolver keyResolver)
     {
-        super();
-        this.port = port;
-        this.agentKeyResolver = agentKeyResolver;
-    }
-    
-    public AgentKeyResolver getAgentKeyResolver()
-    {
-        return this.agentKeyResolver;
+        super(port, "Bergamot Agent", "/agent", BergamotAgentTranscoder.getDefault(), keyResolver);
     }
 
-    private boolean isSecure()
+    @Override
+    protected MessageProcessor create(ClientHeader client, Channel channel)
     {
-        return false;
+        BergamotAgentHandler agent = new BergamotAgentHandler(client, channel, this::fireAgentPing, this::fireAgentConnect, this::fireAgentDisconnect);
+        this.agents.put(agent.getAgentId(), agent);
+        return agent;
     }
-    
-    private SSLEngine createSSLEngine()
+
+    @Override
+    protected void close(MessageProcessor processor)
     {
-        // TODO !!!
-        return null;
+        if (processor instanceof BergamotAgentHandler)
+        {
+            BergamotAgentHandler handler = (BergamotAgentHandler) processor;
+            BergamotAgentHandler agent = this.agents.get(handler.getAgentId());
+            if (agent != null && agent.getNonce().equals(handler.getNonce()))
+            {
+                this.agents.remove(handler.getAgentId(), agent);
+            }
+        }
     }
-    
-    public BergamotAgentServerHandler getAgent(UUID id)
+
+    public BergamotAgent getAgent(UUID id)
     {
         return this.agents.get(id);
     }
     
-    public Collection<BergamotAgentServerHandler> getAgents()
+    public Collection<BergamotAgent> getAgents()
     {
-        return this.agents.values();
+        return Collections.unmodifiableCollection(this.agents.values());
     }
     
     // Event handlers
     
-    public void setOnAgentPingHandler(Consumer<BergamotAgentServerHandler> onAgentPing)
+    public void setOnAgentPingHandler(Consumer<BergamotAgentHandler> onAgentPing)
     {
         synchronized (this)
         {
@@ -92,12 +73,12 @@ public class BergamotAgentServer implements Runnable
         }
     }
     
-    public Consumer<BergamotAgentServerHandler> getOnAgentPing()
+    public Consumer<BergamotAgentHandler> getOnAgentPing()
     {
         return this.onAgentPing;
     }
     
-    public void setOnAgentConnectHandler(Consumer<BergamotAgentServerHandler> onAgentConnect)
+    public void setOnAgentConnectHandler(Consumer<BergamotAgentHandler> onAgentConnect)
     {
         synchronized (this)
         {
@@ -106,12 +87,12 @@ public class BergamotAgentServer implements Runnable
         }
     }
     
-    public Consumer<BergamotAgentServerHandler> getOnAgentConnect()
+    public Consumer<BergamotAgentHandler> getOnAgentConnect()
     {
         return this.onAgentConnect;
     }
     
-    public void setOnAgentDisconnectHandler(Consumer<BergamotAgentServerHandler> onAgentDisconnect)
+    public void setOnAgentDisconnectHandler(Consumer<BergamotAgentHandler> onAgentDisconnect)
     {
         synchronized (this)
         {
@@ -120,85 +101,28 @@ public class BergamotAgentServer implements Runnable
         }
     }
     
-    public Consumer<BergamotAgentServerHandler> getOnAgentDisconnect()
+    public Consumer<BergamotAgentHandler> getOnAgentDisconnect()
     {
         return this.onAgentDisconnect;
     }
     
     // Event Handlers
     
-    public void fireAgentPing(BergamotAgentServerHandler agent)
+    public void fireAgentPing(BergamotAgentHandler agent)
     {
         // fire the agent ping hook
         if (this.onAgentPing != null) this.onAgentPing.accept(agent);
     }
     
-    public void fireAgentConnect(BergamotAgentServerHandler agent)
+    public void fireAgentConnect(BergamotAgentHandler agent)
     {
-        this.agents.put(agent.getAgentId(), agent);
         // fire the agent ping hook
         if (this.onAgentConnect != null) this.onAgentConnect.accept(agent);
     }
     
-    public void fireAgentDisconnect(BergamotAgentServerHandler agent)
+    public void fireAgentDisconnect(BergamotAgentHandler agent)
     {
-        this.agents.remove(agent.getAgentId());
         // fire the agent ping hook
         if (this.onAgentDisconnect != null) this.onAgentDisconnect.accept(agent);
-    }
-
-    // Lifecycle handlers
-    
-    public void run()
-    {
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup();
-        try
-        {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup);
-            b.channel(NioServerSocketChannel.class);
-            b.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator());
-            b.childHandler(new ChannelInitializer<SocketChannel>()
-            {
-                @Override
-                public void initChannel(SocketChannel ch) throws Exception
-                {
-                    SSLEngine engine = isSecure() ? createSSLEngine() : null;
-                    ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast("read-timeout",  new ReadTimeoutHandler(  90 /* seconds */ )); 
-                    pipeline.addLast("write-timeout", new WriteTimeoutHandler( 90 /* seconds */ ));
-                    if (engine != null) pipeline.addLast("ssl", new SslHandler(engine));
-                    pipeline.addLast("codec-http",    new HttpServerCodec());
-                    pipeline.addLast("aggregator",    new HttpObjectAggregator(65536));
-                    pipeline.addLast("handler",       new BergamotAgentServerHandler(BergamotAgentServer.this));
-                }
-            });
-            //
-            Channel ch = b.bind(this.port).sync().channel();
-            logger.info("Web socket server started at port " + this.port + '.');
-            // await the server to stop
-            ch.closeFuture().sync();
-            // log
-            logger.info("Agent server has shutdown");
-        }
-        catch (Exception e)
-        {
-            logger.error("Agent server broke", e);
-        }
-        finally
-        {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
-    }
-
-    public void start()
-    {
-        if (this.runner == null)
-        {
-            this.runner = new Thread(this);
-            this.runner.start();
-        }
     }
 }

@@ -5,7 +5,7 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 import org.hyperic.sigar.Uptime;
 
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.check.CheckUptime;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.UptimeStat;
@@ -26,7 +26,7 @@ public class UptimeInfoHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         try
         {

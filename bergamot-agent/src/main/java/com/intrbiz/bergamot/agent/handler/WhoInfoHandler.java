@@ -5,7 +5,7 @@ import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.SigarProxy;
 import org.hyperic.sigar.Who;
 
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.check.CheckWho;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.WhoStat;
@@ -29,7 +29,7 @@ public class WhoInfoHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         try
         {

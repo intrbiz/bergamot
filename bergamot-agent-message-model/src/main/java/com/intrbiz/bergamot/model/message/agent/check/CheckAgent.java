@@ -1,23 +1,20 @@
 package com.intrbiz.bergamot.model.message.agent.check;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.check.agent")
-public class CheckAgent extends AgentMessage
+public class CheckAgent extends Message
 {
+    private static final long serialVersionUID = 1L;
+
     public CheckAgent()
     {
         super();
     }
 
-    public CheckAgent(AgentMessage message)
+    public CheckAgent(Message message)
     {
         super(message);
-    }
-
-    public CheckAgent(String id)
-    {
-        super(id);
     }
 }

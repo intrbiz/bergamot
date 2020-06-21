@@ -3,7 +3,7 @@ package com.intrbiz.bergamot.model;
 import java.io.Serializable;
 import java.util.EnumSet;
 
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.MessageObject;
 
 public abstract class BergamotObject<T extends MessageObject> implements Serializable, Cloneable
@@ -73,6 +73,6 @@ public abstract class BergamotObject<T extends MessageObject> implements Seriali
 
     public String toJSON()
     {
-        return new BergamotTranscoder().encodeAsString(this.toMO(null));
+        return new BergamotCoreTranscoder().encodeAsString(this.toMO(null));
     }
 }

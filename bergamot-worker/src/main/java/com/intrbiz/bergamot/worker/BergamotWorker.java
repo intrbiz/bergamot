@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.apache.log4j.Logger;
 
@@ -24,7 +24,7 @@ import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.WorkerClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZWorkerClient;
 import com.intrbiz.bergamot.cluster.client.proxy.ProxyWorkerClient;
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
+import com.intrbiz.bergamot.model.AuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.agent.LookupAgentKey;
 import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
@@ -63,7 +63,7 @@ public class BergamotWorker
 
     private volatile CountDownLatch shutdownLatch;
     
-    private final ConcurrentMap<UUID, Consumer<AgentAuthenticationKey>> agentKeyLookups = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, BiConsumer<AuthenticationKey, UUID>> agentKeyLookups = new ConcurrentHashMap<>();
 
     public BergamotWorker()
     {
@@ -170,7 +170,7 @@ public class BergamotWorker
             }
 
             @Override
-            public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
+            public void lookupAgentKey(UUID keyId, BiConsumer<AuthenticationKey, UUID> callback)
             {
                 // TODO: caching
                 // fire off lookup
@@ -284,11 +284,11 @@ public class BergamotWorker
     {
         if (message instanceof FoundAgentKey)
         {
-            Consumer<AgentAuthenticationKey> callback = this.agentKeyLookups.remove(message.getReplyTo());
+            BiConsumer<AuthenticationKey, UUID> callback = this.agentKeyLookups.remove(message.getReplyTo());
             if (callback != null)
             {
                 FoundAgentKey found = (FoundAgentKey) message;
-                callback.accept(found.getKey() == null ? null : new AgentAuthenticationKey(found.getKey()));
+                callback.accept(found.getKey() == null ? null : new AuthenticationKey(found.getKey()), found.getSiteId());
             }
         }
     }

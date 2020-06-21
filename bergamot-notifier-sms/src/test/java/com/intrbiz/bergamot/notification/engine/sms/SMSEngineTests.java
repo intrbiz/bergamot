@@ -4,7 +4,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.ContactMO;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.SendAlert;
@@ -72,7 +72,7 @@ public class SMSEngineTests
     
     private static <T> T loadMessage(Class<T> type, String name)
     {
-        BergamotTranscoder transcoder = new BergamotTranscoder();
+        BergamotCoreTranscoder transcoder = new BergamotCoreTranscoder();
         return transcoder.decode(Thread.currentThread().getContextClassLoader().getResourceAsStream(name), type);
     }
 }

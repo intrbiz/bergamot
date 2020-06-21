@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.Util;
-import com.intrbiz.bergamot.proxy.KeyResolver;
+import com.intrbiz.bergamot.model.AuthenticationKey;
+import com.intrbiz.bergamot.proxy.auth.KeyResolver;
 
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -51,6 +52,10 @@ public class ClientHeader
         public static final String HOST_NAME = HEADER_PREFIX + "host-name";
         
         public static final String INFO = HEADER_PREFIX + "info";
+        
+        public static final String HOST_SUMMARY = HEADER_PREFIX + "host-summary";
+        
+        public static final String TEMPLATE_NAME = HEADER_PREFIX + "template-name";
     }
     
     public static final class BergamotHeaderValues
@@ -202,6 +207,26 @@ public class ClientHeader
     public ClientHeader info(String info)
     {
         return this.attribute(BergamotHeaderNames.INFO, info);
+    }
+    
+    public String getHostSummary()
+    {
+        return this.getAttribute(BergamotHeaderNames.HOST_SUMMARY);
+    }
+    
+    public ClientHeader hostSummary(String hostSummary)
+    {
+        return this.attribute(BergamotHeaderNames.HOST_SUMMARY, hostSummary);
+    }
+    
+    public String getTemplateName()
+    {
+        return this.getAttribute(BergamotHeaderNames.TEMPLATE_NAME);
+    }
+    
+    public ClientHeader templateName(String hostTemplateName)
+    {
+        return this.attribute(BergamotHeaderNames.TEMPLATE_NAME, hostTemplateName);
     }
     
     public long getAuthenticationTimestamp()

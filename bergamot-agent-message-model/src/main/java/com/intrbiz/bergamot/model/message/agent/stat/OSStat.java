@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.stat.os")
-public class OSStat extends AgentMessage
+public class OSStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("arch")
     private String arch;
     
@@ -42,14 +44,9 @@ public class OSStat extends AgentMessage
         super();
     }
 
-    public OSStat(AgentMessage message)
+    public OSStat(Message message)
     {
         super(message);
-    }
-
-    public OSStat(String id)
-    {
-        super(id);
     }
 
     public String getArch()

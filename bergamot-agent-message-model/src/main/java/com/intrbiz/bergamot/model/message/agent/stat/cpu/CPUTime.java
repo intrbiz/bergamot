@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat.cpu;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.cpu-time")
-public class CPUTime extends AgentType
+public class CPUTime extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("total")
     private long total;
     

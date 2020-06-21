@@ -30,7 +30,7 @@ import com.hazelcast.spi.partitiongroup.PartitionGroupStrategy;
 import com.intrbiz.Util;
 import com.intrbiz.bergamot.cluster.util.ZKPaths;
 import com.intrbiz.bergamot.cluster.zookeeper.ZooKeeperManager;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.cluster.NodeRegistration;
 
 /**
@@ -42,7 +42,7 @@ public class HazelcastZooKeeperDiscovery implements DiscoveryStrategy
 
     protected final ZooKeeper zooKeeper;
     
-    protected final BergamotTranscoder transcoder = BergamotTranscoder.getDefaultInstance();
+    protected final BergamotCoreTranscoder transcoder = BergamotCoreTranscoder.getDefault();
     
     protected final DiscoveryNode thisNode;
     

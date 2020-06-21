@@ -1,12 +1,12 @@
 package com.intrbiz.bergamot.agent;
 
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 public interface AgentHandler
 {
     Class<?>[] getMessages();
     
-    AgentMessage handle(AgentMessage request);
+    Message handle(Message request);
     
     void init(BergamotAgent agent);
 }

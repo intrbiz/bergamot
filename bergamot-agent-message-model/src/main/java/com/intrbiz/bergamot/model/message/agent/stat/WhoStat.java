@@ -5,12 +5,14 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.stat.who.WhoInfo;
 
 @JsonTypeName("bergamot.agent.stat.who")
-public class WhoStat extends AgentMessage
+public class WhoStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("users")
     private List<WhoInfo> users = new LinkedList<WhoInfo>();
 
@@ -19,14 +21,9 @@ public class WhoStat extends AgentMessage
         super();
     }
 
-    public WhoStat(AgentMessage message)
+    public WhoStat(Message message)
     {
         super(message);
-    }
-
-    public WhoStat(String id)
-    {
-        super(id);
     }
 
     public List<WhoInfo> getUsers()

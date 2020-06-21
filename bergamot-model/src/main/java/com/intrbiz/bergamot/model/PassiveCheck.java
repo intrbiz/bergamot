@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.config.model.PassiveCheckCfg;
 import com.intrbiz.bergamot.express.BergamotEntityResolver;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.PassiveCheckMO;
 import com.intrbiz.bergamot.model.message.worker.check.RegisterCheck;
 import com.intrbiz.bergamot.model.message.worker.check.UnregisterCheck;
@@ -63,7 +63,7 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
                 logger.error("Error computing parameter value, for check: " + this.getType() + "::" + this.getId() + " " + this.getName() , e);
             }
         }
-        if (logger.isTraceEnabled()) logger.trace("Register check: " + new BergamotTranscoder().encodeAsString(registerCheck));
+        if (logger.isTraceEnabled()) logger.trace("Register check: " + new BergamotCoreTranscoder().encodeAsString(registerCheck));
         return registerCheck;
     }
     
@@ -102,7 +102,7 @@ public abstract class PassiveCheck<T extends PassiveCheckMO, C extends PassiveCh
                 logger.error("Error computing parameter value, for check: " + this.getType() + "::" + this.getId() + " " + this.getName() , e);
             }
         }
-        if (logger.isTraceEnabled()) logger.trace("Unregister check: " + new BergamotTranscoder().encodeAsString(unregisterCheck));
+        if (logger.isTraceEnabled()) logger.trace("Unregister check: " + new BergamotCoreTranscoder().encodeAsString(unregisterCheck));
         return unregisterCheck;
     }
 }

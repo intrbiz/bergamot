@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.codahale.metrics.Metric;
 import com.intrbiz.bergamot.agent.statsd.StatsDProcessor;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.check.CheckMetrics;
 import com.intrbiz.bergamot.model.message.agent.stat.MetricsStat;
 import com.intrbiz.gerald.polyakov.Parcel;
@@ -30,7 +30,7 @@ public class MetricsHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         CheckMetrics metrics = (CheckMetrics) request;
         MetricsStat stat = new MetricsStat(request);

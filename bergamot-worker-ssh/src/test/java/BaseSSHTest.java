@@ -2,19 +2,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.junit.Before;
 
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
+import com.intrbiz.bergamot.model.AuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.CheckEngineContext;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.ssh.SSHEngine;
 
 public abstract class BaseSSHTest
@@ -35,7 +36,7 @@ public abstract class BaseSSHTest
         this.engine.prepare(new CheckEngineContext() {
             
             @Override
-            public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
+            public void lookupAgentKey(UUID keyId, BiConsumer<AuthenticationKey, UUID> callback)
             {
             }
 

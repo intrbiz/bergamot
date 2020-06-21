@@ -6,11 +6,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.check.netio")
-public class CheckNetIO extends AgentMessage
+public class CheckNetIO extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("interfaces")
     private List<String> interfaces = new LinkedList<String>();
     
@@ -19,14 +21,9 @@ public class CheckNetIO extends AgentMessage
         super();
     }
 
-    public CheckNetIO(AgentMessage message)
+    public CheckNetIO(Message message)
     {
         super(message);
-    }
-
-    public CheckNetIO(String id)
-    {
-        super(id);
     }
     
     public CheckNetIO(String... interfaces)

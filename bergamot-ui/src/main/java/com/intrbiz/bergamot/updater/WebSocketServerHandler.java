@@ -12,7 +12,7 @@ import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.BalsaContext;
 import com.intrbiz.balsa.engine.session.BalsaSession;
 import com.intrbiz.balsa.error.BalsaSecurityException;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.Contact;
 import com.intrbiz.bergamot.model.message.api.APIObject;
 import com.intrbiz.bergamot.model.message.api.APIRequest;
@@ -55,7 +55,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object>
 
     private WebSocketServerHandshaker handshaker;
 
-    private BergamotTranscoder transcoder = new BergamotTranscoder();
+    private BergamotCoreTranscoder transcoder = new BergamotCoreTranscoder();
 
     public WebSocketServerHandler(UpdateServer server)
     {

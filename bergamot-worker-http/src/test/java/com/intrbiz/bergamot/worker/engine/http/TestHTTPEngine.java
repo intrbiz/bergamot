@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apache.log4j.BasicConfigurator;
@@ -13,15 +14,15 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.intrbiz.bergamot.model.agent.AgentAuthenticationKey;
+import com.intrbiz.bergamot.model.AuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.agent.ProcessorAgentMessage;
 import com.intrbiz.bergamot.model.message.processor.reading.ReadingParcelMessage;
 import com.intrbiz.bergamot.model.message.processor.result.ActiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.PassiveResult;
 import com.intrbiz.bergamot.model.message.processor.result.ResultMessage;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
-import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 import com.intrbiz.bergamot.worker.engine.CheckEngineContext;
+import com.intrbiz.bergamot.worker.engine.CheckExecutionContext;
 
 @Ignore
 public class TestHTTPEngine
@@ -38,7 +39,7 @@ public class TestHTTPEngine
         this.engine.prepare(new CheckEngineContext() {
 
             @Override
-            public void lookupAgentKey(UUID keyId, Consumer<AgentAuthenticationKey> callback)
+            public void lookupAgentKey(UUID keyId, BiConsumer<AuthenticationKey, UUID> callback)
             {
             }
 

@@ -8,21 +8,15 @@ import java.util.function.BiConsumer;
 
 import org.apache.log4j.Logger;
 
-import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.BergamotConfig;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.cluster.client.ProxyClient;
 import com.intrbiz.bergamot.cluster.client.hz.HZProxyClient;
+import com.intrbiz.bergamot.model.AuthenticationKey;
 import com.intrbiz.bergamot.model.message.processor.proxy.LookupProxyKey;
 import com.intrbiz.bergamot.model.message.proxy.FoundProxyKey;
 import com.intrbiz.bergamot.model.message.proxy.ProxyMessage;
-import com.intrbiz.bergamot.proxy.model.AuthenticationKey;
-import com.intrbiz.bergamot.proxy.model.ClientHeader;
-import com.intrbiz.bergamot.proxy.processor.NotifierProxyProcessor;
-import com.intrbiz.bergamot.proxy.processor.WorkerProxyProcessor;
 import com.intrbiz.bergamot.proxy.server.BergamotProxyServer;
-import com.intrbiz.bergamot.proxy.server.MessageProcessor;
-
-import io.netty.channel.Channel;
 
 public class BergamotProxy
 {
@@ -57,82 +51,6 @@ public class BergamotProxy
         this.client.getProcessorDispatcher().dispatch(lookup);
     }
     
-    protected MessageProcessor.Factory createMessageProcessorFactory()
-    {
-        return new MessageProcessor.Factory()
-        {
-            @Override
-            public MessageProcessor create(ClientHeader clientHeaders, Channel channel)
-            {
-                // What type proxy client is this
-                String proxyFor = clientHeaders.getProxyFor();
-                if (ClientHeader.BergamotHeaderValues.PROXY_FOR_WORKER.equals(proxyFor))
-                {
-                    // create a worker proxy
-                    try
-                    {
-                        return new WorkerProxyProcessor(
-                            clientHeaders, 
-                            channel,
-                            client.registerWorker(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getAllowedSiteIds(), clientHeaders.getWorkerPool(), clientHeaders.getEngines()),
-                            client
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("Failed to register proxy worker", e);
-                    }
-                }
-                else if (ClientHeader.BergamotHeaderValues.PROXY_FOR_NOTIFIER.equals(proxyFor))
-                {
-                    // create a notifier proxy
-                    try
-                    {
-                        return new NotifierProxyProcessor(
-                            clientHeaders, 
-                            channel, 
-                            client.registerNotifier(clientHeaders.getHostName(), clientHeaders.getUserAgent(), clientHeaders.getInfo(), clientHeaders.getAllowedSiteIds(), clientHeaders.getEngines())
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("Failed to register proxy notifier", e);
-                    }
-                }
-                return null;
-            }
-            
-            @Override
-            public void close(MessageProcessor processor)
-            {
-                // TODO: we should retry unregister in the event of an error
-                if (processor instanceof WorkerProxyProcessor)
-                {
-                    try
-                    {
-                        client.unregisterWorker(processor.getId());
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("Failed to unregister proxy worker", e);
-                    }
-                }
-                else if (processor instanceof NotifierProxyProcessor)
-                {
-                    
-                    try
-                    {
-                        client.unregisterNotifier(processor.getId());
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error("Failed to unregister proxy notifier", e);
-                    }
-                }
-            }
-        };
-    }
-
     protected void start() throws Exception
     {
         logger.info("Bergamot Proxy starting....");
@@ -141,7 +59,7 @@ public class BergamotProxy
         logger.info("Connecting to cluster");
         this.client = new HZProxyClient(this::clusterPanic, this.getClass().getSimpleName(), BergamotVersion.fullVersionString());
         // start our server
-        this.server = new BergamotProxyServer(this.port, this::resolveKey, this.createMessageProcessorFactory());
+        this.server = new BergamotProxyServer(this.port, this::resolveKey, this.client);
         this.server.start();
         // start consuming our messages
         this.startConsuming();

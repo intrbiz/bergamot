@@ -1,23 +1,20 @@
 package com.intrbiz.bergamot.model.message.agent.check;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.check.disk")
-public class CheckDisk extends AgentMessage
-{    
+public class CheckDisk extends Message
+{   
+    private static final long serialVersionUID = 1L;
+    
     public CheckDisk()
     {
         super();
     }
 
-    public CheckDisk(AgentMessage message)
+    public CheckDisk(Message message)
     {
         super(message);
-    }
-
-    public CheckDisk(String id)
-    {
-        super(id);
     }
 }

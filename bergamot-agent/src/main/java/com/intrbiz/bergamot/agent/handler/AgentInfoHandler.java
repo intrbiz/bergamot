@@ -1,7 +1,7 @@
 package com.intrbiz.bergamot.agent.handler;
 
 import com.intrbiz.bergamot.agent.BergamotAgent;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.check.CheckAgent;
 import com.intrbiz.bergamot.model.message.agent.error.GeneralError;
 import com.intrbiz.bergamot.model.message.agent.stat.AgentStat;
@@ -22,7 +22,7 @@ public class AgentInfoHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         try
         {

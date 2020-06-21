@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.stat.mem")
-public class MemStat extends AgentMessage
+public class MemStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("ram")
     private long ram;
     
@@ -36,14 +38,9 @@ public class MemStat extends AgentMessage
         super();
     }
 
-    public MemStat(AgentMessage message)
+    public MemStat(Message message)
     {
         super(message);
-    }
-
-    public MemStat(String id)
-    {
-        super(id);
     }
 
     public long getRam()

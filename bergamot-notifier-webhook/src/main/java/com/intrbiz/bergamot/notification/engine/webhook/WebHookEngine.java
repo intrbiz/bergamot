@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import com.intrbiz.accounting.Accounting;
 import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.accounting.model.SendNotificationToContactAccountingEvent;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.notification.CheckNotification;
 import com.intrbiz.bergamot.model.message.notification.Notification;
 import com.intrbiz.bergamot.notification.AbstractNotificationEngine;
@@ -56,7 +56,7 @@ public class WebHookEngine extends AbstractNotificationEngine
     
     private final Timer timer;
     
-    private final BergamotTranscoder transcoder = new BergamotTranscoder();
+    private final BergamotCoreTranscoder transcoder = new BergamotCoreTranscoder();
     
     private Accounting accounting = Accounting.create(WebHookEngine.class);
 

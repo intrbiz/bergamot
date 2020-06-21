@@ -24,7 +24,7 @@ import org.apache.zookeeper.data.ACL;
 import com.intrbiz.bergamot.cluster.registry.model.RegistryEvent;
 import com.intrbiz.bergamot.cluster.registry.model.RegistryEvent.Type;
 import com.intrbiz.bergamot.cluster.util.ZKPaths;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 
 /**
  * A generic registry of things
@@ -35,7 +35,7 @@ public abstract class GenericRegistry<K, V>
     
     protected final ZooKeeper zooKeeper;
     
-    protected final BergamotTranscoder transcoder = BergamotTranscoder.getDefaultInstance();
+    protected final BergamotCoreTranscoder transcoder = BergamotCoreTranscoder.getDefault();
     
     protected final Class<V> dataType;
     

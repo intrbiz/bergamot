@@ -1,23 +1,20 @@
 package com.intrbiz.bergamot.model.message.agent.check;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.check.netif")
-public class CheckNetIf extends AgentMessage
+public class CheckNetIf extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     public CheckNetIf()
     {
         super();
     }
 
-    public CheckNetIf(AgentMessage message)
+    public CheckNetIf(Message message)
     {
         super(message);
-    }
-
-    public CheckNetIf(String id)
-    {
-        super(id);
     }
 }

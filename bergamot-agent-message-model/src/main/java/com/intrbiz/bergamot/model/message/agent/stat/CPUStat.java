@@ -6,14 +6,16 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUInfo;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUTime;
 import com.intrbiz.bergamot.model.message.agent.stat.cpu.CPUUsage;
 
 @JsonTypeName("bergamot.agent.stat.cpu")
-public class CPUStat extends AgentMessage
+public class CPUStat extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("cpu-count")
     private int cpuCount = 0;
 
@@ -40,14 +42,9 @@ public class CPUStat extends AgentMessage
         super();
     }
 
-    public CPUStat(AgentMessage message)
+    public CPUStat(Message message)
     {
         super(message);
-    }
-
-    public CPUStat(String id)
-    {
-        super(id);
     }
 
     public int getCpuCount()

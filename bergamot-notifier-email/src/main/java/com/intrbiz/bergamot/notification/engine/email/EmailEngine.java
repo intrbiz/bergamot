@@ -251,7 +251,7 @@ public class EmailEngine extends TemplatedNotificationEngine
         }
         // helper headers
         message.setHeader("X-Bergamot-Notification-Id", notification.getId().toString());
-        message.setHeader("X-Bergamot-Check-Type", notification.getCheck().getType());
+        message.setHeader("X-Bergamot-Check-Type", notification.getCheck().getMessageType());
         message.setHeader("X-Bergamot-Check-Id", notification.getCheck().getId().toString());
         message.setHeader("X-Bergamot-Check-Status", notification.getCheck().getState().getStatus().toString());
         // sent date

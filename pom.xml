@@ -102,6 +102,7 @@
 
 	<modules>
 	    <!-- Core Model -->
+	    <module>bergamot-message-common</module>
 		<module>bergamot-message-model</module>
 		<module>bergamot-model</module>
 		<module>lamplighter-model</module>
@@ -163,6 +164,7 @@
 		<module>bergamot-cli</module>
 		<!-- Configuration Templates -->
 		<module>bergamot-site-config-template</module>
+		<module>bergamot-agent-client</module>
 	</modules>
 
 	<dependencyManagement>
@@ -395,6 +397,16 @@
 			<dependency>
 				<groupId>com.intrbiz.bergamot</groupId>
 				<artifactId>bergamot-check-jmx</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-message-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intrbiz.bergamot</groupId>
+				<artifactId>bergamot-agent-client</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

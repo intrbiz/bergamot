@@ -6,10 +6,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.agent.util.AgentUtil;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
+import com.intrbiz.bergamot.model.message.ParameterMO;
 import com.intrbiz.bergamot.model.message.agent.check.ExecCheck;
 import com.intrbiz.bergamot.model.message.agent.stat.ExecStat;
-import com.intrbiz.bergamot.model.message.agent.util.Parameter;
 import com.intrbiz.bergamot.nagios.NagiosPluginExecutor;
 import com.intrbiz.bergamot.nagios.model.NagiosPerfData;
 import com.intrbiz.bergamot.nagios.model.NagiosResult;
@@ -36,7 +36,7 @@ public class ExecHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         ExecCheck check = (ExecCheck) request;
         //
@@ -89,9 +89,9 @@ public class ExecHandler extends AbstractAgentHandler
         return stat;
     }
     
-    private static String getParameter(List<Parameter> parameters, String name)
+    private static String getParameter(List<ParameterMO> parameters, String name)
     {
-        for (Parameter parameter : parameters)
+        for (ParameterMO parameter : parameters)
         {
             if (name.equals(parameter.getName()))
                 return parameter.getValue();

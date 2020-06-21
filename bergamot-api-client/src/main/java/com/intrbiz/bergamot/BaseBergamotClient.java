@@ -29,12 +29,12 @@ import com.intrbiz.bergamot.call.SignAgentKey;
 import com.intrbiz.bergamot.credentials.ClientCredentials;
 import com.intrbiz.bergamot.credentials.TokenCredentials;
 import com.intrbiz.bergamot.crypto.util.BergamotTrustManager;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.AuthTokenMO;
 
 public abstract class BaseBergamotClient
 {
-    protected final BergamotTranscoder transcoder = new BergamotTranscoder();
+    protected final BergamotCoreTranscoder transcoder = new BergamotCoreTranscoder();
     
     // the API base url
     protected final String baseURL;
@@ -102,7 +102,7 @@ public abstract class BaseBergamotClient
         this.credentials = new TokenCredentials(token);
     }
     
-    public BergamotTranscoder transcoder()
+    public BergamotCoreTranscoder transcoder()
     {
         return this.transcoder;
     }

@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.config.model.ActiveCheckCfg;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.express.BergamotEntityResolver;
 import com.intrbiz.bergamot.express.BergamotExpressExtensionRegistry;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.ActiveCheckMO;
 import com.intrbiz.bergamot.model.message.worker.check.ExecuteCheck;
 import com.intrbiz.bergamot.model.state.CheckSavedState;
@@ -225,7 +225,7 @@ public abstract class ActiveCheck<T extends ActiveCheckMO, C extends ActiveCheck
         }
         executeCheck.setTimeout(30_000L);
         executeCheck.setScheduled(System.currentTimeMillis());
-        if (logger.isTraceEnabled()) logger.trace("Executing check: " + new BergamotTranscoder().encodeAsString(executeCheck));
+        if (logger.isTraceEnabled()) logger.trace("Executing check: " + new BergamotCoreTranscoder().encodeAsString(executeCheck));
         return executeCheck;
     }
 

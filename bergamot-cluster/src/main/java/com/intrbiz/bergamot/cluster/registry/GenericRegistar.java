@@ -18,7 +18,7 @@ import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
 
 import com.intrbiz.bergamot.cluster.util.ZKPaths;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 
 /**
  * Register items in and out of a registry.
@@ -29,7 +29,7 @@ public abstract class GenericRegistar<K, V>
     
     protected final ZooKeeper zooKeeper;
     
-    protected final BergamotTranscoder transcoder = BergamotTranscoder.getDefaultInstance();
+    protected final BergamotCoreTranscoder transcoder = BergamotCoreTranscoder.getDefault();
     
     protected final Class<V> dataType;
     

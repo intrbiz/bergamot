@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.agent.handler;
 
 import org.hyperic.sigar.OperatingSystem;
 
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.model.message.agent.check.CheckOS;
 import com.intrbiz.bergamot.model.message.agent.stat.OSStat;
 
@@ -21,7 +21,7 @@ public class OSInfoHandler extends AbstractAgentHandler
     }
 
     @Override
-    public AgentMessage handle(AgentMessage request)
+    public Message handle(Message request)
     {
         OSStat stat = new OSStat(request);
         OperatingSystem sys = OperatingSystem.getInstance();

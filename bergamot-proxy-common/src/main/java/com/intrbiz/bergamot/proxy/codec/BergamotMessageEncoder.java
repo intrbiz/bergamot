@@ -1,6 +1,7 @@
 package com.intrbiz.bergamot.proxy.codec;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.intrbiz.bergamot.io.BergamotTranscoder;
 import com.intrbiz.bergamot.model.message.Message;
@@ -13,11 +14,12 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 @Sharable
 public class BergamotMessageEncoder extends MessageToMessageEncoder<Message>
 {
-    private final BergamotTranscoder transcoder = BergamotTranscoder.getDefaultInstance();
+    private final BergamotTranscoder transcoder;
     
-    public BergamotMessageEncoder()
+    public BergamotMessageEncoder(BergamotTranscoder transcoder)
     {
         super();
+        this.transcoder = Objects.requireNonNull(transcoder);
     }
 
     @Override

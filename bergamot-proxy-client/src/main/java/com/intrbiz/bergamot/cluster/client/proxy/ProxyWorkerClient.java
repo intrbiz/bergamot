@@ -20,6 +20,8 @@ import com.intrbiz.bergamot.model.message.proxy.AgentState;
 import com.intrbiz.bergamot.model.message.worker.WorkerMessage;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
 
+import io.netty.channel.Channel;
+
 /**
  * A Bergamot Worker proxy client
  */
@@ -37,7 +39,7 @@ public class ProxyWorkerClient extends ProxyBaseClient implements WorkerClient
     }
 
     @Override
-    protected void handleMessage(Message message)
+    protected void handleMessage(Message message, Channel channel)
     {
         if (message instanceof WorkerMessage)
         {

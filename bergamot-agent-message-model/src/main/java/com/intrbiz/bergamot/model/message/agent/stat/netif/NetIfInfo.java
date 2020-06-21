@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat.netif;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.netif-info")
-public class NetIfInfo extends AgentType
+public class NetIfInfo extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("name")
     private String name;
 

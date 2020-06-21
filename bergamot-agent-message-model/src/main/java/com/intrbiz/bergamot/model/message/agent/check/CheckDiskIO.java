@@ -6,11 +6,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 @JsonTypeName("bergamot.agent.check.diskio")
-public class CheckDiskIO extends AgentMessage
+public class CheckDiskIO extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("devices")
     private List<String> devices = new LinkedList<String>();
     
@@ -19,14 +21,9 @@ public class CheckDiskIO extends AgentMessage
         super();
     }
 
-    public CheckDiskIO(AgentMessage message)
+    public CheckDiskIO(Message message)
     {
         super(message);
-    }
-
-    public CheckDiskIO(String id)
-    {
-        super(id);
     }
     
     public CheckDiskIO(String... devices)

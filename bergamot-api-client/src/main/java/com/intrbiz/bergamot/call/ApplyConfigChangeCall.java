@@ -10,7 +10,7 @@ import com.intrbiz.bergamot.BergamotAPICall;
 import com.intrbiz.bergamot.BergamotAPIException;
 import com.intrbiz.bergamot.BaseBergamotClient;
 import com.intrbiz.bergamot.config.model.BergamotCfg;
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 import com.intrbiz.bergamot.model.message.api.call.AppliedConfigChange;
 import com.intrbiz.bergamot.model.message.api.error.APIError;
 
@@ -18,7 +18,7 @@ public class ApplyConfigChangeCall extends BergamotAPICall<AppliedConfigChange>
 {   
     private BergamotCfg configChange;
     
-    private BergamotTranscoder transcoder = new BergamotTranscoder();
+    private BergamotCoreTranscoder transcoder = new BergamotCoreTranscoder();
     
     public ApplyConfigChangeCall(BaseBergamotClient client)
     {

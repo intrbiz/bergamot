@@ -10,9 +10,9 @@ import org.apache.log4j.Logger;
 
 import com.intrbiz.bergamot.BergamotConfig;
 import com.intrbiz.bergamot.cluster.client.BergamotClient;
+import com.intrbiz.bergamot.model.AuthenticationKey;
 import com.intrbiz.bergamot.model.message.Message;
 import com.intrbiz.bergamot.proxy.client.BergamotProxyClient;
-import com.intrbiz.bergamot.proxy.model.AuthenticationKey;
 import com.intrbiz.bergamot.proxy.model.ClientHeader;
 import com.intrbiz.bergamot.util.HostUtil;
 
@@ -65,7 +65,7 @@ public abstract class ProxyBaseClient implements BergamotClient
         }
     }
     
-    protected abstract void handleMessage(Message message);
+    protected abstract void handleMessage(Message message, Channel channel);
 
     @Override
     public UUID getId()

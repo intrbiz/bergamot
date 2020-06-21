@@ -10,7 +10,7 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.intrbiz.bergamot.io.BergamotTranscoder;
+import com.intrbiz.bergamot.io.BergamotCoreTranscoder;
 
 public abstract class BergamotAPICall<T>
 {
@@ -26,7 +26,7 @@ public abstract class BergamotAPICall<T>
         return this.client;
     }
     
-    protected BergamotTranscoder transcoder()
+    protected BergamotCoreTranscoder transcoder()
     {
         return this.client.transcoder();
     }

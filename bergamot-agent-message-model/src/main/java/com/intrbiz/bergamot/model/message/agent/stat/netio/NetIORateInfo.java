@@ -3,11 +3,13 @@ package com.intrbiz.bergamot.model.message.agent.stat.netio;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.netio-rate-info")
-public class NetIORateInfo extends AgentType
+public class NetIORateInfo extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Transmit rate in B/s
      */

@@ -3,11 +3,13 @@ package com.intrbiz.bergamot.model.message.agent.stat.diskio;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.diskio-rate-info")
-public class DiskIORateInfo extends AgentType
+public class DiskIORateInfo extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Read rate in B/s
      */

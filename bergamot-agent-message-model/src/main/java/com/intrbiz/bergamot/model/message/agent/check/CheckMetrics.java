@@ -2,14 +2,16 @@ package com.intrbiz.bergamot.model.message.agent.check;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentMessage;
+import com.intrbiz.bergamot.model.message.Message;
 
 /**
  * Fetch a batch of metrics from this agent
  */
 @JsonTypeName("bergamot.agent.check.metrics")
-public class CheckMetrics extends AgentMessage
+public class CheckMetrics extends Message
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("metric_name_filter")
     private String metricsNameFilter = ".*";
     
@@ -28,14 +30,9 @@ public class CheckMetrics extends AgentMessage
         this.stripSourceFromMetricName = stripSourceFromMetricName;
     }
 
-    public CheckMetrics(AgentMessage message)
+    public CheckMetrics(Message message)
     {
         super(message);
-    }
-
-    public CheckMetrics(String id)
-    {
-        super(id);
     }
 
     public String getMetricsNameFilter()

@@ -38,10 +38,6 @@
 			<artifactId>gerald-witchcraft</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.intrbiz.bergamot</groupId>
-			<artifactId>bergamot-agent-message-model</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.intrbiz.util</groupId>
 			<artifactId>bootstrap</artifactId>
 		</dependency>

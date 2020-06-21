@@ -2,11 +2,13 @@ package com.intrbiz.bergamot.model.message.agent.stat.disk;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.intrbiz.bergamot.model.message.agent.AgentType;
+import com.intrbiz.bergamot.model.message.MessageObject;
 
 @JsonTypeName("bergamot.agent.model.disk-info")
-public class DiskInfo extends AgentType
+public class DiskInfo extends MessageObject
 {
+    private static final long serialVersionUID = 1L;
+    
     @JsonProperty("mount")
     private String mount;
 
