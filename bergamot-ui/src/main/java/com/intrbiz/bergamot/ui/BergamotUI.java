@@ -10,8 +10,8 @@ import com.intrbiz.Util;
 import com.intrbiz.accounting.AccountingManager;
 import com.intrbiz.balsa.BalsaApplication;
 import com.intrbiz.balsa.engine.impl.session.HazelcastSessionEngine;
-import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.BergamotConfig;
+import com.intrbiz.bergamot.BergamotVersion;
 import com.intrbiz.bergamot.accounting.consumer.BergamotLoggingConsumer;
 import com.intrbiz.bergamot.data.BergamotDB;
 import com.intrbiz.bergamot.model.GlobalSetting;
@@ -50,6 +50,7 @@ import com.intrbiz.bergamot.ui.api.TestAPIRouter;
 import com.intrbiz.bergamot.ui.api.TimePeriodAPIRouter;
 import com.intrbiz.bergamot.ui.api.TrapAPIRouter;
 import com.intrbiz.bergamot.ui.api.UtilAPIRouter;
+import com.intrbiz.bergamot.ui.api.global.GlobalSiteAPIRouter;
 import com.intrbiz.bergamot.ui.express.BergamotCSSVersion;
 import com.intrbiz.bergamot.ui.express.BergamotJSVersion;
 import com.intrbiz.bergamot.ui.express.BergamotUpdateURL;
@@ -305,6 +306,7 @@ public class BergamotUI extends BalsaApplication
         router(new AgentAPIRouter());
         router(new ProxyAPIRouter());
         router(new LamplighterAPIRouter());
+        router(new GlobalSiteAPIRouter());
     }
     
     @Override

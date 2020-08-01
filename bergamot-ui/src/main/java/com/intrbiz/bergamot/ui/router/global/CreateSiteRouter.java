@@ -20,7 +20,7 @@ import com.intrbiz.metadata.Template;
 @RequireValidPrincipal()
 @RequirePermission("ui.admin")
 public class CreateSiteRouter extends Router<BergamotUI>
-{   
+{
     @Before()
     @Any("**")
     @WithDataAdapter(BergamotDB.class)
@@ -33,7 +33,7 @@ public class CreateSiteRouter extends Router<BergamotUI>
     public void showCreateSite() throws Exception
     {
         // create our installation form model
-        InstallBean install = createSessionModel("install", InstallBean.class);
+        CreateSiteRequest install = createSessionModel("install", CreateSiteRequest.class);
         install.setSiteName("new." + balsa().request().getServerName());
         install.setSiteSummary("Bergamot Monitoring");
         // show the create site
@@ -47,7 +47,7 @@ public class CreateSiteRouter extends Router<BergamotUI>
         // decode the form
         decodeOnly("global/site/create");
         // create the site
-        InstallBean bean = sessionModel("install");
+        CreateSiteRequest bean = sessionModel("install");
         action("site-create", bean);
         // done!
         redirect(path("/global/admin/"));

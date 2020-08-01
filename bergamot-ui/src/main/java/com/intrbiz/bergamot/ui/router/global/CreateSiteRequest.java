@@ -2,7 +2,7 @@ package com.intrbiz.bergamot.ui.router.global;
 
 import java.io.Serializable;
 
-public class InstallBean implements Serializable
+public class CreateSiteRequest implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -24,7 +24,7 @@ public class InstallBean implements Serializable
     
     private String confirmPassword;
     
-    public InstallBean()
+    public CreateSiteRequest()
     {
         super();
     }

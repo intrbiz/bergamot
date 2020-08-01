@@ -53,7 +53,7 @@ public class FirstInstallRouter extends Router<BergamotUI>
             redirect(path("/"));
         }
         // create our installation form model
-        InstallBean install = createSessionModel("install", InstallBean.class);
+        CreateSiteRequest install = createSessionModel("install", CreateSiteRequest.class);
         install.setSiteName(balsa().request().getServerName());
         install.setSiteSummary("Bergamot Monitoring");
         // show the first install step
@@ -92,7 +92,7 @@ public class FirstInstallRouter extends Router<BergamotUI>
     public void goCreateSite(BergamotDB db) throws Exception
     {
         // create the site
-        InstallBean install = sessionModel("install");
+        CreateSiteRequest install = sessionModel("install");
         action("site-install", install);
         // done!
         encode("global/install/complete");

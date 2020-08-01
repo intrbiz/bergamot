@@ -212,7 +212,7 @@ public class APIRouter extends Router<BergamotUI>
      */
     @Title("Generate temporary authentication token")
     @Desc({
-        "Temporary authentication tokens last for 1 hour from creation and can be used to authorize subsequent requests to the Bergamot Monitoring API wit the same level of access as requestor."
+        "Temporary authentication tokens last for 1 hour from creation and can be used to authorize subsequent requests to the Bergamot Monitoring API with the same level of access as the requestor."
     })
     @Get("/auth-token")
     @JSON()

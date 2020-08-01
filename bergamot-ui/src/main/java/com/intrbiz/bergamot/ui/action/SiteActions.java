@@ -26,7 +26,7 @@ import com.intrbiz.bergamot.model.Site;
 import com.intrbiz.bergamot.model.message.event.site.DeinitSite;
 import com.intrbiz.bergamot.model.message.event.site.InitSite;
 import com.intrbiz.bergamot.ui.BergamotUI;
-import com.intrbiz.bergamot.ui.router.global.InstallBean;
+import com.intrbiz.bergamot.ui.router.global.CreateSiteRequest;
 import com.intrbiz.configuration.CfgParameter;
 import com.intrbiz.metadata.Action;
 
@@ -52,7 +52,7 @@ public class SiteActions implements BalsaAction<BergamotUI>
     }
     
     @Action("site-create")
-    public UUID createSite(InstallBean install) throws Exception
+    public Site createSite(CreateSiteRequest install) throws Exception
     {
         // the site name
         UUID   siteId      = Site.randomSiteId();
@@ -127,18 +127,18 @@ public class SiteActions implements BalsaAction<BergamotUI>
         }
         // all done
         logger.info("Created the site '" + siteName + "' and imported the default configuration, have fun :)");
-        return siteId;
+        return site;
     }
     
     @Action("site-install")
-    public void installSite(InstallBean install) throws Exception
+    public void installSite(CreateSiteRequest install) throws Exception
     {
-        UUID siteId = this.createSite(install);
+        Site site = this.createSite(install);
         // mark first install as complete
         try (BergamotDB db = BergamotDB.connect())
         {
             // add our newly created admin to the global admin list
-            Contact theAdmin = db.getContactByName(siteId, install.getUsername());
+            Contact theAdmin = db.getContactByName(site.getId(), install.getUsername());
             GlobalSetting globalAdmins = new GlobalSetting(GlobalSetting.NAME.GLOBAL_ADMINS);
             globalAdmins.addParameter(theAdmin.getId().toString(), "true");
             db.setGlobalSetting(globalAdmins);
