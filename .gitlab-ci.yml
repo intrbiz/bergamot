@@ -8,7 +8,7 @@ prep:
   image: 'opensuse/tumbleweed:latest'
   stage: prep
   script: 
-    - 'zypper -q -n ref && zypper -q -n in buildah'
+    - 'zypper -q -n ref && zypper -q -n in buildah cni cni-plugins'
     - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - "cd containers && ./build_base.sh"
   
@@ -59,7 +59,7 @@ containers:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: containers
   script: 
-    - 'zypper -q -n ref && zypper -q -n in buildah'
+    - 'zypper -q -n ref && zypper -q -n in buildah cni cni-plugins'
     - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - 'cd containers && ./build_apps.sh'
 
