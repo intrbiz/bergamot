@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from struct import unpack, pack
 import uuid
@@ -14,15 +12,22 @@ class AuthKey:
         key = key + ''.join('=' for i in range(len(key) % 4))
         key_binary = urlsafe_b64decode(key)
         magic = unpack('!H', key_binary[0:2]);
-        if (magic[0] & 0xFFF0) == 0x1BB0:
+        if (magic[0] & 0xFF00) == 0x1B00:
             self.version = magic[0] & 0xF
             if self.version == 1:
+                self.key_type = magic[0] & 0xF0
                 self.key_id = uuid.UUID(bytes=key_binary[2:18])
                 self.secret = key_binary[18:len(key_binary)]
             else:
-                raise Exception("Unsupported version")
+                raise Exception("AuthKey: Unsupported version")
         else:
-            raise Exception("Bad magic")
+            raise Exception("AuthKey: Bad magic")
+    
+    def is_proxy_key(self):
+        return self.key_type == 0xB0;
+    
+    def is_agent_key(self):
+        return self.key_type == 0xA0;
     
     def get_version(self):
         return self.version
@@ -48,7 +53,7 @@ class ClientHeaders:
         self.attrs = {}
         self.id = id
         self.timestamp = int(time.time())
-        self.user_agent = 'Python Bergamot Proxy Client'
+        self.user_agent = 'Bergamot Client [Python]'
     
     def _header_name(self, short_name):
         return 'x-bergamot-' + short_name
@@ -87,6 +92,11 @@ class ClientHeaders:
         if info != None:
             self._attr('info', info)
         return self
+    
+    def with_template_name(self, template_name):
+        if template_name != None:
+            self._attr('template-name', template_name)
+        return self    
     
     def with_user_agent(self, user_agent):
         if user_agent != None and user_agent != '':

@@ -27,6 +27,7 @@ public class CheckProcess extends Message
     /**
      * Flatten the command line and match against that?
      */
+    @JsonProperty("flatten_command")
     private boolean flattenCommand = false;
     
     /**

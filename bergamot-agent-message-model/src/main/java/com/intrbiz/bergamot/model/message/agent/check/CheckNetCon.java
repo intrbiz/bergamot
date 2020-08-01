@@ -1,5 +1,6 @@
 package com.intrbiz.bergamot.model.message.agent.check;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.intrbiz.bergamot.model.message.Message;
 
@@ -8,36 +9,46 @@ public class CheckNetCon extends Message
 {
     private static final long serialVersionUID = 1L;
     
+    @JsonProperty("client")
     private boolean client = false;
     
+    @JsonProperty("server")
     private boolean server = true;
     
+    @JsonProperty("tcp")
     private boolean tcp = true;
     
+    @JsonProperty("udp")
     private boolean udp = true;
     
+    @JsonProperty("unix")
     private boolean unix = false;
     
+    @JsonProperty("raw")
     private boolean raw = false;
     
     /**
      * Optionally filter on the local port;
      */
+    @JsonProperty("local-port")
     private int localPort = 0;
     
     /**
      * Optionally filter on the remote port;
      */
+    @JsonProperty("remote-port")
     private int remotePort = 0;
     
     /**
      * Optionally filter on the local address;
      */
+    @JsonProperty("local-address")
     private String localAddress;
     
     /**
      * Optionally filter on the remote address;
      */
+    @JsonProperty("remote-sddress")
     private String remoteAddress;
     
     public CheckNetCon()

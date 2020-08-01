@@ -1,13 +1,3 @@
-#!/usr/bin/python3
-
-from bergamot.auth import ClientHeaders, AuthKey
-from bergamot.message import *
-import uuid
-import websocket
-import json
-import time
-
-
 class BaseBergamotWorkerEngine:
     def get_name(self):
         raise Exception('Unimplemented')

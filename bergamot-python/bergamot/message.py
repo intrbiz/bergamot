@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-
-
 #{
 #  "type" : "bergamot.worker.check.execute",
 #  "id" : "d2dd562d-05ee-4086-889e-2b8d4ea447a0",

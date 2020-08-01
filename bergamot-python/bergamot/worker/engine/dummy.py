@@ -1,6 +1,4 @@
-#!/usr/bin/python3
-
-from bergamot.worker_api import *
+from bergamot.agent.api import *
 
 
 class BergamotDummyWorkerEngine(BaseBergamotWorkerEngine):

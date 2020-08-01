@@ -1,27 +1,32 @@
-#!/usr/bin/python3
-
 from bergamot.auth import ClientHeaders, AuthKey
 from bergamot.message import *
-from bergamot.worker_api import *
+from bergamot.worker.api import *
 import uuid
 import websocket
 import json
 import time
-
+import socket
 
 class BergamotWorker:
     def __init__(self):
+        self.engines = {}
         self.id = uuid.uuid4()
         self.url = None
-        self.engines = {}
-        self.worker_pool = None;
-        self.host_name = None;
-        self.info = '';
-        self.auth_key = None;
+        self.auth_key = None
+        self.worker_pool = None
+        self.host_name = None
+        self.info = ''
     
-    def configure(self):
-        self.url = 'ws://127.0.0.1:14080/proxy'
-        self.auth_key = AuthKey('G7EiyxnJRkxGpqvZ5cYg5ygz0eKHFdegce8cqEgEdTCRN0nBc_cqkBWKt82N4MuE9H4')
+    def configure(self, config):
+        # required config
+        self.url = config['url']
+        self.auth_key = AuthKey(config['auth_key'])
+        if not self.auth_key.is_proxy_key():
+            raise Exception("Incorrect key type, was expecting a proxy key")
+        # optional config
+        self.worker_pool = config.get('worker_pool')
+        self.host_name = config.get('host_name', socket.gethostname())
+        self.info = config.get('info', 'Bergamot Monitoring 4.0.0 [Python] (Red Beard)')
     
     def register_engine(self, worker):
         self.engines[worker.get_name()] = worker
@@ -39,8 +44,8 @@ class BergamotWorker:
         try:
             engine = self.engines.get(check.engine())
             engine.execute(check, BergamotWorkerCheckContext(check, self))
-        except:
-            print("Error processing check")
+        except Exception as e:
+            print("Error processing check: " + str(e))
     
     def _engine_names(self):
         return self.engines.keys()
@@ -63,7 +68,7 @@ class BergamotWorker:
         print("### open ###")
 
     def run(self):
-        self.headers = ClientHeaders(self.id).proxy_for_worker().with_engines(self._engine_names()).with_worker_pool(self.worker_pool).with_host_name(self.host_name).with_info(self.info).sign(self.auth_key)
+        self.headers = ClientHeaders(self.id).with_user_agent("BergamotWorker [Python]").proxy_for_worker().with_engines(self._engine_names()).with_worker_pool(self.worker_pool).with_host_name(self.host_name).with_info(self.info).sign(self.auth_key)
         self.socket = websocket.WebSocketApp(self.url, 
                                              on_open = lambda ws: self.on_open(ws), 
                                              on_message = lambda ws, message: self.on_message(ws, message), 
