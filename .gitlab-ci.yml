@@ -4,17 +4,32 @@ stages:
   - containers
   - sync
 
-prep:
+prep_x86_64:
   image: 'opensuse/tumbleweed:latest'
   stage: prep
+  tags:
+    - x86_64
+    - docker
   script: 
     - 'zypper -q -n ref && zypper -q -n in buildah cni cni-plugins'
+    - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
+    - "cd containers && ./build_base.sh"
+    
+prep_arm64:
+  stage: prep
+  tags:
+    - arm64
+    - shell
+  script: 
     - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - "cd containers && ./build_base.sh"
   
 build:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: build
+  tags:
+    - x86_64
+    - docker
   except:
     - tags
   services:
@@ -36,6 +51,9 @@ build:
 release:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: build
+  tags:
+    - x86_64
+    - docker
   only:
     - tags
   services:
@@ -58,6 +76,9 @@ release:
 containers:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: containers
+  tags:
+    - x86_64
+    - docker
   script: 
     - 'zypper -q -n ref && zypper -q -n in buildah cni cni-plugins'
     - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
@@ -66,6 +87,9 @@ containers:
 sync:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: sync
+  tags:
+    - x86_64
+    - docker
   script:
     - 'git checkout $CI_COMMIT_REF_NAME'
     - 'git status'
