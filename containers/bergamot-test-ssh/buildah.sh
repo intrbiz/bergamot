@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 NAME=$1
-ID=$(buildah from docker.io/opensuse/tumbleweed:latest)
+TAG_SUFFIX=$2
+ID=$(buildah from docker.io/opensuse/tumbleweed:latest${TAG_SUFFIX})
 buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 2222 --entrypoint '/entrypoint.sh' $ID
 
 # Install SSH and some other stuff
