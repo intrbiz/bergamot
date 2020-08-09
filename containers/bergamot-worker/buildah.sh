@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 NAME=$1
-ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest)
+TAG_SUFFIX=$2
+ID=$(buildah from docker.io/bergamotmonitoring/bergamot-base:latest${TAG_SUFFIX})
 buildah config --author='Chris Ellis <chris@intrbiz.com>' --port 15080 --port 8161 --port 9002 --workingdir '/opt/bergamot/worker' --cmd '/entrypoint.sh' $ID
 
 # Setup our directories

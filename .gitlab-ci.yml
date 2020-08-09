@@ -73,7 +73,7 @@ release:
       - '*/target/*.tar.gz'
       - '*/target/*.sql'
 
-containers:
+containers_x86_64:
   image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
   stage: containers
   tags:
@@ -81,6 +81,16 @@ containers:
     - docker
   script: 
     - 'zypper -q -n ref && zypper -q -n in buildah cni cni-plugins'
+    - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
+    - 'cd containers && ./build_apps.sh'
+
+containers_arm64:
+  image: 'docker.io/bergamotmonitoring/bergamot-build:latest'
+  stage: containers
+  tags:
+    - arm64
+    - shell
+  script: 
     - 'echo "${DOCKER_PASS}" | buildah login --username "bergamotmonitoring" --password-stdin docker.io'
     - 'cd containers && ./build_apps.sh'
 
