@@ -16,7 +16,7 @@ function build_app {
     TAG_SUFFIX=$(get_tag_suffix)
     echo "Building application container $NAME version ${BERGAMOT_VERSION}${TAG_SUFFIX}"
     cd $NAME
-    ./buildah.sh "bergamotmonitoring/$NAME:${BERGAMOT_VERSION}" "${TAG_SUFFIX}"
+    ./buildah.sh "bergamotmonitoring/$NAME:${BERGAMOT_VERSION}${TAG_SUFFIX}" "${TAG_SUFFIX}"
     buildah push "bergamotmonitoring/$NAME:${BERGAMOT_VERSION}${TAG_SUFFIX}" "docker://docker.io/bergamotmonitoring/$NAME:${BERGAMOT_VERSION}${TAG_SUFFIX}"
     cd ..
 }
