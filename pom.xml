@@ -24,7 +24,7 @@
 		<intrbiz.core.version>1.0.1</intrbiz.core.version>
 		<bouncycastle.version>1.64</bouncycastle.version>
 		<jackson.version>[2.10,)</jackson.version>
-		<u2f.version>0.19.9</u2f.version>
+		<u2f.version>0.19.11</u2f.version>
 		<jsoup.version>[1.8,)</jsoup.version>
 		<jsch.version>0.1.54</jsch.version>
 		<twilio.version>[7.17,)</twilio.version>
