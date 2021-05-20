@@ -22,7 +22,7 @@
 		<intrbiz.balsa.plugin.version>5.1.3</intrbiz.balsa.plugin.version>
 		<intrbiz.express.version>4.1.2</intrbiz.express.version>
 		<intrbiz.core.version>1.0.1</intrbiz.core.version>
-		<bouncycastle.version>1.64</bouncycastle.version>
+		<bouncycastle.version>1.66</bouncycastle.version>
 		<jackson.version>[2.10,)</jackson.version>
 		<u2f.version>0.19.9</u2f.version>
 		<jsoup.version>[1.8,)</jsoup.version>
