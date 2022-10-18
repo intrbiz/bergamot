@@ -33,7 +33,7 @@
 		<hazelcast.aws.version>3.1</hazelcast.aws.version>
 		<hazelcast.kubernetes.version>2.0.1</hazelcast.kubernetes.version>
 		<postgresql.version>42.2.12</postgresql.version>
-		<mysql.version>8.0.20</mysql.version>
+		<mysql.version>8.0.31</mysql.version>
 		<netty.version>4.1.44.Final</netty.version>
 		<log4j.version>1.2.14</log4j.version>
 		<java.mail.version>[1.5,)</java.mail.version>
