@@ -29,7 +29,7 @@
 		<jsch.version>0.1.54</jsch.version>
 		<twilio.version>[7.17,)</twilio.version>
 		<aws.sns.version>1.11.744</aws.sns.version>
-		<hazelcast.version>4.0</hazelcast.version>
+		<hazelcast.version>5.2.5</hazelcast.version>
 		<hazelcast.aws.version>3.1</hazelcast.aws.version>
 		<hazelcast.kubernetes.version>2.0.1</hazelcast.kubernetes.version>
 		<postgresql.version>42.2.12</postgresql.version>
